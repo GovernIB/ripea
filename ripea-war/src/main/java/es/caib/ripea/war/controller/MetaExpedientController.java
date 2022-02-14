@@ -445,9 +445,11 @@ public class MetaExpedientController extends BaseAdminController {
 				}
 			}
 			
-			
 			metaExpedientExport.setCodi(command.getCodi());
+			metaExpedientExport.setNom(command.getCodi());
+			metaExpedientExport.setDescripcio(command.getDescripcio());
 			metaExpedientExport.setClassificacioSia(command.getClassificacioSia());
+			metaExpedientExport.setSerieDocumental(command.getSerieDocumental());
 
 			if (command.getOrganGestorId() != null) {
 				OrganGestorDto organ = new OrganGestorDto();
@@ -535,9 +537,12 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 		}
 		
-		
 		metaExpedientImportEditCommand.setCodi(metaExpedientExport.getCodi());
+		metaExpedientImportEditCommand.setNom(metaExpedientExport.getCodi());
+		metaExpedientImportEditCommand.setDescripcio(metaExpedientExport.getDescripcio());
 		metaExpedientImportEditCommand.setClassificacioSia(metaExpedientExport.getClassificacioSia());
+		metaExpedientImportEditCommand.setSerieDocumental(metaExpedientExport.getSerieDocumental());
+		
 		metaExpedientImportEditCommand.setComu(metaExpedientExport.isComu());
 		if (!metaExpedientExport.isComu()) {
 			OrganGestorDto organGestorDto = null;
@@ -648,12 +653,12 @@ public class MetaExpedientController extends BaseAdminController {
 			codiDir3 = entitatActual.getUnitatArrel();
 		}
 //		codiDir3 = "A04003003";
-//		command.setClassificacioSia("874212");
+//		command.setClassificacioSia("879427");
 		
 		try {
 			
 			ProcedimentDto procedimentDto = metaExpedientService.findProcedimentByCodiSia(entitatActual.getId(), codiDir3, command.getClassificacioSia());
-
+			
 			if (procedimentDto == null) {
 				return getModalControllerReturnValueWarning(
 						request,
@@ -673,14 +678,14 @@ public class MetaExpedientController extends BaseAdminController {
 				}
 			}
 			
-			
 			MetaExpedientCommand metaExpedientCommand = (MetaExpedientCommand)model.asMap().get("metaExpedientCommand");
 			metaExpedientCommand.setClassificacioSia(command.getClassificacioSia());
 			metaExpedientCommand.setNom(procedimentDto.getNom());
 			metaExpedientCommand.setDescripcio(procedimentDto.getResum());
-			
 			metaExpedientCommand.setComu(procedimentDto.isComu());
-			metaExpedientCommand.setOrganGestorId(procedimentDto.getOrganId());
+			if (!procedimentDto.isComu()) {
+				metaExpedientCommand.setOrganGestorId(procedimentDto.getOrganId());
+			}
 			
 			
 		} catch (Exception e) {
