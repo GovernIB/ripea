@@ -40,6 +40,8 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private String registreNumeroFormatat;
 	
 	private boolean ambRegistres;
+	private OrganGestorDto emisor;
+	
 	
 	@Override
 	public String getDestinatari() {

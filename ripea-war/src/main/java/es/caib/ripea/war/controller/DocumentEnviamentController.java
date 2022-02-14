@@ -187,8 +187,11 @@ public class DocumentEnviamentController extends BaseUserController {
 		documentService.notificacioActualitzarEstat(
 				identificador, 
 				referencia);
-		return null;
 		
+		MissatgesHelper.success(
+				request, 
+				"actualized!");
+		 return modalUrlTancar();
 	}
 
 	
@@ -217,7 +220,7 @@ public class DocumentEnviamentController extends BaseUserController {
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
 					"expedient.controller.notificacio.justificant.ko");
 		}
-		return null;
+		return "notificacioForm";
 	}
 	
 	

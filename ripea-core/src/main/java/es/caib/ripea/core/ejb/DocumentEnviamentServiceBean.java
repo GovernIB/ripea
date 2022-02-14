@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -132,10 +133,12 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 	@RolesAllowed("tothom")
 	public List<DocumentEnviamentDto> findAmbExpedient(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId, 
+			DocumentEnviamentTipusEnumDto documentEnviamentTipus) {
 		return delegate.findAmbExpedient(
 				entitatId,
-				expedientId);
+				expedientId, 
+				documentEnviamentTipus);
 	}
 
 	@Override
@@ -174,9 +177,14 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public int enviamentsCount(Long entitatId,
-			Long expedientId) {
-		return delegate.enviamentsCount(entitatId, expedientId);
+	public int enviamentsCount(
+			Long entitatId,
+			Long expedientId, 
+			DocumentEnviamentTipusEnumDto documentEnviamentTipus) {
+		return delegate.enviamentsCount(
+				entitatId, 
+				expedientId, 
+				documentEnviamentTipus);
 	}
 
 	@Override

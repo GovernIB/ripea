@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
@@ -377,7 +378,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Override
 	public List<DocumentEnviamentDto> findAmbExpedient(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId, 
+			DocumentEnviamentTipusEnumDto documentEnviamentTipus) {
 		logger.debug("Obtenint la llista d'enviaments de l'expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
@@ -390,21 +392,27 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				false, false, null);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
-		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByCreatedDateDesc(expedient);
-		for (DocumentNotificacioEntity notificacio: notificacions) {
-			resposta.add(
-					conversioTipusHelper.convertir(
-							notificacio,
-							DocumentNotificacioDto.class));
+
+		if (documentEnviamentTipus == DocumentEnviamentTipusEnumDto.NOTIFICACIO) {
+			List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByCreatedDateDesc(
+					expedient);
+			for (DocumentNotificacioEntity notificacio: notificacions) {
+				resposta.add(
+						conversioTipusHelper.convertir(
+								notificacio,
+								DocumentNotificacioDto.class));
+			}
+		} else if (documentEnviamentTipus == DocumentEnviamentTipusEnumDto.PUBLICACIO) {
+			List<DocumentPublicacioEntity> publicacions = documentPublicacioRepository.findByExpedientOrderByEnviatDataAsc(
+					expedient);
+			for (DocumentPublicacioEntity publicacio: publicacions) {
+				resposta.add(
+						conversioTipusHelper.convertir(
+								publicacio,
+								DocumentPublicacioDto.class));
+			}
 		}
-		List<DocumentPublicacioEntity> publicacions = documentPublicacioRepository.findByExpedientOrderByEnviatDataAsc(
-				expedient);
-		for (DocumentPublicacioEntity publicacio: publicacions) {
-			resposta.add(
-					conversioTipusHelper.convertir(
-							publicacio,
-							DocumentPublicacioDto.class));
-		}
+
 		return resposta;
 	}
 	
@@ -414,7 +422,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Override
 	public int enviamentsCount(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId, 
+			DocumentEnviamentTipusEnumDto documentEnviamentTipus) {
 		logger.debug("Obtenint enviaments count (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
@@ -425,18 +434,24 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				true,
 				false,
 				false,
-				false, false, null);
+				false, 
+				false, 
+				null);
 		
 		int count = 0;
-		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);
-		for (DocumentNotificacioEntity notificacio: notificacions) {
-			count++;
+		if (documentEnviamentTipus == DocumentEnviamentTipusEnumDto.NOTIFICACIO) {
+			List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByExpedientOrderByEnviatDataAsc(expedient);
+			for (DocumentNotificacioEntity notificacio: notificacions) {
+				count++;
+			}
+		} else if (documentEnviamentTipus == DocumentEnviamentTipusEnumDto.PUBLICACIO) {
+			List<DocumentPublicacioEntity> publicacions = documentPublicacioRepository.findByExpedientOrderByEnviatDataAsc(
+					expedient);
+			for (DocumentPublicacioEntity publicacio: publicacions) {
+				count++;
+			}
 		}
-		List<DocumentPublicacioEntity> publicacions = documentPublicacioRepository.findByExpedientOrderByEnviatDataAsc(
-				expedient);
-		for (DocumentPublicacioEntity publicacio: publicacions) {
-			count++;
-		}
+
 		return count;
 	}
 	

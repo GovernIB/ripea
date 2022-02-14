@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -117,6 +119,10 @@ public abstract class DocumentEnviamentDto extends AuditoriaDto implements Compa
 	}
 	public void setAnnexos(List<DocumentDto> annexos) {
 		this.annexos = annexos;
+	}
+	public String getProcessatDataString() {
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");  
+		return dateFormat.format(this.processatData);  
 	}
 
 	public boolean isNotificacio() {

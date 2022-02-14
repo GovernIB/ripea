@@ -14,6 +14,8 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -68,6 +70,10 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	private Integer registreNumero;
 	@Column(name="not_env_registre_num_formatat", length = 50)
 	private String registreNumeroFormatat;
+	
+	@ManyToOne(optional = true)
+	@JoinColumn(name = "not_emisor_id")
+	private OrganGestorEntity emisor;
 	
 	@OneToMany(
 			mappedBy = "notificacio",
@@ -190,6 +196,10 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;
+			return this;
+		}
+		public Builder emisor(OrganGestorEntity emisor) {
+			built.emisor = emisor;
 			return this;
 		}
 		public DocumentNotificacioEntity build() {

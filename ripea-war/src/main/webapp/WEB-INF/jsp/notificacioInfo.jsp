@@ -87,6 +87,10 @@ $(document).ready(function(){
 					<table class="table table-bordered">
 						<tbody>
 						<tr>						
+							<td><strong><spring:message code="notificacio.info.camp.emisor"/></strong></td>
+							<td>${notificacio.emisor.nom} <br> <small>${notificacio.emisor.codi}</small> </td>				
+						</tr>						
+						<tr>						
 							<td><strong><spring:message code="notificacio.info.camp.concepte"/></strong></td>
 							<td>${notificacio.assumpte}</td>				
 						</tr>						
@@ -103,10 +107,12 @@ $(document).ready(function(){
 							<td><strong><spring:message code="notificacio.info.camp.data"/></strong></td>
 							<td><fmt:formatDate value="${notificacio.createdDate}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 						</tr>
-						<tr>				
-							<td><strong><spring:message code="notificacio.info.camp.dataFinalitzada"/></strong></td>
-							<td><fmt:formatDate value="${notificacio.processatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
-						</tr>										
+						<c:if test="${notificacio.notificacioEstat=='FINALITZADA' || notificacio.notificacioEstat=='PROCESSADA'}">						
+							<tr>				
+								<td><strong><spring:message code="notificacio.info.camp.dataFinalitzada"/></strong></td>
+								<td><fmt:formatDate value="${notificacio.processatData}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+							</tr>	
+						</c:if>									
 						<tr>						
 							<td><strong><spring:message code="notificacio.info.camp.tipus"/></strong></td>
 							<td><spring:message code="notificacio.tipus.enum.${notificacio.tipus}"/></td>
