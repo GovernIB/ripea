@@ -361,6 +361,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		try {
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			if (expedientPeticioEntity.getExpedient() == null) {
+				throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+			}
 			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId());
 
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);

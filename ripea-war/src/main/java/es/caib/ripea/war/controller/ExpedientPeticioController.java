@@ -43,7 +43,6 @@ import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
-import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
@@ -55,7 +54,6 @@ import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -433,17 +431,17 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			}
 		}
 		
-		if (!processatOk) {
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"expedientPeticio.controller.acceptat.warning"));
+		if (processatOk) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedientPeticio.controller.acceptat.ok");
+		} else {
+			return getModalControllerReturnValueWarningText(
+					request,
+					"redirect:expedientPeticio",
+					getMessage(request, "expedientPeticio.controller.acceptat.warning") + " " + getMessage(request, "expedientPeticio.controller.acceptat.warning.detalls"));
 		}
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:expedientPeticio",
-				"expedientPeticio.controller.acceptat.ok");
 	}
 	
 	
