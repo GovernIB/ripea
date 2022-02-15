@@ -3,14 +3,20 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
+import es.caib.ripea.core.aggregation.HistoricAggregation;
+import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
+import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
 import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.entity.*;
+import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import ma.glasnost.orika.metadata.Type;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -18,18 +24,11 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.aggregation.HistoricAggregation;
-import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
-import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
-import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
-import ma.glasnost.orika.CustomConverter;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.Type;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper per a convertir entre diferents formats de documents.
@@ -135,7 +134,7 @@ public class ConversioTipusHelper {
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setDataLimit(source.getDataLimit());
 						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
-						target.setComentari(source.getComentari());
+						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
 						return target;
 					}
 				});

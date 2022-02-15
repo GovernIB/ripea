@@ -29,7 +29,7 @@
 	<rip:modalHead/>
 	<title>
 		<c:choose>
-			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
+			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="max-width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
@@ -2048,8 +2048,7 @@ $.views.helpers(myHelpers);
 						</div>
 					</c:if>	
 					<c:if test="${contingut.expedient}">
-					
-						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>			
+						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>
 					</c:if>
 				</ul>
 			</c:if>
@@ -2176,6 +2175,9 @@ $.views.helpers(myHelpers);
 							</c:if>							
 							<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
 							<div class="text-right" id="contingut-botons">
+								<c:if test="${isTasca}">
+									<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
+								</c:if>
 								<c:if test="${vistaIcones}">
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.habilitar"/>" id="habilitar-mult" class="btn-group btn btn-default">
@@ -2759,8 +2761,12 @@ $.views.helpers(myHelpers);
 												<spring:message code="expedient.tasca.estat.enum.REBUTJADA"/>
 											{{/if}}
 										</script>
-										</th>	
-																	
+										</th>
+										<th data-col-name="numComentaris" data-orderable="false" data-template="#cellComentarisTemplate" width="1%">
+											<script id="cellComentarisTemplate" type="text/x-jsrender">
+												<a href='<c:url value="/expedientTasca/{{:id}}/comentaris"/>' data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+											</script>
+										</th>
 										<th data-col-name="id" data-orderable="false" data-template="#cellExpedientTascaTemplate" width="1%">
 											<script id="cellExpedientTascaTemplate" type="text/x-jsrender">
 											<div class="dropdown">

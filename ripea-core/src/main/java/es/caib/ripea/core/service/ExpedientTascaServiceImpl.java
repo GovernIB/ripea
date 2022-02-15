@@ -3,11 +3,29 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaComentariEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.ExpedientTascaComentariRepository;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,48 +35,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
-import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
-import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.TascaHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ExpedientTascaRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
  * 
@@ -73,6 +54,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired
 	private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired
+	private ExpedientTascaComentariRepository expedientTascaComentariRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -380,8 +363,12 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				expedient, 
 				metaExpedientTascaEntity, 
 				responsables, 
-				expedientTasca.getDataLimit(),
-				expedientTasca.getComentari()).build();
+				expedientTasca.getDataLimit()).build();
+
+		if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
+			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, expedientTasca.getComentari()).build();
+			expedientTascaEntity.addComentari(comentari);
+		}
 		
 		if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
 			expedient.updateExpedientEstat(metaExpedientTascaEntity.getEstatCrearTasca());
@@ -707,6 +694,66 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				contingut);
 	}
 
+	@Transactional
+	@Override
+	public boolean publicarComentariPerExpedientTasca(
+			Long entitatId,
+			Long expedientTascaId,
+			String text,
+			String rolActual) {
+		logger.debug("Obtenint els comentaris per la tasca (" + "entitatId=" + entitatId + ", " + "tascaId=" + expedientTascaId + ")");
+
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
+
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(expedientTascaId);
+		if (tasca == null) {
+			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
+		}
+
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				tasca.getExpedient().getId(),
+				false,
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+
+		// truncam a 1024 caracters
+		if (text.length() > 1024)
+			text = text.substring(0, 1021) + "...";
+		ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(tasca, text).build();
+		expedientTascaComentariRepository.save(comentari);
+		return true;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId) {
+		logger.debug("Obtenint els comentaris per la tasca (" + "entitatId=" + entitatId + ", " + "tascaId=" + expedientTascaId + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
+
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(expedientTascaId);
+		if (tasca == null) {
+			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
+		}
+
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				tasca.getExpedient().getId(),
+				false,
+				true,
+				false,
+				false,
+				false, false, null);
+
+		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
+
+		return conversioTipusHelper.convertirList(tascacoms, ExpedientTascaComentariDto.class);
+	}
+
 	private void log (ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
 		contingutLogHelper.log(
 				expedientTascaEntity.getExpedient(),
@@ -715,7 +762,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				LogObjecteTipusEnumDto.TASCA,
 				tipusLog,
 				expedientTascaEntity.getMetaExpedientTasca().getNom(),
-				expedientTascaEntity.getComentari(),
+				expedientTascaEntity.getComentaris().size() == 1 ? expedientTascaEntity.getComentaris().get(0).getText() : null, // expedientTascaEntity.getComentari(),
 				false,
 				false);
 	}
