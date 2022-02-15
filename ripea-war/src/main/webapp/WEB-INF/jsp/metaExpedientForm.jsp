@@ -58,21 +58,26 @@
 	</style>
 	<c:if test="${hasPermisAdmComu}">
 		<script type="text/javascript">
-		$(document).ready(function() {
-			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
-			$( "#comu" ).change(function () {
-				if(this.checked) {
-					selectOrganGestorContainer.hide();
-					$("select#organGestorId").val(null);
-					$("select#organGestorId").trigger("change");
-			    } else {
-			    	selectOrganGestorContainer.show();
-			    }
-		  	});
-			if ($("#comu").is(":checked")) {
-				selectOrganGestorContainer.hide();
-			}
-		});
+			var unicOrganGestorId = null;
+			<c:if test="${not empty organDisponible}">unicOrganGestorId = ${organDisponible.id};</c:if>
+			$(document).ready(function() {
+				var organGestorContainer = $("#organGestorContainer");
+				$( "#comu" ).change(function () {
+					if(this.checked) {
+						organGestorContainer.hide();
+						$("#organGestorId").val(null);
+						$("select#organGestorId").trigger("change");
+					} else {
+						if (unicOrganGestorId != null) {
+							$("#organGestorId").val(unicOrganGestorId);
+						}
+						organGestorContainer.show();
+					}
+				});
+				if ($("#comu").is(":checked")) {
+					organGestorContainer.hide();
+				}
+			});
 		</script>
 	</c:if>
 
@@ -224,15 +229,26 @@
 				</c:choose>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
- 					name="organGestorId"  
- 					urlConsultaInicial="${urlConsultaInicial}"
- 					urlConsultaLlistat="${urlConsultaLlistat}"
- 					textKey="metaexpedient.form.camp.organgestor"
- 					suggestValue="id"
- 					suggestText="codiINom"
- 					required="true"
- 					disabled="${bloquejarCamps}"/>
+
+				<div id="organGestorContainer">
+					<c:choose>
+						<c:when test="${numOrgansDisponibles == 1}">
+							<div class="form-group">
+								<input type="hidden" id="organGestorId" name="organGestorId" value="${organDisponible.id}"/>
+								<label class="control-label col-xs-4" for="organGestorNom"><spring:message code="metaexpedient.form.camp.organgestor"/> *</label>
+								<div class="col-xs-8">
+									<input type="text" class="form-control" id="organGestorNom" name="organGestorNom" disabled="disabled" value="${organDisponible.codiINom}">
+								</div>
+							</div>
+						</c:when>
+						<c:when test="${numOrgansDisponibles < 32 }">
+							<rip:inputSelect name="organGestorId" optionItems="${organsGestors}" optionValueAttribute="id" optionTextAttribute="codiINom" optionMinimumResultsForSearch="1" textKey="metaexpedient.form.camp.organgestor" required="true" emptyOption="true"  disabled="${bloquejarCamps}"/>
+						</c:when>
+						<c:otherwise>
+							<rip:inputSuggest name="organGestorId" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" textKey="metaexpedient.form.camp.organgestor" suggestValue="id" suggestText="codiINom" required="true" disabled="${bloquejarCamps}"/>
+						</c:otherwise>
+					</c:choose>
+				</div>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari" readonly="${bloquejarCamps}"/>
 				
 				<c:if test="${isDocumentsGeneralsEnabled}">
