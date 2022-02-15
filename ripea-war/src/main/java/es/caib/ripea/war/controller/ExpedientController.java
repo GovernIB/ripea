@@ -531,7 +531,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				}
 
 			} else { 
-				throw ex;
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../expedient",
+						"expedient.controller.creat.error",
+						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
 			}
 		}
 	}

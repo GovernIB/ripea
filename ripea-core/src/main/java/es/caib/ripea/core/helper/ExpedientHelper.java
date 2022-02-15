@@ -261,6 +261,11 @@ public class ExpedientHelper {
 				expedient,
 				organGestor);
 		
+		boolean throwExcepcion = false;//throwExcepcion = true;
+		if (throwExcepcion) {
+			throw new RuntimeException("Mock excepcion al crear expedient");
+		}
+		
 		try {
 		//create expedient in arxiu
 		contingutHelper.arxiuPropagarModificacio(
