@@ -1069,7 +1069,7 @@ $(document).ready(function() {
 	    			'<thead>' +
 	    			'<tr>' +
 					'<th><spring:message code="notificacio.list.enviament.list.titular"/></th>' + 
-	    			'<th><spring:message code="notificacio.list.enviament.list.destinataris"/></th>' +
+	    			'<th><spring:message code="notificacio.list.enviament.list.representants"/></th>' +
 	    			'<th><spring:message code="notificacio.list.enviament.list.estat"/></th>' +
 	    			'<th></th>' +
 	    			'</tr>' +
@@ -1143,7 +1143,7 @@ $(document).ready(function() {
 					//Remove last comma
 					representants = representants.substr(0, representants.length-1);
 				} else {
-					representants = '<spring:message code="notificacio.list.enviament.list.sensedestinataris"/>';
+					representants = '<spring:message code="notificacio.list.enviament.list.senserepresentants"/>';
 				}
 				tableBody += '<td>' + representants + '</td>';
 
@@ -2024,7 +2024,7 @@ $.views.helpers(myHelpers);
 						</li>
 						<c:if test="${notificacionsCount> 0}">
 							<li>
-								<a href="#notificacions" data-toggle="tab" id="notificacions-tab"><spring:message code="contingut.tab.notificacions" />&nbsp;<span class="badge" id="notificacions-count">${notificacionsCount}</span></a>
+								<a href="#notificacions" data-toggle="tab" id="notificacions-tab"><spring:message code="contingut.tab.remeses" />&nbsp;<span class="badge" id="notificacions-count">${notificacionsCount}</span></a>
 							</li>
 						</c:if>
 						<c:if test="${publicacionsCount> 0}">
@@ -2548,7 +2548,7 @@ $.views.helpers(myHelpers);
 							</c:if>
 						</script>
 						</div>
-						<!------------------------------ TABPANEL NOTIFICACIONS ------------------------------------->
+						<!------------------------------ TABPANEL REMESES ------------------------------------->
 						<div class="tab-pane" id="notificacions">
 							<table
 								id="taulaNotificacions"
@@ -2576,7 +2576,7 @@ $.views.helpers(myHelpers);
 												{{/if}}
 										</script>
 										</th>
-										<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.data"/></th>
+										<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.creadael"/></th>
 										<th data-col-name="processatDataString" data-orderable="false" data-template="#cellProcessatDataTemplate" width="20%">
 											<spring:message code="contingut.enviament.columna.dataFinalitzada"/>
 											<script id="cellProcessatDataTemplate" type="text/x-jsrender">
