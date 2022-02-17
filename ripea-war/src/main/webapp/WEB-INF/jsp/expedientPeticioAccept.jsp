@@ -193,6 +193,13 @@ $(document).ready(function(){
 		}
 
 	});
+
+	$("button#btnSave").submit(function (e) {
+	    e.preventDefault();
+	    $("button#btnSave").attr("disabled", true);
+	    return true;
+	});		
+			
 });
 </script>
 
@@ -231,7 +238,7 @@ $(document).ready(function(){
  			textKey="expedientPeticio.form.acceptar.camp.associarInteressats"/> 
 			
 		<div id="modal-botons" class="well">
-			<button id="btnSave" type="button" class="btn btn-success">
+			<button id="btnSave" type="submit" class="btn btn-success">
 				<span class="fa fa-save"></span>
 				<spring:message code="comu.boto.guardar" />
 			</button>
