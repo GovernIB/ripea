@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.HistoricEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 
 @NoRepositoryBean
 public interface HistoricRepository<T extends HistoricEntity> extends JpaRepository<T, Long> {
@@ -29,5 +30,8 @@ public interface HistoricRepository<T extends HistoricEntity> extends JpaReposit
 
 	@Query("select t from #{#entityName} as t where t.entitat = :entitat")
 	List<T> findByEntitat(@Param("entitat") EntitatEntity entitat);
+	
+	@Query("select t from #{#entityName} as t where t.metaExpedient = :metaExpedient")
+	List<T> findByMetaExpedient(@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 
 }
