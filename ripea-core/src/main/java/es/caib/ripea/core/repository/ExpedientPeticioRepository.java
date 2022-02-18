@@ -21,6 +21,25 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 
+	
+	@Query("select peticio.registre.id from ExpedientPeticioEntity peticio where peticio.id = :id")
+	Long getRegistreId(
+			@Param("id") Long id);
+	
+	@Query("select annex.id from" +
+			"    RegistreAnnexEntity annex " +
+			"where " +
+			"annex.registre.id = :id ")
+	List<Long> getRegistreAnnexosId(
+			@Param("id") Long id);
+	
+	@Query("select registre.justificantArxiuUuid from" +
+			"    RegistreEntity registre " +
+			"where " +
+			"registre.id = :id")
+	String getRegistreJustificantArxiuUuid(
+			@Param("id") Long id);
+	
 	ExpedientPeticioEntity findByIdentificador(
 			String identificador);
 

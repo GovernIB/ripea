@@ -267,7 +267,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				throw new DocumentAlreadyImportedException();
 			}
-			canviEstatToProcessatPendent(expedientPeticioEntity);
+			canviEstatToProcessatPendent(expedientPeticioEntity.getId());
 			if (processatOk) {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
@@ -289,29 +289,31 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
+		
+		Long registreId = expedientPeticioRepository.getRegistreId(expedientPeticioId);
+		List<Long> annexosIds = expedientPeticioRepository.getRegistreAnnexosId(registreId);
+		for (Long annexId : annexosIds) {
 			try {
 				boolean throwException1 = false;
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 				expedientHelper.crearDocFromAnnex(
 						expedientId,
-						registeAnnexEntity.getId(),
-						expedientPeticioEntity.getId());	
+						annexId,
+						expedientPeticioId);	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
-				expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
+				expedientHelper.updateRegistreAnnexError(annexId, ExceptionUtils.getStackTrace(e));
 			}
 		}
-		String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+		String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 			try {
 				expedientHelper.crearDocFromUuid(
 						expedientId,
 						arxiuUuid, 
-						expedientPeticioEntity.getId());
+						expedientPeticioId);
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
@@ -319,17 +321,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 			throw new DocumentAlreadyImportedException();
 		}
-		canviEstatToProcessatPendent(expedientPeticioEntity);
+		canviEstatToProcessatPendent(expedientPeticioId);
 		if (processatOk) {
-			notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
+			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
 		}
 		return processatOk;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void canviEstatToProcessatPendent(ExpedientPeticioEntity expedientPeticioEntity) {
+	public void canviEstatToProcessatPendent(Long expedientPeticioId) {
 		expedientPeticioHelper.canviEstatExpedientPeticio(
-				expedientPeticioEntity.getId(),
+				expedientPeticioId,
 				ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 	}
 	
@@ -414,7 +416,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		expedientHelper.updateNomExpedient(expedient, nom);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
 	}
 
@@ -440,7 +442,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
 	}
 

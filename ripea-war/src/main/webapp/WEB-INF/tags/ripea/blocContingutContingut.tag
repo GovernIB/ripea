@@ -4,17 +4,16 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ attribute name="contingut" required="true" rtexprvalue="true" type="java.lang.Object"%>
-<%@ attribute name="mostrarExpedients" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
-<%@ attribute name="mostrarNoExpedients" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
+<%@ attribute name="mostrarFillsFlat" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
 <c:set var="expedientPare" value="${contingut.expedientPare}"/>
 <c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
 <c:set var="expedientPareAgafatPerUsuariActual" value="${false}"/>
 <c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientPareAgafatPerUsuariActual" value="${true}"/></c:if>
 <c:choose>
-	<c:when test="${mostrarExpedients and mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsNoRegistres}"/></c:when>
-	<c:when test="${mostrarExpedients and not mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsExpedients}"/></c:when>
-	<c:when test="${not mostrarExpedients and mostrarNoExpedients}"><c:set var="fills" value="${contingut.fillsNoExpedients}"/></c:when>
+	<c:when test="${mostrarFillsFlat}"><c:set var="fills" value="${contingut.fillsFlat}"/></c:when>
+	<c:otherwise><c:set var="fills" value="${contingut.fillsHierarchical}"/></c:otherwise>
+
 </c:choose>
 <c:choose>
 	<c:when test="${vistaIcones}">
