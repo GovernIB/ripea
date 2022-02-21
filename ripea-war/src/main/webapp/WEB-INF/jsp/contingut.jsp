@@ -2011,7 +2011,7 @@ $.views.helpers(myHelpers);
 			<c:if test="${!isTasca}">
 				<ul class="nav nav-tabs">
 					<li class="active" id="pipella-contingut">
-						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsNoRegistresCount}</span></a>
+						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${isMostrarCarpetesPerAnotacions ? contingut.fillsHierarchicalCount : contingut.fillsFlatCount}</span></a>
 					</li>
 					<c:if test="${(contingut.document or contingut.expedient) and fn:length(contingut.metaNode.metaDades) gt 0}">
 						<li>
@@ -2285,7 +2285,7 @@ $.views.helpers(myHelpers);
 										var docsIdx = new Array();
 									</script>							
 								</div>
-								<c:if test="${isTasca or (expedientAgafatPerUsuariActual and (contingut.carpeta or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
+								<c:if test="${isTasca or (expedientAgafatPerUsuariActual and ((contingut.carpeta && isCreacioCarpetesActiva) or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<%---- Crear contingut ----%>
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
@@ -2328,7 +2328,7 @@ $.views.helpers(myHelpers);
 											</c:choose>
 											<c:if test="${!isTasca}">
 												<%---- Carpeta... ----%>
-												<c:if test="${isMostrarCarpeta}">
+												<c:if test="${isCreacioCarpetesActiva}">
 													<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>
 												</c:if>
 												<c:if test="${isMostrarImportacio}">
@@ -2343,7 +2343,7 @@ $.views.helpers(myHelpers);
 							<div id="loading">
 								<img src="<c:url value="/img/loading.gif"/>"/>
 							</div>
-							<rip:blocContingutContingut contingut="${contingut}" mostrarExpedients="${true}" mostrarNoExpedients="${true}"/>
+							<rip:blocContingutContingut contingut="${contingut}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}"/>
 							
 							
 							<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >

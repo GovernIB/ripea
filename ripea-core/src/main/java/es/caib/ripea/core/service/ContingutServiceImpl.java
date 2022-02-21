@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +78,18 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.HibernateHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -137,8 +147,6 @@ public class ContingutServiceImpl implements ContingutService {
 	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -388,7 +396,7 @@ public class ContingutServiceImpl implements ContingutService {
 					fitxer,
 					false,
 					false,
-					null);
+					null, false);
 			if (fitxer != null) {
 				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
@@ -424,7 +432,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				false, null);
 		// Comprova el tipus del contingut que es vol moure
-		if ((contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
+		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
@@ -433,7 +441,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// No es poden moure documents firmats
 		if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
+			if (documentOrigen.isFirmat() && !contingutHelper.isCarpetaLogica()) {
 				throw new ValidationException(
 						contingutOrigenId,
 						contingutOrigen.getClass(),
@@ -1979,9 +1987,6 @@ public class ContingutServiceImpl implements ContingutService {
 		return conteDefinitius;
 	}
 
-	public boolean isCarpetaLogica() {
-		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
-	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 

@@ -121,100 +121,47 @@ public abstract class ContingutDto extends AuditoriaDto {
 		return "/ " + nom;
 	}
 
-	public List<ExpedientDto> getFillsExpedients() {
-		List<ExpedientDto> expedients = new ArrayList<ExpedientDto>();
+	
+	public List<ContingutDto> getFillsHierarchical() {
+		return fills;
+	}
+	
+	public List<ContingutDto> getFillsFlat() {
+		List<ContingutDto> fillsFlat = new ArrayList<ContingutDto>();
 		if (fills != null) {
-			for (ContingutDto contenidor : fills) {
-				if (contenidor instanceof ExpedientDto)
-					expedients.add((ExpedientDto)contenidor);
+			for (ContingutDto fill : fills) {
+				getFillsFlat(fill, fillsFlat);
 			}
 		}
-		return expedients;
+		return fillsFlat;
 	}
-
-	public List<ContingutDto> getFillsNoExpedients() {
-		List<ContingutDto> noExpedients = new ArrayList<ContingutDto>();
-		if (fills != null) {
-			for (ContingutDto contenidor : fills) {
-				if (!(contenidor instanceof ExpedientDto))
-					noExpedients.add(contenidor);
+	
+	
+	public void getFillsFlat(ContingutDto contenidor, List<ContingutDto> fillsFlat) {
+		if (contenidor instanceof CarpetaDto) {
+			for (ContingutDto fill : contenidor.getFills()) {
+				getFillsFlat(fill, fillsFlat);
 			}
+		} else {
+			fillsFlat.add(contenidor);
 		}
-		return noExpedients;
 	}
-
-	public List<RegistreAnotacioDto> getFillsRegistres() {
-		List<RegistreAnotacioDto> registres = new ArrayList<RegistreAnotacioDto>();
-		if (fills != null) {
-			for (ContingutDto contenidor : fills) {
-				if (contenidor instanceof RegistreAnotacioDto)
-					registres.add((RegistreAnotacioDto)contenidor);
-			}
-		}
-		return registres;
+	
+	
+	public int getFillsFlatCount() {
+		return getFillsFlat().size();
 	}
+	
+	
 
-	public List<ContingutDto> getFillsNoRegistres() {
-		List<ContingutDto> noRegistres = new ArrayList<ContingutDto>();
-		if (fills != null) {
-			for (ContingutDto contenidor : fills) {
-				if (!(contenidor instanceof RegistreAnotacioDto))
-					noRegistres.add(contenidor);
-			}
-		}
-		return noRegistres;
-	}
 
-	public int getFillsCount() {
-		return (fills == null) ? 0 : fills.size();
-	}
-
-	public int getFillsExpedientsCount() {
+	public int getFillsHierarchicalCount() {
 		if (fills == null) {
 			return 0;
 		} else {
 			int count = 0;
 			for (ContingutDto contenidor : fills) {
-				if (contenidor instanceof ExpedientDto)
-					count++;
-			}
-			return count;
-		}
-	}
-
-	public int getFillsNoExpedientsCount() {
-		if (fills == null) {
-			return 0;
-		} else {
-			int count = 0;
-			for (ContingutDto contenidor : fills) {
-				if (!(contenidor instanceof ExpedientDto))
-					count++;
-			}
-			return count;
-		}
-	}
-
-	public int getFillsRegistresCount() {
-		if (fills == null) {
-			return 0;
-		} else {
-			int count = 0;
-			for (ContingutDto contenidor : fills) {
-				if (contenidor instanceof RegistreAnotacioDto)
-					count++;
-			}
-			return count;
-		}
-	}
-
-	public int getFillsNoRegistresCount() {
-		if (fills == null) {
-			return 0;
-		} else {
-			int count = 0;
-			for (ContingutDto contenidor : fills) {
-				if (!(contenidor instanceof RegistreAnotacioDto))
+				if (!(contenidor instanceof RegistreAnotacioDto) && !(contenidor instanceof CarpetaDto))
 					count++;
 				// No contar resultat concatenació i zip
 				if (contenidor.isDocument() &&

@@ -167,7 +167,8 @@ public class DocumentHelper {
 						fitxer,
 						document.isAmbFirma(),
 						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmesValidacio);
+						firmes != null ? firmes : firmesValidacio, 
+						false);
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -307,7 +308,7 @@ public class DocumentHelper {
 				fitxer,
 				document.isAmbFirma(),
 				document.isFirmaSeparada(),
-				firmes);
+				firmes, false);
 		return dto;
 	}
 	
@@ -381,7 +382,7 @@ public class DocumentHelper {
 				fitxer,
 				false, //##no validar firma en actualitzar tipus document
 				false,
-				firmes);
+				firmes, false);
 		return true;
 	}
 	
@@ -779,7 +780,7 @@ public class DocumentHelper {
 							fitxer,
 							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
 							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes);
+							firmes, false);
 				
 					if (documentEntity.getGesDocAdjuntId() != null ) {
 						pluginHelper.gestioDocumentalDelete(
