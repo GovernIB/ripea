@@ -133,6 +133,7 @@ span a {
 }
 #contenidor-info {
 	margin-bottom: 0;
+	padding-bottom: 30px;
 }
 #contenidor-info h3 {
 	font-weight: bold;
@@ -153,10 +154,6 @@ span a {
 	font-size: small;
 	font-style: italic;
 	font-weight: normal;
-}
-#contenidor-info #botons-accions-info button{
-    padding: 1px 6px;
-	margin-bottom: 4px;    
 }
 #contenidor-info dd {
 	font-size: medium;
