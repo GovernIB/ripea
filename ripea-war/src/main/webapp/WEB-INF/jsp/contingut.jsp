@@ -1238,7 +1238,7 @@ $(document).ready(function() {
 	$botoTipusDocumental.popover({
 		html: true,
 		placement: 'bottom',
-		title: '<spring:message code="massiu.canvi.tipus.document"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
+		title: '<spring:message code="massiu.canvi.tipus.document.select"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
 	    content: function () {
 	    	return showTipusDocumentals($(this));   
 	  	}
@@ -2233,8 +2233,10 @@ $.views.helpers(myHelpers);
 											</a>
 										</div>
 										<div data-toggle="popover" class="btn btn-default" id="tipusdocumental-mult">
-											<span class="fa fa-edit"></span>
-											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											<div data-toggle="tooltip" title="<spring:message code="massiu.canvi.tipus.document"/>">
+												<span class="fa fa-edit"></span>
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</div>
 										</div>
 									</div>
 									<%---- Button descarregar zip mult 
