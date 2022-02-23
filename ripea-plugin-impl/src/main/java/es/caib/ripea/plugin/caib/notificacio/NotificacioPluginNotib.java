@@ -27,10 +27,11 @@ import es.caib.notib.ws.notificacio.EntregaDeh;
 import es.caib.notib.ws.notificacio.EntregaPostal;
 import es.caib.notib.ws.notificacio.EntregaPostalViaTipusEnum;
 import es.caib.notib.ws.notificacio.EnviamentTipusEnum;
-import es.caib.notib.ws.notificacio.InteressatTipusEnumDto;
 import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.RespostaAlta;
+import es.caib.notib.ws.notificacio.RespostaConsultaJustificantEnviament;
 import es.caib.ripea.plugin.NotibRepostaException;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
@@ -43,7 +44,7 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
-import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 
 /**
  * Implementació de del plugin d'enviament de notificacions
@@ -293,6 +294,30 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 					ex);
 		}
 	}
+	
+	
+	@Override
+	public RespostaJustificantEnviamentNotib consultaJustificantEnviament(
+			String identificador) throws SistemaExternException {
+		RespostaJustificantEnviamentNotib resposta = new RespostaJustificantEnviamentNotib();
+		try {
+
+			RespostaConsultaJustificantEnviament respostaConsultaJustificantEnviament = getNotificacioService().consultaJustificantEnviament(identificador);
+			if (respostaConsultaJustificantEnviament != null) {
+				resposta.setError(respostaConsultaJustificantEnviament.isError());
+				resposta.setErrorData(toDate(respostaConsultaJustificantEnviament.getErrorData()));
+				resposta.setErrorDescripcio(respostaConsultaJustificantEnviament.getErrorDescripcio());
+				resposta.setJustificant(respostaConsultaJustificantEnviament.getJustificant() != null ? respostaConsultaJustificantEnviament.getJustificant().getContingut() : null);
+			}
+		return resposta;
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut consultar justicant de enviament (" +
+					"identificador=" + identificador + ")",
+					ex);
+		}
+	}
 
 
 
@@ -335,18 +360,18 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 
 	
 	
-	private InteressatTipusEnumDto toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
+	private es.caib.notib.ws.notificacio.InteressatTipusEnumDto toInteressatTipusEnumDto(es.caib.ripea.core.api.dto.InteressatTipusEnumDto interessatTipusEnumDto) {
 		es.caib.notib.ws.notificacio.InteressatTipusEnumDto interessatTipusEnumDtoWS = null;
 		if (interessatTipusEnumDto != null) {
 			switch (interessatTipusEnumDto) {
 			case PERSONA_FISICA:
-				interessatTipusEnumDtoWS = InteressatTipusEnumDto.FISICA;
+				interessatTipusEnumDtoWS = es.caib.notib.ws.notificacio.InteressatTipusEnumDto.FISICA;
 				break;
 			case PERSONA_JURIDICA:
-				interessatTipusEnumDtoWS = InteressatTipusEnumDto.JURIDICA;
+				interessatTipusEnumDtoWS = es.caib.notib.ws.notificacio.InteressatTipusEnumDto.JURIDICA;
 				break;
 			case ADMINISTRACIO:
-				interessatTipusEnumDtoWS = InteressatTipusEnumDto.ADMINISTRACIO;
+				interessatTipusEnumDtoWS = es.caib.notib.ws.notificacio.InteressatTipusEnumDto.ADMINISTRACIO;
 				break;				
 			}
 		}

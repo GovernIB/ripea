@@ -2,8 +2,8 @@ package es.caib.ripea.core.api.service;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
@@ -36,7 +36,7 @@ public interface SeguimentService {
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<ExpedientPeticioDto> findExpedientsPendents(
+	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams);

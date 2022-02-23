@@ -184,7 +184,7 @@ public interface AplicacioService {
 
 	List<UsuariDto> findUsuariAmbTextDades(String text);
 
-	UsuariDto findUsuariAmbCodiDades(String codi);
+	UsuariDto findUsuariCarrecAmbCodiDades(String codi);
 	
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public Boolean propertyBooleanFindByKey(String key);
@@ -196,5 +196,11 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public void setRolUsuariActual(String rolActual);
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<String> findUsuarisCodisAmbRol(String rol);
+
+	@PreAuthorize("hasRole('tothom')")
+	public UsuariDto findUsuariAmbCodiDades(String codi);
 
 }

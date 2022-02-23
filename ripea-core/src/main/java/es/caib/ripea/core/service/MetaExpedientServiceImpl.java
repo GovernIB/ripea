@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +23,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -42,6 +51,7 @@ import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.DominiEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
@@ -55,7 +65,12 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DominiHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientEstatHelper;
+import es.caib.ripea.core.helper.GrupHelper;
+import es.caib.ripea.core.helper.MetaDadaHelper;
+import es.caib.ripea.core.helper.MetaDocumentHelper;
 import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
@@ -63,8 +78,10 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.DominiRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
@@ -117,7 +134,21 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MetaExpedientComentariRepository metaExpedientComentariRepository;
-
+	@Resource
+	private MetaDocumentHelper metaDocumentHelper;
+	@Resource
+	private MetaDadaHelper metaDadaHelper;
+	@Autowired
+	private ExpedientEstatHelper expedientEstatHelper;
+	@Autowired
+	private GrupHelper grupHelper;
+	@Autowired
+	private GrupRepository grupRepository;
+	@Autowired
+	private DominiRepository dominiRepository;
+	@Autowired
+	private DominiHelper dominiHelper;
+	
 	@Transactional
 	@Override
 	public MetaExpedientDto create(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, Long organId) {
@@ -221,7 +252,183 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 	}
 	
+	
+	
+	@Transactional
+	@Override
+	public void createFromImport(Long entitatId, MetaExpedientExportDto metaExpedient, String rolActual, Long organId) {
+		logger.debug(
+				"Creant un nou meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient +
+						")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		if (metaExpedient.getOrganGestor() != null) {
+			entityComprovarHelper.comprovarOrganGestorAdmin(
+					entitatId,
+					metaExpedient.getOrganGestor().getId());
+		}
+		MetaExpedientEntity metaExpedientPare = null;
+		if (metaExpedient.getPareId() != null) {
 
+		metaExpedientPare = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedient.getPareId());
+		}
+		Long organGestorId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
+		MetaExpedientEntity entity = MetaExpedientEntity.getBuilder(
+				metaExpedient.getCodi(),
+				metaExpedient.getNom(),
+				metaExpedient.getDescripcio(),
+				metaExpedient.getSerieDocumental(),
+				metaExpedient.getClassificacioSia(),
+				metaExpedient.isNotificacioActiva(),
+				metaExpedient.isPermetMetadocsGenerals(),
+				entitat,
+				metaExpedientPare,
+				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
+				metaExpedient.isGestioAmbGrupsActiva()).
+				expressioNumero(metaExpedient.getExpressioNumero()).build();
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
+		if (metaExpedient.getEstructuraCarpetes() != null) {
+			//crear estructura carpetes per defecte
+			metaExpedientHelper.crearEstructuraCarpetes(
+					metaExpedient.getEstructuraCarpetes(), 
+					metaExpedientEntity);
+		}
+		
+		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
+			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
+		} else {
+			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
+		}
+
+		if (metaExpedient.getMetaDocuments() != null) {
+			for (MetaDocumentDto metaDocumentDto : metaExpedient.getMetaDocuments()) {
+				MetaDocumentDto metaDocumentCreated = metaDocumentHelper.create(entitatId, entity.getId(), metaDocumentDto, metaDocumentDto.getPlantillaNom(), metaDocumentDto.getPlantillaContentType(), metaDocumentDto.getPlantillaContingut(), rolActual, organId);
+				
+				if (metaDocumentDto.getMetaDades() != null) {
+					for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
+						if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
+							List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+							if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
+								dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
+							}
+						}
+						metaDadaHelper.create(entitatId, metaDocumentCreated.getId(), metaDadaDto, rolActual, organId);
+					}
+				}
+			}
+		}
+		
+		if (metaExpedient.getMetaDades() != null) {
+			for (MetaDadaDto metaDadaDto : metaExpedient.getMetaDades()) {
+				if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
+					List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+					if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
+						dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
+					}
+				}
+				metaDadaHelper.create(entitatId, entity.getId(), metaDadaDto, rolActual, organId);
+			}
+		}
+		
+		if (metaExpedient.getEstats() != null) {
+			for (ExpedientEstatDto expedientEstatDto : metaExpedient.getEstats()) {
+				expedientEstatDto.setMetaExpedientId(entity.getId());
+				ExpedientEstatDto expedientEstatCreated = expedientEstatHelper.createExpedientEstat(
+						entitatId,
+						expedientEstatDto,
+						rolActual,
+						organId);
+				
+				if (metaExpedient.getTasques() != null) {
+					for (MetaExpedientTascaDto metaExpedientTascaDto : metaExpedient.getTasques()) {
+						if (metaExpedientTascaDto.getEstatIdCrearTasca() != null && metaExpedientTascaDto.getEstatIdCrearTasca().equals(expedientEstatDto.getId())) {
+							metaExpedientTascaDto.setEstatIdCrearTasca(expedientEstatCreated.getId());
+						}
+						if (metaExpedientTascaDto.getEstatIdFinalitzarTasca() != null && metaExpedientTascaDto.getEstatIdFinalitzarTasca().equals(expedientEstatDto.getId())) {
+							metaExpedientTascaDto.setEstatIdFinalitzarTasca(expedientEstatCreated.getId());
+						}
+					}
+				}
+			}
+		}
+		
+		if (metaExpedient.getTasques() != null) {
+			for (MetaExpedientTascaDto metaExpedientTascaDto : metaExpedient.getTasques()) {
+				metaExpedientHelper.tascaCreate(
+						entitatId,
+						entity.getId(),
+						metaExpedientTascaDto,
+						rolActual,
+						organId);
+			}
+		}
+		
+		if (metaExpedient.getGrups() != null) {
+			for (GrupDto grupDto : metaExpedient.getGrups()) {
+				
+				List<GrupEntity> grups = grupRepository.findByRolDescricpio(entitat, grupDto.getRol(), grupDto.getDescripcio());
+				
+				GrupEntity grup = null;
+				if (grups == null || grups.isEmpty()) {
+					GrupDto grupCreated = grupHelper.create(
+							entitatId,
+							grupDto);
+					grup = grupRepository.findOne(grupCreated.getId());
+				} else {
+					grup = grups.get(0);
+				}
+				entity.addGrup(grup);
+			}
+		}
+
+		
+		
+	}
+	
+	
+	@Transactional
+	@Override
+	public String export(Long entitatId, Long id, Long organId) {
+		logger.debug("Exportant un meta-expedient (" + "id=" + id + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			MetaExpedientExportDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedient, MetaExpedientExportDto.class);
+			
+			if (metaExpedientDto.getMetaDades() != null) {
+				for (MetaDadaDto metaDadaDto : metaExpedientDto.getMetaDades()) {
+					if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+						DominiEntity domini = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi()).get(0);
+						metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+					}
+				}
+			}
+
+			if (metaExpedientDto.getMetaDocuments() != null) {
+				for (MetaDocumentDto metaDocumentDto : metaExpedientDto.getMetaDocuments()) {
+					if (metaDocumentDto.getMetaDades() != null) {
+						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
+							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+								if (dominis != null && !dominis.isEmpty()) {
+									DominiEntity domini = dominis.get(0);
+									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			String carAsString = objectMapper.writeValueAsString(metaExpedientDto);
+			logger.info(carAsString);
+			return carAsString;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+	}
 	
 
 	@Transactional
@@ -508,6 +715,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
+			// Sempre afegirem el nom com a subordre
+			addNomSort(paginacioParams);
 			return paginacioHelper.toPaginaDto(
 					metaExpedientRepository.findByEntitat(
 							entitat,
@@ -551,6 +760,21 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					MetaExpedientDto.class);
 		}
 
+	}
+
+	private void addNomSort(PaginacioParamsDto paginacioParams) {
+		boolean isOrderedByNom = false;
+		if (paginacioParams.getOrdres() != null && !paginacioParams.getOrdres().isEmpty()) {
+			for(PaginacioParamsDto.OrdreDto ordre : paginacioParams.getOrdres()) {
+				if ("nom".equals(ordre.getCamp())) {
+					isOrderedByNom = true;
+					break;
+				}
+			}
+		}
+		if (!isOrderedByNom) {
+			paginacioParams.getOrdres().add(new PaginacioParamsDto.OrdreDto("nom", PaginacioParamsDto.OrdreDireccioDto.ASCENDENT));
+		}
 	}
 
 	private PaginaDto<MetaExpedientDto> findByOrganGestor(
@@ -741,32 +965,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long entitatId,
 			Long metaExpedientId,
 			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException {
-		logger.debug(
-				"Creant una nova tasca del meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
-						metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-
-		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
-		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.findOne(idEstatCrear) : null;
-		Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
-		ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.findOne(
-				idEstatFinalitzar) : null;
-		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
-				metaExpedientTasca.getCodi(),
-				metaExpedientTasca.getNom(),
-				metaExpedientTasca.getDescripcio(),
-				metaExpedientTasca.getResponsable(),
-				metaExpedient,
-				metaExpedientTasca.getDataLimit(),
-				estatCrearTasca,
-				estatFinalitzarTasca).build();
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
+		return metaExpedientHelper.tascaCreate(
+				entitatId,
+				metaExpedientId,
+				metaExpedientTasca,
+				rolActual,
+				organId);
 	}
 
 	@Transactional

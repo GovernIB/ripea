@@ -38,6 +38,7 @@ import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -130,7 +131,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					model);
 			model.addAttribute("isContingutDetail", false);
 			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
-			model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
 			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
 			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
 			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa")));
@@ -767,9 +769,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 							entitatActual.getId(),
 							contingut.getId(),
 							false).size());			
-			model.addAttribute("enviamentsCount", documentEnviamentService.enviamentsCount(
+			model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
 					entitatActual.getId(),
-					contingut.getId()));
+					contingut.getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
+			
+			model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
+					entitatActual.getId(),
+					contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 		}
 		if (contingut instanceof NodeDto) {
 			model.addAttribute(

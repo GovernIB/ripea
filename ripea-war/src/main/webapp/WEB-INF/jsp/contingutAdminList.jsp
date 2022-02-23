@@ -37,7 +37,12 @@ $(document).ready(function() {
 		$('#metaNodeId option[value!=""]').remove();
 		var metaNodeRefresh = function(data) {
 			for (var i = 0; i < data.length; i++) {
-				$('#metaNodeId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+
+				if (data[i].id == '${contingutFiltreCommand.metaNodeId}' ) {
+					$('#metaNodeId').append('<option value="' + data[i].id + '" selected>' + data[i].nom + '</option>');
+				} else {
+					$('#metaNodeId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+				}
 			}
 		};
 		if (tipus == 'EXPEDIENT') {
@@ -54,14 +59,33 @@ $(document).ready(function() {
 			});
 		}
 	});
+
+	$('#tipus').trigger('change');
 });
 </script>
 </head>
 <body>
 	<form:form action="" method="post" cssClass="well" commandName="contingutFiltreCommand">
 		<div class="row">
-			<div class="col-md-7">
+			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>
+			</div>
+<%--
+			<div class="col-md-3">
+				<rip:inputText name="creador" inline="true" placeholderKey="contingut.admin.filtre.creador"/>
+			</div>
+--%>
+			<div class="col-md-3">					
+				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
+				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
+				<rip:inputSuggest 
+						name="creador"  
+						urlConsultaInicial="${urlConsultaInicial}"
+						urlConsultaLlistat="${urlConsultaLlistat}"
+						placeholderKey="contingut.admin.filtre.creador"
+						suggestValue="codi"
+						suggestText="codiAndNom"
+						inline="true"/>	
 			</div>
 			<div class="col-md-2">
 				<rip:inputSelect name="tipus" optionEnum="ContingutTipusEnumDto" emptyOption="true" placeholderKey="contingut.admin.filtre.tipus" inline="true"/>

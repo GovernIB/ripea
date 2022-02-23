@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -267,7 +268,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id, Long organId) {
 		return delegate.getAndCheckAdminPermission(
 				entitatId,
-				id, null);
+				id, 
+				organId);
 	}
 
 	@Override
@@ -419,6 +421,32 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				entitatId,
 				metaExpedientId,
 				rolActual);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public String export(
+			Long entitatId,
+			Long id,
+			Long organActualId) {
+		return delegate.export(
+				entitatId,
+				id,
+				organActualId);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public void createFromImport(
+			Long entitatId,
+			MetaExpedientExportDto metaExpedient,
+			String rolActual,
+			Long organId) {
+		delegate.createFromImport(
+				entitatId,
+				metaExpedient,
+				rolActual,
+				organId);
 	}
 
 }

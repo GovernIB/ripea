@@ -62,7 +62,7 @@ public class AjaxUserController extends BaseUserController {
 			@PathVariable String codi,
 			Model model) {
 		try {
-			return aplicacioService.findUsuariAmbCodiDades(codi);
+			return aplicacioService.findUsuariCarrecAmbCodiDades(codi);
 		} catch (Exception ex) {
 			logger.error("Error al consultar la informació de l'usuari " + codi, ex);
 			return null;

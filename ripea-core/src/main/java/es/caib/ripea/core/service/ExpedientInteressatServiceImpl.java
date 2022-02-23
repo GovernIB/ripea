@@ -108,14 +108,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	public InteressatDto update(
 			Long entitatId,
 			Long expedientId,
-			Long interessatId,
+			Long representatId,
 			InteressatDto interessat, 
 			String rolActual) {
-		if (interessatId != null) {
+		if (representatId != null) {
 			logger.debug("Modificant un representant ("
 					+ "entitatId=" + entitatId + ", "
 					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + interessatId + ", "
+					+ "interessatId=" + representatId + ", "
 					+ "interessat=" + interessat + ")");
 		} else {
 			logger.debug("Modificant un interessat ("
@@ -133,14 +133,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false, 
 				false, 
 				rolActual);
-		InteressatEntity pare = null;
-		if (interessatId != null) {
-			pare = interessatRepository.findOne(interessatId);
-			if (pare == null || 
-				pare.getRepresentant() == null || 
-				!pare.getRepresentant().getId().equals(interessat.getId())) {
+		InteressatEntity representat = null;
+		if (representatId != null) {
+			representat = interessatRepository.findOne(representatId);
+			if (representat == null || 
+				representat.getRepresentant() == null || 
+				!representat.getRepresentant().getId().equals(interessat.getId())) {
 				throw new NotFoundException(
-						interessatId,
+						representatId,
 						InteressatEntity.class);
 			}
 		}

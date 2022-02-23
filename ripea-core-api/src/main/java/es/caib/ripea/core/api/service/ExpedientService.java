@@ -157,21 +157,22 @@ public interface ExpedientService {
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 	
 	/**
-	 * Consulta els expedients de l'usuari per procediment
+	 * Consulta els expedients soble els que té permís un usuari per procediment
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat.
 	 * @param metaExpedientId
 	 *            id del metaExpedient
-	 * @param checkPerMassiuAdmin TODO
+	 * @param rolActual Rol actual de l'usuari
 	 * @return Llista dels expeidents trobats
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<ExpedientSelectorDto> findPerUserAndTipus(
+	public List<ExpedientSelectorDto> findPerUserAndProcediment(
 			Long entitatId,
-			Long metaExpedientId, boolean checkPerMassiuAdmin) throws NotFoundException;
+			Long metaExpedientId,
+			String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta la llista d'ids d'expedient segons el filtre.

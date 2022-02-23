@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -24,20 +26,26 @@ import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -68,7 +76,10 @@ public class MetaExpedientHelper {
     private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
     @Autowired
     private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-
+	@Autowired
+	private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired
+	private MetaExpedientTascaRepository metaExpedientTascaRepository;
     @Autowired
     private EmailHelper emailHelper;
 	@Autowired
@@ -370,6 +381,41 @@ public class MetaExpedientHelper {
 		
 		return metaExpedients;
 	}
+	
+	
+
+	public MetaExpedientTascaDto tascaCreate(
+			Long entitatId,
+			Long metaExpedientId,
+			MetaExpedientTascaDto metaExpedientTasca, String rolActual, Long organId) throws NotFoundException {
+		logger.debug(
+				"Creant una nova tasca del meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" +
+						metaExpedientId + ", " + "metaExpedientTasca=" + metaExpedientTasca + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
+		Long idEstatCrear = metaExpedientTasca.getEstatIdCrearTasca();
+		ExpedientEstatEntity estatCrearTasca = idEstatCrear != null ? expedientEstatRepository.findOne(idEstatCrear) : null;
+		Long idEstatFinalitzar = metaExpedientTasca.getEstatIdFinalitzarTasca();
+		ExpedientEstatEntity estatFinalitzarTasca = idEstatFinalitzar != null ? expedientEstatRepository.findOne(
+				idEstatFinalitzar) : null;
+		MetaExpedientTascaEntity entity = MetaExpedientTascaEntity.getBuilder(
+				metaExpedientTasca.getCodi(),
+				metaExpedientTasca.getNom(),
+				metaExpedientTasca.getDescripcio(),
+				metaExpedientTasca.getResponsable(),
+				metaExpedient,
+				metaExpedientTasca.getDataLimit(),
+				estatCrearTasca,
+				estatFinalitzarTasca).build();
+		
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
+		}
+		return conversioTipusHelper.convertir(metaExpedientTascaRepository.save(entity), MetaExpedientTascaDto.class);
+	}
+	
 
 	public void canviarRevisioAPendentEnviarEmail(Long entitatId, Long metaExpedientId, Long organId) {
 
@@ -588,5 +634,8 @@ public class MetaExpedientHelper {
 		}
 		return listLong;
 	}
+	
+	
+	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientHelper.class);
 
 }

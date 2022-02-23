@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.api.exception;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 
 /**
@@ -14,8 +17,7 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 @SuppressWarnings("serial")
 public class ExecucioMassivaException extends RuntimeException {
 
-	private Long execucioMassivaId;
-	private Long execucioMassivaContingutId;
+	private String message = "";
 	
 	public ExecucioMassivaException(
 			Long contingutId, 
@@ -23,50 +25,30 @@ public class ExecucioMassivaException extends RuntimeException {
 			ContingutTipusEnumDto contingutTipus, 
 			Long execucioMassivaId,
 			Long execucioMassivaContingutId,
-			String message,
 			Throwable cause) {
-		super(getCommonMessage(
-				contingutId, 
-				contingutNom, 
-				contingutTipus, 
-				execucioMassivaId, 
-				execucioMassivaContingutId,
-				message),
-				cause);
-		this.execucioMassivaId = execucioMassivaId;
-		this.execucioMassivaContingutId = execucioMassivaContingutId;
-	}
-	
-	private static String getCommonMessage (
-			Long contingutId, 
-			String contingutNom,
-			ContingutTipusEnumDto contingutTipus, 
-			Long execucioMassivaId,
-			Long execucioMassivaContingutId,
-			String message) {
-		String finalMessage = " ===> ";
-		finalMessage += (message != null ? message : "");
-		if (contingutId != null)
-			finalMessage += " contingutId: " + contingutId + ".";
-		if (contingutNom != null)
-			finalMessage += " contingutNom: " + contingutNom + ".";
-		if (contingutTipus != null)
-			finalMessage += " contingutTipus: " + contingutTipus + ".";
-		if (execucioMassivaId != null)
-			finalMessage += " execucioMassivaId: " + execucioMassivaId + ".";
-		if (execucioMassivaContingutId != null)
-			finalMessage += " execucioMassivaContingutId: " + execucioMassivaContingutId;
 		
-		return finalMessage;
+		String finalMessage = "Error al executar la acció massiva (";
+		if (contingutId != null)
+			finalMessage += "contingutId: " + contingutId + ", ";
+		if (contingutNom != null)
+			finalMessage += "contingutNom: " + contingutNom + ", ";
+		if (contingutTipus != null)
+			finalMessage += "contingutTipus: " + contingutTipus + ", ";
+		if (execucioMassivaId != null)
+			finalMessage += "execucioMassivaId: " + execucioMassivaId + ", ";
+		if (execucioMassivaContingutId != null)
+			finalMessage += "execucioMassivaContingutId: " + execucioMassivaContingutId;
+		finalMessage += ") ===> \r\n";
+		StringWriter out = new StringWriter();
+		cause.printStackTrace(new PrintWriter(out));
+		finalMessage += out.toString();
+		
+		message = finalMessage;
 	}
 
-	public Long getExecucioMassivaId() {
-		return execucioMassivaId;
+	public String getMessage() {
+		return message;
 	}
-	
-	public Long getExecucioMassivaContingutId() {
-		return execucioMassivaContingutId;
-	}
-	
+
 	
 }

@@ -204,11 +204,9 @@ public class EntityComprovarHelper {
 		        new Permission[] { ExtendedPermission.ADMINISTRATION },
 		        auth);
 		if (!esAdministradorEntitat) {
-			boolean esAdministradorOrganGestor = permisosHelper.isGrantedAny(
-					id,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION },
-					auth);
+			boolean esAdministradorOrganGestor = organGestorHelper.isOrganGestorPermes(
+					organGestor,
+					ExtendedPermission.ADMINISTRATION);
 			if (!esAdministradorOrganGestor) {
 				throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(),
 				        "ADMINISTRATION");
@@ -939,8 +937,7 @@ public class EntityComprovarHelper {
 						auth);
 			}
 	
-	
-			if (metaNode.getClass() == MetaExpedientEntity.class ) {
+			if (metaNode.getClass().getCanonicalName().contains("MetaExpedientEntity")) {
 				MetaExpedientEntity metaExpedientEntity = (MetaExpedientEntity) metaNode;
 				boolean grantedOrgan = false;
 				boolean grantedOrganMetaNode = false;

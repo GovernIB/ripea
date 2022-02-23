@@ -345,6 +345,23 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						ExtendedPermission.ADMINISTRATION),
 				OrganGestorDto.class);
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(Long entitatId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		return cacheHelper.findOrganismesEntitatAmbPermis(entitatId, auth.getName());
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
+		cacheHelper.evictOrganismesEntitatAmbPermis(entitatId, usuariCodi);
+	}
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override

@@ -113,6 +113,8 @@ public class ExpedientInteressatController extends BaseUserController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+		interessatCommand.setNotificacioAutoritzat(true);
+		
 		List<Class<?>> grups = new ArrayList<Class<?>>();
 		if (interessatCommand.getTipus() != null) {
 			switch (interessatCommand.getTipus()) {
@@ -317,6 +319,8 @@ public class ExpedientInteressatController extends BaseUserController {
 			representantDto = InteressatCommand.asAdministracioDto(interessatCommand);
 			break;
 		}
+		
+		representantDto.setNotificacioAutoritzat(true);
 		
 		String msgKey = "interessat.controller.representant.afegit.ok";
 		if (interessatCommand.getId() == null) {

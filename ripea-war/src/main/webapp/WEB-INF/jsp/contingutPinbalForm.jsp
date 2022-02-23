@@ -19,8 +19,10 @@
 	<rip:modalHead/>
 <script>
 const metaDocumentServeiScsp = [];
+const metaDocumentFinalitat = [];
 <c:forEach var="metaDocument" items="${metaDocuments}">
 metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei}";
+metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
 </c:forEach>
 $(document).ready(function() {
 	$('#metaDocumentId').on('change', function() {
@@ -29,6 +31,7 @@ $(document).ready(function() {
 		} else {
 			$('#bloc-datos-especificos').hide();
 		}
+		$('#finalitat').val(metaDocumentFinalitat[$(this).val()]);
 	});
 	$('#metaDocumentId').trigger('change');
 });

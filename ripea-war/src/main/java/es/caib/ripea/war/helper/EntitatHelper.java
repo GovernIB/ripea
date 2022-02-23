@@ -28,6 +28,7 @@ public class EntitatHelper {
 	
 	private static final String REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL = "canviOrganGestor";
 	private static final String SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL = "EntitatHelper.organGestorActual";
+	private static final String ORGANS_ACCESSIBLES= "organs.accessiblesUsuari";
 
 	public static List<EntitatDto> findEntitatsAccessibles(HttpServletRequest request) {
 		return findEntitatsAccessibles(request, null);
@@ -79,11 +80,13 @@ public class EntitatHelper {
 	public static String getRequestParameterCanviEntitat() {
 		return REQUEST_PARAMETER_CANVI_ENTITAT;
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	public static boolean isUsuariActualTeOrgans(HttpServletRequest request) {
-		EntitatDto entitat = getEntitatActual(request);
-		if (entitat != null) {
-			return entitat.isUsuariActualTeOrgans();
+
+		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getAttribute(ORGANS_ACCESSIBLES);
+		if (organs != null && !organs.isEmpty()) {
+			return true;
 		} else {
 			return false;
 		}
@@ -100,11 +103,11 @@ public class EntitatHelper {
 	////
 	// ORGANS GESTORS
 	////
-	
+	@SuppressWarnings("unchecked")
 	public static List<OrganGestorDto> findOrganGestorsAccessibles(HttpServletRequest request) {
-		EntitatDto entitat = getEntitatActual(request);
-		if (entitat != null) {
-			return entitat.getOrgansGestors();
+		List<OrganGestorDto> organs = (List<OrganGestorDto>) request.getAttribute(ORGANS_ACCESSIBLES);
+		if (organs != null && !organs.isEmpty()) {
+			return organs;
 		} else {
 			return new ArrayList<OrganGestorDto>();
 		}
@@ -120,6 +123,15 @@ public class EntitatHelper {
 			}
 		}
 		return organGestorActual;
+	}
+	
+	public static Long getOrganGestorActualId(HttpServletRequest request) {
+		OrganGestorDto organGestorActual = getOrganGestorActual(request);
+		if (organGestorActual != null) {
+			return organGestorActual.getId();
+		} else {
+			return null;
+		}
 	}
 	
 	public static void processarCanviOrganGestor(HttpServletRequest request) {

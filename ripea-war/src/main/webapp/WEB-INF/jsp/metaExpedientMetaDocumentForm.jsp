@@ -342,9 +342,13 @@ div.dropdown-menu.loading .rmodal_carrecs {
 			if ($(this).prop("checked")) {
 				$('#pinbalServei').removeAttr('disabled');
 				$('#pinbalServei').parent().parent().css('display', 'block');
+				$('#pinbalFinalitat').removeAttr('disabled');
+				$('#pinbalFinalitat').parent().parent().css('display', 'block');
 			} else {
 				$('#pinbalServei').attr('disabled', 'disabled');
 				$('#pinbalServei').parent().parent().css('display', 'none');
+				$('#pinbalFinalitat').attr('disabled', 'disabled');
+				$('#pinbalFinalitat').parent().parent().css('display', 'none');
 			}
 		});
 		$("#pinbalActiu").trigger('change');
@@ -518,6 +522,7 @@ function removeLoading() {
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect name="pinbalServei" textKey="metadocument.form.camp.pinbal.servei" required="true" optionItems="${pinbalServeiEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
+				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" maxlength="256" disabled="${bloquejarCamps}" required="true"/>
 			</div>
 		</div>
 		<div id="modal-botons">

@@ -26,6 +26,7 @@ public class ContingutFiltreCommand {
 	};
 
 	private String nom;
+	private String creador;
 	private ContingutTipusEnumDto tipus;
 	private Long metaNodeId;
 	private Date dataCreacioInici;
@@ -40,6 +41,12 @@ public class ContingutFiltreCommand {
 	}
 	public void setNom(String nom) {
 		this.nom = nom != null ? nom.trim() : null;
+	}
+	public String getCreador() {
+		return creador;
+	}
+	public void setCreador(String creador) {
+		this.creador = creador != null ? creador.trim() : null;
 	}
 	public ContingutTipusEnumDto getTipus() {
 		return tipus;

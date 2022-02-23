@@ -77,107 +77,108 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 
-	@RequestMapping(value = "/portafirmes", method = RequestMethod.GET)
-	public String getDocuments(
-			HttpServletRequest request,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-		filtreCommand.setBloquejarTipusElement(true);
-		filtreCommand.setBloquejarMetaDada(true);
-		filtreCommand.setBloquejarMetaExpedient(false);
-		model.addAttribute("portafirmes", true);
-		model.addAttribute(
-				"seleccio",
-				RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						SESSION_ATTRIBUTE_SELECCIO));
-		model.addAttribute(
-				"titolMassiu",
-				getMessage(request, "accio.massiva.titol.portafirmes"));
-		model.addAttribute(
-				"botoMassiu",
-				getMessage(request, "accio.massiva.boto.crear.portafirmes"));
-		model.addAttribute(
-				filtreCommand);
-		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
-		
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
-		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
-		model.addAttribute(
-				"expedients",
-				expedients);
-		return "contingutMassiuList";
-	}
-	
-	@RequestMapping(value = "/portafirmes", method = RequestMethod.POST)
-	public String bustiaPost(
-			HttpServletRequest request,
-			@Valid ContingutMassiuFiltreCommand filtreCommand,
-			BindingResult bindingResult,
-			Model model) {
-		if (!bindingResult.hasErrors()) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					filtreCommand);
-		}
-		
-		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-		filtreCommand.setBloquejarTipusElement(true);
-		filtreCommand.setBloquejarMetaDada(true);
-		filtreCommand.setBloquejarMetaExpedient(false);
-		
-		return "redirect:/massiu/portafirmes";
-	}
-	
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/crear/portafirmes", method = RequestMethod.GET)
-	public String getCrearPortafirmes(
-			HttpServletRequest request,
-			Model model) {
-		
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		
-		if (seleccio == null || seleccio.isEmpty()) {
-			model.addAttribute("portafirmes", true);
-			return getModalControllerReturnValueError(
-					request,
-					"redirect:/massiu/portafirmes",
-					"accio.massiva.seleccio.buida");
-		}
-		
-		getEntitatActualComprovantPermisos(request);
-		
-		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
-		model.addAttribute(command);
-		
-		//Flux de firma
-//		MetaDocumentDto metaDocument = metaDocumentService.findById(
-//				entitatActual.getId(), 
-//				filtreCommand.getTipusExpedient(), 
-//				filtreCommand.getTipusDocument());
-//		
-//		setFluxPredefinit(
-//				metaDocument, 
-//				model, 
-//				command);
-		return "enviarPortafirmes";
-	}
+//	@RequestMapping(value = "/portafirmes", method = RequestMethod.GET)
+//	public String getDocuments(
+//			HttpServletRequest request,
+//			Model model) {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+//		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
+//		filtreCommand.setBloquejarTipusElement(true);
+//		filtreCommand.setBloquejarMetaDada(true);
+//		filtreCommand.setBloquejarMetaExpedient(false);
+//		model.addAttribute("portafirmes", true);
+//		model.addAttribute(
+//				"seleccio",
+//				RequestSessionHelper.obtenirObjecteSessio(
+//						request,
+//						SESSION_ATTRIBUTE_SELECCIO));
+//		model.addAttribute(
+//				"titolMassiu",
+//				getMessage(request, "accio.massiva.titol.portafirmes"));
+//		model.addAttribute(
+//				"botoMassiu",
+//				getMessage(request, "accio.massiva.boto.crear.portafirmes"));
+//		model.addAttribute(
+//				filtreCommand);
+//
+//		String rolActual = (String)request.getSession().getAttribute(
+//				SESSION_ATTRIBUTE_ROL_ACTUAL);
+//
+//		boolean checkPerMassiuAdmin = false;
+//		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+//			checkPerMassiuAdmin = true;
+//		}
+//
+//		model.addAttribute(
+//				"metaExpedients",
+//				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+//
+//		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
+//		if (filtreCommand.getMetaExpedientId() != null)
+//			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
+//		model.addAttribute(
+//				"expedients",
+//				expedients);
+//		return "contingutMassiuList";
+//	}
+//
+//	@RequestMapping(value = "/portafirmes", method = RequestMethod.POST)
+//	public String bustiaPost(
+//			HttpServletRequest request,
+//			@Valid ContingutMassiuFiltreCommand filtreCommand,
+//			BindingResult bindingResult,
+//			Model model) {
+//		if (!bindingResult.hasErrors()) {
+//			RequestSessionHelper.actualitzarObjecteSessio(
+//					request,
+//					SESSION_ATTRIBUTE_FILTRE,
+//					filtreCommand);
+//		}
+//
+//		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
+//		filtreCommand.setBloquejarTipusElement(true);
+//		filtreCommand.setBloquejarMetaDada(true);
+//		filtreCommand.setBloquejarMetaExpedient(false);
+//
+//		return "redirect:/massiu/portafirmes";
+//	}
+//
+//	@SuppressWarnings("unchecked")
+//	@RequestMapping(value = "/crear/portafirmes", method = RequestMethod.GET)
+//	public String getCrearPortafirmes(
+//			HttpServletRequest request,
+//			Model model) {
+//
+//		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+//				request,
+//				SESSION_ATTRIBUTE_SELECCIO);
+//
+//		if (seleccio == null || seleccio.isEmpty()) {
+//			model.addAttribute("portafirmes", true);
+//			return getModalControllerReturnValueError(
+//					request,
+//					"redirect:/massiu/portafirmes",
+//					"accio.massiva.seleccio.buida");
+//		}
+//
+//		getEntitatActualComprovantPermisos(request);
+//
+//		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
+//		model.addAttribute(command);
+//
+//		//Flux de firma
+////		MetaDocumentDto metaDocument = metaDocumentService.findById(
+////				entitatActual.getId(),
+////				filtreCommand.getTipusExpedient(),
+////				filtreCommand.getTipusDocument());
+////
+////		setFluxPredefinit(
+////				metaDocument,
+////				model,
+////				command);
+//		return "enviarPortafirmes";
+//	}
 	
 	@RequestMapping(value = "/definitiu", method = RequestMethod.GET)
 	public String getDocumentsEsborranys(
@@ -217,7 +218,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		} 
 		
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
 		model.addAttribute(
 				"expedients",
 				expedients);
@@ -367,7 +368,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), metaExpedientId, checkPerMassiuAdmin);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), metaExpedientId, rolActual);
 		return expedients;
 	}
 	

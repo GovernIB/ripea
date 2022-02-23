@@ -3,10 +3,12 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -23,31 +25,50 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
+import es.caib.ripea.war.command.ExpedientEstatCommand;
+import es.caib.ripea.war.command.FileCommand;
+import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.command.MetaExpedientCommand;
 import es.caib.ripea.war.command.MetaExpedientFiltreCommand;
+import es.caib.ripea.war.command.MetaExpedientImportEditCommand;
+import es.caib.ripea.war.command.MetaExpedientImportRolsacCommand;
+import es.caib.ripea.war.command.MetaExpedientTascaCommand;
+import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -62,6 +83,7 @@ import es.caib.ripea.war.helper.RolHelper;
 public class MetaExpedientController extends BaseAdminController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "MetaExpedientController.session.filtre";
+	private static final String SESSION_ATTRIBUTE_IMPORT_TEMPORAL = "MetaExpedientController.session.import.temporal";
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
@@ -69,6 +91,8 @@ public class MetaExpedientController extends BaseAdminController {
 	private OrganGestorService organGestorService;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private PortafirmesFluxService portafirmesFluxService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -154,6 +178,20 @@ public class MetaExpedientController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
+		
+		getMetaExpedient(
+				request,
+				metaExpedientId,
+				model);
+		
+		return "metaExpedientForm";
+	}
+	
+	public void getMetaExpedient(
+			HttpServletRequest request,
+			Long metaExpedientId,
+			Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 
 		MetaExpedientDto metaExpedient = null;
@@ -194,57 +232,10 @@ public class MetaExpedientController extends BaseAdminController {
 				request,
 				metaExpedient,
 				model);
-		return "metaExpedientForm";
-	}
-
-	
-	@RequestMapping(value = "/importMetaExpedient/{codiSia}", method = RequestMethod.GET)
-	@ResponseBody
-	public JsonResponse importMetaExpedient(
-			HttpServletRequest request,
-			@PathVariable String codiSia,
-			Model model) {
-		
-		try {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-			
-			String codiDir3;
-//			codiDir3 = "A04026978";
-//			codiSia = "874212";
-			
-			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-			if (RolHelper.isRolActualAdministradorOrgan(request) && organActual != null) {
-				codiDir3 = organActual.getCodi();
-			} else {
-				codiDir3 = entitatActual.getUnitatArrel();
-			}
-			
-			return new JsonResponse(metaExpedientService.findProcedimentByCodiSia(entitatActual.getId(), codiDir3, codiSia));
-		} catch (Exception e) {
-			logger.error("Error al importar metaexpedient desde ROLSAC", e);
-			
-			Exception sysExt = ExceptionHelper.findExceptionInstance(e, SistemaExternException.class, 3);
-			if (sysExt != null) {
-				return new JsonResponse(true, sysExt.getMessage());
-			} else {
-				return new JsonResponse(true, e.getMessage());
-			}
-		}
 		
 	}
 	
 	
-	@RequestMapping(value = "/{metaExpedientCarpetaId}/deleteCarpeta", method = RequestMethod.GET)
-	@ResponseBody
-	public void deleteCarpeta(
-			HttpServletRequest request, 
-			@PathVariable Long metaExpedientCarpetaId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-		metaExpedientService.deleteCarpetaMetaExpedient(
-				entitatActual.getId(),
-				metaExpedientCarpetaId);
-	}
-
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
@@ -268,6 +259,8 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
+		dto.setNotificacioActiva(true);
 
 		if (command.getId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), command.getId());
@@ -303,6 +296,424 @@ public class MetaExpedientController extends BaseAdminController {
 					"metaexpedient.controller.creat.ok");
 		}
 	}
+
+	
+	@RequestMapping(value = "/{metaExpedientId}/export", method = RequestMethod.GET)
+	public String export(HttpServletRequest request, HttpServletResponse response, @PathVariable Long metaExpedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
+		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
+		
+		String json = metaExpedientService.export(
+				entitatActual.getId(),
+				metaExpedientId,
+				organActual.getId());
+
+		try {
+			
+			String fileNom = metaExpedient.getCodi().replaceAll("[^a-zA-Z0-9-]", "_");
+			if (fileNom.length() > 60) {
+				fileNom = fileNom.substring(0, 60);
+			}
+			
+			writeFileToResponse(
+					fileNom + "_export.json",
+					json.getBytes(),
+					response);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return null;
+	}
+	
+	@RequestMapping(value = "/importFitxer", method = RequestMethod.GET)
+	public String importFitxerGet(
+			HttpServletRequest request,
+			Model model) {
+		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+
+		boolean isRolAdminOrgan = RolHelper.isRolActualAdministradorOrgan(request);
+		model.addAttribute("isRolAdminOrgan", isRolAdminOrgan);
+		
+		
+		return "importMetaExpedientFileForm";
+	}
+	
+	@RequestMapping(value = "/importFitxer", method = RequestMethod.POST)
+	public String importFitxerPost(
+			HttpServletRequest request,
+			FileCommand command,
+			BindingResult bindingResult,
+			Model model) throws JsonParseException, IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+
+		if (command.getFile().getSize() == 0) {
+			bindingResult.rejectValue("file", "NotNull");
+		}
+		if (bindingResult.hasErrors()) {
+			return "importMetaExpedientFileForm";
+		}
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+		objectMapper.setVisibility(VisibilityChecker.Std.defaultInstance().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+
+		MetaExpedientExportDto metaExpedientExport = objectMapper.readValue(command.getFile().getBytes(), MetaExpedientExportDto.class);
+		MetaExpedientImportEditCommand metaExpedientImportEditCommand = new MetaExpedientImportEditCommand();
+		fillImportEditForm(metaExpedientExport, model, entitatActual, request, metaExpedientImportEditCommand);
+		
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL, metaExpedientExport);
+		
+		return "importMetaExpedientEditForm";
+		
+	}
+	
+	
+	@RequestMapping(value = "/importFitxerEdit", method = RequestMethod.POST)
+	public String importFitxerEditPost(
+			HttpServletRequest request,
+			@Valid MetaExpedientImportEditCommand command,
+			BindingResult bindingResult,
+			Model model) throws JsonParseException, IOException {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		importEditValidation(request, command, bindingResult);
+		
+		MetaExpedientExportDto metaExpedientExport = (MetaExpedientExportDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
+		
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
+			return "importMetaExpedientEditForm";
+		}
+		
+		
+		try {
+			if (command.getMetaDocuments() != null) {
+				for (MetaDocumentCommand metaDocumentCommand : command.getMetaDocuments()) {
+					for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
+						if (metaDocumentDto.getId().equals(metaDocumentCommand.getId())) {
+							metaDocumentDto.setPortafirmesResponsables(metaDocumentCommand.getPortafirmesResponsables());
+						}
+						
+						if (metaDocumentDto.getPortafirmesFluxId() != null && !metaDocumentDto.getPortafirmesFluxId().isEmpty()) {
+							boolean exists = false;
+							List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+							if (plantilles != null) {
+								for (PortafirmesFluxRespostaDto portafirmesFlux : plantilles) {
+									if (portafirmesFlux.getFluxId().equals(metaDocumentDto.getPortafirmesFluxId())) {
+										exists = true;
+									}
+								}
+							}
+							if (!exists) {
+								MissatgesHelper.warning(
+										request, 
+										getMessage(
+												request,
+												"metaexpedient.import.controller.fluxIdNotFound",
+												new Object[] {metaDocumentDto.getPortafirmesFluxId(), metaDocumentDto.getCodi()}));
+								
+										
+								metaDocumentDto.setPortafirmesFluxId(null);
+
+							}
+						}
+					}
+				}
+			}
+			
+			if (command.getEstats() != null) {
+				for (ExpedientEstatCommand expedientEstatCommand : command.getEstats()) {
+					for (ExpedientEstatDto expedientEstatDto : metaExpedientExport.getEstats()) {
+						if (expedientEstatDto.getId().equals(expedientEstatCommand.getId())) {
+							expedientEstatDto.setResponsableCodi(expedientEstatCommand.getResponsableCodi());
+						}
+					}
+				}
+			}
+			
+			if (command.getTasques() != null) {
+				for (MetaExpedientTascaCommand metaExpedientTascaCommand : command.getTasques()) {
+					for (MetaExpedientTascaDto metaExpedientTascaDto : metaExpedientExport.getTasques()) {
+						if (metaExpedientTascaDto.getId().equals(metaExpedientTascaCommand.getId())) {
+							metaExpedientTascaDto.setResponsable(metaExpedientTascaCommand.getResponsable());
+						}
+					}
+				}
+			}
+			
+			metaExpedientExport.setCodi(command.getCodi());
+			metaExpedientExport.setNom(command.getCodi());
+			metaExpedientExport.setDescripcio(command.getDescripcio());
+			metaExpedientExport.setClassificacioSia(command.getClassificacioSia());
+			metaExpedientExport.setSerieDocumental(command.getSerieDocumental());
+
+			if (command.getOrganGestorId() != null) {
+				OrganGestorDto organ = new OrganGestorDto();
+				organ.setId(command.getOrganGestorId());
+				metaExpedientExport.setOrganGestor(organ);
+			} else {
+				metaExpedientExport.setOrganGestor(null);
+			}
+			
+			metaExpedientService.createFromImport(entitatActual.getId(), metaExpedientExport, rolActual, EntitatHelper.getOrganGestorActualId(request));
+			
+
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:metaExpedient",
+					"metaexpedient.import.controller.import.ok");
+			
+		} catch (Exception e) {
+			
+			logger.error("Error al importar procediment", e);
+
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:metaExpedient",
+					"metaexpedient.import.controller.import.error",
+					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() });
+		} finally {
+			request.getSession().removeAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
+		}
+
+	}
+	
+	private void fillImportEditForm(MetaExpedientExportDto metaExpedientExport, Model model, EntitatDto entitatActual, HttpServletRequest request, MetaExpedientImportEditCommand metaExpedientImportEditCommand) {
+		
+		
+		
+		for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
+			if (metaDocumentDto.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && metaDocumentDto.getPortafirmesResponsables() != null && metaDocumentDto.getPortafirmesResponsables().length != 0) {
+				List<String> respons = new ArrayList<>();
+				for (int i = 0; i < metaDocumentDto.getPortafirmesResponsables().length; i++) {
+					try {
+						aplicacioService.findUsuariAmbCodiDades(metaDocumentDto.getPortafirmesResponsables()[i]);
+						respons.add(metaDocumentDto.getPortafirmesResponsables()[i]);
+					} catch (Exception e) {
+					}
+				}
+				metaDocumentDto.setPortafirmesResponsables(respons.toArray(new String[0]));
+				
+				metaExpedientImportEditCommand.getMetaDocuments().add(ConversioTipusHelper.convertir(metaDocumentDto, MetaDocumentCommand.class));
+			}
+		}
+		
+		for (ExpedientEstatDto expedientEstatDto : metaExpedientExport.getEstats()) {
+			if (expedientEstatDto.getResponsableCodi() != null) {
+				try {
+					aplicacioService.findUsuariAmbCodiDades(expedientEstatDto.getResponsableCodi());
+				} catch (Exception e) {
+					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+					if (root instanceof NotFoundException) {
+						logger.debug("Pocediment import. Responsable per estat no trobat. " + root.getMessage());
+					} else {
+						logger.error("Pocediment import. Error al cercar usuari per estat", e);
+					}
+					
+					expedientEstatDto.setResponsableCodi(null);
+				}
+				metaExpedientImportEditCommand.getEstats().add(ConversioTipusHelper.convertir(expedientEstatDto, ExpedientEstatCommand.class));
+			}
+		}
+		
+		for (MetaExpedientTascaDto metaExpedientTascaDto : metaExpedientExport.getTasques()) {
+			if (metaExpedientTascaDto.getResponsable() != null) {
+				try {
+					aplicacioService.findUsuariAmbCodiDades(metaExpedientTascaDto.getResponsable());
+				} catch (Exception e) {
+					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+					if (root instanceof NotFoundException) {
+						logger.debug("Pocediment import. Responsable per tasca no trobat. " + root.getMessage());
+					} else {
+						logger.error("Pocediment import. Error al cercar usuari per tasca", e);
+					}
+					metaExpedientTascaDto.setResponsable(null);
+				}
+				metaExpedientImportEditCommand.getTasques().add(ConversioTipusHelper.convertir(metaExpedientTascaDto, MetaExpedientTascaCommand.class));
+			}
+		}
+		
+		metaExpedientImportEditCommand.setCodi(metaExpedientExport.getCodi());
+		metaExpedientImportEditCommand.setNom(metaExpedientExport.getCodi());
+		metaExpedientImportEditCommand.setDescripcio(metaExpedientExport.getDescripcio());
+		metaExpedientImportEditCommand.setClassificacioSia(metaExpedientExport.getClassificacioSia());
+		metaExpedientImportEditCommand.setSerieDocumental(metaExpedientExport.getSerieDocumental());
+		
+		metaExpedientImportEditCommand.setComu(metaExpedientExport.isComu());
+		if (!metaExpedientExport.isComu()) {
+			OrganGestorDto organGestorDto = null;
+			try {
+				organGestorDto = organGestorService.findItemByEntitatAndCodi(entitatActual.getId(), metaExpedientExport.getOrganGestor().getCodi());
+				
+				if (RolHelper.isRolActualAdministradorOrgan(request)) {
+					List<OrganGestorDto> organs = organGestorService.findAccessiblesUsuariActualRolAdmin(entitatActual.getId(), organGestorDto.getId());
+					if (organs == null || organs.isEmpty()) {
+						throw new NotFoundException(organGestorDto.getId(), OrganGestorDto.class);
+					}
+				}
+				metaExpedientImportEditCommand.setOrganGestorId(organGestorDto.getId());
+			} catch (Exception e) {
+				Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+				if (root instanceof NotFoundException) {
+					logger.debug("Pocediment import. Organ gestor no trobat. " + root.getMessage());
+				} else {
+					logger.error("Pocediment import. Error al cercar organ gestor", e);
+				}
+				metaExpedientImportEditCommand.setOrganGestorId(null);
+			}
+		}
+		metaExpedientImportEditCommand.setEntitatId(entitatActual.getId());
+		model.addAttribute(metaExpedientImportEditCommand);
+		model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
+
+	}
+	
+	
+	
+	private void importEditValidation(			
+			HttpServletRequest request,
+			MetaExpedientImportEditCommand command,
+			BindingResult bindingResult) {
+		if (!command.isComu() && command.getOrganGestorId() == null) {
+			bindingResult.reject("metaexpedient.import.form.validation.organ.obligatori");
+		}
+		
+		for (int i = 0; i < command.getMetaDocuments().size(); i++) {
+			MetaDocumentCommand metaDocumentCommand = command.getMetaDocuments().get(i);
+			if (metaDocumentCommand.isFirmaPortafirmesActiva() && metaDocumentCommand.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && (metaDocumentCommand.getPortafirmesResponsables() == null || metaDocumentCommand.getPortafirmesResponsables().length == 0)) {
+				bindingResult.rejectValue("metaDocuments[" + i + "].portafirmesResponsables", "NotNull");
+			}
+		}
+		
+		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByCodiSia(command.getEntitatId(),
+				command.getClassificacioSia());
+		boolean valid = true;
+		if (metaExpedients != null && !metaExpedients.isEmpty()) {
+			if (command.getId() == null) {
+				valid = false;
+			} else {
+				if (metaExpedients.size() > 1) {
+					valid = false;
+				} else {
+					if (!command.getId().equals(metaExpedients.get(0).getId())) {
+						valid = false;
+					}
+				}
+			}
+		}
+		if (!valid) {
+			bindingResult.reject("metaexpedient.import.form.validation.codisia.repetit");
+		}
+	}
+	
+	
+	
+	
+	@RequestMapping(value = "/importRolsac", method = RequestMethod.GET)
+	public String importRolsacGet(
+			HttpServletRequest request,
+			Model model) {
+		getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+
+		boolean isRolAdminOrgan = RolHelper.isRolActualAdministradorOrgan(request);
+		model.addAttribute("isRolAdminOrgan", isRolAdminOrgan);
+		
+		model.addAttribute(new MetaExpedientImportRolsacCommand());
+		
+		return "importMetaExpedientRolsacForm";
+	}
+	
+	
+	@RequestMapping(value = "/importRolsac", method = RequestMethod.POST)
+	public String importRolsacPost(
+			HttpServletRequest request,
+			@Valid MetaExpedientImportRolsacCommand command,
+			BindingResult bindingResult,
+			Model model) throws JsonParseException, IOException {
+
+		if (bindingResult.hasErrors()) {
+			return "importMetaExpedientRolsacForm";
+		}
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+
+		getMetaExpedient(
+				request,
+				null,
+				model);
+		
+		
+		String codiDir3;
+		if (RolHelper.isRolActualAdministradorOrgan(request)) {
+			codiDir3 = EntitatHelper.getOrganGestorActual(request).getCodi();
+		} else {
+			codiDir3 = entitatActual.getUnitatArrel();
+		}
+//		codiDir3 = "A04003003";
+//		command.setClassificacioSia("879427");
+		
+		try {
+			
+			ProcedimentDto procedimentDto = metaExpedientService.findProcedimentByCodiSia(entitatActual.getId(), codiDir3, command.getClassificacioSia());
+			
+			if (procedimentDto == null) {
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:metaExpedient",
+						"metaexpedient.form.import.rolsac.no.results",
+						null);
+			}
+			
+			if (RolHelper.isRolActualAdministradorOrgan(request)) {
+				if (procedimentDto.isComu() && !organGestorService.hasPermisAdminComu(EntitatHelper.getOrganGestorActual(request).getId())) {
+					MissatgesHelper.warning(
+							request, 
+							getMessage(
+									request, 
+									"metaexpedient.form.import.rolsac.no.permis.admin.coumns",
+									new Object[] {command.getClassificacioSia()}));
+				}
+			}
+			
+			MetaExpedientCommand metaExpedientCommand = (MetaExpedientCommand)model.asMap().get("metaExpedientCommand");
+			metaExpedientCommand.setClassificacioSia(command.getClassificacioSia());
+			metaExpedientCommand.setNom(procedimentDto.getNom());
+			metaExpedientCommand.setDescripcio(procedimentDto.getResum());
+			metaExpedientCommand.setComu(procedimentDto.isComu());
+			if (!procedimentDto.isComu()) {
+				metaExpedientCommand.setOrganGestorId(procedimentDto.getOrganId());
+			}
+			
+			
+		} catch (Exception e) {
+			logger.error("Error al importar metaexpedient desde ROLSAC", e);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:metaExpedient",
+					"metaexpedient.form.import.rolsac.error",
+					new Object[] {ExceptionHelper.getRootCauseOrItself(e).getMessage()});
+		}
+		
+		return "metaExpedientForm";
+	}
+	
+
+	
+	
+	@RequestMapping(value = "/{metaExpedientCarpetaId}/deleteCarpeta", method = RequestMethod.GET)
+	@ResponseBody
+	public void deleteCarpeta(
+			HttpServletRequest request, 
+			@PathVariable Long metaExpedientCarpetaId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		metaExpedientService.deleteCarpetaMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientCarpetaId);
+	}
+
 
 	private boolean hasPermisAdmComu(HttpServletRequest request) {
 		boolean hasPermisAdmComu = RolHelper.isRolActualAdministrador(request);

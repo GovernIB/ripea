@@ -99,7 +99,6 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PaginacioHelper.ConverterParam;
 import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
@@ -268,7 +267,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				throw new DocumentAlreadyImportedException();
 			}
-			canviEstatToProcessatPendent(expedientPeticioEntity);
+			canviEstatToProcessatPendent(expedientPeticioEntity.getId());
 			if (processatOk) {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
@@ -277,40 +276,44 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientDto;
 	}
 
-	@Transactional
 	@Override
 	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats, String rolActual) {
 		logger.debug("Incorporant a l'expedient existent (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"expedientPeticioId=" + expedientPeticioId + ")");
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+
 		expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId);
-		expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual);
+		if (associarInteressats) {
+			expedientHelper.associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual);
+		}
 		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
-		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
+		
+		Long registreId = expedientPeticioRepository.getRegistreId(expedientPeticioId);
+		List<Long> annexosIds = expedientPeticioRepository.getRegistreAnnexosId(registreId);
+		for (Long annexId : annexosIds) {
 			try {
 				boolean throwException1 = false;
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 				expedientHelper.crearDocFromAnnex(
 						expedientId,
-						registeAnnexEntity.getId(),
-						expedientPeticioEntity.getId());	
+						annexId,
+						expedientPeticioId);	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
-				expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
+				expedientHelper.updateRegistreAnnexError(annexId, ExceptionUtils.getStackTrace(e));
 			}
 		}
-		String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+		String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 			try {
 				expedientHelper.crearDocFromUuid(
 						expedientId,
 						arxiuUuid, 
-						expedientPeticioEntity.getId());
+						expedientPeticioId);
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
@@ -318,17 +321,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 			throw new DocumentAlreadyImportedException();
 		}
-		canviEstatToProcessatPendent(expedientPeticioEntity);
+		canviEstatToProcessatPendent(expedientPeticioId);
 		if (processatOk) {
-			notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
+			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
 		}
 		return processatOk;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void canviEstatToProcessatPendent(ExpedientPeticioEntity expedientPeticioEntity) {
+	public void canviEstatToProcessatPendent(Long expedientPeticioId) {
 		expedientPeticioHelper.canviEstatExpedientPeticio(
-				expedientPeticioEntity.getId(),
+				expedientPeticioId,
 				ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 	}
 	
@@ -360,6 +363,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		try {
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			if (expedientPeticioEntity.getExpedient() == null) {
+				throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+			}
 			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId());
 
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
@@ -410,7 +416,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		expedientHelper.updateNomExpedient(expedient, nom);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
 	}
 
@@ -436,7 +442,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
 	}
 
@@ -660,7 +666,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId, boolean checkPerMassiuAdmin) {
+	public List<ExpedientSelectorDto> findPerUserAndProcediment(Long entitatId, Long metaExpedientId, String rolActual) {
 		logger.debug(
 				"Consultant els expedients segons el tipus per usuaris (" + "entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ")");
@@ -673,19 +679,25 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					true,
 					false,
-					false, 
-					checkPerMassiuAdmin, 
+					false,
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					null, 
 					null);
 		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		permisosHelper.filterGrantedAll(metaExpedientsPermesos, new ObjectIdentifierExtractor<MetaExpedientEntity>() {
-			@Override
-			public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
-				return metaExpedient.getId();
-			}
-		}, MetaNodeEntity.class, new Permission[] { ExtendedPermission.READ }, auth);
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
+//		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+//		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//		permisosHelper.filterGrantedAll(
+//				metaExpedientsPermesos,
+//				new ObjectIdentifierExtractor<MetaExpedientEntity>() {
+//					@Override
+//					public Long getObjectIdentifier(MetaExpedientEntity metaExpedient) {
+//						return metaExpedient.getId();
+//					}
+//				},
+//				MetaNodeEntity.class,
+//				new Permission[] { ExtendedPermission.READ },
+//				auth);
 		if (!metaExpedientsPermesos.isEmpty()) {
 			return conversioTipusHelper.convertirList(
 					expedientRepository.findByEntitatAndMetaExpedientOrderByNomAsc(

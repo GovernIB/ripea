@@ -150,8 +150,8 @@ public class AplicacioServiceBean implements AplicacioService {
 	}
 
 	@Override
-	public UsuariDto findUsuariAmbCodiDades(String codi) {
-		return delegate.findUsuariAmbCodiDades(codi);
+	public UsuariDto findUsuariCarrecAmbCodiDades(String codi) {
+		return delegate.findUsuariCarrecAmbCodiDades(codi);
 	}
 
 	@Override
@@ -174,6 +174,18 @@ public class AplicacioServiceBean implements AplicacioService {
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
 	public void setRolUsuariActual(String rolActual) {
 		delegate.setRolUsuariActual(rolActual);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public List<String> findUsuarisCodisAmbRol(String rol) {
+		return delegate.findUsuarisCodisAmbRol(rol);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public UsuariDto findUsuariAmbCodiDades(String codi) {
+		return delegate.findUsuariAmbCodiDades(codi);
 	}
 
 }

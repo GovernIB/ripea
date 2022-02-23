@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
@@ -45,6 +46,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_fi")
 	private Date dataFi;
+
+	// Enviament a Portafirmes
 	@Column(name = "pfirmes_motiu", length = MOTIU_TAMANY)
 	private String motiu;
 	@Column(name = "pfirmes_priori")
@@ -53,6 +56,17 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "pfirmes_datcad")
 	private Date dataCaducitat;
+	@Column(name = "pfirmes_responsables")
+	private String portafirmesResponsables;
+	@Column(name = "pfirmes_seqtipus")
+	@Enumerated(EnumType.STRING)
+	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
+	@Column(name = "pfirmes_fluxid")
+	private String portafirmesFluxId;
+	@Column(name = "pfirmes_transid")
+	private String portafirmesTransaccioId;
+	// /////////////////////////////////////////
+
 	@Column(name = "enviar_correu")
 	private Boolean enviarCorreu;
 	@OneToMany(
@@ -62,6 +76,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	private List<ExecucioMassivaContingutEntity> continguts = new ArrayList<ExecucioMassivaContingutEntity>();
 	@Column(name = "entitat_id")
 	private Long entitatId;
+	@Column(name = "rol_actual")
+	private String rolActual;
 
 	public ExecucioMassivaTipus getTipus() {
 		return tipus;
@@ -90,6 +106,21 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public Long getEntitatId() {
 		return entitatId;
 	}
+	public String getPortafirmesResponsables() {
+		return portafirmesResponsables;
+	}
+	public MetaDocumentFirmaSequenciaTipusEnumDto getPortafirmesSequenciaTipus() {
+		return portafirmesSequenciaTipus;
+	}
+	public String getPortafirmesFluxId() {
+		return portafirmesFluxId;
+	}
+	public String getPortafirmesTransaccioId() {
+		return portafirmesTransaccioId;
+	}
+	public String getRolActual() {
+		return rolActual;
+	}
 
 	public void addContingut(ExecucioMassivaContingutEntity contingut) {
 		getContinguts().add(contingut);
@@ -108,17 +139,27 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			Date dataInici,
 			String motiu,
 			PortafirmesPrioritatEnumDto prioritat,
+			String portafirmesResponsables,
+			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus,
+			String portafirmesFluxId,
+			String portafirmesTransaccioId,
 			Date dataCaducitat,
 			boolean enviarCorreu,
-			Long entitatId) {
+			Long entitatId,
+			String rolActual) {
 		return new Builder(
 				tipus,
 				dataInici,
 				motiu,
 				prioritat,
+				portafirmesResponsables,
+				portafirmesSequenciaTipus,
+				portafirmesFluxId,
+				portafirmesTransaccioId,
 				dataCaducitat,
 				enviarCorreu,
-				entitatId);
+				entitatId,
+				rolActual);
 	}
 	public static class Builder {
 		ExecucioMassivaEntity built;
@@ -126,17 +167,27 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				Date dataInici,
 				String motiu,
 				PortafirmesPrioritatEnumDto prioritat,
+				String portafirmesResponsables,
+				MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus,
+				String portafirmesFluxId,
+				String portafirmesTransaccioId,
 				Date dataCaducitat,
 				boolean enviarCorreu,
-				Long entitatId) {
+				Long entitatId,
+				String rolActual) {
 			built = new ExecucioMassivaEntity();
 			built.tipus = tipus;
 			built.dataInici = dataInici;
 			built.motiu = motiu;
 			built.prioritat = prioritat;
+			built.portafirmesResponsables = portafirmesResponsables;
+			built.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
+			built.portafirmesFluxId = portafirmesFluxId;
+			built.portafirmesTransaccioId = portafirmesTransaccioId;
 			built.dataCaducitat = dataCaducitat;
 			built.enviarCorreu = enviarCorreu;
 			built.entitatId = entitatId;
+			built.rolActual = rolActual;
 		}
 		public ExecucioMassivaEntity build() {
 			return built;

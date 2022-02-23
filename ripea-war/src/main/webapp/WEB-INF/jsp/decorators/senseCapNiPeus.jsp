@@ -22,7 +22,10 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
-    <script>var requestLocale = '${requestLocale}';</script>
+    <script>
+		var requestLocale = '${requestLocale}';
+		var contextAddress = '${pageContext.request.contextPath}';
+	</script>
 	<decorator:head />
 </head>
 <body>

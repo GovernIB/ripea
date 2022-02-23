@@ -54,6 +54,45 @@ public class OrganGestorHelper {
 		}
 	}
 
+	/**
+	 * Comprova si es te permís sobre un òrgan gestor, o un pare d'aquest
+	 *
+	 * @param organGestor
+	 * @param permis
+	 * @return
+	 */
+	public boolean isOrganGestorPermes(
+			OrganGestorEntity organGestor,
+			Permission permis) {
+
+		boolean permes = false;
+
+		boolean granted = permisosHelper.isGrantedAll(
+				organGestor.getId(),
+				OrganGestorEntity.class,
+				new Permission[] {permis},
+				SecurityContextHolder.getContext().getAuthentication());
+		if (granted) {
+			permes = true;
+		} else {
+			List<OrganGestorEntity> organGestorAmbPares = findPares(
+					null,
+					organGestor,
+					true);
+			for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
+				if (permisosHelper.isGrantedAny(
+						organGestorActual.getId(),
+						OrganGestorEntity.class,
+						new Permission[] { permis },
+						SecurityContextHolder.getContext().getAuthentication())) {
+					permes = true;
+					break;
+				}
+			}
+		}
+		return permes;
+	}
+
 	public boolean isOrganGestorPermes(
 			MetaExpedientEntity metaExpedient,
 			OrganGestorEntity organGestor,

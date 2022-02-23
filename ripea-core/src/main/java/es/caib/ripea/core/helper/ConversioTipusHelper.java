@@ -3,13 +3,14 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.entity.*;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -20,51 +21,10 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.aggregation.HistoricAggregation;
 import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
 import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
-import es.caib.ripea.core.api.dto.SeguimentDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.core.entity.AlertaEntity;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.InteressatAdministracioEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
-import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -388,7 +348,30 @@ public class ConversioTipusHelper {
 						target.setIdentificador(source.getIdentificador());
 						return target;
 					}
-				});	
+				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientPeticioEntity, ExpedientPeticioListDto>() {
+					@Override
+					public ExpedientPeticioListDto convert(ExpedientPeticioEntity source, Type<? extends ExpedientPeticioListDto> destinationType) {
+						ExpedientPeticioListDto target = new ExpedientPeticioListDto();
+						target.setId(source.getId());
+						RegistreDto registre = new RegistreDto();
+						if (source.getRegistre() != null) {
+							registre.setIdentificador(source.getRegistre().getIdentificador());
+							registre.setData(source.getRegistre().getData());
+							registre.setExtracte(source.getRegistre().getExtracte());
+							registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
+							registre.setOrigenRegistreNumero(source.getRegistre().getOrigenRegistreNumero());
+						}
+						target.setRegistre(registre);
+						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
+						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setEstat(source.getEstat());
+						target.setIdentificador(source.getIdentificador());
+						return target;
+					}
+				});
 		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<DocumentPortafirmesEntity, SeguimentDto>() {
@@ -512,8 +495,39 @@ public class ConversioTipusHelper {
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
 						return target;
 					}
-				});			
+				});
 
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExecucioMassivaEntity, ExecucioMassivaDto>() {
+					@Override
+					public ExecucioMassivaDto convert(ExecucioMassivaEntity source, Type<? extends ExecucioMassivaDto> destinationType) {
+						ExecucioMassivaDto target = new ExecucioMassivaDto();
+						target.setId(source.getId());
+						target.setTipus(source.getTipus() != null ? ExecucioMassivaDto.ExecucioMassivaTipusDto.valueOf(source.getTipus().name()): null);
+						target.setDataInici(source.getDataInici());
+						target.setDataFi(source.getDataFi());
+						target.setMotiu(source.getMotiu());
+						target.setPrioritat(source.getPrioritat());
+						target.setDataCaducitat(source.getDataCaducitat());
+						target.setPortafirmesResponsables(source.getPortafirmesResponsables() != null ? source.getPortafirmesResponsables().split(",") : null);
+						target.setPortafirmesSequenciaTipus(source.getPortafirmesSequenciaTipus());
+						target.setPortafirmesFluxId(source.getPortafirmesFluxId());
+						target.setPortafirmesTransaccioId(source.getPortafirmesTransaccioId());
+						target.setEnviarCorreu(source.getEnviarCorreu());
+						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
+						return target;
+					}
+				});
+
+//		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
+//				.byDefault()
+//				.register();
+//
+//		mapperFactory.classMap(RegistreAnnexEntity.class, RegistreAnnexDto.class)
+//				.exclude("contingut")
+//				.exclude("firmaContingut")
+//				.byDefault()
+//				.register();
 	}
 	
 

@@ -152,6 +152,33 @@ public class BaseController implements MessageSourceAware {
 	protected String getModalControllerReturnValueWarning(
 			HttpServletRequest request,
 			String url,
+			String messageKey) {
+		return getModalControllerReturnValueWarning(
+				request,
+				url,
+				messageKey,
+				null);
+	}
+	
+	protected String getModalControllerReturnValueWarningText(
+			HttpServletRequest request,
+			String url,
+			String text) {
+
+			MissatgesHelper.warning(
+					request, 
+					text);
+		
+		if (ModalHelper.isModal(request)) {
+			return modalUrlTancar();
+		} else {
+			return url;
+		}
+	}
+	
+	protected String getModalControllerReturnValueWarning(
+			HttpServletRequest request,
+			String url,
 			String messageKey,
 			Object[] messageArgs) {
 		if (messageKey != null) {

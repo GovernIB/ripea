@@ -20,6 +20,7 @@
 <%@ attribute name="emptyOptionTextKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="noResultsFunction" required="false" rtexprvalue="true"%>
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
+<%@ attribute name="comment" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
 <%@ attribute name="netejar" required="false" rtexprvalue="true"%>
@@ -39,6 +40,7 @@
 <c:set var="minimumResultsForSearch"><c:choose><c:when test="${not empty optionMinimumResultsForSearch}">${optionMinimumResultsForSearch}</c:when><c:otherwise>${-1}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
+
 <spring:bind path="${name}">
 	<c:set var="campValue" value="${status.value}"/>
 </spring:bind>
@@ -111,6 +113,7 @@
 					</c:choose>
 				</form:select>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+				<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 		</div>
 	</c:when>
 	<c:when test="${not inline && botons}">
@@ -153,6 +156,7 @@
 					<a class="btn btn-default ${campPath}_btn_edicio" title="${buttonMsg}"><i class="${icon}"></i></a>
 				</span>
 				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+				<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 			</div>
 		</div>
 	</c:when>
@@ -197,6 +201,7 @@
 				<c:otherwise><form:options/></c:otherwise>
 			</c:choose>
 		</form:select>
+		<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 	</c:otherwise>
 </c:choose>
 </div>

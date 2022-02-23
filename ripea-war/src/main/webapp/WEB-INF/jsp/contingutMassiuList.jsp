@@ -79,12 +79,8 @@ $(document).ready(function() {
 					}
 			);
 		});
-		$('#taulaDades').on('draw.dt', function () {
-			var tipus = $('#metaDocumentId').val();
 
-
-			updateSelectionForTipusDocument(tipus);
-			
+		$('#taulaDades').one('draw.dt', function () {
 			$('#seleccioAll').on('click', function() {
 				$.get(
 						"select",
@@ -107,14 +103,30 @@ $(document).ready(function() {
 				return false;
 			});
 		});
+
+		$('#taulaDades').on('draw.dt', function () {
+			if (${portafirmes}) {
+				var tipus = $('#metaDocumentId').val();
+				$('thead tr th:nth-child(1)', $('#taulaDades')).each(function () {
+					enableDisableSelection($(this), tipus);
+				});
+				$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function () {
+					enableDisableSelection($(this), tipus);
+				});
+				updateSelectionForTipusDocument(tipus);
+			}
+		});
+
 		$('#metaExpedientId').trigger('change');
 		$('#metaDocumentId').trigger('change');
 });
 
 function enableDisableSelection($this, tipus) {
+	debugger
     if (tipus != undefined && tipus != "") {
     	$this.removeClass('selection-disabled');
     	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
+		$('.botons .btn-group button').removeAttr('disabled');
     } else {
     	$this.addClass('selection-disabled');
     	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
@@ -125,6 +137,7 @@ function enableDisableSelection($this, tipus) {
 					$('#taulaDades').webutilDatatable('select-none');
 				}
 			);
+		$('.botons .btn-group button').attr('disabled','disabled');
 	}
 }
 

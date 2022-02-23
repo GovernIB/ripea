@@ -167,19 +167,22 @@ $(document).ready(function(){
 	});
 
 	$('#btnSave').on('click', function() {
+
 		var showConfirm = false;
 		var expedientId = $('#expedientId').val();
-		if (expedientId != null && expedientId != '') {
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/expedientPeticio/comprovarInteressatsPeticio/"/>' + expedientId + '/${expedientPeticioId}',
-				async: false,
-				success: function(data) {
-					showConfirm = data;
-				}
-			});
+		if (expedientId) {
+			var associarInteressats = $('#associarInteressats').is(":checked");
+			if (associarInteressats) {
+				$.ajax({
+					type: 'GET',
+					url: '<c:url value="/expedientPeticio/comprovarInteressatsPeticio/"/>' + expedientId + '/${expedientPeticioId}',
+					async: false,
+					success: function(data) {
+						showConfirm = data;
+					}
+				});
+			}
 		}
-		
 		if (showConfirm) {
 			var overrideInteressat = confirm("<spring:message code="expedientPeticio.form.acceptar.confirm"/>");
 			if (overrideInteressat) {
@@ -188,6 +191,7 @@ $(document).ready(function(){
 		} else {
 			$('#expedientPeticioAcceptarForm').submit();
 		}
+
 	});
 });
 </script>

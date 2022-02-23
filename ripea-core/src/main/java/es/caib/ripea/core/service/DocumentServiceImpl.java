@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -12,7 +11,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +49,7 @@ import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
@@ -68,6 +67,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -102,6 +102,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -1418,6 +1419,19 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return new NotificacioInfoRegistreDto();
 	}
+	
+	
+	@Override
+	@Transactional
+	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId) {
+		
+		DocumentNotificacioEntity documentNotificacioEntity = documentNotificacioRepository.findOne(notificacioId);
+
+		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getEnviamentIdentificador());
+		return conversioTipusHelper.convertir(resposta, RespostaJustificantEnviamentNotibDto.class);
+	}
+
+
 
 	@Override
 	@Transactional

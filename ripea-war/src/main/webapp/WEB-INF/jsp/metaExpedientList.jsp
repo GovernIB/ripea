@@ -55,8 +55,21 @@
 	</script>
 </head>
 <body>
-	<div class="text-right" data-toggle="botons-titol">
-		<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
+
+	<div class="text-right" data-toggle="botons-titol" data-btn-title-col-size="4">
+		<div>
+				<div class="btn-group">
+					<button class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  						<span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
+						<li><a href="metaExpedient/importFitxer" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
+					</ul>
+				</div>
+			
+			<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
+		</div>
 	</div>
 	<c:url value="metaExpedient/filtrar" var="formAction"/>
 	<form:form id="metaExpedientFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="metaExpedientFiltreCommand">
@@ -211,6 +224,7 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
 								{^{if !~hlpIsAdministradorOrgan() || (~hlpIsAdministradorOrgan() && revisioEstat != 'REVISAT')}}
 									{{if !actiu}}
 									<li><a href="metaExpedient/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>

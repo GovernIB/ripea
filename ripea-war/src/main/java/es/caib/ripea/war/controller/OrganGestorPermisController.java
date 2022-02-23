@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
 import es.caib.ripea.war.command.PermisOrganGestorCommand;
@@ -38,6 +40,9 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
 public class OrganGestorPermisController extends BaseAdminController {
 
 	private final static String ORGANS_FILTRE = "organs_filtre";
+	
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@Autowired
 	private OrganGestorService organGestorService;
@@ -109,6 +114,16 @@ public class OrganGestorPermisController extends BaseAdminController {
 			Model model) {
 		command.setOrganGestorId(organId);
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+
+		if (command.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
+			organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), command.getPrincipalNom());
+		} else {
+			List<String> usuaris = aplicacioService.findUsuarisCodisAmbRol(command.getPrincipalNom());
+			for (String usuari : usuaris) {
+				organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), usuari);
+			}
+		}
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitat.getId()));
 			return "organGestorPermisForm";
@@ -127,6 +142,21 @@ public class OrganGestorPermisController extends BaseAdminController {
 	@RequestMapping(value = "{permisId}/delete", method = RequestMethod.GET)
 	public String delete(HttpServletRequest request, @PathVariable Long organId, @PathVariable Long permisId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitatActual.getId(), organId);
+		for (PermisOrganGestorDto permisOrganGestorDto : permisos) {
+			if (permisOrganGestorDto.getId().equals(permisId)) {
+				if (permisOrganGestorDto.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
+					organGestorService.evictOrganismesEntitatAmbPermis(entitatActual.getId(), permisOrganGestorDto.getPrincipalNom());
+				} else {
+					List<String> usuaris = aplicacioService.findUsuarisCodisAmbRol(permisOrganGestorDto.getPrincipalNom());
+					for (String usuari : usuaris) {
+						organGestorService.evictOrganismesEntitatAmbPermis(entitatActual.getId(), usuari);
+					}
+				}
+			}
+		}
+		
 		organGestorService.deletePermis(organId, permisId, entitatActual.getId());
 		return getAjaxControllerReturnValueSuccess(
 				request,

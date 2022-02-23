@@ -68,6 +68,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
     protected Set<ExpedientEstatEntity> estats;
     
+    @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
+    protected Set<MetaExpedientTascaEntity> tasques;
     
     @OneToMany(mappedBy = "metaExpedient", cascade = { CascadeType.ALL })
     protected Set<HistoricEntity> historics;

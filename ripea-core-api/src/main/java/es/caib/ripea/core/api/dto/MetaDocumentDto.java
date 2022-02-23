@@ -29,6 +29,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private String firmaPassarelaCustodiaTipus;
 	private String plantillaNom;
 	private String plantillaContentType;
+	private byte[] plantillaContingut;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	private String ntiTipoDocumental;
 	private NtiOrigenEnumDto ntiOrigen;
@@ -37,6 +38,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	private String pinbalFinalitat;
 	private boolean perDefecte;
 	private Long metaExpedientId;
 	

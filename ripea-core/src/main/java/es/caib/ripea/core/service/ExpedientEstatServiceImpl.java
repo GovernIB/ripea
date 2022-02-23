@@ -36,6 +36,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientEstatHelper;
 import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -72,6 +73,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private ExpedientEstatHelper expedientEstatHelper;
 	
 	
 	@Transactional(readOnly = true)
@@ -179,39 +182,12 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	public ExpedientEstatDto createExpedientEstat(
 			Long entitatId,
 			ExpedientEstatDto estat, String rolActual, Long organId) {
-		logger.debug("Creant un nou estat d'expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"estat=" + estat + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, estat.getMetaExpedientId());
-		int ordre = expedientEstatRepository.countByMetaExpedient(metaExpedient);
-		ExpedientEstatEntity expedientEstat = ExpedientEstatEntity.getBuilder(
-				estat.getCodi(),
-				estat.getNom(),
-				ordre,
-				estat.getColor(),
-				metaExpedient,
-				estat.getResponsableCodi()).
-				build();
-		//if inicial of the modified state is true set inicial of other states to false
-		if(estat.isInicial()){
-			List<ExpedientEstatEntity> expedientEstats =  expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(metaExpedient);
-			for (ExpedientEstatEntity expEst: expedientEstats){
-				if(!expEst.equals(expedientEstat)){
-					expEst.updateInicial(false);
-				}
-			}
-			expedientEstat.updateInicial(true);
-		} else {
-			expedientEstat.updateInicial(false);
-		}
-		
-		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
-		}
-		return conversioTipusHelper.convertir(
-				expedientEstatRepository.save(expedientEstat),
-				ExpedientEstatDto.class);
+
+		return expedientEstatHelper.createExpedientEstat(
+				entitatId,
+				estat,
+				rolActual,
+				organId);
 	}
 
 	@Transactional

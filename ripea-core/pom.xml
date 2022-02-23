@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.89</version>
+		<version>0.9.90</version>
 	</parent>
 	<artifactId>ripea-core</artifactId>
 	<packaging>ejb</packaging>
@@ -12,6 +12,11 @@
 		<liquibase.version>4.4.3</liquibase.version>
 	</properties>
 	<dependencies>
+		<dependency>
+		    <groupId>com.sun.jersey</groupId>
+		    <artifactId>jersey-client</artifactId>
+		    <version>1.19.3</version>
+		</dependency>	
 		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
@@ -346,6 +351,42 @@
 					</exclusions>
 				</dependency>
 			</dependencies>
+		</profile>
+		<profile>
+			<id>jboss</id>
+			<activation>
+				<file>
+					<missing>../ripea-war/appserv_tomcat</missing>
+				</file>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<version>1.5.3</version>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<basedir>${basedir}/src/main/java/es/caib/ripea/core/ejb/ws</basedir>
+									<includes>
+										<include>PortaFIBCallbackWsBean.java</include>
+										<include>MCGDWsBean.java</include>
+										<include>BackofficeWsServiceBean.java</include>
+									</includes>
+									<token>/ripea</token>
+									<value>/${ripea.path}</value>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 	<build>

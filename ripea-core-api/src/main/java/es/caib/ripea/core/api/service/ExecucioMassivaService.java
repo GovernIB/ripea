@@ -35,24 +35,11 @@ public interface ExecucioMassivaService {
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException;
 	
 	/**
-	 * Retorna l'ID de la pròxima execució massiva activa
-	 * 
-	 * @param ultimaExecucioMassiva
-	 *            Dto amb la informació de l'execució massiva a programar
-	 */
-	public Long getExecucionsMassivesActiva(Long ultimaExecucioMassiva);
-	
-	/**
 	 * Executa un contingut massiu
 	 * 
 	 * @param cmasiu_id id del contingut massiu a executar
 	 */
 	public void executarExecucioMassiva(Long cmasiu_id) throws NotFoundException, ValidationException;
-	
-	
-	public void generaInformeError(Long emc_id, String error) throws NotFoundException;
-	
-	public void actualitzaUltimaOperacio(Long ome_id) throws NotFoundException, ExecucioMassivaException;
 	
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException;
 	
