@@ -870,16 +870,15 @@ tr.clicable {
 							</div>
  							<div id="collapse-annex-${status.index}" class="panel-collapse collapse collapse-annex" role="tabpanel" aria-labelledby="dadesAnnex${status.index}" data-registre-id="${registre.id}"  data-fitxer-arxiu-uuid="${annex.uuid}">
 
-
 								<div>
 									<c:if test="${annex.estat == 'PENDENT' && not empty annex.error}">
 									
 										<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
 											<span class="fa fa-exclamation-triangle"></span>
-											<spring:message code="expedientPeticio.detalls.annex.error" />
+											<spring:message code="expedient.peticio.detalls.annex.error" />
 											<a href="<c:url value="/expedientPeticio/${annex.id}/${peticio.id}/reintentar"/>"
-												class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
-												<spring:message code="expedientPeticio.detalls.annex.accio.reintentar" /></a>
+												class="btn btn-xs btn-default pull-right" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-refresh"></span>
+												<spring:message code="expedient.peticio.detalls.annex.accio.reintentar" /></a>
 										</div>
 										<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${annex.error}</pre>
 									</c:if>
@@ -992,10 +991,10 @@ tr.clicable {
 								<c:if test="${registre.justificant.estat == 'PENDENT' && not empty registre.justificant.error}">	
 										<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
 											<span class="fa fa-exclamation-triangle"></span>
-											<spring:message code="expedientPeticio.detalls.annex.error" />
+											<spring:message code="expedient.peticio.detalls.annex.error" />
 											<a href="<c:url value="/expedientPeticio/justificant/${peticio.id}/reintentar"/>"
 												class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
-												<spring:message code="expedientPeticio.detalls.annex.accio.reintentar" /></a>
+												<spring:message code="expedient.peticio.detalls.annex.accio.reintentar" /></a>
 										</div>
 										<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${registre.justificant.error}</pre>
 									</c:if>
@@ -1063,10 +1062,10 @@ tr.clicable {
 				<div>
 					<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
 						<span class="fa fa-exclamation-triangle"></span>
-						<spring:message code="expedientPeticio.detalls.errorNotifacio" />
+						<spring:message code="expedient.peticio.detalls.errorNotifacio" />
 						<a href="<c:url value="/expedientPeticio/${peticio.id}/reintentarNotificar"/>"
 							class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
-							<spring:message code="expedientPeticio.detalls.annex.accio.reintentar" /></a>
+							<spring:message code="expedient.peticio.detalls.annex.accio.reintentar" /></a>
 					</div>
 					<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${peticio.notificaDistError}</pre>
 				</div>

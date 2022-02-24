@@ -22,6 +22,7 @@ public class ExpedientPeticioDto {
 	private String metaExpedientNom;
 	private ExpedientPeticioAccioEnumDto accio;
 	private String notificaDistError;
+	private Long expedientId;
 
 	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {
@@ -109,6 +110,11 @@ public class ExpedientPeticioDto {
 	public void setMetaExpedientId(Long metaExpedientId) {
 		this.metaExpedientId = metaExpedientId;
 	}
-	
+	public Long getExpedientId() {
+		return expedientId;
+	}
+	public void setExpedientId(Long expedientId) {
+		this.expedientId = expedientId;
+	}
 
 }

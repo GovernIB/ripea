@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.war.command;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
@@ -24,6 +27,8 @@ public class ExpedientPeticioAcceptarCommand {
 	private ExpedientPeticioAccioEnumDto accio;
 	
 	private Long organGestorId;
+    private List<RegistreAnnexCommand> annexos = new ArrayList<>();
+	
 	
 
 	public ExpedientPeticioAccioEnumDto getAccio() {
@@ -68,12 +73,17 @@ public class ExpedientPeticioAcceptarCommand {
 	public void setAssociarInteressats(boolean associarInteressats) {
 		this.associarInteressats = associarInteressats;
 	}
-
 	public Long getOrganGestorId() {
 		return organGestorId;
 	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;
+	}
+	public List<RegistreAnnexCommand> getAnnexos() {
+		return annexos;
+	}
+	public void setAnnexos(List<RegistreAnnexCommand> annexos) {
+		this.annexos = annexos;
 	}
 	@Override
 	public String toString() {

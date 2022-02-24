@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.service.OrganGestorService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.mockito.Mockito;
@@ -23,6 +21,21 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -184,7 +197,9 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 								expedientCreate.getNom(),
 								null,
 								false,
-								null, null);
+								null, 
+								null, 
+								null);
 						try {
 							elementsCreats.add(creat);
 							testAmbExpedientCreat.executar(elementsCreats);

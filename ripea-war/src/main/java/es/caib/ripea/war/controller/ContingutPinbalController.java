@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.ejb.EJBException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -26,7 +25,6 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
-import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -103,7 +101,8 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List <MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
-				contingutId);
+				contingutId, 
+				null);
 		Iterator<MetaDocumentDto> itmd = metaDocuments.iterator();
 		while (itmd.hasNext()) {
 			MetaDocumentDto metaDocument = itmd.next();

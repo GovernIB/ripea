@@ -11,7 +11,7 @@ pageContext.setAttribute(
 		es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
 %>
 <c:set var="titol">
-	<spring:message code="expedientPeticio.form.acceptar.titol" />
+	<spring:message code="expedient.peticio.form.acceptar.titol" />
 </c:set>
 <html>
 <head>
@@ -184,7 +184,7 @@ $(document).ready(function(){
 			}
 		}
 		if (showConfirm) {
-			var overrideInteressat = confirm("<spring:message code="expedientPeticio.form.acceptar.confirm"/>");
+			var overrideInteressat = confirm("<spring:message code="expedient.peticio.form.acceptar.confirm"/>");
 			if (overrideInteressat) {
 				$('#expedientPeticioAcceptarForm').submit();
 			}
@@ -206,24 +206,24 @@ $(document).ready(function(){
 </head>
 <body>
 	<c:set var="formAction">
-		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
+		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/next" />
 	</c:set>
 	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
 		<form:hidden path="id" />
 
-		<rip:inputRadio name="accio" textKey="expedientPeticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<rip:inputRadio name="accio" textKey="expedient.peticio.form.acceptar.camp.accio" botons="true" optionItems="${accios}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 
-		<rip:inputSelect name="metaExpedientId" textKey="expedientPeticio.form.acceptar.camp.metaExpedient"
+		<rip:inputSelect name="metaExpedientId" textKey="expedient.peticio.form.acceptar.camp.metaExpedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true"
 			optionTextAttribute="codiSiaINom" optionMinimumResultsForSearch="6"/>
 			
 		<div id="input-accio-incorporar" class="hidden">
 			<rip:inputSelect name="expedientId"
-				textKey="expedientPeticio.form.acceptar.camp.expedient" required="true" 
+				textKey="expedient.peticio.form.acceptar.camp.expedient" required="true" 
 	 			optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="6"/> 
 		</div>
 		<div id="input-accio-crear" class="hidden">
-			<rip:inputText name="newExpedientTitol" textKey="expedientPeticio.form.acceptar.camp.newExpedientTitol"
+			<rip:inputText name="newExpedientTitol" textKey="expedient.peticio.form.acceptar.camp.newExpedientTitol"
 				required="true" />
 			<div id="organFixed" style="display: none;">
 				<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true"><span id="organFixedNom"></span></rip:inputFixed>
@@ -231,16 +231,16 @@ $(document).ready(function(){
 			<div id="organSelect" style="display: none;">
 				<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true"/>
 			</div>			
-			<rip:inputText name="any" textKey="expedientPeticio.form.acceptar.camp.any" required="true"/> 			
+			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 			
 		</div>
 		
 		<rip:inputCheckbox name="associarInteressats"
- 			textKey="expedientPeticio.form.acceptar.camp.associarInteressats"/> 
-			
+ 			textKey="expedient.peticio.form.acceptar.camp.associarInteressats"/> 
+ 			
 		<div id="modal-botons" class="well">
-			<button id="btnSave" type="submit" class="btn btn-success">
-				<span class="fa fa-save"></span>
-				<spring:message code="comu.boto.guardar" />
+			<button id="btnSave" type="submit" data-toggle="modal" class="btn btn-success">
+				<span class="fa fa-arrow-right"></span>
+				<spring:message code="comu.boto.next" />
 			</button>
 			<a href="<c:url value="/expedientPeticio"/>" class="btn btn-default"
 				data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>

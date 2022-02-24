@@ -6,6 +6,7 @@ package es.caib.ripea.core.ejb;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -54,7 +55,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId, 
-			String rolActual) {
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -67,7 +69,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				expedientPeticioId,
 				associarInteressats,
 				grupId, 
-				rolActual);
+				rolActual, 
+				anexosIdsMetaDocsIdsMap);
 	}
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,
@@ -282,9 +285,14 @@ public class ExpedientServiceBean implements ExpedientService {
 
 
 	@Override
-	public boolean retryCreateDocFromAnnex(Long registreAnnexId,
-			Long expedientPeticioId) {
-		return delegate.retryCreateDocFromAnnex(registreAnnexId, expedientPeticioId);		
+	public boolean retryCreateDocFromAnnex(
+			Long registreAnnexId,
+			Long expedientPeticioId, 
+			Long metaDocumentId) {
+		return delegate.retryCreateDocFromAnnex(
+				registreAnnexId, 
+				expedientPeticioId, 
+				metaDocumentId);		
 	}
 
 	@Override
@@ -299,8 +307,15 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientId,
 			Long expedientPeticioId,
 			boolean associarInteressats, 
-			String rolActual) {
-		return delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats, rolActual);
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+		return delegate.incorporar(
+				entitatId, 
+				expedientId, 
+				expedientPeticioId,  
+				associarInteressats, 
+				rolActual, 
+				anexosIdsMetaDocsIdsMap);
 		
 	}
 

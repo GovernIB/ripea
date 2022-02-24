@@ -355,14 +355,15 @@ public class ExpedientHelper {
 
 	/**
 	 * Creates document from registre annex
-	 * 
-	 * @param registreAnnexId
 	 * @param expedientId 
+	 * @param registreAnnexId
 	 * @param expedientPeticioId
+	 * @param metaDocumentId
+	 * 
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId) {
+	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
@@ -398,9 +399,10 @@ public class ExpedientHelper {
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
-//		Recuperar tipus document per defecte
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
 		
+//		Recuperar tipus document per defecte
+		MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
+
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),
 				documentDto.getNom(),

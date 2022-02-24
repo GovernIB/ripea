@@ -169,7 +169,7 @@ public class ContingutImportacioController extends BaseUserController {
 					request, 
 					getMessage(
 						request, 
-						"expedientPeticio.controller.acceptat.duplicat.warning",
+						"expedient.peticio.controller.acceptat.duplicat.warning",
 						new Object[] {sb.toString()}));
 		}
 	}
