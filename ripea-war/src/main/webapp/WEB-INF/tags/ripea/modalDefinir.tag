@@ -14,7 +14,7 @@
 				<h4 class="modal-title"></h4>
 			</div>
 			<div class="modal-body">
-				<iframe frameborder="0" height="100" width="99.6%"></iframe>
+				<iframe frameborder="0" height="80" width="99.6%"></iframe>
 			</div>
 			<div class="modal-footer">
 			</div>

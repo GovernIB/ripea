@@ -11,20 +11,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.ripea.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 
 /**
@@ -297,6 +287,16 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	@Override
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId) {
 		return delegate.findAmbEntitat(entitatId);
+	}
+
+    @Override
+    public boolean publicarComentariPerExpedientTasca(Long entitatId, Long expedientTascaId, String text, String rolActual) {
+        return delegate.publicarComentariPerExpedientTasca(entitatId, expedientTascaId, text, rolActual);
+    }
+
+	@Override
+	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId) {
+		return delegate.findComentarisPerTasca(entitatId, expedientTascaId);
 	}
 
 }

@@ -154,7 +154,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	
 			List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
-					contingutId);
+					contingutId, 
+					null);
 			List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
 			List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
 			for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
@@ -756,7 +757,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				"metaDocuments",
 				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
-						contingut.getId()));
+						contingut.getId(), 
+						null));
 		if (contingut instanceof ExpedientDto) {
 
 			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(

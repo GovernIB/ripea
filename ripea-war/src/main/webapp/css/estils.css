@@ -133,3 +133,42 @@ div.exemple {
 	pointer-events: none;
 	opacity: .65;
 }
+
+.color-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 6px;
+	border-radius: 8px;
+	top: 2px;
+	position: relative;
+}
+
+.no-icon {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 6px;
+	border: solid 1px #AAA;
+	border-radius: 8px;
+	top: 2px;
+	position: relative;
+	border: dashed 1px #AAA;
+}
+
+.color-legend {
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	border-radius: 11px;
+}
+
+.color-legend-min {
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	margin-right: 6px;
+	border-radius: 11px;
+	position: relative;
+	top: -1px;
+}

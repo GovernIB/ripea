@@ -247,6 +247,11 @@ public class ExpedientHelper {
 				
 			}
 		}
+		// Crea les relacions expedients i organs pare
+		organGestorHelper.crearExpedientOrganPares(
+				expedient,
+				organGestor);
+		
 		// if expedient comes from distribucio
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
@@ -256,10 +261,11 @@ public class ExpedientHelper {
 		}
 		// crear carpetes per defecte del procediment
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
-		// Crea les relacions expedients i organs pare
-		organGestorHelper.crearExpedientOrganPares(
-				expedient,
-				organGestor);
+		
+		boolean throwExcepcion = false;//throwExcepcion = true;
+		if (throwExcepcion) {
+			throw new RuntimeException("Mock excepcion al crear expedient");
+		}
 		
 		try {
 		//create expedient in arxiu
@@ -279,7 +285,6 @@ public class ExpedientHelper {
 		return expedient.getId();
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
@@ -350,15 +355,15 @@ public class ExpedientHelper {
 
 	/**
 	 * Creates document from registre annex
-	 * 
-	 * @param registreAnnexId
 	 * @param expedientId 
+	 * @param registreAnnexId
 	 * @param expedientPeticioId
+	 * @param metaDocumentId
+	 * 
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId) {
-		
+	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
@@ -386,8 +391,10 @@ public class ExpedientHelper {
 				documentDto.getNom(),
 				null,
 				DocumentEntity.class);
+		
 //		Recuperar tipus document per defecte
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
+		MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
+
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),
 				documentDto.getNom(),

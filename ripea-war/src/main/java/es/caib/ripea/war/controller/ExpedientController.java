@@ -490,7 +490,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					null,
 					false,
 					command.getGrupId(), 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					null);
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			
@@ -532,7 +533,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				}
 
 			} else { 
-				throw ex;
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../expedient",
+						"expedient.controller.creat.error",
+						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
 			}
 		}
 	}
@@ -1313,6 +1318,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	        c.set(Calendar.MINUTE, 0);
 	        c.set(Calendar.SECOND, 0);
 			filtreCommand.setDataCreacioInici(c.getTime());
+			filtreCommand.setExpedientEstatId(Long.valueOf(0));
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));

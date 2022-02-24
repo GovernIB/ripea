@@ -30,6 +30,7 @@
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="iconAddicional" required="false" rtexprvalue="true"%>
+<%@ attribute name="templateResultFunction" required="false" rtexprvalue="true"%>
 
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <c:set var="campPath" value="${name}"/>
@@ -58,12 +59,12 @@
 					data-enum="${optionEnum}" data-enum-value="${campValue}"
 					data-noresultsfunction="${noResultsFunction}"
 					multiple="${multiple}"
-					data-idioma="${idioma}">
+					data-idioma="${idioma}"
+				 	data-templateresultfunction="${templateResultFunction}">
 					<c:if test="${emptyOption == 'true'}">
 						<c:choose>
 							<c:when test="${not empty emptyOptionTextKey}">
-								<option value=""><spring:message
-										code="${emptyOptionTextKey}" /></option>
+								<option value=""><spring:message code="${emptyOptionTextKey}" /></option>
 							</c:when>
 							<c:when test="${not empty emptyOptionText}">
 								<option value="">${emptyOptionText}</option>
@@ -78,8 +79,7 @@
 							<c:forEach var="opt" items="${optionItems}">
 								<c:set var="nivellTxt">
 									<c:if test="${not empty optionNivellAttribute}">
-										<c:forEach begin="${0}" end="${(opt[optionNivellAttribute])}"
-											varStatus="status">
+										<c:forEach begin="${0}" end="${(opt[optionNivellAttribute])}" varStatus="status">
 											<c:if test="${status.index >= 1}">&nbsp;&nbsp;&nbsp;&nbsp;</c:if>
 										</c:forEach>
 									</c:if>
@@ -92,7 +92,7 @@
 											</c:when>
 											<c:when test="${not empty optionTextKeyAttribute}">
 												<form:option value="${opt[optionValueAttribute]}">${nivellTxt}<spring:message
-														code="${opt[optionTextKeyAttribute]}" />
+														code="${opt[optionTextKeyAttribute]}"/>
 												</form:option>
 											</c:when>
 											<c:otherwise>
@@ -121,7 +121,20 @@
 		<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
 		<div class="col-xs-${campInputSize}">
 			<div class="input-group select2-bootstrap-append">
-				<form:select path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" style="width:100%" data-toggle="select2" data-netejar="${netejar}" data-placeholder="${campPlaceholder}" data-minimumresults="${minimumResultsForSearch}" data-enum="${optionEnum}" data-enum-value="${campValue}" multiple="${multiple}" data-idioma="${idioma}">
+				<form:select path="${campPath}"
+							 id="${campId}"
+							 cssClass="form-control"
+							 disabled="${disabled}"
+							 style="width:100%"
+							 data-toggle="select2"
+							 data-netejar="${netejar}"
+							 data-placeholder="${campPlaceholder}"
+							 data-minimumresults="${minimumResultsForSearch}"
+							 data-enum="${optionEnum}"
+							 data-enum-value="${campValue}"
+							 multiple="${multiple}"
+							 data-idioma="${idioma}"
+							 data-templateresultfunction="${templateResultFunction}">
 					<c:if test="${emptyOption == 'true'}">
 						<c:choose>
 							<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>
@@ -173,7 +186,8 @@
 						data-enum="${optionEnum}" 
 						data-enum-value="${campValue}"
 						multiple="${multiple}"
-						data-idioma="${idioma}">
+						data-idioma="${idioma}"
+						data-templateresultfunction="${templateResultFunction}">
 			<c:if test="${emptyOption == 'true'}">
 				<c:choose>
 					<c:when test="${not empty emptyOptionTextKey}"><option value=""><spring:message code="${emptyOptionTextKey}"/></option></c:when>

@@ -122,7 +122,6 @@ $(document).ready(function() {
 });
 
 function enableDisableSelection($this, tipus) {
-	debugger
     if (tipus != undefined && tipus != "") {
     	$this.removeClass('selection-disabled');
     	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
