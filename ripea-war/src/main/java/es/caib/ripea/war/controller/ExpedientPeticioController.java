@@ -177,7 +177,21 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 		
 		ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId());
 		
-
+		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
+		if (metaDocPerDefecte != null) {
+			boolean potCrearMetaDocPerDefecte = false;
+			for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
+				if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
+					potCrearMetaDocPerDefecte = true;
+				}
+			}
+			if (potCrearMetaDocPerDefecte) {
+				registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
+			} else {
+				MissatgesHelper.warning(
+						request,
+						getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
+			}
 		}
 		
 		model.addAttribute(
@@ -404,7 +418,54 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 		}
 		
 		
-	
+		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = new ArrayList<>();
+		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
+					entitatActual.getId(),
+					null, 
+					command.getMetaExpedientId());
+		} else {
+			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
+					entitatActual.getId(),
+					command.getExpedientId(), 
+					null);
+		}
+		model.addAttribute(
+				"metaDocuments",
+				metaDocumentsQueQuedenPerCreacio);
+		
+		command.setAnnexos(ConversioTipusHelper.convertirList(expedientPeticioService.findOne(expedientPeticioId).getRegistre().getAnnexos(), RegistreAnnexCommand.class));
+
+		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), command.getMetaExpedientId());
+		if (metaDocPerDefecte != null) {
+			boolean potCrearMetaDocPerDefecte = false;
+			for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
+				if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
+					potCrearMetaDocPerDefecte = true;
+				}
+			}
+			if (potCrearMetaDocPerDefecte) {
+				boolean potCrearNomesUnMetaDocPerDefecte = !metaDocPerDefecte.isPermetMultiple();
+				
+				if (potCrearNomesUnMetaDocPerDefecte || command.getAnnexos().size() > 1) {
+					command.getAnnexos().get(0).setMetaDocumentId(metaDocPerDefecte.getId());
+					MissatgesHelper.warning(
+							request,
+							getMessage(request, "expedient.peticio.controller.acceptar.warning.pot.crear.nomes.un.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
+					
+				} else {
+					for (RegistreAnnexCommand registreAnnexCommand : command.getAnnexos()) {
+						registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
+					}
+				}
+
+			} else {
+				MissatgesHelper.warning(
+						request,
+						getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
+			}
+		}
+
 		return "expedientPeticioAcceptMetaDocs";
 	}
 	
@@ -426,7 +487,19 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			}
 		}
 		
-
+		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = new ArrayList<>();
+		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
+					entitatActual.getId(),
+					null, 
+					command.getMetaExpedientId());
+		} else {
+			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
+					entitatActual.getId(),
+					command.getExpedientId(), 
+					null);
+		}
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaDocuments",

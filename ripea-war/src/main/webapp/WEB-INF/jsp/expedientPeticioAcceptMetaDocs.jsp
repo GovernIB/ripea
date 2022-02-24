@@ -28,6 +28,57 @@
 
 $(document).ready(function(){
 
+var metaDocs = [];
+<c:forEach var="metaDoc" items="${metaDocuments}" varStatus="status">
+metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple}, 'nom': '${metaDoc.nom}'});
+</c:forEach>
+
+	var listOfSelectedNotMultiple = [];
+	$("[id$=metaDocumentId]").on('change', function(e) {
+
+		elementWithChange = $(this);
+		elementWithChangeId = $(this).val();
+		
+		listOfSelectedNotMultiple = [];
+		$("[id$=metaDocumentId]").each( function() {
+			elemeId = $(this).val();
+			for (var md in metaDocs) {
+				if (elemeId == metaDocs[md].id && metaDocs[md].permetMultiple==false) {
+					listOfSelectedNotMultiple.push(metaDocs[md]);
+				}
+			}
+		});
+		
+		$("[id$=metaDocumentId]").each( function() {
+			var other = $(this);
+			var otherId = $(this).val();
+			if (!other.is(elementWithChange)) {
+				var thisList = [];
+				for (var md in metaDocs) {
+					var addToList = true;
+					for (var nm in listOfSelectedNotMultiple) {
+						if (listOfSelectedNotMultiple[nm].id == metaDocs[md].id && listOfSelectedNotMultiple[nm].id != otherId) {
+							addToList = false;
+						}
+					}
+					if (addToList) {
+						thisList.push(metaDocs[md]);
+					}
+				}
+				var idElem = other.attr('id');
+				idElem = idElem.replace(/\[/g, '\\[').replace(/\]/g, '\\]').replace(/\./g, '\\.');
+				$('#' + idElem + ' option[value!=""]').remove();
+				for (var i = 0; i < thisList.length; i++) {
+					other.append('<option value="' + thisList[i].id + '">' + thisList[i].nom + '</option>');
+				}
+				$(other).val(otherId);
+				
+			}
+		});
+	});
+
+	$("[id$=metaDocumentId]").trigger( "change" );
+	
 	$("button#btnSave").submit(function (e) {
 	    e.preventDefault();
 	    $("button#btnSave").attr("disabled", true);
