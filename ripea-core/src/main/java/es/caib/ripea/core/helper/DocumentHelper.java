@@ -869,7 +869,7 @@ public class DocumentHelper {
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		for (DocumentEntity document : documents) {
 			if (document.getEsborrat() == 0 
-					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
+					&& (document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL) || document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT))
 					&& (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
 				return true;
 			}
