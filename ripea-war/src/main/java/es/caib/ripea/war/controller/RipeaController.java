@@ -39,7 +39,7 @@ public class RipeaController {
 			HttpServletRequest request) {
 		
 		if (RolHelper.isRolActualSuperusuari(request)) {
-			return "redirect:entitat";
+			return "redirect:integracio";
 		} else {
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 			if (entitat == null)
