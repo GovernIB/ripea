@@ -640,6 +640,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ExpedientDto expedient = new ExpedientDto();
 				expedient.setId(exp.getId());
 				expedient.setNom(exp.getNom());
+				expedient.setNumero(expedientHelper.calcularNumero(exp));
 				expedient.setAgafatPer(
 						conversioTipusHelper.convertir(
 								exp.getAgafatPer(),
@@ -654,6 +655,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExpedientDto expedient = new ExpedientDto();
 					expedient.setId(exp.getId());
 					expedient.setNom(exp.getNom());
+					expedient.setNumero(expedientHelper.calcularNumero(exp));
 					expedient.setAgafatPer(
 							conversioTipusHelper.convertir(
 									exp.getAgafatPer(),
