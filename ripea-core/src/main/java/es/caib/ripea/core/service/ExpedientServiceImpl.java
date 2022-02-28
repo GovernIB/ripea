@@ -72,6 +72,7 @@ import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
@@ -1269,16 +1270,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
 				expedientIds);
 		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
-		int numColumnes = 5 + metaDades.size();
+		int numColumnes = 7 + metaDades.size();
 		String[] columnes = new String[numColumnes];
 		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
 		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
 		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
 		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
 		columnes[4] = messageHelper.getMessage("expedient.service.exportacio.idnti");
+		columnes[5] = messageHelper.getMessage("expedient.service.exportacio.procediment");
+		columnes[6] = messageHelper.getMessage("expedient.service.exportacio.interessats");
 		for (int i = 0; i < metaDades.size(); i++) {
 			MetaDadaEntity metaDada = metaDades.get(i);
-			columnes[5 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
+			columnes[7 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		List<String[]> files = new ArrayList<String[]>();
@@ -1294,7 +1297,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
 			fila[4] = expedient.getNtiIdentificador();
-			if (!dades.isEmpty()) {
+			fila[5] = expedient.getMetaExpedient().getNom();
+			
+			String intressatsString = "";
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				intressatsString += interessat.getIdentificador() + " | ";
+			}
+			intressatsString = intressatsString.replaceAll(",","");
+			
+			int index = intressatsString.lastIndexOf(" | ");
+			if (index != -1) {
+				intressatsString = intressatsString.substring(0, index);
+			}
+			fila[6] = intressatsString;
+			
+			if (!dades.isEmpty() && dadesIndex < dades.size()) {
 				DadaEntity dadaActual = dades.get(dadesIndex);
 				if (dadaActual.getNode().getId().equals(expedient.getId())) {
 					for (int i = 0; i < metaDades.size(); i++) {
@@ -1313,7 +1330,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							dadaActual = dades.get(dadesIndex + dadesIndexIncrement);
 						}
 						if (dadaActual.getMetaDada().getId().equals(metaDada.getId()) && dadaActual.getNode().getId().equals(expedient.getId())) {
-							fila[5 + i] = dadaActual.getValorComString();
+							fila[7 + i] = dadaActual.getValorComString();
 						} else {
 							dadaActual = dades.get(dadesIndex);
 						}
