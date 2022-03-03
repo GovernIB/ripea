@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -184,13 +185,15 @@ public interface DocumentEnviamentService {
 	 *            Atribut id de l'entitat.
 	 * @param expedientId
 	 *            Atribut id de l'expedient.
+	 * @param documentEnviamentTipus
 	 * @return La llista de notificacions.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	public List<DocumentEnviamentDto> findAmbExpedient(
 			Long entitatId,
-			Long expedientId) throws NotFoundException;
+			Long expedientId, 
+			DocumentEnviamentTipusEnumDto documentEnviamentTipus) throws NotFoundException;
 
 	/**
 	 * Retorna la llista d'enviaments associats a un expedient.
@@ -234,14 +237,15 @@ public interface DocumentEnviamentService {
 	public void notificacioActualitzarEstat(String identificador, String referencia);
 
 	int enviamentsCount(Long entitatId,
-			Long expedientId);
+			Long expedientId, 
+			DocumentEnviamentTipusEnumDto documentEnviamentTipus);
 
 	DocumentNotificacioDto notificacioFindAmbIdAndExpedient(Long entitatId,
 			Long expedientId,
 			Long notificacioId);
 
 	Map<String, String> consultaErrorsNotificacio();
-	
+
 //	/**
 //	 * Actualitza l'estat de les notificacions pendents de forma periòdica.
 //	 */

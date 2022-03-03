@@ -1,0 +1,7 @@
+databaseChangeLog:
+- changeSet:
+    id: 1645188456014-1
+    author: limit
+    changes:   
+    - sql:
+        sql: "Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.mostrar.carpetes.anotacions','true','Mostrar carpetes per anotacions','CONTINGUT','2','0','BOOL',null,null);"    

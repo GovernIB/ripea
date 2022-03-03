@@ -45,9 +45,12 @@
 
 		<form:hidden path="entitatId"/>
 		
-		<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
-
+		<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" />
 		<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true" />
+		<rip:inputTextarea name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
+		<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio" />
+		<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
+
 		<c:choose>
 			<c:when test="${hasPermisAdmComu}">
 				<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu" />

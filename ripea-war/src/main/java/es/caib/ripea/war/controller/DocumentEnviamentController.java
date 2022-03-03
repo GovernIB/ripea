@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -13,7 +14,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +57,7 @@ import es.caib.ripea.war.command.DocumentPublicacioCommand;
 import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -138,17 +139,17 @@ public class DocumentEnviamentController extends BaseUserController {
 					"redirect:../../../contingut/" + documentId,
 					"document.controller.notificacio.ok");
 
-		} catch (Exception ex) {
-			logger.error(ExceptionUtils.getRootCauseMessage(ex), ex);
-			String msg = "";
-			Throwable rootCause = ExceptionUtils.getRootCause(ex);
-			if (rootCause instanceof NotibRepostaException) {
-				msg = getMessage(request, "contingut.enviament.errorReposta.notib") + " " + rootCause.getMessage();
+		} catch (Exception e) {
+			logger.error("Error al enviar notificació", e);
+			String msg = getMessage(request, "document.controller.notificacio.error") + ": ";
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			if (root instanceof NotibRepostaException) {
+				msg += getMessage(request, "contingut.enviament.errorReposta.notib") + " " + root.getMessage();
+			} else if (root instanceof ConnectException || root.getMessage().contains("timed out")){
+				msg += getMessage(request, "error.notib.connectTimedOut");
 			} else {
-				msg = rootCause.getMessage();
-			}
-			if (msg == null) {
-				msg = rootCause.toString();
+				root.getMessage();
+				msg += root.getMessage();
 			}
 
 			return getModalControllerReturnValueErrorMessageText(
@@ -187,8 +188,11 @@ public class DocumentEnviamentController extends BaseUserController {
 		documentService.notificacioActualitzarEstat(
 				identificador, 
 				referencia);
-		return null;
 		
+		MissatgesHelper.success(
+				request, 
+				"Estat actualitzat!");
+		 return modalUrlTancar();
 	}
 
 	
@@ -217,7 +221,7 @@ public class DocumentEnviamentController extends BaseUserController {
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
 					"expedient.controller.notificacio.justificant.ko");
 		}
-		return null;
+		return "notificacioForm";
 	}
 	
 	

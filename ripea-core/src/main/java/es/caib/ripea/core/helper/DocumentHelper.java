@@ -27,6 +27,7 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -167,7 +168,8 @@ public class DocumentHelper {
 						fitxer,
 						document.isAmbFirma(),
 						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmesValidacio);
+						firmes != null ? firmes : firmesValidacio, 
+						false);
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -307,7 +309,7 @@ public class DocumentHelper {
 				fitxer,
 				document.isAmbFirma(),
 				document.isFirmaSeparada(),
-				firmes);
+				firmes, false);
 		return dto;
 	}
 	
@@ -347,27 +349,6 @@ public class DocumentHelper {
 				metaDocument.getNtiTipoDocumental());
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
-		FitxerDto fitxer = null;
-		List<ArxiuFirmaDto> firmes = null;
-		if (documentEntity.getArxiuUuid() != null) {
-			fitxer = new FitxerDto();
-			fitxer.setContentType(documentEntity.getFitxerContentType());
-			fitxer.setNom(documentEntity.getFitxerNom());
-//			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-//					documentEntity,
-//					null,
-//					null,
-//					true,
-//					false);
-//			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-//			##no validar firma en actualitzar tipus document
-//			if (documentEntity.isFirmat()) {
-//				firmes = validaFirmaDocument(
-//						documentEntity, 
-//						fitxer,
-//						null);
-//			}
-		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -376,13 +357,45 @@ public class DocumentHelper {
 				null,
 				true,
 				true);
-		contingutHelper.arxiuPropagarModificacio(
-				documentEntity,
-				fitxer,
-				false, //##no validar firma en actualitzar tipus document
-				false,
-				firmes);
-		return true;
+		
+		
+		if (pluginHelper.getPropertyArxiuMetadadesAddicionalsActiu()) {
+		
+			FitxerDto fitxer = null;
+			List<ArxiuFirmaDto> firmes = null;
+			if (documentEntity.getArxiuUuid() != null) {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(documentEntity.getFitxerContentType());
+				fitxer.setNom(documentEntity.getFitxerNom());
+				if (pluginHelper.getArxiuPlugin() instanceof ArxiuPluginCaib) {
+					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+							documentEntity,
+							null,
+							null,
+							true,
+							false);
+					fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			//		##no validar firma en actualitzar tipus document
+			//		if (documentEntity.isFirmat()) {
+			//			firmes = validaFirmaDocument(
+			//					documentEntity, 
+			//					fitxer,
+			//					null);
+			//		}
+				}
+			}
+			contingutHelper.arxiuPropagarModificacio(
+					documentEntity,
+					fitxer,
+					false, //##no validar firma en actualitzar tipus document
+					false,
+					firmes, 
+					false);
+			return true;
+		} else {
+			return true;
+		}
+		
 	}
 	
 	public DocumentEntity crearDocumentDB(
@@ -779,7 +792,7 @@ public class DocumentHelper {
 							fitxer,
 							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
 							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes);
+							firmes, false);
 				
 					if (documentEntity.getGesDocAdjuntId() != null ) {
 						pluginHelper.gestioDocumentalDelete(
@@ -868,7 +881,7 @@ public class DocumentHelper {
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		for (DocumentEntity document : documents) {
 			if (document.getEsborrat() == 0 
-					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
+					&& (document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL) || document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT))
 					&& (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
 				return true;
 			}

@@ -447,7 +447,7 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			if (potCrearMetaDocPerDefecte) {
 				boolean potCrearNomesUnMetaDocPerDefecte = !metaDocPerDefecte.isPermetMultiple();
 				
-				if (potCrearNomesUnMetaDocPerDefecte || command.getAnnexos().size() > 1) {
+				if (potCrearNomesUnMetaDocPerDefecte && command.getAnnexos().size() > 1) {
 					command.getAnnexos().get(0).setMetaDocumentId(metaDocPerDefecte.getId());
 					MissatgesHelper.warning(
 							request,
@@ -628,10 +628,6 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.WRITE);
 	}
-	
-
-	
-
 	
 	
 	private void addWarningDocumentExists(HttpServletRequest request) {
