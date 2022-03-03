@@ -859,11 +859,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				false,
+				true,
 				false,
 				false, 
 				false, 
-				true);
+				false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(metaExpedientEntity);

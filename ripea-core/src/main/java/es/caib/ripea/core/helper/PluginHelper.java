@@ -5097,7 +5097,7 @@ public class PluginHelper {
 		}
 		return unitatsOrganitzativesPlugin;
 	}
-	private IArxiuPlugin getArxiuPlugin() {
+	public IArxiuPlugin getArxiuPlugin() {
 		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
@@ -5518,7 +5518,7 @@ public class PluginHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.plugin.signatura.signarAnnexos");
 	}
 
-	private boolean getPropertyArxiuMetadadesAddicionalsActiu() {
+	public boolean getPropertyArxiuMetadadesAddicionalsActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.arxiu.metadades.addicionals.actiu");
 	}
 	
