@@ -29,7 +29,7 @@
 	<rip:modalHead/>
 	<title>
 		<c:choose>
-			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
+			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="max-width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.carpeta}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
@@ -133,6 +133,7 @@ span a {
 }
 #contenidor-info {
 	margin-bottom: 0;
+	padding-bottom: 30px;
 }
 #contenidor-info h3 {
 	font-weight: bold;
@@ -153,10 +154,6 @@ span a {
 	font-size: small;
 	font-style: italic;
 	font-weight: normal;
-}
-#contenidor-info #botons-accions-info button{
-    padding: 1px 6px;
-	margin-bottom: 4px;    
 }
 #contenidor-info dd {
 	font-size: medium;
@@ -1241,7 +1238,7 @@ $(document).ready(function() {
 	$botoTipusDocumental.popover({
 		html: true,
 		placement: 'bottom',
-		title: '<spring:message code="massiu.canvi.tipus.document"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
+		title: '<spring:message code="massiu.canvi.tipus.document.select"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
 	    content: function () {
 	    	return showTipusDocumentals($(this));   
 	  	}
@@ -1913,7 +1910,7 @@ $.views.helpers(myHelpers);
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${contingut.expedientEstat!=null}">
-									<dd> ${contingut.expedientEstat.nom} </dd>
+									<dd style="<c:if test='${not empty contingut.expedientEstat.color}'>border-left: solid 6px ${contingut.expedientEstat.color}; padding-left: 4px;</c:if>">${contingut.expedientEstat.nom}</dd>
 								</c:when>
 								<c:otherwise>
 									<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
@@ -2048,8 +2045,7 @@ $.views.helpers(myHelpers);
 						</div>
 					</c:if>	
 					<c:if test="${contingut.expedient}">
-					
-						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>			
+						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>
 					</c:if>
 				</ul>
 			</c:if>
@@ -2176,6 +2172,9 @@ $.views.helpers(myHelpers);
 							</c:if>							
 							<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
 							<div class="text-right" id="contingut-botons">
+								<c:if test="${isTasca}">
+									<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
+								</c:if>
 								<c:if test="${vistaIcones}">
 									<div class="btn-group">
 										<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.habilitar"/>" id="habilitar-mult" class="btn-group btn btn-default">
@@ -2234,8 +2233,10 @@ $.views.helpers(myHelpers);
 											</a>
 										</div>
 										<div data-toggle="popover" class="btn btn-default" id="tipusdocumental-mult">
-											<span class="fa fa-edit"></span>
-											<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											<div data-toggle="tooltip" title="<spring:message code="massiu.canvi.tipus.document"/>">
+												<span class="fa fa-edit"></span>
+												<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+											</div>
 										</div>
 									</div>
 									<%---- Button descarregar zip mult 
@@ -2759,8 +2760,12 @@ $.views.helpers(myHelpers);
 												<spring:message code="expedient.tasca.estat.enum.REBUTJADA"/>
 											{{/if}}
 										</script>
-										</th>	
-																	
+										</th>
+										<th data-col-name="numComentaris" data-orderable="false" data-template="#cellComentarisTemplate" width="1%">
+											<script id="cellComentarisTemplate" type="text/x-jsrender">
+												<a href='<c:url value="/expedientTasca/{{:id}}/comentaris"/>' data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+											</script>
+										</th>
 										<th data-col-name="id" data-orderable="false" data-template="#cellExpedientTascaTemplate" width="1%">
 											<script id="cellExpedientTascaTemplate" type="text/x-jsrender">
 											<div class="dropdown">

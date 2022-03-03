@@ -195,7 +195,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId, 
-			String rolActual) {
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
 		logger.debug(
 				"Creant nou expedient (" +
 						"entitatId=" + entitatId + ", " +
@@ -240,7 +241,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientHelper.crearDocFromAnnex(
 							expedient.getId(),
 							registeAnnexEntity.getId(),
-							expedientPeticioEntity.getId());
+							expedientPeticioEntity.getId(), 
+							anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()));
 				} catch (Exception e) {
 					processatOk = false;
 					logger.info(ExceptionUtils.getStackTrace(e));
@@ -277,7 +279,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	@Override
-	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats, String rolActual) {
+	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats, String rolActual, Map<Long, Long> anexosIdsMetaDocsIdsMap) {
 		logger.debug("Incorporant a l'expedient existent (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
@@ -298,7 +300,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.crearDocFromAnnex(
 						expedientId,
 						registeAnnexEntity.getId(),
-						expedientPeticioEntity.getId());	
+						expedientPeticioEntity.getId(), 
+						anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()));	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
@@ -357,11 +360,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId) {
+	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId) {
 		boolean processatOk = true;
 		try {
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId());
+			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId);
 
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {

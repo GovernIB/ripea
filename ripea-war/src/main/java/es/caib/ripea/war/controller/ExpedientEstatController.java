@@ -118,10 +118,12 @@ public class ExpedientEstatController extends BaseAdminController {
 			model.addAttribute(estat);	
 		}
 		ExpedientEstatCommand command = null;
-		if (estat != null)
+		if (estat != null) {
 			command = ExpedientEstatCommand.asCommand(estat);
-		else
+		} else {
 			command = new ExpedientEstatCommand();
+			command.setColor("#FFFFFF");
+		}
 		command.setMetaExpedientId(metaExpedientId);
 		command.setComu(metaExpedientService.findById(entitatActual.getId(), metaExpedientId).isComu());
 		model.addAttribute(command);

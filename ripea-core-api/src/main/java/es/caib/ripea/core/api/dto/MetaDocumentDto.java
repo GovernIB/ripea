@@ -42,6 +42,10 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private boolean perDefecte;
 	private Long metaExpedientId;
 	
+	public boolean isPermetMultiple() {
+		return multiplicitat.equals(MultiplicitatEnumDto.M_0_N) || multiplicitat.equals(MultiplicitatEnumDto.M_1_N);
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

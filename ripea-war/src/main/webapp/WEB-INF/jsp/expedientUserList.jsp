@@ -109,29 +109,15 @@ $(document).ready(function() {
 		});
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
 		$("span[class^='stateColor-']").each(function( index ) {
-			
-			/* var rgb = $(selector).css("background-color");
-
-			  if (rgb.match(/^rgb/)) {
-			    var a = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/),
-			      r = a[1],
-			      g = a[2],
-			      b = a[3];
-			  }
-			  var hsp = Math.sqrt(
-			    0.299 * (r * r) +
-			    0.587 * (g * g) +
-			    0.114 * (b * b)
-			  );
-			  if (hsp > 127.5) {
-			    $(selector).addClass('dark-color');
-			  } else {
-			    $(selector).addClass('light-color');
-			  } */
-
 		    var fullClassNameString = this.className;
 		    var colorString = fullClassNameString.substring(11);
-		    $(this).parent().css( "background-color", colorString );
+			if (colorString != "") {
+				$(this).parent().css( "background-color", colorString );
+				if (adaptColor(colorString)) {
+					$(this).parent().css( "color", "white" );
+				}
+				$(this).parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+			}
 		});
 		
 
@@ -341,13 +327,6 @@ function findActiusPerLectura(organId) {
 	selProcediments.select2(select2Options);
 }
 
-
-
-
-
-
-
-
 function checkLoadingFinished() {
 	var cookieName = "contentLoaded";
 	if (getCookie(cookieName) != "") {
@@ -382,6 +361,38 @@ function getCookie(cname) {
 function removeCookie(cname) {
     var expires = new Date(0).toUTCString();
     document.cookie = cname + "=; path=/; expires=" + expires + ";";
+}
+
+function adaptColor(hexColor) {
+	let adapt = false;
+
+	let rgb = hexToRgb(hexColor);
+	if (rgb != null) {
+		var hsp = Math.sqrt(
+				0.299 * (rgb.r * rgb.r) +
+				0.587 * (rgb.g * rgb.g) +
+				0.114 * (rgb.b * rgb.b)
+		);
+	}
+	if (hsp < 127.5) {
+		adapt = true;
+	}
+	return adapt;
+}
+
+function hexToRgb(hex) {
+	// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+		return r + r + g + g + b + b;
+	});
+
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
 }
 
 </script>

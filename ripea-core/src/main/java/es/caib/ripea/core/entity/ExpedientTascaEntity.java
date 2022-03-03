@@ -3,29 +3,15 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.audit.RipeaAuditable;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.audit.RipeaAuditable;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Classe del model de dades que representa una tasca del expedient.
@@ -84,21 +70,26 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Column(name = "data_limit")
 	private Date dataLimit;
 	
-	@Column(name = "comentari", length = 1024)
-	private String comentari;
+//	@Column(name = "comentari", length = 1024)
+//	private String comentari;
+
+	@OneToMany(
+			mappedBy = "expedientTasca",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	@OrderBy("createdDate")
+	private List<ExpedientTascaComentariEntity> comentaris = new ArrayList<>();
 	
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
 			List<UsuariEntity> responsables,
-			Date dataLimit,
-			String comentari) {
+			Date dataLimit) {
 		return new Builder(
 				expedient,
 				metaExpedientTasca,
 				responsables,
-				dataLimit,
-				comentari);
+				dataLimit);
 	}
 	
 	public static class Builder {
@@ -107,8 +98,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
 				List<UsuariEntity> responsables,
-				Date dataLimit,
-				String comentari) {
+				Date dataLimit) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
@@ -116,7 +106,6 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
-			built.comentari = comentari;
 		}
 		public ExpedientTascaEntity build() {
 			return built;
@@ -153,19 +142,18 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public List<UsuariEntity> getResponsables() {
 		return responsables;
 	}
-	
 	public UsuariEntity getResponsableActual() {
 		return responsableActual;
 	}
-
 	public void addResponsable(UsuariEntity responsable) {
 		responsables.add(responsable);
 	}
-	
 	public void removeResponsable(UsuariEntity responsable) {
 		responsables.remove(responsable);
-	} 
-
+	}
+	public void updateResponsables(List<UsuariEntity> responsables) {
+		this.responsables = responsables;
+	}
 	public Date getDataInici() {
 		return dataInici;
 	}
@@ -175,28 +163,27 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public Date getDataFi() {
 		return dataFi;
 	}
-
 	public TascaEstatEnumDto getEstat() {
 		return estat;
 	}
-	
 	public String getMotiuRebuig() {
 		return motiuRebuig;
 	}
-	public String getComentari() {
-		return comentari;
+	public List<ExpedientTascaComentariEntity> getComentaris() {
+		return comentaris;
 	}
-	
-	
-	public void updateResponsables(List<UsuariEntity> responsables) {
-		this.responsables = responsables;
+	public void addComentari(ExpedientTascaComentariEntity comentari) {
+		comentaris.add(comentari);
 	}
-	
-//	@PreUpdate
-//	public void clearResponsables() {
-//		if (estat.equals(TascaEstatEnumDto.FINALITZADA) || estat.equals(TascaEstatEnumDto.CANCELLADA) || estat.equals(TascaEstatEnumDto.REBUTJADA)) {
-//			responsables.clear();
-//		}
-//	}
+	public void updateComentaris(List<ExpedientTascaComentariEntity> comentaris) {
+		this.comentaris = comentaris;
+	}
+	public String getTextLastComentari() {
+		String comentariText = null;
+		if (this.getComentaris() != null && !this.getComentaris().isEmpty()) {
+		 comentariText = this.getComentaris().get(this.getComentaris().size() - 1).getText();
+		}
+		return comentariText;
+	}
 
 }

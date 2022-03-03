@@ -205,8 +205,8 @@
  </c:forEach>
 <div id="modal-botons" class="well">
 	<a href="<c:url value="/massiu/portafirmes"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-	<button type="button" class="btn btn-primary" name="previousPage" value="previousPage"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comuns.boto.previous"/></button>
-		<button type="button" class="btn btn-primary" name="nextPage" value="nextPage"><spring:message code="comuns.boto.next"/>&nbsp;<span class="fa fa-arrow-right"></span></button>
+	<button type="button" class="btn btn-primary" name="previousPage" value="previousPage"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.previous"/></button>
+		<button type="button" class="btn btn-primary" name="nextPage" value="nextPage"><spring:message code="comu.boto.next"/>&nbsp;<span class="fa fa-arrow-right"></span></button>
 	<button type="button" class="btn btn-primary" name="refrescar" value="refrescar"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.refrescar"/></button>
 </div>
 </body>

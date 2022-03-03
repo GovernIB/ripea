@@ -995,7 +995,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
-				contingutId);
+				contingutId, 
+				null);
 		for (MetaDocumentDto metaDocument: metaDocuments) {
 			if (metaDocument.getId().equals(metaDocumentId))
 				return metaDocument;
@@ -1159,7 +1160,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					"metaDocuments",
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
-							contingutId));
+							contingutId, 
+							null));
 		} else {
 			model.addAttribute(
 					"metaDocuments",

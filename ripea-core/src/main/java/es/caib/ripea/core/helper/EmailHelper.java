@@ -3,11 +3,14 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.api.dto.EventTipusEnumDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,26 +20,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.core.api.dto.EventTipusEnumDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Mètodes per a l'enviament de correus.
@@ -701,7 +688,7 @@ public class EmailHelper {
 		String from = getRemitent();
 		String subject;
 		String text;
-		String comentari = expedientTascaEntity.getComentari();
+		String comentari = expedientTascaEntity.getTextLastComentari();
 		TascaEstatEnumDto estat = expedientTascaEntity.getEstat();
 		String rebutjMotiu = "";
 		if (estat == TascaEstatEnumDto.REBUTJADA) {
@@ -718,7 +705,7 @@ public class EmailHelper {
 					"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
 					"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
 					"\tEstat: " + estat + "\n" +
-					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + estat + "\n" : "") +
+					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 					enllacTramitar;
 		} else {
 			subject = PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
@@ -728,7 +715,7 @@ public class EmailHelper {
 							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
 							"\tEstat anterior:" + estatAnterior + "\n" +
 							"\tEstat actual:" + estat + "\n" + 
-							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + estat + "\n" : "") +
+							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 							rebutjMotiu +
 							enllacTramitar;
 		}

@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,6 +51,7 @@ public interface ExpedientService {
 	 * @param nom
 	 *            Nom de l'expedient que es vol crear.
 	 * @param rolActual TODO
+	 * @param anexosIdsMetaDocsIdsMap
 	 * @return L'expedient creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -69,7 +71,8 @@ public interface ExpedientService {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, String rolActual) throws NotFoundException, ValidationException;
+			Long grupId, String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un expedient.
@@ -392,8 +395,10 @@ public interface ExpedientService {
 	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean retryCreateDocFromAnnex(Long registreAnnexId,
-			Long expedientPeticioId);
+	boolean retryCreateDocFromAnnex(
+			Long registreAnnexId,
+			Long expedientPeticioId, 
+			Long metaDocumentId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryNotificarDistribucio(Long expedientPeticioId);
@@ -402,7 +407,9 @@ public interface ExpedientService {
 	boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
-			boolean associarInteressats, String rolActual);
+			boolean associarInteressats, 
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap);
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.

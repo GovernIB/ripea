@@ -23,25 +23,25 @@
 
 
 
-		<rip:inputSelect name="metaExpedientId" textKey="expedientPeticio.form.acceptar.camp.metaExpedient"
+		<rip:inputSelect name="metaExpedientId" textKey="expedient.peticio.form.acceptar.camp.metaExpedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id"
 			optionTextAttribute="nom" disabled="true" labelSize="2" style="display:none" />
 
-		<rip:inputSelect name="expedientId" textKey="expedientPeticio.form.acceptar.camp.expedient"
+		<rip:inputSelect name="expedientId" textKey="expedient.peticio.form.acceptar.camp.expedient"
 			required="true" optionItems="${metaExpedients}" optionValueAttribute="id"
 			optionTextAttribute="nom" disabled="true" labelSize="2" />
 
-		<rip:inputText name="newExpedientTitol" textKey=expedientPeticio.form.acceptar.camp.newExpedientTitol"
+		<rip:inputText name="newExpedientTitol" textKey=expedient.peticio.form.acceptar.camp.newExpedientTitol"
 			required="true" labelSize="2" style="display:none"/>
 
 		<rip:inputCheckbox name="associarInteressats"
-			textKey="expedientPeticio.form.acceptar.camp.associarInteressats" />
+			textKey="expedient.peticio.form.acceptar.camp.associarInteressats" />
 			
 		<rip:inputCheckbox name="associarDocuments"
-			textKey="expedientPeticio.form.acceptar.camp.associarDocuments" />
+			textKey="expedient.peticio.form.acceptar.camp.associarDocuments" />
 
 
-		<rip:inputText name="any" textKey="expedientPeticio.form.acceptar.camp.any" required="true"
+		<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"
 			labelSize="2" style="display:none" />
 
 		<div id="modal-botons" class="well">

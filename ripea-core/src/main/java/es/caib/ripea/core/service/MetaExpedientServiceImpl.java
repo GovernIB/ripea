@@ -56,6 +56,9 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.HistoricExpedientEntity;
+import es.caib.ripea.core.entity.HistoricInteressatEntity;
+import es.caib.ripea.core.entity.HistoricUsuariEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -88,6 +91,9 @@ import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -148,6 +154,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private DominiRepository dominiRepository;
 	@Autowired
 	private DominiHelper dominiHelper;
+	@Autowired
+	private HistoricExpedientRepository historicExpedientRepository;
+	@Autowired
+	private HistoricInteressatRepository historicInteressatRepository;
+	@Autowired
+	private HistoricUsuariRepository historicUsuariRepository;
 	
 	@Transactional
 	@Override
@@ -473,6 +485,20 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			
 		//esborrar les carpetes per defecte
 		metaExpedientCarpetaHelper.removeAllCarpetes(metaExpedient);
+		
+		List<HistoricExpedientEntity> historicsExpedient = historicExpedientRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricExpedientEntity historicEntity : historicsExpedient) {
+			historicExpedientRepository.delete(historicEntity);
+		}
+		List<HistoricInteressatEntity> historicsInteressats = historicInteressatRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricInteressatEntity historicEntity : historicsInteressats) {
+			historicInteressatRepository.delete(historicEntity);
+		}
+		List<HistoricUsuariEntity> historicsUsuari = historicUsuariRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricUsuariEntity historicEntity : historicsUsuari) {
+			historicUsuariRepository.delete(historicEntity);
+		}
+		
 		metaExpedientRepository.delete(metaExpedient);
 		return conversioTipusHelper.convertir(
 				metaExpedient,

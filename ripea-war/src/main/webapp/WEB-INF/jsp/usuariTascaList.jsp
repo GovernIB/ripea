@@ -79,7 +79,12 @@
 							<spring:message code="expedient.tasca.estat.enum.REBUTJADA"/>
 						{{/if}}
 					</script>
-				</th>	
+				</th>
+				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellComentarisTemplate" width="1%">
+					<script id="cellComentarisTemplate" type="text/x-jsrender">
+						<a href="expedientTasca/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+					</script>
+				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAnotacioAccionsTemplate" width="1%">
 					<script id="cellAnotacioAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
