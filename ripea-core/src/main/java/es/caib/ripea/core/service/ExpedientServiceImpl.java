@@ -1301,7 +1301,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			
 			String intressatsString = "";
 			for (InteressatEntity interessat : expedient.getInteressats()) {
-				intressatsString += interessat.getIdentificador() + " | ";
+				intressatsString += interessat.getIdentificador() + " (" + interessat.getDocumentNum() + ") | ";
 			}
 			intressatsString = intressatsString.replaceAll(",","");
 			
