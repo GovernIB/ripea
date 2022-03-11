@@ -112,15 +112,6 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@Column(name = "ordre")
 	protected int ordre;
 	
-	@Transient
-	protected boolean ambNotificacions;
-	@Transient
-	protected String estatDarreraNotificacio;
-	@Transient
-	protected boolean errorDarreraNotificacio;
-	@Transient
-	protected boolean errorEnviamentPortafirmes;
-	
 	@Version
 	private long version = 0;
 

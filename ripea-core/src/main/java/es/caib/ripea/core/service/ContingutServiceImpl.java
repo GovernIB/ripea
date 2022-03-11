@@ -66,9 +66,6 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -93,8 +90,6 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
@@ -140,11 +135,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
 	private TipusDocumentalRepository tipusDocumentalRepository;
-	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
 
@@ -750,23 +741,24 @@ public class ContingutServiceImpl implements ContingutService {
 		} else {
 			contingut = contingutRepository.findOne(contingutId);
 		}
+		// ** #979 -> Es comprova cada camp dins documentEntity
 		// Comprovar si hi ha notificacions del document
-		for (ContingutEntity document: contingut.getFills()) {
-			if (document instanceof DocumentEntity) {
-				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
-				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
-				if (notificacions != null && notificacions.size() > 0) {
-					document.setAmbNotificacions(true);
-					DocumentNotificacioEntity lastNofificacio = notificacions.get(0);
-					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "");
-					document.setErrorDarreraNotificacio(lastNofificacio.isError());
-				}
-				if (enviaments != null && enviaments.size() > 0) {
-					DocumentEnviamentEntity lastEnviament = enviaments.get(0);
-					document.setErrorEnviamentPortafirmes(lastEnviament.isError());
-				}
-			}
-		}
+//		for (ContingutEntity document: contingut.getFills()) {
+//			if (document instanceof DocumentEntity) {
+//				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
+//				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
+//				if (notificacions != null && notificacions.size() > 0) {
+//					document.setAmbNotificacions(true);
+//					DocumentNotificacioEntity lastNofificacio = notificacions.get(0);
+//					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "");
+//					document.setErrorDarreraNotificacio(lastNofificacio.isError());
+//				}
+//				if (enviaments != null && enviaments.size() > 0) {
+//					DocumentEnviamentEntity lastEnviament = enviaments.get(0);
+//					document.setErrorEnviamentPortafirmes(lastEnviament.isError());
+//				}
+//			}
+//		}
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,

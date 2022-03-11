@@ -846,7 +846,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
 		}
 		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
-		if (!documentHelper.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
+		if (!documentRepository.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
 			throw new ExpedientTancarSenseDocumentsDefinitiusException();
 		}
 		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
