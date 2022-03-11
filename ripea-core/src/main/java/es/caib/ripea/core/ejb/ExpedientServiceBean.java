@@ -391,4 +391,11 @@ public class ExpedientServiceBean implements ExpedientService {
 			String text){
 		return delegate.findByText(entitatId, text);
 	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
+	}
 }

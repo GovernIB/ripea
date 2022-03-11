@@ -478,4 +478,10 @@ public interface ExpedientService {
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text);
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
+			Long entitatId, 
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams);
 }

@@ -1740,6 +1740,49 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}*/
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
+			Long entitatId,
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		MetaExpedientEntity metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+		
+		Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
+		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedient(metaExpedientFiltre, pageable);
+		return paginacioHelper.toPaginaDto(
+				paginaExpedients,
+				ExpedientDto.class,
+				new Converter<ExpedientEntity, ExpedientDto>() {
+					@Override
+					public ExpedientDto convert(ExpedientEntity source) {
+						return toExpedientDto(source);
+					}
+				});
+	}
+	
+	private ExpedientDto toExpedientDto(ExpedientEntity entity) {
+		ExpedientDto dto = new ExpedientDto();
+		
+		dto.setNumero(expedientHelper.calcularNumero(entity));
+		dto.setNom(entity.getNom());
+		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, entity.getId()) > 0);
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity).isEmpty());
+		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(entity));
+		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(entity));
+		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(entity));
+		dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(entity));
+		dto.setArxiuUuid(entity.getArxiuUuid());
+		dto.setId(entity.getId());
+		dto.setCreatedDate(entity.getCreatedDate().toDate());
+		dto.setEstat(entity.getEstat());
+		dto.setAgafatPer(conversioTipusHelper.convertir(entity.getAgafatPer(),UsuariDto.class));
+		
+		return dto;
+	}
 
 
 	private ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {

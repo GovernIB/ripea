@@ -223,6 +223,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
+								<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
 								{^{if !~hlpIsAdministradorOrgan() || (~hlpIsAdministradorOrgan() && revisioEstat != 'REVISAT')}}

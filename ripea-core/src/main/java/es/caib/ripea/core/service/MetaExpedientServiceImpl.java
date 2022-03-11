@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.service;
 
+//import com.codahale.metrics.Timer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -585,8 +587,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return resposta;
 	}
 
-	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findByEntitat(Long entitatId) {
