@@ -166,7 +166,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 //			boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
 			if (crearNovaCarpeta) {
 				// create carpeta ind db and arxiu if doesnt already exists
-				Long carpetaId = expedientHelper.createCarpetaFromExpPeticio(
+				Long carpetaId = expedientHelper.createCarpetaForDocFromAnnex(
 						expedientSuperior,
 						entitatId,
 						dades.getCarpetaNom());

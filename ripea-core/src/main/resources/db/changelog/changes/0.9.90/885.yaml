@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1644578219762-1
+      author: limit
+      changes:
+        - addColumn:
+            columns:
+            - column:
+                name: not_emisor_id
+                type: bigint
+            tableName: ipa_document_enviament
+        - addForeignKeyConstraint:
+            baseColumnNames: not_emisor_id
+            baseTableName: ipa_document_enviament
+            constraintName: ipa_organ_docenv_fk
+            referencedColumnNames: id
+            referencedTableName: ipa_organ_gestor            
+        - sql:
+            sql:  UPDATE IPA_DOCUMENT_ENVIAMENT SET NOT_EMISOR_ID = (SELECT ORGAN_GESTOR_ID FROM IPA_EXPEDIENT WHERE IPA_DOCUMENT_ENVIAMENT.EXPEDIENT_ID = IPA_EXPEDIENT.ID);
+    

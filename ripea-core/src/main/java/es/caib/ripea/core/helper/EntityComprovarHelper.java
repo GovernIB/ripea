@@ -937,8 +937,7 @@ public class EntityComprovarHelper {
 						auth);
 			}
 	
-	
-			if (metaNode.getClass() == MetaExpedientEntity.class ) {
+			if (metaNode.getClass().getCanonicalName().contains("MetaExpedientEntity")) {
 				MetaExpedientEntity metaExpedientEntity = (MetaExpedientEntity) metaNode;
 				boolean grantedOrgan = false;
 				boolean grantedOrganMetaNode = false;

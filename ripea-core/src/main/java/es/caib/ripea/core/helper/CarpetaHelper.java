@@ -54,7 +54,8 @@ public class CarpetaHelper {
 			boolean alreadyCreatedInDB,
 			Long carpetaId,
 			boolean alreadyCreatedInArxiu,
-			String arxiuUuid) {
+			String arxiuUuid, 
+			boolean fromAnotacio) {
 		logger.debug("Creant nova carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "pareId=" + pareId + ", "
@@ -114,7 +115,8 @@ public class CarpetaHelper {
 					null,
 					false,
 					false,
-					null);
+					null, 
+					fromAnotacio);
 		}
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);
 		return dto;

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.validation.constraints.Size;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
@@ -27,10 +28,17 @@ public class MetaExpedientImportEditCommand {
 	@NotEmpty
 	@Size(max = 64)
 	private String codi;
-	
+	@NotEmpty
+	@Size(max = 256)
+	private String nom;
+	@Size(max = 1024)
+	private String descripcio;
 	@NotEmpty
 	@Size(max = 30)
 	private String classificacioSia;
+	@NotEmpty
+	@Size(max = 30)
+	private String serieDocumental;
 
 	private Long organGestorId;
 
@@ -67,6 +75,15 @@ public class MetaExpedientImportEditCommand {
 	}
 	public void setTasques(List<MetaExpedientTascaCommand> tasques) {
 		this.tasques = tasques;
+	}
+	public void setNom(String nom) {
+		this.nom = StringUtils.trim(nom);
+	}
+	public void setDescripcio(String descripcio) {
+		this.descripcio = StringUtils.trim(descripcio);
+	}
+	public void setSerieDocumental(String serieDocumental) {
+		this.serieDocumental = StringUtils.trim(serieDocumental);
 	}
 
 

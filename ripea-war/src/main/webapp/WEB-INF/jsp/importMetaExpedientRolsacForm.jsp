@@ -27,7 +27,7 @@
 		<div style="min-height: 20px;"></div>
 
 		<div id="modal-botons">
-			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.importar"/></button>
+			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-upload"></span>&nbsp;<spring:message code="comu.boto.importar"/>...</button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

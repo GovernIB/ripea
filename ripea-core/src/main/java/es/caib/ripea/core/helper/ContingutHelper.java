@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -22,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -534,7 +531,7 @@ public class ContingutHelper {
 						ContingutDto fillDto = toContingutDto(
 								fill,
 								ambPermisos,
-								false,
+								true,
 								false,
 								false,
 								false,
@@ -1169,7 +1166,11 @@ public class ContingutHelper {
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes) {
+			List<ArxiuFirmaDto> firmes, 
+			boolean fromAnotacio) {
+		
+		boolean utilitzarCarpetes = fromAnotacio || isCarpetaLogica();
+		
 		String serieDocumental = null;
 		ExpedientEntity expedient = contingut.getExpedient();
 		if (expedient != null) {
@@ -1186,7 +1187,7 @@ public class ContingutHelper {
 				DocumentEntity document = (DocumentEntity) contingut;
 				custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
 						(DocumentEntity) contingut,
-						isCarpetaLogica() ? contingut.getExpedientPare() : contingut.getPare(),
+						utilitzarCarpetes ? contingut.getPare() : contingut.getExpedientPare(),
 						serieDocumental,
 						fitxer,
 						documentAmbFirma,
@@ -1211,7 +1212,7 @@ public class ContingutHelper {
 				}
 			//##################### CARPETA #####################
 			} else if (contingut instanceof CarpetaEntity) {
-				if (!isCarpetaLogica()) {
+				if (utilitzarCarpetes) {
 					pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
 							contingut.getPare());
 				}

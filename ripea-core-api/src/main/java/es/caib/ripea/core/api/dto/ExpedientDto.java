@@ -86,6 +86,10 @@ public class ExpedientDto extends NodeDto {
 	public String getNomINumero() {
 		return this.nom + " (" + this.numero + ")";
 	}
+	
+	public String getNumeroINom() {
+		return this.numero + " - " + this.nom;
+	}
 
 	public Set<InteressatDto> getInteressats() {
 		return interessats;

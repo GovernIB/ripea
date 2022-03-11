@@ -39,6 +39,7 @@ import org.springframework.web.util.WebUtils;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -1217,11 +1218,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 
 
 
-	@RequestMapping(value = "/{expedientId}/enviament/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{expedientId}/enviament/{documentEnviamentTipus}/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse enviamentDatatable(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
+			@PathVariable DocumentEnviamentTipusEnumDto documentEnviamentTipus,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -1229,7 +1231,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				request,
 				documentEnviamentService.findAmbExpedient(
 						entitatActual.getId(),
-						expedientId));		
+						expedientId, 
+						documentEnviamentTipus));		
 	}
 	
 	
@@ -1334,7 +1337,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request,
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
-
+			
 			Date now = new Date();
 			Calendar c = Calendar.getInstance(); 
 			c.setTime(now); 

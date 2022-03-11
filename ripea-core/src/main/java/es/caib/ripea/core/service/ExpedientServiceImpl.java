@@ -72,6 +72,7 @@ import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
@@ -269,7 +270,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				throw new DocumentAlreadyImportedException();
 			}
-			canviEstatToProcessatPendent(expedientPeticioEntity);
+			canviEstatToProcessatPendent(expedientPeticioEntity.getId());
 			if (processatOk) {
 				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
@@ -291,30 +292,32 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
+		
+		Long registreId = expedientPeticioRepository.getRegistreId(expedientPeticioId);
+		List<Long> annexosIds = expedientPeticioRepository.getRegistreAnnexosId(registreId);
+		for (Long annexId : annexosIds) {
 			try {
 				boolean throwException1 = false;
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
 				expedientHelper.crearDocFromAnnex(
 						expedientId,
-						registeAnnexEntity.getId(),
-						expedientPeticioEntity.getId(), 
-						anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()));	
+						annexId,
+						expedientPeticioId, 
+						anexosIdsMetaDocsIdsMap.get(annexId));	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
-				expedientHelper.updateRegistreAnnexError(registeAnnexEntity.getId(), ExceptionUtils.getStackTrace(e));
+				expedientHelper.updateRegistreAnnexError(annexId, ExceptionUtils.getStackTrace(e));
 			}
 		}
-		String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+		String arxiuUuid = expedientPeticioRepository.getRegistreJustificantArxiuUuid(registreId);
 		if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
 			try {
 				expedientHelper.crearDocFromUuid(
 						expedientId,
 						arxiuUuid, 
-						expedientPeticioEntity.getId());
+						expedientPeticioId);
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
@@ -322,17 +325,17 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 			throw new DocumentAlreadyImportedException();
 		}
-		canviEstatToProcessatPendent(expedientPeticioEntity);
+		canviEstatToProcessatPendent(expedientPeticioId);
 		if (processatOk) {
-			notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
+			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
 		}
 		return processatOk;
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void canviEstatToProcessatPendent(ExpedientPeticioEntity expedientPeticioEntity) {
+	public void canviEstatToProcessatPendent(Long expedientPeticioId) {
 		expedientPeticioHelper.canviEstatExpedientPeticio(
-				expedientPeticioEntity.getId(),
+				expedientPeticioId,
 				ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 	}
 	
@@ -364,8 +367,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		try {
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			if (expedientPeticioEntity.getExpedient() == null) {
+				throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+			}
 			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId);
-
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {
 			processatOk = false;
@@ -414,7 +419,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		expedientHelper.updateNomExpedient(expedient, nom);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
 	}
 
@@ -440,7 +445,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null);
+		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
 	}
 
@@ -636,6 +641,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ExpedientDto expedient = new ExpedientDto();
 				expedient.setId(exp.getId());
 				expedient.setNom(exp.getNom());
+				expedient.setNumero(expedientHelper.calcularNumero(exp));
 				expedient.setAgafatPer(
 						conversioTipusHelper.convertir(
 								exp.getAgafatPer(),
@@ -650,6 +656,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExpedientDto expedient = new ExpedientDto();
 					expedient.setId(exp.getId());
 					expedient.setNom(exp.getNom());
+					expedient.setNumero(expedientHelper.calcularNumero(exp));
 					expedient.setAgafatPer(
 							conversioTipusHelper.convertir(
 									exp.getAgafatPer(),
@@ -1263,16 +1270,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
 				expedientIds);
 		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
-		int numColumnes = 5 + metaDades.size();
+		int numColumnes = 7 + metaDades.size();
 		String[] columnes = new String[numColumnes];
 		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
 		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
 		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
 		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
 		columnes[4] = messageHelper.getMessage("expedient.service.exportacio.idnti");
+		columnes[5] = messageHelper.getMessage("expedient.service.exportacio.procediment");
+		columnes[6] = messageHelper.getMessage("expedient.service.exportacio.interessats");
 		for (int i = 0; i < metaDades.size(); i++) {
 			MetaDadaEntity metaDada = metaDades.get(i);
-			columnes[5 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
+			columnes[7 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		List<String[]> files = new ArrayList<String[]>();
@@ -1288,7 +1297,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
 			fila[4] = expedient.getNtiIdentificador();
-			if (!dades.isEmpty()) {
+			fila[5] = expedient.getMetaExpedient().getNom();
+			
+			String intressatsString = "";
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				intressatsString += interessat.getIdentificador() + " | ";
+			}
+			intressatsString = intressatsString.replaceAll(",","");
+			
+			int index = intressatsString.lastIndexOf(" | ");
+			if (index != -1) {
+				intressatsString = intressatsString.substring(0, index);
+			}
+			fila[6] = intressatsString;
+			
+			if (!dades.isEmpty() && dadesIndex < dades.size()) {
 				DadaEntity dadaActual = dades.get(dadesIndex);
 				if (dadaActual.getNode().getId().equals(expedient.getId())) {
 					for (int i = 0; i < metaDades.size(); i++) {
@@ -1307,7 +1330,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							dadaActual = dades.get(dadesIndex + dadesIndexIncrement);
 						}
 						if (dadaActual.getMetaDada().getId().equals(metaDada.getId()) && dadaActual.getNode().getId().equals(expedient.getId())) {
-							fila[5 + i] = dadaActual.getValorComString();
+							fila[7 + i] = dadaActual.getValorComString();
 						} else {
 							dadaActual = dades.get(dadesIndex);
 						}
@@ -1623,11 +1646,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
 						organProcedimentsComunsIdsPermesos == null || organProcedimentsComunsIdsPermesos.isEmpty(),
 						organProcedimentsComunsIdsPermesos == null || organProcedimentsComunsIdsPermesos.isEmpty() ? null : organProcedimentsComunsIdsPermesos,	
-						procedimentsComunsIds,
+						!procedimentsComunsIds.isEmpty() ? procedimentsComunsIds : null,
 						metaExpedientFiltre == null,
 						metaExpedientFiltre,
 						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),
-						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty() ? null : metaExpedientIdDomini,
+						!metaExpedientIdDomini.isEmpty() ? metaExpedientIdDomini : null,
 						organGestorFiltre == null,
 						organGestorFiltre,
 						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
