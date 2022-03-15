@@ -1298,7 +1298,7 @@ function showTipusDocumentals() {
 							<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option> \
 								<c:forEach items="${metaDocumentsLeft}" var="metaDocument"> \
 									<option id="${metaDocument.id}"> \
-										${metaDocument.nom} \
+									${fn:escapeXml(metaDocument.nom)} \
 									</option> \
 								</c:forEach> \
 						</select> \
