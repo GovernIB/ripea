@@ -177,7 +177,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	@Transactional
@@ -272,7 +272,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -362,7 +362,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -401,7 +401,8 @@ public class ContingutServiceImpl implements ContingutService {
 	public ContingutDto move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId) {
+			Long contingutDestiId, 
+			String rolActual) {
 		logger.debug("Movent el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
@@ -413,7 +414,8 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true, 
-				false, null);
+				false, 
+				rolActual);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -421,7 +423,8 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false, null);
+				false, 
+				rolActual);
 		// Comprova el tipus del contingut que es vol moure
 		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -487,7 +490,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -590,7 +593,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -696,7 +699,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		return dto;
 	}
 
@@ -707,14 +710,14 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions, 
-			String rolActual) {
+			String rolActual, Long organActualId) {
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
 				true, 
-				rolActual);
+				rolActual, null);
 	}
 
 	@Transactional(readOnly = true)
@@ -725,7 +728,8 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambFills,
 			boolean ambVersions,
 			boolean ambPermisos, 
-			String rolActual) {
+			String rolActual, 
+			Long organActualId) {
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
@@ -768,7 +772,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false);
+				rolActual, false, null);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -801,7 +805,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null, false);
+				true, null, false, null);
 	}
 
 	@Transactional(readOnly = true)
@@ -1065,7 +1069,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null, false);
+								false, null, false, null);
 					}
 				});
 	}
@@ -1126,7 +1130,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null, false);
+								false, null, false, null);
 					}
 				});
 	}
@@ -1593,7 +1597,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false);
+									false, null, false, null);
 							return dto;
 						}
 					});

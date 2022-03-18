@@ -495,7 +495,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
-			boolean isAdmin);
+			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean isRevisioActiva();

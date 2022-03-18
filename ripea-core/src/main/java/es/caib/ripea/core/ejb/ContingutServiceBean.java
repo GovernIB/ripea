@@ -100,8 +100,8 @@ public class ContingutServiceBean implements ContingutService {
 	public ContingutDto move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId) {
-		return delegate.move(entitatId, contingutOrigenId, contingutDestiId);
+			Long contingutDestiId, String rolActual) {
+		return delegate.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
 	}
 
 	@Override
@@ -120,12 +120,15 @@ public class ContingutServiceBean implements ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions, String rolActual) {
+			boolean ambVersions, 
+			String rolActual, Long organActualId) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
-				ambVersions, null);
+				ambVersions, 
+				rolActual, 
+				organActualId);
 	}
 
 	@Override
@@ -319,13 +322,13 @@ public class ContingutServiceBean implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermis, String rolActual) {
+			boolean ambPermis, String rolActual, Long organActualId) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
-				ambPermis, null);
+				ambPermis, null, null);
 	}
 
 	@Override

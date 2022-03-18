@@ -3,7 +3,34 @@
  */
 package es.caib.ripea.core.service;
 
-import es.caib.ripea.core.api.dto.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
@@ -19,26 +46,23 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.TascaHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ExpedientTascaComentariRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
@@ -155,7 +179,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				true,
 				true,
-				ambVersions, null, false);
+				ambVersions, null, false, null);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -710,7 +734,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
 
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+		entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				tasca.getExpedient().getId(),
 				false,
@@ -740,7 +764,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
 
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+		entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				tasca.getExpedient().getId(),
 				false,
@@ -777,7 +801,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				true,
 				true,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	/*private String getIdiomaPerDefecte() {

@@ -169,7 +169,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				Long carpetaId = expedientHelper.createCarpetaForDocFromAnnex(
 						expedientSuperior,
 						entitatId,
-						dades.getCarpetaNom());
+						dades.getCarpetaNom(), null);
 				carpetaEntity = carpetaRepository.findOne(carpetaId);
 			}
 			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')) : documentArxiu.getNom();
@@ -300,7 +300,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				true,
 				true,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	private static NtiOrigenEnumDto getOrigen(Document document) {

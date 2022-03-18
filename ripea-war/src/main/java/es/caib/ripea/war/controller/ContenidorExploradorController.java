@@ -21,6 +21,8 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per a navegar pels contenidors.
@@ -29,7 +31,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
  */
 @Controller
 @RequestMapping("/contenidor")
-public class ContenidorExploradorController extends BaseUserController {
+public class ContenidorExploradorController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private ContingutService contenidorService;
@@ -49,7 +51,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false, null);
+				false, null, null);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		return contenidor;
 	}	
@@ -67,7 +69,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false, null);
+				false, null, null);
 //		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		return contenidor;
 	}
@@ -85,7 +87,7 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false, null);
+				false, null, null);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		
 		Long metaExpedientId;
@@ -98,7 +100,7 @@ public class ContenidorExploradorController extends BaseUserController {
 			metaExpedientId = exp.getMetaNode().getId();
 		}
 		
-		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId, null);
+		List<ExpedientDto> expedients = expedientService.findByEntitatAndMetaExpedient(entitatActual.getId(), metaExpedientId, RolHelper.getRolActual(request), EntitatHelper.getOrganGestorActualId(request));
 		
 		
 		List<ContingutDto> expedientsReplaced = new ArrayList<>();
@@ -126,9 +128,9 @@ public class ContenidorExploradorController extends BaseUserController {
 				entitatActual.getId(),
 				contenidorId,
 				true,
-				false, null);
+				false, null, null);
 		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
-		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), contenidorArrelId);
+		ExpedientDto expedient = expedientService.findById(entitatActual.getId(), contenidorArrelId, null);
 		List<ContingutDto> expedientsReplaced = new ArrayList<>();
 		
 		expedientsReplaced.add(expedient);

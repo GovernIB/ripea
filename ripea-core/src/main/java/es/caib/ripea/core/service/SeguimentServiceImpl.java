@@ -187,7 +187,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		
@@ -203,10 +204,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false, null, null);
 		}
 		
-		
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
-				true,
+				rolActual,
+				null,
 				null,
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,

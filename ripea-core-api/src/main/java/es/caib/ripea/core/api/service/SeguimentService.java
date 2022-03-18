@@ -39,7 +39,7 @@ public interface SeguimentService {
 	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+			PaginacioParamsDto paginacioParams, String rolActual);
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsExpedients(

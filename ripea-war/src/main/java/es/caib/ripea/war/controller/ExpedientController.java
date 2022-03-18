@@ -72,6 +72,7 @@ import es.caib.ripea.war.command.ExpedientFiltreCommand;
 import es.caib.ripea.war.command.ExpedientTancarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -183,7 +184,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
-		if ((metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) && filtreCommand.getOrganGestorId() == null) {
+		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
@@ -433,7 +434,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (expedientId != null) {
 			expedient = expedientService.findById(
 					entitatActual.getId(),
-					expedientId);
+					expedientId, null);
 		}
 		ExpedientCommand command = null;
 		if (expedient != null) {
@@ -455,12 +456,17 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
+		List<GrupDto> grups = new ArrayList<>();
+		if (metaExpedients != null && !metaExpedients.isEmpty()) {
+			grups = metaExpedientService.findGrupsAmbMetaExpedient(
+					entitatActual.getId(),
+					expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId());
+			command.setGestioAmbGrupsActiva(metaExpedients.get(0).isGestioAmbGrupsActiva());
+		}
 		model.addAttribute(
 				"grups",
-				metaExpedientService.findGrupsAmbMetaExpedient(
-						entitatActual.getId(),
-						expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId()));
-		command.setGestioAmbGrupsActiva(metaExpedients.get(0).isGestioAmbGrupsActiva());
+				grups);
+		
 		return "contingutExpedientForm";
 	}
 	@RequestMapping(value = "/new", method = RequestMethod.POST)
@@ -669,7 +675,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				metaExpedientId,
 				filter, 
 				null,
-				RolHelper.isRolActualAdministrador(request));
+				RolHelper.getRolActual(request), 
+				EntitatHelper.getOrganGestorActualId(request));
 
 	}
 
@@ -687,7 +694,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				metaExpedientId,
 				filter, 
 				expedientId,
-				RolHelper.isRolActualAdministrador(request));
+				RolHelper.getRolActual(request), 
+				EntitatHelper.getOrganGestorActualId(request));
 
 	}
 
@@ -789,7 +797,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false, null));
+						false, null, null));
 		boolean hasWritePermisions = expedientService.hasWritePermission(expedientId);
 		model.addAttribute(
 				"hasWritePermisions",
@@ -994,11 +1002,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (expedientId != null) {
 			expedient = expedientService.findById(
 					entitatActual.getId(),
-					expedientId);
+					expedientId, null);
 		}
 		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstats(
 				entitatActual.getId(),
-				expedientId);
+				expedientId, 
+				RolHelper.getRolActual(request));
 		ExpedientEstatDto expedientEstatObert = new ExpedientEstatDto();
 		expedientEstatObert.setNom("OBERT");
 		expedientEstats.add(0, expedientEstatObert);
@@ -1064,7 +1073,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
@@ -1108,7 +1117,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
-		if ((metaExpedientsPermisLectura == null || metaExpedientsPermisLectura.size() <= 0) && filtre.getOrganGestorId() == null) {
+		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
 			MissatgesHelper.warning(
 					request, 
 					getMessage(
@@ -1283,7 +1292,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		model.addAttribute(
 				"classificacioSia",
-				expedientService.findById(entitatActual.getId(), expedientId).getMetaExpedient().getClassificacioSia());
+				expedientService.findById(entitatActual.getId(), expedientId, null).getMetaExpedient().getClassificacioSia());
 		
 		return "enviamentInfo";
 	}
@@ -1378,7 +1387,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				expedientId,
 				true,
-				false, null);
+				false, null, null);
 		model.addAttribute("expedient", expedient);
 		if (expedient.isHasEsborranys()) {
 			List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(

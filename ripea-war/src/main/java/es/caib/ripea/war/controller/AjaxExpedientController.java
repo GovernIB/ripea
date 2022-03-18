@@ -57,7 +57,7 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		return expedientService.findById(
 				entitat.getId(),
-				id);
+				id, null);
 	}
 
 }

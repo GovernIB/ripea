@@ -46,7 +46,7 @@ import es.caib.ripea.war.helper.ValidationHelper;
  */
 @Controller
 @RequestMapping("/expedient")
-public class ExpedientInteressatController extends BaseUserController {
+public class ExpedientInteressatController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;

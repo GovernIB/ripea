@@ -55,7 +55,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity e " +
 			"where " +
 			"e.registre.entitat = :entitat " +
-			"and (:isAdmin = true or e.metaExpedient.id in (:idMetaExpedientPermesos)) " +
+			"and (:rolActual = 'IPA_ADMIN' or (:rolActual = 'IPA_ORGAN_ADMIN' and e.registre.destiCodi in (:organsCodisPermitted)) or e.metaExpedient.id in (:idMetaExpedientPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
 			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
@@ -71,7 +71,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			)
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("isAdmin") boolean isAdmin,
+			@Param("rolActual") String rolActual,
+			@Param("organsCodisPermitted") List<String> organsCodisPermitted,
 			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
@@ -99,12 +100,34 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity pet " +
 			"where " +
 			":entitatActual = pet.registre.entitat " +
-			"and (:isAdmin = true or pet.metaExpedient.id in (:idMetaExpedientPermesos)) " +
-			"and :entitatActual = pet.registre.entitat " +
+			"and (pet.metaExpedient.id in (:idMetaExpedientPermesos)) " +
 			"and pet.estat='PENDENT' " )
-	long countAnotacionsPendents(
+	long countAnotacionsPendentsUser(
 			@Param("entitatActual") EntitatEntity entitatActual,
-			@Param("isAdmin") boolean isAdmin,
 			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos);
-
+	
+	@Query(	"select " +
+			"    count(pet) " +
+			"from " +
+			"    ExpedientPeticioEntity pet " +
+			"where " +
+			":entitatActual = pet.registre.entitat " +
+			"and pet.estat='PENDENT' " )
+	long countAnotacionsPendentsAdminEntitat(
+			@Param("entitatActual") EntitatEntity entitatActual);
+	
+	
+	@Query(	"select " +
+			"    count(pet) " +
+			"from " +
+			"    ExpedientPeticioEntity pet " +
+			"where " +
+			":entitatActual = pet.registre.entitat " +
+			"and (pet.registre.destiCodi in (:organsCodisPermitted)) " +
+			"and pet.estat='PENDENT' " )
+	long countAnotacionsPendentsAdminOrgan(
+			@Param("entitatActual") EntitatEntity entitatActual,
+			@Param("organsCodisPermitted") List<String> organsCodisPermitted);
+	
+	
 }

@@ -897,7 +897,7 @@ public class DocumentServiceImpl implements DocumentService {
 									false,
 									true,
 									true,
-									false, null, false);
+									false, null, false, null);
 							return dto;
 						}
 					});
@@ -1457,7 +1457,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				true,
-				false, null, false);
+				false, null, false, null);
 	}
 	
 	

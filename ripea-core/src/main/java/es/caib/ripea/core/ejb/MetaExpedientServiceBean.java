@@ -366,8 +366,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
-			boolean isAdmin) {
-		return delegate.findCreateWritePerm(entitatId, isAdmin);
+			String rolActual) {
+		return delegate.findCreateWritePerm(entitatId, rolActual);
 	}
 
 	@Override

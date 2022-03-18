@@ -682,9 +682,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				+ "documentId=" + documentId +  ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
 				false,
-				false, false, false);
+				false,
+				false, 
+				true, 
+				false);
 		DocumentEntity document = entityComprovarHelper.comprovarDocument(
 				entitat,
 				null,
@@ -859,10 +861,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
-				true,
+				false,
 				false,
 				false, 
-				false, 
+				true, 
 				false);
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);

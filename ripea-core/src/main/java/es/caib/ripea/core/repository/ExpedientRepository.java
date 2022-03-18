@@ -507,5 +507,32 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	public List<ExpedientEntity> findByText(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("text") String text);
+	
+	
+	@Query(	"select" +
+			"    e " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
+	List<ExpedientEntity> findByEntitatAndMetaExpedient(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaNode") MetaNodeEntity metaNode);
+	
+	@Query(	"select" +
+			"    e " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and e.organGestor.id in (:organsIdsPermitted) " +
+			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
+	List<ExpedientEntity> findByEntitatAndMetaExpedientAndOrgans(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIdsPermitted") List<Long> organsIdsPermitted,
+			@Param("metaNode") MetaNodeEntity metaNode);
 
 }

@@ -212,11 +212,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
-		
 		if (filtreCommand.getMetaExpedientId() != null)
 			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
 		model.addAttribute(
@@ -271,7 +266,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null);
+					false, null, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
 				documentService.documentActualitzarEstat(
 						entitatActual.getId(), 
@@ -360,11 +355,6 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
 		
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (metaExpedientId != null)

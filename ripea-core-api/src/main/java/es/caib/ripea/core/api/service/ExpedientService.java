@@ -102,6 +102,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat a la qual pertany l'expedient.
 	 * @param id
 	 *            Atribut id de l'expedient que es vol trobar.
+	 * @param rolActual TODO
 	 * @return L'expedient.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -109,7 +110,7 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id, Long rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta un expedient donat el seu id.
@@ -380,7 +381,7 @@ public interface ExpedientService {
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual);
+	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual, Long organActualId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
@@ -398,7 +399,7 @@ public interface ExpedientService {
 	boolean retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
-			Long metaDocumentId);
+			Long metaDocumentId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryNotificarDistribucio(Long expedientPeticioId);
@@ -484,4 +485,10 @@ public interface ExpedientService {
 			Long entitatId, 
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('tothom')")
+	public boolean hasReadPermissionsAny(
+			String rolActual,
+			Long entitatId);
+
 }

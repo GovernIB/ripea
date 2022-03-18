@@ -141,6 +141,7 @@ public interface ContingutService {
 	 *            Atribut id del contingut que es vol moure.
 	 * @param contingutDestiId
 	 *            Atribut id del contingut a on es vol moure l'origen.
+	 * @param rolActual TODO
 	 * @return El contingut mogut.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -152,7 +153,7 @@ public interface ContingutService {
 	public ContingutDto move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId) throws NotFoundException, ValidationException;
+			Long contingutDestiId, String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Copia un contingut al destí especificat.
@@ -216,6 +217,7 @@ public interface ContingutService {
 	 * @param ambVersions
 	 *            Indica si la resposta ha d'incloure les versions del contingut.
 	 * @param rolActual TODO
+	 * @param organActualId TODO
 	 * @return El contingut amb l'id especificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -225,7 +227,7 @@ public interface ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions, String rolActual) throws NotFoundException;
+			boolean ambVersions, String rolActual, Long organActualId) throws NotFoundException;
 
 	/**
 	 * Obté la informació del contingut especificat.
@@ -516,7 +518,7 @@ public interface ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermis, String rolActual);
+			boolean ambPermis, String rolActual, Long organActualId);
 	
 	/**
 	 * Assigna el nou ordre als fills d'un contenidor.

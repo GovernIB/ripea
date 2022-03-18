@@ -98,9 +98,11 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 		<form:hidden path="accio"/>
 		<form:hidden path="metaExpedientId"/>
 		<form:hidden path="expedientId"/>
+		<form:hidden path="organGestorId"/>
 		<form:hidden path="any"/> 			
 		<form:hidden path="associarInteressats"/> 
 		<form:hidden path="newExpedientTitol"/>
+		
 
 		<c:forEach items="${expedientPeticioAcceptarCommand.annexos}" varStatus="vs">
 			<div class="well"> 

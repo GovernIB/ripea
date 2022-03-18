@@ -28,6 +28,7 @@ import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de seguiment de expedients pendents de distribució
@@ -97,7 +98,8 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
             docsPortafirmes = seguimentService.findExpedientsPendents(
 					entitat.getId(),
 					ExpedientPeticioFiltreCommand.asDto(filtreCommand),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
+					DatatablesHelper.getPaginacioDtoFromRequest(request), 
+					RolHelper.getRolActual(request));
 			
         return DatatablesHelper.getDatatableResponse(request, docsPortafirmes, "id");
     }

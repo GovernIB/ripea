@@ -153,7 +153,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								autenticarUsuari("user");
 								expedientService.findById(
 										entitatCreada.getId(),
-										expedientCreat.getId());
+										expedientCreat.getId(), null);
 								fail("L'expedient esborrat no s'hauria d'haver trobat");
 							} catch (NotFoundException expected) {
 							}
@@ -194,7 +194,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 							autenticarUsuari("user");
 							expedientService.findById(
 									entitatCreada.getId(),
-									expedientCreat.getId());
+									expedientCreat.getId(), null);
 							fail("L'expe`dient esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
 						}
@@ -222,7 +222,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								expedientCreat.getId());
 						ExpedientDto alliberat = expedientService.findById(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						assertTrue(
 								!alliberat.isAgafat());
 						assertNull(alliberat.getAgafatPer());
@@ -246,13 +246,13 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								expedientCreat.getId());
 						/*ExpedientDto alliberat = */expedientService.findById(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						expedientService.agafarUser(
 								entitatCreada.getId(),
 								expedientCreat.getId());
 						ExpedientDto agafat = expedientService.findById(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						assertTrue(
 								agafat.isAgafat());
 						assertEquals("user", agafat.getAgafatPer().getCodi());
@@ -402,7 +402,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						List<ExpedientEstatDto> estats0 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						assertNotNull(estats0);
 						assertTrue(estats0.isEmpty());
 						autenticarUsuari("admin");
@@ -416,7 +416,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						autenticarUsuari("user");
 						List<ExpedientEstatDto> estats1 = expedientEstatService.findExpedientEstats(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						assertNotNull(estats1);
 						assertTrue(estats1.size() == 1);
 						ExpedientEstatDto estatCreat = estats1.get(0);
@@ -571,7 +571,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null, false);
 						ExpedientDto expedientTancat = expedientService.findById(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						assertNotNull(expedientTancat);
 						assertEquals(ExpedientEstatEnumDto.TANCAT, expedientTancat.getEstat());
 					}
