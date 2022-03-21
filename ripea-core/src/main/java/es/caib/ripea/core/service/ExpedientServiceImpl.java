@@ -475,7 +475,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long organId) {
 		logger.debug(
 				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
-						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + ")");
+						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + "organId=" + organId + "rolActual=" + rolActual + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,

@@ -167,14 +167,16 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    MetaExpedientEntity me left join me.metaExpedientOrganGestors meog " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (:esNullActiu = true or me.actiu = :actiu and (:revisioActiva = false or me.revisioEstat = 'REVISAT')) " +
+			"and (:esNullActiu = true or me.actiu = :actiu) " +
+			"and (:revisioActiva = false or me.revisioEstat = 'REVISAT') " +
 			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
 			"and (:organGestorIComu = false or (me.organGestor = :organ or me.organGestor is null)) " +
-			"and ((:esAdminEntitat = true or :esAdminOrgan = true) " +
+			"and (:esAdminEntitat = true " +
+			" 	  or (:esAdminOrgan = true and (me.organGestor is null or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos))) " +
 			"     or (:esNullIdPermesos = false and me.id in (:idPermesos)) " +
 			"     or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos)) " +
 			"     or (me.organGestor is null and :esNullMetaExpedientOrganIdPermesos = false and meog.id in (:metaExpedientOrganIdPermesos)) " +
-			"	  or (:allComuns = true and me.organGestor is null))")
+			"	  or (:allComuns = true and me.organGestor is null)))")
 	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullActiu") boolean esNullActiu,

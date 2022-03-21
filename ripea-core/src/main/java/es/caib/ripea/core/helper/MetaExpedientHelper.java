@@ -284,7 +284,7 @@ public class MetaExpedientHelper {
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
-				permis));
+				isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis));
 		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
