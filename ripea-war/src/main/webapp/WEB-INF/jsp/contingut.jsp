@@ -483,6 +483,24 @@ body.loading .rmodal {
     text-shadow: 0 1px 0 #FFFFFF;
 }
 
+.rowinfo-interessat h5 {
+	font-weight: bold;
+}
+.interessaat-info dl {
+	columns: 2;
+	margin: 0;
+}
+.interessaat-info dl div {
+	display: flex;
+}
+.interessaat-info dl div dt {
+	text-align: right;
+	width: 160px;
+}
+.interessaat-info dl div dd {
+	grid-column: 2;
+	margin-left: 10px;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -1054,6 +1072,61 @@ $(document).ready(function() {
 	});
 	
 	//======================= enviament list on clicking desplegable in notificacio table =============================
+	$('#taulaInteressats').on('rowinfo.dataTable', function(e, td, rowData) {
+		var getUrl = "<c:url value="/expedient/interessat/"/>" + rowData.id + "?dadesExternes=true";
+		$.get(getUrl).done(function(data) {
+			$(td).empty();
+			var rowinfo_content = 
+				    			'<div class="rowinfo-interessat">' + 
+								'<h5><spring:message code="contingut.interessat.info.interessat"/>:</h5>' + 
+				    			'<div class="interessaat-info">' +
+				    				'<dl>' +
+				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.pais"/>', data.paisNom) +
+				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.email"/>', data.email) +
+				    				'</dl>' +
+					    			'<dl>' +
+					    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.provincia"/>', data.provinciaNom) +
+					    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.telefon"/>', data.telefon) +
+								    '</dl>'+
+								    '<dl>' +
+								    	showInteressatFieldInfo('<spring:message code="contingut.interessat.info.municipi"/>', data.municipiNom) +
+				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.observacions"/>', data.observacions) +
+							    	'</dl>'+
+							    	'<dl>' +
+							    		showInteressatFieldInfo('<spring:message code="contingut.interessat.info.adresa"/>', data.adresa) +
+									'</dl>'+
+									'<dl>' +
+										showInteressatFieldInfo('<spring:message code="contingut.interessat.info.codipostal"/>', data.codiPostal) +
+									'</dl>'+
+								'</div>';
+								if (data.representant) {
+									rowinfo_content += '<h5><spring:message code="contingut.interessat.info.representant"/>:</h5>' +
+														'<div class="interessaat-info">' +
+										    				'<dl>' +
+										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.pais"/>', data.representant.paisNom) +
+										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.email"/>', data.representant.email) +
+										    				'</dl>' +
+											    			'<dl>' +
+											    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.provincia"/>', data.representant.provinciaNom) +
+											    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.telefon"/>', data.representant.telefon) +
+														    '</dl>'+
+														    '<dl>' +
+														    	showInteressatFieldInfo('<spring:message code="contingut.interessat.info.municipi"/>', data.representant.municipiNom) +
+										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.observacions"/>', data.representant.observacions) +
+													    	'</dl>'+
+													    	'<dl>' +
+													    		showInteressatFieldInfo('<spring:message code="contingut.interessat.info.adresa"/>', data.representant.adresa) +
+															'</dl>'+
+															'<dl>' +
+																showInteressatFieldInfo('<spring:message code="contingut.interessat.info.codipostal"/>', data.representant.codiPostal) +
+															'</dl>'+
+														'</div>';
+								}
+								rowinfo_content += '</div>';
+	    	$(td).append(rowinfo_content);
+		});
+	});
+	//======================= enviament list on clicking desplegable in notificacio table =============================
 	$('#taulaNotificacions').on('rowinfo.dataTable', function(e, td, rowData) {
 		var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + rowData.id;
 	    $.get(getUrl).done(function(data) {
@@ -1291,6 +1364,13 @@ $(document).ready(function() {
 	});
 	
 });
+
+function showInteressatFieldInfo(fieldName, fieldValue) {
+	return '<div>' +
+				'<dt>' + fieldName + '</dt>' +
+				'<dd>' + fieldValue + '</dd>' +
+		   '</div>';
+}
 
 function showTipusDocumentals() {
 	var content = '<div> \
@@ -2478,7 +2558,8 @@ $.views.helpers(myHelpers);
 								data-paging-enabled="false"
 								data-botons-template="#taulaInteressatsNouBoton" 
 								class="table table-striped table-bordered" 
-								style="width:100%">
+								style="width:100%"
+								data-row-info="true">
 								<thead>
 									<tr>
 										<th data-col-name="id" data-visible="false">#</th>

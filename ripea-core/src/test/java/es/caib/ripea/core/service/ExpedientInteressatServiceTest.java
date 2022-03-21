@@ -230,7 +230,8 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
-									interessatCreat.getId());
+									interessatCreat.getId(),
+									false);
 							fail("L'expe`dient esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
 						}
@@ -376,7 +377,8 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
-									interessatCreat.getId());
+									interessatCreat.getId(),
+									false);
 							fail("L'expe`dient esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
 						}
@@ -464,7 +466,8 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 						try {
 							autenticarUsuari("user");
 							expedientInteressatService.findById(
-									interessatCreat.getId());
+									interessatCreat.getId(),
+									false);
 							fail("L'expe`dient esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
 						}
