@@ -480,6 +480,7 @@ public interface ExpedientService {
 			Long entitatId,
 			String text);
 
+
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
 			Long entitatId, 
@@ -490,5 +491,10 @@ public interface ExpedientService {
 	public boolean hasReadPermissionsAny(
 			String rolActual,
 			Long entitatId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<ExpedientDto> findByIds(
+			Long entitatId,
+			Set<Long> ids);
 
 }

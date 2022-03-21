@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
 
 <c:set var="titol"><spring:message code="expedient.massiu.tancar.titol"/></c:set>
@@ -23,8 +24,47 @@
 	<c:set var="formAction"><rip:modalUrl value="/massiu/tancament/tancar"/></c:set>
 
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientMassiuTancamentCommand">
-	<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
-	
+		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
+		<c:if test="${hasEsborranys}">
+			<div class="alert well-sm alert-info">
+				<span class="fa fa-info-circle"></span>
+				<spring:message code="contingut.expedient.tancar.esborranys.info.multiple" />
+			</div>
+		</c:if>
+
+		<c:forEach items="${expedients}" varStatus="vs" var="expedient">
+			<form:hidden path="expedientsTancar[${vs.index}].id" value="${expedient.id}"/>
+			<c:if test="${expedient.hasEsborranys}">
+				
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+							<th colspan="5" style="font-size: 20px; background-color: #f5f5f5;">${expedient.numeroINom}</th>
+							<tr>
+							<tr>
+								<th style="background-color: #f5f5f5;"><spring:message code="contingut.info.nom" /></th>
+								<th style="background-color: #f5f5f5;"><spring:message code="contingut.info.tipus" /></th>
+								<th style="background-color: #f5f5f5;"><spring:message code="contingut.info.createl" /></th>
+								<th style="background-color: #f5f5f5;"><spring:message code="contingut.info.creatper" /></th>
+								<th style="background-color: #f5f5f5;" width="10%">&nbsp;</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="esborrany" items="${expedient.esborranys}">
+								<tr>
+									<td><rip:blocIconaContingut contingut="${esborrany}" />&nbsp;${esborrany.nom}</td>
+									<td>${esborrany.metaNode.nom}</td>
+									<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
+									<td>${esborrany.createdBy.nom}</td>
+									<td><form:checkbox path="expedientsTancar[${vs.index}].documentsPerFirmar" value="${esborrany.id}" /></td>
+								</tr>
+							</c:forEach>
+						</tbody>
+					</table>
+						
+			</c:if>
+		</c:forEach>
+
 
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

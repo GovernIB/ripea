@@ -134,8 +134,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired
 	private ExpedientPeticioRepository expedientPeticioRepository;
 	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
 	private DadaRepository dadaRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
@@ -179,6 +177,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private DocumentRepository documentRepository;
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -463,6 +463,30 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, false, null);
 		return toExpedientDto(expedient, true, null, false);
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientDto> findByIds(Long entitatId, Set<Long> ids) {
+		logger.debug("Obtenint l'expedients (" + "entitatId=" + entitatId + ", " + "ids=" + ids + ")");
+		List<ExpedientDto> expedients = new ArrayList<>();
+		
+		for (Long id : ids) {
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+					entitatId,
+					id,
+					false,
+					true,
+					false,
+					false,
+					false, 
+					false, 
+					null);
+			expedients.add(toExpedientDto(expedient, true, null, false));
+		}
+		return expedients;
+	}
+	
+	
 
 	@Transactional(readOnly = true)
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(

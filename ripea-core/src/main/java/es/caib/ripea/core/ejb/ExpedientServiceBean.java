@@ -407,4 +407,14 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId) {
 		return delegate.hasReadPermissionsAny(rolActual, entitatId);
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<ExpedientDto> findByIds(
+			Long entitatId,
+			Set<Long> ids) {
+		return delegate.findByIds(
+				entitatId,
+				ids);
+	}
 }
