@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.WebUtils;
 
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
@@ -981,6 +982,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		logger.debug("findExpedientEstatByMetaExpedient time: " + (System.currentTimeMillis() - t0) + " ms");
 		return expedientEstatsOptions;
+	}
+	
+	@RequestMapping(value = "/findAll", method = RequestMethod.GET)
+	@ResponseBody
+	public List<CodiValorDto> findAll(HttpServletRequest request, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return expedientService.findByEntitat(entitatActual.getId());
 	}
 
 	@RequestMapping(value = "/{expedientId}/canviarEstat", method = RequestMethod.GET)

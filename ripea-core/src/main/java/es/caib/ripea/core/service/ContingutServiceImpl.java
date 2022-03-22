@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +92,7 @@ import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
@@ -138,6 +140,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private TipusDocumentalRepository tipusDocumentalRepository;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private ExpedientRepository expedientRepository;
 
 	@Transactional
 	@Override
@@ -277,6 +281,16 @@ public class ContingutServiceImpl implements ContingutService {
 			contingut.getPare().getFills().remove(contingut);
 		}
 		
+		if (contingut instanceof ExpedientEntity && contingut.getFills() != null) {
+			Set<ContingutEntity> fills = contingut.getFills();
+			
+			for (ContingutEntity document : fills) {
+				if (document instanceof DocumentEntity) {
+					this.deleteDefinitiu(entitatId, document.getId());
+				}
+			}
+		}
+		
 		if (contingut instanceof DocumentEntity) {
 			DocumentEntity documentEntity = (DocumentEntity) contingut;
 			
@@ -310,7 +324,7 @@ public class ContingutServiceImpl implements ContingutService {
 //				true);
 		return dto;
 	}
-
+	
 	@Transactional
 	@Override
 	public ContingutDto undelete(
@@ -1030,8 +1044,22 @@ public class ContingutServiceImpl implements ContingutService {
 		Date dataCreacioInici = DateHelper.toDateInicialDia(filtre.getDataCreacioInici());
 		Date dataCreacioFi = DateHelper.toDateFinalDia(filtre.getDataCreacioFi());
 		
+		Date dataEsborratInici = DateHelper.toDateInicialDia(filtre.getDataEsborratInici());
+		Date dataEsborratFi = DateHelper.toDateFinalDia(filtre.getDataEsborratFi());
+		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = expedientRepository.findOne(filtre.getExpedientId());
+			if (expedient == null) {
+				throw new NotFoundException(
+						filtre.getExpedientId(),
+						ExpedientEntity.class);
+			}
+		}
+		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+		
 		
 		
 		return paginacioHelper.toPaginaDto(
@@ -1050,8 +1078,14 @@ public class ContingutServiceImpl implements ContingutService {
 						dataCreacioInici,
 						(dataCreacioFi == null),
 						dataCreacioFi,
+						(dataEsborratInici == null),
+						dataEsborratInici,
+						(dataEsborratFi == null),
+						dataEsborratFi,
 						filtre.isMostrarEsborrats(),
 						filtre.isMostrarNoEsborrats(),
+						(expedient == null),
+						expedient,
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				ContingutDto.class,
 				new Converter<ContingutEntity, ContingutDto>() {

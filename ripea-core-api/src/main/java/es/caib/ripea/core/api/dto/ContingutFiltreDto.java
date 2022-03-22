@@ -22,9 +22,11 @@ public class ContingutFiltreDto implements Serializable {
 	private Long metaNodeId;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
+	private Date dataEsborratInici;
+	private Date dataEsborratFi;
 	private boolean mostrarEsborrats;
 	private boolean mostrarNoEsborrats;
-
+	private Long expedientId;
 
 
 	public ContingutTipusEnumDto getTipus() {
@@ -63,6 +65,18 @@ public class ContingutFiltreDto implements Serializable {
 	public void setDataCreacioFi(Date dataCreacioFi) {
 		this.dataCreacioFi = dataCreacioFi;
 	}
+	public Date getDataEsborratInici() {
+		return dataEsborratInici;
+	}
+	public void setDataEsborratInici(Date dataEsborratInici) {
+		this.dataEsborratInici = dataEsborratInici;
+	}
+	public Date getDataEsborratFi() {
+		return dataEsborratFi;
+	}
+	public void setDataEsborratFi(Date dataEsborratFi) {
+		this.dataEsborratFi = dataEsborratFi;
+	}
 	public boolean isMostrarEsborrats() {
 		return mostrarEsborrats;
 	}
@@ -74,6 +88,12 @@ public class ContingutFiltreDto implements Serializable {
 	}
 	public void setMostrarNoEsborrats(boolean mostrarNoEsborrats) {
 		this.mostrarNoEsborrats = mostrarNoEsborrats;
+	}
+	public Long getExpedientId() {
+		return expedientId;
+	}
+	public void setExpedientId(Long expedientId) {
+		this.expedientId = expedientId;
 	}
 
 	@Override

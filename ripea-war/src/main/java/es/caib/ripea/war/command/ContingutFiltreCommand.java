@@ -31,8 +31,11 @@ public class ContingutFiltreCommand {
 	private Long metaNodeId;
 	private Date dataCreacioInici;
 	private Date dataCreacioFi;
+	private Date dataEsborratInici;
+	private Date dataEsborratFi;
 	private String usuariCreacio;
 	private ContenidorFiltreOpcionsEsborratEnum opcionsEsborrat;
+	private Long expedientId;
 
 
 
@@ -72,6 +75,18 @@ public class ContingutFiltreCommand {
 	public void setDataCreacioFi(Date dataCreacioFi) {
 		this.dataCreacioFi = dataCreacioFi;
 	}
+	public Date getDataEsborratInici() {
+		return dataEsborratInici;
+	}
+	public void setDataEsborratInici(Date dataEsborratInici) {
+		this.dataEsborratInici = dataEsborratInici;
+	}
+	public Date getDataEsborratFi() {
+		return dataEsborratFi;
+	}
+	public void setDataEsborratFi(Date dataEsborratFi) {
+		this.dataEsborratFi = dataEsborratFi;
+	}
 	public String getUsuariCreacio() {
 		return usuariCreacio;
 	}
@@ -84,6 +99,12 @@ public class ContingutFiltreCommand {
 	public void setOpcionsEsborrat(
 			ContenidorFiltreOpcionsEsborratEnum opcionsEsborrat) {
 		this.opcionsEsborrat = opcionsEsborrat;
+	}
+	public Long getExpedientId() {
+		return expedientId;
+	}
+	public void setExpedientId(Long expedientId) {
+		this.expedientId = expedientId;
 	}
 
 	public static ContingutFiltreCommand asCommand(ContingutFiltreDto dto) {

@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -381,6 +382,9 @@ public interface ExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<CodiValorDto> findByEntitat(Long entitatId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);

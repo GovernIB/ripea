@@ -16,6 +16,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -397,5 +398,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
+	}
+	@Override
+	@RolesAllowed({"IPA_ADMIN"})
+	public List<CodiValorDto> findByEntitat(
+			Long entitatId) {
+		return delegate.findByEntitat(entitatId);
 	}
 }

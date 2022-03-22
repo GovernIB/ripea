@@ -81,7 +81,7 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			ContingutEntity pare,
 			String nom,
 			int esborrat);
-
+	
 	@Query(	"select " +
 			"    c " +
 			"from " +
@@ -96,7 +96,10 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"and (:esNullCreador = true or lower(c.createdBy) like lower('%'||:creador||'%')) " +
 			"and (:esNullDataInici = true or c.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or c.createdDate <= :dataFi) " +
-			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) ")
+			"and (:esNullDataEsborratInici = true or c.esborratData >= :dataEsborratInici) " +
+			"and (:esNullDataEsborratFi = true or c.esborratData <= :dataEsborratFi) " +
+			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) " +
+			"and (:esNullExpedient = true or c.expedient = :expedient)) ")
 	public Page<ContingutEntity> findByFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("tipusCarpeta") boolean tipusCarpeta,
@@ -112,8 +115,14 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
+			@Param("esNullDataEsborratInici") boolean esNullDataEsborratInici,
+			@Param("dataEsborratInici") Date dataEsborratInici,
+			@Param("esNullDataEsborratFi") boolean esNullDataEsborratFi,
+			@Param("dataEsborratFi") Date dataEsborratFi,
 			@Param("mostrarEsborrats") boolean mostrarEsborrats,
 			@Param("mostrarNoEsborrats") boolean mostrarNoEsborrats,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
 			Pageable pageable);
 
 	@Query(	"select " +

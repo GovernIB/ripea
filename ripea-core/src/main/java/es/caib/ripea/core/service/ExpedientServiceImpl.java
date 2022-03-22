@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -667,6 +668,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 		}
 		return expedientsDto;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<CodiValorDto> findByEntitat(Long entitatId) {
+		logger.debug("Consulta de expedients de l'entitat (" + "entitatId=" + entitatId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		List<ExpedientEntity> expedients = expedientRepository.findByEntitatOrderByNomAsc(entitat);
+		return conversioTipusHelper.convertirList(expedients, CodiValorDto.class);
 	}
 
 	@Transactional(readOnly = true)

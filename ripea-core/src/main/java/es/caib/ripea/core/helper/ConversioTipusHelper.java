@@ -522,6 +522,17 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientEntity, CodiValorDto>() {
+					@Override
+					public CodiValorDto convert(ExpedientEntity source, Type<? extends CodiValorDto> destinationClass) {
+						CodiValorDto target = new CodiValorDto();
+						target.setCodi(source.getId().toString());
+						target.setValor(source.getNom());
+						return target;
+					}
+				});
 
 //		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
 //				.byDefault()

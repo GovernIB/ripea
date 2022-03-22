@@ -37,7 +37,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			ContingutEntity pare,
 			String nom,
 			int esborrat);
-
+	
 	List<ExpedientEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 
@@ -46,6 +46,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			MetaNodeEntity metaNode,
 			int any,
 			long sequencia);
+	
+	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 
 	@Query(	"from" +
 			"    ExpedientEntity e "
