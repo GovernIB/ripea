@@ -154,6 +154,9 @@ public class ContingutHelper {
 	private InteressatRepository interessatRepository;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
+
 
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut) {
@@ -165,7 +168,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 	}
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
@@ -177,7 +180,8 @@ public class ContingutHelper {
 			boolean pathNomesFinsExpedientArrel,
 			boolean ambVersions, 
 			String rolActual, 
-			boolean onlyForList) {
+			boolean onlyForList, 
+			Long organActualId) {
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
@@ -429,7 +433,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false, 
-								rolActual, onlyForList));
+								rolActual, onlyForList, organActualId));
 			}
 			resposta.setEntitat(
 					conversioTipusHelper.convertir(
@@ -448,6 +452,10 @@ public class ContingutHelper {
 			if (ambPermisos && metaNode != null) {
 				// Omple els permisos
 				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
+			}
+			
+			if (ambPermisos) {
+				resposta.setAdmin(checkIfUserIsAdminOfContingut(contingut.getId(), rolActual));
 			}
 			
 			// Omple la informació d'auditoria
@@ -522,7 +530,7 @@ public class ContingutHelper {
 							false,
 							false,
 							false,
-							false, rolActual, onlyForList));
+							false, rolActual, onlyForList, organActualId));
 				}
 				for (ContingutEntity fill: fills) {
 					if (fill.getEsborrat() == 0) {
@@ -534,7 +542,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, rolActual, onlyForList);
+								false, rolActual, onlyForList, organActualId);
 						// Configura el pare de cada fill
 						fillDto.setPath(fillPath);
 						contenidorDtos.add(fillDto);
@@ -559,6 +567,36 @@ public class ContingutHelper {
 
 		logger.debug("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
+	}
+	
+	public boolean checkIfUserIsAdminOfContingut(Long contingutId, String rolActual) {
+		
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		boolean admin = false;
+		if (rolActual != null) {
+			if (rolActual.equals("IPA_ADMIN")) {
+				admin = permisosHelper.isGrantedAll(
+						contingut.getEntitat().getId(),
+						EntitatEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						SecurityContextHolder.getContext().getAuthentication());
+			}
+			if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+				if (contingut.getExpedientPare().getOrganGestor() != null) {
+					boolean grantedOrgan = false;
+					List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(contingut.getExpedientPare().getOrganGestor(), true);
+					permisosHelper.filterGrantedAny(
+							organsGestors,
+							OrganGestorEntity.class,
+							new Permission[] { ExtendedPermission.ADMINISTRATION });
+					grantedOrgan = !organsGestors.isEmpty();
+					if (grantedOrgan) {
+						admin = true;
+					}
+				}
+			}
+		}
+		return admin;
 	}
 	
 	public DocumentDto generarDocumentDto(
@@ -665,9 +703,8 @@ public class ContingutHelper {
 		}
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(entitatId, EntitatEntity.class,
-				new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
-		if (!checkPerMassiuAdmin && !esAdministradorEntitat) {
+
+		if (!checkPerMassiuAdmin && !checkIfUserIsAdminOfContingut(contingutId, rolActual) && !RolHelper.isAdminEntitat(rolActual) && !RolHelper.isAdminOrgan(rolActual)) {
 			// Comprova que l'usuari actual te agafat l'expedient
 			UsuariEntity agafatPer = expedient.getAgafatPer();
 			if (agafatPer == null) {
@@ -811,7 +848,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1346,7 +1383,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, false));
+								false, null, false, null));
 				}
 			}
 		}

@@ -73,7 +73,7 @@
 			<li><a href="<c:url value="/expedient/${contingut.id}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 		</c:if>
 		
-		<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
+		<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
 			<c:choose>
@@ -122,7 +122,7 @@
 		<c:if test="${contingut.expedient && not expedientPareAgafatPerUsuariActual}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 		</c:if>
-		<c:if test="${(isTasca || potModificarExpedientPare || isRolActualAdministrador) || (contingut.carpeta && isCreacioCarpetesActiva)}">
+		<c:if test="${(isTasca || potModificarExpedientPare || contingut.admin) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
@@ -219,7 +219,7 @@
 			</c:if>
 			
 			<%--------------- FIRMA RELATED ACCIONS -------------------%>
-			<c:if test="${isTasca || potModificarExpedientPare}">
+			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 			
 				<%---- Enviar a portafirmes ----%>
 				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
@@ -297,7 +297,7 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 			</c:if>
-			<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
+			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 				<%---- Seguiment portafirmes ----%>
 				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMAT') && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>

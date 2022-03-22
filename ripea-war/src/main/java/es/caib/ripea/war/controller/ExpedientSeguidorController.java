@@ -48,7 +48,7 @@ public class ExpedientSeguidorController extends BaseUserController {
 				expedientId);
 		ExpedientDto expedient = expedientService.findById(
 				entitatActual.getId(),
-				expedientId);
+				expedientId, null);
 		String url;
 		if (contingutId != null) {
 			url = "redirect:../../contingut/" + contingutId;
@@ -75,7 +75,7 @@ public class ExpedientSeguidorController extends BaseUserController {
 				expedientId);
 		ExpedientDto expedient = expedientService.findById(
 				entitatActual.getId(),
-				expedientId);
+				expedientId, null);
 		String url;
 		if (contingutId != null) {
 			url = "redirect:../../contingut/" + contingutId;
@@ -104,7 +104,7 @@ public class ExpedientSeguidorController extends BaseUserController {
 				"expedient",
 				expedientService.findById(
 						entitatActual.getId(),
-						expedientId));
+						expedientId, null));
 		
 		model.addAttribute("followers", followers);
 		model.addAttribute("usuariActual", usuariActual);		

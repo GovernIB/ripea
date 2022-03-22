@@ -28,17 +28,6 @@ import es.caib.ripea.core.entity.UsuariEntity;
  */
 public interface ContingutRepository extends JpaRepository<ContingutEntity, Long> {
 
-	@Query(	"select" +
-			"    e " +
-			"from" +
-			"    ExpedientEntity e " +
-			"where " +
-			"e.esborrat = 0 " +
-			"and e.entitat = :entitat " +
-			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
-	List<ContingutEntity> findByEntitatAndMetaExpedient(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("metaNode") MetaNodeEntity metaNode);
 
 	List<ContingutEntity> findByNomAndTipusAndPareAndEntitatAndEsborrat(
 			String nom,

@@ -689,7 +689,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				documentId,
 				true,
-				false, null);
+				false, null, null);
 		documentService.documentActualitzarEstat(
 				entitatActual.getId(), 
 				documentId, 

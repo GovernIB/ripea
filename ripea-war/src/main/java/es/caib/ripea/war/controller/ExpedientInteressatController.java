@@ -46,7 +46,7 @@ import es.caib.ripea.war.helper.ValidationHelper;
  */
 @Controller
 @RequestMapping("/expedient")
-public class ExpedientInteressatController extends BaseUserController {
+public class ExpedientInteressatController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
@@ -81,7 +81,7 @@ public class ExpedientInteressatController extends BaseUserController {
 			@PathVariable Long interessatId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		InteressatDto interessatDto = expedientInteressatService.findById(interessatId); 
+		InteressatDto interessatDto = expedientInteressatService.findById(interessatId, false); 
 		InteressatCommand interessatCommand = InteressatCommand.asCommand(interessatDto);
 		interessatCommand.setEntitatId(entitatActual.getId());
 		model.addAttribute("interessatCommand", interessatCommand);
@@ -210,8 +210,9 @@ public class ExpedientInteressatController extends BaseUserController {
 	public InteressatDto getInteressat(
 			HttpServletRequest request,
 			@PathVariable Long interessatId,
+			@RequestParam(value = "dadesExternes", defaultValue = "false") boolean dadesExternes,
 			Model model) {
-		InteressatDto interessatDto = expedientInteressatService.findById(interessatId);
+		InteressatDto interessatDto = expedientInteressatService.findById(interessatId, dadesExternes);
 		return interessatDto;
 	}
 	

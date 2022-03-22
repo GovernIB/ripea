@@ -152,7 +152,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	@Override
 	public List<ExpedientEstatDto> findExpedientEstats(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId, 
+			String rolActual) {
 		logger.debug("Consultant els estas dels expedients ("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
@@ -170,7 +171,8 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false, 
-				false, null);
+				false, 
+				rolActual);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
@@ -455,7 +457,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 									false,
 									true,
 									true,
-									false, null, false);
+									false, null, false, null);
 							return dto;
 						}
 					});
@@ -548,7 +550,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null, false);
+				false, null, false, null);
 		
 		return expedientDto;
 	}

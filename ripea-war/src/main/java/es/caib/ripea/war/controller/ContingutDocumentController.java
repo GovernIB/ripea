@@ -487,7 +487,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				documentId,
 				true,
-				false, null);
+				false, null, null);
 		if (contingut instanceof DocumentDto) {
 			
 			try {
@@ -549,7 +549,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				pareId,
 				true,
-				false, null);
+				false, null, null);
 		
 		byte[] reportContent = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -594,7 +594,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		
 		List<DocumentDto> documents = new ArrayList<DocumentDto>();
 		@SuppressWarnings("unchecked")
@@ -608,7 +608,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null);
+					false, null, null);
 
 			document = (DocumentDto) contingutDoc;
 			//No es possible concatenar els documents que no són pdf
@@ -735,7 +735,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -747,7 +747,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null);
+					false, null, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 				existsEsborrat = true;
 				documentService.documentActualitzarEstat(
@@ -884,7 +884,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						entitatActual.getId(),
 						docId,
 						true,
-						false, null);
+						false, null, null);
 				if (contingut instanceof DocumentDto) {
 					DocumentDto document = (DocumentDto) contingut;
 					if ((!document.isFirmat() || document.isCustodiat())
@@ -917,7 +917,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		if (!contingut.isCarpeta())
 			isDocument = true;
 		else
@@ -939,7 +939,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					documentId,
 					true,
-					false, null);
+					false, null, null);
 				FitxerDto fitxer = documentService.descarregarImprimible(
 						entitatActual.getId(),
 						documentId,

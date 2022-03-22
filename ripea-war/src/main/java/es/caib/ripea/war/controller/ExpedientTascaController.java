@@ -83,7 +83,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				expedientTascaCommand);
 		ExpedientDto expedientDto = expedientService.findById(
 				entitatActual.getId(),
-				expedientId);
+				expedientId, null);
 		model.addAttribute(
 				"metaexpTasques",
 				expedientTascaService.findAmbMetaExpedient(
@@ -102,7 +102,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		expedientService.findById(
 				entitatActual.getId(),
-				expedientTascaDto.getExpedient().getId());
+				expedientTascaDto.getExpedient().getId(), null);
 		model.addAttribute(
 				"expedientTascaDto",
 				expedientTascaDto);
@@ -144,7 +144,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 					expedientTascaCommand);
 			ExpedientDto expedientDto = expedientService.findById(
 					entitatActual.getId(),
-					expedientId);
+					expedientId, null);
 			model.addAttribute(
 					"metaexpTasques",
 					expedientTascaService.findAmbMetaExpedient(
@@ -216,7 +216,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisos(request);
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		model.addAttribute("expedientTasca", expedientTascaDto);
 		boolean hasWritePermisions = expedientService.hasWritePermission(expedientTascaDto.getExpedient().getId());

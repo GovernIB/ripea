@@ -50,7 +50,7 @@ import es.caib.ripea.war.helper.MissatgesHelper;
  */
 @Controller
 @RequestMapping("/contingutDada")
-public class ContingutDadaController extends BaseUserController {
+public class ContingutDadaController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private ContingutService contingutService;
@@ -127,7 +127,7 @@ public class ContingutDadaController extends BaseUserController {
 				entitatActual.getId(),
 				contingutId,
 				false,
-				false, null);
+				false, null, null);
 		if (contingut instanceof NodeDto) {
 			return ((NodeDto)contingut).getDadesCount();
 		} else {

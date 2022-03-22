@@ -69,7 +69,7 @@ public class DocumentHelper {
 						entitatActual.getId(),
 						entry.getValue(),
 						true,
-						false, null);
+						false, null, null);
 				if (contingut.isDocument() 
 						&& (((DocumentDto)contingut).isFirmat() || ((DocumentDto)contingut).isCustodiat() || (((DocumentDto)contingut).isDefinitiu()))) {
 					fitxer = documentService.descarregarImprimible(
@@ -128,7 +128,7 @@ public class DocumentHelper {
 							entitatActual.getId(),
 							docId,
 							true,
-							false, null);
+							false, null, null);
 					if (contingutDoc instanceof DocumentDto)
 						fitxer = documentService.descarregar(
 								entitatActual.getId(),

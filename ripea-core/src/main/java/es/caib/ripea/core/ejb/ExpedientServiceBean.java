@@ -106,8 +106,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) {
-		return delegate.findById(entitatId, id);
+			Long id, 
+			Long rolActual) {
+		return delegate.findById(entitatId, id, rolActual);
 	}
 
 
@@ -251,11 +252,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	@Override
 	public List<ExpedientDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId, String rolActual) {
+			Long metaExpedientId, String rolActual, Long organActualId) {
 		return delegate.findByEntitatAndMetaExpedient(
 				entitatId,
 				metaExpedientId, 
-				rolActual);
+				rolActual, organActualId);
 	}
 
 	@Override
@@ -289,11 +290,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	public boolean retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
-			Long metaDocumentId) {
+			Long metaDocumentId, String rolActual) {
 		return delegate.retryCreateDocFromAnnex(
 				registreAnnexId, 
 				expedientPeticioId, 
-				metaDocumentId);		
+				metaDocumentId, rolActual);		
 	}
 
 	@Override
@@ -404,5 +405,24 @@ public class ExpedientServiceBean implements ExpedientService {
 	public List<CodiValorDto> findByEntitat(
 			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
+
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public boolean hasReadPermissionsAny(
+			String rolActual,
+			Long entitatId) {
+		return delegate.hasReadPermissionsAny(rolActual, entitatId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<ExpedientDto> findByIds(
+			Long entitatId,
+			Set<Long> ids) {
+		return delegate.findByIds(
+				entitatId,
+				ids);
 	}
 }

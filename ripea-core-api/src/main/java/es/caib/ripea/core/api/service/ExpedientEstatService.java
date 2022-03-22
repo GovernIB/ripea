@@ -34,7 +34,7 @@ public interface ExpedientEstatService {
 	ExpedientEstatDto deleteExpedientEstat(Long entitatId, Long expedientEstatId, String rolActual, Long organId) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId);
+	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId, boolean checkPerMassiuAdmin);

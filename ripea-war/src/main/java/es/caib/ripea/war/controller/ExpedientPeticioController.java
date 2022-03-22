@@ -60,6 +60,7 @@ import es.caib.ripea.war.command.RegistreAnnexCommand;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -72,7 +73,7 @@ import es.caib.ripea.war.helper.RolHelper;
  */
 @Controller
 @RequestMapping("/expedientPeticio")
-public class ExpedientPeticioController extends BaseUserOAdminController {
+public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
 
@@ -148,7 +149,9 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 				expedientPeticioService.findAmbFiltre(
 						entitatActual.getId(),
 						ExpedientPeticioFiltreCommand.asDto(expedientPeticioFiltreCommand),
-						DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual.equals("IPA_ADMIN")),
+						DatatablesHelper.getPaginacioDtoFromRequest(request), 
+						rolActual, 
+						EntitatHelper.getOrganGestorActualId(request)),
 				"id");
 	}
 	
@@ -175,7 +178,7 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 		
 		RegistreAnnexCommand registreAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioService.findAnnexById(registreAnnexId), RegistreAnnexCommand.class);
 		
-		ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId());
+		ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null);
 		
 		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
 		if (metaDocPerDefecte != null) {
@@ -230,12 +233,12 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			return "expedientPeticioReintentarMetaDoc";
 		}
 		
-		
 		boolean processatOk = true;
 		processatOk = expedientService.retryCreateDocFromAnnex(
 				command.getId(),
 				expedientPeticioId, 
-				command.getMetaDocumentId());
+				command.getMetaDocumentId(), 
+				RolHelper.getRolActual(request));
 		if (processatOk) {
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -591,7 +594,11 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			@PathVariable Long entitatId,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		return (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitatId, metaExpedientId, RolHelper.getRolActual(request));
+		return (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(
+				entitatId, 
+				metaExpedientId, 
+				RolHelper.getRolActual(request), 
+				EntitatHelper.getOrganGestorActualId(request));
 	}
 	
 	@RequestMapping(value = "/comprovarInteressatsPeticio/{expedientId}/{expedientPeticioId}", method = RequestMethod.GET)
@@ -616,7 +623,12 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.CREATE);
+		if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
+			return true;
+		} else {
+			return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.CREATE);
+		}
+		
 	}
 	
 	@RequestMapping(value = "/comprovarPermisWrite/{metaExpedientId}", method = RequestMethod.GET)
@@ -626,7 +638,11 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.WRITE);
+		if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
+			return true;
+		} else {
+			return metaExpedientService.comprovarPermisosMetaExpedient(entitatActual.getId(), metaExpedientId, PermissionEnumDto.WRITE);
+		}
 	}
 	
 	
@@ -850,7 +866,7 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(
 				entitat.getId(), 
-				rolActual.equals("IPA_ADMIN"));
+				rolActual);
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedients);
@@ -869,7 +885,7 @@ public class ExpedientPeticioController extends BaseUserOAdminController {
 			// if current user has create permissions for this metaexpedient
 			if (hasPermissions) {
 				command.setMetaExpedientId(metaExpedientDto.getId());
-				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId(), null);
+				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId(), rolActual, EntitatHelper.getOrganGestorActualId(request));
 				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
 				if (expedientNumero != null && !expedientNumero.isEmpty()) {
 					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(

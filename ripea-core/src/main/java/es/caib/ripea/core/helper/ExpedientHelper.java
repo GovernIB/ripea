@@ -285,6 +285,7 @@ public class ExpedientHelper {
 		return expedient.getId();
 	}
 
+	@Transactional
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
@@ -359,11 +360,11 @@ public class ExpedientHelper {
 	 * @param registreAnnexId
 	 * @param expedientPeticioId
 	 * @param metaDocumentId
-	 * 
+	 * @param rolActual TODO
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId) {
+	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
 		EntitatEntity entitat;
@@ -381,7 +382,8 @@ public class ExpedientHelper {
 		Long carpetaId = createCarpetaForDocFromAnnex(
 				expedientEntity,
 				entitat.getId(),
-				"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador());
+				"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador(), 
+				rolActual);
 		carpetaEntity = carpetaRepository.findOne(carpetaId);
 
 		// ########################### CREATE DOCUMENT IN DB ########################
@@ -509,7 +511,7 @@ public class ExpedientHelper {
 			Long carpetaId = createCarpetaForDocFromAnnex(
 					expedientEntity,
 					entitat.getId(),
-					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador());
+					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador(), null);
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		}
 
@@ -736,7 +738,7 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
@@ -1533,7 +1535,7 @@ public class ExpedientHelper {
 		return documentNtiTipoDocumental;
 	}
 
-	public Long createCarpetaForDocFromAnnex(ExpedientEntity expedientEntity, Long entitatId, String nom) {
+	public Long createCarpetaForDocFromAnnex(ExpedientEntity expedientEntity, Long entitatId, String nom, String rolActual) {
 		// check if already exists in db
 		boolean carpetaExistsInDB = false;
 		Long carpetaId = null;
@@ -1571,7 +1573,8 @@ public class ExpedientHelper {
 					carpetaId,
 					carpetaExistsInArxiu,
 					carpetaUuid, 
-					true);
+					true, 
+					rolActual);
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
@@ -1593,7 +1596,7 @@ public class ExpedientHelper {
 					false, 
 					null, 
 					false, 
-					null, false);
+					null, false, null);
 			if (! metaExpedientCarpeta.getFills().isEmpty()) {
 				crearSubCarpetes(
 						metaExpedientCarpeta.getFills(), 
@@ -1615,7 +1618,7 @@ public class ExpedientHelper {
 					false, 
 					null, 
 					false, 
-					null, false);
+					null, false, null);
 				
 			crearSubCarpetes(
 					metaExpedientCarpetaDto.getFills(), 

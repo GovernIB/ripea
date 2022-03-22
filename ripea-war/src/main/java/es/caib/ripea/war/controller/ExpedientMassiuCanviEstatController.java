@@ -218,7 +218,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 					"accio.massiva.seleccio.buida");
 		}
 		
-		ExpedientDto oneOfSelectedExpedients = expedientService.findById(entitatActual.getId(), seleccio.iterator().next());
+		ExpedientDto oneOfSelectedExpedients = expedientService.findById(entitatActual.getId(), seleccio.iterator().next(), null);
 
 		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstatsByMetaExpedient(
 				entitatActual.getId(),

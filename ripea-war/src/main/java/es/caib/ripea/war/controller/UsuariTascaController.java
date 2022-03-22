@@ -443,7 +443,7 @@ public class UsuariTascaController extends BaseUserController {
 				documentId,
 				true,
 				false,
-				false, null);
+				false, null, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = expedientTascaService.descarregar(
 					entitatActual.getId(),
