@@ -282,14 +282,13 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(value = "/{metaExpedientId}/export", method = RequestMethod.GET)
 	public String export(HttpServletRequest request, HttpServletResponse response, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		
 		String json = metaExpedientService.export(
 				entitatActual.getId(),
 				metaExpedientId,
-				organActual.getId());
+				EntitatHelper.getOrganGestorActualId(request));
 
 		try {
 			
@@ -519,7 +518,7 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		
 		metaExpedientImportEditCommand.setCodi(metaExpedientExport.getCodi());
-		metaExpedientImportEditCommand.setNom(metaExpedientExport.getCodi());
+		metaExpedientImportEditCommand.setNom(metaExpedientExport.getNom());
 		metaExpedientImportEditCommand.setDescripcio(metaExpedientExport.getDescripcio());
 		metaExpedientImportEditCommand.setClassificacioSia(metaExpedientExport.getClassificacioSia());
 		metaExpedientImportEditCommand.setSerieDocumental(metaExpedientExport.getSerieDocumental());
