@@ -264,6 +264,24 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
+		
+		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+				request,
+				command,
+				model);
+		
+		if (command.isOnlyFileSubmit()) {
+			if (command.isUnselect()) {
+				request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
+			}
+			FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
+			if (fitxerTemp != null) {
+				model.addAttribute("isSigned", documentService.isFitxerSigned(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
+			}
+			return "fileUploadResult";
+		}
+		
+		
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 			recuperarResultatEscaneig(
