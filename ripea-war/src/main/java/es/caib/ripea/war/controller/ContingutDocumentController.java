@@ -56,6 +56,7 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.FitxerTemporalDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -138,6 +139,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
 			Model model) throws ClassNotFoundException, IOException {
+		FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = null;
 		if (documentId != null) {
@@ -188,6 +190,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				request,
 				command,
 				model);
+		
+		if (command.isOnlyFileSubmit()) {
+			if (command.isUnselect()) {
+				request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
+			}
+			FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
+			if (fitxerTemp != null) {
+				model.addAttribute("isSigned", documentService.isFitxerSigned(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
+			}
+			return "fileUploadResult";
+		}
+
 		
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
@@ -240,9 +254,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			} else {
 				throw ex;
 			}
-		} finally {
-			FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
-		}
+		} 
 	}
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
 	public String postUpdate(

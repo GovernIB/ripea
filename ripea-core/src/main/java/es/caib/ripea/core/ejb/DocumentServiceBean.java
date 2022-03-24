@@ -427,5 +427,15 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.notificacioDescarregarJustificantEnviamentNotib(notificacioId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean isFitxerSigned(
+			byte[] contingut,
+			String contentType) {
+		return delegate.isFitxerSigned(
+				contingut,
+				contentType);
+	}
+
 
 }

@@ -20,6 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfReader;
+
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
@@ -245,6 +248,29 @@ public class DocumentServiceImpl implements DocumentService {
 				documentDto,
 				comprovarMetaExpedient);
 	}
+	
+	@Override
+	public boolean isFitxerSigned(byte[] contingut, String contentType) {
+		if (contentType.equals("application/pdf")) {
+			PdfReader reader;
+			try {
+				reader = new PdfReader(contingut);
+				AcroFields acroFields = reader.getAcroFields();
+				List<String> signatureNames = acroFields.getSignatureNames();
+				if (signatureNames != null && !signatureNames.isEmpty()) {
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			return false;
+		}
+
+	}
+	
 	
 	@Transactional
 	@Override

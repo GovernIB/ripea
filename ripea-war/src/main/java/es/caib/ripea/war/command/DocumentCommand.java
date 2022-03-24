@@ -82,6 +82,10 @@ public class DocumentCommand extends ContenidorCommand {
 	private String fitxerNom;
 	private byte[] fitxerContingut;
 	private String descripcio;
+	
+	private boolean onlyFileSubmit = false;
+	private boolean unselect = false;
+	
 
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
@@ -274,11 +278,23 @@ public class DocumentCommand extends ContenidorCommand {
 		return dto;
 	}
 
+	public boolean isOnlyFileSubmit() {
+		return onlyFileSubmit;
+	}
+	public void setOnlyFileSubmit(boolean onlyFileSubmit) {
+		this.onlyFileSubmit = onlyFileSubmit;
+	}
 	public FitxerTemporalDto getFirmaTemporal() {
 		return firmaTemporal;
 	}
 	public void setFirmaTemporal(FitxerTemporalDto firmaTemporal) {
 		this.firmaTemporal = firmaTemporal;
+	}
+	public boolean isUnselect() {
+		return unselect;
+	}
+	public void setUnselect(boolean unselect) {
+		this.unselect = unselect;
 	}
 
 	public interface CreateDigital {}
