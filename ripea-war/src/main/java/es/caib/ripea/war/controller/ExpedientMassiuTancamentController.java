@@ -1,15 +1,22 @@
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
+import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
+import es.caib.ripea.war.command.ExpedientTancarCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,23 +31,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.helper.ExceptionHelper;
-import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
-import es.caib.ripea.war.command.ExpedientTancarCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per tancament massiu d'expedients

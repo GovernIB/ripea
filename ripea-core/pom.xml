@@ -26,6 +26,7 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>2.21.0</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
@@ -257,12 +258,12 @@
 			<version>1.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>dumbster</groupId>
-			<artifactId>dumbster</artifactId>
-			<version>1.6</version>
-			<scope>test</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>dumbster</groupId>-->
+<!--			<artifactId>dumbster</artifactId>-->
+<!--			<version>1.6</version>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-plugin-impl</artifactId>
@@ -339,6 +340,33 @@
 			<groupId>com.itextpdf.tool</groupId>
 			<artifactId>xmlworker</artifactId>
 			<version>1.1.1</version>
+		</dependency>
+		<!-- XDocReports -->
+		 <dependency>
+			<groupId>fr.opensagres.xdocreport</groupId>
+			<artifactId>fr.opensagres.xdocreport.core</artifactId>
+			<version>${xdocreport.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>fr.opensagres.xdocreport</groupId>
+			<artifactId>fr.opensagres.xdocreport.document</artifactId>
+			<version>${xdocreport.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.template.velocity</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-tools</artifactId>
+			<version>2.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>antlr</groupId>
+					<artifactId>antlr</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>es.caib.pinbal</groupId>
