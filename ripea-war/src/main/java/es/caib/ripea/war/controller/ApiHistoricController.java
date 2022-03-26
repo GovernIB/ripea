@@ -1,13 +1,19 @@
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricApiResponse;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricOrganGestorSerializer.RegistreOrganGestor;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricOrganGestorSerializer.RegistresOrganGestor;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricSerializers.RegistreExpedient;
+import es.caib.ripea.core.api.service.HistoricService;
+import es.caib.ripea.war.command.HistoricFiltreCommand;
+import es.caib.ripea.war.helper.ConversioTipusHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,23 +26,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
-
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
-import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.core.api.service.HistoricService;
-import es.caib.ripea.war.command.HistoricFiltreCommand;
-import es.caib.ripea.war.helper.ConversioTipusHelper;
-import es.caib.ripea.war.historic.HistoricApiResponse;
-import es.caib.ripea.war.historic.serializers.DAOHistoric;
-import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RegistreOrganGestor;
-import es.caib.ripea.war.historic.serializers.HistoricOrganGestorSerializer.RegistresOrganGestor;
-import es.caib.ripea.war.historic.serializers.HistoricSerializers.RegistreExpedient;
+import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("api/historic")
@@ -196,11 +191,8 @@ public class ApiHistoricController extends BaseAdminController {
 //		}
 
 		// Perform query
-		Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = historicService.getDadesOrgansGestors(
-				null,
-				null, 
-				filtre.asDto());
-		List<RegistresOrganGestor> registres = DAOHistoric.mapRegistreOrganGestor(dades, tipusAgrupament).registres;
+		List<RegistresOrganGestor> registres = historicService.getRegistresDadesOrgansGestors(null, null, filtre.asDto(), tipusAgrupament);
+
 		
 //		// ordena els registres per data
 //		Collections.sort(registres, new Comparator<RegistresOrganGestor>() {
@@ -248,12 +240,7 @@ public class ApiHistoricController extends BaseAdminController {
 //		}
 		
 		// Perform query
-		Map<OrganGestorDto, HistoricExpedientDto> dades = historicService.getDadesActualsOrgansGestors(
-				null,
-				null,
-				filtre.asDto());
-
-		return DAOHistoric.mapRegistresActualsOrganGestors(dades);
+		return historicService.getRegistresDadesActualsOrgansGestors(null, null, filtre.asDto());
 	}
 
 	/*
@@ -315,12 +302,8 @@ public class ApiHistoricController extends BaseAdminController {
 //		}
 		
 		// Perform query
-		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
-		for (String codiUsuari : usuarisCodi) {
-			results.put(codiUsuari, historicService.getDadesUsuari(null, null, codiUsuari, filtre.asDto()));
-		}
+		return new HistoricApiResponse(filtre.asDto(), historicService.getRegistresDadesUsuaris(usuarisCodi, null, null, filtre.asDto(), tipusAgrupament));
 
-		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresUsuaris(results, tipusAgrupament).registres);
 	}
 
 	@RequestMapping(value = "/usuaris/actual", method = RequestMethod.GET, produces = "application/json")
@@ -430,17 +413,18 @@ public class ApiHistoricController extends BaseAdminController {
 //		}
 		
 		// Perform query
-		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
-		for (String docNum : interessatsDocNum) {
-			List<HistoricInteressatDto> historics = historicService.getDadesInteressat(
-					null,
-					null,
-					docNum,
-					filtre.asDto());
-			results.put(docNum, historics);
-		}
-
-		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresInteressats(results, tipusAgrupament).registres);
+//		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
+//		for (String docNum : interessatsDocNum) {
+//			List<HistoricInteressatDto> historics = historicService.getDadesInteressat(
+//					null,
+//					null,
+//					docNum,
+//					filtre.asDto());
+//			results.put(docNum, historics);
+//		}
+//
+//		return new HistoricApiResponse(filtre.asDto(), DAOHistoric.mapRegistresInteressats(results, tipusAgrupament).registres);
+		return new HistoricApiResponse(filtre.asDto(), historicService.getRegistresDadesInteressat(interessatsDocNum, null, null, filtre.asDto(), tipusAgrupament));
 	}
 
 	@RequestMapping(value = "/interessats/actual", method = RequestMethod.GET, produces = "application/json")

@@ -27,6 +27,20 @@ public class ExceptionHelper {
 		
 		return isTheException;
 	}
+
+	public static boolean isExceptionOrCauseInstanceOf(Exception e, String exceptionClassName, int nCheckedNestedExceptions) {
+		int i = 0;
+		boolean isTheException = e.getClass().getCanonicalName().equals(exceptionClassName);
+		Throwable t = e;
+		while (i < nCheckedNestedExceptions && !isTheException && t.getCause() != null)
+		{
+			t = t.getCause();
+			isTheException = t.getClass().getCanonicalName().equals(exceptionClassName);;
+			i++;
+		}
+
+		return isTheException;
+	}
 	
 	
 	public static Exception findExceptionInstance(Exception e, Class<? extends Exception> exceptionClass, int nCheckedNestedExceptions) {
