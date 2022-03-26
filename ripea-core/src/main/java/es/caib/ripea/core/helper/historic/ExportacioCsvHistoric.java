@@ -3,6 +3,7 @@ package es.caib.ripea.core.helper.historic;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
+import es.caib.ripea.core.helper.CsvHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
