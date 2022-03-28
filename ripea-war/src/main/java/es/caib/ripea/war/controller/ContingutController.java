@@ -784,6 +784,26 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 		}
+		if (contingut instanceof CarpetaDto) {
+
+			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
+					entitatActual.getId(),
+					contingut.getExpedientPare().getId()));
+			
+			model.addAttribute(
+					"interessatsCount",
+					interessatService.findByExpedient(
+							entitatActual.getId(),
+							contingut.getExpedientPare().getId(),
+							false).size());			
+			model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
+					entitatActual.getId(),
+					contingut.getExpedientPare().getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
+			
+			model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
+					entitatActual.getId(),
+					contingut.getExpedientPare().getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
+		}
 		if (contingut instanceof NodeDto) {
 			model.addAttribute(
 					"metaDades",
