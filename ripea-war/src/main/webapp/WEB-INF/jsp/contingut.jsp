@@ -2180,6 +2180,12 @@ $.views.helpers(myHelpers);
 			<div class="tab-content">
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
 				<div class="tab-pane active in" id="contingut">
+				<!-- 
+				TODO
+				<div class="btnback" style="float: left;">
+				    <button class="btn btn-primary" data-toggle="tooltip" title="Volver atras"><span class="fa fa-chevron-left"></span></button>
+				</div>
+				 -->
 					<c:choose>
 						<%--------------- WHEN CONTINGUT IS DOCUMENT (SHOWS DOCUMENT DETAILS) ---------------%>
 						<c:when test="${contingut.document}">
@@ -2300,6 +2306,13 @@ $.views.helpers(myHelpers);
 							</c:if>							
 							<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
 							<div class="text-right" id="contingut-botons">
+								<c:if test="${not empty contingut.expedientPare}">
+									<div class="btnback" style="float: left;">
+										<a href="<c:url value="/contingut/${contingut.expedientPare.id}"/>">
+										    <button class="btn btn-primary" data-toggle="tooltip" title="Volver atrás"><span class="fa fa-chevron-left"></span></button>
+										</a>
+									</div>
+								</c:if>
 								<c:if test="${isTasca}">
 									<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
 								</c:if>
