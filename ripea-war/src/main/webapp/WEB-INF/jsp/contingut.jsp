@@ -944,7 +944,7 @@ $(document).ready(function() {
 	});
 
 	var tableDocuments = document.getElementById('table-documents');
-	
+
 	<c:if test="${vistaIcones}">
 		var checkItAll = document.getElementById('checkItAll');
 		$('.checkItAll').addClass('disabled');
@@ -989,6 +989,7 @@ $(document).ready(function() {
 	if (tableDocuments != null) {
 		//Vista llista
 		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+		if (typeof checkItAll !== 'undefined') {
 			checkItAll.addEventListener('change', function() {
 				if (checkItAll.checked) {
 					inputs.forEach(function(input) {
@@ -1019,6 +1020,7 @@ $(document).ready(function() {
 					deselectAll();
 				}
 			});
+		}
 	} else {
 		//Vista icones
 		$(checkItAll).on('click', function(){
