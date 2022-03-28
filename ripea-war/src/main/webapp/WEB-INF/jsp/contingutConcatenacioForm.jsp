@@ -21,7 +21,8 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
-	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
 	<rip:modalHead/>
 <style type="text/css">
