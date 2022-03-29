@@ -1705,6 +1705,26 @@ function removeLoading(idModal) {
 	}
 }
 
+function removeTransactionId(idModal) {
+	if (idModal) {
+		$('#' + idModal).on('hidden.bs.modal', function() {
+			var idTransaccio = localStorage.getItem('transaccioId');
+			if (idTransaccio) {
+				$.ajax({
+			    	type: 'GET',
+					url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
+					success: function() {
+						localStorage.removeItem('transaccioId');
+					},
+					error: function(err) {
+						console.log("Error tancant la transacció");
+					}
+			    });
+			}
+		});
+	}
+}
+
 function modalLoading(modalDivId, modalData, message){
 	return  '<div id="' + modalDivId + '"' + modalData + '>' +
 			'	<div class="modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
