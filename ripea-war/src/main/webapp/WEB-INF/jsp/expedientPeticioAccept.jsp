@@ -9,7 +9,15 @@
 pageContext.setAttribute(
 		"dadesUsuariActual",
 		es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
+pageContext.setAttribute(
+		"isRolActualAdministrador",
+		es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request),
+		PageContext.SESSION_SCOPE);
+pageContext.setAttribute(
+			"isRolActualAdministradorOrgan",
+			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
 %>
+
 <c:set var="titol">
 	<spring:message code="expedient.peticio.form.acceptar.titol" />
 </c:set>
@@ -98,7 +106,7 @@ $(document).ready(function(){
 			$.get("<c:url value="/expedientPeticio/expedients/"/>"+${entitatId}+"/"+tipus)
 			.done(function(data){
 				for (var i = 0; i < data.length; i++) {
-					if (data[i].agafat && data[i].agafatPer.codi === '${dadesUsuariActual.codi}')
+					if ((data[i].agafat && data[i].agafatPer.codi === '${dadesUsuariActual.codi}') || ${isRolActualAdministrador} || ${isRolActualAdministradorOrgan})
 						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].numeroINom + '</option>');
 					else
 						$('#expedientId').append('<option value="' + data[i].id + '" disabled>' + data[i].numeroINom + '</option>');

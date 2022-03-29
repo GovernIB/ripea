@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.service;
 
+//import com.codahale.metrics.Timer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -585,8 +587,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return resposta;
 	}
 
-	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findByEntitat(Long entitatId) {
@@ -663,7 +663,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
-			boolean isAdmin) {
+			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -679,7 +679,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedients = metaExpedientRepository.findMetaExpedientsByIds(
 				entitat,
 				createWritePermIds,
-				isAdmin);
+				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
 
 		return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
 

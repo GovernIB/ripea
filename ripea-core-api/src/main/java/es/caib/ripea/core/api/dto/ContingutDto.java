@@ -37,6 +37,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 	private boolean alerta;
 	private boolean hasFills;
 	protected Date esborratData;
+	private boolean admin;
 
 	protected int ordre;
 	

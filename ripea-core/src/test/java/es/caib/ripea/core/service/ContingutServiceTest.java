@@ -176,7 +176,7 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								true,
-								true, null);
+								true, null, null);
 						
 						List<MetaDadaDto> metaDades = metaDadaService.findByNode(entitatCreada.getId(),
 								expedientCreat.getId());

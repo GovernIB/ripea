@@ -373,6 +373,7 @@ public class ConversioTipusHelper {
 						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
 						target.setEstat(source.getEstat());
 						target.setIdentificador(source.getIdentificador());
+						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
 						return target;
 					}
 				});
@@ -519,6 +520,17 @@ public class ConversioTipusHelper {
 						target.setPortafirmesTransaccioId(source.getPortafirmesTransaccioId());
 						target.setEnviarCorreu(source.getEnviarCorreu());
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
+						return target;
+					}
+				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ExpedientEntity, CodiValorDto>() {
+					@Override
+					public CodiValorDto convert(ExpedientEntity source, Type<? extends CodiValorDto> destinationClass) {
+						CodiValorDto target = new CodiValorDto();
+						target.setCodi(source.getId().toString());
+						target.setValor(source.getNom());
 						return target;
 					}
 				});

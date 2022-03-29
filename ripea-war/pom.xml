@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.91</version>
+		<version>0.9.92</version>
 	</parent>
 	<artifactId>ripea-war</artifactId>
 	<packaging>war</packaging>
@@ -88,22 +88,6 @@
 			<artifactId>commons-io</artifactId>
 			<version>2.2</version>
 		</dependency>
-		<!--dependency>
-			<groupId>io.milton</groupId>
-			<artifactId>milton-api</artifactId>
-			<version>${io.milton.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.milton</groupId>
-			<artifactId>milton-server-ce</artifactId>
-			<version>${io.milton.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>mail</artifactId>
-					<groupId>javax.mail</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency-->
 		<dependency>
 			<groupId>org.fundaciobit.plugins</groupId>
 			<artifactId>plugins-api</artifactId>
@@ -173,114 +157,6 @@
 	        <version>${jackson.version}</version>
 	    </dependency>
 
-		<!-- XDocReports -->
-		 <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.core</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.document</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        
-        <!-- Dependencia para visualizar PDFs -->
-		<dependency>
-		    <groupId>org.webjars</groupId>
-		    <artifactId>pdf-js</artifactId>
-		    <version>2.5.207</version>
-		</dependency>
-		
-        <!-- Dependencia per llegir document de tipus Docx -->
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        
-        <!-- Dependencia para poder leer documento de tipo Odt -->
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.document.odt</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        
-        <!-- Dependencia necesaria para convertir los ficheros odt a PDF -->
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter.odt.odfdom</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        
-        <!-- Dependencia necesaria para convertir los ficheros Docx a PDF -->
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.template.velocity</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-        <dependency>
-		    <groupId>org.apache.velocity</groupId>
-		    <artifactId>velocity-tools</artifactId>
-		    <version>2.0</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>antlr</groupId>
-		    		<artifactId>antlr</artifactId>
-		    	</exclusion>
-		    </exclusions>
-        </dependency>
-        
-		<!-- XDocReports -->	
-		<dependency>
-		    <groupId>org.apache.poi</groupId>
-		    <artifactId>poi</artifactId>
-		    <version>3.15</version>
-		</dependency>
-		<dependency> 
-			<groupId>org.apache.poi</groupId> 
-			<artifactId>poi-ooxml</artifactId> 
-			<version>3.15</version>
-			<exclusions>
-				<exclusion>
-					<groupId>stax</groupId>
-					<artifactId>stax-api</artifactId> 	
-				</exclusion> 
-			</exclusions>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.poi</groupId>
-		    <artifactId>poi-scratchpad</artifactId>
-		    <version>3.15</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.poi</groupId>
-		    <artifactId>ooxml-schemas</artifactId>
-		    <version>1.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>stax</groupId>
-					<artifactId>stax-api</artifactId> 	
-				</exclusion> 
-			</exclusions>
-		</dependency>
-
-<!-- 		<dependency> -->
-<!-- 		    <groupId>io.springfox</groupId> -->
-<!-- 		    <artifactId>springfox-swagger2</artifactId> -->
-<!-- 		    <version>2.9.2</version> -->
-<!-- 		</dependency> -->
-
 		<dependency>
 			<groupId>com.mangofactory</groupId>
 			<artifactId>swagger-springmvc</artifactId>
@@ -297,11 +173,6 @@
 			</exclusions>
 		</dependency>
 		<!-- WEBJARS -->
-		<dependency>
-		    <groupId>org.webjars</groupId>
-		    <artifactId>swagger-ui</artifactId>
-		    <version>2.2.0</version>
-		</dependency>
 		<dependency>
 			<groupId>org.webjars.bower</groupId>
 			<artifactId>jquery</artifactId>
@@ -420,29 +291,6 @@
 				<webjars.classpath>classpath:</webjars.classpath>
 			</properties>
 			<dependencies>
-				<!--dependency>
-					<groupId>org.jvnet.jax-ws-commons.spring</groupId>
-					<artifactId>jaxws-spring</artifactId>
-					<version>1.9</version>
-					<exclusions>
-						<exclusion>
-							<groupId>org.springframework</groupId>
-							<artifactId>spring-core</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.springframework</groupId>
-							<artifactId>spring-beans</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.springframework</groupId>
-							<artifactId>spring-context</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.springframework</groupId>
-							<artifactId>spring-web</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency-->
 				<dependency>
 					<groupId>javax.transaction</groupId>
 					<artifactId>jta</artifactId>
@@ -458,36 +306,6 @@
 					<artifactId>plugin-signatureweb-portafib</artifactId>
 					<version>2.0.0</version>
 				</dependency>
-				<!--dependency>
-					<groupId>org.fundaciobit.plugins</groupId>
-					<artifactId>plugin-signatureweb-miniappletinclient</artifactId>
-					<version>2.0.0</version>
-					<exclusions>
-						<exclusion>
-							<groupId>org.bouncycastle</groupId>
-							<artifactId>bcprov-jdk15on</artifactId>
-						</exclusion>
-						<exclusion>
-							<groupId>org.bouncycastle</groupId>
-							<artifactId>bcpkix-jdk15on</artifactId>
-						</exclusion>
-					</exclusions>
-				</dependency>
-				<dependency>
-					<groupId>org.fundaciobit.plugins</groupId>
-					<artifactId>plugin-signatureweb-miniappletinserver</artifactId>
-					<version>2.0.0</version>
-				</dependency>
-				<dependency>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcmail-jdk16</artifactId>
-					<version>${bouncycastle.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bcprov-jdk16</artifactId>
-					<version>${bouncycastle.version}</version>
-				</dependency-->
 				<dependency>
 					<groupId>org.fundaciobit.plugins</groupId>
 					<artifactId>plugin-scanweb-api</artifactId>
@@ -498,11 +316,6 @@
 					<artifactId>plugin-scanweb-dynamicwebtwain</artifactId>
 					<version>2.0.0</version>
 				</dependency>
-				<!--dependency>
-					<groupId>org.fundaciobit.plugins</groupId>
-					<artifactId>plugin-scanweb-iecisascanweb-plugin</artifactId>
-					<version>2.0.0</version>
-				</dependency-->
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>ripea-core</artifactId>

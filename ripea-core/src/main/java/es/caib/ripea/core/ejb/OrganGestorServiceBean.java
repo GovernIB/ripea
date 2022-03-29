@@ -70,13 +70,13 @@ public class OrganGestorServiceBean implements OrganGestorService {
 			Long metaExpedientId,
 			String filter, 
 			Long expedientId,
-			boolean isAdmin) {
+			String rolActual, Long organActualId) {
 		return delegate.findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 				entitatId,
 				metaExpedientId,
 				filter, 
 				expedientId,
-				isAdmin);
+				rolActual, organActualId);
 	}
 
 	@Override

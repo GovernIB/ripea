@@ -682,6 +682,9 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId);
 
+	@PreAuthorize("hasRole('tothom')")
+	boolean isFitxerSigned(byte[] contingut, String contentType);
+
 	
 
 }

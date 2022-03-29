@@ -68,8 +68,8 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId) {
-		return delegate.findExpedientEstats(entitatId, expedientId);
+	public List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId, String rolActual) {
+		return delegate.findExpedientEstats(entitatId, expedientId, rolActual);
 	}
 
 	@Override

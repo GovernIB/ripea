@@ -16,6 +16,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -105,8 +106,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) {
-		return delegate.findById(entitatId, id);
+			Long id, 
+			Long rolActual) {
+		return delegate.findById(entitatId, id, rolActual);
 	}
 
 
@@ -250,11 +252,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	@Override
 	public List<ExpedientDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId, String rolActual) {
+			Long metaExpedientId, String rolActual, Long organActualId) {
 		return delegate.findByEntitatAndMetaExpedient(
 				entitatId,
 				metaExpedientId, 
-				rolActual);
+				rolActual, organActualId);
 	}
 
 	@Override
@@ -288,11 +290,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	public boolean retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
-			Long metaDocumentId) {
+			Long metaDocumentId, String rolActual) {
 		return delegate.retryCreateDocFromAnnex(
 				registreAnnexId, 
 				expedientPeticioId, 
-				metaDocumentId);		
+				metaDocumentId, rolActual);		
 	}
 
 	@Override
@@ -390,5 +392,37 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			String text){
 		return delegate.findByText(entitatId, text);
+	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
+	}
+	@Override
+	@RolesAllowed({"IPA_ADMIN"})
+	public List<CodiValorDto> findByEntitat(
+			Long entitatId) {
+		return delegate.findByEntitat(entitatId);
+
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public boolean hasReadPermissionsAny(
+			String rolActual,
+			Long entitatId) {
+		return delegate.hasReadPermissionsAny(rolActual, entitatId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<ExpedientDto> findByIds(
+			Long entitatId,
+			Set<Long> ids) {
+		return delegate.findByIds(
+				entitatId,
+				ids);
 	}
 }

@@ -334,6 +334,58 @@ $(document).ready(function() {
 		$('.scan-profile').empty().hide();
 		$('.scan-back-btn').addClass('hidden');
 	});
+
+
+
+
+	
+	$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
+
+	    $('#onlyFileSubmit').val(true);
+	    $('#loading').show();
+	    $('#arxiuInput').hide();
+	    $("#documentCommand").prop("target", 'target_iframe');
+	    $('#documentCommand').submit();
+		
+	});
+	
+	
+	$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
+		 $('#unselect').val(true);
+		 $("#inputDoc .fileinput").fileinput('reset');
+		 $("#documentCommand").prop("target", 'target_iframe');
+		 $('#documentCommand').submit();
+	});
+
+	$("#inputDoc .fileinput").on("reset.bs.fileinput", function(e){
+		console.log('before reset');
+ 	    e.stopPropagation();
+ 	    e.preventDefault();
+	});
+
+	$("#inputDoc .fileinput").on("reseted.bs.fileinput", function(e){
+		console.log('after reset');
+	});
+	
+	$('#target_iframe').load(function() {
+	    $("#documentCommand").prop("target", '');
+	    $('#unselect').val(false);
+		$('#onlyFileSubmit').val(false);
+	    var isSigned = $('iframe[name=target_iframe]').contents().find('#isSigned').val();
+	    var isSignedTrue = (isSigned === 'true');
+
+	    if (isSignedTrue != $('#ambFirma').prop('checked')) {
+	        $('#ambFirma').click();
+	    }
+
+	    $('#loading').hide();
+	    $('#arxiuInput').show();
+
+	});
+
+
+
+	
 	
 });
 
@@ -368,6 +420,9 @@ function removeLoading() {
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
 		<form:hidden path="origen"/>
+		<form:hidden path="onlyFileSubmit"/>
+		<form:hidden path="unselect"/>
+		
 
 		<c:choose>
 			<c:when test="${documentCommand.documentTipus == 'IMPORTAT' || !isPermesModificarCustodiatsVar}">
@@ -392,12 +447,18 @@ function removeLoading() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="fitxer">
-					<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
-					<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-					<div id="input-firma" class="hidden">
-						<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-						<div id="input-firma-arxiu" class="hidden">
-							<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+					<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
+					<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
+					<div id="arxiuInput">
+						<div id="inputDoc">
+							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+						</div>
+						<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+						<div id="input-firma" class="hidden">
+							<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+							<div id="input-firma-arxiu" class="hidden">
+								<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+							</div>
 						</div>
 					</div>
 				</div>

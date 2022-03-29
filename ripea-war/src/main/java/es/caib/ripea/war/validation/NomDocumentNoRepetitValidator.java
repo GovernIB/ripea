@@ -48,7 +48,7 @@ public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDoc
 					pareId, 
 					true, 
 					false,
-					false, null);
+					false, null, null);
 			
 			for (ContingutDto contingut: contingutPare.getFills()) {
 				if (contingut.isDocument()) {

@@ -328,7 +328,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId,
 				true,
-				false, null);
+				false, null, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = documentService.descarregar(
 					entitatActual.getId(),
@@ -550,7 +550,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId,
 				false,
-				false, null);
+				false, null, null);
 		model.addAttribute(
 				"document",
 				document);
@@ -664,7 +664,7 @@ public class DocumentEnviamentController extends BaseUserController {
 						entitatActual.getId(),
 						documentId,
 						false,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"publicacioTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(

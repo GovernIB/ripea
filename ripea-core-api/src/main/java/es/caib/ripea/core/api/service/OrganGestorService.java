@@ -142,8 +142,9 @@ public interface OrganGestorService {
 	 * @param filter
 	 *            text per a filtrar els resultats. 
 	 * @param expedientId TODO
-	 * @param isAdmin
+	 * @param rolActual
 	 * 			  boolean que indica si el rol actual és Admin d'entitat
+	 * @param organActualId TODO
 	 * @return
 	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
 	 */
@@ -153,7 +154,7 @@ public interface OrganGestorService {
 			Long metaExpedientId,
 			String filter, 
 			Long expedientId,
-			boolean isAdmin);
+			String rolActual, Long organActualId);
 
 	/**
 	 * Consulta els permisos dels distits organs gestors de l'entitat

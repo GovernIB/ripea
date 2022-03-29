@@ -71,11 +71,11 @@ public  class SeguimentServiceBean implements SeguimentService {
 	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, String rolActual) {
 		return delegate.findExpedientsPendents(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, rolActual);
 	}
 
 	@Override

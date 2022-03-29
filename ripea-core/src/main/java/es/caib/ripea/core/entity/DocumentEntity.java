@@ -15,8 +15,8 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -118,11 +118,22 @@ public class DocumentEntity extends NodeEntity {
 	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+	@OrderBy("createdDate DESC")
 	protected Set<DocumentEnviamentEntity> enviaments;
 	@OneToMany(
 			mappedBy = "document",
 			fetch = FetchType.LAZY, targetEntity = DocumentEnviamentEntity.class)
+	@OrderBy("createdDate DESC")
 	protected List<DocumentNotificacioEntity> notificacions;
+	
+	@Transient
+	protected boolean ambNotificacions;
+	@Transient
+	protected String estatDarreraNotificacio;
+	@Transient
+	protected boolean errorDarreraNotificacio;
+	@Transient
+	protected boolean errorEnviamentPortafirmes;
 	
 	public Long getPareId() {
 		return pare.getId();
@@ -242,7 +253,35 @@ public class DocumentEntity extends NodeEntity {
 		this.versioDarrera = versioDarrera;
 		this.versioCount = versioCount;
 	}
+	
+	public boolean isAmbNotificacions() {
+		return (notificacions != null && !notificacions.isEmpty() && notificacions.get(0) instanceof DocumentNotificacioEntity) ? true : false;
+	}
 
+	public boolean isErrorDarreraNotificacio() {
+		if (notificacions != null && !notificacions.isEmpty() && notificacions.get(0) instanceof DocumentNotificacioEntity) {
+			DocumentNotificacioEntity lastNofificacio = notificacions.get(0);
+			return lastNofificacio.isError();
+		}
+		return false;
+	}
+	
+	public String getEstatDarreraNotificacio() {
+		if (notificacions != null && !notificacions.isEmpty() && notificacions.get(0) instanceof DocumentNotificacioEntity) {
+			DocumentNotificacioEntity lastNofificacio = (DocumentNotificacioEntity) notificacions.get(0);
+			return lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "";
+		}
+		return "";
+	}
+
+	public boolean isErrorEnviamentPortafirmes() {
+		if (enviaments != null && !enviaments.isEmpty() && enviaments.iterator() instanceof DocumentPortafirmesEntity) {
+			DocumentPortafirmesEntity lastEnviament = (DocumentPortafirmesEntity) enviaments.iterator().next();
+			return lastEnviament.isError();
+		}
+		return false;
+	}
+	
 	public static Builder getBuilder(
 			DocumentTipusEnumDto documentTipus,
 			DocumentEstatEnumDto estat,

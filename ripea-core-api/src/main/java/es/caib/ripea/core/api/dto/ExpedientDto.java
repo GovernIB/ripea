@@ -51,6 +51,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean processatOk;
 	private boolean tasques;
 	private boolean hasEsborranys;
+	private List<DocumentDto> esborranys;
 	private Set<InteressatDto> interessats;
 	private List<InteressatDto> interessatsNotificable;
 	private long numSeguidors;
@@ -94,4 +95,6 @@ public class ExpedientDto extends NodeDto {
 	public Set<InteressatDto> getInteressats() {
 		return interessats;
 	}
+	
+	
 }

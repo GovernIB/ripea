@@ -41,7 +41,8 @@
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
 		
-    <script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+    <script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
@@ -483,6 +484,24 @@ body.loading .rmodal {
     text-shadow: 0 1px 0 #FFFFFF;
 }
 
+.rowinfo-interessat h5 {
+	font-weight: bold;
+}
+.interessaat-info dl {
+	columns: 2;
+	margin: 0;
+}
+.interessaat-info dl div {
+	display: flex;
+}
+.interessaat-info dl div dt {
+	text-align: right;
+	width: 160px;
+}
+.interessaat-info dl div dd {
+	grid-column: 2;
+	margin-left: 10px;
+}
 </style>
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
 <c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
@@ -925,7 +944,7 @@ $(document).ready(function() {
 	});
 
 	var tableDocuments = document.getElementById('table-documents');
-	
+
 	<c:if test="${vistaIcones}">
 		var checkItAll = document.getElementById('checkItAll');
 		$('.checkItAll').addClass('disabled');
@@ -970,6 +989,7 @@ $(document).ready(function() {
 	if (tableDocuments != null) {
 		//Vista llista
 		var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
+		if (typeof checkItAll !== 'undefined') {
 			checkItAll.addEventListener('change', function() {
 				if (checkItAll.checked) {
 					inputs.forEach(function(input) {
@@ -1000,6 +1020,7 @@ $(document).ready(function() {
 					deselectAll();
 				}
 			});
+		}
 	} else {
 		//Vista icones
 		$(checkItAll).on('click', function(){
@@ -1053,6 +1074,61 @@ $(document).ready(function() {
 	    }
 	});
 	
+	//======================= enviament list on clicking desplegable in notificacio table =============================
+	$('#taulaInteressats').on('rowinfo.dataTable', function(e, td, rowData) {
+		var getUrl = "<c:url value="/expedient/interessat/"/>" + rowData.id + "?dadesExternes=true";
+		$.get(getUrl).done(function(data) {
+			$(td).empty();
+			var rowinfo_content = 
+				    			'<div class="rowinfo-interessat">' + 
+								'<h5><spring:message code="contingut.interessat.info.interessat"/>:</h5>' + 
+				    			'<div class="interessaat-info">' +
+				    				'<dl>' +
+				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.pais"/>', data.paisNom) +
+				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.email"/>', data.email) +
+				    				'</dl>' +
+					    			'<dl>' +
+					    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.provincia"/>', data.provinciaNom) +
+					    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.telefon"/>', data.telefon) +
+								    '</dl>'+
+								    '<dl>' +
+								    	showInteressatFieldInfo('<spring:message code="contingut.interessat.info.municipi"/>', data.municipiNom) +
+				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.observacions"/>', data.observacions) +
+							    	'</dl>'+
+							    	'<dl>' +
+							    		showInteressatFieldInfo('<spring:message code="contingut.interessat.info.adresa"/>', data.adresa) +
+									'</dl>'+
+									'<dl>' +
+										showInteressatFieldInfo('<spring:message code="contingut.interessat.info.codipostal"/>', data.codiPostal) +
+									'</dl>'+
+								'</div>';
+								if (data.representant) {
+									rowinfo_content += '<h5><spring:message code="contingut.interessat.info.representant"/>:</h5>' +
+														'<div class="interessaat-info">' +
+										    				'<dl>' +
+										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.pais"/>', data.representant.paisNom) +
+										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.email"/>', data.representant.email) +
+										    				'</dl>' +
+											    			'<dl>' +
+											    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.provincia"/>', data.representant.provinciaNom) +
+											    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.telefon"/>', data.representant.telefon) +
+														    '</dl>'+
+														    '<dl>' +
+														    	showInteressatFieldInfo('<spring:message code="contingut.interessat.info.municipi"/>', data.representant.municipiNom) +
+										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.observacions"/>', data.representant.observacions) +
+													    	'</dl>'+
+													    	'<dl>' +
+													    		showInteressatFieldInfo('<spring:message code="contingut.interessat.info.adresa"/>', data.representant.adresa) +
+															'</dl>'+
+															'<dl>' +
+																showInteressatFieldInfo('<spring:message code="contingut.interessat.info.codipostal"/>', data.representant.codiPostal) +
+															'</dl>'+
+														'</div>';
+								}
+								rowinfo_content += '</div>';
+	    	$(td).append(rowinfo_content);
+		});
+	});
 	//======================= enviament list on clicking desplegable in notificacio table =============================
 	$('#taulaNotificacions').on('rowinfo.dataTable', function(e, td, rowData) {
 		var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + rowData.id;
@@ -1291,6 +1367,13 @@ $(document).ready(function() {
 	});
 	
 });
+
+function showInteressatFieldInfo(fieldName, fieldValue) {
+	return '<div>' +
+				'<dt>' + fieldName + '</dt>' +
+				'<dd>' + fieldValue + '</dd>' +
+		   '</div>';
+}
 
 function showTipusDocumentals() {
 	var content = '<div> \
@@ -1851,9 +1934,11 @@ $.views.helpers(myHelpers);
 		</div>
 	</c:if>
 	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual && expedientPare.metaNode.usuariActualRead}">
-		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
-			<span class="fa fa-info-circle"></span>
-			<spring:message code="contingut.alerta.no.agafat"/>
+		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable" style="min-height: 40px;">
+			<c:if test="${!contingut.admin}">
+				<span class="fa fa-info-circle"></span> 
+				<spring:message code="contingut.alerta.no.agafat"/>
+			</c:if>  
 			<a href="<c:url value="../expedient/${expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
@@ -1884,13 +1969,46 @@ $.views.helpers(myHelpers);
 						</c:choose>
 					</h3>
 					<dl>
-						<c:if test="${contingut.carpeta}">
-							<dt><spring:message code="contingut.info.nom" /></dt>
-							<dd class="ellipsis">${contingut.nom}</dd>
+<%-- 						<c:if test="${contingut.carpeta}"> --%>
+<%-- 							<dt><spring:message code="contingut.info.nom" /></dt> --%>
+<%-- 							<dd class="ellipsis">${contingut.nom}</dd> --%>
 							
-							<dt><spring:message code="contingut.info.tipus"/></dt>
-							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd>
+<%-- 							<dt><spring:message code="contingut.info.tipus"/></dt> --%>
+<%-- 							<dd><spring:message code="contingut.tipus.enum.${contingut.tipus}"/></dd> --%>
+<%-- 						</c:if> --%>
+						<c:if test="${contingut.carpeta}">
+							<dt><spring:message code="contingut.info.numero"/></dt>
+							<dd>${contingut.expedientPare.numero}</dd>
+							
+							<dt><spring:message code="contingut.info.titol"/></dt>
+							<dd>${contingut.expedientPare.nom}</dd>							
+							
+							<c:if test="${not empty contingut.expedientPare.metaNode}">
+								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
+								<dd>${contingut.expedientPare.metaNode.nom}</dd>
+							</c:if>
+							
+							<dt><spring:message code="contingut.info.nti.organ"/></dt>
+							<dd>${contingut.expedientPare.organGestorText}</dd>
+
+							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
+							<dd><fmt:formatDate value="${contingut.expedientPare.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							
+							<dt><spring:message code="contingut.info.estat"/></dt>
+							<c:choose>
+								<c:when test="${contingut.expedientPare.expedientEstat!=null}">
+									<dd style="<c:if test='${not empty contingut.expedientPare.expedientEstat.color}'>border-left: solid 6px ${contingut.expedientPare.expedientEstat.color}; padding-left: 4px;</c:if>">${contingut.expedientPare.expedientEstat.nom}</dd>
+								</c:when>
+								<c:otherwise>
+									<dd><spring:message code="expedient.estat.enum.${contingut.expedientPare.estat}"/></dd>
+								</c:otherwise>
+							</c:choose>	
+								
+							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
+							<dd>${contingut.expedientPare.ntiClasificacionSia}</dd>
+
 						</c:if>
+
 						<c:if test="${contingut.expedient}">
 							<dt><spring:message code="contingut.info.numero"/></dt>
 							<dd>${contingut.numero}</dd>
@@ -2015,7 +2133,7 @@ $.views.helpers(myHelpers);
 							<a href="#dades" data-toggle="tab"><spring:message code="contingut.tab.dades"/>&nbsp;<span class="badge" id="dades-count">${contingut.dadesCount}</span></a>
 						</li>
 					</c:if>
-					<c:if test="${contingut.expedient}">
+					<c:if test="${contingut.expedient or contingut.carpeta}">
 						<li>
 							<a href="#interessats" data-toggle="tab"><spring:message code="contingut.tab.interessats"/>&nbsp;<span class="badge" id="interessats-count">${interessatsCount}</span></a>
 						</li>
@@ -2029,7 +2147,7 @@ $.views.helpers(myHelpers);
 								<a href="#publicacions" data-toggle="tab" id="publicacions-tab"><spring:message code="contingut.tab.publicacions" />&nbsp;<span class="badge" id="publicacions-count">${publicacionsCount}</span></a>
 							</li>
 						</c:if>
-						<c:if test="${contingut.peticions}">
+						<c:if test="${not contingut.carpeta && contingut.peticions}">
 							<li>
 								<a href="#anotacions" data-toggle="tab"><spring:message code="contingut.tab.anotacions"/>&nbsp;<span class="badge" id="anotacions-count"></span></a>
 							</li>
@@ -2054,11 +2172,20 @@ $.views.helpers(myHelpers);
 					<c:if test="${contingut.expedient}">
 						<a href="<c:url value="/expedient/${contingut.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.numComentaris}</span></a>
 					</c:if>
+					<c:if test="${contingut.carpeta}">
+						<a href="<c:url value="/expedient/${contingut.expedientPare.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.expedientPare.numComentaris}</span></a>
+					</c:if>
 				</ul>
 			</c:if>
 			<div class="tab-content">
 				<!------------------------------ TABPANEL CONTINGUT ------------------------------------->
 				<div class="tab-pane active in" id="contingut">
+				<!-- 
+				TODO
+				<div class="btnback" style="float: left;">
+				    <button class="btn btn-primary" data-toggle="tooltip" title="Volver atras"><span class="fa fa-chevron-left"></span></button>
+				</div>
+				 -->
 					<c:choose>
 						<%--------------- WHEN CONTINGUT IS DOCUMENT (SHOWS DOCUMENT DETAILS) ---------------%>
 						<c:when test="${contingut.document}">
@@ -2179,6 +2306,13 @@ $.views.helpers(myHelpers);
 							</c:if>							
 							<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
 							<div class="text-right" id="contingut-botons">
+								<c:if test="${not empty contingut.expedientPare}">
+									<div class="btnback" style="float: left;">
+										<a href="<c:url value="/contingut/${contingut.expedientPare.id}"/>">
+										    <button class="btn btn-primary" data-toggle="tooltip" title="Volver atrás"><span class="fa fa-chevron-left"></span></button>
+										</a>
+									</div>
+								</c:if>
 								<c:if test="${isTasca}">
 									<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
 								</c:if>
@@ -2204,7 +2338,7 @@ $.views.helpers(myHelpers);
 										</a>
 									</div>
 								</div>
-								<c:if test="${expedientAgafatPerUsuariActual and !expedientTancat}">
+								<c:if test="${(expedientAgafatPerUsuariActual or contingut.admin) and !expedientTancat}">
 									<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
 									<%---- Button notificar mult ----%>
 									<div class="btn-group">
@@ -2286,7 +2420,7 @@ $.views.helpers(myHelpers);
 										var docsIdx = new Array();
 									</script>							
 								</div>
-								<c:if test="${isTasca or (expedientAgafatPerUsuariActual and ((contingut.carpeta && isCreacioCarpetesActiva) or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
+								<c:if test="${isTasca or ((expedientAgafatPerUsuariActual or contingut.admin) and ((contingut.carpeta && isCreacioCarpetesActiva) or (contingut.expedient and (potModificarContingut or contingut.admin) and contingut.estat != 'TANCAT')))}">
 									<div id="botons-crear-contingut" class="btn-group">
 										<%---- Crear contingut ----%>
 										<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
@@ -2352,7 +2486,7 @@ $.views.helpers(myHelpers);
 							</div>  
 										
 							
-							<c:if test="${isTasca or (expedientAgafatPerUsuariActual and ((contingut.carpeta and contingut.expedientPare.estat != 'TANCAT') or (contingut.expedient and potModificarContingut and contingut.estat != 'TANCAT')))}">
+							<c:if test="${isTasca or ((expedientAgafatPerUsuariActual or contingut.admin) and ((contingut.carpeta and contingut.expedientPare.estat != 'TANCAT') or (contingut.expedient and (potModificarContingut or contingut.admin) and contingut.estat != 'TANCAT')))}">
 								<div id="drag_container" class="drag_activated">
 									<span class="down fa fa-upload"></span>
 									<p>
@@ -2372,7 +2506,7 @@ $.views.helpers(myHelpers);
 							<c:choose>
 								<c:when test="${not empty metaDades}">
 									<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
-										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
+										<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && !expedientTancat}">
 											<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 										</c:if>
 										<table class="table table-striped table-bordered" style="width:100%">
@@ -2397,7 +2531,7 @@ $.views.helpers(myHelpers);
 													<td>${metaDada.nom}</td>
 													<td>
 														<c:choose>
-															<c:when test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
+															<c:when test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && !expedientTancat}">
 																<div class="form-group ${metaDada.tipus == 'DOMINI' ? '' :''}" ${metaDada.tipus == 'DOMINI' ? 'style="width: 100%;margin-bottom: -10px;"' :''} <c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 																	<label class="hidden" for="${metaDada.codi}"></label>
 																	<div class="controls">
@@ -2456,7 +2590,7 @@ $.views.helpers(myHelpers);
 											</c:forEach>
 										</tbody>
 										</table>
-										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && !expedientTancat}">
+										<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && !expedientTancat}">
 											<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 										</c:if>
 									</form:form>
@@ -2476,7 +2610,8 @@ $.views.helpers(myHelpers);
 								data-paging-enabled="false"
 								data-botons-template="#taulaInteressatsNouBoton" 
 								class="table table-striped table-bordered" 
-								style="width:100%">
+								style="width:100%"
+								data-row-info="true">
 								<thead>
 									<tr>
 										<th data-col-name="id" data-visible="false">#</th>
@@ -2511,7 +2646,7 @@ $.views.helpers(myHelpers);
 												{{/if}}												
 											</script>										
 										</th>
-										<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+										<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && contingut.estat != 'TANCAT'}">
 										<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
 											<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
 											<div class="dropdown">
@@ -2544,7 +2679,7 @@ $.views.helpers(myHelpers);
 								</thead>
 							</table>
 							<script id="taulaInteressatsNouBoton" type="text/x-jsrender">
-							<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+							<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && contingut.estat != 'TANCAT'}">
 								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.id}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-refresh-pagina="false"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 							</c:if>
 						</script>
@@ -2746,6 +2881,254 @@ $.views.helpers(myHelpers);
 							</div>						
 						</c:if>
 					</c:if>
+					<c:if test="${contingut.carpeta}">
+						<!------------------------------ TABPANEL INTERESSATS CARPETA ------------------------------------->	
+						<div class="tab-pane" id="interessats">
+							<table 
+								id="taulaInteressats" 
+								data-toggle="datatable" 
+								data-url="<c:url value="/contingut/${contingut.expedientPare.id}/interessat/datatable"/>" 
+								data-paging-enabled="false"
+								data-botons-template="#taulaInteressatsNouBoton" 
+								class="table table-striped table-bordered" 
+								style="width:100%"
+								data-row-info="true">
+								<thead>
+									<tr>
+										<th data-col-name="id" data-visible="false">#</th>
+										<th data-col-name="representantId" data-visible="false">#</th>
+										<th data-col-name="representant" data-visible="false">#</th>
+										<th data-col-name="arxiuPropagat" data-visible="false"></th>
+										<th data-col-name="representantArxiuPropagat" data-visible="false"></th>			
+										<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
+										<th data-col-name="tipus" data-template="#cellTipusInteressatTemplate" data-orderable="false" width="15%">
+											<spring:message code="contingut.interessat.columna.tipus"/>
+											<script id="cellTipusInteressatTemplate" type="text/x-jsrender">
+											{{:~eval('interessatTipusText["' + tipus + '"]')}}
+										</script>
+										</th>
+										<th data-col-name="documentNum" data-orderable="false" width="15%"><spring:message code="contingut.interessat.columna.document"/></th>
+										<th data-col-name="identificador" data-orderable="false" width="35%" data-template="#cellIdentificadorTemplate"><spring:message code="contingut.interessat.columna.identificador"/>
+											<script id="cellIdentificadorTemplate" type="text/x-jsrender">
+												{{:identificador}} 
+												{{if !arxiuPropagat}}
+													<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+												{{/if}}												
+											</script>
+										</th>
+										<th data-col-name="representantIdentificador" data-orderable="false" width="25%" data-template="#cellRepresentantTemplate">
+											<spring:message code="contingut.interessat.columna.representant"/>
+											<script id="cellRepresentantTemplate" type="text/x-jsrender">
+												{{:representantIdentificador}} 
+												{{if representantId != null}}
+													{{if !representantArxiuPropagat}}
+														<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
+													{{/if}}	
+												{{/if}}												
+											</script>										
+										</th>
+										<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.expedientPare.admin) && contingut.expedientPare.estat != 'TANCAT'}">
+										<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
+											<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
+											<div class="dropdown">
+												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+												<ul class="dropdown-menu">
+													{{if (!arxiuPropagat || !representantArxiuPropagat)}}
+														{{if !expedientArxiuPropagat}}
+															<li class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+														{{else}}
+															<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+														{{/if}}
+													{{/if}}	
+													<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="false" class="btnModificarInteressat"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+													<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="false" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+													{{if tipus != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>'}}
+														<li class="divider" role="separator"></li>
+														{{if representantId}}
+															<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/interessat/{{:id}}/representant/{{:representantId}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.modificar.prepresentant"/></a></li>
+															<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/interessat/{{:id}}/representant/{{:representantId}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.representant"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.borrar.representant"/></a></li>
+														{{else}}
+															<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/interessat/{{:id}}/representant/new"/>" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.nou.prepresentant"/></a></li>														
+														{{/if}}
+													{{/if}}
+												</ul>
+											</div>
+											</script>
+										</th>
+										</c:if>
+									</tr>
+								</thead>
+							</table>
+							<script id="taulaInteressatsNouBoton" type="text/x-jsrender">
+							<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.expedientPare.admin) && contingut.expedientPare.estat != 'TANCAT'}">
+								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.expedientPare.id}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-refresh-pagina="false"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
+							</c:if>
+						</script>
+						</div>
+						<!------------------------------ TABPANEL REMESES ------------------------------------->
+						<div class="tab-pane" id="notificacions">
+							<table
+								id="taulaNotificacions"
+								data-toggle="datatable"
+								data-url="<c:url value="/expedient/${contingut.expedientPare.id}/enviament/NOTIFICACIO/datatable"/>"
+								data-paging-enabled="false"
+								data-agrupar="5"
+								class="table table-bordered table-striped"
+								style="width:100%"
+								data-row-info="true">
+								<thead>
+									<tr>
+										<th data-col-name="error" data-visible="false"></th>
+										<th data-col-name="notificacio" data-visible="false"></th>
+										<th data-col-name="publicacio" data-visible="false"></th>
+										<th data-col-name="tipus" data-orderable="false" data-template="#cellNotficicacioTipusTemplate" width="15%">
+											<spring:message code="contingut.enviament.columna.tipus"/>
+											<script id="cellNotficicacioTipusTemplate" type="text/x-jsrender">
+												{{if tipus == 'MANUAL'}}
+													<spring:message code="contingut.enviament.notificacio.man"/>
+												{{else tipus == 'COMUNICACIO'}}
+													<spring:message code="contingut.enviament.comunicacio"/>
+												{{else}}
+													<spring:message code="contingut.enviament.notificacio.elec"/>
+												{{/if}}
+										</script>
+										</th>
+										<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.creadael"/></th>
+										<th data-col-name="processatDataString" data-orderable="false" data-template="#cellProcessatDataTemplate" width="20%">
+											<spring:message code="contingut.enviament.columna.dataFinalitzada"/>
+											<script id="cellProcessatDataTemplate" type="text/x-jsrender">
+												{{if notificacioEstat == 'FINALITZADA' or notificacioEstat == 'PROCESSADA'}}
+													{{:processatDataString}}
+												{{/if}}
+											</script>										
+										</th>
+										<th data-col-name="assumpte" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.concepte"/></th>
+										<th data-col-name="destinatari" data-orderable="false" data-visible="false" width="20%">
+											<spring:message code="contingut.enviament.columna.destinatari"/>
+										</th>
+										<th data-col-name="documentId" data-visible="false"/>
+										<th data-col-name="documentNom" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.document"/></th>
+										
+										<th data-col-name="notificacioEstat" data-visible="false"></th>
+										<th data-col-name="estat" data-template="#cellNotificacioEstatTemplate" data-orderable="false" width="10%">
+											<spring:message code="contingut.enviament.columna.estat"/>
+											<script id="cellNotificacioEstatTemplate" type="text/x-jsrender">
+												{{if notificacioEstat == 'PENDENT'}}
+													<span class="label label-warning"><span class="fa fa-clock-o"></span> <spring:message code="notificacio.notificacioEstat.enum.PENDENT"/></span>
+													{{if error}} <span class="fa fa-warning text-danger" title="<spring:message code="contingut.enviament.error"/>"></span> {{/if}}
+												{{else notificacioEstat == 'ENVIADA'}}
+													{{if error}}
+														<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA"/></span>
+													{{else}}
+														<span class="label label-info"><span class="fa fa-envelope-o"></span> <spring:message code="notificacio.notificacioEstat.enum.ENVIADA"/></span>
+													{{/if}}
+												{{else notificacioEstat == 'REGISTRADA'}}
+													{{if error}}
+														<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.REGISTRADA"/></span>
+													{{else}}
+														<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.REGISTRADA"/></span>
+													{{/if}}
+												{{else notificacioEstat == 'FINALITZADA'}}
+													{{if error}}
+															<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA"/></span>
+														{{else}}
+															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.FINALITZADA"/></span>
+													{{/if}}
+												{{else notificacioEstat == 'PROCESSADA'}}
+													{{if error}}
+															<span class="label label-danger"><span class="fa fa-warning"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
+														{{else}}
+															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
+													{{/if}}
+												{{/if}}
+												{{if notificacioEstat == 'PROCESSADA'}}
+												{{:~recuperarEstatEnviament(id)}}
+												<p class="estat_{{:id}}"  style="display:inline"></p>
+												{{/if}}
+										</script>
+										</th>
+										<th data-col-name="id" data-orderable="false" data-template="#cellNotifiacioAccionsTemplate" width="10%">
+											<script id="cellNotifiacioAccionsTemplate" type="text/x-jsrender">
+											<div class="dropdown">
+												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+												<ul class="dropdown-menu">
+													<li><a href="<c:url value="/document/{{:documentId}}/{{if notificacio}}notificacio{{else}}publicacio{{/if}}/{{:id}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+													{{if tipus == 'MANUAL'}}
+														<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+														<li><a href="<c:url value="/expedient/${contingut.expedientPare.id}/notificacio/{{:id}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.notificacio"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+													{{/if}}
+												</ul>
+											</div>
+										</script>
+										</th>
+									</tr>
+								</thead>
+							</table>
+						</div>
+						
+						<!------------------------------ TABPANEL PUBLICACIONS ------------------------------------->
+						<div class="tab-pane" id="publicacions">
+							<table
+								id="taulaEnviaments"
+								data-toggle="datatable"
+								data-url="<c:url value="/expedient/${contingut.expedientPare.id}/enviament/PUBLICACIO/datatable"/>"
+								data-paging-enabled="false"
+								data-agrupar="5"
+								class="table table-bordered table-striped"
+								style="width:100%"
+								data-row-info="true">
+								<thead>
+									<tr>
+										<th data-col-name="error" data-visible="false"></th>
+										<th data-col-name="notificacio" data-visible="false"></th>
+										<th data-col-name="publicacio" data-visible="false"></th>
+										<th data-col-name="tipus" data-orderable="false" data-template="#cellPublicacioTipusTemplate" width="15%">
+											<spring:message code="contingut.enviament.columna.tipus"/>
+											<script id="cellPublicacioTipusTemplate" type="text/x-jsrender">
+												<spring:message code="contingut.enviament.publicacio"/>
+											</script>
+										</th>
+										<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.data"/></th>
+										<th data-col-name="processatData" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.dataFinalitzada"/></th>
+										<th data-col-name="assumpte" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.assumpte"/></th>
+										<th data-col-name="destinatari" data-orderable="false" data-visible="false" width="20%">
+											<spring:message code="contingut.enviament.columna.destinatari"/>
+										</th>
+										<th data-col-name="documentId" data-visible="false"/>
+										<th data-col-name="documentNom" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.document"/></th>
+										
+										<th data-col-name="notificacioEstat" data-visible="false"></th>
+										<th data-col-name="estat" data-template="#cellPublicacioEstatTemplate" data-orderable="false" width="10%">
+											<spring:message code="contingut.enviament.columna.estat"/>
+											<script id="cellPublicacioEstatTemplate" type="text/x-jsrender">
+												{{if estat == 'PENDENT'}}
+													<span class="label label-warning"><span class="fa fa-clock-o"></span> {{:~eval('publicacioEstatText["' + estat + '"]')}}</span>
+												{{else estat == 'ENVIAT'}}
+													<span class="label label-info"><span class="fa fa-envelope-o"></span> {{:~eval('publicacioEstatText["' + estat + '"]')}}</span>
+												{{else estat == 'REBUTJAT'}}
+													<span class="label label-default"><span class="fa fa-times"></span> {{:~eval('publicacioEstatText["' + estat + '"]')}}</span>
+												{{else estat == 'PROCESSAT'}}
+													<span class="label label-danger"><span class="fa fa-check"></span> {{:~eval('publicacioEstatText["' + estat + '"]')}}</span>
+												{{/if}}
+											</script>
+										</th>
+										<th data-col-name="id" data-orderable="false" data-template="#cellPublicacioAccionsTemplate" width="10%">
+											<script id="cellPublicacioAccionsTemplate" type="text/x-jsrender">
+											<div class="dropdown">
+												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+												<ul class="dropdown-menu">
+													<li><a href="<c:url value="/document/{{:documentId}}/{{if notificacio}}notificacio{{else}}publicacio{{/if}}/{{:id}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+													<li><a href="<c:url value="/document/{{:documentId}}/publicacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+													<li><a href="<c:url value="/document/{{:documentId}}/publicacio/{{:id}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.publicacio"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+												</ul>
+											</div>
+										</script>
+										</th>
+									</tr>
+								</thead>
+							</table>
+						</div>						
+					</c:if>
 					<c:if test="${contingut.document and fn:length(contingut.versions) gt 0}">
 						<!------------------------------ TABPANEL VERSIONS ------------------------------------->
 						<div class="tab-pane" id="versions">
@@ -2831,7 +3214,7 @@ $.views.helpers(myHelpers);
 												<ul class="dropdown-menu">
 													<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 													<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
-													<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+													<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && contingut.estat != 'TANCAT'}">
 														{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
 															<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
 														{{/if}}
@@ -2846,8 +3229,77 @@ $.views.helpers(myHelpers);
 							</table>
 						</div>
 						<script id="taulaTasquesNouBoton" type="text/x-jsrender">
-						<c:if test="${expedientAgafatPerUsuariActual && potModificarContingut && contingut.estat != 'TANCAT'}">
+						<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && contingut.estat != 'TANCAT'}">
 							<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.id}/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
+						</c:if>	
+					</script>					
+					</c:if>	
+					<c:if test="${contingut.carpeta}">
+						<!------------------------------ TABPANEL TASQUES CARPETA ------------------------------------->
+						<div class="tab-pane" id="tasques">
+							<table
+								id="taulaTasques"
+								data-toggle="datatable"
+								data-url="<c:url value="/expedientTasca/${contingut.expedientPare.id}/datatable"/>"
+								data-paging-enabled="false"
+								data-agrupar="6"
+								class="table table-bordered table-striped"
+								style="width:100%"
+								data-botons-template="#taulaTasquesNouBoton">
+								<thead>
+									<tr>
+										<th data-col-name="id" data-visible="false"></th>
+										<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>								
+										<th data-col-name="comentari" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>	
+										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
+										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
+										<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>	
+										<th data-col-name="responsableActual.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>								
+										<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
+											<spring:message code="expedient.tasca.list.columna.estat"/>
+											<script id="cellTascaEstatTemplate" type="text/x-jsrender">
+											{{if estat == 'PENDENT'}}
+												<spring:message code="expedient.tasca.estat.enum.PENDENT"/>
+											{{else estat == 'INICIADA'}}
+												<spring:message code="expedient.tasca.estat.enum.INICIADA"/>
+											{{else estat == 'FINALITZADA'}}
+												<spring:message code="expedient.tasca.estat.enum.FINALITZADA"/>
+											{{else estat == 'CANCELLADA'}}
+												<spring:message code="expedient.tasca.estat.enum.CANCELLADA"/>
+											{{else estat == 'REBUTJADA'}}
+												<spring:message code="expedient.tasca.estat.enum.REBUTJADA"/>
+											{{/if}}
+										</script>
+										</th>
+										<th data-col-name="numComentaris" data-orderable="false" data-template="#cellComentarisTemplate" width="1%">
+											<script id="cellComentarisTemplate" type="text/x-jsrender">
+												<a href='<c:url value="/expedientTasca/{{:id}}/comentaris"/>' data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
+											</script>
+										</th>
+										<th data-col-name="id" data-orderable="false" data-template="#cellExpedientTascaTemplate" width="1%">
+											<script id="cellExpedientTascaTemplate" type="text/x-jsrender">
+											<div class="dropdown">
+												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+												<ul class="dropdown-menu">
+													<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+													<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
+													<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.expedientPare.admin) && contingut.expedientPare.estat != 'TANCAT'}">
+														{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
+															<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
+														{{/if}}
+													</c:if>
+												</ul>
+											</div>
+										</script>
+										</th>										
+									
+									</tr>
+								</thead>
+							</table>
+						</div>
+						<script id="taulaTasquesNouBoton" type="text/x-jsrender">
+						<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.expedientPare.admin) && contingut.expedientPare.estat != 'TANCAT'}">
+							<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.expedientPare.id}/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
 						</c:if>	
 					</script>					
 					</c:if>		

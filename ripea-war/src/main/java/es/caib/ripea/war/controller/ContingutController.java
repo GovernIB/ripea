@@ -64,6 +64,7 @@ import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.JsonResponse;
@@ -122,7 +123,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId,
 					true,
 					true, 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					EntitatHelper.getOrganGestorActualId(request));
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,
@@ -207,7 +209,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					true,
-					false, null);
+					false, null, null);
 			
 			boolean isExpedient = contingut.getPare() == null;
 			if (isExpedient) {
@@ -300,7 +302,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(), 
 				contingutOrigenId, 
 				false, 
-				false, null);
+				false, null, null);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			command.setOrigenIds(
@@ -339,13 +341,15 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				contingutService.move(
 						entitatActual.getId(),
 						docIdx,
-						command.getDestiId());
+						command.getDestiId(), 
+						RolHelper.getRolActual(request));
 			}
 		} else {
 			contingutService.move(
 					entitatActual.getId(),
 					contingutOrigenId,
-					command.getDestiId());
+					command.getDestiId(), 
+					RolHelper.getRolActual(request));
 		}
 		return getModalControllerReturnValueSuccess(
 				request,
@@ -364,11 +368,12 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false, null);
+				false, null, null);
 		contingutService.move(
 				entitatActual.getId(),
 				contingutOrigenId,
-				contingutDestiId);
+				contingutDestiId, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../" + contingutOrigen.getPare().getId(),
@@ -515,7 +520,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"errors",
 				contingutService.findErrorsValidacio(
@@ -536,7 +541,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"alertes",
 				contingutService.findAlertes(
@@ -585,7 +590,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		if (contingut instanceof ExpedientDto) {
 			interessats = interessatService.findByExpedient(
 					entitatActual.getId(),
@@ -609,7 +614,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"logs",
 				contingutService.findLogsPerContingutUser(
@@ -659,7 +664,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					false,
-					false, null);
+					false, null, null);
 			model.addAttribute("contingut", contingut);
 			if (contingut.isReplicatDinsArxiu()) {
 				model.addAttribute(
@@ -779,6 +784,26 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 		}
+		if (contingut instanceof CarpetaDto) {
+
+			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
+					entitatActual.getId(),
+					contingut.getExpedientPare().getId()));
+			
+			model.addAttribute(
+					"interessatsCount",
+					interessatService.findByExpedient(
+							entitatActual.getId(),
+							contingut.getExpedientPare().getId(),
+							false).size());			
+			model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
+					entitatActual.getId(),
+					contingut.getExpedientPare().getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
+			
+			model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
+					entitatActual.getId(),
+					contingut.getExpedientPare().getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
+		}
 		if (contingut instanceof NodeDto) {
 			model.addAttribute(
 					"metaDades",
@@ -847,11 +872,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false, null);
+				false, null, null);
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			List<ContingutDto> documentsOrigen = new ArrayList<ContingutDto>();
 			for (Long docIdx : docsIdx) {
-				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, null);
+				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, null, null);
 				documentsOrigen.add(contingut);
 			}
 			model.addAttribute(

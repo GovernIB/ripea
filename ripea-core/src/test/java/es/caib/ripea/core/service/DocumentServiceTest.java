@@ -370,7 +370,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 						assertEquals(DocumentEstatEnumDto.CUSTODIAT, documentFirmat.getEstat());
 						ExpedientDto expedientAlerta = expedientService.findById(
 								entitatCreada.getId(),
-								expedientCreat.getId());
+								expedientCreat.getId(), null);
 						assertTrue(expedientAlerta.isAlerta());
 						List<AlertaDto> alertes = contingutService.findAlertes(
 								entitatCreada.getId(),

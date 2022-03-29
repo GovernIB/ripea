@@ -68,6 +68,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
@@ -124,6 +125,8 @@ public class CacheHelper {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
@@ -592,16 +595,25 @@ public class CacheHelper {
 	public void evictRolsDisponiblesEnAcls() {
 	}
 
-	@Cacheable(value = "anotacionsUsuari", key="{#entitat, #isAdmin, #usuariCodi}")
-	public long countAnotacionsPendents(EntitatEntity entitat, boolean isAdmin, String usuariCodi) {
+	@Cacheable(value = "anotacionsUsuari", key="{#entitat, #rolActual, #usuariCodi, #organActualId}")
+	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {
 		logger.debug("Consulta anotacions pendents de processar");
 		
-		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitat.getId()); 
-		
-		return expedientPeticioRepository.countAnotacionsPendents(entitat, isAdmin, createWritePermIds);
+		if (rolActual.equals("IPA_ADMIN")) {
+			return expedientPeticioRepository.countAnotacionsPendentsAdminEntitat(entitat);
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			List<String> organsCodisPermitted = organGestorRepository.findFillsCodis(entitat, Arrays.asList(organActualId));
+			OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organActualId);
+			organsCodisPermitted.add(organGestorEntity.getCodi());
+			return expedientPeticioRepository.countAnotacionsPendentsAdminOrgan(entitat, organsCodisPermitted);
+		} else {
+			List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitat.getId()); 
+			return expedientPeticioRepository.countAnotacionsPendentsUser(entitat,createWritePermIds);
+		}
 	}
 	
-	@CacheEvict(value = "anotacionsUsuari", key="{#entitat, #isAdmin, #usuariCodi}", allEntries=true)
+	
+	@CacheEvict(value = "anotacionsUsuari", key="{#entitat, #rolActual, #usuariCodi, #organActualId}", allEntries=true)
 	public void evictCountAnotacionsPendents(EntitatEntity entitat) {
 	}
 

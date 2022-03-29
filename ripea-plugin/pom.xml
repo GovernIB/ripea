@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.91</version>
+		<version>0.9.92</version>
 	</parent>
 	<artifactId>ripea-plugin</artifactId>
 	<dependencies>
@@ -12,11 +12,6 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>ripea-core-api</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

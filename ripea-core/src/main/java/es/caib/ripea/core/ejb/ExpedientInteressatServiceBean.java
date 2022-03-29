@@ -75,8 +75,8 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 
 	@Override
 	@RolesAllowed("tothom")
-	public InteressatDto findById(Long id) {
-		return delegate.findById(id);
+	public InteressatDto findById(Long id, boolean consultarDadesExternes) {
+		return delegate.findById(id, consultarDadesExternes);
 	}
 
 	@Override

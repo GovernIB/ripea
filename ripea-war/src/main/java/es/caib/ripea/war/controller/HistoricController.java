@@ -1,23 +1,5 @@
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
@@ -33,7 +15,22 @@ import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.historic.ExportacioActionHistoric;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/historic")
@@ -47,9 +44,6 @@ public class HistoricController extends BaseAdminController {
 	@Autowired
 	private HistoricService historicService;
 
-	@Autowired
-	private ExportacioActionHistoric exportacioActionHistoric;
-	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
 		getEntitatActualComprovantPermisAdminEntitat(request);
@@ -331,22 +325,22 @@ public class HistoricController extends BaseAdminController {
 		FitxerDto fitxer = null;
 		try {
 			if (historicFiltreCommand.showingDadesEntitat()) {
-				fitxer = exportacioActionHistoric.exportarHistoricEntitat(entitatActual, rolActual, historicFiltreCommand.asDto(), format);
+				fitxer = historicService.exportarHistoricEntitat(entitatActual, rolActual, historicFiltreCommand.asDto(), format);
 				
 			} else if (historicFiltreCommand.showingDadesOrganGestor()) {
-				fitxer = exportacioActionHistoric.exportarHistoricOrgansGestors(entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
+				fitxer = historicService.exportarHistoricOrgansGestors(entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
 				
 			} else if (historicFiltreCommand.showingDadesUsuari()) {
 				String[] usuaris = (String[])RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS);
 				usuaris = usuaris == null ? new String[0] : usuaris;
-				fitxer = exportacioActionHistoric.exportarHistoricUsuaris(usuaris, entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
+				fitxer = historicService.exportarHistoricUsuaris(usuaris, entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
 				
 			} else if (historicFiltreCommand.showingDadesInteressat()) {
 				String[] interessats = (String[])RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_INTERESSATS);
 				interessats = interessats == null ? new String[0] : interessats;
-				fitxer = exportacioActionHistoric.exportarHistoricInteressats(interessats, entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
+				fitxer = historicService.exportarHistoricInteressats(interessats, entitatActual.getId(), rolActual, historicFiltreCommand.asDto(), format);
 				
 			} else {
 				throw new Exception("No s'han seleccionat el tipus de dades a generar");

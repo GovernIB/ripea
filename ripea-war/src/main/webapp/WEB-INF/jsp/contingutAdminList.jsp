@@ -51,15 +51,24 @@ $(document).ready(function() {
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
+			$('#expedientId').prop('disabled', true);
+			$('#expedientId').select2('val', '', true);
+			$('#expedientId option[value!=""]').remove();
 		} else if (tipus == 'DOCUMENT') {
 			$.get("<c:url value="/metaDocument/findAll"/>")
 			.done(metaNodeRefresh)
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
+			
+			$('#expedientId').removeAttr('disabled');
+		} else {
+			$('#expedientId').prop('disabled', true);
+			$('#expedientId').select2('val', '', true);
+			$('#expedientId option[value!=""]').remove();
 		}
 	});
-
+	
 	$('#tipus').trigger('change');
 });
 </script>
@@ -70,11 +79,6 @@ $(document).ready(function() {
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>
 			</div>
-<%--
-			<div class="col-md-3">
-				<rip:inputText name="creador" inline="true" placeholderKey="contingut.admin.filtre.creador"/>
-			</div>
---%>
 			<div class="col-md-3">					
 				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
@@ -96,13 +100,33 @@ $(document).ready(function() {
 		</div>
 		<div class="row">
 			<div class="col-md-2">
+				<rip:inputDate name="dataEsborratInici" inline="true" placeholderKey="contingut.admin.filtre.data.esborrat.inici"/>
+			</div>
+			<div class="col-md-2">
+				<rip:inputDate name="dataEsborratFi" inline="true" placeholderKey="contingut.admin.filtre.data.esborrat.fi"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputSelect name="opcionsEsborrat" optionItems="${contingutAdminOpcionsEsborratEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="false" inline="true"/>
+			</div>
+			<div class="col-md-5">					
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpLlistat"/>
+				<rip:inputSuggest 
+ 					name="expedientId"  
+ 					urlConsultaInicial="${urlConsultaExpInicial}"
+ 					urlConsultaLlistat="${urlConsultaExpLlistat}"
+					placeholderKey="contingut.admin.filtre.expedient"
+ 					suggestValue="id"
+ 					suggestText="nomINumero"
+					inline="true"/>	
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2">
 				<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="contingut.admin.filtre.data.inici"/>
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="contingut.admin.filtre.data.fi"/>
-			</div>
-			<div class="col-md-3">
-				<rip:inputSelect name="opcionsEsborrat" optionItems="${contingutAdminOpcionsEsborratEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="false" inline="true"/>
 			</div>
 			<div class="col-md-5 pull-right">
 				<div class="pull-right">
@@ -165,12 +189,14 @@ $(document).ready(function() {
 								<li><a href="contingutAdmin/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 								{{if esborrat}}
 								<li><a href="contingutAdmin/{{:id}}/undelete" data-toggle="ajax"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="contingut.admin.boto.recuperar"/></a></li>
-									{{if hasFills}}
+							
+	<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<%--	{{if hasFills}}
 									<li class="disabled"><a data-toggle="ajax" ><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									{{else}}
 									<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-									{{/if}}								
-								{{/if}}
+									{{/if}}			--%>				
+								{{/if}} 
 								{{if expedient}}
 									<li><a href="<c:url value="contingutAdmin/{{:id}}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 								{{/if}}								

@@ -113,6 +113,44 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<Long> findFillsIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pareIds") List<Long> pareIds);
+	
+	
+	@Query("select " +
+			"    og.codi " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds))")
+	public List<String> findFillsCodis(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("pareIds") List<Long> pareIds);
+	
+	
+	@Query("select " +
+			"    og " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds))")
+	public List<OrganGestorEntity> findFills(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("pareIds") List<Long> pareIds);
 
 	@Query("from " +
 			"    OrganGestorEntity og " +
@@ -128,19 +166,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    og.codi in (:codi)")
 	public List<Long> findIdsByCodiDir3List(List<String> codi);
 	
-	
-	@Query(	"select " +
-			"    org " + 
-			"from " +
-			"    OrganGestorEntity org " +
-			"    left join org.pare pare1 " +
-			"    left join pare1.pare pare2 " + 
-			"	 left join pare2.pare pare3 " +
-			"	 left join pare3.pare pare4 " +
-			"where " +
-			"    org.id = :organId")
-	List<OrganGestorEntity> findOrganGestorsPath(
-			@Param("organId") Long organId);
 	
 	
 	@Query(	"select " +

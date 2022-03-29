@@ -37,7 +37,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			ContingutEntity pare,
 			String nom,
 			int esborrat);
-
+	
 	List<ExpedientEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 
@@ -46,6 +46,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			MetaNodeEntity metaNode,
 			int any,
 			long sequencia);
+	
+	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 
 	@Query(	"from" +
 			"    ExpedientEntity e "
@@ -282,6 +284,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode);
 
+	Page<ExpedientEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient, Pageable pageable);
+	
 	@Query(	"select " +
 			"    e " +
 			"from " +
@@ -376,7 +380,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
-			"and (select count(document) from DocumentEntity document where document.expedient = e and document.estat = 3) > 0 " +   // at least one document custodiat
+			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
 			"and (select " +																										// all dades obligatoris created
 			"	     	count(metaDada) " +
 			"	  from " +
@@ -505,5 +509,32 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	public List<ExpedientEntity> findByText(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("text") String text);
+	
+	
+	@Query(	"select" +
+			"    e " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
+	List<ExpedientEntity> findByEntitatAndMetaExpedient(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaNode") MetaNodeEntity metaNode);
+	
+	@Query(	"select" +
+			"    e " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and e.organGestor.id in (:organsIdsPermitted) " +
+			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
+	List<ExpedientEntity> findByEntitatAndMetaExpedientAndOrgans(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("organsIdsPermitted") List<Long> organsIdsPermitted,
+			@Param("metaNode") MetaNodeEntity metaNode);
 
 }
