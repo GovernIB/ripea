@@ -188,4 +188,10 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.findUsuariAmbCodiDades(codi);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void evictRolsDisponiblesEnAcls() {
+		delegate.evictRolsDisponiblesEnAcls();
+	}
+
 }

@@ -250,6 +250,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return cacheHelper.rolsDisponiblesEnAcls();
 		//return aclSidRepository.findSidByPrincipalFalse();
 	}
+	@Override
+	public void evictRolsDisponiblesEnAcls() {
+		logger.debug("Evict rols disponibles en ACLs");
+		cacheHelper.evictRolsDisponiblesEnAcls();
+	}
 
 	@Override
 	public boolean isPluginArxiuActiu() {

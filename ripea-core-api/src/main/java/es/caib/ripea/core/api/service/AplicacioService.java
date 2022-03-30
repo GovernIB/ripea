@@ -203,4 +203,7 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public UsuariDto findUsuariAmbCodiDades(String codi);
 
+	@PreAuthorize("hasRole('tothom')")
+	public void evictRolsDisponiblesEnAcls();
+
 }
