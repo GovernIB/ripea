@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -22,6 +23,7 @@ public class ExpedientTascaCommand {
 	private Date dataInici;
 	private Date dataFi;
 	private Date dataLimit;
+	@Size(max=256)
 	private String comentari;
 
 	public Date getDataLimit() {
