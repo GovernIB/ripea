@@ -1,4 +1,12 @@
 databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
   - changeSet:
       id: 1644841333349-1
       author: limit
@@ -19,16 +27,16 @@ databaseChangeLog:
                   type: BIGINT
               - column:
                   name: text
-                  type: VARCHAR2(1024)
+                  type: VARCHAR(1024 ${varcharUnit})
               - column:
                   name: createdby_codi
-                  type: VARCHAR2(64)
+                  type: VARCHAR(64 ${varcharUnit})
               - column:
                   name: createddate
                   type: TIMESTAMP
               - column:
                   name: lastmodifiedby_codi
-                  type: VARCHAR2(64)
+                  type: VARCHAR(64 ${varcharUnit})
               - column:
                   name: lastmodifieddate
                   type: TIMESTAMP

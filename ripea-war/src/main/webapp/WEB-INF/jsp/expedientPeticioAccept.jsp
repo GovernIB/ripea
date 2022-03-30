@@ -228,7 +228,7 @@ $(document).ready(function(){
 		<div id="input-accio-incorporar" class="hidden">
 			<rip:inputSelect name="expedientId"
 				textKey="expedient.peticio.form.acceptar.camp.expedient" required="true" 
-	 			optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="isMadeByJquery" emptyOption="true" optionMinimumResultsForSearch="6"/> 
+	 			optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="numeroINom" emptyOption="true" optionMinimumResultsForSearch="6"/> 
 		</div>
 		<div id="input-accio-crear" class="hidden">
 			<rip:inputText name="newExpedientTitol" textKey="expedient.peticio.form.acceptar.camp.newExpedientTitol"

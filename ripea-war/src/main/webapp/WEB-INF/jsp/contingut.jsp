@@ -1381,7 +1381,7 @@ function showTipusDocumentals() {
 							<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option> \
 								<c:forEach items="${metaDocumentsLeft}" var="metaDocument"> \
 									<option id="${metaDocument.id}"> \
-										${metaDocument.nom} \
+									${fn:escapeXml(metaDocument.nom)} \
 									</option> \
 								</c:forEach> \
 						</select> \
@@ -1702,6 +1702,26 @@ function removeLoading(idModal) {
 		$('#' + idModal).off('hidden.bs.modal', modalCloseLoadingHandler)
 	} else {
 		$('body').removeClass('loading');
+	}
+}
+
+function removeTransactionId(idModal) {
+	if (idModal) {
+		$('#' + idModal).on('hidden.bs.modal', function() {
+			var idTransaccio = localStorage.getItem('transaccioId');
+			if (idTransaccio) {
+				$.ajax({
+			    	type: 'GET',
+					url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
+					success: function() {
+						localStorage.removeItem('transaccioId');
+					},
+					error: function(err) {
+						console.log("Error tancant la transacció");
+					}
+			    });
+			}
+		});
 	}
 }
 
