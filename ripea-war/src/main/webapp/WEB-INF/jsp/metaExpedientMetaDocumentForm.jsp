@@ -476,7 +476,7 @@ function removeLoading() {
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true" disabled="${bloquejarCamps}"/>
-				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="codi" optionTextAttribute="nom" required="true" disabled="${bloquejarCamps}"/>
+				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="codi" optionTextAttribute="nom" required="true" disabled="${bloquejarCamps}" optionMinimumResultsForSearch="3"/>
 				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">
