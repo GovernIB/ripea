@@ -450,6 +450,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				model);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		command.setOrigenId(contingutOrigenId);
+		model.addAttribute("moureMateixExpedients", false);
 		model.addAttribute(command);
 		return "contingutVincularForm";
 	}
