@@ -415,10 +415,10 @@ $(document).ready(function() {
 	    var isErrorTrue = (isError === 'true');
 		if (isErrorTrue) {
 			var errorMsg = $('iframe[name=target_iframe]').contents().find('#errorMsg').val();
-			
+			$('#inputDoc').find('div.alert.alert-danger').remove();
 			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
 		} else {
-			$('#inputDoc').children().last().remove();
+			$('#inputDoc').find('div.alert.alert-danger').remove();
 		}
 	   
 
@@ -433,8 +433,10 @@ $(document).ready(function() {
 	});
 
 
-
-
+	
+	if(${not empty nomDocument}){
+		$('#inputAmbFirma').removeClass('hidden');
+	}
     if($('#ambFirma').prop('checked') && $('#tipusFirma1').is(":checked")){
         $('#ambFirma').attr('onclick', 'return false;');
         $('#tipusFirma1').parent().show();

@@ -3468,7 +3468,7 @@ public class PluginHelper {
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
 
 			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
-			if (validationStatus.getStatus() == 0) {
+			if (validationStatus.getStatus() == 1) {
 				return new SignatureInfoDto(
 						true,
 						false,
