@@ -170,7 +170,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			}
 			FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
 			if (fitxerTemp != null) {
-				model.addAttribute("isSigned", documentService.isFitxerSigned(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
+				SignatureInfoDto signatureInfoDto = documentService.checkIfSignedAttached(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+				model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
+				model.addAttribute("isError", signatureInfoDto.isError());
+				model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
 			}
 			return "fileUploadResult";
 		}
@@ -249,7 +252,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			}
 			FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
 			if (fitxerTemp != null) {
-				model.addAttribute("isSigned", documentService.isFitxerSigned(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
+				model.addAttribute("isSigned", documentService.checkIfSignedAttached(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
 			}
 			return "fileUploadResult";
 		}

@@ -194,4 +194,14 @@ public class AplicacioServiceBean implements AplicacioService {
 		delegate.evictRolsDisponiblesEnAcls();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean getBooleanJbossProperty(
+			String key,
+			boolean defaultValueIfNull) {
+		return getBooleanJbossProperty(
+				key,
+				defaultValueIfNull);
+	}
+
 }

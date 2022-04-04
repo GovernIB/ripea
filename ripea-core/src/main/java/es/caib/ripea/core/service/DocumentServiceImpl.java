@@ -20,9 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.PdfReader;
-
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
@@ -53,6 +50,7 @@ import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
@@ -65,6 +63,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
@@ -157,6 +156,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private PinbalHelper pinbalHelper;
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 	@Transactional
 	@Override
@@ -250,27 +251,22 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 	
 	@Override
-	public boolean isFitxerSigned(byte[] contingut, String contentType) {
-		if (contentType.equals("application/pdf")) {
-			PdfReader reader;
-			try {
-				reader = new PdfReader(contingut);
-				AcroFields acroFields = reader.getAcroFields();
-				List<String> signatureNames = acroFields.getSignatureNames();
-				if (signatureNames != null && !signatureNames.isEmpty()) {
-					return true;
-				} else {
-					return false;
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+	public SignatureInfoDto checkIfSignedAttached(
+			byte[] contingut, 
+			String contentType) {
+		
+		if (aplicacioService.getBooleanJbossProperty("es.caib.ripea.firma.detectar.attached.validate.signature", true)) {
+			return pluginHelper.detectSignedAttachedUsingValidateSignaturePlugin(
+					contingut,
+					contentType);
 		} else {
-			return false;
+			return pluginHelper.detectSignedAttachedUsingPdfReader(
+					contingut, 
+					contentType);
 		}
+		
 
 	}
-	
 	
 	@Transactional
 	@Override
@@ -1486,6 +1482,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false, null, false, null);
 	}
 	
+
 	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false) : null;

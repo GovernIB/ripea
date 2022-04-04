@@ -312,6 +312,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return configHelper.getAsBoolean(key);
 	}
 	
+	@Override
+	public boolean getBooleanJbossProperty(
+			String key,
+			boolean defaultValueIfNull) {
+		String property = configHelper.getJBossProperty(key);
+		if (property != null) {
+			return Boolean.parseBoolean(property);
+		} else {
+			return defaultValueIfNull;
+		}
+	}
+	
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
 		UsuariDto dto = conversioTipusHelper.convertir(

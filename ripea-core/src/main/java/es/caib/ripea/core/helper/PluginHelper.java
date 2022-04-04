@@ -24,9 +24,15 @@ import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformati
 import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfReader;
 
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
@@ -83,6 +89,7 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
@@ -3406,6 +3413,92 @@ public class PluginHelper {
 	public boolean isRegistreSignarAnnexos() {
 		return this.getPropertyPluginRegistreSignarAnnexos();
 	}
+	
+	public SignatureInfoDto detectSignedAttachedUsingPdfReader(
+			byte[] documentContingut,
+			String contentType) {
+		
+		boolean isSigned = isFitxerSigned(documentContingut, contentType);
+		boolean validationError = false; // !isSigned;
+		String validationErrorMsg = ""; // "error error error error error error ";
+
+		return new SignatureInfoDto(
+				isSigned,
+				validationError,
+				validationErrorMsg);
+
+	
+	}
+	
+	private boolean isFitxerSigned(byte[] contingut, String contentType) {
+		if (contentType.equals("application/pdf")) {
+			PdfReader reader;
+			try {
+				reader = new PdfReader(contingut);
+				AcroFields acroFields = reader.getAcroFields();
+				List<String> signatureNames = acroFields.getSignatureNames();
+				if (signatureNames != null && !signatureNames.isEmpty()) {
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			return false;
+		}
+	}	
+	
+	public SignatureInfoDto detectSignedAttachedUsingValidateSignaturePlugin(
+			byte[] documentContingut,
+			String firmaContentType) {
+
+		try {
+			ValidateSignatureRequest validationRequest = new ValidateSignatureRequest();
+			validationRequest.setSignatureData(documentContingut);
+			SignatureRequestedInformation sri = new SignatureRequestedInformation();
+			sri.setReturnSignatureTypeFormatProfile(true);
+			sri.setReturnCertificateInfo(true);
+			sri.setReturnValidationChecks(false);
+			sri.setValidateCertificateRevocation(false);
+			sri.setReturnCertificates(false);
+			sri.setReturnTimeStampInfo(true);
+			validationRequest.setSignatureRequestedInformation(sri);
+			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
+
+			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+			if (validationStatus.getStatus() == 0) {
+				return new SignatureInfoDto(
+						true,
+						false,
+						null);
+			} else {
+				return new SignatureInfoDto(
+						true,
+						true,
+						validationStatus.getErrorMsg());
+			}
+
+		} catch (Exception e) {
+			Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
+			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")) {
+				return new SignatureInfoDto(
+						false,
+						false,
+						null);
+			} else {
+				logger.error("Error al detectar firma de document", e);
+				return new SignatureInfoDto(
+						false,
+						true,
+						e.getMessage());
+			}
+		}
+	}
+	
+	
+	
 
 	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(
 			byte[] documentContingut,
@@ -5558,5 +5651,5 @@ public class PluginHelper {
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {
 		this.dadesUsuariPlugin = dadesUsuariPlugin;
 	}
-
+	private static final Logger logger = LoggerFactory.getLogger(PluginHelper.class);
 }

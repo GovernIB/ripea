@@ -338,53 +338,111 @@ $(document).ready(function() {
 
 
 
-	
-	$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
-
-	    $('#onlyFileSubmit').val(true);
-	    $('#loading').show();
-	    $('#arxiuInput').hide();
-	    $("#documentCommand").prop("target", 'target_iframe');
-	    $('#documentCommand').submit();
-		
-	});
-	
-	
 	$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
+		 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+	     $('#loading').show();
+	     $('#inputAmbFirma').addClass('hidden');
+		 $('#arxiuInput').hide();
 		 $('#unselect').val(true);
 		 $("#inputDoc .fileinput").fileinput('reset');
 		 $("#documentCommand").prop("target", 'target_iframe');
 		 $('#documentCommand').submit();
 	});
-
 	$("#inputDoc .fileinput").on("reset.bs.fileinput", function(e){
 		console.log('before reset');
- 	    e.stopPropagation();
- 	    e.preventDefault();
+	    e.stopPropagation();
+	    e.preventDefault();
 	});
-
 	$("#inputDoc .fileinput").on("reseted.bs.fileinput", function(e){
 		console.log('after reset');
+	});
+	
+	
+	
+	$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
+		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+	    $('#onlyFileSubmit').val(true);
+	    $('#loading').show();
+	    $('#arxiuInput').hide();
+		$('#inputAmbFirma').removeClass('hidden');
+	    $("#documentCommand").prop("target", 'target_iframe');
+	    $('#documentCommand').submit();
+		
 	});
 	
 	$('#target_iframe').load(function() {
 	    $("#documentCommand").prop("target", '');
 	    $('#unselect').val(false);
 		$('#onlyFileSubmit').val(false);
-	    var isSigned = $('iframe[name=target_iframe]').contents().find('#isSigned').val();
-	    var isSignedTrue = (isSigned === 'true');
 
-	    if (isSignedTrue != $('#ambFirma').prop('checked')) {
+		
+	    var isSignedAttached = $('iframe[name=target_iframe]').contents().find('#isSignedAttached').val();
+	    var isSignedAttachedTrue = (isSignedAttached === 'true');
+	    
+	    if (isSignedAttachedTrue && !$('#ambFirma').prop('checked')) {
 	        $('#ambFirma').click();
-	    }
+	        $('#ambFirma').attr('onclick', 'return false;');
+	        $("#ambFirma").css({"cursor": "not-allowed"});
+		    $('#tipusFirma1').parent().show();
+		    $('#tipusFirma2').parent().hide();
+		    $('#input-firma-arxiu').addClass('hidden');
+		    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
+		    $('#tipusFirma1').click();
+	    } else if (!isSignedAttachedTrue && $('#ambFirma').prop('checked')){
+	    	$('#ambFirma').attr('onclick', null);
+	    	$("#ambFirma").css({"cursor": ""});
+	    	$('#ambFirma').click();
+		    $('#tipusFirma1').parent().hide();
+		    $('#tipusFirma2').parent().show();
+		    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+		    $('#tipusFirma2').click();
+		} else if (!isSignedAttachedTrue && !$('#ambFirma').prop('checked')){
+		    $('#tipusFirma1').parent().hide();
+		    $('#tipusFirma2').parent().show();
+		    $('#tipusFirma2').click();
+		    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+		} else if (isSignedAttachedTrue && $('#ambFirma').prop('checked')){
+	        $('#ambFirma').attr('onclick', 'return false;');
+	        $("#ambFirma").css({"cursor": "not-allowed"});
+		    $('#tipusFirma1').parent().show();
+		    $('#tipusFirma2').parent().hide();
+		    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
+		    $('#tipusFirma1').click();
+		}
+
+
+	    var isError = $('iframe[name=target_iframe]').contents().find('#isError').val();
+	    var isErrorTrue = (isError === 'true');
+		if (isErrorTrue) {
+			var errorMsg = $('iframe[name=target_iframe]').contents().find('#errorMsg').val();
+			
+			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
+		} else {
+			$('#inputDoc').children().last().remove();
+		}
+	   
 
 	    $('#loading').hide();
 	    $('#arxiuInput').show();
+	    
+		if (!isErrorTrue) {
+			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
+			
+		}
 
 	});
 
 
 
+
+    if($('#ambFirma').prop('checked') && $('#tipusFirma1').is(":checked")){
+        $('#ambFirma').attr('onclick', 'return false;');
+        $('#tipusFirma1').parent().show();
+        $('#tipusFirma2').parent().hide();
+    } else if($('#ambFirma').prop('checked') && $('#tipusFirma2').is(":checked")){
+        $('#tipusFirma1').parent().hide();
+        $('#tipusFirma2').parent().show();
+    }
 	
 	
 });
@@ -453,7 +511,9 @@ function removeLoading() {
 						<div id="inputDoc">
 							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
 						</div>
-						<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+						<div id="inputAmbFirma" class="hidden">
+							<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+						</div>
 						<div id="input-firma" class="hidden">
 							<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 							<div id="input-firma-arxiu" class="hidden">
@@ -489,7 +549,7 @@ function removeLoading() {
 		</c:if>
 		<div class="rmodal"></div>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="crearDocumentBtnSubmit btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
