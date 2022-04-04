@@ -15,4 +15,5 @@ import lombok.Setter;
 public class OrganGestorFiltreDto extends AuditoriaDto {
 	private String codi;
 	private String nom;
+	private Long pareId;
 }

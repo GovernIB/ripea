@@ -534,6 +534,23 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<OrganGestorEntity, OrganGestorDto>() {
+					@Override
+					public OrganGestorDto convert(OrganGestorEntity source, Type<? extends OrganGestorDto> destinationClass) {
+						OrganGestorDto target = new OrganGestorDto();
+						target.setId(source.getId());
+						target.setCodi(source.getCodi());
+						target.setNom(source.getNom());
+						target.setEntitatId(source.getEntitat() != null ? source.getEntitat().getId().toString() : null);
+						target.setEntitatNom(source.getEntitat() != null ? source.getEntitat().getNom() : null);
+						target.setPareId(source.getPare() != null ? source.getPare().getId() : null);
+						target.setPareCodi(source.getPare() != null ? source.getPare().getCodi() : null);
+						target.setPareNom(source.getPare() != null ? source.getPare().getNom() : null);
+						target.setGestioDirect(source.isGestioDirect());
+						return target;
+					}
+				});
 
 //		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
 //				.byDefault()

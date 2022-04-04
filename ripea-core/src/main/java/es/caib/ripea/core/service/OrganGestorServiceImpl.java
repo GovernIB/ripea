@@ -266,6 +266,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 				filtre.getNom() == null || filtre.getNom().isEmpty(),
 				filtre.getNom() != null ? filtre.getNom().trim() : "",
+				filtre.getPareId() == null,
+				filtre.getPareId(),
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 		for (OrganGestorDto organ : paginaOrgans.getContingut()) {
@@ -623,5 +625,21 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
+
+	@Override
+	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		List<OrganGestorEntity> organsSuperiorEntities = new ArrayList<OrganGestorEntity>();
+		organsSuperiorEntities = organGestorRepository.findByEntitatAndHasPare(entitat);
+		List<OrganGestorDto> organsSuperior = new ArrayList<OrganGestorDto>();
+		
+		for (OrganGestorEntity organ : organsSuperiorEntities) {
+			organsSuperior.add(conversioTipusHelper.convertir(organ, OrganGestorDto.class));
+		}
+		
+		return organsSuperior;
+	}
 
 }

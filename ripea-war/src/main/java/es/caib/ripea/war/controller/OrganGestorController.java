@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -52,8 +53,15 @@ public class OrganGestorController extends BaseUserOAdminController {
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
     	
+    	EntitatDto entitat = getEntitatActualComprovantPermisos(request);
     	OrganGestorFiltreCommand command = getFiltreCommand(request);
+    	
+    	List<OrganGestorDto> organsSuperior = organGestorService.findOrgansSuperiorByEntitat(entitat.getId());
+    	
 		model.addAttribute(command);
+		model.addAttribute(
+				"organsSuperior",
+				organsSuperior);
     	
         return "organGestor";
     }
