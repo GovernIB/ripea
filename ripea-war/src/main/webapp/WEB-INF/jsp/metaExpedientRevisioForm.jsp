@@ -5,7 +5,13 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<c:set var="titol"><spring:message code="metaexpedient.revisio.form.titol.canviarEstatRevisio"/></c:set>
+
+<c:choose>
+	<c:when test="${modificar}"><c:set var="titol"><spring:message code="metaexpedient.revisio.form.titol.canviarEstatRevisio"/></c:set></c:when>
+	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.revisio.form.titol.estatRevisio"/></c:set></c:otherwise>
+</c:choose>
+
+
 
 <html>
 <head>
@@ -37,11 +43,11 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientRevisioCommand" role="form" >
 	
 		<form:hidden path="id"/>
-		<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio"/>
-		<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}"/>
+		<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${!modificar}"/>
+		<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}" disabled="${!modificar}"/>
 
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${modificar}"><button type="submit" class="btn btn-success" <span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>
 			<a href="<c:url value="/entitat"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
