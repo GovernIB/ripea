@@ -82,7 +82,7 @@
 			</div>
 		</div>
 	</form:form>
-	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedientRevisio/{{:id}}</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
 	<table 
 		id="metaexpedients" 
 		data-toggle="datatable" 
@@ -149,11 +149,15 @@
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-					{{if revisioEstat == 'PENDENT'}}
-						<a href="metaExpedientRevisio/{{:id}}" class="btn btn-primary" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a>
-					{{else}}
-						<a href="metaExpedientRevisio/{{:id}}" class="btn btn-primary" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a>
-					{{/if}}
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+							<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+							{{if revisioEstat == 'PENDENT'}}
+								<li><a href="metaExpedientRevisio/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.canviar.estat.revisio"/></a></li>
+							{{/if}}
+							</ul>
+						</div>	
 					</script>
 				</th>
 			</tr>

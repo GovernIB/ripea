@@ -1204,7 +1204,7 @@ public class ContingutHelper {
 			List<ArxiuFirmaDto> firmes, 
 			boolean fromAnotacio) {
 		
-		boolean utilitzarCarpetes = fromAnotacio || isCarpetaLogica();
+		boolean utilitzarCarpetes = fromAnotacio || !isCarpetaLogica();
 		
 		String serieDocumental = null;
 		ExpedientEntity expedient = contingut.getExpedient();
