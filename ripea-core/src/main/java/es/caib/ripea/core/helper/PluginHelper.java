@@ -66,6 +66,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
@@ -84,7 +85,7 @@ import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
+import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -2012,19 +2013,33 @@ public class PluginHelper {
 		}
 	}
 
-	public List<ContingutArxiu> getCustodyIdDocuments(
-			String numeroRegistre,
-			Date dataPresentacio,
-			TipusRegistreEnumDto tipusRegistre) {
+	public List<ContingutArxiu> importarDocumentsArxiu(ImportacioDto params) {
 		String accioDescripcio = "Importar documents";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("numeroRegistre", numeroRegistre);
+		accioParams.put("numeroRegistre", params.getNumeroRegistre());
 		long t0 = System.currentTimeMillis();
 		try {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");  
-			String dataPresentacioStr = dateFormat.format(dataPresentacio);  
-			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(
-					numeroRegistre + ";" + tipusRegistre.getLabel() + ";" + dataPresentacioStr);
+			String tipusRegistreLabel = null;
+			String dataPresentacioStr = null;
+			String numeroRegistreStr = null;
+			String codiEniStr = null;
+			if (params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE)) {
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");  
+				dataPresentacioStr = "'" + dateFormat.format(params.getDataPresentacioFormatted()) + "'";
+				tipusRegistreLabel = "'" + params.getTipusRegistre().getLabel() + "'";
+				numeroRegistreStr = "'" + params.getNumeroRegistre() + "'";
+			} else {
+				codiEniStr = "'" + params.getCodiEni() + "'";
+			}
+			// Aprofitam el mètode documentVersions per fer la importació
+			String paramsJson = "{" + 
+									"'tipusImportacio' : '" + params.getTipusImportacio().name() + "'," +
+									"'numeroRegistre' : " + numeroRegistreStr + "," +
+									"'tipusRegistre' : " + tipusRegistreLabel + "," +
+									"'dataPresentacio' : " + dataPresentacioStr + "," +
+									"'codiEni' : " + codiEniStr + "" +
+								 "}";
+			List<ContingutArxiu> contingutArxiu = getArxiuPlugin().documentVersions(paramsJson);
 			return contingutArxiu;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -2056,11 +2071,21 @@ public class PluginHelper {
 					arxiuUuid,
 					null,
 					false);
-
 			document.setIdentificador(arxiuUuid);
 			if (moureDocument) {
+				// Si és de registre moure el document
 				getArxiuPlugin().documentCopiar(arxiuUuidPare, arxiuUuid);
-				//document.setIdentificador(nouContingut.getIdentificador());
+			} else {
+				// Si és una importació amb ENI fer un linkdocument
+				//Empram el mètode carpetaCopiar per no disposar d'un mètode específic per vincular.
+				ContingutArxiu nouContingut = getArxiuPlugin().carpetaCopiar(
+						arxiuUuid,
+						arxiuUuidPare);
+				document = getArxiuPlugin().documentDetalls(
+						nouContingut.getIdentificador(),
+						null,
+						false);
+				return document;
 			}
 			return document;
 		} catch (Exception ex) {

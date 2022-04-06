@@ -26,7 +26,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
-import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
+import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.ImportacioService;
@@ -64,6 +64,7 @@ public class ContingutImportacioController extends BaseUserController {
 			Model model) {
 		ImportacioCommand command = new ImportacioCommand();
 		command.setDestiTipus(TipusDestiEnumDto.CARPETA_ACTUAL);
+		command.setTipusImportacio(TipusImportEnumDto.NUMERO_REGISTRE);
 		emplenarModelImportacio(contingutId, command, model);
 		return "contingutImportacioForm";
 	}
@@ -97,7 +98,7 @@ public class ContingutImportacioController extends BaseUserController {
 		int documentsRepetits = 0;
 		try {
 			synchronized (semafor) {
-				documentsRepetits = importacioService.getDocuments(
+				documentsRepetits = importacioService.importarDocuments(
 							entitatActual.getId(), 
 							contingutId,
 							ImportacioCommand.asDto(command));
@@ -145,10 +146,10 @@ public class ContingutImportacioController extends BaseUserController {
 		command.setPareId(contingutId);
 		model.addAttribute(command);
 		model.addAttribute(
-			"tipusRegistreOptions",
-			EnumHelper.getOptionsForEnum(
-					TipusRegistreEnumDto.class,
-					"contingut.importacio.tipus.enum."));
+				"tipusImportacioOptions",
+				EnumHelper.getOptionsForEnum(
+						TipusImportEnumDto.class,
+						"contingut.importacio.tipus.enum."));
 		model.addAttribute(
 				"tipusDestiOptions",
 				EnumHelper.getOptionsForEnum(
