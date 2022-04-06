@@ -1009,6 +1009,7 @@ public class PluginHelper {
 				document.updateArxiu(
 						documentCreat.getIdentificador());
 			} else {
+				boolean propagarConversioDefinitiu = getPropertyPropagarConversioDefinitiuActiu() && document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU);
 				getArxiuPlugin().documentModificar(
 						toArxiuDocument(
 								document.getArxiuUuid(),
@@ -1027,7 +1028,7 @@ public class PluginHelper {
 								document.getDataCaptura(),
 								document.getNtiEstadoElaboracion(),
 								document.getNtiTipoDocumental(),
-								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
+								((firmes != null || propagarConversioDefinitiu) ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
 								serieDocumental, null));
 				document.updateArxiu(null);
@@ -5567,7 +5568,9 @@ public class PluginHelper {
 	private boolean getPropertyViaFirmaDispositius() {
 		return configHelper.getAsBoolean("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled");
 	}
-	
+	public boolean getPropertyPropagarConversioDefinitiuActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+	}
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
 		this.arxiuPlugin = arxiuPlugin;
 	}

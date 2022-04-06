@@ -450,6 +450,21 @@ public class DocumentHelper {
 		if ((document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) || document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) || document.getEstat().equals(DocumentEstatEnumDto.ADJUNT_FIRMAT)) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
+		if (isPropagarConversioDefinitiuActiu() && nouEstat.equals(DocumentEstatEnumDto.DEFINITIU)) {
+			FitxerDto fitxer = null;
+			if (document.getArxiuUuid() != null) {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setNom(document.getFitxerNom());
+			}
+			contingutHelper.arxiuPropagarModificacio(
+					document,
+					fitxer,
+					false,
+					false,
+					null,
+					false);
+		}
 		contingutLogHelper.log(
 				document,
 				LogTipusEnumDto.CANVI_ESTAT,
@@ -912,7 +927,9 @@ public class DocumentHelper {
 	public boolean isModificacioCustodiatsActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
 	}
-	
+	public boolean isPropagarConversioDefinitiuActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+	}
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 
 }
