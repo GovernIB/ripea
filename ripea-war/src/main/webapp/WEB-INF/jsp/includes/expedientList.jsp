@@ -103,7 +103,7 @@ $(document).ready(function() {
 								{{/if}}
 							</script>
 						</th>
-			<th data-col-name="agafatPer.codiAndNom"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+			<th data-col-name="agafatPer.codiAndNom" data-orderable="false"><spring:message code="expedient.list.user.columna.agafatper"/></th>
 
 		</tr>
 	</thead>

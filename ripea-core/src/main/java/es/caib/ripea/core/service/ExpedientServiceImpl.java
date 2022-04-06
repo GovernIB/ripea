@@ -1884,12 +1884,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
 		
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		
-		Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedient(metaExpedientFiltre, pageable);
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
+		
+		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedient(metaExpedientFiltre, paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 		return paginacioHelper.toPaginaDto(
 				paginaExpedients,
 				ExpedientDto.class,
