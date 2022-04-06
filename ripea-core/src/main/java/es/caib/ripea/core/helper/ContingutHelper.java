@@ -1170,6 +1170,20 @@ public class ContingutHelper {
 		}
 		return contingutRepository.findOne(contingutActual.getId());
 	}
+	
+	public void findDescendants(
+			ContingutEntity contingut,
+			List<ContingutEntity> descendants) {
+
+		if (contingut.getFills() == null || contingut.getFills().isEmpty()) {
+			descendants.add(contingut);
+		} else {
+			for (ContingutEntity contingutEntity : contingut.getFills()) {
+				findDescendants(contingutEntity,
+						descendants);
+			}
+		}
+	}
 
 	/**
 	 * Check if given name (@param nom) doesnt already exist inside given container (@param contingutPare)
