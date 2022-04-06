@@ -4007,7 +4007,7 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		try {
 			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(
-					document.getNom(),
+					fitxer.getNom(),
 					motiu,
 					fitxer.getContingut(),
 					tipusFirma,

@@ -701,7 +701,8 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long id) {
+			Long id, 
+			String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ")");
@@ -711,11 +712,14 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				false,
-				false, false, null);
+				false, 
+				false, 
+				rolActual);
 
 		firmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
-				document);
+				document, 
+				rolActual);
 	}
 	
 	@Transactional

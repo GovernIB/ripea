@@ -394,6 +394,7 @@ public interface DocumentService {
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param rolActual TODO
 	 * @param id
 	 *            Atribut id del document que es vol enviar a firmar.
 	 * @param versio
@@ -408,7 +409,7 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long documentId) throws NotFoundException, IllegalStateException, SistemaExternException;
+			Long documentId, String rolActual) throws NotFoundException, IllegalStateException, SistemaExternException;
 
 	/**
 	 * Processa una petició del callback de portafirmes.

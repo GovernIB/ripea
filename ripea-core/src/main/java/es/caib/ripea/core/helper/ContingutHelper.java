@@ -835,7 +835,8 @@ public class ContingutHelper {
 
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			ContingutEntity contingut) throws IOException {
+			ContingutEntity contingut, 
+			String rolActual) throws IOException {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingut.getId() + ")");
@@ -886,7 +887,7 @@ public class ContingutHelper {
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
 				firmaPortafirmesHelper.portafirmesCancelar(
 						entitatId,
-						document);
+						document, rolActual);
 			}
 		}
 		return dto;

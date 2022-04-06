@@ -180,10 +180,10 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long id) {
+			Long id, String rolActual) {
 		delegate.portafirmesCancelar(
 				entitatId,
-				id);
+				id, rolActual);
 	}
 
 	@Override

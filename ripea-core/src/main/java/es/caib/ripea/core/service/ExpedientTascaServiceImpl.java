@@ -578,7 +578,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long tascaId,
-			Long docuemntId) {
+			Long docuemntId, 
+			String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + docuemntId + ")");
@@ -589,7 +590,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		documentFirmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
-				document);
+				document, 
+				rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -715,7 +717,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		return contingutHelper.deleteReversible(
 				entitatId,
-				contingut);
+				contingut, null);
 	}
 
 	@Transactional

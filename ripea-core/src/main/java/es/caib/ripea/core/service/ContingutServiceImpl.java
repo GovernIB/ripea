@@ -247,7 +247,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return contingutHelper.deleteReversible(
 				entitatId,
-				contingut);
+				contingut, null);
 	}
 
 	@Transactional

@@ -266,6 +266,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					
 					correctes++;
 				} catch (Exception e) {
+					logger.error("Error al tancament massiu de expedient amb id=" + expedientTancar.getId(), e);
 					Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
 					if (throwable.getClass() == ExpedientTancarSenseDocumentsDefinitiusException.class) {
 						nodefinitius++;

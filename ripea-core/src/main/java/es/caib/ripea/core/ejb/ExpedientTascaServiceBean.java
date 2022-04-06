@@ -205,11 +205,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long tascaId,
-			Long docuemntId) {
+			Long docuemntId, String rolActual) {
 		delegate.portafirmesCancelar(
 				entitatId,
 				tascaId,
-				docuemntId);
+				docuemntId, rolActual);
 		
 	}
 

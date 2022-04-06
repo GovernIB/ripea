@@ -153,6 +153,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 			bindingResult.rejectValue("revisioComentari", "NotNull");
 		}
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("modificar", true);
 			return "metaExpedientRevisioForm";
 		}
 
