@@ -95,6 +95,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
+	private static final String SESSION_ATTRIBUTE_RELACIONATS_FILTRE = "ExpedientUserController.session.relacionats.filtre";
 	
 	@Autowired
 	private ContingutService contingutService;
@@ -1075,40 +1076,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute(
-				"expedient",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						expedientId,
-						true,
-						false, null, null));
-		model.addAttribute("expedientId", expedientId);
-		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
-		model.addAttribute(filtre);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActius(
-						entitatActual.getId(), 
-						null, 
-						rolActual, 
-						false, 
-						null));
-		model.addAttribute(
-				"expedientEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						ExpedientEstatEnumDto.class,
-						"expedient.estat.enum."));
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
-				entitatActual.getId(), 
-				null, 
-				rolActual, 
-				false, 
-				null);
-		model.addAttribute(
-				"metaExpedientsPermisLectura",
-				metaExpedientsPermisLectura);
+		emplenarFiltreRelacionats(request, model, expedientId);
+		
 		ExpedientFiltreCommand expedientFiltreCommand = getRelacionarFiltreCommand(request);
 //		Long metaExpedientId = null;
 //		if (expedientFiltreCommand != null) {
@@ -1125,13 +1094,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
-		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.sense.permis.lectura"));
-		}
 		return "expedientRelacionarForm";
 	}
 
@@ -1334,6 +1296,100 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				"id");
 	}
 	
+	@RequestMapping(value = "/{expedientId}/relacionats/{destiId}/list", method = RequestMethod.GET)
+	public String getRelacionatsByExpedientGetList(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long destiId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		emplenarFiltreRelacionats(request, model, expedientId);
+		model.addAttribute("destiId", destiId);
+		ExpedientFiltreCommand expedientFiltreCommand = getRelacionatsFiltreCommand(request);
+		model.addAttribute(
+				"expedientFiltreCommand",
+				expedientFiltreCommand);
+		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
+		model.addAttribute(
+				"expedientEstatsOptions",
+				expedientEstatsOptions);
+		return "expedientRelacionatsList";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/relacionats/{destiId}/list", method = RequestMethod.POST)
+	public String getRelacionatsByExpedientPostList(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long destiId,
+			@Valid ExpedientFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+		getEntitatActualComprovantPermisos(request);
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONATS_FILTRE);
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_RELACIONATS_FILTRE,
+						filtreCommand);
+			}
+		}
+		return "redirect:/modal/expedient/" + expedientId + "/relacionats/" + destiId + "/list";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/relacionats/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse getRelacionatsByExpedientDatatable(HttpServletRequest request,
+								   @PathVariable Long expedientId,
+								   Model model) {
+		ExpedientFiltreCommand filtreCommand = getRelacionatsFiltreCommand(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return DatatablesHelper.getDatatableResponse(
+				request,
+				expedientService.relacioFindAmbExpedientPaginat(
+						entitatActual.getId(),
+						ExpedientFiltreCommand.asDto(filtreCommand),
+						expedientId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+				"id");
+	}
+	
+	@RequestMapping(value = "/{expedientPareId}/relacionats/{destiId}/importarExpedient/{expedientId}", method = RequestMethod.GET)
+	public String importarExpedient(
+			HttpServletRequest request,
+			@PathVariable Long expedientPareId,
+			@PathVariable Long destiId,
+			@PathVariable Long expedientId) throws IOException {
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			expedientService.importarExpedient(
+					entitatActual.getId(),
+					destiId,
+					expedientId, 
+					RolHelper.getRolActual(request));
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:/../../contingut/" + destiId,
+					"expedient.controller.importacio.relacionat.ok");
+			
+		} catch (Exception e) {
+			logger.error("Error al importar expedient relacionat", e);
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:/../../contingut/" + destiId,
+					e.getMessage());
+
+		}
+	}
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -1343,6 +1399,54 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	    				true));
 	}
 
+	private void emplenarFiltreRelacionats(
+			HttpServletRequest request, 
+			Model model, 
+			Long expedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"expedient",
+				contingutService.findAmbIdUser(
+						entitatActual.getId(),
+						expedientId,
+						true,
+						false, null, null));
+		model.addAttribute("expedientId", expedientId);
+		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
+		model.addAttribute(filtre);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActius(
+						entitatActual.getId(), 
+						null, 
+						rolActual, 
+						false, 
+						null));
+		model.addAttribute(
+				"expedientEstatEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						ExpedientEstatEnumDto.class,
+						"expedient.estat.enum."));
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
+				entitatActual.getId(), 
+				null, 
+				rolActual, 
+				false, 
+				null);
+		model.addAttribute(
+				"metaExpedientsPermisLectura",
+				metaExpedientsPermisLectura);
+		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.sense.permis.lectura"));
+		}
+	}
+	
 	private ExpedientFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
@@ -1386,6 +1490,21 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		return filtreCommand;
 	}
 
+	private ExpedientFiltreCommand getRelacionatsFiltreCommand(
+			HttpServletRequest request) {
+		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RELACIONATS_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new ExpedientFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONATS_FILTRE,
+					filtreCommand);
+		}
+		return filtreCommand;
+	}
+	
 	private void omplirModelTancarExpedient(
 			Long expedientId,
 			HttpServletRequest request,

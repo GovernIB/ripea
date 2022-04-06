@@ -394,6 +394,18 @@ public class ContingutHelper {
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
+			CarpetaEntity carpeta = (CarpetaEntity)deproxied;
+			if (carpeta.getExpedientRelacionat() != null)
+				dto.setExpedientRelacionat(
+						(ExpedientDto)toContingutDto(
+								carpeta.getExpedientRelacionat(),
+								false,
+								false,
+								false,
+								false,
+								false,
+								false,
+								false, null, true, null));
 			resposta = dto;
 		} 
 
@@ -1204,7 +1216,7 @@ public class ContingutHelper {
 			List<ArxiuFirmaDto> firmes, 
 			boolean fromAnotacio) {
 		
-		boolean utilitzarCarpetes = fromAnotacio || isCarpetaLogica();
+		boolean utilitzarCarpetes = fromAnotacio || !isCarpetaLogica();
 		
 		String serieDocumental = null;
 		ExpedientEntity expedient = contingut.getExpedient();

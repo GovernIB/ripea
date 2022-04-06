@@ -425,4 +425,28 @@ public class ExpedientServiceBean implements ExpedientService {
 				entitatId,
 				ids);
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
+			Long id,
+			ExpedientFiltreDto filtre,
+			Long expedientId,
+			PaginacioParamsDto paginacioDtoFromRequest) {
+		return delegate.relacioFindAmbExpedientPaginat(id, filtre, expedientId, paginacioDtoFromRequest);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public void importarExpedient(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
+			throws NotFoundException {
+		delegate.importarExpedient(entitatId, expedientPareId, expedientId, rolActual);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
+			throws NotFoundException {
+		return delegate.esborrarExpedientFill(entitatId, expedientPareId, expedientId, rolActual);
+	}
 }

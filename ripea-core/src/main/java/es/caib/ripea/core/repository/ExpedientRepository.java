@@ -169,6 +169,33 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			Pageable pageable);
 
+	@Query(	"select " +
+			"    distinct e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
+			"and (:esNullNumero = true or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:numero||'%')) " +
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
+			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
+			"and (e.id in (:expedientsRelacionatsIdx)) ")
+	Page<ExpedientEntity> findExpedientsRelacionatsByIdIn(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullMetaNode") boolean esNullMetaNode,
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("esNullNumero") boolean esNullNumero,
+			@Param("numero") String numero,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientEstatEntity estat,
+			@Param("expedientsRelacionatsIdx") Collection<Long> ids,
+			Pageable pageable);
 	
 	
 	

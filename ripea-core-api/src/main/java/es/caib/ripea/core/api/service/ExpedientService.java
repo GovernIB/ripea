@@ -500,4 +500,60 @@ public interface ExpedientService {
 			Long entitatId,
 			Set<Long> ids);
 
+	/**
+	 * Retorna una pàgina d'expedients relacionats amb l'expedient especificat.
+	 * @param filtre 
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que es vol consultar.
+	 * @return La llista d'expedients relacionats.
+	 */
+	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
+			Long id, 
+			ExpedientFiltreDto filtre, 
+			Long expedientId,
+			PaginacioParamsDto paginacioDtoFromRequest);
+	
+	/**
+	 * Afegeix un expedient relacionat a la llista de documents d'un expedient (expedient pare).
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param expedientPareId
+	 *            Atribut id de l'expedient pare.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que s'importarà (fill)
+	 * @param rolActual Rol actual de l'usuari que realitza l'acció
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void importarExpedient(
+			Long entitatId,
+			Long expedientPareId,
+			Long expedientId,
+			String rolActual) throws NotFoundException;
+
+	/**
+	 * Esborra un expedient del llistat de documents d'un expedient (expedient pare).
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param expedientPareId
+	 *            Atribut id de l'expedient pare.
+	 * @param relacionatId
+	 *            Atribut id de l'expedient fill.
+	 * @param rolActual Rol actual de l'usuari que realitza l'acció
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public boolean esborrarExpedientFill(
+			Long entitatId,
+			Long expedientPareId,
+			Long expedientId,
+			String rolActual) throws NotFoundException;
+
 }

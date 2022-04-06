@@ -2488,6 +2488,9 @@ $.views.helpers(myHelpers);
 												</c:if>
 												<c:if test="${isMostrarImportacio}">
 													<li><a href="<c:url value="/contingut/${contingut.id}/importacio/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaImportacio}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.importacio"/>...</a></li>
+												</c:if>
+												<c:if test="${isImportacioRelacionatsActiva}">
+													<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/relacionats/${contingut.id}/list"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.expedient.relacionat"/>...</a></li>
 												</c:if>	
 											</c:if>											
 										</ul>
