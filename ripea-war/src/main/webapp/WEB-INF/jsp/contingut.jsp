@@ -1369,10 +1369,14 @@ $(document).ready(function() {
 });
 
 function showInteressatFieldInfo(fieldName, fieldValue) {
-	return '<div>' +
-				'<dt>' + fieldName + '</dt>' +
-				'<dd>' + fieldValue + '</dd>' +
-		   '</div>';
+	if (fieldValue) {
+		return '<div>' +
+					'<dt>' + fieldName + '</dt>' +
+					'<dd>' + fieldValue + '</dd>' +
+			   '</div>';
+	} else {
+		return '';
+	}
 }
 
 function showTipusDocumentals() {
