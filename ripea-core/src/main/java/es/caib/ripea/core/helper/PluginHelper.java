@@ -3482,7 +3482,7 @@ public class PluginHelper {
 
 		} catch (Exception e) {
 			Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
-			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")) {
+			if (throwable.getMessage().contains("El formato de la firma no es valido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)") || throwable.getMessage().contains("El formato de la firma no es válido(urn:oasis:names:tc:dss:1.0:resultmajor:RequesterError)")) {
 				return new SignatureInfoDto(
 						false,
 						false,
