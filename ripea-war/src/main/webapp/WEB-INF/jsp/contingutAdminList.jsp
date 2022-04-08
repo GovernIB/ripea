@@ -95,7 +95,7 @@ $(document).ready(function() {
 				<rip:inputSelect name="tipus" optionEnum="ContingutTipusEnumDto" emptyOption="true" placeholderKey="contingut.admin.filtre.tipus" inline="true"/>
 			</div>
 			<div class="col-md-3">
-				<rip:inputSelect name="metaNodeId" optionItems="${metaNodes}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="contingut.admin.filtre.metanode" inline="true"/>
+				<rip:inputSelect name="metaNodeId" optionItems="${metaNodes}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="3" placeholderKey="contingut.admin.filtre.element" inline="true"/>
 			</div>
 		</div>
 		<div class="row">
@@ -161,7 +161,6 @@ $(document).ready(function() {
 					<script id="cellNomTemplate" type="text/x-jsrender">
 						{{if expedient}}<span class="fa ${iconaExpedient}"></span>{{else document}}<span class="fa ${iconaDocument}"></span>{{else carpeta}}<span class="fa ${iconaCarpeta}"></span>{{else registre}}<span class="fa ${iconaAnotacioRegistre}"></span>{{/if}}
 						{{:nom}}
-						{{if esborrat}}<span class="fa fa-trash-o pull-right" title="<spring:message code="contingut.admin.columna.esborrat"/>"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="numero" data-orderable="false"><spring:message code="contingut.admin.columna.numero"/></th>				
