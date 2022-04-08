@@ -18,12 +18,62 @@ function isRolActualAdministrador() {
 }
 
 $(document).ready(function() {
+
+	$('#expedient').on('draw.dt', function () {
+		$("span[class^='stateColor-']").each(function( index ) {
+		    var fullClassNameString = this.className;
+		    var colorString = fullClassNameString.substring(11);
+			if (colorString != "") {
+				$(this).parent().css( "background-color", colorString );
+				if (adaptColor(colorString)) {
+					$(this).parent().css( "color", "white" );
+				}
+				$(this).parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+			}
+		});
+	});
+
 	
 	$( document ).ajaxComplete(function() {
 		webutilModalAdjustHeight();
 	});
 	
 });
+
+
+
+function adaptColor(hexColor) {
+	let adapt = false;
+
+	let rgb = hexToRgb(hexColor);
+	if (rgb != null) {
+		var hsp = Math.sqrt(
+				0.299 * (rgb.r * rgb.r) +
+				0.587 * (rgb.g * rgb.g) +
+				0.114 * (rgb.b * rgb.b)
+		);
+	}
+	if (hsp < 127.5) {
+		adapt = true;
+	}
+	return adapt;
+}
+
+function hexToRgb(hex) {
+	// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+		return r + r + g + g + b + b;
+	});
+
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
+}
+
 </script>
 
 <%--
@@ -52,7 +102,7 @@ $(document).ready(function() {
 	data-toggle="datatable"
 	data-url="<c:url value="/expedient/metaExpedient/${metaExpedient.id}/datatable"/>"
 	data-search-enabled="false"
-	data-default-order="10"
+	data-default-order="11"
 	data-default-dir="desc"
 	class="table table-striped table-bordered"
 	data-botons-template="#botonsTemplate"
@@ -61,14 +111,18 @@ $(document).ready(function() {
 	style="width:100%"
 	data-filter="#filtre">
 	<thead>
-		<tr>
-
-			<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>
+		<tr> 
+			<th data-col-name="numero" data-template="#cellExpedientLink"><spring:message code="expedient.list.user.columna.numero"/>
+				<script id="cellExpedientLink" type="text/x-jsrender">
+					<a href="<c:url value="/contingut/{{:id}}"/>" target="_blank">{{:numero}}</a>	
+				</script>
+			</th>
 			<th data-col-name="nom"><spring:message code="expedient.list.user.columna.titol"/></th>
 			<th data-col-name="alerta" data-visible="false"></th>
 			<th data-col-name="valid" data-visible="false"></th>
 			<th data-col-name="errorLastEnviament" data-visible="false"></th>
 			<th data-col-name="errorLastNotificacio" data-visible="false"></th>
+			<th data-col-name="expedientEstat" data-visible="false"></th>
 			<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 			<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 			<th data-col-name="arxiuUuid" data-visible="false"></th>	
@@ -85,24 +139,26 @@ $(document).ready(function() {
 							<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
 						{{/if}}
 					</script>
-				</th>
+			</th>
 			<th data-col-name="createdDate" data-type="datetime" data-converter="datetime"><spring:message code="expedient.list.user.columna.createl"/></th>
-			<th data-col-name="estat" data-template="#cellEstatTemplate" data-visible="false">
-							<spring:message code="expedient.list.user.columna.estat"/>
-							<script id="cellEstatTemplate" type="text/x-jsrender">
-								{{if estat == 'OBERT'}}
-									<span class="label label-default"><span class="fa fa-folder-open"></span> <spring:message code="expedient.estat.enum.OBERT"/></span>
-								{{else}}
-									<span class="label label-success"><span class="fa fa-folder"></span> <spring:message code="expedient.estat.enum.TANCAT"/></span>
-								{{/if}}
-								{{if ambRegistresSenseLlegir}}
-									<span class="fa-stack" aria-hidden="true">
-          								<i class="fa fa-certificate fa-stack-1x" style="color: darkturquoise; font-size: 20px;"></i>
-          								<i class="fa-stack-1x" style="color: white;font-style: normal;font-weight: bold;">N</i>
-        							</span>
-								{{/if}}
-							</script>
-						</th>
+			<th data-col-name="id" data-visible="false"></th>
+			<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
+				<spring:message code="expedient.list.user.columna.estat"/>
+				<script id="cellEstatTemplate" type="text/x-jsrender">
+					{{if expedientEstat != null && estat != 'TANCAT'}}
+						<span class="fa fa-folder-open"></span>&nbsp;{{:expedientEstat.nom}}
+					{{else}}
+						{{if estat == 'OBERT'}}
+							<span class="fa fa-folder-open"></span>&nbsp;<spring:message code="expedient.estat.enum.OBERT"/>
+						{{else}}
+							<span class="fa fa-folder"></span>&nbsp;<spring:message code="expedient.estat.enum.TANCAT"/>
+						{{/if}}
+					{{/if}}				
+					{{if expedientEstat != null && expedientEstat.color!=null}}
+						<span class="stateColor-{{:expedientEstat.color}}"></span>
+					{{/if}}
+				</script>
+			</th>
 			<th data-col-name="agafatPer.codiAndNom" data-orderable="false"><spring:message code="expedient.list.user.columna.agafatper"/></th>
 
 		</tr>

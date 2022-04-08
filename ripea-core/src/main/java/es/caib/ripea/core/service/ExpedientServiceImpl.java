@@ -47,6 +47,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
@@ -1890,7 +1891,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
 		
-		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedient(metaExpedientFiltre, paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedientAndEsborrat(metaExpedientFiltre, 0, paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 		return paginacioHelper.toPaginaDto(
 				paginaExpedients,
 				ExpedientDto.class,
@@ -1918,6 +1919,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		dto.setCreatedDate(entity.getCreatedDate().toDate());
 		dto.setEstat(entity.getEstat());
 		dto.setAgafatPer(conversioTipusHelper.convertir(entity.getAgafatPer(),UsuariDto.class));
+		// expedient estat
+		if (entity.getExpedientEstat() != null) {
+			dto.setExpedientEstat(conversioTipusHelper.convertir(
+					entity.getExpedientEstat(),
+					ExpedientEstatDto.class));
+		}
 		
 		return dto;
 	}
