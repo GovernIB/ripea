@@ -37,6 +37,7 @@ import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -764,8 +765,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingut.getId(), 
 						null));
+		
+		if (contingut instanceof CarpetaDto) {
+			contingut = contingut.getExpedientPare();
+		}
 		if (contingut instanceof ExpedientDto) {
-
 			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
 					entitatActual.getId(),
 					contingut.getId()));
@@ -784,27 +788,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 		}
-		if (contingut instanceof CarpetaDto) {
-
-			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
-					entitatActual.getId(),
-					contingut.getExpedientPare().getId()));
-			
-			model.addAttribute(
-					"interessatsCount",
-					interessatService.findByExpedient(
-							entitatActual.getId(),
-							contingut.getExpedientPare().getId(),
-							false).size());			
-			model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
-					entitatActual.getId(),
-					contingut.getExpedientPare().getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
-			
-			model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
-					entitatActual.getId(),
-					contingut.getExpedientPare().getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
-		}
-		if (contingut instanceof NodeDto) {
+		if (contingut instanceof ExpedientDto || contingut instanceof DocumentDto) {
 			model.addAttribute(
 					"metaDades",
 					metaDadaService.findByNode(
@@ -816,7 +800,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 							entitatActual.getId(),
 							contingut.getId(),
 							((NodeDto)contingut).getDades()));
-		}
+		} 
+
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
 			contingutVista = CONTENIDOR_VISTA_LLISTAT;
