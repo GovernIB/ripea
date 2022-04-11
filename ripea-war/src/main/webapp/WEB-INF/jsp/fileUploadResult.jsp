@@ -10,7 +10,9 @@
 	<rip:modalHead/>
 
 <body>
-	<input id="isSigned" name="isSigned" value="${isSigned}">
+	<input id="isSignedAttached" name="isSignedAttached" value="${isSignedAttached}">
+	<input id="isError" name="isError" value="${isError}">
+	<input id="errorMsg" name="errorMsg" value="${errorMsg}">
 
 </body>
 </html>

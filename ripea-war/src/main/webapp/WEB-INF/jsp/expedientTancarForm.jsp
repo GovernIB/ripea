@@ -56,7 +56,7 @@
 						<td>${esborrany.metaNode.nom}</td>
 						<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${esborrany.createdBy.nom}</td>
-						<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}"/><!--input type="checkbox" name="firmar" value="${esborrany.id}"/--></td>
+						<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" disabled="${esborrany.fitxerExtension == 'zip'}"/></td>
 					</tr>
 				</c:forEach>
 			</tbody>

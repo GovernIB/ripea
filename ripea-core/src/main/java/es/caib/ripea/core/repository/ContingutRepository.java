@@ -88,7 +88,7 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"and (:esNullDataEsborratInici = true or c.esborratData >= :dataEsborratInici) " +
 			"and (:esNullDataEsborratFi = true or c.esborratData <= :dataEsborratFi) " +
 			"and ((:mostrarEsborrats = true and c.esborrat > 0) or (:mostrarNoEsborrats = true and c.esborrat = 0)) " +
-			"and (:esNullExpedient = true or c.expedient = :expedient)) ")
+			"and (:esNullExpedient = true or c.expedient = :expedient) ")
 	public Page<ContingutEntity> findByFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("tipusCarpeta") boolean tipusCarpeta,

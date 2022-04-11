@@ -188,4 +188,20 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.findUsuariAmbCodiDades(codi);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void evictRolsDisponiblesEnAcls() {
+		delegate.evictRolsDisponiblesEnAcls();
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean getBooleanJbossProperty(
+			String key,
+			boolean defaultValueIfNull) {
+		return getBooleanJbossProperty(
+				key,
+				defaultValueIfNull);
+	}
+
 }

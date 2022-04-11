@@ -143,7 +143,7 @@ public class EntitatServiceBean implements EntitatService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN","IPA_SUPER"})
+	@RolesAllowed({"tothom"})
 	public void evictEntitatsAccessiblesUsuari() {
 		delegate.evictEntitatsAccessiblesUsuari();
 	}

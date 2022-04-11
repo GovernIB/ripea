@@ -18,7 +18,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class MetaNodeDto implements Serializable {
+public class MetaNodeDto extends AuditoriaDto implements Serializable {
 
 	protected Long id;
 	private String codi;

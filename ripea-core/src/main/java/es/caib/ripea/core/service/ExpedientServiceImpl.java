@@ -48,6 +48,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
@@ -460,7 +461,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public ExpedientDto findById(Long entitatId, Long id, Long rolActual) {
+	public ExpedientDto findById(Long entitatId, Long id, String rolActual) {
 		logger.debug("Obtenint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
@@ -1892,12 +1893,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
 		
-		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		
-		Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams);
-		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedient(metaExpedientFiltre, pageable);
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
+		
+		Page<ExpedientEntity> paginaExpedients = expedientRepository.findByMetaExpedientAndEsborrat(metaExpedientFiltre, 0, paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 		return paginacioHelper.toPaginaDto(
 				paginaExpedients,
 				ExpedientDto.class,
@@ -2082,6 +2084,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		dto.setCreatedDate(entity.getCreatedDate().toDate());
 		dto.setEstat(entity.getEstat());
 		dto.setAgafatPer(conversioTipusHelper.convertir(entity.getAgafatPer(),UsuariDto.class));
+		// expedient estat
+		if (entity.getExpedientEstat() != null) {
+			dto.setExpedientEstat(conversioTipusHelper.convertir(
+					entity.getExpedientEstat(),
+					ExpedientEstatDto.class));
+		}
 		
 		return dto;
 	}

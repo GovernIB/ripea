@@ -64,7 +64,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN"));
-		
+		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
 		return "metaExpedientRevisioList";
 	}
 
@@ -102,11 +102,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		filtreCommand.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
 		
 		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
-		if (rolActual.equals("IPA_ADMIN")) {
-			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT, MetaExpedientRevisioEstatEnumDto.REVISAT });
-		} else {
-			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT });
-		}
+		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT, MetaExpedientRevisioEstatEnumDto.REVISAT, MetaExpedientRevisioEstatEnumDto.REBUTJAT});
 		
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
@@ -133,8 +129,11 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientRevisioCommand command = MetaExpedientRevisioCommand.asCommand(metaExpedient);
-		
 		model.addAttribute(command);
+		
+		if (RolHelper.isRolActualRevisor(request) && metaExpedientService.isRevisioActiva() && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT) {
+			model.addAttribute("modificar", true);
+		}
 
 		return "metaExpedientRevisioForm";
 	}
@@ -154,6 +153,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 			bindingResult.rejectValue("revisioComentari", "NotNull");
 		}
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("modificar", true);
 			return "metaExpedientRevisioForm";
 		}
 

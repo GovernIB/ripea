@@ -3,26 +3,6 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.Date;
-
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.distribucio.ws.backofficeintegracio.FirmaPerfil;
 import es.caib.distribucio.ws.backofficeintegracio.FirmaTipus;
 import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracion;
@@ -32,6 +12,12 @@ import es.caib.distribucio.ws.backofficeintegracio.SicresTipoDocumento;
 import es.caib.distribucio.ws.backofficeintegracio.SicresValidezDocumento;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.Date;
 
 /**
  * Classe del model de dades que representa un document
@@ -87,7 +73,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	private NtiEstadoElaboracion ntiEstadoElaboracion;
 	@Column(name = "tamany", nullable = false)
 	private long tamany;
-	@Column(name = "tipus_mime", length = 30)
+	@Column(name = "tipus_mime", length = 255)
 	private String tipusMime;
 	@Column(name = "titol", length = 200, nullable = false)
 	private String titol;
