@@ -1931,14 +1931,14 @@ $.views.helpers(myHelpers);
 <body>
 	<div class="rmodal"></div>
 	<input id="contingutId" type="hidden" value="${contingut.id}">
-	<c:if test="${empty contingut.pare and not empty expedientPare.agafatPer and !isTasca}">
+	<c:if test="${(contingut.expedient or contingut.carpeta) and not empty expedientPare.agafatPer and !isTasca}">
 		<div class="text-right" data-toggle="botons-titol">
 			<ul class="list-group pull-right">
 	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
 	  				<spring:message code="contingut.info.agafat.per"/>:
 	  				${expedientPare.agafatPer.codiAndNom}&nbsp;
 	  				<c:if test="${expedientAgafatPerUsuariActual}">
-	  					<a href="<c:url value="/expedient/${expedientPare.id}/alliberar"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
+	  					<a href="<c:url value="/expedient/${expedientPare.id}/alliberar?contingutId=${contingut.id}"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
 	  				</c:if>
 	  			</li>
 	  		</ul>
@@ -1950,7 +1950,7 @@ $.views.helpers(myHelpers);
 				<span class="fa fa-info-circle"></span> 
 				<spring:message code="contingut.alerta.no.agafat"/>
 			</c:if>  
-			<a href="<c:url value="../expedient/${expedientPare.id}/agafar"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
+			<a href="<c:url value="../expedient/${expedientPare.id}/agafar?contingutId=${contingut.id}"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
 	<c:if test="${!isTasca && !expedientPare.metaNode.usuariActualRead}">
@@ -2119,14 +2119,14 @@ $.views.helpers(myHelpers);
 					<a href="<c:url value="/contingut/${contingut.id}/alertes"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.alertes.consultar"/></a>
 				</div>
 			</c:if>
-			<c:if test="${!isTasca && contingut.node and not contingut.valid}">
+			<c:if test="${!isTasca && (((contingut.expedient or contingut.document) and not contingut.valid) or ((contingut.carpeta) and not contingut.expedientPare.valid))}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
 					<span class="fa fa-exclamation-triangle"></span>&nbsp;
 					<c:choose>
-						<c:when test="${contingut.expedient}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
+						<c:when test="${contingut.expedient or contingut.carpeta}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
 						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.validacio"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
+					<a href="<c:url value="/contingut/${contingut.carpeta ? contingut.expedientPare.id : contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
 				</div>
 			</c:if>
 			<!---------------------------------------- TABLIST ------------------------------------------>
@@ -2308,7 +2308,6 @@ $.views.helpers(myHelpers);
 							
 								<c:if test="${contingut.expedient or contingut.carpeta}">
 									<rip:blocContenidorPath contingut="${contingut}"/>
-									<c:if test="${contingut.carpeta}"><rip:blocContingutAccions id="botons-accions-info" contingut="${contingut}" modeLlistat="true" mostrarObrir="false"/></c:if>
 								</c:if>
 								
 								<c:if test="${isTasca}">
