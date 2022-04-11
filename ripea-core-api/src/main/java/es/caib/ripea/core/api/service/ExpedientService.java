@@ -111,7 +111,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id, Long rolActual) throws NotFoundException;
+			Long id, 
+			String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta un expedient donat el seu id.

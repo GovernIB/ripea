@@ -107,7 +107,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	public ExpedientDto findById(
 			Long entitatId,
 			Long id, 
-			Long rolActual) {
+			String rolActual) {
 		return delegate.findById(entitatId, id, rolActual);
 	}
 

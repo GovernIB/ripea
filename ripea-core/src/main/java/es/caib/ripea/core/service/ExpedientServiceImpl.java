@@ -453,7 +453,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public ExpedientDto findById(Long entitatId, Long id, Long rolActual) {
+	public ExpedientDto findById(Long entitatId, Long id, String rolActual) {
 		logger.debug("Obtenint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
