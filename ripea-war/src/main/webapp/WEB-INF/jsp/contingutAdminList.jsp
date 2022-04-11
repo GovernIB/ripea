@@ -164,7 +164,7 @@ $(document).ready(function() {
 					</script>
 				</th>
 				<th data-col-name="numero" data-orderable="false"><spring:message code="contingut.admin.columna.numero"/></th>				
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.metanode"/></th>
+				<th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.element"/></th>
 				<th data-col-name="createdBy.codiAndNom" width="10%"><spring:message code="contingut.admin.columna.creat.per"/></th>
 				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.creat.el"/></th>
 				<th data-col-name="esborratData" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.esborratData"/></th>
