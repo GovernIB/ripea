@@ -430,7 +430,7 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 			
 			metaExpedientExport.setCodi(command.getCodi());
-			metaExpedientExport.setNom(command.getCodi());
+			metaExpedientExport.setNom(command.getNom());
 			metaExpedientExport.setDescripcio(command.getDescripcio());
 			metaExpedientExport.setClassificacioSia(command.getClassificacioSia());
 			metaExpedientExport.setSerieDocumental(command.getSerieDocumental());
