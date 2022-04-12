@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.preauth.j2ee.J2eeBasedPre
  */
 public class RolesBasedPreAuthenticatedWebAuthenticationDetailsSource extends J2eeBasedPreAuthenticatedWebAuthenticationDetailsSource {
 
-	private boolean rolesConfigured = false;
 
 	MappableAttributesRetriever mappableAttributesRetriever;
 
@@ -29,10 +28,7 @@ public class RolesBasedPreAuthenticatedWebAuthenticationDetailsSource extends J2
 
 	@Override
 	protected Collection<String> getUserRoles(HttpServletRequest request) {
-		if (!rolesConfigured) {
-			j2eeMappableRoles = mappableAttributesRetriever.getMappableAttributes();
-			rolesConfigured = true;
-		}
+		j2eeMappableRoles = mappableAttributesRetriever.getMappableAttributes();
 		Set<String> j2eeUserRolesList = new HashSet<String>();
 		for (String role: j2eeMappableRoles) {
 			if (request.isUserInRole(role)) {

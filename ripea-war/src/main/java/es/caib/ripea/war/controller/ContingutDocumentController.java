@@ -165,13 +165,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				model);
 		
 		if (command.isOnlyFileSubmit()) {
-			if (command.isUnselect()) {
-				request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
-			}
-			FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
-			if (fitxerTemp != null) {
-				model.addAttribute("isSigned", documentService.isFitxerSigned(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
-			}
+			fillModelFileSubmit(command, model, request);
 			return "fileUploadResult";
 		}
 
@@ -229,6 +223,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			}
 		} 
 	}
+	
+
+	
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
 	public String postUpdate(
 			HttpServletRequest request,
@@ -244,13 +241,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				model);
 		
 		if (command.isOnlyFileSubmit()) {
-			if (command.isUnselect()) {
-				request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
-			}
-			FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
-			if (fitxerTemp != null) {
-				model.addAttribute("isSigned", documentService.isFitxerSigned(fitxerTemp.getBytes(), fitxerTemp.getContentType()));
-			}
+			fillModelFileSubmit(command, model, request);
 			return "fileUploadResult";
 		}
 		
@@ -1053,7 +1044,19 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		        new StringArrayPropertyEditor(null)); 
 	}
 	
-
+	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
+		if (command.isUnselect()) {
+			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
+		}
+		FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
+		if (fitxerTemp != null) {
+			SignatureInfoDto signatureInfoDto = documentService.checkIfSignedAttached(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
+			model.addAttribute("isError", signatureInfoDto.isError());
+			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
+		}
+	}
+	
 	private String createUpdateDocument(
 			HttpServletRequest request,
 			DocumentCommand command,

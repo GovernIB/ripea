@@ -441,7 +441,7 @@ public class ContingutHelper {
 								ambPermisos,
 								false,
 								false,
-								false,
+								true,
 								false,
 								false,
 								false, 
@@ -847,7 +847,8 @@ public class ContingutHelper {
 
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			ContingutEntity contingut) throws IOException {
+			ContingutEntity contingut, 
+			String rolActual) throws IOException {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingut.getId() + ")");
@@ -898,7 +899,7 @@ public class ContingutHelper {
 			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
 				firmaPortafirmesHelper.portafirmesCancelar(
 						entitatId,
-						document);
+						document, rolActual);
 			}
 		}
 		return dto;
@@ -1180,6 +1181,20 @@ public class ContingutHelper {
 			contingutActual = contingutActual.getPare();
 		}
 		return contingutRepository.findOne(contingutActual.getId());
+	}
+	
+	public void findDescendants(
+			ContingutEntity contingut,
+			List<ContingutEntity> descendants) {
+
+		if (contingut.getFills() == null || contingut.getFills().isEmpty()) {
+			descendants.add(contingut);
+		} else {
+			for (ContingutEntity contingutEntity : contingut.getFills()) {
+				findDescendants(contingutEntity,
+						descendants);
+			}
+		}
 	}
 
 	/**

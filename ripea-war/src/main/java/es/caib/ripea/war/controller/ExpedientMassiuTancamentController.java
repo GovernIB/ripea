@@ -17,6 +17,8 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -266,11 +268,14 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					
 					correctes++;
 				} catch (Exception e) {
+					logger.error("Error al tancament massiu de expedient amb id=" + expedientTancar.getId(), e);
 					Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
 					if (throwable.getClass() == ExpedientTancarSenseDocumentsDefinitiusException.class) {
 						nodefinitius++;
 					} else {
 						errors++;
+						ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientTancar.getId(), RolHelper.getRolActual(request));
+						MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.error", new Object[]{expedientDto.getNom(), throwable.getMessage()}));
 					}
 				}
 			}

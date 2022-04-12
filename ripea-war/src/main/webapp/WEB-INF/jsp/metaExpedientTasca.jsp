@@ -55,26 +55,31 @@
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<c:if test="${!esRevisor}">
-					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
-						<script id="cellAccionsTemplate" type="text/x-jsrender">
-							<div class="dropdown">
-								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="tasca/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-									<c:if test="${!bloquejarCamps}">
-									{{if !activa}}
-									<li><a href="tasca/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
-									{{else}}
-									<li><a href="tasca/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
-									{{/if}}
-									<li><a href="tasca/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.tasca.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-									</c:if>
-								</ul>
-							</div>
-						</script>
-					</th>
-				</c:if>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<c:choose>
+									<c:when test="${consultar}">
+										<li><a href="tasca/{{:id}}" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+									</c:when>
+									<c:otherwise>
+										<li><a href="tasca/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${!bloquejarCamps}">
+								{{if !activa}}
+								<li><a href="tasca/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
+								{{else}}
+								<li><a href="tasca/{{:id}}/disable" data-toggle="ajax"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desactivar"/></a></li>
+								{{/if}}
+								<li><a href="tasca/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="metaexpedient.tasca.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</c:if>
+							</ul>
+						</div>
+					</script>
+				</th>
 			</tr>
 		</thead>
 	</table>

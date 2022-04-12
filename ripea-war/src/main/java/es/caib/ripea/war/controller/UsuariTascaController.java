@@ -78,6 +78,7 @@ import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
@@ -797,7 +798,8 @@ public class UsuariTascaController extends BaseUserController {
 		expedientTascaService.portafirmesCancelar(
 				entitatActual.getId(),
 				tascaId,
-				documentId);
+				documentId, 
+				RolHelper.getRolActual(request));
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

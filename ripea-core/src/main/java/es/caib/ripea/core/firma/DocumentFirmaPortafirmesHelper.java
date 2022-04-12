@@ -493,7 +493,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	
 	public void portafirmesCancelar(
 			Long entitatId,
-			DocumentEntity document) {
+			DocumentEntity document, String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");
@@ -624,6 +624,17 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		switch (callbackEstat) {
 		case PARCIAL:
 			if (administrationId != null) {
+				PortafirmesDocument portafirmesDocument = pluginHelper.portafirmesDownload(documentPortafirmes);
+				if ((portafirmesDocument.getTipusFirma() != null && portafirmesDocument.getTipusFirma().equals("PAdES"))
+						|| (portafirmesDocument.getFirmants() != null && !portafirmesDocument.getFirmants().isEmpty())) {
+					for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
+						// Actualitza data firma blocs
+						actualitzarDataFirmaBlocksPortafirmes(
+								documentPortafirmes, 
+								firmant.getResponsableNif(), 
+								firmant.getData());
+					}
+				} 
 				List<PortafirmesBlockEntity> portafirmesBlocksEntity = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
 				if (portafirmesBlocksEntity != null && !portafirmesBlocksEntity.isEmpty()) {
 					for (PortafirmesBlockEntity portafirmesBlockEntity : portafirmesBlocksEntity) {
@@ -666,6 +677,26 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			break;
 		default:
 			break;
+		}
+	}
+	
+	private void actualitzarDataFirmaBlocksPortafirmes(
+			DocumentPortafirmesEntity documentPortafirmes, 
+			String administrationId,
+			Date signDate) {
+		try {
+			List<PortafirmesBlockEntity> portafirmesBlocksEntity = portafirmesBlockRepository.findByEnviament(documentPortafirmes);
+			if (portafirmesBlocksEntity != null && !portafirmesBlocksEntity.isEmpty()) {
+				for (PortafirmesBlockEntity portafirmesBlockEntity : portafirmesBlocksEntity) {
+					PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = portafirmesBlockInfoRepository.findBySignerIdAndPortafirmesBlock(
+							administrationId,
+							portafirmesBlockEntity);
+					if (portafirmesBlockInfoEntity != null && portafirmesBlockInfoEntity.getSignerId() != null && portafirmesBlockInfoEntity.getSignerId().equals(administrationId))
+						portafirmesBlockInfoEntity.updateSignDate(signDate);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Hi ha hagut un problema actualitzant el bloc de firma amb la data de firma [administrationId=" + administrationId + ", signDate=" + signDate + "]");
 		}
 	}
 

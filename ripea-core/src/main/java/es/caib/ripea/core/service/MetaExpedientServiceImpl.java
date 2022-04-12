@@ -741,6 +741,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
+			ordenacioMap.put("lastModifiedBy.codiAndNom", new String[] {"lastModifiedBy.nom"});
+			
 			// Sempre afegirem el nom com a subordre
 			addNomSort(paginacioParams);
 			return paginacioHelper.toPaginaDto(

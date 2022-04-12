@@ -62,22 +62,26 @@
 						<span class="color-legend" {{if color}}style="background-color: {{:color}};"{{else}}style="border: dashed 1px #AAA;"{{/if}}></span>
 					</script>
 				</th>
-				
-				<c:if test="${!esRevisor}">
-					<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
-						<script id="cellAccionsTemplate" type="text/x-jsrender">
-							<div class="dropdown">
-								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-									<c:if test="${!bloquejarCamps}">
-										<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-									</c:if>
-								</ul>
-							</div>
-						</script>
-					</th>
-				</c:if>
+				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<c:choose>
+									<c:when test="${consultar}">
+										<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+									</c:when>
+									<c:otherwise>
+										<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${!bloquejarCamps}">
+									<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</c:if>
+							</ul>
+						</div>
+					</script>
+				</th>
 			</tr>
 		</thead>
 	</table>

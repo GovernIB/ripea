@@ -6,7 +6,16 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
 	<c:when test="${empty metaExpedientTascaCommand.id}"><c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.modificar"/></c:set></c:otherwise>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${consultar}">
+				<c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.consultar"/></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.modificar"/></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -62,7 +71,7 @@
 		<rip:inputSelect id="estatIdCrearTasca" name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 		<rip:inputSelect id="estatIdFinalitzarTasca" name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button></c:if>
 			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/tasca"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

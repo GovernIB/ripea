@@ -245,7 +245,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		documentService.portafirmesCancelar(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				RolHelper.getRolActual(request));
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

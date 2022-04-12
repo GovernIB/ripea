@@ -40,7 +40,7 @@
 						<thead>
 							<tr>
 							<th colspan="5" style="font-size: 20px; background-color: #f5f5f5;">${expedient.numeroINom}</th>
-							<tr>
+							</tr>
 							<tr>
 								<th style="background-color: #f5f5f5;"><spring:message code="contingut.info.nom" /></th>
 								<th style="background-color: #f5f5f5;"><spring:message code="contingut.info.tipus" /></th>
@@ -56,7 +56,7 @@
 									<td>${esborrany.metaNode.nom}</td>
 									<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
 									<td>${esborrany.createdBy.nom}</td>
-									<td><form:checkbox path="expedientsTancar[${vs.index}].documentsPerFirmar" value="${esborrany.id}" /></td>
+									<td><form:checkbox path="expedientsTancar[${vs.index}].documentsPerFirmar" value="${esborrany.id}" disabled="${esborrany.fitxerExtension == 'zip'}"/></td>
 								</tr>
 							</c:forEach>
 						</tbody>

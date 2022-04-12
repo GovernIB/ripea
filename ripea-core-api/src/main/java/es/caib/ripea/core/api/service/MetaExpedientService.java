@@ -139,7 +139,7 @@ public interface MetaExpedientService {
 	 * 
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id, Long organId);
 	
 	/**
