@@ -493,7 +493,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	
 	public void portafirmesCancelar(
 			Long entitatId,
-			DocumentEntity document) {
+			DocumentEntity document, String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");

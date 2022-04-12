@@ -10,9 +10,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -247,7 +247,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return contingutHelper.deleteReversible(
 				entitatId,
-				contingut);
+				contingut, null);
 	}
 
 	@Transactional
@@ -281,13 +281,33 @@ public class ContingutServiceImpl implements ContingutService {
 			contingut.getPare().getFills().remove(contingut);
 		}
 		
-		if (contingut instanceof ExpedientEntity && contingut.getFills() != null) {
-			Set<ContingutEntity> fills = contingut.getFills();
+		if (contingut instanceof ExpedientEntity && contingut.getFills() != null && !contingut.getFills().isEmpty()) {
+			List<ContingutEntity> descendants = new ArrayList<>();
+			contingutHelper.findDescendants(contingut, descendants);
 			
-			for (ContingutEntity document : fills) {
-				if (document instanceof DocumentEntity) {
-					this.deleteDefinitiu(entitatId, document.getId());
+			Iterator<ContingutEntity> itr = descendants.iterator();
+			while (itr.hasNext()) {
+				ContingutEntity cont = itr.next();
+				if (cont.getPare() != null) {
+					cont.getPare().getFills().remove(cont);
 				}
+				if (cont instanceof DocumentEntity) {
+					DocumentEntity documentEntity = (DocumentEntity) cont;
+					if (documentEntity.getGesDocAdjuntId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					}
+					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntFirmaId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					}
+					if (contingutHelper.fitxerDocumentEsborratLlegir(documentEntity) != null) {
+						contingutHelper.fitxerDocumentEsborratEsborrar(documentEntity);
+					}
+				} 
+				contingutRepository.delete(cont);
 			}
 		}
 		

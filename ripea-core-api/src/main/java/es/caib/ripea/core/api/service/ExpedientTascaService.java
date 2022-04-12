@@ -92,7 +92,7 @@ public interface ExpedientTascaService {
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long tascaId,
-			Long docuemntId);
+			Long docuemntId, String rolActual);
 
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,

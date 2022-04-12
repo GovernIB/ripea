@@ -151,7 +151,7 @@ public class DocumentHelper {
 			entity.setGesDocAdjuntId(gestioDocumentalAdjuntId);
 		}
 		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
-		if (document.isFirmaSeparada()) {
+		if (document.isAmbFirma() && document.isFirmaSeparada()) {
 			gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 					new ByteArrayInputStream(document.getFirmaContingut()));

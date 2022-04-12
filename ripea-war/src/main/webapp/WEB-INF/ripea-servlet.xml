@@ -211,7 +211,7 @@
 			<mvc:exclude-mapping path="/metaExpedient/metaDadaPermisLectura/domini"/>	
 			<mvc:exclude-mapping path="/metaExpedientRevisio**"/>
 			<mvc:exclude-mapping path="/metaExpedientRevisio/**"/>
-			<bean class="es.caib.ripea.war.interceptor.AccesAdminInterceptor"/>
+			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatOAdminOrganORevisorInterceptor"/>
 		</mvc:interceptor>
 
 		<!-- Rutes només accessibles amb el rol d'administrador d'entitat -->

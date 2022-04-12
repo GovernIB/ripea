@@ -311,7 +311,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode);
 
-	Page<ExpedientEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient, Pageable pageable);
+	Page<ExpedientEntity> findByMetaExpedientAndEsborrat(MetaExpedientEntity metaExpedient, int esborrat, Pageable pageable);
 	
 	@Query(	"select " +
 			"    e " +

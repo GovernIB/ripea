@@ -34,7 +34,7 @@ public class ValidIfSeparadaValidator implements ConstraintValidator<ValidIfSepa
 			final DocumentCommand command,
 			final ConstraintValidatorContext context) {
 		boolean valid = true;
-		if (DocumentTipusFirmaEnumDto.SEPARAT.equals(command.getTipusFirma())) {
+		if (command.isAmbFirma() && DocumentTipusFirmaEnumDto.SEPARAT.equals(command.getTipusFirma())) {
 			if (command.getId() == null) {
 				valid = (command.getFirma() != null && !command.getFirma().isEmpty()) || request.getSession().getAttribute(SESSION_ATTRIBUTE_FRIMA) != null;
 				if (!valid) {

@@ -111,7 +111,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id, Long rolActual) throws NotFoundException;
+			Long id, 
+			String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta un expedient donat el seu id.
@@ -484,7 +485,7 @@ public interface ExpedientService {
 			String text);
 
 
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
 			Long entitatId, 
 			Long metaExpedientId,

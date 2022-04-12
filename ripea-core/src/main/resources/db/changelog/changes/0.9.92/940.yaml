@@ -95,19 +95,19 @@ databaseChangeLog:
       columnName:  LASTMODIFIEDBY_CODI  
       newDataType:  VARCHAR2(64 CHAR)  
       tableName:  IPA_CONTINGUT
-   #IPA_CONT_COMMENT
-   - modifyDataType:  
-      columnName:  TEXT  
-      newDataType:  VARCHAR2(1024 CHAR)  
-      tableName:  IPA_CONT_COMMENT
-   - modifyDataType:  
-      columnName:  CREATEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_CONT_COMMENT
-   - modifyDataType:  
-      columnName:  LASTMODIFIEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_CONT_COMMENT
+#   #IPA_CONT_COMMENT --> Taula no utilitzada
+#   - modifyDataType:
+#      columnName:  TEXT
+#      newDataType:  VARCHAR2(1024 CHAR)
+#      tableName:  IPA_CONT_COMMENT
+#   - modifyDataType:
+#      columnName:  CREATEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_CONT_COMMENT
+#   - modifyDataType:
+#      columnName:  LASTMODIFIEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_CONT_COMMENT
    #IPA_CONT_LOG
    - modifyDataType:  
       columnName:  OBJECTE_ID  
@@ -633,31 +633,31 @@ databaseChangeLog:
       columnName:  LASTMODIFIEDBY_CODI  
       newDataType:  VARCHAR2(64 CHAR)  
       tableName:  IPA_EXPEDIENT_ESTAT
-   #IPA_EXPEDIENT_FILTRE 
-   - modifyDataType:  
-      columnName:  NOM  
-      newDataType:  VARCHAR2(256 CHAR)  
-      tableName:  IPA_EXPEDIENT_FILTRE
-   - modifyDataType:  
-      columnName:  NUMERO  
-      newDataType:  VARCHAR2(256 CHAR)  
-      tableName:  IPA_EXPEDIENT_FILTRE
-   - modifyDataType:  
-      columnName:  ESTAT  
-      newDataType:  VARCHAR2(256 CHAR)  
-      tableName:  IPA_EXPEDIENT_FILTRE
-   - modifyDataType:  
-      columnName:  FILTER_NAME  
-      newDataType:  VARCHAR2(256 CHAR)  
-      tableName:  IPA_EXPEDIENT_FILTRE
-   - modifyDataType:  
-      columnName:  CREATEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_EXPEDIENT_FILTRE
-   - modifyDataType:  
-      columnName:  LASTMODIFIEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_EXPEDIENT_FILTRE
+#   #IPA_EXPEDIENT_FILTRE --> Taula no utilitzada
+#   - modifyDataType:
+#      columnName:  NOM
+#      newDataType:  VARCHAR2(256 CHAR)
+#      tableName:  IPA_EXPEDIENT_FILTRE
+#   - modifyDataType:
+#      columnName:  NUMERO
+#      newDataType:  VARCHAR2(256 CHAR)
+#      tableName:  IPA_EXPEDIENT_FILTRE
+#   - modifyDataType:
+#      columnName:  ESTAT
+#      newDataType:  VARCHAR2(256 CHAR)
+#      tableName:  IPA_EXPEDIENT_FILTRE
+#   - modifyDataType:
+#      columnName:  FILTER_NAME
+#      newDataType:  VARCHAR2(256 CHAR)
+#      tableName:  IPA_EXPEDIENT_FILTRE
+#   - modifyDataType:
+#      columnName:  CREATEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_EXPEDIENT_FILTRE
+#   - modifyDataType:
+#      columnName:  LASTMODIFIEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_EXPEDIENT_FILTRE
    #IPA_EXPEDIENT_ORGANPARE 
    - modifyDataType:  
       columnName:  CREATEDBY_CODI  
@@ -895,10 +895,10 @@ databaseChangeLog:
       columnName:  DESCRIPCIO  
       newDataType:  VARCHAR2(1024 CHAR)  
       tableName:  IPA_METADADA
-   - modifyDataType:  
-      columnName:  GLOBAL_MULTIPLICITAT  
-      newDataType:  VARCHAR2(255 CHAR)  
-      tableName:  IPA_METADADA
+#   - modifyDataType: --> Columna no existeix
+#      columnName:  GLOBAL_MULTIPLICITAT
+#      newDataType:  VARCHAR2(255 CHAR)
+#      tableName:  IPA_METADADA
    - modifyDataType:  
       columnName:  VALOR  
       newDataType:  VARCHAR2(255 CHAR)  
@@ -948,10 +948,10 @@ databaseChangeLog:
       columnName:  PLANTILLA_CONTENT_TYPE  
       newDataType:  VARCHAR2(256 CHAR)  
       tableName:  IPA_METADOCUMENT
-   - modifyDataType:  
-      columnName:  GLOBAL_MULTIPLICITAT  
-      newDataType:  VARCHAR2(255 CHAR)  
-      tableName:  IPA_METADOCUMENT
+#   - modifyDataType: --> Columna no existeix
+#      columnName:  GLOBAL_MULTIPLICITAT
+#      newDataType:  VARCHAR2(255 CHAR)
+#      tableName:  IPA_METADOCUMENT
    - modifyDataType:  
       columnName:  NTI_ORIGEN  
       newDataType:  VARCHAR2(2 CHAR)  
@@ -1014,19 +1014,19 @@ databaseChangeLog:
       columnName:  LASTMODIFIEDBY_CODI  
       newDataType:  VARCHAR2(64 CHAR)  
       tableName:  IPA_METAEXPEDIENT_CARPETA
-   #IPA_METAEXPEDIENT_METADOCUMENT 
-   - modifyDataType:  
-      columnName:  MULTIPLICITAT  
-      newDataType:  VARCHAR2(255 CHAR)  
-      tableName:  IPA_METAEXPEDIENT_METADOCUMENT
-   - modifyDataType:  
-      columnName:  CREATEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_METAEXPEDIENT_METADOCUMENT
-   - modifyDataType:  
-      columnName:  LASTMODIFIEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_METAEXPEDIENT_METADOCUMENT
+#   #IPA_METAEXPEDIENT_METADOCUMENT --> Taula no existeix
+#   - modifyDataType:
+#      columnName:  MULTIPLICITAT
+#      newDataType:  VARCHAR2(255 CHAR)
+#      tableName:  IPA_METAEXPEDIENT_METADOCUMENT
+#   - modifyDataType:
+#      columnName:  CREATEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_METAEXPEDIENT_METADOCUMENT
+#   - modifyDataType:
+#      columnName:  LASTMODIFIEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_METAEXPEDIENT_METADOCUMENT
    #IPA_METAEXP_COMMENT 
    - modifyDataType:  
       columnName:  TEXT  
@@ -1108,19 +1108,19 @@ databaseChangeLog:
       columnName:  LASTMODIFIEDBY_CODI  
       newDataType:  VARCHAR2(64 CHAR)  
       tableName:  IPA_METANODE
-   #IPA_METANODE_METADADA 
-   - modifyDataType:  
-      columnName:  MULTIPLICITAT  
-      newDataType:  VARCHAR2(256 CHAR)  
-      tableName:  IPA_METANODE_METADADA
-   - modifyDataType:  
-      columnName:  CREATEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_METANODE_METADADA
-   - modifyDataType:  
-      columnName:  LASTMODIFIEDBY_CODI  
-      newDataType:  VARCHAR2(64 CHAR)  
-      tableName:  IPA_METANODE_METADADA
+#   #IPA_METANODE_METADADA --> Taula no existeix
+#   - modifyDataType:
+#      columnName:  MULTIPLICITAT
+#      newDataType:  VARCHAR2(256 CHAR)
+#      tableName:  IPA_METANODE_METADADA
+#   - modifyDataType:
+#      columnName:  CREATEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_METANODE_METADADA
+#   - modifyDataType:
+#      columnName:  LASTMODIFIEDBY_CODI
+#      newDataType:  VARCHAR2(64 CHAR)
+#      tableName:  IPA_METANODE_METADADA
    #IPA_ORGAN_GESTOR 
    - modifyDataType:  
       columnName:  CODI  
@@ -1308,7 +1308,7 @@ databaseChangeLog:
       tableName:  IPA_REGISTRE_ANNEX
    - modifyDataType:  
       columnName:  FIRMA_TIPUS  
-      newDataType:  VARCHAR2(4 CHAR)  
+      newDataType:  VARCHAR2(10 CHAR)
       tableName:  IPA_REGISTRE_ANNEX
    - modifyDataType:  
       columnName:  NOM  
@@ -1336,7 +1336,7 @@ databaseChangeLog:
       tableName:  IPA_REGISTRE_ANNEX
    - modifyDataType:  
       columnName:  TIPUS_MIME  
-      newDataType:  VARCHAR2(30 CHAR)  
+      newDataType:  VARCHAR2(255 CHAR)
       tableName:  IPA_REGISTRE_ANNEX
    - modifyDataType:  
       columnName:  TITOL  

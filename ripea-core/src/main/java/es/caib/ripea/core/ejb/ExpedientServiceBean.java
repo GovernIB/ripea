@@ -107,7 +107,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	public ExpedientDto findById(
 			Long entitatId,
 			Long id, 
-			Long rolActual) {
+			String rolActual) {
 		return delegate.findById(entitatId, id, rolActual);
 	}
 
@@ -395,7 +395,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
 			PaginacioParamsDto paginacioParams) {
 		return delegate.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
