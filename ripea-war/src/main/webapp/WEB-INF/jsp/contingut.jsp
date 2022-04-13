@@ -2320,6 +2320,9 @@ $.views.helpers(myHelpers);
 									<c:if test="${tascaEstat=='INICIADA'}">
 										<a href="<c:url value="/usuariTasca/${tascaId}/finalitzar"/>" class="btn btn-default" style="float: right;" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzarTasca" /></a>
 									</c:if>
+									<c:if test="${tascaEstat=='PENDENT'}">
+										<a href="<c:url value="/usuariTasca/${tascaId}/iniciar?redirectATasca=true"/>" class="btn btn-default" style="float: right;"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a>
+									</c:if>									
 									<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 								</div>
 							</c:if>							
@@ -2984,7 +2987,9 @@ $.views.helpers(myHelpers);
 												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 												<ul class="dropdown-menu">
 													<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-													<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
+													{{if estat != 'FINALITZADA'}}
+														<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
+													{{/if}}
 													<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT')}">
 														{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
 															<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>

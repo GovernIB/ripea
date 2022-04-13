@@ -29,6 +29,7 @@ public class ExpedientTascaDto {
 	private boolean shouldNotifyAboutDeadline;
 	private String comentari;
 	private long numComentaris;
+	private boolean usuariActualResponsable;
 	
 	public String getDataLimitString() {
 		if (dataLimit != null) {

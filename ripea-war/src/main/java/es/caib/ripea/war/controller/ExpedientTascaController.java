@@ -203,7 +203,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaReassignar";
 		}
 	
-		expedientTascaService.updateResponsables(expedientTascaId, command.getUsuariCodi());
+		expedientTascaService.updateResponsables(expedientTascaId, command.getResponsablesCodi());
 		
 		return getModalControllerReturnValueSuccess(
 				request,

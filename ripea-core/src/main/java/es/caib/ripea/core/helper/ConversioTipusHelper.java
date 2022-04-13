@@ -22,6 +22,8 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -135,6 +137,16 @@ public class ConversioTipusHelper {
 						target.setDataLimit(source.getDataLimit());
 						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
+						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
+						
+						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+						boolean usuariActualReposnable = false;
+						for (UsuariEntity usuari : source.getResponsables()) {
+							if (usuari.getCodi().equals(auth.getName())) {
+								usuariActualReposnable = true;
+							}
+						}
+						target.setUsuariActualResponsable(usuariActualReposnable);
 						return target;
 					}
 				});

@@ -313,17 +313,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto updateResponsables(Long expedientTascaId, String usuariCodi) {
+	public ExpedientTascaDto updateResponsables(Long expedientTascaId, List<String> responsablesCodi) {
 		logger.debug("Canviant responsable de la tasca " +
 				"expedientTascaId=" + expedientTascaId +", "+
-				"usuariCodi=" + usuariCodi +
+				"responsablesCodi=" + responsablesCodi +
 				")");
 
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
 		
-		UsuariEntity nouResponsable = usuariHelper.getUsuariByCodi(usuariCodi);
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
-		responsables.add(nouResponsable);
+		for (String responsableCodi: responsablesCodi) {
+			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi);
+			responsables.add(responsable);
+		}
 		
 		expedientTascaEntity.updateResponsables(responsables);	
 		

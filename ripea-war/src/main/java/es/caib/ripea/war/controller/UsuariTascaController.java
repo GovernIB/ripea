@@ -196,13 +196,14 @@ public class UsuariTascaController extends BaseUserController {
 	public String expedientTascaIniciar(
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
+			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.INICIADA, null);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/usuariTasca",
+				redirectATasca != null && redirectATasca == true ? "redirect:/usuariTasca/" + expedientTascaId + "/tramitar" : "redirect:/usuariTasca",
 				"expedient.tasca.controller.iniciada.ok");
 		
 	}
