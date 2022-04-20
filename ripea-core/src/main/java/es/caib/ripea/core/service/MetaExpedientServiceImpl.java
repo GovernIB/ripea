@@ -71,6 +71,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DominiHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientEstatHelper;
 import es.caib.ripea.core.helper.GrupHelper;
@@ -162,6 +163,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired
 	private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	@Transactional
 	@Override
@@ -1133,6 +1136,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient, 
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
+		
+		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
+		
 		return true;
 	}
 	
@@ -1372,14 +1378,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id, Long organId) {
 		logger.debug(
 				"Marcant com en procés de disseny un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, null);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
 
-		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}

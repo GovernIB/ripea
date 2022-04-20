@@ -393,8 +393,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
-		return delegate.marcarProcesDisseny(entitatId, id);
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id, Long organId) {
+		return delegate.marcarProcesDisseny(entitatId, id, organId);
 	}
 
 	@Override
