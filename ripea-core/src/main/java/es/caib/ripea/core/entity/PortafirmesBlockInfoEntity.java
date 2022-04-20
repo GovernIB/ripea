@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -45,12 +47,19 @@ public class PortafirmesBlockInfoEntity extends RipeaAuditable<Long> {
 	@Column(name = "signed")
 	protected boolean signed = false;
 	
+	@Column(name = "sign_date")
+	protected Date data;
+	
 	@Version
 	private long version = 0;
 	
 	public void updateSigned(
 			boolean signed) {
 		this.signed = signed;
+	}
+	
+	public void updateSignDate(Date signDate) {
+		this.data = signDate;
 	}
 	/**
 	 * Obté el Builder per a crear objectes de tipus signatura-info
