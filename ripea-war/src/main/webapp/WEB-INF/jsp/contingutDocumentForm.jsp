@@ -142,8 +142,10 @@ $(document).ready(function() {
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 					$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-					$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					if(!$('#ntiEstadoElaboracion').val()){
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					}
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
@@ -153,8 +155,10 @@ $(document).ready(function() {
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						if(!$('#ntiEstadoElaboracion').val()){
+							$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+							$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						}
 						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 					})

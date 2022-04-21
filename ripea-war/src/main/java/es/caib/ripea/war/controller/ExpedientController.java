@@ -903,7 +903,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "redirect:../../expedient";
 		} else {
 			for (Long expedientId : seleccio) {
-				this.alliberar(request, expedientId, model);
+				this.alliberar(request, expedientId, null, model);
 			}
 			return null;
 		}
