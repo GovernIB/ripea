@@ -1002,7 +1002,9 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, null),
+								serieDocumental, 
+								null, 
+								document.getNtiIdDocumentoOrigen()),
 						contingutPare.getArxiuUuid());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Document documentDetalls = getArxiuPlugin().documentDetalls(
@@ -1037,7 +1039,9 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								((firmes != null || propagarConversioDefinitiu) ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, null));
+								serieDocumental, 
+								null, 
+								document.getNtiIdDocumentoOrigen()));
 				document.updateArxiu(null);
 			}
 			integracioHelper.addAccioOk(
@@ -1436,7 +1440,9 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, null),
+								serieDocumental, 
+								null, 
+								document.getNtiIdDocumentoOrigen()),
 						document.getExpedientPare().getArxiuUuid());
 				if (getArxiuPlugin().suportaMetadadesNti()) {
 					Document documentDetalls = getArxiuPlugin().documentDetalls(
@@ -1475,7 +1481,9 @@ public class PluginHelper {
 								document.getNtiTipoDocumental(),
 								document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
 								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, null));
+								serieDocumental, 
+								null, 
+								document.getNtiIdDocumentoOrigen()));
 				integracioHelper.addAccioOk(
 						IntegracioHelper.INTCODI_ARXIU,
 						accioDescripcio,
@@ -1604,7 +1612,8 @@ public class PluginHelper {
 					DocumentEstat.DEFINITIU,
 					DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
 					serieDocumental, 
-					ArxiuAccioEnumDto.MODIFICACIO);
+					ArxiuAccioEnumDto.MODIFICACIO, 
+					document.getNtiIdDocumentoOrigen());
 			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(documentArxiu);
 			document.updateEstat(
 					DocumentEstatEnumDto.CUSTODIAT);
@@ -4345,7 +4354,8 @@ public class PluginHelper {
 			DocumentEstat estat,
 			boolean enPaper,
 			String serieDocumental, 
-			ArxiuAccioEnumDto arxiuAccio) {
+			ArxiuAccioEnumDto arxiuAccio, 
+			String ntiIdDocumentoOrigen) {
 		Document document = new Document();
 		String fitxerExtensio = null;
 		String documentNomInArxiu = nom;
@@ -4369,7 +4379,8 @@ public class PluginHelper {
 				fitxerExtensio,
 				ntiOrgans,
 				serieDocumental,
-				metadades);
+				metadades, 
+				ntiIdDocumentoOrigen);
 		document.setMetadades(metadades);
 		document.setEstat(estat);
 		DocumentContingut contingut = null;
@@ -4528,7 +4539,8 @@ public class PluginHelper {
 			String fitxerExtensio,
 			List<String> ntiOrgans,
 			String serieDocumental,
-			DocumentMetadades metadades){
+			DocumentMetadades metadades, 
+			String ntiIdDocumentoOrigen){
 		metadades.setIdentificador(ntiIdentificador);
 		if (ntiOrigen != null) {
 			switch (ntiOrigen) {
@@ -4560,6 +4572,11 @@ public class PluginHelper {
 			break;
 		}
 		metadades.setEstatElaboracio(estatElaboracio);
+		
+		if (ntiIdDocumentoOrigen != null && !ntiIdDocumentoOrigen.isEmpty()) {
+			metadades.setIdentificadorOrigen(ntiIdDocumentoOrigen);
+		}
+		
 		DocumentTipus tipusDocumental = null;
 		String tipusDocumentalAddicional = null;
 		switch (ntiTipusDocumental) {

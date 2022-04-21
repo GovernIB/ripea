@@ -604,6 +604,24 @@ databaseChangeLog:
             name: vf_viafirma_dispositiu
             type: BIGINT
         - column:
+            name: VF_SIGNANT_NIF
+            type: VARCHAR2(17)  
+        - column:
+            name: VF_SIGNANT_NOM
+            type: VARCHAR2(90)      
+        - column:
+            name: VF_OBSERVACIONS
+            type: VARCHAR2(256) 
+        - column:
+            name: VF_VALIDATE_CODE_ENABLED
+            type: BOOLEAN   
+        - column:
+            name: VF_VALIDATE_CODE
+            type: VARCHAR2(100)   
+        - column:
+            name: VF_REBRE_CORREU
+            type: BOOLEAN            
+        - column:
             name: firma_parcial
             type: BOOLEAN
         - column:
