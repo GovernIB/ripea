@@ -833,11 +833,18 @@ public class ContingutHelper {
 					+ "usuari=" + auth.getName() + ")");
 		}
 		
-		UsuariEntity responsableActual = expedientTascaEntity.getResponsableActual();
-		if (responsableActual != null && !responsableActual.getCodi().equals(auth.getName())) {
-			throw new SecurityException("Sense permisos per accedir la tasca ("
-					+ "tascaId=" + expedientTascaEntity.getId() + ", "
-					+ "usuari=" + auth.getName() + ")");
+		if (expedientTascaEntity.getResponsables() != null) {
+			boolean pemitted = false;
+			for (UsuariEntity responsable : expedientTascaEntity.getResponsables()) {
+				if (responsable.getCodi().equals(auth.getName())) {
+					pemitted = true;
+				}
+			}
+			if (!pemitted) {
+				throw new SecurityException("Sense permisos per accedir la tasca ("
+						+ "tascaId=" + expedientTascaEntity.getId() + ", "
+						+ "usuari=" + auth.getName() + ")");
+			}
 		}
 		
 		return contingut;

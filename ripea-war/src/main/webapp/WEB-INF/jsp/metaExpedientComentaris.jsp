@@ -42,6 +42,9 @@
 			$('button.enviar-comentari').click(function() {
 				var text = $("#comentari_text").val();
 				if (text != undefined && text != "") {
+					$('.enviar-comentari').prop("disabled", true);
+					$("#comentaris_content").empty();
+					$("#comentaris_content").append('<div class="datatable-dades-carregant" style="text-align: center; margin-top: 200px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div>');
 					enviarLlistarComentaris(text);
 				}
 			});
@@ -60,6 +63,7 @@
 					pintarComentaris(data);
 					$("#comentari_text").val("");
 					webutilModalAdjustHeight();
+					$('.enviar-comentari').prop("disabled", false);
 				},
 				error: function() {
 					console.log("error enviant comentari..");

@@ -158,7 +158,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								expedientPeticioEntity.getId(),
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
-										4000));
+										3600));
 						
 						// change state of registre in DISTRIBUCIO to BACK_ERROR
 						DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
@@ -166,7 +166,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								Estat.ERROR,
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
-										4000));
+										3600));
 						
 					} catch (IOException e1) {
 						logger.error(ExceptionUtils.getStackTrace(e1));

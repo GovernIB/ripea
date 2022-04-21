@@ -859,6 +859,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public String alliberar(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
+			@RequestParam(required = false) String contingutId,
 			Model model) {
 		
 		try {
@@ -869,7 +870,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					expedientId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
-					"redirect:../../contingut/" + expedientId,
+					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
 					"expedient.controller.alliberat.ok");
 			
 		} catch (Exception e) {
@@ -877,7 +878,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
-					"redirect:../../contingut/" + expedientId,
+					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
 					ExceptionHelper.getRootCauseOrItself(e).getMessage());
 
 		}

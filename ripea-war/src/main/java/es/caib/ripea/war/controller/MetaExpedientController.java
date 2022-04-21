@@ -835,7 +835,8 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		metaExpedientService.marcarProcesDisseny(
 				entitatActual.getId(),
-				metaExpedientId);
+				metaExpedientId, 
+				EntitatHelper.getOrganGestorActualId(request));
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,

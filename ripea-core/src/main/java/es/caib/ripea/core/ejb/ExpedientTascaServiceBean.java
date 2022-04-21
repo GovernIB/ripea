@@ -278,10 +278,10 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				motiu);
 	}
 	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
-			String usuariCodi) {
+			List<String> responsablesCodi) {
 		return delegate.updateResponsables(
 				expedientTascaId,
-				usuariCodi);
+				responsablesCodi);
 	}
 		
 	@Override

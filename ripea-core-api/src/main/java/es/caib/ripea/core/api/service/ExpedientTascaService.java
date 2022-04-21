@@ -122,7 +122,7 @@ public interface ExpedientTascaService {
 			String motiu);
 	
 	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
-			String usuariCodi);
+			List<String> responsablesCodi);
 
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
 
