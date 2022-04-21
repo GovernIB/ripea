@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
@@ -226,6 +227,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId, 
 					RolHelper.getRolActual(request));
 
+			deselect(request, contingutId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,
@@ -246,6 +248,16 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						"redirect:../../contingut/" + contingutId,
 						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
 			}
+		}
+	}
+	
+	private void deselect(HttpServletRequest request, Long id) {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				ExpedientController.SESSION_ATTRIBUTE_SELECCIO);
+		if (seleccio != null) {
+			seleccio.remove(id);
 		}
 	}
 

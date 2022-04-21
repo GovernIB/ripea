@@ -90,7 +90,7 @@ import es.caib.ripea.war.helper.RolHelper;
 public class ExpedientController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
-	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
+	public static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 
@@ -135,6 +135,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		@SuppressWarnings("unused")
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
 
 		if (filtreCommand.getOrganGestorId() != null) {
@@ -786,6 +787,31 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 		}
 	}
+	
+	@RequestMapping(value = "/agafar", method = RequestMethod.GET)
+	public String agafarMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:../../expedient";
+		} else {
+			for (Long expedientId : seleccio) {
+				this.agafar(request, expedientId, COOKIE_MEUS_EXPEDIENTS, model);
+			}
+			return null;
+		}
+	}
 
 	@RequestMapping(value = "/{expedientId}/comentaris", method = RequestMethod.GET)
 	public String comentaris(
@@ -854,6 +880,31 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					"redirect:../../contingut/" + expedientId,
 					ExceptionHelper.getRootCauseOrItself(e).getMessage());
 
+		}
+	}
+	
+	@RequestMapping(value = "/alliberar", method = RequestMethod.GET)
+	public String alliberarMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:../../expedient";
+		} else {
+			for (Long expedientId : seleccio) {
+				this.alliberar(request, expedientId, model);
+			}
+			return null;
 		}
 	}
 	
@@ -1387,6 +1438,67 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					"redirect:/../../contingut/" + destiId,
 					e.getMessage());
 
+		}
+	}
+	
+	@RequestMapping(value = "/contingut/delete", method = RequestMethod.GET)
+	public String deleteMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:../../expedient";
+		} else {
+			int borrados = 0;
+			int errors = 0;
+			for (Long contingutId : seleccio) {
+				try {
+					contingutService.deleteReversible(
+							entitatActual.getId(),
+							contingutId, 
+							RolHelper.getRolActual(request));
+					borrados++;
+				} catch (Exception e) {
+					errors++;
+					mostrarErrorBorrar(request, contingutId, e);
+				}
+			}
+			deselect(request, null);
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.esborrat.error.multiple", new Object[]{errors}));
+			}
+			if (borrados > 0) {
+				MissatgesHelper.success(request, getMessage(request, "contingut.controller.element.esborrat.ok.multiple", new Object[]{borrados}));
+			}
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:../../expedient",
+					"contingut.controller.element.esborrat.ok");
+		}
+	}
+	
+	private void mostrarErrorBorrar(HttpServletRequest request, Long contingutId, Exception e) {
+		logger.error("Error al esborrar el contingut", e);
+		Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+		if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+		} else {
+			MissatgesHelper.error(
+					request, 
+					getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
 		}
 	}
 	

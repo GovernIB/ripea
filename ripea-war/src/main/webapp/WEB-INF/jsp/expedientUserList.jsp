@@ -502,6 +502,8 @@ function hexToRgb(hex) {
 		</div>
 	</form:form>
 	<div class="rmodal"></div>
+	<!-- TODO --> 
+	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -509,13 +511,18 @@ function hexToRgb(hex) {
 				<button id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
 					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
+  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.opcions"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
+						<li><a href="expedient/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.agafar"/></a></li>							
+						<li><a href="expedient/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.alliberar"/></a></li>
+						<li><a href="expedient/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.unfollow"/></a></li>
+						<li><a href="expedient/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.follow"/></a></li>		
+						<li><a href="expedient/contingut/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="expedient.list.user.esborrar"/></a></li>
 					</ul>
 				</div>
 			</div>
