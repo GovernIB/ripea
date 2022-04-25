@@ -2154,7 +2154,7 @@ $.views.helpers(myHelpers);
 			<c:if test="${!isTasca}">
 				<ul class="nav nav-tabs">
 					<li class="active" id="pipella-contingut">
-						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${isMostrarCarpetesPerAnotacions ? contingut.fillsHierarchicalCount : contingut.fillsFlatCount}</span></a>
+						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsHierarchicalCount}</span></a>
 					</li>
 					<c:if test="${((contingut.document or contingut.expedient) and fn:length(contingut.metaNode.metaDades) gt 0) || ((contingut.carpeta) and fn:length(contingut.expedientPare.metaNode.metaDades) gt 0)}">
 						<li>
