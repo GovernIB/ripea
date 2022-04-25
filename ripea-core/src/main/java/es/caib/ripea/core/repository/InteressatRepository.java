@@ -70,7 +70,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "where "
 			+ "    inter.expedient = :expedient "
 			+ "and inter.esRepresentant = false "
-			+ "and inter.notificacioAutoritzat = true "
 			+ "order by "
 			+ "    inter.id asc")
 	List<InteressatEntity> findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
