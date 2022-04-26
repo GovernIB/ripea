@@ -99,19 +99,20 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		MetaExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-		filtreCommand.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
+//		filtreCommand.setRevisioEstat(MetaExpedientRevisioEstatEnumDto.PENDENT);
 		
 		MetaExpedientFiltreDto filtreDto = filtreCommand.asDto();
-		if (rolActual.equals("IPA_ADMIN")) {
-			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT, MetaExpedientRevisioEstatEnumDto.REVISAT });
-		} else {
-			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT });
-		}
+		filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { filtreCommand.getRevisioEstat() });
+//		if (rolActual.equals("IPA_ADMIN")) {
+//			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT, MetaExpedientRevisioEstatEnumDto.REVISAT });
+//		} else {
+//			filtreDto.setRevisioEstats(new MetaExpedientRevisioEstatEnumDto[] { MetaExpedientRevisioEstatEnumDto.PENDENT });
+//		}
 		
 		PaginaDto<MetaExpedientDto> metaExps = metaExpedientService.findByEntitatOrOrganGestor(
 				entitatActual.getId(),
 				organActual == null ? null : organActual.getId(),
-						filtreDto,
+				filtreDto,
 				organActual == null ? false : RolHelper.isRolActualAdministradorOrgan(request),
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
 				rolActual,
