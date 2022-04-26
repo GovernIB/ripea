@@ -23,7 +23,6 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
@@ -111,15 +110,6 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	
 	@Column(name = "ordre")
 	protected int ordre;
-	
-	@Transient
-	protected boolean ambNotificacions;
-	@Transient
-	protected String estatDarreraNotificacio;
-	@Transient
-	protected boolean errorDarreraNotificacio;
-	@Transient
-	protected boolean errorEnviamentPortafirmes;
 	
 	@Version
 	private long version = 0;

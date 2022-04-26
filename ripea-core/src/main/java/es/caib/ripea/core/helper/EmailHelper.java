@@ -15,6 +15,7 @@ import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -33,8 +34,11 @@ import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -64,6 +68,10 @@ public class EmailHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private UsuariRepository usuariRepository;
 
 	public void contingutAgafatPerAltreUsusari(
 			ContingutEntity contingut,
@@ -218,11 +226,127 @@ public class EmailHelper {
 		}
 	}
 	
-	public void canviEstatRevisioMetaExpedientAOrganAdmin(
+	
+	public void comentariMetaExpedient(
+			MetaExpedientEntity metaExpedientEntity, 
+			Long entitatId, 
+			String comentari) {
+		logger.debug("Enviant correu electrònic per nou comentari");
+		
+		List<String> emailsNoAgrupats = new ArrayList<>();
+		List<String> emailsAgrupats = new ArrayList<>();
+		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
+		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
+			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
+			if (usuari.isRebreEmailsAgrupats()) {
+				emailsAgrupats.add(dadesUsuari.getEmail());
+			} else {
+				emailsNoAgrupats.add(dadesUsuari.getEmail());
+			}
+		}
+		
+		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+		for (DadesUsuari dadesUsuari : dadesUsuarisAdminEntitat) {
+			boolean granted = permisosHelper.isGrantedAll(
+					entitatId,
+					EntitatEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					dadesUsuari.getCodi());
+			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
+			if (granted && usuari != null) {
+				if (usuari.isRebreEmailsAgrupats()) {
+					emailsAgrupats.add(dadesUsuari.getEmail());
+				} else {
+					emailsNoAgrupats.add(dadesUsuari.getEmail());
+				}
+			}
+		}
+		
+		OrganGestorEntity organGestor = metaExpedientEntity.getOrganGestor();
+		if (organGestor == null) {
+			List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(metaExpedientEntity.getEntitat());
+			List<DadesUsuari> dadesUsuarisAdminOrgan = pluginHelper.dadesUsuariFindAmbGrup("IPA_ORGAN_ADMIN");
+			for (DadesUsuari dadesUsuari : dadesUsuarisAdminOrgan) {
+				for (OrganGestorEntity organ : organs) {
+					boolean granted = permisosHelper.isGrantedAll(
+							organ.getId(),
+							EntitatEntity.class,
+							new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU},
+							dadesUsuari.getCodi());
+					UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
+					if (granted && usuari != null) {
+						if (usuari.isRebreEmailsAgrupats()) {
+							emailsAgrupats.add(dadesUsuari.getEmail());
+						} else {
+							emailsNoAgrupats.add(dadesUsuari.getEmail());
+						}
+					}
+				}
+			}
+		} else {
+			List<DadesUsuari> dadesUsuarisAdminOrgan = pluginHelper.dadesUsuariFindAmbGrup("IPA_ORGAN_ADMIN");
+			for (DadesUsuari dadesUsuari : dadesUsuarisAdminOrgan) {
+				boolean granted = permisosHelper.isGrantedAll(
+						organGestor.getId(),
+						EntitatEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						dadesUsuari.getCodi());
+				UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
+				if (granted && usuari != null) {
+					if (usuari.isRebreEmailsAgrupats()) {
+						emailsAgrupats.add(dadesUsuari.getEmail());
+					} else {
+						emailsNoAgrupats.add(dadesUsuari.getEmail());
+					}
+				}
+			}
+		}
+		
+		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
+		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
+		
+		UsuariEntity usuariEntity = usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		String from = getRemitent();
+		String subject = PREFIX_RIPEA + " Nou comentari per procediment";
+		String text = 
+				"Informació del procediment:\n" +
+						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
+						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
+						"Comentari: " + comentari + "\n" +
+						"Usuari: " + usuariEntity.getNom();
+		
+		if (!emailsNoAgrupats.isEmpty()) {
+
+			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
+			SimpleMailMessage missatge = new SimpleMailMessage();
+			missatge.setFrom(from);
+			missatge.setBcc(to);
+			missatge.setSubject(subject);
+			missatge.setText(text);
+			logger.debug(missatge.toString());
+			mailSender.send(missatge);
+		}
+		
+		if (!emailsAgrupats.isEmpty()) {
+			
+			for (String email : emailsAgrupats) {
+				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
+						from,
+						email,
+						subject,
+						text,
+						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
+						.build();
+				emailPendentEnviarRepository.save(enitity);
+			}
+		}
+	}
+	
+	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(
 			MetaExpedientEntity metaExpedientEntity, 
 			Long entitatId) {
-		logger.debug("Enviant correu electrònic per a canvi d'estat de revisio a l'organ admin");
-		
+		logger.debug("Enviant correu electrònic a administrador d'organ que ha creat procediment degut a canvi d'estat de revisio");
 		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
 		
 		List<String> emailsNoAgrupats = new ArrayList<>();
@@ -701,7 +825,7 @@ public class EmailHelper {
 		String from = getRemitent();
 		String subject;
 		String text;
-		String comentari = expedientTascaEntity.getComentari();
+		String comentari = expedientTascaEntity.getTextLastComentari();
 		TascaEstatEnumDto estat = expedientTascaEntity.getEstat();
 		String rebutjMotiu = "";
 		if (estat == TascaEstatEnumDto.REBUTJADA) {
@@ -718,7 +842,7 @@ public class EmailHelper {
 					"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
 					"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
 					"\tEstat: " + estat + "\n" +
-					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + estat + "\n" : "") +
+					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 					enllacTramitar;
 		} else {
 			subject = PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
@@ -728,7 +852,7 @@ public class EmailHelper {
 							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
 							"\tEstat anterior:" + estatAnterior + "\n" +
 							"\tEstat actual:" + estat + "\n" + 
-							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + estat + "\n" : "") +
+							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 							rebutjMotiu +
 							enllacTramitar;
 		}

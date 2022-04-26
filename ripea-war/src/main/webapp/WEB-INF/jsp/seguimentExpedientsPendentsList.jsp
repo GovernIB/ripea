@@ -34,21 +34,21 @@
 
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputText name="numero" inline="true" placeholderKey="expedientPeticio.list.placeholder.numero"/>
+				<rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.placeholder.numero"/>
 			</div>	
 			<div class="col-md-4">
-				<rip:inputText name="extracte" inline="true" placeholderKey="expedientPeticio.list.placeholder.extracte"/>
+				<rip:inputText name="extracte" inline="true" placeholderKey="expedient.peticio.list.placeholder.extracte"/>
 			</div>	
 			<div class="col-md-4">					
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedientPeticio.list.placeholder.metaExpedient" inline="true"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>			
 		</div>
 		<div class="row">
 			<div class="col-md-4">							
-				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataInicial"/>
+				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataInicial"/>
 			</div>	
 			<div class="col-md-4">							
-				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataFinal"/>
+				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataFinal"/>
 			</div>					
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
@@ -71,10 +71,10 @@
 		style="width:100%">
 		<thead> 
 			<tr>
-				<th data-col-name="registre.identificador"><spring:message code="expedientPeticio.list.columna.numero"/></th>
-				<th data-col-name="registre.extracte"><spring:message code="expedientPeticio.list.columna.extracte"/></th>
-				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
-				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedientPeticio.list.columna.data"/></th>
+				<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
+				<th data-col-name="registre.extracte"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
+				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
+				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
 			</tr>
 		</thead>
 	</table>

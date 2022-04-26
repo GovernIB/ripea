@@ -17,8 +17,6 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
@@ -87,7 +85,6 @@ public class MetaExpedientHelper {
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
     
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public synchronized long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
@@ -287,7 +284,7 @@ public class MetaExpedientHelper {
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
-				permis));
+				isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis));
 		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
@@ -611,7 +608,7 @@ public class MetaExpedientHelper {
 		
 		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.DISSENY) {
 
-			emailHelper.canviEstatRevisioMetaExpedientAOrganAdmin(metaExpedientEntity, entitatId);
+			emailHelper.canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(metaExpedientEntity, entitatId);
 
 		}
 

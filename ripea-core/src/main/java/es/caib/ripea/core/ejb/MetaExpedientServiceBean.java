@@ -268,7 +268,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 			Long id, Long organId) {
 		return delegate.getAndCheckAdminPermission(
 				entitatId,
-				id, null);
+				id, 
+				organId);
 	}
 
 	@Override
@@ -365,8 +366,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
-			boolean isAdmin) {
-		return delegate.findCreateWritePerm(entitatId, isAdmin);
+			String rolActual) {
+		return delegate.findCreateWritePerm(entitatId, rolActual);
 	}
 
 	@Override
@@ -392,8 +393,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
-		return delegate.marcarProcesDisseny(entitatId, id);
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id, Long organId) {
+		return delegate.marcarProcesDisseny(entitatId, id, organId);
 	}
 
 	@Override

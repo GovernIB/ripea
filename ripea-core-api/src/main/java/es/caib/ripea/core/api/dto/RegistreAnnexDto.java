@@ -14,8 +14,6 @@ import java.util.Date;
 public class RegistreAnnexDto {
 
 	private Long id;
-	private byte[] contingut;
-	private byte[] firmaContingut;
 	private String firmaPerfil;
 	private String firmaTipus;
 	private Date ntiFechaCaptura;
@@ -52,20 +50,6 @@ public class RegistreAnnexDto {
 	public void setId(
 			Long id) {
 		this.id = id;
-	}
-	public byte[] getContingut() {
-		return contingut;
-	}
-	public void setContingut(
-			byte[] contingut) {
-		this.contingut = contingut;
-	}
-	public byte[] getFirmaContingut() {
-		return firmaContingut;
-	}
-	public void setFirmaContingut(
-			byte[] firmaContingut) {
-		this.firmaContingut = firmaContingut;
 	}
 	public String getFirmaPerfil() {
 		return firmaPerfil;

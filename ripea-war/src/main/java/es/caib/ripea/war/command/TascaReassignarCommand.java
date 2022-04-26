@@ -1,25 +1,24 @@
 package es.caib.ripea.war.command;
 
+import java.util.List;
+
 import org.hibernate.validator.constraints.NotEmpty;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class TascaReassignarCommand {
 
+	
 	@NotEmpty
-	private String usuariCodi;
+	private List<String> responsablesCodi;
 	
-	
-	public String getUsuariCodi() {
-		return usuariCodi;
-	}
-	public void setUsuariCodi(String usuariCodi) {
-		this.usuariCodi = usuariCodi != null ? usuariCodi.trim() : null;
-	}
-
-
 	
 	public interface Create {}
 	public interface Update {}

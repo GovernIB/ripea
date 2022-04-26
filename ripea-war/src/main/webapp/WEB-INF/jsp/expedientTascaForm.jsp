@@ -72,7 +72,7 @@ $(document).ready(function(){
 			required="true"
 			multiple="true"/>				
 		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
-		<rip:inputTextarea name="comentari" textKey="expedient.tasca.form.camp.comentari" required="false"/>
+		<rip:inputTextarea name="comentari" textKey="expedient.tasca.form.camp.comentari" required="false" maxlength="256"/>
 		<rip:inputTextarea 
 			name="metaExpedientTascaDescripcio" 
 			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 

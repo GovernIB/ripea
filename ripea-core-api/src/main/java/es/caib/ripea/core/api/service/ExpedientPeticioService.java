@@ -6,6 +6,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
@@ -16,10 +17,10 @@ import es.caib.ripea.core.api.dto.RegistreDto;
 
 public interface ExpedientPeticioService {
 
-	PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+	PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, boolean isAdmin);
+			PaginacioParamsDto paginacioParams, String rolActual, Long organActualId);
 
 	ExpedientPeticioDto findOne(
 			Long expedientPeticioId);
@@ -48,7 +49,7 @@ public interface ExpedientPeticioService {
 
 	RegistreDto findRegistreById(Long registreId);
 
-	List<ExpedientPeticioDto> findByExpedientAmbFiltre(
+	List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams);
@@ -59,7 +60,7 @@ public interface ExpedientPeticioService {
 
 	FitxerDto getJustificantContent(String arxiuUuid);
 
-	public long countAnotacionsPendents(Long entitatId, boolean isAdmin);
+	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId);
 
 	boolean comprovarExistenciaInteressatsPeticio(
 			Long entitatId, 

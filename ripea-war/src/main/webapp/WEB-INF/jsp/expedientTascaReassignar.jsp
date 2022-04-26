@@ -23,13 +23,14 @@
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
-			name="usuariCodi" 
+			name="responsablesCodi" 
 			urlConsultaInicial="${urlConsultaInicial}" 
 			urlConsultaLlistat="${urlConsultaLlistat}" 
 			textKey="expedient.tasca.reassignar.camp.responsable"
 			suggestValue="codi"
 			suggestText="codiAndNom"
-			required="true"/>
+			required="true"
+			multiple="true"/>
 		<div class="row" style="margin-bottom: 60px;"></div>
 		
 		<div id="modal-botons">

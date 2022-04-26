@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy=MetaExpedientCodiSiaNoRepetitValidator.class)
 public @interface MetaExpedientCodiSiaNoRepetit {
 
-	String message() default "Ja existeix un altre meta-expedient amb aquest codi SIA";
+	String message() default "Ja existeix un altre procediment amb aquest codi SIA";
 
 	Class<?>[] groups() default {};
 

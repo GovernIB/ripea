@@ -3,12 +3,20 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.war.command.ExpedientTascaCommand;
+import es.caib.ripea.war.command.TascaReassignarCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -19,19 +27,14 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.war.command.ExpedientTascaCommand;
-import es.caib.ripea.war.command.TascaReassignarCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Controlador per al llistat d'expedients tasques.
@@ -42,45 +45,13 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 @RequestMapping("/expedientTasca")
 public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 
-//	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientTascaController.session.filtre";
-
 	@Autowired
 	private ExpedientTascaService expedientTascaService;
 	@Autowired
 	private ExpedientService expedientService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
-
-//	@RequestMapping(method = RequestMethod.GET)
-//	public String get(
-//			HttpServletRequest request,
-//			Model model) {
-//		model.addAttribute(
-//				getFiltreCommand(request));
-//		return "expedientTascaList";
-//	}
-
-//	@RequestMapping(method = RequestMethod.POST)
-//	public String post(
-//			HttpServletRequest request,
-//			ExpedientPeticioFiltreCommand filtreCommand,
-//			BindingResult bindingResult,
-//			Model model,
-//			@RequestParam(value = "accio", required = false) String accio) {
-//		getEntitatActualComprovantPermisos(request);
-//		if ("netejar".equals(accio)) {
-//			RequestSessionHelper.esborrarObjecteSessio(
-//					request,
-//					SESSION_ATTRIBUTE_FILTRE);
-//		} else {
-//			if (!bindingResult.hasErrors()) {
-//				RequestSessionHelper.actualitzarObjecteSessio(
-//						request,
-//						SESSION_ATTRIBUTE_FILTRE,
-//						filtreCommand);
-//			}
-//		}
-//		return "redirect:expedientTasca";
-//	}
 
 	@RequestMapping(value = "/{expedientId}/datatable", method = RequestMethod.GET)
 	@ResponseBody
@@ -95,9 +66,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId));		
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/{expedientId}/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -114,7 +83,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				expedientTascaCommand);
 		ExpedientDto expedientDto = expedientService.findById(
 				entitatActual.getId(),
-				expedientId);
+				expedientId, null);
 		model.addAttribute(
 				"metaexpTasques",
 				expedientTascaService.findAmbMetaExpedient(
@@ -123,8 +92,6 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 
 		return "expedientTascaForm";
 	}
-	
-
 	
 	@RequestMapping(value = "/{expedientTascaId}/detall", method = RequestMethod.GET)
 	public String getExpedientTascaDetall(
@@ -135,7 +102,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		expedientService.findById(
 				entitatActual.getId(),
-				expedientTascaDto.getExpedient().getId());
+				expedientTascaDto.getExpedient().getId(), null);
 		model.addAttribute(
 				"expedientTascaDto",
 				expedientTascaDto);
@@ -159,7 +126,6 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		
 	}	
 	
-	
 	@RequestMapping(value="/{expedientId}/tasca", method = RequestMethod.POST)
 	public String postTasca(
 			HttpServletRequest request,
@@ -178,7 +144,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 					expedientTascaCommand);
 			ExpedientDto expedientDto = expedientService.findById(
 					entitatActual.getId(),
-					expedientId);
+					expedientId, null);
 			model.addAttribute(
 					"metaexpTasques",
 					expedientTascaService.findAmbMetaExpedient(
@@ -200,8 +166,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.creat.ok");
 	}
-	
-	
+
 	@RequestMapping(value = "{metaExpedientTascaId}/getMetaExpedientTasca", method = RequestMethod.GET)
 	@ResponseBody
 	public MetaExpedientTascaDto findMetaExpedientTascaById(
@@ -238,12 +203,46 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaReassignar";
 		}
 	
-		expedientTascaService.updateResponsables(expedientTascaId, command.getUsuariCodi());
+		expedientTascaService.updateResponsables(expedientTascaId, command.getResponsablesCodi());
 		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.reassignat.ok");
+	}
+
+	@RequestMapping(value = "/{expedientTascaId}/comentaris", method = RequestMethod.GET)
+	public String comentaris(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		model.addAttribute("expedientTasca", expedientTascaDto);
+		boolean hasWritePermisions = expedientService.hasWritePermission(expedientTascaDto.getExpedient().getId());
+		model.addAttribute("hasWritePermisions", hasWritePermisions);
+		model.addAttribute("usuariActual", aplicacioService.getUsuariActual());
+		return "expedientTascaComentaris";
+	}
+
+	@RequestMapping(value = "/{expedientTascaId}/comentaris/publicar", method = RequestMethod.POST)
+	@ResponseBody
+	public List<ExpedientTascaComentariDto> publicarComentari(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@RequestParam String text,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		if (text != null && !text.isEmpty()) {
+			expedientTascaService.publicarComentariPerExpedientTasca(
+					entitatActual.getId(),
+					expedientTascaId,
+					text,
+					RolHelper.getRolActual(request));
+		}
+
+		return expedientTascaService.findComentarisPerTasca(entitatActual.getId(), expedientTascaId);
 	}
 	
 	@InitBinder
@@ -255,29 +254,4 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	    				true));
 	}
 	
-	
-
-	
-	
-//	/**
-//	 * Gets filtreCommand from session, if it doesnt exist it creates new one in session
-//	 * @param request
-//	 * @return 
-//	 */
-//	private ExpedientPeticioFiltreCommand getFiltreCommand(
-//			HttpServletRequest request) {
-//		ExpedientPeticioFiltreCommand filtreCommand = (ExpedientPeticioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-//				request,
-//				SESSION_ATTRIBUTE_FILTRE);
-//		if (filtreCommand == null) {
-//			filtreCommand = new ExpedientPeticioFiltreCommand();
-//			RequestSessionHelper.actualitzarObjecteSessio(
-//					request,
-//					SESSION_ATTRIBUTE_FILTRE,
-//					filtreCommand);
-//		}
-//		return filtreCommand;
-//	}
-
-
 }

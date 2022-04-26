@@ -3,11 +3,14 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Resource;
 
 import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
@@ -32,6 +35,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
@@ -46,12 +50,14 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 
@@ -91,13 +97,17 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, boolean isAdmin) {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual, 
+			Long organActualId) {
 		logger.debug("Consultant els expedient peticions segons el filtre (" +
 				"entitatId=" +
 				entitatId +
@@ -111,8 +121,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				entitatId,
 				false,
 				false,
-				true, 
 				false, 
+				true, 
 				false);
 
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
@@ -127,11 +137,18 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
 		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitatId); 
+		List<String> organsCodisPermitted = null;
+		if (organActualId != null) {
+			organsCodisPermitted = organGestorRepository.findFillsCodis(entitat, Arrays.asList(organActualId));
+			OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organActualId);
+			organsCodisPermitted.add(organGestorEntity.getCodi());
+		}
 		
 		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
-				isAdmin,
-				createWritePermIds,
+				rolActual,
+				organsCodisPermitted,
+				createWritePermIds ,
 				metaExpedient == null,
 				metaExpedient,
 				filtre.getProcediment() == null ||
@@ -158,8 +175,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 						paginacioParams,
 						ordenacioMap));
 
-		PaginaDto<ExpedientPeticioDto> result = paginacioHelper.toPaginaDto(paginaExpedientPeticios,
-				ExpedientPeticioDto.class);
+		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(paginaExpedientPeticios,
+				ExpedientPeticioListDto.class);
 
 		return result;
 
@@ -207,8 +224,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				entitatId,
 				false,
 				false,
-				true, 
 				false, 
+				true, 
 				false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
@@ -228,7 +245,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientPeticioDto> findByExpedientAmbFiltre(
+	public List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams) {
@@ -246,7 +263,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		return conversioTipusHelper.convertirList(
 				peticions,
-				ExpedientPeticioDto.class);
+				ExpedientPeticioListDto.class);
 	}
 
 	@Transactional(readOnly = true)
@@ -468,16 +485,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public long countAnotacionsPendents(Long entitatId, boolean isAdmin) {
+	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId) {
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
-				true, 
 				false, 
+				true, 
 				false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return cacheHelper.countAnotacionsPendents(entitatActual, isAdmin, auth.getName());
+		return cacheHelper.countAnotacionsPendents(entitatActual, rolActual, auth.getName(), organActualId);
 	}
 
 	private boolean isIncorporacioJustificantActiva() {

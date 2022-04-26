@@ -31,13 +31,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -63,6 +66,7 @@ import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.JsonResponse;
@@ -121,7 +125,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId,
 					true,
 					true, 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					EntitatHelper.getOrganGestorActualId(request));
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,
@@ -130,7 +135,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					model);
 			model.addAttribute("isContingutDetail", false);
 			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
-			model.addAttribute("isMostrarCarpeta", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
 			model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
 			model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
 			model.addAttribute("isMostrarPublicar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.publicar.activa")));
@@ -142,6 +148,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isRolActualAdministrador", RolHelper.isRolActualAdministrador(request));
 			model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
 			model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
+			model.addAttribute("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.importacio.expedient.relacionat.activa")));
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
 				isEntitatUserAdminOrOrgan = true;
@@ -152,7 +159,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	
 			List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
-					contingutId);
+					contingutId, 
+					null);
 			List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
 			List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
 			for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
@@ -204,7 +212,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					true,
-					false, null);
+					false, null, null);
 			
 			boolean isExpedient = contingut.getPare() == null;
 			if (isExpedient) {
@@ -219,6 +227,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId, 
 					RolHelper.getRolActual(request));
 
+			deselect(request, contingutId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,
@@ -239,6 +248,16 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						"redirect:../../contingut/" + contingutId,
 						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
 			}
+		}
+	}
+	
+	private void deselect(HttpServletRequest request, Long id) {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				ExpedientController.SESSION_ATTRIBUTE_SELECCIO);
+		if (seleccio != null) {
+			seleccio.remove(id);
 		}
 	}
 
@@ -297,7 +316,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(), 
 				contingutOrigenId, 
 				false, 
-				false, null);
+				false, null, null);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			command.setOrigenIds(
@@ -336,13 +355,15 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				contingutService.move(
 						entitatActual.getId(),
 						docIdx,
-						command.getDestiId());
+						command.getDestiId(), 
+						RolHelper.getRolActual(request));
 			}
 		} else {
 			contingutService.move(
 					entitatActual.getId(),
 					contingutOrigenId,
-					command.getDestiId());
+					command.getDestiId(), 
+					RolHelper.getRolActual(request));
 		}
 		return getModalControllerReturnValueSuccess(
 				request,
@@ -361,11 +382,12 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false, null);
+				false, null, null);
 		contingutService.move(
 				entitatActual.getId(),
 				contingutOrigenId,
-				contingutDestiId);
+				contingutDestiId, 
+				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../" + contingutOrigen.getPare().getId(),
@@ -442,6 +464,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				model);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		command.setOrigenId(contingutOrigenId);
+		model.addAttribute("moureMateixExpedients", false);
 		model.addAttribute(command);
 		return "contingutVincularForm";
 	}
@@ -512,7 +535,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"errors",
 				contingutService.findErrorsValidacio(
@@ -533,7 +556,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"alertes",
 				contingutService.findAlertes(
@@ -582,7 +605,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		if (contingut instanceof ExpedientDto) {
 			interessats = interessatService.findByExpedient(
 					entitatActual.getId(),
@@ -606,7 +629,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"logs",
 				contingutService.findLogsPerContingutUser(
@@ -656,7 +679,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					contingutId,
 					false,
-					false, null);
+					false, null, null);
 			model.addAttribute("contingut", contingut);
 			if (contingut.isReplicatDinsArxiu()) {
 				model.addAttribute(
@@ -754,9 +777,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				"metaDocuments",
 				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
-						contingut.getId()));
+						contingut.getId(), 
+						null));
+		
+		if (contingut instanceof CarpetaDto) {
+			contingut = contingut.getExpedientPare();
+		}
 		if (contingut instanceof ExpedientDto) {
-
 			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
 					entitatActual.getId(),
 					contingut.getId()));
@@ -767,11 +794,15 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 							entitatActual.getId(),
 							contingut.getId(),
 							false).size());			
-			model.addAttribute("enviamentsCount", documentEnviamentService.enviamentsCount(
+			model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
 					entitatActual.getId(),
-					contingut.getId()));
+					contingut.getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
+			
+			model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
+					entitatActual.getId(),
+					contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
 		}
-		if (contingut instanceof NodeDto) {
+		if (contingut instanceof ExpedientDto || contingut instanceof DocumentDto) {
 			model.addAttribute(
 					"metaDades",
 					metaDadaService.findByNode(
@@ -783,7 +814,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 							entitatActual.getId(),
 							contingut.getId(),
 							((NodeDto)contingut).getDades()));
-		}
+		} 
+
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
 			contingutVista = CONTENIDOR_VISTA_LLISTAT;
@@ -839,11 +871,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false, null);
+				false, null, null);
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			List<ContingutDto> documentsOrigen = new ArrayList<ContingutDto>();
 			for (Long docIdx : docsIdx) {
-				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, null);
+				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, null, null);
 				documentsOrigen.add(contingut);
 			}
 			model.addAttribute(

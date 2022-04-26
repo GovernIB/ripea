@@ -191,10 +191,12 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@RolesAllowed("tothom")
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
-			Long contenidorId) {
+			Long contenidorId, 
+			Long metaExpedientId) {
 		return delegate.findActiusPerCreacio(
 				entitatId,
-				contenidorId);
+				contenidorId, 
+				metaExpedientId);
 	}
 
 	@Override
@@ -256,6 +258,16 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@RolesAllowed("tothom")
 	public void marcarPerDefecte(Long entitatId, Long metaExpedientId, Long metaDocumentId, boolean remove) throws NotFoundException {
 		delegate.marcarPerDefecte(entitatId, metaExpedientId, metaDocumentId, remove);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
+			Long entitatId,
+			Long metaExpedientId) throws NotFoundException {
+		return delegate.findByMetaExpedientAndPerDefecteTrue(
+				entitatId, 
+				metaExpedientId);
 	}
 
 }

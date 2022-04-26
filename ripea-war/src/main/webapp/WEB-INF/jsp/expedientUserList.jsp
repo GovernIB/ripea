@@ -65,8 +65,12 @@ body.loading {
 body.loading .rmodal {
     display: block;
 }
+/* Adapt font color if the background is light or dark  */
+/* .dark-color { color: black }
+.light-color { color: white }	 */
 </style>
 <script>
+
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
 var columnaAgafatPer = 19;
 $(document).ready(function() {
@@ -105,10 +109,15 @@ $(document).ready(function() {
 		});
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
 		$("span[class^='stateColor-']").each(function( index ) {
-
 		    var fullClassNameString = this.className;
 		    var colorString = fullClassNameString.substring(11);
-		    $(this).parent().css( "background-color", colorString );	
+			if (colorString != "") {
+				$(this).parent().css( "background-color", colorString );
+				if (adaptColor(colorString)) {
+					$(this).parent().css( "color", "white" );
+				}
+				$(this).parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+			}
 		});
 		
 
@@ -318,13 +327,6 @@ function findActiusPerLectura(organId) {
 	selProcediments.select2(select2Options);
 }
 
-
-
-
-
-
-
-
 function checkLoadingFinished() {
 	var cookieName = "contentLoaded";
 	if (getCookie(cookieName) != "") {
@@ -359,6 +361,38 @@ function getCookie(cname) {
 function removeCookie(cname) {
     var expires = new Date(0).toUTCString();
     document.cookie = cname + "=; path=/; expires=" + expires + ";";
+}
+
+function adaptColor(hexColor) {
+	let adapt = false;
+
+	let rgb = hexToRgb(hexColor);
+	if (rgb != null) {
+		var hsp = Math.sqrt(
+				0.299 * (rgb.r * rgb.r) +
+				0.587 * (rgb.g * rgb.g) +
+				0.114 * (rgb.b * rgb.b)
+		);
+	}
+	if (hsp < 127.5) {
+		adapt = true;
+	}
+	return adapt;
+}
+
+function hexToRgb(hex) {
+	// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+		return r + r + g + g + b + b;
+	});
+
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
 }
 
 </script>
@@ -468,6 +502,8 @@ function removeCookie(cname) {
 		</div>
 	</form:form>
 	<div class="rmodal"></div>
+	<!-- TODO --> 
+	
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="text-right">
 			<div class="btn-group">
@@ -475,17 +511,22 @@ function removeCookie(cname) {
 				<button id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
 				<div class="btn-group">
 					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.exportar"/> <span class="caret"></span>
+  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.opcions"/> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
 						<li><a href="expedient/export/ODS"><spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><spring:message code="expedient.list.user.exportar.CSV"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
+						<li><a href="expedient/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.agafar"/></a></li>							
+						<li><a href="expedient/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.alliberar"/></a></li>
+						<li><a href="expedient/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.unfollow"/></a></li>
+						<li><a href="expedient/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.follow"/></a></li>		
+						<li><a href="expedient/contingut/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="expedient.list.user.esborrar"/></a></li>
 					</ul>
 				</div>
 			</div>
-			<c:if test="${not empty metaExpedientsPermisCreacio || rolActual == 'IPA_ADMIN'}">
+			<c:if test="${not empty metaExpedientsPermisCreacio || rolActual == 'IPA_ADMIN' || rolActual == 'IPA_ORGAN_ADMIN'}">
 				<a href="<c:url value="/expedient/new"/>" data-toggle="modal" data-maximized="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="expedient.list.user.nou"/></a>
 			</c:if>
 		</div>

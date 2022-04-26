@@ -18,10 +18,14 @@ import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MunicipiDto;
+import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -64,6 +68,8 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired
+	private DadesExternesService dadesExternesService;
 
 	@Override
 	public InteressatDto create(
@@ -108,14 +114,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	public InteressatDto update(
 			Long entitatId,
 			Long expedientId,
-			Long interessatId,
+			Long representatId,
 			InteressatDto interessat, 
 			String rolActual) {
-		if (interessatId != null) {
+		if (representatId != null) {
 			logger.debug("Modificant un representant ("
 					+ "entitatId=" + entitatId + ", "
 					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + interessatId + ", "
+					+ "interessatId=" + representatId + ", "
 					+ "interessat=" + interessat + ")");
 		} else {
 			logger.debug("Modificant un interessat ("
@@ -133,14 +139,14 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false, 
 				false, 
 				rolActual);
-		InteressatEntity pare = null;
-		if (interessatId != null) {
-			pare = interessatRepository.findOne(interessatId);
-			if (pare == null || 
-				pare.getRepresentant() == null || 
-				!pare.getRepresentant().getId().equals(interessat.getId())) {
+		InteressatEntity representat = null;
+		if (representatId != null) {
+			representat = interessatRepository.findOne(representatId);
+			if (representat == null || 
+				representat.getRepresentant() == null || 
+				!representat.getRepresentant().getId().equals(interessat.getId())) {
 				throw new NotFoundException(
-						interessatId,
+						representatId,
 						InteressatEntity.class);
 			}
 		}
@@ -361,7 +367,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 
 	@Transactional(readOnly = true)
 	@Override
-	public InteressatDto findById(Long id) {
+	public InteressatDto findById(Long id, boolean consultarDadesExternes) {
 		logger.debug("Consulta de l'interessat ("
 				+ "id=" + id + ")");
 		InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
@@ -381,9 +387,46 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 //					interessat,
 //					InteressatAdministracioDto.class);
 		
-		return conversioTipusHelper.convertir(
+		InteressatDto interessatDto = conversioTipusHelper.convertir(
 				interessat,
 				InteressatDto.class);
+		if (consultarDadesExternes) {
+			String provinciaCodi = interessat.getProvincia();
+			for (PaisDto paisDto : dadesExternesService.findPaisos()) {
+				if (paisDto.getCodi().equals(interessat.getPais())) {
+					interessatDto.setPaisNom(paisDto.getNom());
+				}
+			}
+			for (ProvinciaDto provinciaDto : dadesExternesService.findProvincies()) {
+				if (provinciaDto.getCodi().equals(interessat.getProvincia())) {
+					interessatDto.setProvinciaNom(provinciaDto.getNom());
+				}
+			}
+			for (MunicipiDto municipiDto : dadesExternesService.findMunicipisPerProvincia(provinciaCodi)) {
+				if (municipiDto.getCodi().equals(interessat.getMunicipi())) {
+					interessatDto.setMunicipiNom(municipiDto.getNom());
+				}
+			}
+			InteressatEntity representant = interessat.getRepresentant();
+			if (representant != null) {
+				for (PaisDto paisDto : dadesExternesService.findPaisos()) {
+					if (paisDto.getCodi().equals(representant.getPais())) {
+						interessatDto.getRepresentant().setPaisNom(paisDto.getNom());
+					}
+				}
+				for (ProvinciaDto provinciaDto : dadesExternesService.findProvincies()) {
+					if (provinciaDto.getCodi().equals(representant.getProvincia())) {
+						interessatDto.getRepresentant().setProvinciaNom(provinciaDto.getNom());
+					}
+				}
+				for (MunicipiDto municipiDto : dadesExternesService.findMunicipisPerProvincia(provinciaCodi)) {
+					if (municipiDto.getCodi().equals(representant.getMunicipi())) {
+						interessatDto.getRepresentant().setMunicipiNom(municipiDto.getNom());
+					}
+				}
+			}
+		}
+		return interessatDto;
 	}
 
 	@Transactional(readOnly = true)

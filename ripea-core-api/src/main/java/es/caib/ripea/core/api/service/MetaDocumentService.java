@@ -308,6 +308,7 @@ public interface MetaDocumentService {
 	 *            Id de l'entitat.
 	 * @param contenidorId
 	 *            Id del contenidor.
+	 * @param metaExpedientId
 	 * @return La llista de meta-documents per crear.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -315,7 +316,8 @@ public interface MetaDocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
-			Long contenidorId) throws NotFoundException;
+			Long contenidorId, 
+			Long metaExpedientId) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-documents actius donada una entitat i un document.
@@ -412,4 +414,10 @@ public interface MetaDocumentService {
 			Long metaExpedientId,
 			Long metaDocumentId,
 			boolean remove) throws NotFoundException;
+
+	
+	@PreAuthorize("hasRole('tothom')")
+	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
+			Long entitatId,
+			Long metaExpedientId) throws NotFoundException;
 }

@@ -78,6 +78,7 @@ import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
@@ -195,13 +196,14 @@ public class UsuariTascaController extends BaseUserController {
 	public String expedientTascaIniciar(
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
+			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.INICIADA, null);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/usuariTasca",
+				redirectATasca != null && redirectATasca == true ? "redirect:/usuariTasca/" + expedientTascaId + "/tramitar" : "redirect:/usuariTasca",
 				"expedient.tasca.controller.iniciada.ok");
 		
 	}
@@ -443,7 +445,7 @@ public class UsuariTascaController extends BaseUserController {
 				documentId,
 				true,
 				false,
-				false, null);
+				false, null, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = expedientTascaService.descarregar(
 					entitatActual.getId(),
@@ -562,7 +564,8 @@ public class UsuariTascaController extends BaseUserController {
 					"metaDocuments",
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
-							pareId));
+							pareId, 
+							null));
 		} else {
 			model.addAttribute(
 					"metaDocuments",
@@ -649,7 +652,8 @@ public class UsuariTascaController extends BaseUserController {
 				"metaDocuments",
 				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
-						contingut.getId()));
+						contingut.getId(), 
+						null));
 
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
@@ -795,7 +799,8 @@ public class UsuariTascaController extends BaseUserController {
 		expedientTascaService.portafirmesCancelar(
 				entitatActual.getId(),
 				tascaId,
-				documentId);
+				documentId, 
+				RolHelper.getRolActual(request));
 		return this.getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../../contingut/" + documentId,

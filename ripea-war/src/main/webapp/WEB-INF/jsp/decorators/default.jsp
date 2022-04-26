@@ -92,7 +92,10 @@
 	<![endif]-->
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	
-	<script>var requestLocale = '${requestLocale}';</script>
+	<script>
+		var requestLocale = '${requestLocale}';
+		var contextAddress = '${pageContext.request.contextPath}';
+	</script>
 	<decorator:head />
 <style>
 body {
@@ -389,6 +392,11 @@ body {
 					<c:when test="${isRolActualAdministradorOrgan}">
 						<%---- Expedients ----%>
 						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>									
+						<%---- Annotacions pendents ----%>
+						<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+							<spring:message code="decorator.menu.expedientPeticions"/>
+							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
+						</a>
 						<div class="btn-group">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">

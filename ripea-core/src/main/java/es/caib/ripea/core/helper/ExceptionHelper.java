@@ -1,5 +1,7 @@
 package es.caib.ripea.core.helper;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 public class ExceptionHelper {
 
 	/**
@@ -47,6 +49,12 @@ public class ExceptionHelper {
 			
 		}
 		return exception;
+	}
+	
+	
+	public static Throwable getRootCauseOrItself(Throwable e) {
+
+		return ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
 	}
 	
 }

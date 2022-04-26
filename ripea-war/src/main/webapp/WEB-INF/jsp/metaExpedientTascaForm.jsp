@@ -6,7 +6,16 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
 	<c:when test="${empty metaExpedientTascaCommand.id}"><c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.modificar"/></c:set></c:otherwise>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${consultar}">
+				<c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.consultar"/></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="titol"><spring:message code="metaexpedient.tasca.form.titol.modificar"/></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -20,6 +29,21 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<rip:modalHead/>
+	<script type="application/javascript">
+		var colorsEstats = {};
+		<c:forEach items="${expedientEstats}" var="estat">
+			colorsEstats['${estat.id}'] = '${estat.color}';
+		</c:forEach>
+
+		function showColor(element) {
+			const id = element.id;
+			const color = colorsEstats[id];
+			if (!color) {
+				return $('<span class="no-icon"></span><span>' + element.text + '</span>');
+			}
+			return $('<span class="color-icon" style="background-color: ' + color + '"></span><span>' + element.text + '</span>');
+		}
+	</script>
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/${metaExpedient.id}/tasca/save"/></c:set>
@@ -44,10 +68,10 @@
 		<rip:inputDate name="dataLimit" textKey="metaexpedient.tasca.form.camp.dataLimit" readonly="${bloquejarCamps}"/>
 		<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true" disabled="${bloquejarCamps}"/>
 		
-		<rip:inputSelect name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}"/>
-		<rip:inputSelect name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}"/>
+		<rip:inputSelect id="estatIdCrearTasca" name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
+		<rip:inputSelect id="estatIdFinalitzarTasca" name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button></c:if>
 			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/tasca"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

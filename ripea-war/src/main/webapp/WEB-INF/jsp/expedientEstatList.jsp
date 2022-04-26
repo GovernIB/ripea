@@ -21,21 +21,18 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-	$('#estats').on('dragupdate.dataTable', function (event, itemId, index) {
-		$.ajax({
-			url: "<c:url value="/ajax/expedientEstat/"/>" + ${metaExpedient.id} + "/" + itemId + "/move/" + index,
-			async: false
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#estats').on('dragupdate.dataTable', function (event, itemId, index) {
+				$.ajax({
+					url: "<c:url value="/ajax/expedientEstat/"/>" + ${metaExpedient.id} + "/" + itemId + "/move/" + index,
+					async: false
+				});
+			});
 		});
-	});
-});
-</script>
+	</script>
 </head>
 <body>
-
-	
-
 
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<c:if test="${!bloquejarCamps}">
@@ -59,22 +56,32 @@ $(document).ready(function() {
 					</script>
 				</th>				
 				<th data-col-name="responsableCodi" data-orderable="false"><spring:message code="expedient.estat.form.camp.responsable"/></th>
-				
-				<c:if test="${!esRevisor}">
-					<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
-						<script id="cellAccionsTemplate" type="text/x-jsrender">
-							<div class="dropdown">
-								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-								<ul class="dropdown-menu">
-									<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-									<c:if test="${!bloquejarCamps}">
-										<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-									</c:if>
-								</ul>
-							</div>
-						</script>
-					</th>
-				</c:if>
+				<th data-col-name="color" data-orderable="false" data-template="#cellColorTemplate" width="80px;">
+					<spring:message code="expedient.estat.form.camp.color"/>
+					<script id="cellColorTemplate" type="text/x-jsrender">
+						<span class="color-legend" {{if color}}style="background-color: {{:color}};"{{else}}style="border: dashed 1px #AAA;"{{/if}}></span>
+					</script>
+				</th>
+				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+								<c:choose>
+									<c:when test="${consultar}">
+										<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+									</c:when>
+									<c:otherwise>
+										<li><a href="${metaExpedient.id}/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									</c:otherwise>
+								</c:choose>
+								<c:if test="${!bloquejarCamps}">
+									<li><a href="${metaExpedient.id}/{{:id}}/delete"  data-toggle="ajax" data-confirm="<spring:message code="entitat.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								</c:if>
+							</ul>
+						</div>
+					</script>
+				</th>
 			</tr>
 		</thead>
 	</table>

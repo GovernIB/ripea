@@ -1,12 +1,23 @@
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
+import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
+import es.caib.ripea.war.command.ExpedientTancarCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +33,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.command.ExpedientMassiuTancamentCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per tancament massiu d'expedients
@@ -50,7 +61,10 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private ExpedientService expedientService;
-
+	@Autowired
+	private ContingutService contingutService;
+	@Autowired
+	private DocumentService documentService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -210,7 +224,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					"redirect:/massiu/definitiu",
 					"accio.massiva.seleccio.buida");
 		}
-		
+		omplirModelTancarExpedient(request, model);
 		ExpedientMassiuTancamentCommand command = new ExpedientMassiuTancamentCommand();
 		model.addAttribute(command);
 		
@@ -228,7 +242,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-
+			omplirModelTancarExpedient(request, model);
 			return "expedientMassiuTancamentForm";
 		}
 		
@@ -238,13 +252,32 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		
 		try {
 			
-			for (Long expedientId : seleccio) {
-				expedientService.tancar(
-						entitatActual.getId(),
-						expedientId,
-						command.getMotiu(),
-						null, false);
+			int errors = 0;
+			int nodefinitius = 0;
+			int correctes = 0;
+			
+			for (ExpedientTancarCommand expedientTancar : command.getExpedientsTancar()) {
 				
+				try {
+					expedientService.tancar(
+							entitatActual.getId(),
+							expedientTancar.getId(),
+							command.getMotiu(),
+							expedientTancar.getDocumentsPerFirmar(), 
+							false);
+					
+					correctes++;
+				} catch (Exception e) {
+					logger.error("Error al tancament massiu de expedient amb id=" + expedientTancar.getId(), e);
+					Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
+					if (throwable.getClass() == ExpedientTancarSenseDocumentsDefinitiusException.class) {
+						nodefinitius++;
+					} else {
+						errors++;
+						ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientTancar.getId(), RolHelper.getRolActual(request));
+						MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.error", new Object[]{expedientDto.getNom(), throwable.getMessage()}));
+					}
+				}
 			}
 			
 			seleccio.clear();
@@ -253,10 +286,16 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					getSessionAttributeSelecio(request),
 					seleccio);
 			
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../massiu/tancament",
-					"expedient.controller.tancar.massiu.ok");
+			if (correctes > 0) {
+				MissatgesHelper.success(request, getMessage(request, "expedient.controller.tancar.massiu.correctes", new Object[]{correctes}));
+			} 
+			if (nodefinitius > 0) {
+				MissatgesHelper.warning(request, getMessage(request, "expedient.controller.tancar.massiu.nodefinitius", new Object[]{nodefinitius}));
+			} 
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.errors", new Object[]{errors}));
+			} 
+			return modalUrlTancar();
 			
 		} catch (Exception ex) {
 			logger.error("Error al tancament massiu", ex);
@@ -265,9 +304,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					request,
 					"redirect:../massiu/tancament",
 					ex.getMessage());
-
 		}
-		
 	}
 	
 	
@@ -288,6 +325,41 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 		return sessionAttribute;
 	}
 	
+	
+	private void omplirModelTancarExpedient(
+			HttpServletRequest request,
+			Model model) {
+		
+		boolean hasEsborranys = false;
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<ExpedientDto> expedients = new ArrayList<>();
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request));
+		
+		for (Long expedientId : seleccio) {
+			ExpedientDto expedient = (ExpedientDto)contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					expedientId,
+					true,
+					false, 
+					null, 
+					null);
+			if (expedient.isHasEsborranys()) {
+				List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(
+						entitatActual.getId(),
+						expedientId,
+						DocumentEstatEnumDto.REDACCIO);
+				expedient.setEsborranys(esborranys);
+				hasEsborranys = true;
+			}
+			expedients.add(expedient);
+		}
+		model.addAttribute("expedients", expedients);
+		model.addAttribute("hasEsborranys", hasEsborranys);
+
+	}
 	
 	
 

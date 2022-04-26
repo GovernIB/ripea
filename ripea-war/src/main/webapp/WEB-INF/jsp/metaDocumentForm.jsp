@@ -324,7 +324,8 @@ function removeLoading() {
 					textKey="contingut.document.form.camp.nti.tipdoc"
 					optionItems="${ntiTipusDocumentalOptions}"
 					optionValueAttribute="codi" optionTextAttribute="nom"
-					required="true" />
+					required="true" 
+					optionMinimumResultsForSearch="3"/>
 				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">

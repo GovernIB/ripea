@@ -85,14 +85,17 @@ public class BaseAdminController extends BaseController {
 	
 	protected MetaExpedientDto comprovarAccesMetaExpedient(HttpServletRequest request, Long metaExpedientId) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		if (!entitat.isUsuariActualAdministration()) {
-				
-		}	
-		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-		MetaExpedientDto metaExpedient = metaExpedientService.getAndCheckAdminPermission(
-				entitat.getId(),
-				metaExpedientId,
-				organActual != null ? organActual.getId() : null);
+		
+		MetaExpedientDto metaExpedient = null;
+		if (RolHelper.isRolActualRevisor(request)) {
+			metaExpedient = metaExpedientService.findById(entitat.getId(), metaExpedientId);
+		} else {
+			OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+			metaExpedient = metaExpedientService.getAndCheckAdminPermission(
+					entitat.getId(),
+					metaExpedientId,
+					organActual != null ? organActual.getId() : null);
+		}
 		return metaExpedient;
 	}
 }

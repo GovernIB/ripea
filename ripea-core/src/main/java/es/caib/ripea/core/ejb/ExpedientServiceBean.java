@@ -6,6 +6,7 @@ package es.caib.ripea.core.ejb;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
@@ -15,6 +16,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -54,7 +56,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId, 
-			String rolActual) {
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -67,7 +70,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				expedientPeticioId,
 				associarInteressats,
 				grupId, 
-				rolActual);
+				rolActual, 
+				anexosIdsMetaDocsIdsMap);
 	}
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,
@@ -102,8 +106,9 @@ public class ExpedientServiceBean implements ExpedientService {
 	@RolesAllowed("tothom")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) {
-		return delegate.findById(entitatId, id);
+			Long id, 
+			String rolActual) {
+		return delegate.findById(entitatId, id, rolActual);
 	}
 
 
@@ -226,8 +231,8 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientSelectorDto> findPerUserAndTipus(Long entitatId, Long metaExpedientId, boolean checkPerMassiuAdmin) throws NotFoundException {
-		return delegate.findPerUserAndTipus(entitatId, metaExpedientId, checkPerMassiuAdmin);
+	public List<ExpedientSelectorDto> findPerUserAndProcediment(Long entitatId, Long metaExpedientId, String rolActual) throws NotFoundException {
+		return delegate.findPerUserAndProcediment(entitatId, metaExpedientId, rolActual);
 	}
 
 	@Override
@@ -247,11 +252,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	@Override
 	public List<ExpedientDto> findByEntitatAndMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId, String rolActual) {
+			Long metaExpedientId, String rolActual, Long organActualId) {
 		return delegate.findByEntitatAndMetaExpedient(
 				entitatId,
 				metaExpedientId, 
-				rolActual);
+				rolActual, organActualId);
 	}
 
 	@Override
@@ -282,9 +287,14 @@ public class ExpedientServiceBean implements ExpedientService {
 
 
 	@Override
-	public boolean retryCreateDocFromAnnex(Long registreAnnexId,
-			Long expedientPeticioId) {
-		return delegate.retryCreateDocFromAnnex(registreAnnexId, expedientPeticioId);		
+	public boolean retryCreateDocFromAnnex(
+			Long registreAnnexId,
+			Long expedientPeticioId, 
+			Long metaDocumentId, String rolActual) {
+		return delegate.retryCreateDocFromAnnex(
+				registreAnnexId, 
+				expedientPeticioId, 
+				metaDocumentId, rolActual);		
 	}
 
 	@Override
@@ -299,8 +309,15 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientId,
 			Long expedientPeticioId,
 			boolean associarInteressats, 
-			String rolActual) {
-		return delegate.incorporar(entitatId, expedientId, expedientPeticioId,  associarInteressats, rolActual);
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+		return delegate.incorporar(
+				entitatId, 
+				expedientId, 
+				expedientPeticioId,  
+				associarInteressats, 
+				rolActual, 
+				anexosIdsMetaDocsIdsMap);
 		
 	}
 
@@ -375,5 +392,61 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			String text){
 		return delegate.findByText(entitatId, text);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(Long entitatId, Long metaExpedientId,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findExpedientMetaExpedientPaginat(entitatId, metaExpedientId, paginacioParams);
+	}
+	@Override
+	@RolesAllowed({"IPA_ADMIN"})
+	public List<CodiValorDto> findByEntitat(
+			Long entitatId) {
+		return delegate.findByEntitat(entitatId);
+
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public boolean hasReadPermissionsAny(
+			String rolActual,
+			Long entitatId) {
+		return delegate.hasReadPermissionsAny(rolActual, entitatId);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<ExpedientDto> findByIds(
+			Long entitatId,
+			Set<Long> ids) {
+		return delegate.findByIds(
+				entitatId,
+				ids);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
+			Long id,
+			ExpedientFiltreDto filtre,
+			Long expedientId,
+			PaginacioParamsDto paginacioDtoFromRequest) {
+		return delegate.relacioFindAmbExpedientPaginat(id, filtre, expedientId, paginacioDtoFromRequest);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public void importarExpedient(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
+			throws NotFoundException {
+		delegate.importarExpedient(entitatId, expedientPareId, expedientId, rolActual);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
+			throws NotFoundException {
+		return delegate.esborrarExpedientFill(entitatId, expedientPareId, expedientId, rolActual);
 	}
 }

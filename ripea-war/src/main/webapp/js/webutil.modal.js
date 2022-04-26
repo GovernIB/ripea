@@ -62,7 +62,7 @@
 								'					<h4 class="modal-title"></h4>' +
 								'				</div>' +
 								'				<div class="modal-body" style="padding:0">' +
-								'					<iframe frameborder="0" height="100" width="100%"></iframe>' +
+								'					<iframe frameborder="0" height="80" width="100%"></iframe>' +
 								'					<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
 								'						<span class="fa fa-circle-o-notch fa-spin fa-3x"></span>' + 
 								(plugin.settings.missatgeLoading != null ? '<p>' + plugin.settings.missatgeLoading + '</p>' : '') +	

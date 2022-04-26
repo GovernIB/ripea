@@ -92,7 +92,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 */
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
-		logger.info(
+		logger.debug(
 				"Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
 		// find peticions with no registre associated and with no errors from previous invocation of this method
@@ -158,7 +158,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								expedientPeticioEntity.getId(),
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
-										4000));
+										3600));
 						
 						// change state of registre in DISTRIBUCIO to BACK_ERROR
 						DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
@@ -166,7 +166,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								Estat.ERROR,
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
-										4000));
+										3600));
 						
 					} catch (IOException e1) {
 						logger.error(ExceptionUtils.getStackTrace(e1));
@@ -178,7 +178,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	@Override
 	public void buidarCacheDominis() {
-		logger.info("Execució tasca periòdica: Buidar cachés dominis");
+		logger.debug("Execució tasca periòdica: Buidar cachés dominis");
 		try {
 			//Consulta
 			cacheHelper.evictFindDominisByConsutla();
@@ -319,7 +319,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void guardarExpedientsDocumentsArxiu() {
 		
-		logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
+		logger.debug("Execució tasca periòdica: Guardar expedients i documents en arxiu");
 		
 		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
 		int arxiuMaxReintentsDocuments = getArxiuMaxReintentsDocuments();
@@ -343,7 +343,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void guardarInteressatsArxiu() {
 		
-		logger.info("Execució tasca periòdica: Guardar interessats en arxiu");
+		logger.debug("Execució tasca periòdica: Guardar interessats en arxiu");
 		
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
 		

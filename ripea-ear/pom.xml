@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.90</version>
+		<version>0.9.92</version>
 	</parent>
 	<artifactId>ripea-ear</artifactId>
 	<packaging>ear</packaging>
@@ -111,6 +111,45 @@
 			<type>war</type>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>jboss</id>
+			<activation>
+				<file>
+					<missing>../ripea-war/appserv_tomcat</missing>
+				</file>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Tornam a deixar els placeholders com a l'inici	-->
+					<plugin>
+						<groupId>com.google.code.maven-replacer-plugin</groupId>
+						<artifactId>replacer</artifactId>
+						<version>1.5.3</version>
+						<executions>
+							<execution>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>replace</goal>
+								</goals>
+								<configuration>
+									<basedir>${basedir}/../ripea-core/src/main/java/es/caib/ripea/core/ejb/ws</basedir>
+									<includes>
+										<include>PortaFIBCallbackWsBean.java</include>
+										<include>MCGDWsBean.java</include>
+										<include>BackofficeWsServiceBean.java</include>
+									</includes>
+									<token>/${ripea.path}</token>
+									<value>/ripea</value>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<build>
 		<plugins>
 			<plugin>

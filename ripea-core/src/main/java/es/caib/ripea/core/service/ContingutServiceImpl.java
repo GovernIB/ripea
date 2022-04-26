@@ -10,10 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,9 +67,6 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -79,13 +76,23 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.HibernateHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
@@ -130,15 +137,11 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
-	private DocumentNotificacioRepository documentNotificacioRepository;
-	@Autowired
 	private TipusDocumentalRepository tipusDocumentalRepository;
-	@Autowired
-	private DocumentPortafirmesRepository documentPortafirmesRepository;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
-	private ConfigHelper configHelper;
+	private ExpedientRepository expedientRepository;
 
 	@Transactional
 	@Override
@@ -178,7 +181,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	@Transactional
@@ -244,7 +247,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return contingutHelper.deleteReversible(
 				entitatId,
-				contingut);
+				contingut, null);
 	}
 
 	@Transactional
@@ -273,9 +276,39 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
+		}
+		
+		if (contingut instanceof ExpedientEntity && contingut.getFills() != null && !contingut.getFills().isEmpty()) {
+			List<ContingutEntity> descendants = new ArrayList<>();
+			contingutHelper.findDescendants(contingut, descendants);
+			
+			Iterator<ContingutEntity> itr = descendants.iterator();
+			while (itr.hasNext()) {
+				ContingutEntity cont = itr.next();
+				if (cont.getPare() != null) {
+					cont.getPare().getFills().remove(cont);
+				}
+				if (cont instanceof DocumentEntity) {
+					DocumentEntity documentEntity = (DocumentEntity) cont;
+					if (documentEntity.getGesDocAdjuntId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					}
+					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+						pluginHelper.gestioDocumentalDelete(
+								documentEntity.getGesDocAdjuntFirmaId(),
+								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					}
+					if (contingutHelper.fitxerDocumentEsborratLlegir(documentEntity) != null) {
+						contingutHelper.fitxerDocumentEsborratEsborrar(documentEntity);
+					}
+				} 
+				contingutRepository.delete(cont);
+			}
 		}
 		
 		if (contingut instanceof DocumentEntity) {
@@ -311,7 +344,7 @@ public class ContingutServiceImpl implements ContingutService {
 //				true);
 		return dto;
 	}
-
+	
 	@Transactional
 	@Override
 	public ContingutDto undelete(
@@ -363,7 +396,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -388,7 +421,7 @@ public class ContingutServiceImpl implements ContingutService {
 					fitxer,
 					false,
 					false,
-					null);
+					null, false);
 			if (fitxer != null) {
 				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
@@ -402,7 +435,8 @@ public class ContingutServiceImpl implements ContingutService {
 	public ContingutDto move(
 			Long entitatId,
 			Long contingutOrigenId,
-			Long contingutDestiId) {
+			Long contingutDestiId, 
+			String rolActual) {
 		logger.debug("Movent el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
@@ -414,7 +448,8 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				true, 
-				false, null);
+				false, 
+				rolActual);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -422,9 +457,10 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false, null);
+				false, 
+				rolActual);
 		// Comprova el tipus del contingut que es vol moure
-		if ((contingutOrigen instanceof CarpetaEntity && !isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
+		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
@@ -433,7 +469,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// No es poden moure documents firmats
 		if (contingutOrigen instanceof DocumentEntity) {
 			DocumentEntity documentOrigen = (DocumentEntity)contingutOrigen;
-			if (documentOrigen.isFirmat() && !isCarpetaLogica()) {
+			if (documentOrigen.isFirmat() && !contingutHelper.isCarpetaLogica()) {
 				throw new ValidationException(
 						contingutOrigenId,
 						contingutOrigen.getClass(),
@@ -488,7 +524,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -591,7 +627,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -697,7 +733,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 		return dto;
 	}
 
@@ -708,14 +744,14 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions, 
-			String rolActual) {
+			String rolActual, Long organActualId) {
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
 				true, 
-				rolActual);
+				rolActual, null);
 	}
 
 	@Transactional(readOnly = true)
@@ -726,7 +762,8 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambFills,
 			boolean ambVersions,
 			boolean ambPermisos, 
-			String rolActual) {
+			String rolActual, 
+			Long organActualId) {
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
@@ -742,23 +779,24 @@ public class ContingutServiceImpl implements ContingutService {
 		} else {
 			contingut = contingutRepository.findOne(contingutId);
 		}
+		// ** #979 -> Es comprova cada camp dins documentEntity
 		// Comprovar si hi ha notificacions del document
-		for (ContingutEntity document: contingut.getFills()) {
-			if (document instanceof DocumentEntity) {
-				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
-				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
-				if (notificacions != null && notificacions.size() > 0) {
-					document.setAmbNotificacions(true);
-					DocumentNotificacioEntity lastNofificacio = notificacions.get(0);
-					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "");
-					document.setErrorDarreraNotificacio(lastNofificacio.isError());
-				}
-				if (enviaments != null && enviaments.size() > 0) {
-					DocumentEnviamentEntity lastEnviament = enviaments.get(0);
-					document.setErrorEnviamentPortafirmes(lastEnviament.isError());
-				}
-			}
-		}
+//		for (ContingutEntity document: contingut.getFills()) {
+//			if (document instanceof DocumentEntity) {
+//				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
+//				List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);
+//				if (notificacions != null && notificacions.size() > 0) {
+//					document.setAmbNotificacions(true);
+//					DocumentNotificacioEntity lastNofificacio = notificacions.get(0);
+//					document.setEstatDarreraNotificacio(lastNofificacio.getNotificacioEstat() != null ? lastNofificacio.getNotificacioEstat().name() : "");
+//					document.setErrorDarreraNotificacio(lastNofificacio.isError());
+//				}
+//				if (enviaments != null && enviaments.size() > 0) {
+//					DocumentEnviamentEntity lastEnviament = enviaments.get(0);
+//					document.setErrorEnviamentPortafirmes(lastEnviament.isError());
+//				}
+//			}
+//		}
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -768,7 +806,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false);
+				rolActual, false, null);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -801,7 +839,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null, false);
+				true, null, false, null);
 	}
 
 	@Transactional(readOnly = true)
@@ -1030,8 +1068,22 @@ public class ContingutServiceImpl implements ContingutService {
 		Date dataCreacioInici = DateHelper.toDateInicialDia(filtre.getDataCreacioInici());
 		Date dataCreacioFi = DateHelper.toDateFinalDia(filtre.getDataCreacioFi());
 		
+		Date dataEsborratInici = DateHelper.toDateInicialDia(filtre.getDataEsborratInici());
+		Date dataEsborratFi = DateHelper.toDateFinalDia(filtre.getDataEsborratFi());
+		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = expedientRepository.findOne(filtre.getExpedientId());
+			if (expedient == null) {
+				throw new NotFoundException(
+						filtre.getExpedientId(),
+						ExpedientEntity.class);
+			}
+		}
+		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+		
 		
 		
 		return paginacioHelper.toPaginaDto(
@@ -1050,8 +1102,14 @@ public class ContingutServiceImpl implements ContingutService {
 						dataCreacioInici,
 						(dataCreacioFi == null),
 						dataCreacioFi,
+						(dataEsborratInici == null),
+						dataEsborratInici,
+						(dataEsborratFi == null),
+						dataEsborratFi,
 						filtre.isMostrarEsborrats(),
 						filtre.isMostrarNoEsborrats(),
+						(expedient == null),
+						expedient,
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				ContingutDto.class,
 				new Converter<ContingutEntity, ContingutDto>() {
@@ -1065,7 +1123,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null, false);
+								false, null, false, null);
 					}
 				});
 	}
@@ -1126,7 +1184,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null, false);
+								false, null, false, null);
 					}
 				});
 	}
@@ -1562,6 +1620,7 @@ public class ContingutServiceImpl implements ContingutService {
 			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("metaDocument.nom", new String[] {"metaNode.nom"});
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
 					entitat,
 					metaExpedientsPermesos, 
@@ -1592,7 +1651,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false);
+									false, null, false, null);
 							return dto;
 						}
 					});
@@ -1978,9 +2037,6 @@ public class ContingutServiceImpl implements ContingutService {
 		return conteDefinitius;
 	}
 
-	public boolean isCarpetaLogica() {
-		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
-	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 

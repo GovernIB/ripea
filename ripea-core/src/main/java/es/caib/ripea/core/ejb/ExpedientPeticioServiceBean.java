@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
@@ -40,14 +41,14 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<ExpedientPeticioDto> findAmbFiltre(
+	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, boolean isAdmin) {
+			PaginacioParamsDto paginacioParams, String rolActual, Long organActualId) {
 		return delegate.findAmbFiltre(
 				entitatId,
 				filtre,
-				paginacioParams, isAdmin);
+				paginacioParams, rolActual, organActualId);
 	}
 
 	@Override
@@ -117,7 +118,7 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientPeticioDto> findByExpedientAmbFiltre(
+	public List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams) {
@@ -140,8 +141,8 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public long countAnotacionsPendents(Long entitatId, boolean isAdmin) {
-		return delegate.countAnotacionsPendents(entitatId, isAdmin);
+	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId) {
+		return delegate.countAnotacionsPendents(entitatId, rolActual, organActualId);
 	}
 
 	@Override

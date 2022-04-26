@@ -103,7 +103,7 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
 		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndTipus(entitatActual.getId(), filtreCommand.getMetaExpedientId(), checkPerMassiuAdmin);
+			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
 		model.addAttribute(
 				"expedients",
 				expedients);

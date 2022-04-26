@@ -16,18 +16,18 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
-	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/entitat/${entitat.id}/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-default-order="1" data-default-dir="asc" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%">
+	<table id="permisos" data-toggle="datatable" data-url="<c:url value="/entitat/${entitat.id}/permis/datatable"/>" data-search-enabled="false" data-paging-enabled="false" data-botons-template="#botonsTemplate" class="table table-striped table-bordered" style="width:100%">	
 		<thead>
 			<tr>
-				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)"><spring:message code="entitat.permis.columna.tipus"/></th>
-				<th data-col-name="principalNom"><spring:message code="entitat.permis.columna.principal"/></th>
-				<th data-col-name="administration" data-template="#cellAdministrationTemplate">
+				<th data-col-name="principalTipus" data-renderer="enum(PrincipalTipusEnumDto)" data-orderable="false"><spring:message code="entitat.permis.columna.tipus"/></th>
+				<th data-col-name="principalNom" data-orderable="false"><spring:message code="entitat.permis.columna.principal"/></th>
+				<th data-col-name="administration" data-template="#cellAdministrationTemplate" data-orderable="false">
 					<spring:message code="entitat.permis.columna.administracio"/>
 					<script id="cellAdministrationTemplate" type="text/x-jsrender">
 						{{if administration}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="read" data-template="#cellReadTemplate">
+				<th data-col-name="read" data-template="#cellReadTemplate" data-orderable="false">
 					<spring:message code="entitat.permis.columna.usuari"/>
 					<script id="cellReadTemplate" type="text/x-jsrender">
 						{{if read}}<span class="fa fa-check"></span>{{/if}}

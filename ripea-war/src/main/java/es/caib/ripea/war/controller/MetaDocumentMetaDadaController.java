@@ -73,11 +73,15 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
 		if (metaDocument.getMetaExpedientId() != null) {
 			MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaDocument.getMetaExpedientId());
-			if (metaExpedient != null // es tracta d'una modificació
-					&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
-					&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
-				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
-				model.addAttribute("bloquejarCamps", true);
+			if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
+				if (RolHelper.isRolActualAdministradorOrgan(request)  && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT){
+					MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+					model.addAttribute("bloquejarCamps", true);
+				} else if (RolHelper.isRolActualRevisor(request)){
+					model.addAttribute("bloquejarCamps", true);
+					model.addAttribute("consultar", true);
+					model.addAttribute("isRolActualRevisor", true);
+				}
 			}
 		}
 
@@ -122,15 +126,19 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaNodeId(metaDocumentId);
 		model.addAttribute(command);
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
 		
+		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
 		if (metaDocument.getMetaExpedientId() != null) {
 			MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaDocument.getMetaExpedientId());
-			if (metaExpedient != null // es tracta d'una modificació
-					&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
-					&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
-				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
-				model.addAttribute("bloquejarCamps", true);
+			if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
+				if (RolHelper.isRolActualAdministradorOrgan(request)  && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT){
+					MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+					model.addAttribute("bloquejarCamps", true);
+				} else if (RolHelper.isRolActualRevisor(request)){
+					model.addAttribute("bloquejarCamps", true);
+					model.addAttribute("consultar", true);
+					model.addAttribute("isRolActualRevisor", true);
+				}
 			}
 		}
 
@@ -181,11 +189,14 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true, rolActual, organActual != null ? organActual.getId() : null);
 		
 		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
-		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
-			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		if (metaDocument.getMetaExpedientId() != null) {
+			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 		}
+		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
@@ -203,11 +214,14 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false, rolActual, organActual != null ? organActual.getId() : null);
 		
 		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
-		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
-			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		if (metaDocument.getMetaExpedientId() != null) {
+			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
+			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+			}
 		}
+
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",

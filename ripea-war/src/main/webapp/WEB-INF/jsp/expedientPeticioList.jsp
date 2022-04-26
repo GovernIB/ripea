@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="expedientPeticio.list.titol"/></title>
+	<title><spring:message code="expedient.peticio.list.titol"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -41,10 +41,10 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputText name="numero" inline="true" placeholderKey="expedientPeticio.list.placeholder.numero"/>
+				<rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.placeholder.numero"/>
 			</div>	
 			<div class="col-md-4">
-				<rip:inputText name="extracte" inline="true" placeholderKey="expedientPeticio.list.placeholder.extracte"/>
+				<rip:inputText name="extracte" inline="true" placeholderKey="expedient.peticio.list.placeholder.extracte"/>
 			</div>	
 			<div class="col-md-4">					
 				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaInicial"/>
@@ -53,7 +53,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 						name="destinacio"  
 						urlConsultaInicial="${urlConsultaInicial}"
 						urlConsultaLlistat="${urlConsultaLlistat}"
-						placeholderKey="expedientPeticio.list.placeholder.destinacio"
+						placeholderKey="expedient.peticio.list.placeholder.destinacio"
 						suggestValue="codi"
 						suggestText="nom"
 						inline="true"/>	
@@ -62,7 +62,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		<div class="row">
 		<!--  optionMinimumResultsForSearch -->
 			<div class="col-md-4">					
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedientPeticio.list.placeholder.metaExpedient" inline="true"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>
 <%--
 			<div class="col-md-4">					
@@ -72,20 +72,20 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 						name="metaExpedientId"  
 						urlConsultaInicial="${urlConsultaInicial}"
 						urlConsultaLlistat="${urlConsultaLlistat}"
-						placeholderKey="expedientPeticio.list.placeholder.metaExpedient"
+						placeholderKey="expedient.peticio.list.placeholder.metaExpedient"
 						suggestValue="codi"
 						suggestText="nom"
 						inline="true"/>	
 			</div>
  --%>			
 			<div class="col-md-4">							
-				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataInicial"/>
+				<rip:inputDate name="dataInicial" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataInicial"/>
 			</div>	
 			<div class="col-md-4">							
-				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedientPeticio.list.placeholder.dataFinal"/>
+				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataFinal"/>
 			</div>	
 			<div class="col-md-4">							
-				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedientPeticio.list.placeholder.estat"/>
+				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
 			</div>					
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
@@ -109,12 +109,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="registre.identificador"><spring:message code="expedientPeticio.list.columna.numero"/></th>
-				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedientPeticio.list.columna.data"/></th>
-				<th data-col-name="registre.extracte"><spring:message code="expedientPeticio.list.columna.extracte"/></th>
-				<th data-col-name="registre.destiDescripcio"><spring:message code="expedientPeticio.list.columna.destiNom"/></th>
-				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedientPeticio.list.columna.metaExpedientNom"/></th>
-				<th data-col-name="estatView" data-orderable="false"><spring:message code="expedientPeticio.list.columna.estat"/></th>
+				<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
+				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
+				<th data-col-name="registre.extracte"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
+				<th data-col-name="registre.destiDescripcio"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
+				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
+				<th data-col-name="estatView" data-orderable="false"><spring:message code="expedient.peticio.list.columna.estat"/></th>
+				<th data-col-name="expedientId" data-visible="false"></th>
 
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
@@ -125,6 +126,9 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 								{{if estatView == 'PENDENT'}}
 									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
 									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
+								{{/if}}
+								{{if estatView == 'ACCEPTAT'}}
+									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
 								{{/if}}
 							</ul>
 						</div>

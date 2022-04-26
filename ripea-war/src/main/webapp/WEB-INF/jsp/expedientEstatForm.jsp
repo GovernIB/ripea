@@ -6,7 +6,16 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
 	<c:when test="${empty expedientEstatCommand.id}"><c:set var="titol"><spring:message code="expedient.estat.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="expedient.estat.form.titol.modificar"/></c:set></c:otherwise>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${consultar}">
+				<c:set var="titol"><spring:message code="expedient.estat.form.titol.consultar"/></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="titol"><spring:message code="expedient.estat.form.titol.modificar"/></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -16,6 +25,13 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$("#ambColor").change(function() {
+				$("#color").prop("disabled", !$("#ambColor").prop('checked'));
+			});
+		});
+	</script>
 	<rip:modalHead/>
 </head>
 <body>
@@ -28,7 +44,16 @@
 			<form:hidden path="comu"/>
 			<rip:inputText name="codi" textKey="expedient.estat.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 			<rip:inputText name="nom" textKey="expedient.estat.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
-			<rip:inputText name="color" textKey="expedient.estat.form.camp.color" readonly="${bloquejarCamps}"/>
+			
+			<div class="row">
+				<div class="col-xs-4" style="text-align: right;">
+					<label for="color">Color</label>
+				</div>
+				<div class="col-xs-8">
+					<form:checkbox id="ambColor" path="ambColor" disabled="${bloquejarCamps}" />
+					<form:input type="color" path="color" id="color" name="color" value="" disabled="${bloquejarCamps or not expedientEstatCommand.ambColor}" style="width: calc(100% - 36px); float: right;" />
+				</div>
+			</div>
 			<rip:inputCheckbox name="inicial" textKey="expedient.estat.form.camp.inicial" disabled="${bloquejarCamps}"/>
 			
 			<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
@@ -44,7 +69,7 @@
 				placeholderKey="expedient.estat.form.camp.responsable"/>
 				
 			<div id="modal-botons">
-				<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+				<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>
 				<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 			</div>
 		</form:form>

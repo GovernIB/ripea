@@ -19,7 +19,7 @@
 	<rip:modalHead/>
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/import"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxer"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="fileCommand" role="form" enctype="multipart/form-data">
 
 	
@@ -28,7 +28,7 @@
 		<div style="min-height: 20px;"></div>
 
 		<div id="modal-botons">
-			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/>...</button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

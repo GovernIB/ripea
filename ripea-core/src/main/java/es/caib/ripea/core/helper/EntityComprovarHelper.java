@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -204,11 +205,9 @@ public class EntityComprovarHelper {
 		        new Permission[] { ExtendedPermission.ADMINISTRATION },
 		        auth);
 		if (!esAdministradorEntitat) {
-			boolean esAdministradorOrganGestor = permisosHelper.isGrantedAny(
-					id,
-					OrganGestorEntity.class,
-					new Permission[] { ExtendedPermission.ADMINISTRATION },
-					auth);
+			boolean esAdministradorOrganGestor = organGestorHelper.isOrganGestorPermes(
+					organGestor,
+					ExtendedPermission.ADMINISTRATION);
 			if (!esAdministradorOrganGestor) {
 				throw new PermissionDeniedException(id, OrganGestorEntity.class, auth.getName(),
 				        "ADMINISTRATION");
@@ -549,7 +548,7 @@ public class EntityComprovarHelper {
 			throw new ValidationException(expedientId, ExpedientEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat de l'expedient");
 		}
-		if (comprovarAgafatPerUsuariActual) {
+		if (comprovarAgafatPerUsuariActual && !RolHelper.isAdminEntitat(rolActual) && !RolHelper.isAdminOrgan(rolActual)) {
 			UsuariEntity agafatPer = expedient.getAgafatPer();
 			if (agafatPer != null) {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -911,14 +910,21 @@ public class EntityComprovarHelper {
 			String rolActual, 
 			Long organId) {
 		
-		boolean isAdmin = false;
-		if (rolActual != null && rolActual.equals("IPA_ADMIN")) {
-			isAdmin = true;
+		
+		boolean isAdminEntitat = false;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		EntitatEntity entitat = metaNode.getEntitat();
+		if (auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_ADMIN"))) {
+			isAdminEntitat = permisosHelper.isGrantedAll(entitat.getId(), EntitatEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
+		} 
+		boolean isAdminOrganPermRead = false;
+		if (auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_ORGAN_ADMIN")) && permission == ExtendedPermission.READ) {
+			isAdminOrganPermRead = true;
 		}
+
 		
-		if (!isAdmin) {
+		if (!isAdminEntitat && !isAdminOrganPermRead) {
 		
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			// Per a tenir permís s'ha de donar, com a mínim, un d'aquests casos:
 			// - Permis assignat directament al meta-node
 			// - Permís assignat a l'òrgan del node (o a un dels òrgans pare)
@@ -939,35 +945,36 @@ public class EntityComprovarHelper {
 						auth);
 			}
 	
-	
-			if (metaNode.getClass() == MetaExpedientEntity.class ) {
+			if (metaNode.getClass().getCanonicalName().contains("MetaExpedientEntity")) {
 				MetaExpedientEntity metaExpedientEntity = (MetaExpedientEntity) metaNode;
 				boolean grantedOrgan = false;
 				boolean grantedOrganMetaNode = false;
 				boolean grantedOrganProcedimentsComuns = false;
 				
 				if (!grantedDirect) {
-					
 					List<OrganGestorEntity> organsGestors = new ArrayList<>();
 					if (nodeId != null) {
 						organsGestors = expedientOrganPareRepository.findOrganGestorByExpedientId(nodeId);
+					} else if (organId != null) {
+						OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organId);
+						organsGestors = organGestorHelper.findPares(organGestorEntity, true);
 					} else {
 						OrganGestorEntity organGestorEntity = metaExpedientEntity.getOrganGestor();
 						if (organGestorEntity != null) {
-							organsGestors = organGestorRepository.findOrganGestorsPath(organGestorEntity.getId());
+							organsGestors = organGestorHelper.findPares(organGestorEntity, true);
 						}
 					}
 					if (usuariCodi != null) {
-						permisosHelper.filterGrantedAll(
+						permisosHelper.filterGrantedAny(
 								organsGestors,
 								OrganGestorEntity.class,
-								new Permission[] { permission },
+								new Permission[] { permission , ExtendedPermission.ADMINISTRATION },
 								usuariCodi);
 					} else {
-						permisosHelper.filterGrantedAll(
+						permisosHelper.filterGrantedAny(
 								organsGestors,
 								OrganGestorEntity.class,
-								new Permission[] { permission });
+								new Permission[] { permission , ExtendedPermission.ADMINISTRATION });
 					}
 					grantedOrgan = !organsGestors.isEmpty();
 				}

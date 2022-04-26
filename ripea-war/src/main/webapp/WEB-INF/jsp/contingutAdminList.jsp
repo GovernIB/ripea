@@ -37,7 +37,12 @@ $(document).ready(function() {
 		$('#metaNodeId option[value!=""]').remove();
 		var metaNodeRefresh = function(data) {
 			for (var i = 0; i < data.length; i++) {
-				$('#metaNodeId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+
+				if (data[i].id == '${contingutFiltreCommand.metaNodeId}' ) {
+					$('#metaNodeId').append('<option value="' + data[i].id + '" selected>' + data[i].nom + '</option>');
+				} else {
+					$('#metaNodeId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+				}
 			}
 		};
 		if (tipus == 'EXPEDIENT') {
@@ -46,14 +51,25 @@ $(document).ready(function() {
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
+			$('#expedientId').prop('disabled', true);
+			$('#expedientId').select2('val', '', true);
+			$('#expedientId option[value!=""]').remove();
 		} else if (tipus == 'DOCUMENT') {
 			$.get("<c:url value="/metaDocument/findAll"/>")
 			.done(metaNodeRefresh)
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
+			
+			$('#expedientId').removeAttr('disabled');
+		} else {
+			$('#expedientId').prop('disabled', true);
+			$('#expedientId').select2('val', '', true);
+			$('#expedientId option[value!=""]').remove();
 		}
 	});
+	
+	$('#tipus').trigger('change');
 });
 </script>
 </head>
@@ -63,11 +79,6 @@ $(document).ready(function() {
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="contingut.admin.filtre.nom"/>
 			</div>
-<%--
-			<div class="col-md-3">
-				<rip:inputText name="creador" inline="true" placeholderKey="contingut.admin.filtre.creador"/>
-			</div>
---%>
 			<div class="col-md-3">					
 				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
@@ -84,7 +95,30 @@ $(document).ready(function() {
 				<rip:inputSelect name="tipus" optionEnum="ContingutTipusEnumDto" emptyOption="true" placeholderKey="contingut.admin.filtre.tipus" inline="true"/>
 			</div>
 			<div class="col-md-3">
-				<rip:inputSelect name="metaNodeId" optionItems="${metaNodes}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" placeholderKey="contingut.admin.filtre.metanode" inline="true"/>
+				<rip:inputSelect name="metaNodeId" optionItems="${metaNodes}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="3" placeholderKey="contingut.admin.filtre.element" inline="true"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-2">
+				<rip:inputDate name="dataEsborratInici" inline="true" placeholderKey="contingut.admin.filtre.data.esborrat.inici"/>
+			</div>
+			<div class="col-md-2">
+				<rip:inputDate name="dataEsborratFi" inline="true" placeholderKey="contingut.admin.filtre.data.esborrat.fi"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputSelect name="opcionsEsborrat" optionItems="${contingutAdminOpcionsEsborratEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="false" inline="true"/>
+			</div>
+			<div class="col-md-5">					
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpLlistat"/>
+				<rip:inputSuggest 
+ 					name="expedientId"  
+ 					urlConsultaInicial="${urlConsultaExpInicial}"
+ 					urlConsultaLlistat="${urlConsultaExpLlistat}"
+					placeholderKey="contingut.admin.filtre.expedient"
+ 					suggestValue="id"
+ 					suggestText="nomINumero"
+					inline="true"/>	
 			</div>
 		</div>
 		<div class="row">
@@ -93,9 +127,6 @@ $(document).ready(function() {
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="contingut.admin.filtre.data.fi"/>
-			</div>
-			<div class="col-md-3">
-				<rip:inputSelect name="opcionsEsborrat" optionItems="${contingutAdminOpcionsEsborratEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" emptyOption="false" inline="true"/>
 			</div>
 			<div class="col-md-5 pull-right">
 				<div class="pull-right">
@@ -130,11 +161,10 @@ $(document).ready(function() {
 					<script id="cellNomTemplate" type="text/x-jsrender">
 						{{if expedient}}<span class="fa ${iconaExpedient}"></span>{{else document}}<span class="fa ${iconaDocument}"></span>{{else carpeta}}<span class="fa ${iconaCarpeta}"></span>{{else registre}}<span class="fa ${iconaAnotacioRegistre}"></span>{{/if}}
 						{{:nom}}
-						{{if esborrat}}<span class="fa fa-trash-o pull-right" title="<spring:message code="contingut.admin.columna.esborrat"/>"></span>{{/if}}
 					</script>
 				</th>
 				<th data-col-name="numero" data-orderable="false"><spring:message code="contingut.admin.columna.numero"/></th>				
-				<th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.metanode"/></th>
+				<th data-col-name="metaNode.nom" width="15%"><spring:message code="contingut.admin.columna.element"/></th>
 				<th data-col-name="createdBy.codiAndNom" width="10%"><spring:message code="contingut.admin.columna.creat.per"/></th>
 				<th data-col-name="createdDate" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.creat.el"/></th>
 				<th data-col-name="esborratData" data-converter="datetime" width="10%"><spring:message code="contingut.admin.columna.esborratData"/></th>
@@ -158,12 +188,14 @@ $(document).ready(function() {
 								<li><a href="contingutAdmin/{{:id}}/log" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 								{{if esborrat}}
 								<li><a href="contingutAdmin/{{:id}}/undelete" data-toggle="ajax"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="contingut.admin.boto.recuperar"/></a></li>
-									{{if hasFills}}
+							
+	<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<%--	{{if hasFills}}
 									<li class="disabled"><a data-toggle="ajax" ><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									{{else}}
 									<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-									{{/if}}								
-								{{/if}}
+									{{/if}}			--%>				
+								{{/if}} 
 								{{if expedient}}
 									<li><a href="<c:url value="contingutAdmin/{{:id}}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 								{{/if}}								

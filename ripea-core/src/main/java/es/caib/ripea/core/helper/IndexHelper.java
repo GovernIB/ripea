@@ -189,16 +189,19 @@ public class IndexHelper {
 //			## [TITOL ÍNDEX]
 			PdfPCell titolIntroduccioCell = new PdfPCell();
 			titolIntroduccioCell.setBorder(Rectangle.NO_BORDER);
-			
-			Paragraph indexTitol = new Paragraph(expedient.getNom(), frutiger11TitolBold);
-			indexTitol.setAlignment(Element.ALIGN_CENTER);
+
+			Paragraph titolParagraph = new Paragraph();
+			Chunk localDest = new Chunk(expedient.getNom(), frutiger11TitolBold);
+			localDest.setLocalDestination("expedient_" + expedient.getId());
+			titolParagraph.add(localDest);
+			titolParagraph.setAlignment(Element.ALIGN_CENTER);
 			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacioSia() + "] (" + expedientHelper.calcularNumero(expedient) + ")";
-			Paragraph indexSubtitol = new Paragraph(subtitol, frutiger9TitolBold);
-			indexSubtitol.setAlignment(Element.ALIGN_CENTER);
-			indexSubtitol.add(Chunk.NEWLINE);
+			Paragraph subTitolParagraph = new Paragraph(subtitol, frutiger9TitolBold);
+			subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
+			subTitolParagraph.add(Chunk.NEWLINE);
 			
-			titolIntroduccioCell.addElement(indexTitol);
-			titolIntroduccioCell.addElement(indexSubtitol);
+			titolIntroduccioCell.addElement(titolParagraph);
+			titolIntroduccioCell.addElement(subTitolParagraph);
 			
 			titolIntroduccioTable.addCell(titolIntroduccioCell);
 			titolIntroduccioTable.setSpacingAfter(10f);
@@ -297,13 +300,23 @@ public class IndexHelper {
 				}
 			}
 			if (contingut instanceof CarpetaEntity) {
-				num = crearFilesCarpetaActual(
-						num, 
-						sum,
-						contingut, 
-						taulaDocuments, 
-						entitatActual, 
-						isRelacio);
+				CarpetaEntity carpeta = (CarpetaEntity)contingut;
+				if (carpeta.getExpedientRelacionat() != null) { // És un expedient importat, mostrar en una fila
+					num = crearNovaFila(
+							taulaDocuments,
+							carpeta,
+							entitatActual,
+							num,
+							isRelacio);
+				} else {
+					num = crearFilesCarpetaActual(
+							num, 
+							sum,
+							contingut, 
+							taulaDocuments, 
+							entitatActual, 
+							isRelacio);
+				}
 			}
 		}
 	}
@@ -337,13 +350,23 @@ public class IndexHelper {
 		
 		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
 			if (contingutCarpetaActual instanceof CarpetaEntity) {
-				num = crearFilesCarpetaActual(
-						num, 
-						sum,
-						contingutCarpetaActual, 
-						taulaDocuments, 
-						entitatActual,  	
-						isRelacio);
+				CarpetaEntity subCarpeta = (CarpetaEntity)contingutCarpetaActual;
+				if (subCarpeta.getExpedientRelacionat() != null) {
+					num = crearNovaFila(
+							taulaDocuments,
+							subCarpeta,
+							entitatActual,
+							num,
+							isRelacio);
+				} else {
+					num = crearFilesCarpetaActual(
+							num, 
+							sum,
+							contingutCarpetaActual, 
+							taulaDocuments, 
+							entitatActual,  	
+							isRelacio);
+				}
 			} else {
 				DocumentEntity document = (DocumentEntity)contingutCarpetaActual;
 				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
@@ -360,153 +383,157 @@ public class IndexHelper {
 		return num;
 	}
 	
-	private void crearNovaFila(
+	private BigDecimal crearNovaFila(
 		PdfPTable taulaDocuments,
-		DocumentEntity document,
+		ContingutEntity contingut,
 		EntitatEntity entitatActual,
 		BigDecimal num,
 		boolean isRelacio) throws Exception {
-		logger.debug("Afegint nova fila a la taula de documents...");
-		ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
-				entitatActual.getId(),
-				document.getId());
-		List<String> subTitols = null;
-		SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//		Nº
-		String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
-		if (!isRelacio)
-			taulaDocuments.addCell(crearCellaContingut(nextVal, null, false));
-		
-//		Nom document
-		String nom = document.getNom() != null ? document.getNom() : "";
-		taulaDocuments.addCell(crearCellaContingut(nom, null, false));
-		
-		if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
-//			Nom natural
-			Object tituloDocMet = arxiuDetall.getMetadadesAddicionals().get("tituloDoc");
-			String tituloDoc = tituloDocMet != null ? tituloDocMet.toString() : "";
-			taulaDocuments.addCell(crearCellaContingut(tituloDoc, null, false));
-		}
-
-//		Descripció
-		String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
-		taulaDocuments.addCell(crearCellaContingut(descripcio, null, false));
-
-		
-//		Tipus documental
-		String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
-		taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null, false));
-		
-//		Tipus document
-		String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
-		
-		if (document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
-			subTitols = new ArrayList<String>();
+		if (contingut instanceof DocumentEntity) {
+			DocumentEntity document = (DocumentEntity)contingut;
+			logger.debug("Afegint nova fila a la taula de documents...");
+			ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
+					entitatActual.getId(),
+					document.getId());
+			List<String> subTitols = null;
+			SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			//Nº
+			String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
+			if (!isRelacio)
+				taulaDocuments.addCell(crearCellaContingut(nextVal, null, false));
 			
-			if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
-				Object numRegistreMet = arxiuDetall.getMetadadesAddicionals().get("numRegistre");
-				Object dataRegistreMet = arxiuDetall.getMetadadesAddicionals().get("dataRegistre");
-				if (numRegistreMet != null) {
-					String numRegistre = numRegistreMet != null ? numRegistreMet.toString() : "";
-					subTitols.add(numRegistre);
-				}
-				if (dataRegistreMet != null) {
-					Date dataRegistre = dataRegistreMet != null ? (Date)dataRegistreMet : null;
-					subTitols.add(sdtTime.format(dataRegistre));
+			// Nom document
+			String nom = document.getNom() != null ? document.getNom() : "";
+			taulaDocuments.addCell(crearCellaContingut(nom, null, false));
+			
+			if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+				// Nom natural
+				Object tituloDocMet = arxiuDetall.getMetadadesAddicionals().get("tituloDoc");
+				String tituloDoc = tituloDocMet != null ? tituloDocMet.toString() : "";
+				taulaDocuments.addCell(crearCellaContingut(tituloDoc, null, false));
+			}
+	
+			// Descripció
+			String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
+			taulaDocuments.addCell(crearCellaContingut(descripcio, null, false));
+	
+			
+			// Tipus documental
+			String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
+			taulaDocuments.addCell(crearCellaContingut(tipusDocumental, null, false));
+			
+			// Tipus document
+			String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
+			
+			if (document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+				subTitols = new ArrayList<String>();
+				
+				if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+					Object numRegistreMet = arxiuDetall.getMetadadesAddicionals().get("numRegistre");
+					Object dataRegistreMet = arxiuDetall.getMetadadesAddicionals().get("dataRegistre");
+					if (numRegistreMet != null) {
+						String numRegistre = numRegistreMet != null ? numRegistreMet.toString() : "";
+						subTitols.add(numRegistre);
+					}
+					if (dataRegistreMet != null) {
+						Date dataRegistre = dataRegistreMet != null ? (Date)dataRegistreMet : null;
+						subTitols.add(sdtTime.format(dataRegistre));
+					}
 				}
 			}
-		}
-		taulaDocuments.addCell(crearCellaContingut(tipusDocument, subTitols, false));
-
-//		Data creació
-		SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
-		String dataCreacio = document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "";
-		taulaDocuments.addCell(crearCellaContingut(dataCreacio, null, false));
-		
-//		Enllaç csv
-		String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
-		if (csv.isEmpty() && arxiuDetall != null && !arxiuDetall.getMetadadesAddicionals().isEmpty()) {
-			String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
-			csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
-		}
-		taulaDocuments.addCell(crearCellaContingut(csv, null, true));
-		
-//		Data captura
-		String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
-		taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, false));	
-		
-//		Custodiat / Notificat
-		DocumentNotificacioEstatEnumCustom estatNotificacio = null;
-		List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
-		boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
-
-		if (hasNotificacions) {
-//			Estat darrera notificació
-			DocumentNotificacioEstatEnumDto estatLastNotificacio = notificacions.get(0).getNotificacioEstat();
-			switch (estatLastNotificacio) {
-				case PENDENT:
-					estatNotificacio = DocumentNotificacioEstatEnumCustom.PENDENT;
-					break;
-				case REGISTRADA:
-					estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
-				case ENVIADA:
-					estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
-					break;
-				case FINALITZADA:
-					estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
-					break;
-				case PROCESSADA:
-					estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
-					break;
+			taulaDocuments.addCell(crearCellaContingut(tipusDocument, subTitols, false));
+	
+			// Data creació
+			SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
+			String dataCreacio = document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "";
+			taulaDocuments.addCell(crearCellaContingut(dataCreacio, null, false));
+			
+			// Enllaç csv
+			String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
+			if (csv.isEmpty() && arxiuDetall != null && !arxiuDetall.getMetadadesAddicionals().isEmpty()) {
+				String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
+				csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
+			}
+			taulaDocuments.addCell(crearCellaContingut(csv, null, true));
+			
+			// Data captura
+			String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
+			taulaDocuments.addCell(crearCellaContingut(dataCaptura, null, false));	
+			
+			// Custodiat / Notificat
+			DocumentNotificacioEstatEnumCustom estatNotificacio = null;
+			List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
+			boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
+	
+			if (hasNotificacions) {
+				// Estat darrera notificació
+				DocumentNotificacioEstatEnumDto estatLastNotificacio = notificacions.get(0).getNotificacioEstat();
+				switch (estatLastNotificacio) {
+					case PENDENT:
+						estatNotificacio = DocumentNotificacioEstatEnumCustom.PENDENT;
+						break;
+					case REGISTRADA:
+						estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
+					case ENVIADA:
+						estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
+						break;
+					case FINALITZADA:
+						estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+						break;
+					case PROCESSADA:
+						estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+						break;
+				}
+				
+				if (!document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT))
+					taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio), null, false));
 			}
 			
-			if (!document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT))
-				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio), null, false));
-		}
-		
-		if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
-			subTitols = new ArrayList<String>();
-			Map<Integer, Date> datesFirmes = null;
-			try {
-				if (pluginHelper.isArxiuPluginActiu()) {
-					es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-							document,
-							null,
-							null,
-							true,
-							false);
-					byte[] contingut = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
-					datesFirmes = getDataFirmaFromDocument(contingut);
+			if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+				subTitols = new ArrayList<String>();
+				Map<Integer, Date> datesFirmes = null;
+				try {
+					if (pluginHelper.isArxiuPluginActiu()) {
+						es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+								document,
+								null,
+								null,
+								true,
+								false);
+						byte[] contingutArxiu = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
+						datesFirmes = getDataFirmaFromDocument(contingutArxiu);
+					}
+				} catch (Exception ex) {
+					logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
 				}
-			} catch (Exception ex) {
-				logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
-			}
-			if (datesFirmes != null && !datesFirmes.isEmpty()) {
-//				múltiples firmes
-//				for (Entry<Integer, Date> entry : datesFirmes.entrySet()) {
-//					String dataFirma = null;
-//					if (datesFirmes.size() > 1)
-//						dataFirma = "Firma " + entry.getKey() + ": " + sdtTime.format(entry.getValue());
-//					else
-//						dataFirma = sdtTime.format(entry.getValue());
-//					datesFirmesStr.add(dataFirma);
-//				}
-//				la darrera firma
-				String dataFirma = sdtTime.format(datesFirmes.get(datesFirmes.size()));
-				subTitols.add(dataFirma);
+				if (datesFirmes != null && !datesFirmes.isEmpty()) {
+					String dataFirma = sdtTime.format(datesFirmes.get(datesFirmes.size()));
+					subTitols.add(dataFirma);
+				} 
+				
+				if (hasNotificacions) {
+					String missatgeEstatNotificacio = messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio);
+					subTitols.add(missatgeEstatNotificacio);
+				}
+				taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), subTitols, false));
 			} 
 			
-			if (hasNotificacions) {
-				String missatgeEstatNotificacio = messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio);
-				subTitols.add(missatgeEstatNotificacio);
+			
+			if (!hasNotificacions && !document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)){
+				taulaDocuments.addCell(crearCellaContingut("-", null, false));
 			}
-			taulaDocuments.addCell(crearCellaContingut(messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat"), subTitols, false));
-		} 
-		
-		
-		if (!hasNotificacions && !document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)){
-			taulaDocuments.addCell(crearCellaContingut("-", null, false));
+		} else {
+			CarpetaEntity carpeta = (CarpetaEntity)contingut;
+			if (!isRelacio) {
+				BigDecimal sum = new BigDecimal(1);
+				num = num.add(sum);
+				String nextVal = num.scale() > 0 ? String.valueOf(num.doubleValue()) : String.valueOf(num.intValue());
+				taulaDocuments.addCell(crearCellaContingut(nextVal, null, false));
+			}
+			if (carpeta.getExpedientRelacionat() != null)
+				taulaDocuments.addCell(crearCellaUnica(carpeta.getNom(), carpeta.getExpedientRelacionat().getId(), isRelacio));
 		}
+		return num;
 	}
 	
 	private Map<Integer, Date> getDataFirmaFromDocument(byte[] content) throws IOException {
@@ -628,6 +655,30 @@ public class IndexHelper {
 		titolCell.addElement(titolParagraph);
 		titolCell.setPaddingBottom(6f);
 		titolCell.setBackgroundColor(new BaseColor(166, 166, 166));
+		titolCell.setBorderWidth((float) 0.5);
+		return titolCell;
+	}
+	
+	private PdfPCell crearCellaUnica(String titol, Long destinationId, boolean isRelacio) throws NoSuchFileException, IOException {
+		PdfPCell titolCell = new PdfPCell();
+		Paragraph titolParagraph = new Paragraph("", frutiger6);
+		// Enllaç intern a l'expedient relacionat
+		String internalLink = "expedient_" + destinationId;
+		Chunk internalLinkChunk = new Chunk(titol);
+		internalLinkChunk.setLocalGoto(internalLink);
+		titolParagraph.add(internalLinkChunk);
+		titolParagraph.setAlignment(Element.ALIGN_CENTER);
+		
+		if (!isRelacio && isMostrarCampsAddicionals())
+			titolCell.setColspan(9);
+		else if (!isRelacio && !isMostrarCampsAddicionals())
+			titolCell.setColspan(8);
+		else if (isRelacio && isMostrarCampsAddicionals())
+			titolCell.setColspan(9);
+		else if (isRelacio && !isMostrarCampsAddicionals())
+			titolCell.setColspan(8);
+		titolCell.addElement(titolParagraph);
+		titolCell.setPaddingBottom(6f);
 		titolCell.setBorderWidth((float) 0.5);
 		return titolCell;
 	}

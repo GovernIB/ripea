@@ -1,26 +1,10 @@
 package es.caib.ripea.core.service;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.joda.time.LocalDate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.aggregation.HistoricAggregation;
 import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
 import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -29,6 +13,11 @@ import es.caib.ripea.core.api.dto.historic.HistoricFiltreDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricInteressatSerializer.RegistresInteressatDiari;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricOrganGestorSerializer;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricOrganGestorSerializer.RegistreOrganGestor;
+import es.caib.ripea.core.api.dto.historic.serializer.HistoricUsuariSerializer;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.HistoricExpedientEntity;
@@ -41,11 +30,28 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HistoricHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.historic.ExportacioCsvHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioDocHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioExcelEntitatHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioExcelInteressatsHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioExcelOrganGestorHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioExcelUsuariHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioJSONHistoric;
+import es.caib.ripea.core.helper.historic.ExportacioXMLHistoric;
+import es.caib.ripea.core.helper.historic.serializers.DAOHistoric;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
+import org.joda.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 @Service
 public class HistoricServiceImpl implements HistoricService {
@@ -68,6 +74,11 @@ public class HistoricServiceImpl implements HistoricService {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private HistoricHelper historicHelper;
+
+	@Autowired
+	private ExportacioCsvHistoric exportacioCsvHistoric;
+	@Autowired
+	private ExportacioXMLHistoric exportacioXMLHistoric;
 
 	@Override
 	public void generateOldHistorics() {
@@ -169,6 +180,11 @@ public class HistoricServiceImpl implements HistoricService {
 	}
 
 	@Override
+	public List<HistoricOrganGestorSerializer.RegistresOrganGestor> getRegistresDadesOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament) {
+		return DAOHistoric.mapRegistreOrganGestor(getDadesOrgansGestors(entitatId, rolActual, filtre), tipusAgrupament).registres;
+	}
+
+	@Override
 	public Map<OrganGestorDto, List<HistoricExpedientDto>> getHistoricsByOrganGestor(
 			Long entitatId,
 			String rolActual, 
@@ -253,6 +269,15 @@ public class HistoricServiceImpl implements HistoricService {
 	}
 
 	@Override
+	public List<HistoricUsuariSerializer.RegistresUsuariDiari> getRegistresDadesUsuaris(List<String> usuarisCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament) {
+		Map<String, List<HistoricUsuariDto>> results = new HashMap<>();
+		for (String codiUsuari : usuarisCodi) {
+			results.put(codiUsuari, getDadesUsuari(codiUsuari, null, null, filtre));
+		}
+		return DAOHistoric.mapRegistresUsuaris(results, tipusAgrupament).registres;
+	}
+
+	@Override
 	public List<HistoricInteressatDto> getDadesInteressat(String interessatDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
 		boolean filteringByMetaExpedients = filtre.getMetaExpedientsIds() != null &&
 				filtre.getMetaExpedientsIds().size() > 0;
@@ -277,6 +302,17 @@ public class HistoricServiceImpl implements HistoricService {
 				filtre.getDataFi());
 		historics = fillEmptyData(filtre, historics, HistoricAggregation.class);
 		return conversioTipusHelper.convertirList(historics, HistoricInteressatDto.class);
+	}
+
+	@Override
+	public List<RegistresInteressatDiari> getRegistresDadesInteressat(List<String> interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, HistoricTipusEnumDto tipusAgrupament) {
+		Map<String, List<HistoricInteressatDto>> results = new HashMap<>();
+		for (String docNum : interessatsDocNum) {
+			List<HistoricInteressatDto> historics = getDadesInteressat(docNum, null, null, filtre);
+			results.put(docNum, historics);
+		}
+
+		return DAOHistoric.mapRegistresInteressats(results, tipusAgrupament).registres;
 	}
 
 	@Transactional
@@ -406,6 +442,11 @@ public class HistoricServiceImpl implements HistoricService {
 		return results;
 	}
 
+	@Override
+	public List<RegistreOrganGestor> getRegistresDadesActualsOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre) {
+		return DAOHistoric.mapRegistresActualsOrganGestors(getDadesActualsOrgansGestors(entitatId, rolActual, filtre));
+	}
+
 	@Transactional
 	@Override
 	public List<HistoricUsuariDto> getDadesActualsUsuari(String codiUsuari, Long entitatId, String rolActual, HistoricFiltreDto filtre) {
@@ -479,6 +520,152 @@ public class HistoricServiceImpl implements HistoricService {
 		return historicHelper.comprovarAccesEstadistiques(
 				entitatId, 
 				rolActual);
+	}
+
+	@Override
+	public FitxerDto exportarHistoricEntitat(EntitatDto entitat, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
+		List<HistoricExpedientDto> dades = getDadesEntitat(entitat.getId(), rolActual, filtre);
+
+		byte[] fileContent = null;
+		FitxerDto fitxer = null;
+		switch (format) {
+			case "json":
+				fileContent = (new ExportacioJSONHistoric()).convertDadesEntitat(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicEntitat.json", "application/json", fileContent);
+				break;
+			case "xlsx":
+				fileContent = (new ExportacioExcelEntitatHistoric()).convertDadesEntitat(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicEntitat.xls", "application/vnd.ms-excel", fileContent);
+				break;
+			case "odf":
+				fileContent = (new ExportacioDocHistoric()).convertDadesEntitat(entitat, dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicEntitat.ods", "application/vnd.oasis.opendocument.text", fileContent);
+				break;
+			case "xml":
+				fileContent = exportacioXMLHistoric.convertDadesEntitat(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicEntitat.xml", "application/xml", fileContent);
+				break;
+			case "csv":
+				fileContent = exportacioCsvHistoric.convertDadesEntitat(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicEntitat.csv", "application/csv", fileContent);
+				break;
+			default:
+				throw new Exception("Unsuported file format");
+		}
+
+		return fitxer;
+	}
+
+	@Override
+	public FitxerDto exportarHistoricOrgansGestors(Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
+		byte[] fileContent = null;
+		FitxerDto fitxer = null;
+		if (format.equals("json")) {
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = getDadesOrgansGestors(entitatId, rolActual, filtre);
+
+			fileContent = (new ExportacioJSONHistoric()).convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
+			fitxer = new FitxerDto("historicOrgansGestors.json", "application/json", fileContent);
+
+		} else if (format.equals("xlsx")) {
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = getDadesOrgansGestors(entitatId, rolActual, filtre);
+			List<OrganGestorDto> organsGestors = new ArrayList<>();
+			for (Long organId : filtre.getOrganGestorsIds()) {
+				OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organId);
+				if (organGestorEntity == null) {
+					throw new NotFoundException(organId, OrganGestorEntity.class);
+				}
+				organsGestors.add(conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class));
+			}
+			if (filtre.getIncorporarExpedientsComuns()) {
+				OrganGestorDto organDto = new OrganGestorDto();
+				organDto.setCodi("");
+				organDto.setNom("Expedients comuns");
+				organsGestors.add(organDto);
+			}
+
+			fileContent = (new ExportacioExcelOrganGestorHistoric()).convertDadesOrgansGestors(dades, organsGestors, filtre.getTipusAgrupament());
+			fitxer = new FitxerDto("historicOrgansGestors.xls", "application/vnd.ms-excel", fileContent);
+
+		} else if (format.equals("odf")) {
+			Map<OrganGestorDto, List<HistoricExpedientDto>> dades = getHistoricsByOrganGestor(entitatId, rolActual, filtre);
+			fileContent = (new ExportacioDocHistoric()).convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
+			fitxer = new FitxerDto("historicOrgansGestors.ods", "application/vnd.oasis.opendocument.text", fileContent);
+
+		} else if (format.equals("xml")) {
+			Map<Date, Map<OrganGestorDto, HistoricExpedientDto>> dades = getDadesOrgansGestors(entitatId, rolActual, filtre);
+			fileContent = exportacioXMLHistoric.convertDadesOrgansGestors(dades, filtre.getTipusAgrupament());
+			fitxer = new FitxerDto("historicOrgansGestors.xml", "application/xml", fileContent);
+
+		} else {
+			throw new Exception("Unsuported file format");
+		}
+
+		return fitxer;
+	}
+
+	@Override
+	public FitxerDto exportarHistoricUsuaris(String[] usuarisCodi, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
+		Map<String, List<HistoricUsuariDto>> dades = new HashMap<String, List<HistoricUsuariDto>>();
+		for (String codiUsuari : usuarisCodi) {
+			dades.put(codiUsuari, getDadesUsuari(codiUsuari, entitatId, rolActual, filtre));
+		}
+
+		byte[] fileContent = null;
+		FitxerDto fitxer = null;
+		switch (format) {
+			case "json":
+				fileContent = (new ExportacioJSONHistoric()).convertDadesUsuaris(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicUsuaris.json", "application/json", fileContent);
+				break;
+			case "xlsx":
+				fileContent = (new ExportacioExcelUsuariHistoric()).convertDadesUsuaris(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicUsuaris.xls", "application/vnd.ms-excel", fileContent);
+				break;
+			case "odf":
+				fileContent = (new ExportacioDocHistoric()).convertDadesUsuaris(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicUsuaris.ods", "application/vnd.oasis.opendocument.text", fileContent);
+				break;
+			case "xml":
+				fileContent = exportacioXMLHistoric.convertDadesUsuaris(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicUsuaris.xml", "application/xml", fileContent);
+				break;
+			default:
+				throw new Exception("Unsuported file format");
+		}
+		return fitxer;
+	}
+
+	@Override
+	public FitxerDto exportarHistoricInteressats(String[] interessatsDocNum, Long entitatId, String rolActual, HistoricFiltreDto filtre, String format) throws Exception {
+		Map<String, List<HistoricInteressatDto>> dades = new HashMap<String, List<HistoricInteressatDto>>();
+		for (String docNum : interessatsDocNum) {
+			dades.put(docNum, getDadesInteressat(docNum, entitatId, rolActual, filtre));
+		}
+
+		byte[] fileContent = null;
+		FitxerDto fitxer = null;
+		switch (format) {
+			case "json":
+				fileContent = (new ExportacioJSONHistoric()).convertDadesInteressats(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicInteressats.json", "application/json", fileContent);
+				break;
+			case "xlsx":
+				fileContent = (new ExportacioExcelInteressatsHistoric()).convertDadesInteressats(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicInteressats.xls", "application/vnd.ms-excel", fileContent);
+				break;
+			case "odf":
+				fileContent = (new ExportacioDocHistoric()).convertDadesInteressats(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicInteressats.ods", "application/vnd.oasis.opendocument.text", fileContent);
+				break;
+			case "xml":
+				fileContent = exportacioXMLHistoric.convertDadesInteressats(dades, filtre.getTipusAgrupament());
+				fitxer = new FitxerDto("historicInteressats.xml", "application/xml", fileContent);
+				break;
+			default:
+				throw new Exception("Unsuported file format");
+		}
+
+		return fitxer;
 	}
 
 	/**

@@ -52,4 +52,14 @@ public interface NotificacioPlugin {
 			String referencia,
 			boolean ambJustificant) throws SistemaExternException;
 
+	/**
+	 * Consulta justificant d'enviament generat per Notib.
+	 * 
+	 * @param identificador
+	 * @return
+	 * @throws SistemaExternException
+	 */
+	public RespostaJustificantEnviamentNotib consultaJustificantEnviament(
+			String identificador) throws SistemaExternException;
+
 }

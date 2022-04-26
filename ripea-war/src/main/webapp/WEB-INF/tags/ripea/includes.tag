@@ -48,7 +48,8 @@
 <script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 </c:if>
 <c:if test="${jqueryui}">
-<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 </c:if>
 <c:if test="${clamp}">
 <script src="<c:url value="/js/clamp.js"/>"></script>

@@ -54,13 +54,57 @@ public class OrganGestorHelper {
 		}
 	}
 
+	/**
+	 * Comprova si es te permís sobre un òrgan gestor, o un pare d'aquest
+	 *
+	 * @param organGestor
+	 * @param permis
+	 * @return
+	 */
+	public boolean isOrganGestorPermes(
+			OrganGestorEntity organGestor,
+			Permission permis) {
+
+		boolean permes = false;
+
+		boolean granted = permisosHelper.isGrantedAll(
+				organGestor.getId(),
+				OrganGestorEntity.class,
+				new Permission[] {permis},
+				SecurityContextHolder.getContext().getAuthentication());
+		if (granted) {
+			permes = true;
+		} else {
+			List<OrganGestorEntity> organGestorAmbPares = findPares(
+					organGestor,
+					true);
+			for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
+				if (permisosHelper.isGrantedAny(
+						organGestorActual.getId(),
+						OrganGestorEntity.class,
+						new Permission[] { permis },
+						SecurityContextHolder.getContext().getAuthentication())) {
+					permes = true;
+					break;
+				}
+			}
+		}
+		return permes;
+	}
+
 	public boolean isOrganGestorPermes(
 			MetaExpedientEntity metaExpedient,
 			OrganGestorEntity organGestor,
 			Permission permis, 
 			String rolActual) {
 		
-		if (RolHelper.isAdmin(rolActual)) {
+		List<OrganGestorEntity> organGestorAmbPares = findPares(
+				organGestor,
+				true);
+		
+		if (RolHelper.isAdminEntitat(rolActual)) {
+			return true;
+		} else if (RolHelper.isAdminOrgan(rolActual) && organGestorAmbPares.contains(organGestor)) {
 			return true;
 		} else {
 			boolean permes = false;
@@ -73,10 +117,7 @@ public class OrganGestorHelper {
 			if (granted) {
 				permes = true;
 			} else {
-				List<OrganGestorEntity> organGestorAmbPares = findPares(
-						metaExpedient,
-						organGestor,
-						true);
+
 				for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
 					if (permisosHelper.isGrantedAny(
 							organGestorActual.getId(),
@@ -107,7 +148,6 @@ public class OrganGestorHelper {
 			ExpedientEntity expedient,
 			OrganGestorEntity organGestor) {
 		List<OrganGestorEntity> organGestorAmbPares = findPares(
-				expedient.getMetaExpedient(),
 				organGestor,
 				true);
 		for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
@@ -181,8 +221,7 @@ public class OrganGestorHelper {
 	}
 	
 
-	private List<OrganGestorEntity> findPares(
-			MetaExpedientEntity metaExpedient,
+	public List<OrganGestorEntity> findPares(
 			OrganGestorEntity organGestor,
 			boolean incloureOrganGestor) {
 		List<OrganGestorEntity> pares = new ArrayList<OrganGestorEntity>();

@@ -25,6 +25,13 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			" and (og.id in (select distinct pare.id from OrganGestorEntity))")
+	public List<OrganGestorEntity> findByEntitatAndHasPare(
+			@Param("entitat") EntitatEntity entitat);
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
@@ -64,13 +71,16 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where " +
 			"    (og.entitat = :entitat) " +
 			"and (:esNullCodi = true or lower(og.codi) like lower('%'||:codi||'%')) " +
-			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%'))")
+			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%'))" +
+			"and (:esNullOrganSuperior = true or og.pare.id = :organSuperiorId) ")
 	public Page<OrganGestorEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullCodi") boolean esNullCodi,
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
+			@Param("esNullOrganSuperior") boolean esNullOrganSuperior,
+			@Param("organSuperiorId") Long organSuperiorId,
 			Pageable paginacio);
 
 	@Query(	"select " +
@@ -113,6 +123,44 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<Long> findFillsIds(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pareIds") List<Long> pareIds);
+	
+	
+	@Query("select " +
+			"    og.codi " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds))")
+	public List<String> findFillsCodis(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("pareIds") List<Long> pareIds);
+	
+	
+	@Query("select " +
+			"    og " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and (pare1.id in (:pareIds) " +
+			"     or pare2.id in (:pareIds) " +
+			"     or pare3.id in (:pareIds) " +
+			"     or pare4.id in (:pareIds))")
+	public List<OrganGestorEntity> findFills(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("pareIds") List<Long> pareIds);
 
 	@Query("from " +
 			"    OrganGestorEntity og " +
@@ -128,19 +176,6 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"    og.codi in (:codi)")
 	public List<Long> findIdsByCodiDir3List(List<String> codi);
 	
-	
-	@Query(	"select " +
-			"    org " + 
-			"from " +
-			"    OrganGestorEntity org " +
-			"    left join org.pare pare1 " +
-			"    left join pare1.pare pare2 " + 
-			"	 left join pare2.pare pare3 " +
-			"	 left join pare3.pare pare4 " +
-			"where " +
-			"    org.id = :organId")
-	List<OrganGestorEntity> findOrganGestorsPath(
-			@Param("organId") Long organId);
 	
 	
 	@Query(	"select " +

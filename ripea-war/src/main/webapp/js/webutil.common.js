@@ -1,6 +1,7 @@
 
 function webutilContextPath() {
-	return '/ripea';
+	//return '/ripea';
+	return contextAddress;
 }
 function webutilModalTancarPath() {
 	return webutilContextPath() + '/modal/tancar';
@@ -411,31 +412,29 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				}
 			});
 		}
-				
-		var noResultsFunction = window[$(this).data('noresultsfunction')];
 
+		let select2Options = {
+			placeholder: $(this).data('placeholder'),
+			theme: "bootstrap",
+			allowClear: $(this).data('placeholder') ? true : false,
+			minimumResultsForSearch: $(this).data('minimumresults'),
+			width: '100%'
+		};
+
+		var noResultsFunction = window[$(this).data('noresultsfunction')];
 		if (noResultsFunction != null) {
-			$(this).select2({
-			    placeholder: $(this).data('placeholder'),
-			    theme: "bootstrap",
-			    allowClear: $(this).data('placeholder') ? true : false,
-			    minimumResultsForSearch: $(this).data('minimumresults'),
-			    language: {
-					noResults: noResultsFunction
-				},
-			    width: '100%',
-			});
+			select2Options['language'] = { noResults: noResultsFunction }
+		} else {
+			select2Options['language'] = $(this).data('idioma');
 		}
-		else {
-			$(this).select2({
-			    placeholder: $(this).data('placeholder'),
-			    theme: "bootstrap",
-			    allowClear: $(this).data('placeholder') ? true : false,
-			    minimumResultsForSearch: $(this).data('minimumresults'),
-			    language: $(this).data('idioma'),
-			    width: '100%',
-			});
+
+		var templateResultFunction = window[$(this).data('templateresultfunction')];
+		if (templateResultFunction != null) {
+			select2Options['templateResult'] = templateResultFunction;
+			select2Options['templateSelection'] = templateResultFunction;
 		}
+
+		$(this).select2(select2Options);
 		
 		$(this).on('select2:open', function() {
 			webutilModalAdjustHeight();

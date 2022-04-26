@@ -117,6 +117,7 @@ public class DocumentNotificacioHelper {
 					notificacioDto.getServeiTipusEnum(),
 					notificacioDto.isEntregaPostal()).
 					observacions(notificacioDto.getObservacions()).
+					emisor(documentEntity.getExpedient() != null ? documentEntity.getExpedient().getOrganGestor() : null).
 					build();
 			
 			documentNotificacioRepository.save(notificacioEntity);

@@ -27,6 +27,7 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -150,7 +151,7 @@ public class DocumentHelper {
 			entity.setGesDocAdjuntId(gestioDocumentalAdjuntId);
 		}
 		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
-		if (document.isFirmaSeparada()) {
+		if (document.isAmbFirma() && document.isFirmaSeparada()) {
 			gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 					new ByteArrayInputStream(document.getFirmaContingut()));
@@ -167,7 +168,8 @@ public class DocumentHelper {
 						fitxer,
 						document.isAmbFirma(),
 						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmesValidacio);
+						firmes != null ? firmes : firmesValidacio, 
+						false);
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -307,7 +309,7 @@ public class DocumentHelper {
 				fitxer,
 				document.isAmbFirma(),
 				document.isFirmaSeparada(),
-				firmes);
+				firmes, false);
 		return dto;
 	}
 	
@@ -347,27 +349,6 @@ public class DocumentHelper {
 				metaDocument.getNtiTipoDocumental());
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
-		FitxerDto fitxer = null;
-		List<ArxiuFirmaDto> firmes = null;
-		if (documentEntity.getArxiuUuid() != null) {
-			fitxer = new FitxerDto();
-			fitxer.setContentType(documentEntity.getFitxerContentType());
-			fitxer.setNom(documentEntity.getFitxerNom());
-//			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-//					documentEntity,
-//					null,
-//					null,
-//					true,
-//					false);
-//			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-//			##no validar firma en actualitzar tipus document
-//			if (documentEntity.isFirmat()) {
-//				firmes = validaFirmaDocument(
-//						documentEntity, 
-//						fitxer,
-//						null);
-//			}
-		}
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -376,13 +357,45 @@ public class DocumentHelper {
 				null,
 				true,
 				true);
-		contingutHelper.arxiuPropagarModificacio(
-				documentEntity,
-				fitxer,
-				false, //##no validar firma en actualitzar tipus document
-				false,
-				firmes);
-		return true;
+		
+		
+		if (pluginHelper.getPropertyArxiuMetadadesAddicionalsActiu()) {
+		
+			FitxerDto fitxer = null;
+			List<ArxiuFirmaDto> firmes = null;
+			if (documentEntity.getArxiuUuid() != null) {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(documentEntity.getFitxerContentType());
+				fitxer.setNom(documentEntity.getFitxerNom());
+				if (pluginHelper.getArxiuPlugin() instanceof ArxiuPluginCaib) {
+					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+							documentEntity,
+							null,
+							null,
+							true,
+							false);
+					fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			//		##no validar firma en actualitzar tipus document
+			//		if (documentEntity.isFirmat()) {
+			//			firmes = validaFirmaDocument(
+			//					documentEntity, 
+			//					fitxer,
+			//					null);
+			//		}
+				}
+			}
+			contingutHelper.arxiuPropagarModificacio(
+					documentEntity,
+					fitxer,
+					false, //##no validar firma en actualitzar tipus document
+					false,
+					firmes, 
+					false);
+			return true;
+		} else {
+			return true;
+		}
+		
 	}
 	
 	public DocumentEntity crearDocumentDB(
@@ -437,6 +450,21 @@ public class DocumentHelper {
 		if ((document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) || document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) || document.getEstat().equals(DocumentEstatEnumDto.ADJUNT_FIRMAT)) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
+		if (isPropagarConversioDefinitiuActiu() && nouEstat.equals(DocumentEstatEnumDto.DEFINITIU)) {
+			FitxerDto fitxer = null;
+			if (document.getArxiuUuid() != null) {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setNom(document.getFitxerNom());
+			}
+			contingutHelper.arxiuPropagarModificacio(
+					document,
+					fitxer,
+					false,
+					false,
+					null,
+					false);
+		}
 		contingutLogHelper.log(
 				document,
 				LogTipusEnumDto.CANVI_ESTAT,
@@ -455,7 +483,7 @@ public class DocumentHelper {
 				false,
 				true,
 				true,
-				false, null, false);
+				false, null, false, null);
 	}
 		
 
@@ -779,7 +807,7 @@ public class DocumentHelper {
 							fitxer,
 							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
 							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes);
+							firmes, false);
 				
 					if (documentEntity.getGesDocAdjuntId() != null ) {
 						pluginHelper.gestioDocumentalDelete(
@@ -868,7 +896,7 @@ public class DocumentHelper {
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		for (DocumentEntity document : documents) {
 			if (document.getEsborrat() == 0 
-					&& document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL)
+					&& (document.getDocumentTipus().equals(DocumentTipusEnumDto.DIGITAL) || document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT))
 					&& (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
 				return true;
 			}
@@ -890,7 +918,7 @@ public class DocumentHelper {
 							false, 
 							true, 
 							false, 
-							false, null, false));
+							false, null, false, null));
 			
 		}
 		return documentsDto;
@@ -899,7 +927,9 @@ public class DocumentHelper {
 	public boolean isModificacioCustodiatsActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
 	}
-	
+	public boolean isPropagarConversioDefinitiuActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+	}
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 
 }

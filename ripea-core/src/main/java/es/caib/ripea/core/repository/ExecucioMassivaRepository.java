@@ -22,16 +22,22 @@ import es.caib.ripea.core.entity.UsuariEntity;
  */
 public interface ExecucioMassivaRepository extends JpaRepository<ExecucioMassivaEntity, Long> {
 	
-	List<ExecucioMassivaEntity> findByCreatedByAndEntitatId(UsuariEntity createdBy, Long entitatId, Pageable pageable);
+	List<ExecucioMassivaEntity> findByCreatedByAndEntitatIdOrderByCreatedDateDesc(UsuariEntity createdBy, Long entitatId, Pageable pageable);
 	
-	List<ExecucioMassivaEntity> findByEntitatId(Long entitatId, Pageable pageable);
+	List<ExecucioMassivaEntity> findByEntitatIdOrderByCreatedDateDesc(Long entitatId, Pageable pageable);
 	
 	@Query("select min(id) " +
 			"from 	ExecucioMassivaEntity " +
 			"where 	dataInici <= :ara " +
+			"	and dataFi is null ")
+	Long getNextMassiu(@Param("ara") Date ara);
+	
+	@Query("select e " +
+			"from 	ExecucioMassivaEntity e " +
+			"where 	dataInici <= :ara " +
 			"	and dataFi is null " +
-			"	and id > :lastMassiu ")
-	Long getNextMassiu(@Param("lastMassiu") Long lastMassiu, @Param("ara") Date ara);
+			"	order by e.id asc")
+	List<ExecucioMassivaEntity> getMassivesPerProcessar(@Param("ara") Date ara);
 	
 	@Query("select min(id) " +
 			"	from 	ExecucioMassivaEntity " +

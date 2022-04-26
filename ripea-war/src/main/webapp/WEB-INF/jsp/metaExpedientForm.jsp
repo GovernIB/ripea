@@ -5,9 +5,26 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
-	<c:when test="${empty metaExpedientCommand.id}"><c:set var="titol"><spring:message code="metaexpedient.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="metaexpedient.form.titol.modificar"/></c:set></c:otherwise>
+	<c:when test="${empty metaExpedientCommand.id}">
+		<c:set var="titol"><spring:message code="metaexpedient.form.titol.crear" /></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${consultar}">
+				<c:set var="titol"><spring:message code="metaexpedient.form.titol.consultar" /></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="titol"><spring:message code="metaexpedient.form.titol.modificar" /></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
 </c:choose>
+
+
+
+
+
+
 <html>
 <head>
 	<title>${titol}</title>
@@ -58,21 +75,26 @@
 	</style>
 	<c:if test="${hasPermisAdmComu}">
 		<script type="text/javascript">
-		$(document).ready(function() {
-			var selectOrganGestorContainer = $("select#organGestorId").parent().parent(); 
-			$( "#comu" ).change(function () {
-				if(this.checked) {
-					selectOrganGestorContainer.hide();
-					$("select#organGestorId").val(null);
-					$("select#organGestorId").trigger("change");
-			    } else {
-			    	selectOrganGestorContainer.show();
-			    }
-		  	});
-			if ($("#comu").is(":checked")) {
-				selectOrganGestorContainer.hide();
-			}
-		});
+			var unicOrganGestorId = null;
+			<c:if test="${not empty organDisponible}">unicOrganGestorId = ${organDisponible.id};</c:if>
+			$(document).ready(function() {
+				var organGestorContainer = $("#organGestorContainer");
+				$( "#comu" ).change(function () {
+					if(this.checked) {
+						organGestorContainer.hide();
+						$("#organGestorId").val(null);
+						$("select#organGestorId").trigger("change");
+					} else {
+						if (unicOrganGestorId != null) {
+							$("#organGestorId").val(unicOrganGestorId);
+						}
+						organGestorContainer.show();
+					}
+				});
+				if ($("#comu").is(":checked")) {
+					organGestorContainer.hide();
+				}
+			});
 		</script>
 	</c:if>
 
@@ -165,51 +187,8 @@
 	</c:if>
 	
 	
-	
 	<script>
 		$(document).ready(function(){
-			$('#importMetaExpedient').on('click', function() {
-				$('#metaExpedientCommand').hide();
-				$("#loading").show();
-				var codiSia = $('#classificacioSia').val();
-				
-				if (codiSia != null && codiSia != "") {
-					$.get("<c:url value="/metaExpedient/importMetaExpedient/"/>" + codiSia)
-					.done(function(json){
-						if (json.error) {
-							$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + json.errorMsg + '</div>');
-
-						} else {
-							if (json.data){
-								data = json.data;
-								$('#nom').val(data.nom);
-								$('#descripcio').val(data.resum);
-								
-								if ($("#comu:checked").val() != data.comu) {
-									$("#comu").click();
-								}
-								if (!data.comu) {
-									$('#organGestorId').data('currentValue', data.organId);
-									$('#organGestorId').webutilInputSuggest();
-								}	
-							} else {
-								$('#contingut-missatges').append('<div class="alert alert-warning"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="metaexpedient.form.import.rolsac.no.results"/></div>');
-							}
-						}
-					})
-					.fail(function() {
-						alert("<spring:message code="error.jquery.ajax"/>");
-					})
-					.always(function() {
-						$("#loading").hide();
-						$('#metaExpedientCommand').show();
-					});
-				} else {
-					$("#loading").hide();
-					$('#metaExpedientCommand').show();
-				}
-			});	
-					
 
 			$('#revisioEstat').on('change', function() {
 				var estat = $(this).val();
@@ -226,24 +205,24 @@
 	
 	
 	
-	
-	
 </head>
 <body>
 
 	<div id="loading" style="display: none;"><div style="text-align: center; padding-bottom: 100px; color: #666666; margin-top: 100px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientCommand">
-		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>
+		<c:if test="${isCarpetaDefecte || (metaExpedientCommand.revisioEstat!=null && isRevisioActiva)}">
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.dades"/></a></li>
 <%-- 			<li role="presentation"><a href="#notificacions" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.notificacions"/></a></li> --%>
-			<c:if test="${isCarpetaDefecte}">
-				<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
-			</c:if>
-			<c:if test="${metaExpedientCommand.revisioEstat!=null && isRevisioActiva}">
-				<li role="presentation"><a href="#revisioEstatTab" aria-controls="revisioEstatTab" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
-			</c:if>
-		</ul>
+				<c:if test="${isCarpetaDefecte}">
+					<li role="presentation"><a href="#carpetes" aria-controls="notificacions" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.carpetes"/></a></li>
+				</c:if>
+				<c:if test="${metaExpedientCommand.revisioEstat!=null && isRevisioActiva}">
+					<li role="presentation"><a href="#revisioEstatTab" aria-controls="revisioEstatTab" role="tab" data-toggle="tab"><spring:message code="metaexpedient.form.camp.tab.revisioEstat"/></a></li>
+				</c:if>
+			</ul>
+		</c:if>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="RolAdminOrgan"/>
@@ -252,19 +231,7 @@
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
-				
-				<c:set var="campErrors"><form:errors path="classificacioSia"/></c:set>
-				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
-					<label class="control-label col-xs-4" for="classificacioSia"><spring:message code="metaexpedient.form.camp.classificacio.sia"/> *</label>
-					<div class="col-xs-6">
-						<form:input path="classificacioSia" cssClass="form-control" id="classificacioSia" disabled="false" readonly="${bloquejarCamps}"/>	
-						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="classificacioSia"/></p></c:if>
-					</div>
-					<div class="col-xs-2">
-						<button id="importMetaExpedient" type="button" class="btn btn-info" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/></button>
-					</div>
-				</div>
-				
+				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true" readonly="${bloquejarCamps}"/>
 				<rip:inputTextarea name="nom" textKey="metaexpedient.form.camp.nom" required="true" disabled="${bloquejarCamps}"/>
 				<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 				
@@ -279,15 +246,26 @@
 				</c:choose>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
- 					name="organGestorId"  
- 					urlConsultaInicial="${urlConsultaInicial}"
- 					urlConsultaLlistat="${urlConsultaLlistat}"
- 					textKey="metaexpedient.form.camp.organgestor"
- 					suggestValue="id"
- 					suggestText="codiINom"
- 					required="true"
- 					disabled="${bloquejarCamps}"/>
+
+				<div id="organGestorContainer">
+					<c:choose>
+						<c:when test="${numOrgansDisponibles == 1}">
+							<div class="form-group">
+								<input type="hidden" id="organGestorId" name="organGestorId" value="${organDisponible.id}"/>
+								<label class="control-label col-xs-4" for="organGestorNom"><spring:message code="metaexpedient.form.camp.organgestor"/> *</label>
+								<div class="col-xs-8">
+									<input type="text" class="form-control" id="organGestorNom" name="organGestorNom" disabled="disabled" value="${organDisponible.codiINom}">
+								</div>
+							</div>
+						</c:when>
+						<c:when test="${numOrgansDisponibles < 32 }">
+							<rip:inputSelect name="organGestorId" optionItems="${organsGestors}" optionValueAttribute="id" optionTextAttribute="codiINom" optionMinimumResultsForSearch="1" textKey="metaexpedient.form.camp.organgestor" required="true" emptyOption="true"  disabled="${bloquejarCamps}"/>
+						</c:when>
+						<c:otherwise>
+							<rip:inputSuggest name="organGestorId" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" textKey="metaexpedient.form.camp.organgestor" suggestValue="id" suggestText="codiINom" required="true" disabled="${bloquejarCamps}"/>
+						</c:otherwise>
+					</c:choose>
+				</div>
 				<rip:inputText name="expressioNumero" textKey="metaexpedient.form.camp.expressio.numero" comment="metaexpedient.form.camp.expressio.numero.comentari" readonly="${bloquejarCamps}"/>
 				
 				<c:if test="${isDocumentsGeneralsEnabled}">
@@ -318,10 +296,14 @@
 					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatPerAdminOrganEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${bloquejarCamps}"/>
 					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="false" disabled="${bloquejarCamps}"/>
 				</c:if>
+				<c:if test="${isRolActualRevisor}">
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatPerAdminOrganEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${bloquejarCamps}"/>
+					<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="false" disabled="${bloquejarCamps}"/>
+				</c:if>				
 			</div>
 		</div>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

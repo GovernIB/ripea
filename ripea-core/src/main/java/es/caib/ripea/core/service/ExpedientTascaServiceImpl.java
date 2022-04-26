@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
@@ -30,11 +31,13 @@ import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -55,10 +58,12 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.TascaHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.ExpedientTascaComentariRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
  * 
@@ -73,6 +78,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired
 	private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired
+	private ExpedientTascaComentariRepository expedientTascaComentariRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -172,7 +179,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				true,
 				true,
-				ambVersions, null, false);
+				ambVersions, null, false, null);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -306,17 +313,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto updateResponsables(Long expedientTascaId, String usuariCodi) {
+	public ExpedientTascaDto updateResponsables(Long expedientTascaId, List<String> responsablesCodi) {
 		logger.debug("Canviant responsable de la tasca " +
 				"expedientTascaId=" + expedientTascaId +", "+
-				"usuariCodi=" + usuariCodi +
+				"responsablesCodi=" + responsablesCodi +
 				")");
 
 		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
 		
-		UsuariEntity nouResponsable = usuariHelper.getUsuariByCodi(usuariCodi);
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
-		responsables.add(nouResponsable);
+		for (String responsableCodi: responsablesCodi) {
+			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi);
+			responsables.add(responsable);
+		}
 		
 		expedientTascaEntity.updateResponsables(responsables);	
 		
@@ -380,8 +389,12 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				expedient, 
 				metaExpedientTascaEntity, 
 				responsables, 
-				expedientTasca.getDataLimit(),
-				expedientTasca.getComentari()).build();
+				expedientTasca.getDataLimit()).build();
+
+		if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
+			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, expedientTasca.getComentari()).build();
+			expedientTascaEntity.addComentari(comentari);
+		}
 		
 		if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
 			expedient.updateExpedientEstat(metaExpedientTascaEntity.getEstatCrearTasca());
@@ -567,7 +580,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long tascaId,
-			Long docuemntId) {
+			Long docuemntId, 
+			String rolActual) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + docuemntId + ")");
@@ -578,7 +592,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		documentFirmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
-				document);
+				document, 
+				rolActual);
 	}
 
 	@Transactional(readOnly = true)
@@ -704,7 +719,67 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		return contingutHelper.deleteReversible(
 				entitatId,
-				contingut);
+				contingut, null);
+	}
+
+	@Transactional
+	@Override
+	public boolean publicarComentariPerExpedientTasca(
+			Long entitatId,
+			Long expedientTascaId,
+			String text,
+			String rolActual) {
+		logger.debug("Obtenint els comentaris per la tasca (" + "entitatId=" + entitatId + ", " + "tascaId=" + expedientTascaId + ")");
+
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
+
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(expedientTascaId);
+		if (tasca == null) {
+			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
+		}
+
+		entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				tasca.getExpedient().getId(),
+				false,
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+
+		// truncam a 1024 caracters
+		if (text.length() > 1024)
+			text = text.substring(0, 1021) + "...";
+		ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(tasca, text).build();
+		expedientTascaComentariRepository.save(comentari);
+		return true;
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId) {
+		logger.debug("Obtenint els comentaris per la tasca (" + "entitatId=" + entitatId + ", " + "tascaId=" + expedientTascaId + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, true, false, false);
+
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(expedientTascaId);
+		if (tasca == null) {
+			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
+		}
+
+		entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				tasca.getExpedient().getId(),
+				false,
+				true,
+				false,
+				false,
+				false, false, null);
+
+		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
+
+		return conversioTipusHelper.convertirList(tascacoms, ExpedientTascaComentariDto.class);
 	}
 
 	private void log (ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
@@ -715,7 +790,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				LogObjecteTipusEnumDto.TASCA,
 				tipusLog,
 				expedientTascaEntity.getMetaExpedientTasca().getNom(),
-				expedientTascaEntity.getComentari(),
+				expedientTascaEntity.getComentaris().size() == 1 ? expedientTascaEntity.getComentaris().get(0).getText() : null, // expedientTascaEntity.getComentari(),
 				false,
 				false);
 	}
@@ -730,7 +805,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				true,
 				true,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	/*private String getIdiomaPerDefecte() {

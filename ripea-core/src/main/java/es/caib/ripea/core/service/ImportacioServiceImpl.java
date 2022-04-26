@@ -12,7 +12,6 @@ import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +19,7 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -30,8 +30,10 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
-import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
+import es.caib.ripea.core.api.dto.TipusImportEnumDto;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -42,10 +44,8 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 
@@ -66,11 +66,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
-	private ExpedientHelper expedientHelper;
+	private CarpetaService carpetaService;
 	@Autowired
 	private CarpetaRepository carpetaRepository;
-	@Autowired
-	private ContingutRepository contingutRepository;
 	@Autowired
 	private EntitatRepository entitatRepository;
 	@Autowired
@@ -82,24 +80,19 @@ public class ImportacioServiceImpl implements ImportacioService {
 	
 	@Transactional
 	@Override
-	public int getDocuments(
+	public int importarDocuments(
 			Long entitatId,
 			Long contingutId,
-			ImportacioDto dades) throws ValidationException {
+			ImportacioDto params) {
 		logger.debug("Important documents de l'arxiu digital (" +
-				"numeroRegistre=" + dades.getNumeroRegistre() + ")");
+				"numeroRegistre=" + params.getNumeroRegistre() + ")");
 		ExpedientEntity expedientSuperior;
 		FitxerDto fitxer = new FitxerDto();;
 		int documentsRepetits = 0;
-		boolean crearNovaCarpeta = dades.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA);
-		List<DocumentDto> listDto = new ArrayList<DocumentDto>();
-		
-		ContingutEntity pare =contingutId != null ? contingutRepository.getOne(contingutId) : null;			
-		if (crearNovaCarpeta && !checkCarpetaUniqueContraint(dades.getCarpetaNom(), pare, entitatId)) {
-			throw new ContingutNotUniqueException();
-		}
-		
-		ContingutEntity contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
+		boolean usingNumeroRegistre = params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE);
+		boolean crearNovaCarpeta = params.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA);
+		String numeroRegistre = params.getNumeroRegistre();
+		ContingutEntity pareActual = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
 				false,
@@ -107,34 +100,25 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false, 
 				false, null);
-		// ############### RECUPERAR DOCUMENTS DEL NUMERO D REGISTRE INTRDUIT #########
-		List<ContingutArxiu> documentsArxiu = pluginHelper.getCustodyIdDocuments(
-				dades.getNumeroRegistre(),
-				dades.getDataPresentacioFormatted(),
-				dades.getTipusRegistre());
-		if (documentsArxiu != null && documentsArxiu.isEmpty())
-			throw new ValidationException("No s'han trobat registres amb les dades especificades");
 		
-		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
-			expedientSuperior = (ExpedientEntity)contingutPare;
+		if (ContingutTipusEnumDto.EXPEDIENT.equals(pareActual.getTipus())) {
+			expedientSuperior = (ExpedientEntity)pareActual;
 		} else {
-			expedientSuperior = contingutPare.getExpedient();
+			expedientSuperior = pareActual.getExpedient();
 		}
-//		Recuperar tipus document per defecte
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientSuperior.getMetaExpedient());
 		
+		List<ContingutArxiu> documentsTrobats = cercarDocumentsArxiu(params);
+
+		// IMPORTAR DETALLS DE CADA DOCUMENT I CREACIÓ DOCUMENT A L'EXPEDIENT
 		int idx = 1;
 		List<Document> documents = new ArrayList<Document>();
 		expedientsWithImportacio = new ArrayList<DocumentDto>();
-		// ############### IMPORTAR EL DETALL DE CADA DOCUMENT #########
-		outerloop: for (ContingutArxiu contingutArxiu : documentsArxiu) {
-			DocumentEntity entity = null;
+		outerloop: for (ContingutArxiu contingutArxiu : documentsTrobats) {
 			CarpetaEntity carpetaEntity = null;
 			Document documentArxiu = pluginHelper.importarDocument(
 					expedientSuperior.getArxiuUuid(),
 					contingutArxiu.getIdentificador(),
-					true);
-
+					usingNumeroRegistre);
 			documents.add(documentArxiu);
 			documents = findAndCorrectDuplicates(
 					documents,
@@ -144,7 +128,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
 			fitxer.setContingut(documentArxiu.getContingut().getContingut());
 
-			// comprovar si el justificant s'ha importat anteriorment
+			// COMPROVAR SI S'HA IMPORTAT PRÈVIAMENT I ES PERMET DUPLICAR CONTINGUT
 			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(contingutArxiu.getIdentificador());
 			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
@@ -152,95 +136,112 @@ public class ImportacioServiceImpl implements ImportacioService {
 					documentsRepetits++;
 				}
 				continue outerloop;
-//				throw new DocumentAlreadyImportedException();
 			}
-//			for (ContingutEntity contingut: contingutPare.getFills()) {
-//				if (contingut instanceof DocumentEntity && contingut.getEsborrat() == 0) {
-//					if (contingut.getNom().equals(tituloDoc)) {
-//						documentsRepetits++;
-//						continue outerloop;
-//					} 
-//				}
-//			}
-			// ############### CREAR CARPETA PARE ON INTRODUIR DOCUMENT #########
-//			boolean isCarpetaActive = configHelper.getAsBoolean("es.caib.ripea.creacio.carpetes.activa");
+			// CREAR NOVA CARPETA SI ÉS EL CAS ON IMPORTAR DOCUMENT
 			if (crearNovaCarpeta) {
-				// create carpeta ind db and arxiu if doesnt already exists
-				Long carpetaId = expedientHelper.createCarpetaFromExpPeticio(
-						expedientSuperior,
+				CarpetaDto carpeta = carpetaService.create(
 						entitatId,
-						dades.getCarpetaNom());
-				carpetaEntity = carpetaRepository.findOne(carpetaId);
+						expedientSuperior.getId(),
+						params.getCarpetaNom());
+				carpetaEntity = carpetaRepository.findOne(carpeta.getId());
 			}
-			String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  dades.getNumeroRegistre().replace('/', '_')) : documentArxiu.getNom();
+			String nomDocument = (tituloDoc != null && usingNumeroRegistre) ? (tituloDoc + " - " + numeroRegistre.replace('/', '_')) : documentArxiu.getNom();
 			contingutHelper.comprovarNomValid(
 					crearNovaCarpeta ? carpetaEntity : expedientSuperior,
 					nomDocument,
 					null,
 					DocumentEntity.class);
-			// ############### CREAR DOCUMENT A LA BBDD #########
-			entity = documentHelper.crearDocumentDB(
-					DocumentTipusEnumDto.IMPORTAT,
-					nomDocument,
-					null,
-					documentArxiu.getMetadades().getDataCaptura(),
-					documentArxiu.getMetadades().getDataCaptura(),
-					//Només hi ha un òrgan
-					getOrgans(documentArxiu),
-					getOrigen(documentArxiu),
-					getEstatElaboracio(documentArxiu),
-					getTipusDocumental(documentArxiu),
-					metaDocument, //metaDocumentEntity
-					crearNovaCarpeta ? carpetaEntity : contingutPare,
-					contingutPare.getEntitat(),
+			// CREAR DOCUMENT A LA BBDD
+			if (!checkDocumentUniqueContraint(nomDocument, crearNovaCarpeta ? carpetaEntity : pareActual, entitatId)) {
+				throw new DocumentAlreadyImportedException();
+			}
+			crearDocumentActualitzarMetadades(
+					nomDocument, 
+					documentArxiu, 
+					crearNovaCarpeta ? carpetaEntity : pareActual,
+					pareActual,
 					expedientSuperior,
-					null,
-					expedientSuperior.getArxiuUuid(),
-					null);
-		
-			if (fitxer != null) {
-				entity.updateFitxer(
-						fitxer.getNom(),
-						fitxer.getContentType(),
-						null);
-			}
-			if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-				entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-			} else {
-				entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
-			}
-			// ############### ACTUALITZAR METADADES NTI #########
-			entity.updateArxiu(documentArxiu.getIdentificador());
-			entity.updateNtiIdentificador(documentArxiu.getMetadades().getIdentificador());
-			entity.updateNti(
-					obtenirNumeroVersioEniDocument(
-							documentArxiu.getMetadades().getVersioNti()),
-							documentArxiu.getMetadades().getIdentificador(),
-					getOrgans(documentArxiu),
-					getOrigen(documentArxiu),
-					getEstatElaboracio(documentArxiu),
-					getTipusDocumental(documentArxiu),
-					documentArxiu.getMetadades().getIdentificadorOrigen(),
-					getNtiTipoFirma(documentArxiu),
-					getNtiCsv(documentArxiu)[0],
-					getNtiCsv(documentArxiu)[1]);
-			contingutLogHelper.logCreacio(
-					entity,
-					true,
-					true);
-			try {
-				listDto.add(toDocumentDto(entity));
-			} catch (DataIntegrityViolationException e) {
-					documentsRepetits++;
-					logger.error("No s'ha pogut importar el document", e);
-			}
+					fitxer,
+					usingNumeroRegistre,
+					params.getCodiEni());
+			
 		}
 		return documentsRepetits;
 	}
-	
+
 	@Override
 	public List<DocumentDto> consultaExpedientsAmbImportacio() {
 		return expedientsWithImportacio;
+	}
+	
+	private List<ContingutArxiu> cercarDocumentsArxiu(ImportacioDto params) {
+		// IMPORTAR DE L'ARXIU ELS DOCUMENTS
+		List<ContingutArxiu> documentsArxiu = pluginHelper.importarDocumentsArxiu(params);
+		if (documentsArxiu != null && documentsArxiu.isEmpty())
+			throw new ValidationException("No s'han trobat registres amb les dades especificades");
+		return documentsArxiu;
+	}
+	
+	private DocumentEntity crearDocumentActualitzarMetadades(
+			String nomDocument,
+			Document documentArxiu,
+			ContingutEntity contenidor,
+			ContingutEntity pareActual,
+			ExpedientEntity expedientSuperior,
+			FitxerDto fitxer,
+			boolean usingNumeroRegistre,
+			String codiEniOrigen) {
+		// TIPUS DE DOCUMENT PER DEFECTE
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientSuperior.getMetaExpedient());
+		DocumentEntity entity = documentHelper.crearDocumentDB(
+				DocumentTipusEnumDto.IMPORTAT,
+				nomDocument,
+				null,
+				documentArxiu.getMetadades().getDataCaptura(),
+				documentArxiu.getMetadades().getDataCaptura(),
+				//Només hi ha un òrgan
+				getOrgans(documentArxiu),
+				getOrigen(documentArxiu),
+				getEstatElaboracio(documentArxiu),
+				getTipusDocumental(documentArxiu),
+				metaDocument, //metaDocumentEntity
+				contenidor,
+				pareActual.getEntitat(),
+				expedientSuperior,
+				null,
+				expedientSuperior.getArxiuUuid(),
+				null);
+		if (fitxer != null) {
+			entity.updateFitxer(
+					fitxer.getNom(),
+					fitxer.getContentType(),
+					null);
+		}
+		// POSAR COM A CUSTODIAT O DEFINITIU
+		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
+			entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+		} else {
+			entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
+		}
+		// ACTUALITZAR METADADES NTI DEL DOCUMENT CREAT
+		entity.updateArxiu(documentArxiu.getIdentificador());
+		entity.updateNtiIdentificador(documentArxiu.getMetadades().getIdentificador());
+		entity.updateNti(
+				obtenirNumeroVersioEniDocument(documentArxiu.getMetadades().getVersioNti()),
+				documentArxiu.getMetadades().getIdentificador(),
+				getOrgans(documentArxiu),
+				getOrigen(documentArxiu),
+				getEstatElaboracio(documentArxiu),
+				getTipusDocumental(documentArxiu),
+				documentArxiu.getMetadades().getIdentificadorOrigen(),
+				getNtiTipoFirma(documentArxiu),
+				getNtiCsv(documentArxiu)[0],
+				getNtiCsv(documentArxiu)[1]);
+		contingutLogHelper.logCreacio(
+				entity,
+				true,
+				true);
+		return entity;
 	}
 	
 	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
@@ -290,18 +291,18 @@ public class ImportacioServiceImpl implements ImportacioService {
 	    return corrected;
 	}
 	
-	private DocumentDto toDocumentDto(
-			DocumentEntity document) {
-		return (DocumentDto)contingutHelper.toContingutDto(
-				document,
-				false,
-				false,
-				false,
-				false,
-				true,
-				true,
-				false, null, false);
-	}
+//	private DocumentDto toDocumentDto(
+//			DocumentEntity document) {
+//		return (DocumentDto)contingutHelper.toContingutDto(
+//				document,
+//				false,
+//				false,
+//				false,
+//				false,
+//				true,
+//				true,
+//				false, null, false, null);
+//	}
 
 	private static NtiOrigenEnumDto getOrigen(Document document) {
 		NtiOrigenEnumDto origen = null;
@@ -427,34 +428,36 @@ public class ImportacioServiceImpl implements ImportacioService {
 					break;
 				}
 			}
-			switch (firmaTipus) {
-			case CSV:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
-				break;
-			case XADES_DET:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
-				break;
-			case XADES_ENV:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
-				break;
-			case CADES_DET:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
-				break;
-			case CADES_ATT:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
-				break;
-			case PADES:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
-				break;
-			case SMIME:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
-				break;
-			case ODT:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
-				break;
-			case OOXML:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
-				break;
+			if (firmaTipus != null) {
+				switch (firmaTipus) {
+				case CSV:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
+					break;
+				case XADES_DET:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
+					break;
+				case XADES_ENV:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
+					break;
+				case CADES_DET:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
+					break;
+				case CADES_ATT:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
+					break;
+				case PADES:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
+					break;
+				case SMIME:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
+					break;
+				case ODT:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
+					break;
+				case OOXML:
+					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
+					break;
+				}
 			}
 		}
 		return ntiTipoFirma;
@@ -473,9 +476,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 		return ntiCsv;
 	}
 	
-	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
+	private boolean checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
-		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.CARPETA);
+		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);
 	}
 	
 	private boolean isIncorporacioDuplicadaPermesa() {

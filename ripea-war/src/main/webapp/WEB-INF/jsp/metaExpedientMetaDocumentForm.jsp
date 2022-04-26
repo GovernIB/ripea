@@ -31,7 +31,16 @@ pageContext.setAttribute(
 
 <c:choose>
 	<c:when test="${empty metaDocumentCommand.id}"><c:set var="titol"><spring:message code="metadocument.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="metadocument.form.titol.modificar"/></c:set></c:otherwise>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${consultar}">
+				<c:set var="titol"><spring:message code="metadocument.form.titol.consultar"/></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="titol"><spring:message code="metadocument.form.titol.modificar"/></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -476,7 +485,7 @@ function removeLoading() {
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true" disabled="${bloquejarCamps}"/>
-				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="codi" optionTextAttribute="nom" required="true" disabled="${bloquejarCamps}"/>
+				<rip:inputSelect name="ntiTipoDocumental" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.tipdoc" optionItems="${ntiTipusDocumentalOptions}" optionValueAttribute="codi" optionTextAttribute="nom" required="true" disabled="${bloquejarCamps}" optionMinimumResultsForSearch="3"/>
 				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">
@@ -522,11 +531,11 @@ function removeLoading() {
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect name="pinbalServei" textKey="metadocument.form.camp.pinbal.servei" required="true" optionItems="${pinbalServeiEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
-				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" required="true" maxlength="256" disabled="${bloquejarCamps}"/>
+				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" maxlength="256" disabled="${bloquejarCamps}" required="true"/>
 			</div>
 		</div>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button></c:if>
 			<a href="<c:url value="/metaDocument"/>" class="btn btn-default modal-cancel" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

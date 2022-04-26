@@ -20,12 +20,16 @@ public class OrganGestorFiltreCommand {
 
 	private String codi;
 	private String nom;
+	private Long pareId;
 	
 	public void setCodi(String codi) {
 		this.codi = codi != null ? codi.trim() : null;
 	}
 	public void setNom(String nom) {
 		this.nom = nom != null ? nom.trim() : null;
+	}
+	public void setPareId(Long pareId) {
+		this.pareId = pareId;
 	}
 	
 	public OrganGestorFiltreDto asDto() {

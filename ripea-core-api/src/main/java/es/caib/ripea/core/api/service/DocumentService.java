@@ -23,6 +23,8 @@ import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
@@ -392,6 +394,7 @@ public interface DocumentService {
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param rolActual TODO
 	 * @param id
 	 *            Atribut id del document que es vol enviar a firmar.
 	 * @param versio
@@ -406,7 +409,7 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long documentId) throws NotFoundException, IllegalStateException, SistemaExternException;
+			Long documentId, String rolActual) throws NotFoundException, IllegalStateException, SistemaExternException;
 
 	/**
 	 * Processa una petició del callback de portafirmes.
@@ -677,6 +680,12 @@ public interface DocumentService {
 			Long documentId, 
 			Long tipusDocumentId,
 			boolean comprovarMetaExpedient);
+
+	@PreAuthorize("hasRole('tothom')")
+	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId);
+
+	@PreAuthorize("hasRole('tothom')")
+	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType);
 
 	
 

@@ -75,7 +75,7 @@ public class DominiHelper {
 				domini.getDescripcio(),
 				domini.getConsulta(),
 				domini.getCadena(),
-				xifrarContrasenya ? xifrarContrasenya(domini.getContrasenya()) : null,
+				xifrarContrasenya ? xifrarContrasenya(domini.getContrasenya()) : domini.getContrasenya(),
 				entitat).build();
 		DominiDto dominiDto = conversioTipusHelper.convertir(
 				dominiRepository.save(entity),

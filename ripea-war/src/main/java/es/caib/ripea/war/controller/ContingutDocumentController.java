@@ -3,26 +3,24 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DigitalitzacioService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.war.command.DocumentCommand;
+import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
+import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
+import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
+import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
+import es.caib.ripea.war.command.DocumentGenericCommand;
+import es.caib.ripea.war.helper.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -43,48 +41,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DadaDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DigitalitzacioService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.war.command.DocumentCommand;
-import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
-import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
-import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
-import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
-import es.caib.ripea.war.command.DocumentGenericCommand;
-import es.caib.ripea.war.helper.ArxiuTemporalHelper;
-import es.caib.ripea.war.helper.BeanGeneratorHelper;
-import es.caib.ripea.war.helper.DocumentHelper;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.FitxerTemporalHelper;
-import es.caib.ripea.war.helper.JsonResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per al manteniment de documents.
@@ -138,6 +112,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
 			Model model) throws ClassNotFoundException, IOException {
+		FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = null;
 		if (documentId != null) {
@@ -189,6 +164,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				command,
 				model);
 		
+		if (command.isOnlyFileSubmit()) {
+			fillModelFileSubmit(command, model, request);
+			return "fileUploadResult";
+		}
+
+		if ((command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE02 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE03 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE04) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
+			bindingResult.rejectValue("ntiIdDocumentoOrigen", "NotNull");
+		}
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 			recuperarResultatEscaneig(
@@ -240,10 +223,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			} else {
 				throw ex;
 			}
-		} finally {
-			FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
-		}
+		} 
 	}
+	
+
+	
 	@RequestMapping(value = "/{contingutId}/document/docUpdate", method = RequestMethod.POST)
 	public String postUpdate(
 			HttpServletRequest request,
@@ -252,6 +236,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
+		
+		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+				request,
+				command,
+				model);
+		
+		if (command.isOnlyFileSubmit()) {
+			fillModelFileSubmit(command, model, request);
+			return "fileUploadResult";
+		}
+		
+		
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 			recuperarResultatEscaneig(
@@ -465,14 +461,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 			return new JsonResponse(convertit);
 				
-			} catch (Exception e) {
-				logger.error("Error al visualitzar document", e);
-				if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, fr.opensagres.xdocreport.converter.XDocConverterException.class, 5)) {
-					return new JsonResponse(null, true);
-				} else {
-					return new JsonResponse(true, e.getMessage());
-				}
+		} catch (Exception e) {
+			logger.error("Error al visualitzar document", e);
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, "fr.opensagres.xdocreport.converter.XDocConverterException", 5)) {
+				return new JsonResponse(null, true);
+			} else {
+				return new JsonResponse(true, e.getMessage());
 			}
+		}
 	}
 	
 
@@ -487,7 +483,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				documentId,
 				true,
-				false, null);
+				false, null, null);
 		if (contingut instanceof DocumentDto) {
 			
 			try {
@@ -549,7 +545,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				pareId,
 				true,
-				false, null);
+				false, null, null);
 		
 		byte[] reportContent = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -594,7 +590,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		
 		List<DocumentDto> documents = new ArrayList<DocumentDto>();
 		@SuppressWarnings("unchecked")
@@ -608,7 +604,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null);
+					false, null, null);
 
 			document = (DocumentDto) contingutDoc;
 			//No es possible concatenar els documents que no són pdf
@@ -735,7 +731,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -747,7 +743,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null);
+					false, null, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 				existsEsborrat = true;
 				documentService.documentActualitzarEstat(
@@ -884,7 +880,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						entitatActual.getId(),
 						docId,
 						true,
-						false, null);
+						false, null, null);
 				if (contingut instanceof DocumentDto) {
 					DocumentDto document = (DocumentDto) contingut;
 					if ((!document.isFirmat() || document.isCustodiat())
@@ -917,7 +913,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual.getId(),
 				contingutId,
 				true,
-				false, null);
+				false, null, null);
 		if (!contingut.isCarpeta())
 			isDocument = true;
 		else
@@ -939,7 +935,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					documentId,
 					true,
-					false, null);
+					false, null, null);
 				FitxerDto fitxer = documentService.descarregarImprimible(
 						entitatActual.getId(),
 						documentId,
@@ -995,7 +991,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
-				contingutId);
+				contingutId, 
+				null);
 		for (MetaDocumentDto metaDocument: metaDocuments) {
 			if (metaDocument.getId().equals(metaDocumentId))
 				return metaDocument;
@@ -1049,7 +1046,19 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		        new StringArrayPropertyEditor(null)); 
 	}
 	
-
+	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
+		if (command.isUnselect()) {
+			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
+		}
+		FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
+		if (fitxerTemp != null) {
+			SignatureInfoDto signatureInfoDto = documentService.checkIfSignedAttached(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
+			model.addAttribute("isError", signatureInfoDto.isError());
+			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
+		}
+	}
+	
 	private String createUpdateDocument(
 			HttpServletRequest request,
 			DocumentCommand command,
@@ -1159,7 +1168,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					"metaDocuments",
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
-							contingutId));
+							contingutId, 
+							null));
 		} else {
 			model.addAttribute(
 					"metaDocuments",

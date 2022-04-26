@@ -20,14 +20,14 @@ import es.caib.ripea.war.command.DocumentCommand;
  */
 @Component
 public class FitxerTemporalHelper {
-	private static final String SESSION_ATTRIBUTE_DOCUMENT = "ContingutDocumentController.session.document";
-	private static final String SESSION_ATTRIBUTE_FIRMA = "ContingutDocumentController.session.firma";
+	public static final String SESSION_ATTRIBUTE_DOCUMENT = "ContingutDocumentController.session.document";
+	public static final String SESSION_ATTRIBUTE_FIRMA = "ContingutDocumentController.session.firma";
 
 	public static void guardarFitxersAdjuntsSessio(			
 			HttpServletRequest request,
 			DocumentCommand command,
 			Model model) throws IOException {
-		if (!command.getArxiu().isEmpty()) {
+		if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
 			FitxerTemporalDto fitxer = new FitxerTemporalDto(
 					command.getArxiu().getOriginalFilename(),
 					command.getArxiu().getContentType(),
@@ -40,7 +40,7 @@ public class FitxerTemporalHelper {
 			model.addAttribute("nomDocument", fitxerTemp.getNom());
 		}
 		
-		if (!command.getFirma().isEmpty()) {
+		if (command.getFirma() != null && !command.getFirma().isEmpty()) {
 			FitxerTemporalDto fitxer = new FitxerTemporalDto(
 					command.getFirma().getOriginalFilename(),
 					command.getFirma().getContentType(),
@@ -55,7 +55,10 @@ public class FitxerTemporalHelper {
 	}
 
 	public static void esborrarFitxersAdjuntsSessio(HttpServletRequest request) {
-		((FitxerTemporalDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_DOCUMENT)).delete();
+		FitxerTemporalDto fitxerTemporalDto = ((FitxerTemporalDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_DOCUMENT));
+		if (fitxerTemporalDto != null) {
+			fitxerTemporalDto.delete();
+		}
 		request.getSession().removeAttribute(SESSION_ATTRIBUTE_DOCUMENT);
 		if (((FitxerTemporalDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_FIRMA)) != null) {
 			((FitxerTemporalDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_FIRMA)).delete();

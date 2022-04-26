@@ -63,23 +63,29 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		model.addAttribute(
 				"esRevisor",
 				rolActual.equals("IPA_REVISIO"));
-		MetaExpedientDto metaExpedient = null;
-		if (!rolActual.equals("IPA_REVISIO")) {
-			metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
-		}
 		
+		if (!rolActual.equals("IPA_REVISIO")) {
+			comprovarAccesMetaExpedient(request, metaExpedientId);
+		}
+		MetaExpedientDto metaExpedient = metaExpedientService.findById(
+				entitatActual.getId(),
+				metaExpedientId);
 		model.addAttribute(
 				"metaExpedient",
-				metaExpedientService.findById(
-						entitatActual.getId(),
-						metaExpedientId));
-		//TODO rename to metaExpedientTascaList
-		if (metaExpedient != null // es tracta d'una modificació
-				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
-				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
-			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
-			model.addAttribute("bloquejarCamps", true);
+				metaExpedient);
+		
+		if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
+			if (RolHelper.isRolActualAdministradorOrgan(request)  && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT){
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+				model.addAttribute("bloquejarCamps", true);
+			} else if (RolHelper.isRolActualRevisor(request)){
+				model.addAttribute("bloquejarCamps", true);
+				model.addAttribute("consultar", true);
+				model.addAttribute("isRolActualRevisor", true);
+			}
 		}
+		
+		//TODO rename to metaExpedientTascaList
 		return "metaExpedientTasca";
 	}
 
@@ -159,11 +165,16 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		command.setEntitatId(entitatActual.getId());
 		command.setMetaExpedientId(metaExpedientId);
 		model.addAttribute(command);
-		if (metaExpedient != null // es tracta d'una modificació
-				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
-				&& metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT) {
-			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
-			model.addAttribute("bloquejarCamps", true);
+		
+		if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
+			if (RolHelper.isRolActualAdministradorOrgan(request)  && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT){
+				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
+				model.addAttribute("bloquejarCamps", true);
+			} else if (RolHelper.isRolActualRevisor(request)){
+				model.addAttribute("bloquejarCamps", true);
+				model.addAttribute("consultar", true);
+				model.addAttribute("isRolActualRevisor", true);
+			}
 		}
 		return "metaExpedientTascaForm";
 	}

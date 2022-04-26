@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -13,7 +14,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -56,6 +57,7 @@ import es.caib.ripea.war.command.DocumentPublicacioCommand;
 import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -137,17 +139,17 @@ public class DocumentEnviamentController extends BaseUserController {
 					"redirect:../../../contingut/" + documentId,
 					"document.controller.notificacio.ok");
 
-		} catch (Exception ex) {
-			logger.error(ExceptionUtils.getRootCauseMessage(ex), ex);
-			String msg = "";
-			Throwable rootCause = ExceptionUtils.getRootCause(ex);
-			if (rootCause instanceof NotibRepostaException) {
-				msg = getMessage(request, "contingut.enviament.errorReposta.notib") + " " + rootCause.getMessage();
+		} catch (Exception e) {
+			logger.error("Error al enviar notificació", e);
+			String msg = getMessage(request, "document.controller.notificacio.error") + ": ";
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			if (root instanceof NotibRepostaException) {
+				msg += getMessage(request, "contingut.enviament.errorReposta.notib") + " " + root.getMessage();
+			} else if (root instanceof ConnectException || root.getMessage().contains("timed out")){
+				msg += getMessage(request, "error.notib.connectTimedOut");
 			} else {
-				msg = rootCause.getMessage();
-			}
-			if (msg == null) {
-				msg = rootCause.toString();
+				root.getMessage();
+				msg += root.getMessage();
 			}
 
 			return getModalControllerReturnValueErrorMessageText(
@@ -173,7 +175,28 @@ public class DocumentEnviamentController extends BaseUserController {
 						notificacioId));
 		return "notificacioInfo";
 	}
+	
+	
+	@RequestMapping(value = "/notificacio/actualitzarEstat/{identificador}/{referencia}")
+	public String notificacioActualitzarEstat(
+			HttpServletRequest request,
+			@PathVariable String identificador,
+			@PathVariable String referencia,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+		
+		documentService.notificacioActualitzarEstat(
+				identificador, 
+				referencia);
+		
+		MissatgesHelper.success(
+				request, 
+				"Estat actualitzat!");
+		 return modalUrlTancar();
+	}
 
+	
+	
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/{enviamentId}/descarregarJustificant", method = RequestMethod.GET)
 	public String notificacioConsultarIDescarregarJustificant(
 			HttpServletRequest request,
@@ -198,8 +221,34 @@ public class DocumentEnviamentController extends BaseUserController {
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
 					"expedient.controller.notificacio.justificant.ko");
 		}
+		return "notificacioForm";
+	}
+	
+	
+	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/descarregarJustificantEnviamentNotib", method = RequestMethod.GET)
+	public String notificacioConsultarIDescarregarJustificant(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long documentId,
+			@PathVariable Long notificacioId) throws IOException {
+		getEntitatActualComprovantPermisos(request);
+		RespostaJustificantEnviamentNotibDto info = documentService.notificacioDescarregarJustificantEnviamentNotib(
+				notificacioId);
+		
+		if (info.getJustificant() != null) {
+			writeFileToResponse(
+					"justificant.pdf",
+					info.getJustificant(),
+					response);
+		} else {
+			return this.getModalControllerReturnValueError(
+					request,
+					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
+					"expedient.controller.notificacio.justificant.ko");
+		}
 		return null;
 	}
+	
 
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}", method = RequestMethod.GET)
@@ -279,7 +328,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId,
 				true,
-				false, null);
+				false, null, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = documentService.descarregar(
 					entitatActual.getId(),
@@ -501,7 +550,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId,
 				false,
-				false, null);
+				false, null, null);
 		model.addAttribute(
 				"document",
 				document);
@@ -615,7 +664,7 @@ public class DocumentEnviamentController extends BaseUserController {
 						entitatActual.getId(),
 						documentId,
 						false,
-						false, null));
+						false, null, null));
 		model.addAttribute(
 				"publicacioTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(

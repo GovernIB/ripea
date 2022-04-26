@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.service.SeguimentService;
@@ -28,6 +28,7 @@ import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de seguiment de expedients pendents de distribució
@@ -88,7 +89,7 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
-        PaginaDto<ExpedientPeticioDto> docsPortafirmes = new PaginaDto<ExpedientPeticioDto>();
+        PaginaDto<ExpedientPeticioListDto> docsPortafirmes = new PaginaDto<ExpedientPeticioListDto>();
 
             EntitatDto entitat = getEntitatActualComprovantPermisos(request);
             
@@ -97,7 +98,8 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
             docsPortafirmes = seguimentService.findExpedientsPendents(
 					entitat.getId(),
 					ExpedientPeticioFiltreCommand.asDto(filtreCommand),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
+					DatatablesHelper.getPaginacioDtoFromRequest(request), 
+					RolHelper.getRolActual(request));
 			
         return DatatablesHelper.getDatatableResponse(request, docsPortafirmes, "id");
     }

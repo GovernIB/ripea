@@ -118,11 +118,12 @@ public interface ExpedientInteressatService {
 	 * Consulta l'interessat donat el seu id.
 	 * 
 	 * @param id Atribut id de l'interessat que es vol trobar.
+	 * @param consultarDadesExternes Indicar si consultar el plugin de dades externes per obtenir la informació restatnt de la direcció (nom país, nom província, nom municipi)
 	 * @return l'interessat.
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public InteressatDto findById(Long id) throws NotFoundException;
+	public InteressatDto findById(Long id, boolean consultarDadesExternes) throws NotFoundException;
 
 	/**
 	 * Consulta l'interessat donat el seu id.

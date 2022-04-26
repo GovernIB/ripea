@@ -6,10 +6,12 @@ package es.caib.ripea.core.api.service;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
@@ -50,6 +52,7 @@ public interface ExpedientService {
 	 * @param nom
 	 *            Nom de l'expedient que es vol crear.
 	 * @param rolActual TODO
+	 * @param anexosIdsMetaDocsIdsMap
 	 * @return L'expedient creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -69,7 +72,8 @@ public interface ExpedientService {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, String rolActual) throws NotFoundException, ValidationException;
+			Long grupId, String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un expedient.
@@ -99,6 +103,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat a la qual pertany l'expedient.
 	 * @param id
 	 *            Atribut id de l'expedient que es vol trobar.
+	 * @param rolActual TODO
 	 * @return L'expedient.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -106,7 +111,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public ExpedientDto findById(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long id, 
+			String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta un expedient donat el seu id.
@@ -157,21 +163,22 @@ public interface ExpedientService {
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 	
 	/**
-	 * Consulta els expedients de l'usuari per procediment
+	 * Consulta els expedients soble els que té permís un usuari per procediment
 	 * 
 	 * @param entitatId
 	 *            Atribut id de l'entitat.
 	 * @param metaExpedientId
 	 *            id del metaExpedient
-	 * @param checkPerMassiuAdmin TODO
+	 * @param rolActual Rol actual de l'usuari
 	 * @return Llista dels expeidents trobats
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<ExpedientSelectorDto> findPerUserAndTipus(
+	public List<ExpedientSelectorDto> findPerUserAndProcediment(
 			Long entitatId,
-			Long metaExpedientId, boolean checkPerMassiuAdmin) throws NotFoundException;
+			Long metaExpedientId,
+			String rolActual) throws NotFoundException;
 
 	/**
 	 * Consulta la llista d'ids d'expedient segons el filtre.
@@ -375,8 +382,10 @@ public interface ExpedientService {
 			Long entitatId, ExpedientFiltreDto filtre, Long expedientId,
 			PaginacioParamsDto paginacioParams);
 
-	@PreAuthorize("hasRole('tothom')")
-	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual);
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<CodiValorDto> findByEntitat(Long entitatId);
+	
+	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual, Long organActualId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
@@ -391,8 +400,10 @@ public interface ExpedientService {
 	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean retryCreateDocFromAnnex(Long registreAnnexId,
-			Long expedientPeticioId);
+	boolean retryCreateDocFromAnnex(
+			Long registreAnnexId,
+			Long expedientPeticioId, 
+			Long metaDocumentId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryNotificarDistribucio(Long expedientPeticioId);
@@ -401,7 +412,9 @@ public interface ExpedientService {
 	boolean incorporar(Long entitatId,
 			Long expedientId,
 			Long expedientPeticioId,
-			boolean associarInteressats, String rolActual);
+			boolean associarInteressats, 
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap);
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.
@@ -470,4 +483,78 @@ public interface ExpedientService {
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text);
+
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	PaginaDto<ExpedientDto> findExpedientMetaExpedientPaginat(
+			Long entitatId, 
+			Long metaExpedientId,
+			PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('tothom')")
+	public boolean hasReadPermissionsAny(
+			String rolActual,
+			Long entitatId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<ExpedientDto> findByIds(
+			Long entitatId,
+			Set<Long> ids);
+
+	/**
+	 * Retorna una pàgina d'expedients relacionats amb l'expedient especificat.
+	 * @param filtre 
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que es vol consultar.
+	 * @return La llista d'expedients relacionats.
+	 */
+	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
+			Long id, 
+			ExpedientFiltreDto filtre, 
+			Long expedientId,
+			PaginacioParamsDto paginacioDtoFromRequest);
+	
+	/**
+	 * Afegeix un expedient relacionat a la llista de documents d'un expedient (expedient pare).
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param expedientPareId
+	 *            Atribut id de l'expedient pare.
+	 * @param expedientId
+	 *            Atribut id de l'expedient que s'importarà (fill)
+	 * @param rolActual Rol actual de l'usuari que realitza l'acció
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public void importarExpedient(
+			Long entitatId,
+			Long expedientPareId,
+			Long expedientId,
+			String rolActual) throws NotFoundException;
+
+	/**
+	 * Esborra un expedient del llistat de documents d'un expedient (expedient pare).
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat.
+	 * @param expedientPareId
+	 *            Atribut id de l'expedient pare.
+	 * @param relacionatId
+	 *            Atribut id de l'expedient fill.
+	 * @param rolActual Rol actual de l'usuari que realitza l'acció
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public boolean esborrarExpedientFill(
+			Long entitatId,
+			Long expedientPareId,
+			Long expedientId,
+			String rolActual) throws NotFoundException;
+
 }

@@ -9,8 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
@@ -184,10 +184,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<ExpedientPeticioDto> findExpedientsPendents(
+	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		
@@ -203,10 +204,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 					false, null, null);
 		}
 		
-		
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
-				true,
+				rolActual,
+				null,
 				null,
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,
@@ -231,7 +232,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 						paginacioParams,
 						null));
 		
-		return paginacioHelper.toPaginaDto(paginaExpedientPeticios, ExpedientPeticioDto.class);
+		return paginacioHelper.toPaginaDto(paginaExpedientPeticios, ExpedientPeticioListDto.class);
 		
 	}
 	

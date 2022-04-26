@@ -100,7 +100,39 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	List<DocumentEntity> findByExpedientAndEsborrat(
 			ExpedientEntity expedient,
 			int esborrat);
+	
+	@Query(	"select case when (count(c) > 0) then true else false end " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"    c.expedient = :expedient "  + 
+			"and c.documentTipus = 0 " + //= DIGITAL
+			"and c.esborrat = 0 " +
+			"and c.estat = 0) ")
+	Boolean hasFillsEsborranys(@Param("expedient") ExpedientEntity expedient);
+	
+	@Query(	"select case when (count(c) = 0) then true else false end " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"    c.expedient = :expedient "  + 
+			"and c.documentTipus = 0 " + //= DIGITAL
+			"and c.esborrat = 0 " +
+			"and (c.estat = 0 or c.estat = 1 " + //!= REDACCIO || != FIRMA_PENDENT
+			"or c.estat = 2 or c.estat = 4 " + //!= FIRMAT || != FIRMA_PENDENT_VIAFIRMA
+			"or c.estat = 6 or c.estat = 7) ") //!= FIRMA_PARCIAL || != ADJUNT_FIRMAT
+	Boolean hasAllDocumentsDefinitiu(@Param("expedient") ExpedientEntity expedient);
 
+	@Query(	"select case when (count(c) > 0) then true else false end " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"    c.expedient = :expedient "  + 
+			"and (c.documentTipus = 0 or c.documentTipus = 3)" + //= DIGITAL || = IMPORTAT
+			"and c.esborrat = 0 " +
+			"and (c.estat = 3 or c.estat = 5)) ") //= CUSTODIAT || = DEFINITIU
+	Boolean hasAnyDocumentDefinitiu(@Param("expedient") ExpedientEntity expedient);
+	
 	List<DocumentEntity> findByEntitat(EntitatEntity entitat);
 	
 	List<DocumentEntity> findByExpedientAndMetaNodeAndEsborrat(
@@ -138,9 +170,10 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
-			"and d.estat = 0 "  + 
-			"and d.esborrat = 0 " + 
-			"and d.documentTipus != 2 and d.documentTipus != 3 " +
+			"and d.estat = 0 "  +
+			"and d.esborrat = 0 " +
+			"and d.gesDocAdjuntId is null " +
+			"and d.documentTipus != 1 and d.documentTipus != 2 and d.documentTipus != 3 " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
@@ -149,9 +182,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
 			"and (d.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
-			"				where metaDocument.firmaPortafirmesActiva = true" + 
-			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" + 
-			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
+			"				where metaDocument.firmaPortafirmesActiva = true))" )
+//			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" +
+//			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
 	public Page<DocumentEntity> findDocumentsPerFirmaMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -178,8 +211,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.entitat = :entitat " +
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and d.estat = 0 "  + 
-			"and d.esborrat = 0 " + 
-			"and d.documentTipus != 2 and d.documentTipus != 3 " +
+			"and d.esborrat = 0 " +
+			"and d.gesDocAdjuntId is null " +
+			"and d.documentTipus != 1 and d.documentTipus != 2 and d.documentTipus != 3 " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
 			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
@@ -188,9 +222,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
 			"and (d.metaNode.id in " + 
 			"			(select metaDocument.id from MetaDocumentEntity metaDocument " +
-			"				where metaDocument.firmaPortafirmesActiva = 1" + 
-			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" + 
-			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
+			"				where metaDocument.firmaPortafirmesActiva = true))" )
+//			"				and (metaDocument.portafirmesFluxTipus = 'PORTAFIB' and metaDocument.portafirmesFluxId != null)" +
+//			"				or (metaDocument.portafirmesFluxTipus = 'SIMPLE' and metaDocument.portafirmesResponsables != null)))")
 	public List<Long> findIdsDocumentsPerFirmaMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,

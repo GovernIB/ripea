@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.service;
 
+//import com.codahale.metrics.Timer;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,6 +58,9 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.HistoricExpedientEntity;
+import es.caib.ripea.core.entity.HistoricInteressatEntity;
+import es.caib.ripea.core.entity.HistoricUsuariEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -66,6 +71,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DominiHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientEstatHelper;
 import es.caib.ripea.core.helper.GrupHelper;
@@ -88,6 +94,9 @@ import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
@@ -148,6 +157,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private DominiRepository dominiRepository;
 	@Autowired
 	private DominiHelper dominiHelper;
+	@Autowired
+	private HistoricExpedientRepository historicExpedientRepository;
+	@Autowired
+	private HistoricInteressatRepository historicInteressatRepository;
+	@Autowired
+	private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	@Transactional
 	@Override
@@ -307,7 +324,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 						if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
 							List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
-							if (dominis == null || dominis.isEmpty()) {
+							if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
 								dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
 							}
 						}
@@ -321,8 +338,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			for (MetaDadaDto metaDadaDto : metaExpedient.getMetaDades()) {
 				if (metaDadaDto.getTipus() == MetaDadaTipusEnumDto.DOMINI) {
 					List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
-					if (dominis == null || dominis.isEmpty()) {
-						dominiHelper.create(entitatId, metaDadaDto.getDomini(), true);
+					if (dominis == null || dominis.isEmpty() && metaDadaDto.getDomini() != null) {
+						dominiHelper.create(entitatId, metaDadaDto.getDomini(), false);
 					}
 				}
 				metaDadaHelper.create(entitatId, entity.getId(), metaDadaDto, rolActual, organId);
@@ -410,8 +427,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					if (metaDocumentDto.getMetaDades() != null) {
 						for (MetaDadaDto metaDadaDto : metaDocumentDto.getMetaDades()) {
 							if (metaDadaDto.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
-								DominiEntity domini = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi()).get(0);
-								metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+								List<DominiEntity> dominis = dominiRepository.findByEntitatAndCodi(entitat, metaDadaDto.getCodi());
+								if (dominis != null && !dominis.isEmpty()) {
+									DominiEntity domini = dominis.get(0);
+									metaDadaDto.setDomini(conversioTipusHelper.convertir(domini, DominiDto.class));
+								}
 							}
 						}
 					}
@@ -470,6 +490,20 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			
 		//esborrar les carpetes per defecte
 		metaExpedientCarpetaHelper.removeAllCarpetes(metaExpedient);
+		
+		List<HistoricExpedientEntity> historicsExpedient = historicExpedientRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricExpedientEntity historicEntity : historicsExpedient) {
+			historicExpedientRepository.delete(historicEntity);
+		}
+		List<HistoricInteressatEntity> historicsInteressats = historicInteressatRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricInteressatEntity historicEntity : historicsInteressats) {
+			historicInteressatRepository.delete(historicEntity);
+		}
+		List<HistoricUsuariEntity> historicsUsuari = historicUsuariRepository.findByMetaExpedient(metaExpedient);
+		for (HistoricUsuariEntity historicEntity : historicsUsuari) {
+			historicUsuariRepository.delete(historicEntity);
+		}
+		
 		metaExpedientRepository.delete(metaExpedient);
 		return conversioTipusHelper.convertir(
 				metaExpedient,
@@ -556,8 +590,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return resposta;
 	}
 
-	
-	
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findByEntitat(Long entitatId) {
@@ -634,7 +666,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Override
 	public List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
-			boolean isAdmin) {
+			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -650,7 +682,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		metaExpedients = metaExpedientRepository.findMetaExpedientsByIds(
 				entitat,
 				createWritePermIds,
-				isAdmin);
+				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
 
 		return conversioTipusHelper.convertirList(metaExpedients, MetaExpedientDto.class);
 
@@ -712,6 +744,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
+			ordenacioMap.put("lastModifiedBy.codiAndNom", new String[] {"lastModifiedBy.nom"});
+			
 			// Sempre afegirem el nom com a subordre
 			addNomSort(paginacioParams);
 			return paginacioHelper.toPaginaDto(
@@ -1102,6 +1136,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient, 
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
+		
+		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
+		
 		return true;
 	}
 	
@@ -1341,14 +1378,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id, Long organId) {
 		logger.debug(
 				"Marcant com en procés de disseny un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, null);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
 
-		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}

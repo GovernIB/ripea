@@ -1,9 +1,11 @@
 databaseChangeLog:
-  - changeSet:
-      id: 1642616819000-1
-      author: limit
-      changes:
-        - sql:
-            sql: "
-            ALTER TABLE IPA_METADOCUMENT ADD PINBAL_FINALITAT VARCHAR2(512);
-            "
+- changeSet:
+    id: 1642616819000-1
+    author: limit
+    changes:
+    - addColumn:
+        tableName: IPA_METADOCUMENT
+        columns:
+        - column:
+            name: PINBAL_FINALITAT
+            type: varchar2(512)

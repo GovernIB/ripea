@@ -63,7 +63,7 @@
 					</c:choose>	
 				</c:when>
 				<c:otherwise>
-					<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+					<li><a href="${(contingut.carpeta && not empty contingut.expedientRelacionat) ? contingut.expedientRelacionat.id : contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 				</c:otherwise>
 			</c:choose>
 			<c:set var="mostrarSeparador" value="${true}"/>
@@ -73,7 +73,7 @@
 			<li><a href="<c:url value="/expedient/${contingut.id}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 		</c:if>
 		
-		<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
+		<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
 			<c:choose>
@@ -92,12 +92,12 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
-				<c:when test="${contingut.carpeta}">
+				<c:when test="${contingut.carpeta && isCreacioCarpetesActiva}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 			</c:choose>
-			<c:if test="${not contingut.expedient and !isTasca}">
+			<c:if test="${contingut.document and !isTasca or (contingut.carpeta && isCreacioCarpetesActiva)}">
 				
 				<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-arrows"></span>&nbsp;<spring:message code="comu.boto.moure"/>...</a></li>
 				<c:if test="${isMostrarCopiar}">
@@ -122,7 +122,7 @@
 		<c:if test="${contingut.expedient && not expedientPareAgafatPerUsuariActual}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 		</c:if>
-		<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
+		<c:if test="${(isTasca || potModificarExpedientPare || contingut.admin) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
@@ -166,7 +166,7 @@
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					</c:when>
 					<c:otherwise>
-						<c:if test="${((contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite) || (contingut.carpeta && expedientPare.usuariActualDelete)) && expedientPareObert}">
+						<c:if test="${((contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite) || (contingut.carpeta && isCreacioCarpetesActiva && expedientPare.usuariActualDelete )) && expedientPareObert}">
 							<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 						</c:if>
 					</c:otherwise>
@@ -219,7 +219,7 @@
 			</c:if>
 			
 			<%--------------- FIRMA RELATED ACCIONS -------------------%>
-			<c:if test="${isTasca || potModificarExpedientPare}">
+			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 			
 				<%---- Enviar a portafirmes ----%>
 				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
@@ -297,7 +297,7 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 			</c:if>
-			<c:if test="${isTasca || potModificarExpedientPare || isRolActualAdministrador}">
+			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 				<%---- Seguiment portafirmes ----%>
 				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMAT') && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>

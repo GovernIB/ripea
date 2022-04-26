@@ -39,6 +39,7 @@ import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
@@ -265,6 +266,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 				filtre.getNom() == null || filtre.getNom().isEmpty(),
 				filtre.getNom() != null ? filtre.getNom().trim() : "",
+				filtre.getPareId() == null,
+				filtre.getPareId(),
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 		for (OrganGestorDto organ : paginaOrgans.getContingut()) {
@@ -370,14 +373,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			Long metaExpedientId,
 			String filter, 
 			Long expedientId,
-			boolean isAdmin) {
+			String rolActual, 
+			Long organActualId) {
 		List<OrganGestorEntity> organsPermesos = findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 				entitatId,
 				metaExpedientId,
 				expedientId == null ? ExtendedPermission.CREATE : ExtendedPermission.WRITE,
 				filter, 
 				expedientId,
-				isAdmin);
+				rolActual, 
+				organActualId);
 		return conversioTipusHelper.convertirList(
 				organsPermesos,
 				OrganGestorDto.class);	
@@ -487,13 +492,16 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			Permission permis,
 			String filtre, 
 			Long expedientId,
-			boolean isAdmin) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, !isAdmin, false, false, false, false);
+			String rolActual, Long organActualId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		List<OrganGestorEntity> organsGestors = null;
 		
-		if (isAdmin) {
+		if (RolHelper.isAdminEntitat(rolActual)) {
 			organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
+		} else if (RolHelper.isAdminOrgan(rolActual)){
+			organsGestors = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
+			
 		} else {
 		
 			if (metaExpedient.getOrganGestor() != null) {
@@ -617,5 +625,21 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
+
+
+	@Override
+	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		List<OrganGestorEntity> organsSuperiorEntities = new ArrayList<OrganGestorEntity>();
+		organsSuperiorEntities = organGestorRepository.findByEntitatAndHasPare(entitat);
+		List<OrganGestorDto> organsSuperior = new ArrayList<OrganGestorDto>();
+		
+		for (OrganGestorEntity organ : organsSuperiorEntities) {
+			organsSuperior.add(conversioTipusHelper.convertir(organ, OrganGestorDto.class));
+		}
+		
+		return organsSuperior;
+	}
 
 }

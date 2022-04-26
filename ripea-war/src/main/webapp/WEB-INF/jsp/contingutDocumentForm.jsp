@@ -138,29 +138,33 @@ $(document).ready(function() {
 	$('#metaNodeId').on('change', function() {
 		if ($(this).val()) {
 			if ($('#id').val() == '') { // if creating new document
-				$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+				$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 					$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-					$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					if(!$('#ntiEstadoElaboracion').val()){
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					}
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
 			} else { // if modifying existing document 
 				if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
-					$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val() + "/dadesnti")
+					$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						if(!$('#ntiEstadoElaboracion').val()){
+							$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+							$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						}
 						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 					})
 				}
 			}
-			$.get("/ripea/modal/contingut/${contingutId}/metaDocument/" +  $(this).val())
+			$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val())
 			.done(function(data) {
 				if (data.plantillaNom) {
 					$('#info-plantilla-si').removeClass('hidden');
@@ -334,6 +338,127 @@ $(document).ready(function() {
 		$('.scan-profile').empty().hide();
 		$('.scan-back-btn').addClass('hidden');
 	});
+
+	
+	$('#ntiEstadoElaboracion').on('change', function() {
+		if ($(this).val() && ($(this).val()=='EE02' || $(this).val()=='EE03' ||  $(this).val()=='EE04')) {
+			$('#ntiIdDocumentoOrigenDiv').show();
+		} else {
+			$('#ntiIdDocumentoOrigenDiv').hide();
+		}
+	});
+	$('#ntiEstadoElaboracion').trigger('change');
+
+
+	
+	$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
+		 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+	     $('#loading').show();
+	     $('#inputAmbFirma').addClass('hidden');
+		 $('#arxiuInput').hide();
+		 $('#unselect').val(true);
+		 $("#inputDoc .fileinput").fileinput('reset');
+		 $("#documentCommand").prop("target", 'target_iframe');
+		 $('#documentCommand').submit();
+	});
+	$("#inputDoc .fileinput").on("reset.bs.fileinput", function(e){
+		console.log('before reset');
+	    e.stopPropagation();
+	    e.preventDefault();
+	});
+	$("#inputDoc .fileinput").on("reseted.bs.fileinput", function(e){
+		console.log('after reset');
+	});
+	
+	
+	
+	$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
+		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+	    $('#onlyFileSubmit').val(true);
+	    $('#loading').show();
+	    $('#arxiuInput').hide();
+		$('#inputAmbFirma').removeClass('hidden');
+	    $("#documentCommand").prop("target", 'target_iframe');
+	    $('#documentCommand').submit();
+		
+	});
+	
+	$('#target_iframe').load(function() {
+	    $("#documentCommand").prop("target", '');
+	    $('#unselect').val(false);
+		$('#onlyFileSubmit').val(false);
+
+		
+	    var isSignedAttached = $('iframe[name=target_iframe]').contents().find('#isSignedAttached').val();
+	    var isSignedAttachedTrue = (isSignedAttached === 'true');
+	    
+	    if (isSignedAttachedTrue && !$('#ambFirma').prop('checked')) {
+	        $('#ambFirma').click();
+	        $('#ambFirma').attr('onclick', 'return false;');
+	        $("#ambFirma").css({"cursor": "not-allowed"});
+		    $('#tipusFirma1').parent().show();
+		    $('#tipusFirma2').parent().hide();
+		    $('#input-firma-arxiu').addClass('hidden');
+		    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
+		    $('#tipusFirma1').click();
+	    } else if (!isSignedAttachedTrue && $('#ambFirma').prop('checked')){
+	    	$('#ambFirma').attr('onclick', null);
+	    	$("#ambFirma").css({"cursor": ""});
+	    	$('#ambFirma').click();
+		    $('#tipusFirma1').parent().hide();
+		    $('#tipusFirma2').parent().show();
+		    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+		    $('#tipusFirma2').click();
+		} else if (!isSignedAttachedTrue && !$('#ambFirma').prop('checked')){
+		    $('#tipusFirma1').parent().hide();
+		    $('#tipusFirma2').parent().show();
+		    $('#tipusFirma2').click();
+		    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+		} else if (isSignedAttachedTrue && $('#ambFirma').prop('checked')){
+	        $('#ambFirma').attr('onclick', 'return false;');
+	        $("#ambFirma").css({"cursor": "not-allowed"});
+		    $('#tipusFirma1').parent().show();
+		    $('#tipusFirma2').parent().hide();
+		    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
+		    $('#tipusFirma1').click();
+		}
+
+
+	    var isError = $('iframe[name=target_iframe]').contents().find('#isError').val();
+	    var isErrorTrue = (isError === 'true');
+		if (isErrorTrue) {
+			var errorMsg = $('iframe[name=target_iframe]').contents().find('#errorMsg').val();
+			$('#inputDoc').find('div.alert.alert-danger').remove();
+			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
+		} else {
+			$('#inputDoc').find('div.alert.alert-danger').remove();
+		}
+	   
+
+	    $('#loading').hide();
+	    $('#arxiuInput').show();
+	    
+		if (!isErrorTrue) {
+			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
+			
+		}
+
+	});
+
+
+	
+	if(${not empty nomDocument}){
+		$('#inputAmbFirma').removeClass('hidden');
+	}
+    if($('#ambFirma').prop('checked') && $('#tipusFirma1').is(":checked")){
+        $('#ambFirma').attr('onclick', 'return false;');
+        $('#tipusFirma1').parent().show();
+        $('#tipusFirma2').parent().hide();
+    } else if($('#ambFirma').prop('checked') && $('#tipusFirma2').is(":checked")){
+        $('#tipusFirma1').parent().hide();
+        $('#tipusFirma2').parent().show();
+    }
+	
 	
 });
 
@@ -368,6 +493,9 @@ function removeLoading() {
 		<form:hidden path="pareId"/>
 		<form:hidden path="documentTipus"/>
 		<form:hidden path="origen"/>
+		<form:hidden path="onlyFileSubmit"/>
+		<form:hidden path="unselect"/>
+		
 
 		<c:choose>
 			<c:when test="${documentCommand.documentTipus == 'IMPORTAT' || !isPermesModificarCustodiatsVar}">
@@ -384,6 +512,10 @@ function removeLoading() {
 		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
 		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		
+		<div id="ntiIdDocumentoOrigenDiv">
+			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true"/>
+		</div>
 		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
@@ -392,12 +524,20 @@ function removeLoading() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="fitxer">
-					<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
-					<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-					<div id="input-firma" class="hidden">
-						<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-						<div id="input-firma-arxiu" class="hidden">
-							<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+					<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
+					<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
+					<div id="arxiuInput">
+						<div id="inputDoc">
+							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+						</div>
+						<div id="inputAmbFirma" class="hidden">
+							<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+						</div>
+						<div id="input-firma" class="hidden">
+							<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+							<div id="input-firma-arxiu" class="hidden">
+								<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -428,7 +568,7 @@ function removeLoading() {
 		</c:if>
 		<div class="rmodal"></div>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="crearDocumentBtnSubmit btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/contingut/${documentCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

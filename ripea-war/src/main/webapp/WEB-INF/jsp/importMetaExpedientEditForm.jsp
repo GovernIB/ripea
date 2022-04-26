@@ -40,14 +40,17 @@
 	</c:if>	
 </head>
 <body>
-	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importEdit"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/metaExpedient/importFitxerEdit"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientImportEditCommand" role="form">
 
 		<form:hidden path="entitatId"/>
 		
-		<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true"/>
-
+		<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" />
 		<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true" />
+		<rip:inputTextarea name="nom" textKey="metaexpedient.form.camp.nom" required="true"/>
+		<rip:inputTextarea name="descripcio" textKey="metaexpedient.form.camp.descripcio" />
+		<rip:inputText name="serieDocumental" textKey="metaexpedient.form.camp.serie.doc" required="true"/>
+
 		<c:choose>
 			<c:when test="${hasPermisAdmComu}">
 				<rip:inputCheckbox name="comu" textKey="metaexpedient.form.camp.comu" />
@@ -77,6 +80,7 @@
 				<div class="well"> 
 					<form:hidden path="metaDocuments[${vs.index}].id" />
 					<form:hidden path="metaDocuments[${vs.index}].portafirmesFluxTipus" />
+					<form:hidden path="metaDocuments[${vs.index}].firmaPortafirmesActiva" />
 					<rip:inputText name="metaDocuments[${vs.index}].codi" textKey="metaexpedient.form.camp.codi" required="true" readonly = "true"/>
 					
 					<c:choose>
@@ -91,7 +95,7 @@
 								suggestValue="codi"
 								suggestText="nom"
 								suggestTextAddicional="nif"
-								required="true"/>							
+								required="${metaExpedientImportEditCommand.metaDocuments[vs.index].firmaPortafirmesActiva}"/>							
 						</c:when>
 						<c:otherwise>
 						</c:otherwise>
@@ -143,7 +147,7 @@
 		</c:if>
 
 		<div id="modal-botons">
-			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" data-toggle="modal" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.importar"/></button>
 			<a href="<c:url value="/metaExpedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

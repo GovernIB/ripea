@@ -1,20 +1,10 @@
 package es.caib.ripea.core.api.service;
 
+import es.caib.ripea.core.api.dto.*;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 
 public interface ExpedientTascaService {
 
@@ -102,7 +92,7 @@ public interface ExpedientTascaService {
 	public void portafirmesCancelar(
 			Long entitatId,
 			Long tascaId,
-			Long docuemntId);
+			Long docuemntId, String rolActual);
 
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
@@ -132,8 +122,15 @@ public interface ExpedientTascaService {
 			String motiu);
 	
 	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
-			String usuariCodi);
+			List<String> responsablesCodi);
 
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
 
+	public boolean publicarComentariPerExpedientTasca(
+			Long entitatId,
+			Long expedientTascaId,
+			String text,
+			String rolActual);
+
+	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId);
 }

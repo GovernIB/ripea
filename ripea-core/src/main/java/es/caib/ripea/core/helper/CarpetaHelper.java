@@ -54,7 +54,9 @@ public class CarpetaHelper {
 			boolean alreadyCreatedInDB,
 			Long carpetaId,
 			boolean alreadyCreatedInArxiu,
-			String arxiuUuid) {
+			String arxiuUuid, 
+			boolean fromAnotacio, 
+			String rolActual) {
 		logger.debug("Creant nova carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "pareId=" + pareId + ", "
@@ -77,12 +79,16 @@ public class CarpetaHelper {
 					false,
 					false,
 					false,
-					false, false, null);
+					false, 
+					false, 
+					rolActual);
 			ExpedientEntity expedient = contingutHelper.getExpedientSuperior(
 					pare,
 					true,
 					false,
-					false, false, null);
+					false, 
+					false, 
+					rolActual);
 			contingutHelper.comprovarNomValid(
 					pare,
 					nom,
@@ -114,7 +120,8 @@ public class CarpetaHelper {
 					null,
 					false,
 					false,
-					null);
+					null, 
+					fromAnotacio);
 		}
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);
 		return dto;
@@ -130,7 +137,7 @@ public class CarpetaHelper {
 				false,
 				false,
 				false,
-				false, null, false);
+				false, null, false, null);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);

@@ -139,7 +139,7 @@ public interface MetaExpedientService {
 	 * 
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto getAndCheckAdminPermission(Long entitatId, Long id, Long organId);
 	
 	/**
@@ -495,7 +495,7 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	List<MetaExpedientDto> findCreateWritePerm(
 			Long entitatId,
-			boolean isAdmin);
+			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean isRevisioActiva();
@@ -530,6 +530,7 @@ public interface MetaExpedientService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
+	 * @param organId
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a marcar com a pendent.
 	 * @return El meta-expedient modificat.
@@ -539,7 +540,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto marcarProcesDisseny(
 			Long entitatId, 
-			Long id);
+			Long id, 
+			Long organId);
 	
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public boolean publicarComentariPerMetaExpedient(

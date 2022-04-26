@@ -71,7 +71,6 @@
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="metaexpedient.list.filtre.camp.nom"/>
 			</div>
-
 		</div>
 		<div class="row">
 			<div class="col-md-4">
@@ -88,7 +87,7 @@
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
  					suggestText="codiINom" />
-			</div>		
+			</div>	
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -97,7 +96,7 @@
 			</div>
 		</div>
 	</form:form>
-	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedientRevisio/{{:id}}</script>
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
 	<table 
 		id="metaexpedients" 
 		data-toggle="datatable" 
@@ -115,30 +114,46 @@
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
-				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>						
+				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>
+				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>								
 				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
-				<c:if test="${isRolActualAdmin}">
-					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
-						<spring:message code="metaexpedient.list.columna.revisioEstat"/>
-						<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
-							{{if revisioEstat == 'DISSENY'}}
-								<spring:message code="meta.expedient.revisio.estat.enum.DISSENY"/>
-							{{else revisioEstat == 'PENDENT'}}
-								<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
-							{{else revisioEstat == 'REVISAT'}}
-								<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
-							{{else revisioEstat == 'REBUTJAT'}}
-								<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
-							{{/if}}
-						</script>
-					</th>
-				</c:if>
+				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
+					<spring:message code="metaexpedient.list.columna.comu"/>
+					<script id="cellComuTemplate" type="text/x-jsrender">
+						{{if comu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
+					<spring:message code="metaexpedient.list.columna.actiu"/>
+					<script id="cellActiuTemplate" type="text/x-jsrender">
+						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				
+				<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
+					<spring:message code="metaexpedient.list.columna.revisioEstat"/>
+					<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
+						{{if revisioEstat == 'DISSENY'}}
+							<spring:message code="meta.expedient.revisio.estat.enum.DISSENY"/>
+						{{else revisioEstat == 'PENDENT'}}
+							<spring:message code="meta.expedient.revisio.estat.enum.PENDENT"/>
+						{{else revisioEstat == 'REVISAT'}}
+							<spring:message code="meta.expedient.revisio.estat.enum.REVISAT"/>
+						{{else revisioEstat == 'REBUTJAT'}}
+							<spring:message code="meta.expedient.revisio.estat.enum.REBUTJAT"/>
+						{{/if}}
+					</script>
+				</th>
+				
+				<th data-col-name="lastModifiedBy.codiAndNom" width="10%"><spring:message code="metaexpedient.list.columna.modificat.per"/></th>
+				<th data-col-name="lastModifiedDate" data-converter="datetime" width="10%"><spring:message code="metaexpedient.list.columna.modificat.el"/></th>
 				
 				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellNumComentaris" width="1%">
 					<script id="cellNumComentaris" type="text/x-jsrender">
 							<a href="metaExpedientRevisio/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 					</script>
 				</th>					
+				
 				<th data-col-name="metaDocumentsCount" data-visible="false"></th>
 				<th data-col-name="metaDadesCount" data-visible="false"></th>
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
@@ -163,7 +178,15 @@
 				</th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="metaExpedientRevisio/{{:id}}" class="btn btn-primary" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a>
+						<div class="dropdown">
+							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+							<ul class="dropdown-menu">
+							<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.consultar"/></a></li>
+							{{if revisioEstat == 'PENDENT'}}
+								<li><a href="metaExpedientRevisio/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.canviar.estat.revisio"/></a></li>
+							{{/if}}
+							</ul>
+						</div>	
 					</script>
 				</th>
 			</tr>

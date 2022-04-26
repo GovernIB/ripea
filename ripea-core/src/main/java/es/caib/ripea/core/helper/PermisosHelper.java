@@ -134,7 +134,7 @@ public class PermisosHelper {
 	}
 
 	public void filterGrantedAny(
-			Collection<? extends AbstractPersistable<Serializable>> objects,
+			Collection<?> objects,
 			Class<?> clazz,
 			Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -244,6 +244,41 @@ public class PermisosHelper {
 				it.remove();
 		}
 	}
+	
+	public void filterGrantedAny(
+			Collection<?> objects,
+			Class<?> clazz,
+			Permission[] permissions,
+			String usuariCodi) {
+		filterGrantedAny(
+				objects,
+				new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
+					@Override
+					public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
+						return entitat.getId();
+					}
+				},
+				clazz,
+				permissions,
+				usuariCodi);
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void filterGrantedAny(
+			Collection<?> objects,
+			ObjectIdentifierExtractor objectIdentifierExtractor,
+			Class<?> clazz,
+			Permission[] permissions,
+			String usuariCodi) {
+		Iterator<?> it = objects.iterator();
+		while (it.hasNext()) {
+			Serializable objectIdentifier = objectIdentifierExtractor.getObjectIdentifier(it.next());
+			if (objectIdentifier == null) {
+				it.remove();
+			} else if (!isGrantedAny(objectIdentifier, clazz, permissions, usuariCodi))
+				it.remove();
+		}
+	}
 
 	/**
 	 * Filtre un llistat d'identificadors d'objectes amb els que tenen uns
@@ -308,6 +343,20 @@ public class PermisosHelper {
 		}
 		return false;
 	}
+	
+	public boolean isGrantedAny(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, String usuariCodi) {
+		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, usuariCodi);
+		boolean result = true;
+		for (int i = 0; i < granted.length; i++) {
+			if (!granted[i]) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	
 
 	/**
 	 * Filtre un llistat d'identificadors d'objectes amb els que tenen tots els

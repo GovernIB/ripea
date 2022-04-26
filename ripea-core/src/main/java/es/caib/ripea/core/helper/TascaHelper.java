@@ -9,7 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
@@ -18,8 +17,6 @@ import es.caib.ripea.core.repository.ExpedientTascaRepository;
 public class TascaHelper {
 	@Autowired
 	private ConfigHelper configHelper;
-	@Autowired
-	private UsuariHelper usuariHelper;
 	@Autowired
 	private ExpedientTascaRepository expedientTascaRepository;
 	
@@ -36,16 +33,24 @@ public class TascaHelper {
 	
 	public ExpedientTascaEntity comprovarTasca(Long expedientTascaId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity usuariActual = usuariHelper.getUsuariByCodiDades(auth.getName());
 		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(expedientTascaId);
 		
 		if (tasca == null)
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		
-		UsuariEntity responsableActual = tasca.getResponsableActual();
-		
-		if (responsableActual != null && ! responsableActual.equals(usuariActual))
-			throw new ValidationException(tasca.getId(), ExpedientTascaEntity.class, "La tasca s'està tramitant per un altre usuari (codi=" + responsableActual.getCodi() + ")");
+		if (tasca.getResponsables() != null) {
+			boolean pemitted = false;
+			for (UsuariEntity responsable : tasca.getResponsables()) {
+				if (responsable.getCodi().equals(auth.getName())) {
+					pemitted = true;
+				}
+			}
+			if (!pemitted) {
+				throw new SecurityException("Sense permisos per accedir la tasca ("
+						+ "tascaId=" + tasca.getId() + ", "
+						+ "usuari=" + auth.getName() + ")");
+			}
+		}
 		
 		return tasca;
 	}

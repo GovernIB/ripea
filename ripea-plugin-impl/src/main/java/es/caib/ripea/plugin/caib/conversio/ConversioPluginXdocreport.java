@@ -5,6 +5,21 @@ package es.caib.ripea.plugin.caib.conversio;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
+
+import org.apache.poi.xwpf.usermodel.IBodyElement;
+import org.apache.poi.xwpf.usermodel.IRunElement;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFFooter;
+import org.apache.poi.xwpf.usermodel.XWPFHeader;
+import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.xmlbeans.XmlCursor;
+import org.jdom.Namespace;
+import org.jopendocument.dom.ODPackage;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTR;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTText;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Element;
@@ -97,16 +112,31 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 		}
 	}
 
+
 	private ConversioArxiu convertirIEstampar(
 			ConversioArxiu arxiu,
 			String url) throws Exception {
 		ConversioArxiu convertit = new ConversioArxiu();
 		ByteArrayOutputStream baosConversio = null;
 		if (!isExtensioPdf(arxiu)) {
+			
+			DocumentKind documentKind = getDocumentKind(arxiu);
+			
 			Options options = Options.getFrom(
-					getDocumentKind(arxiu)).to(
+					documentKind).to(
 					ConverterTypeTo.PDF);
-			ByteArrayInputStream bais = new ByteArrayInputStream(arxiu.getArxiuContingut());
+			
+			byte[] contingut;
+			// xdocreport gives error when trying to convert docx/odt which has hyperlink in header/footer to pdf
+			// that's why hyperlinks needs to be removed
+			// error is: java.lang.RuntimeException: Not all annotations could be added to the document (the document doesn't have enough pages). at com.lowagie.text.pdf.PdfDocument.close(Unknown Source)
+			if (documentKind == DocumentKind.DOCX) {
+				contingut = removeLinksHeaderFooterDocx(arxiu.getArxiuContingut());
+			} else {
+				contingut = removeLinksHeaderFooterOdt(arxiu.getArxiuContingut());
+			}
+			
+			ByteArrayInputStream bais = new ByteArrayInputStream(contingut);
 			baosConversio = new ByteArrayOutputStream();
 			IConverter converter = ConverterRegistry.getRegistry().getConverter(options);
 			converter.convert(bais, baosConversio, options);
@@ -140,6 +170,144 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 		return convertit;
 	}
 
+	
+
+	  
+	private byte[] removeLinksHeaderFooterOdt(byte[] contingut) {
+		try {
+
+			ODPackage p = new ODPackage(new ByteArrayInputStream(contingut));
+			for (Object o1 : p.getStyles().getDocument().getContent()) {
+				if (o1 instanceof org.jdom.Element) {
+					org.jdom.Element e1 = ((org.jdom.Element) o1);
+					for (Object o2 : e1.getChildren()) {
+						if (o2 instanceof org.jdom.Element) {
+							org.jdom.Element e2 = ((org.jdom.Element) o2);
+							if (e2.getName().equals("master-styles")) {
+								for (Object o3 : e2.getChildren()) {
+									if (o3 instanceof org.jdom.Element) {
+										org.jdom.Element e3 = ((org.jdom.Element) o3);
+										if (e3.getName().equals("master-page")) {
+											for (Object o4 : e3.getChildren()) {
+												org.jdom.Element e4 = ((org.jdom.Element) o4);
+												if (e4.getName().equals("header") || e4.getName().equals("footer")) { 
+													for (Object o5 : e4.getChildren()) {
+														if (o5 instanceof org.jdom.Element) {
+															org.jdom.Element e5 = ((org.jdom.Element) o5);
+															if (e5.getName().equals("p")) {
+																for (Object o6 : e5.getChildren()) {
+																	org.jdom.Element e6 = ((org.jdom.Element) o6);
+																	e6.getName();
+																}
+																org.jdom.Element element = e5.getChild("a", Namespace.getNamespace("text", "urn:oasis:names:tc:opendocument:xmlns:text:1.0"));
+																if (element != null) {
+																	String value = element.getValue();
+																	element.setName("span");
+																	element.setText(value);
+																}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			p.save(out);
+			byte[] documentBytes = out.toByteArray();
+			out.close();
+			return documentBytes;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private byte[] removeLinksHeaderFooterDocx(byte[] contingut) {
+		try {
+			XWPFDocument document = new XWPFDocument(new ByteArrayInputStream(contingut));
+			
+			for (XWPFHeader header : document.getHeaderList()) {
+				removeLinksDocx(header.getBodyElements());
+			}
+			for (XWPFFooter footer : document.getFooterList()) {
+				removeLinksDocx(footer.getBodyElements());
+			}
+			
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			document.write(out);
+			byte[] xwpfDocumentBytes = out.toByteArray();
+			out.close();
+			document.close();
+			return xwpfDocumentBytes;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void removeLinksDocx(List<IBodyElement> bodyElements) throws Exception {
+		for (IBodyElement bodyElement : bodyElements) {
+			if (bodyElement instanceof XWPFParagraph) {
+				XWPFParagraph paragraph = (XWPFParagraph) bodyElement;
+				
+				
+				//removes hyperlink created with keyword HYPERLINK
+				int runToRemove = -1;
+				int i = 0;
+				for (IRunElement runElement : paragraph.getIRuns()) {
+					if (runElement instanceof XWPFRun) {
+						XWPFRun run = (XWPFRun) runElement;
+						CTR cTR = run.getCTR();
+						boolean containsHyperlink = false;
+						for (CTText ctText : cTR.getInstrTextList()) {
+							if (ctText.getStringValue().contains("HYPERLINK")) {
+								containsHyperlink = true;
+							}
+						}
+						if (containsHyperlink) {
+							runToRemove = i;
+						}
+					} 
+					i++;
+				}
+				if (runToRemove != -1) {
+					paragraph.removeRun(runToRemove);
+				}
+				
+				
+				//removes hyperlink created with tag <w:hyperlink>
+				int j = 0;
+				int runRemoved = -1;
+				String runRemovedText = "";
+				int runRemovedFontSize = 0;
+				for (IRunElement runElement : paragraph.getIRuns()) {
+					if (runElement instanceof XWPFHyperlinkRun) {
+						runRemovedText = runElement.toString();
+						runRemovedFontSize = ((XWPFHyperlinkRun) runElement).getFontSize();
+		                XmlCursor c = ((XWPFHyperlinkRun) runElement).getCTHyperlink().newCursor();
+		                c.removeXml();
+		                c.dispose();
+		                runRemoved = j;
+					}
+					j++;
+				}
+				if (runRemoved != -1) {
+					XWPFRun xWPFRun = paragraph.insertNewRun(runRemoved);
+					xWPFRun.setText(runRemovedText);
+					xWPFRun.setColor("0000EE");
+					xWPFRun.setFontSize(runRemovedFontSize);
+				}
+			}
+		}
+	}
+	
+	
 	private void estamparBarcodePdf417(
 			PdfContentByte contentByte,
 			String url,
@@ -224,5 +392,8 @@ public class ConversioPluginXdocreport implements ConversioPlugin {
 			}
 		}
 	}
+	
+	
+	
 
 }

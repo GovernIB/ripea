@@ -1,0 +1,67 @@
+databaseChangeLog:
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - changeSet:
+      id: 1644841333349-1
+      author: limit
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: ipa_exp_tasca_comment_pk
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: exp_tasca_id
+                  type: BIGINT
+              - column:
+                  name: text
+                  type: VARCHAR(1024 ${varcharUnit})
+              - column:
+                  name: createdby_codi
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: createddate
+                  type: TIMESTAMP
+              - column:
+                  name: lastmodifiedby_codi
+                  type: VARCHAR(64 ${varcharUnit})
+              - column:
+                  name: lastmodifieddate
+                  type: TIMESTAMP
+            tableName: ipa_exp_tasca_comment
+        - addForeignKeyConstraint:
+            baseColumnNames: exp_tasca_id
+            baseTableName: ipa_exp_tasca_comment
+            constraintName: ipa_exptasca_tascacomment_fk
+            referencedColumnNames: id
+            referencedTableName: ipa_expedient_tasca
+        - addForeignKeyConstraint:
+            baseColumnNames: createdby_codi
+            baseTableName: ipa_exp_tasca_comment
+            constraintName: ipa_usucre_tascacomment_fk
+            referencedColumnNames: codi
+            referencedTableName: ipa_usuari
+        - addForeignKeyConstraint:
+            baseColumnNames: lastmodifiedby_codi
+            baseTableName: ipa_exp_tasca_comment
+            constraintName: ipa_usumod_tascacomment_fk
+            referencedColumnNames: codi
+            referencedTableName: ipa_usuari
+        - sql:
+            dbms: oracle
+            sql: grant select, update, insert, delete on ipa_exp_tasca_comment to www_ripea;
+        - sql:
+            dbms: oracle
+            sql: insert into ipa_exp_tasca_comment (id, exp_tasca_id, text, createdby_codi, createddate) select ipa_hibernate_seq.nextval, id, comentari, createdby_codi, createddate from ipa_expedient_tasca where comentari is not null;

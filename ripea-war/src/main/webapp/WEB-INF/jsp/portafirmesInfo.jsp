@@ -300,13 +300,15 @@ $(document).ready(function() {
 										<c:forEach items="${block.signers}" var="signer">
 											<div class="signer_container signed_${signer.signed}">
 												<c:choose>
-													<c:when test="${not emptysigner.signerNom}">
+													<c:when test="${not empty signer.signerNom}">
 															${signer.signerNom} <c:if test="${signer.signerCodi != ' '}">(${signer.signerCodi})</c:if>
 													</c:when>
 													<c:otherwise>
 														${signer.signerCodi}
 													</c:otherwise>
-												</c:choose><br>
+												</c:choose>
+												<c:if test="${not empty signer.data}"><br><fmt:formatDate value="${signer.data}" pattern="dd/MM/yyyy HH:mm:ss"/></c:if>
+												<br>
 												${signer.signerId}
 											</div>
 										</c:forEach>

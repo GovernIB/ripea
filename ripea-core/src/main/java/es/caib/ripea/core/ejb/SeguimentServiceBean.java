@@ -7,8 +7,8 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
@@ -68,14 +68,14 @@ public  class SeguimentServiceBean implements SeguimentService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ExpedientPeticioDto> findExpedientsPendents(
+	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, String rolActual) {
 		return delegate.findExpedientsPendents(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, rolActual);
 	}
 
 	@Override

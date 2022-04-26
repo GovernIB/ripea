@@ -28,6 +28,8 @@ import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
@@ -178,10 +180,10 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long id) {
+			Long id, String rolActual) {
 		delegate.portafirmesCancelar(
 				entitatId,
-				id);
+				id, rolActual);
 	}
 
 	@Override
@@ -418,6 +420,22 @@ public class DocumentServiceBean implements DocumentService {
 			Long tipusDocumentId,
 			boolean comprovarMetaExpedient) {
 		return delegate.updateTipusDocumental(entitatId, documentId, tipusDocumentId, comprovarMetaExpedient);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId) {
+		return delegate.notificacioDescarregarJustificantEnviamentNotib(notificacioId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public SignatureInfoDto checkIfSignedAttached(
+			byte[] contingut,
+			String contentType) {
+		return delegate.checkIfSignedAttached(
+				contingut,
+				contentType);
 	}
 
 

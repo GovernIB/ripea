@@ -6,7 +6,16 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:choose>
 	<c:when test="${empty metaDadaCommand.id}"><c:set var="titol"><spring:message code="metadada.form.titol.crear"/></c:set></c:when>
-	<c:otherwise><c:set var="titol"><spring:message code="metadada.form.titol.modificar"/></c:set></c:otherwise>
+	<c:otherwise>
+		<c:choose>
+			<c:when test="${consultar}">
+				<c:set var="titol"><spring:message code="metadada.form.titol.consultar" /></c:set>
+			</c:when>
+			<c:otherwise>
+				<c:set var="titol"><spring:message code="metadada.form.titol.modificar" /></c:set>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
 </c:choose>
 <html>
 <head>
@@ -33,7 +42,8 @@
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<script src="<c:url value="/js/clamp.js"/>"></script>
-	<script src="<c:url value="/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
@@ -271,7 +281,7 @@ $(document).ready(function() {
 		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini" disabled="${bloquejarCamps}"/>
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>
 			<a href="<c:url value="/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
