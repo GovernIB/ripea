@@ -61,12 +61,17 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -79,6 +84,7 @@ import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -156,6 +162,8 @@ public class ContingutHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 
 
 	public ContingutDto toContingutDto(
@@ -612,18 +620,45 @@ public class ContingutHelper {
 	}
 	
 	public DocumentDto generarDocumentDto(
-			DocumentNotificacioEntity notificacio,
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
 			MetaDocumentEntity metaDocument,
 			RespostaConsultaEstatEnviament resposta) {
 		DocumentDto dto = new DocumentDto();
 		MetaNodeDto metaNode = null;
-		dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_"));
+		String interessatNif = null;
+		String interessatNom = null;
+		
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		InteressatEntity interessat = HibernateHelper.deproxy(documentEnviamentInteressatEntity.getInteressat());
+		if (interessat instanceof InteressatPersonaFisicaEntity) {
+			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
+			interessatNif = interessatPf.getDocumentNum();
+			interessatNom = interessatPf.getNom() + " " + interessatPf.getLlinatge1();
+			String llinatge2 = interessatPf.getLlinatge2();
+			interessatNom += (llinatge2 != null && !llinatge2.isEmpty()) ? " " + llinatge2 : "";
+		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
+			InteressatPersonaJuridicaEntity interessatPj = (InteressatPersonaJuridicaEntity)interessat;
+			interessatNif = interessatPj.getDocumentNum();
+			interessatNom = interessatPj.getRaoSocial();
+		} else if (interessat instanceof InteressatAdministracioEntity) {
+			InteressatAdministracioEntity interessatA = (InteressatAdministracioEntity)interessat;
+			interessatNif = interessatA.getDocumentNum();
+			interessatNom = interessatA.getOrganNom();
+		}
+		
+		if (interessatNif != null && interessatNom != null)
+			dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom);
+		else
+			dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_"));
 		dto.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		dto.setUbicacio(null);
 		dto.setData(resposta.getCertificacioData());
 		if (resposta.getCertificacioContingut() != null) {
 			logger.debug("[CERT] Generant fitxer certificació...");
-			dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
+			if (interessatNif != null && interessatNom != null)
+				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom + ".pdf");
+			else
+				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
