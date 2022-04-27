@@ -4,6 +4,8 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -708,6 +710,13 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		if (document.getMetaDocument() != null && !metaDocuments.contains(document.getMetaDocument())) {
 			metaDocuments.add(document.getMetaDocument());
 		}
+		Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){
+		     public int compare(MetaDocumentEntity o1, MetaDocumentEntity o2){
+		         if(o1.getNom().toLowerCase() == o2.getNom().toLowerCase())
+		             return 0;
+		         return o1.getNom().toLowerCase().compareTo(o2.getNom().toLowerCase()) < -1 ? -1 : 1;
+		     }
+		});
 		return conversioTipusHelper.convertirList(
 				metaDocuments,
 				MetaDocumentDto.class);
@@ -754,6 +763,13 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					metaDocuments.add(metaDocument);
 				}
 			}
+			Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){
+			     public int compare(MetaDocumentEntity o1, MetaDocumentEntity o2){
+			         if(o1.getNom().toLowerCase() == o2.getNom().toLowerCase())
+			             return 0;
+			         return o1.getNom().toLowerCase().compareTo(o2.getNom().toLowerCase()) < -1 ? -1 : 1;
+			     }
+			});
 		} else {
 			metaDocuments = metaDocumentsDelMetaExpedient;
 		}
