@@ -1,0 +1,32 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1648212798512-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: crear_regla_dist_estat
+            type: varchar(10)
+        - column:
+            name: crear_regla_dist_error
+            type: varchar(1024 ${varcharunit})
+        tableName: ipa_metaexpedient
+    changes:   
+    - sql:
+        sql: "
+          INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (11, 'PLUGINS', 'DISTRIBUCIO_REGLA', 'Plugin de creació de regla en DISTRIBUCIO' );
+          Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.distribucio.regla.ws.url',null,'Url del plugin','DISTRIBUCIO_REGLA','1','1','TEXT',null,null);
+          Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.distribucio.regla.ws.username',null,'Usuari del plugin','DISTRIBUCIO_REGLA','2','1','TEXT',null,null);
+          Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.distribucio.regla.ws.password',null,'Constrasenya del plugin','DISTRIBUCIO_REGLA','3','1','PASSWORD',null,null);
+          Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.distribucio.regla.ws.codi.backoffice',null,'Codi de backoffice','DISTRIBUCIO_REGLA','4','0','TEXT',null,null);
+        "
+        
