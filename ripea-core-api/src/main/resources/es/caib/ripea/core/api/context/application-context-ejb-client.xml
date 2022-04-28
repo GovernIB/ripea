@@ -128,4 +128,8 @@
 			id="configService"
 			jndi-name="ripea/ConfigServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.ConfigService"/>
+	<jee:local-slsb
+			id="avisService"
+			jndi-name="ripea/AvisServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.AvisService"/>
 </beans>
