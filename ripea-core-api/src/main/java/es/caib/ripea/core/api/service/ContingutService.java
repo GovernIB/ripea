@@ -513,6 +513,23 @@ public interface ContingutService {
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
+	
+	/**
+	 * Consulta documents definitius per executar l'acció massiva: copiar enllaç csv
+	 * 
+	 * @param entitatId
+	 *            Id de l'entitat.
+	 * @param filtre del datatable
+	 * @param rolActual TODO
+	 * @return El contingut pendent.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public PaginaDto<DocumentDto> findDocumentsPerCopiarCsv(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 
 	ContingutDto findAmbIdUser(Long entitatId,
 			Long contingutId,

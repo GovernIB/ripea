@@ -202,6 +202,40 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("dataFi") Date dataFi,
 			Pageable pageable);
 	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.entitat = :entitat " +
+			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and (d.estat = 2 or d.estat = 3 or d.estat = 5) "  +
+			"and d.esborrat = 0 " +
+			"and d.gesDocAdjuntId is null " +
+			"and d.documentTipus != 1 and d.documentTipus != 2 and d.documentTipus != 3 " +
+			"and (:esNullMetaExpedient = true or d.expedient.metaNode = :metaExpedient) " +
+			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullMetaDocument = true or d.metaNode = :metaDocument) " +
+			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullDataInici = true or d.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or d.createdDate <= :dataFi) " +
+			"and (d.metaNode.id is not null)" )
+	public Page<DocumentEntity> findDocumentsPerCopiarCsv(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullMetaDocument") boolean esNullMetaDocument,
+			@Param("metaDocument") MetaNodeEntity metaDocument,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			Pageable pageable);
 	
 	@Query(	"select " +
 			"    d.id " +

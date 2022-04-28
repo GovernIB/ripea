@@ -67,6 +67,12 @@
 	pageContext.setAttribute(
 			"teAccesEstadistiques",
 			es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
+	pageContext.setAttribute(
+			"isConvertirDefinitiuActiu",
+			es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
+	pageContext.setAttribute(
+			"isUrlValidacioDefinida",
+			es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -437,7 +443,7 @@ body {
 						</button>
 						<ul class="dropdown-menu">
 							<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
-							<c:if test="${convertirDefinitiu}">
+							<c:if test="${isConvertirDefinitiuActiu}">
 							<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
 							</c:if>
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
@@ -448,6 +454,9 @@ body {
 									<spring:message code="decorator.menu.accions.massives.user"/>
 								</a>
 							</li>
+							<c:if test="${isUrlValidacioDefinida}">
+								<li><a href="<c:url value="/massiu/csv"/>"><spring:message code="massiu.documents.csv"/></a></li>
+							</c:if>
 						</ul>
 					</div>
 				</c:if>
