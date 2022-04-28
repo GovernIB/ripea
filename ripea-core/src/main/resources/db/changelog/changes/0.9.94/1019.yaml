@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1651146740000-1
+      author: limit
+      changes:
+        - sql:
+            sql: "
+            UPDATE IPA_INTERESSAT SET INCAPACITAT = 0 WHERE INCAPACITAT = 1;
+            "

@@ -571,9 +571,9 @@ function canviVisibilitat(tipus) {
 			<div class="row" class="hidden">		
 				<div class="col-xs-6" style="float: right;" id="entregaDehObligatDiv"><rip:inputCheckbox name="entregaDehObligat" textKey="interessat.form.camp.entregaDehObligat" labelSize="10"/></div>
 			</div>		
-			<div class="row" class="hidden">		
-				<div class="col-xs-6" style="float: right;"><rip:inputCheckbox name="incapacitat" textKey="interessat.form.camp.incapacitat" labelSize="10"/></div>
-			</div>
+<!-- 			<div class="row" class="hidden">		 -->
+<%-- 				<div class="col-xs-6" style="float: right;"><rip:inputCheckbox name="incapacitat" textKey="interessat.form.camp.incapacitat" labelSize="10"/></div> --%>
+<!-- 			</div> -->
 		</c:if>
 		
 		

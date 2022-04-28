@@ -114,6 +114,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		interessatCommand.setNotificacioAutoritzat(true);
+		interessatCommand.setIncapacitat(false);
 		
 		List<Class<?>> grups = new ArrayList<Class<?>>();
 		if (interessatCommand.getTipus() != null) {
