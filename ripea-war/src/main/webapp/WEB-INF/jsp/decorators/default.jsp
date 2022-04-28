@@ -67,6 +67,9 @@
 	pageContext.setAttribute(
 			"teAccesEstadistiques",
 			es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
+	pageContext.setAttribute(
+			"avisos",
+			es.caib.ripea.war.helper.AvisHelper.getAvisos(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -313,6 +316,8 @@ body {
 								</li>
 							</ul>
 						</div>
+						
+						<a href="<c:url value="/avis"/>" class="btn btn-primary"><spring:message code="decorator.menu.avisos"/></a>
 					</c:when>
 					<c:when test="${isRolActualAdministrador}">
 						<%---- Expedients ----%>
@@ -480,6 +485,25 @@ body {
 	
 	
 	<div class="container container-main container-caib">
+	
+		<c:if test="${not empty avisos}">
+			<div id="accordion">
+				<c:forEach var="avis" items="${avisos}" varStatus="status">
+						<div class="card avisCard ${avis.avisNivell == 'INFO' ? 'avisCardInfo':''} ${avis.avisNivell == 'WARNING' ? 'avisCardWarning':''} ${avis.avisNivell == 'ERROR' ? 'avisCardError':''}">
+	
+							<div data-toggle="collapse" data-target="#collapse${status.index}" class="card-header avisCardHeader">
+								${avis.avisNivell == 'INFO' ? '<span class="fa fa-info-circle text-info"></span>':''} ${avis.avisNivell == 'WARNING' ? '<span class="fa fa-exclamation-triangle text-warning"></span>':''} ${avis.avisNivell == 'ERROR' ? '<span class="fa fa-warning text-danger"></span>':''} ${avis.assumpte}
+							<button class="btn btn-default btn-xs pull-right"><span class="fa fa-chevron-down "></span></button>										
+							</div>
+	
+							<div id="collapse${status.index}" class="collapse" data-parent="#accordion">
+								<div class="card-body avisCardBody" >${avis.missatge}</div>
+							</div>
+						</div>
+				</c:forEach>
+			</div>
+		</c:if>
+	
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h2>
