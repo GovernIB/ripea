@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 
 /**
@@ -21,6 +22,8 @@ public class ExpedientHelper {
 	private static final String REQUEST_PARAMETER_ACCES_EXPEDIENTS = "ExpedientHelper.teAccesExpedients";
 	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 	private static final String REQUEST_PARAMETER_STATISTICS_EXPEDIENTS = "ExpedientHelper.teAccesEstadistiques";
+	private static final String SESSION_CONVERSIO_DEFINITIU_ACTIVA = "ExpedientHelper.isConversioDefinitiuActiva";
+	private static final String SESSION_URL_VALIDACIO = "ExpedientHelper.isUrlValidacioDefinida";
 	
 	public static void accesUsuariExpedients(
 			HttpServletRequest request,
@@ -91,6 +94,32 @@ public class ExpedientHelper {
 	public static void resetAccesUsuariExpedients(
 			HttpServletRequest request) {
 		request.getSession().removeAttribute(REQUEST_PARAMETER_ACCES_EXPEDIENTS);
+	}
+	
+	public static Boolean isConversioDefinitiuActiva(HttpServletRequest request) {
+		return (Boolean)request.getSession().getAttribute(SESSION_CONVERSIO_DEFINITIU_ACTIVA);
+	}
+	
+	public static void setConversioDefinitiu(
+			HttpServletRequest request,
+			AplicacioService aplicacioService) {
+		boolean isConversioDefinitiuActiva = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu"));
+		request.getSession().setAttribute(
+				SESSION_CONVERSIO_DEFINITIU_ACTIVA,
+				isConversioDefinitiuActiva);
+	}
+	
+	public static Boolean isUrlValidacioDefinida(HttpServletRequest request) {
+		return (Boolean)request.getSession().getAttribute(SESSION_URL_VALIDACIO);
+	}
+	
+	public static void setUrlValidacioDefinida(
+			HttpServletRequest request,
+			AplicacioService aplicacioService) {
+		boolean isUrlValidacioDefinida = aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false;
+		request.getSession().setAttribute(
+				SESSION_URL_VALIDACIO,
+				isUrlValidacioDefinida);
 	}
 
 }
