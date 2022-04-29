@@ -27,6 +27,8 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
+import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.UnitatOrganitzativaService;
@@ -54,6 +56,8 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 	private UnitatOrganitzativaService unitatOrganitzativaService;
 	@Autowired
 	private DadesExternesService dadesExternesService;
+	@Autowired
+	private ConfigService configService;
 
 	@Autowired(required = true)
 	private javax.validation.Validator validator;
@@ -499,6 +503,11 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		} catch (Exception e) {
 			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.nivell.administracio.error"));
 		}
+		boolean dehActiu = false;
+		try {
+			dehActiu = Boolean.parseBoolean(configService.getConfigValue("es.caib.ripea.notificacio.enviament.deh.activa"));
+		} catch (Exception e) {}
+		model.addAttribute("dehActiu", dehActiu);
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatController.class);
 

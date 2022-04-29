@@ -2,6 +2,7 @@ package es.caib.ripea.core.service;
 
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
@@ -36,6 +37,8 @@ public class ConfigServiceImpl implements ConfigService {
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private PluginHelper pluginHelper;
+    @Autowired
+    private ConfigHelper configHelper;
 
     @Override
     @Transactional
@@ -79,6 +82,12 @@ public class ConfigServiceImpl implements ConfigService {
             }
         }
         return editedProperties;
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public String getConfigValue(String configKey) throws NotDefinedConfigException {
+    	return configHelper.getConfig(configKey);
     }
 
     private void processPropertyValues(ConfigGroupDto cGroup) {

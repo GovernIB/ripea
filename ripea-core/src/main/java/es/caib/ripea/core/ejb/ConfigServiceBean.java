@@ -2,6 +2,7 @@ package es.caib.ripea.core.ejb;
 
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 import es.caib.ripea.core.api.service.ConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
@@ -39,5 +40,10 @@ public class ConfigServiceBean implements ConfigService {
 	@RolesAllowed({"IPA_SUPER"})
 	public List<String> syncFromJBossProperties(){
 		return delegate.syncFromJBossProperties();
+	}
+	
+	@Override
+	public String getConfigValue(String configKey) throws NotDefinedConfigException {
+		return delegate.getConfigValue(configKey);
 	}
 }

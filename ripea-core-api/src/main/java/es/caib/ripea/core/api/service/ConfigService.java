@@ -2,6 +2,8 @@ package es.caib.ripea.core.api.service;
 
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
@@ -44,6 +46,9 @@ public interface ConfigService {
 	 */
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	List<String> syncFromJBossProperties();
+
+	
+	String getConfigValue(String configKey) throws NotDefinedConfigException;
 
 }
 
