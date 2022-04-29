@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.helper.ExpedientHelper;
 
@@ -21,7 +22,9 @@ public class ExpedientsInterceptor extends HandlerInterceptorAdapter {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@Override
 	public boolean preHandle(
 			HttpServletRequest request,
@@ -33,6 +36,12 @@ public class ExpedientsInterceptor extends HandlerInterceptorAdapter {
 		ExpedientHelper.accesUsuariEstadistiques(
 				request, 
 				metaExpedientService);
+		ExpedientHelper.setConversioDefinitiu(
+				request, 
+				aplicacioService);
+		ExpedientHelper.setUrlValidacioDefinida(
+				request, 
+				aplicacioService);
 		return true;
 	}
 

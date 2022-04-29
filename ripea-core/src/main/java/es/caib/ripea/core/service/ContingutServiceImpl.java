@@ -1724,6 +1724,96 @@ public class ContingutServiceImpl implements ContingutService {
 			return new ArrayList<>();
 		}
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<DocumentDto> findDocumentsPerCopiarCsv(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) throws NotFoundException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true, false);
+
+		
+		boolean checkPerMassiuAdmin = false;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			checkPerMassiuAdmin = true;
+		} 
+
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
+		}
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					entitat.getId(),
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false, 
+					checkPerMassiuAdmin, null);
+		}
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					entitat,
+					filtre.getMetaDocumentId());
+		}
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
+		if (!metaExpedientsPermesos.isEmpty()) {
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("metaDocument.nom", new String[] {"metaNode.nom"});
+			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerCopiarCsv(
+					entitat,
+					metaExpedientsPermesos, 
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+			return paginacioHelper.toPaginaDto(
+					paginaDocuments,
+					DocumentDto.class,
+					new Converter<DocumentEntity, DocumentDto>() {
+						@Override
+						public DocumentDto convert(DocumentEntity source) {
+							DocumentDto dto = (DocumentDto)contingutHelper.toContingutDto(
+									source,
+									false,
+									false,
+									false,
+									false,
+									true,
+									true,
+									false, null, false, null);
+							return dto;
+						}
+					});
+		} else {
+			return paginacioHelper.getPaginaDtoBuida(
+					DocumentDto.class);
+		}
+	}
 
 	@Transactional
 	@Override
