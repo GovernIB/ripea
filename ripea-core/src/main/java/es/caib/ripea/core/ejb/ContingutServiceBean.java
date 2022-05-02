@@ -341,4 +341,10 @@ public class ContingutServiceBean implements ContingutService {
 		delegate.order(entitatId, contingutId, orderedElements);
 	}
 
+	@Override
+	public PaginaDto<DocumentDto> findDocumentsPerCopiarCsv(Long entitatId, ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
+		return delegate.findDocumentsPerCopiarCsv(entitatId, filtre, paginacioParams, rolActual);
+	}
+
 }
