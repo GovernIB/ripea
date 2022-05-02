@@ -1272,11 +1272,10 @@ $(document).ready(function() {
 	selTipusDocument.on('change', function(event){
 
 		var tipusDocumentId = $(':selected', $(this)).attr('id');
-		if (tipusDocumentId) {
 			showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
 			var documentId = $(this).attr('id');
 			
-			var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument/"/>' + tipusDocumentId;
+			var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument"/>' +'?tipusDocumentId=' + tipusDocumentId;
 			$.ajax({
 				type: 'GET',
 		        url: updateUrl,
@@ -1293,7 +1292,6 @@ $(document).ready(function() {
 		        	location.reload();
 		        }
 		    });	
-		}
 	});
 
 						

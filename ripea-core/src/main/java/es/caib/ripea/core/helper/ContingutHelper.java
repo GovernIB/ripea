@@ -390,6 +390,8 @@ public class ContingutHelper {
 			dto.setGesDocFirmatId(document.getGesDocFirmatId());
 			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
 			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
+			dto.setDocFromAnnex(document.isDocFromAnnex()); 
+
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);

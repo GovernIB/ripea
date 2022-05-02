@@ -624,7 +624,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 	}
 	
-	
+
 	
 	
 
@@ -633,7 +633,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contingutId, 
-			Long metaExpedientId) {
+			Long metaExpedientId, 
+			boolean findAllMarkDisponiblesPerCreacio) {
 		logger.debug("Consulta de meta-documents actius per a creació ("
 				+ "entitatId=" + entitatId +  ", "
 				+ "contingutId=" + contingutId +  ")");
@@ -660,13 +661,15 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 					entitat,
 					expedient, 
-					null);
+					null, 
+					findAllMarkDisponiblesPerCreacio);
 		} else {
 			MetaExpedientEntity metaExpedient =  metaExpedientRepository.findOne(metaExpedientId);
 			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 					entitat,
 					null, 
-					metaExpedient);
+					metaExpedient, 
+					findAllMarkDisponiblesPerCreacio);
 		}
 
 		return conversioTipusHelper.convertirList(
@@ -674,6 +677,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 	}
 
+	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaDocumentDto> findActiusPerModificacio(
@@ -706,7 +711,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		// del document que es vol modificar
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 				entitat,
-				expedientSuperior, null);
+				expedientSuperior, 
+				null, 
+				false);
 		if (document.getMetaDocument() != null && !metaDocuments.contains(document.getMetaDocument())) {
 			metaDocuments.add(document.getMetaDocument());
 		}
@@ -729,11 +736,11 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	}
 
 
-
 	private List<MetaDocumentEntity> findMetaDocumentsDisponiblesPerCreacio(
 			EntitatEntity entitat,
 			ExpedientEntity expedient, 
-			MetaExpedientEntity metaExpedient) {
+			MetaExpedientEntity metaExpedient, 
+			boolean findAllMarkDisponiblesPerCreacio) {
 		
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
 		// Dels meta-documents actius pel meta-expedient només deixa els que
@@ -759,8 +766,13 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 						break;
 					}
 				}
-				if (afegir) {
+				if (findAllMarkDisponiblesPerCreacio) {
+					metaDocument.setLeftPerCreacio(afegir);
 					metaDocuments.add(metaDocument);
+				} else {
+					if (afegir) {
+						metaDocuments.add(metaDocument);
+					}
 				}
 			}
 			Collections.sort(metaDocuments, new Comparator<MetaDocumentEntity>(){

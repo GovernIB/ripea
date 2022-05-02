@@ -58,6 +58,7 @@ public class DocumentDto extends NodeDto {
 	private String Descripcio;
 	
 	private Long pareId;
+	private boolean docFromAnnex;
 	
 	private String gesDocFirmatId;
 	

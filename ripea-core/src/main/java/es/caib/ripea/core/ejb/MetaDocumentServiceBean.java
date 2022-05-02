@@ -192,11 +192,11 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contenidorId, 
-			Long metaExpedientId) {
+			Long metaExpedientId, boolean findAllMarkDisponiblesPerCreacio) {
 		return delegate.findActiusPerCreacio(
 				entitatId,
 				contenidorId, 
-				metaExpedientId);
+				metaExpedientId, findAllMarkDisponiblesPerCreacio);
 	}
 
 	@Override

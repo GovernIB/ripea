@@ -309,6 +309,7 @@ public interface MetaDocumentService {
 	 * @param contenidorId
 	 *            Id del contenidor.
 	 * @param metaExpedientId
+	 * @param findAllMarkDisponiblesPerCreacio TODO
 	 * @return La llista de meta-documents per crear.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -317,7 +318,7 @@ public interface MetaDocumentService {
 	public List<MetaDocumentDto> findActiusPerCreacio(
 			Long entitatId,
 			Long contenidorId, 
-			Long metaExpedientId) throws NotFoundException;
+			Long metaExpedientId, boolean findAllMarkDisponiblesPerCreacio) throws NotFoundException;
 
 	/**
 	 * Consulta els meta-documents actius donada una entitat i un document.
@@ -420,4 +421,6 @@ public interface MetaDocumentService {
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
 			Long entitatId,
 			Long metaExpedientId) throws NotFoundException;
+
+
 }

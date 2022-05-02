@@ -285,12 +285,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 	
-	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument/{tipusDocumentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument", method = RequestMethod.GET)
 	@ResponseBody
 	public JsonResponse updateTipusDocument(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			@PathVariable Long tipusDocumentId,
+			@RequestParam(value = "tipusDocumentId", required = false) Long tipusDocumentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
@@ -992,7 +992,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
 				contingutId, 
-				null);
+				null, 
+				false);
 		for (MetaDocumentDto metaDocument: metaDocuments) {
 			if (metaDocument.getId().equals(metaDocumentId))
 				return metaDocument;
@@ -1169,7 +1170,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
 							contingutId, 
-							null));
+							null, 
+							false));
 		} else {
 			model.addAttribute(
 					"metaDocuments",
