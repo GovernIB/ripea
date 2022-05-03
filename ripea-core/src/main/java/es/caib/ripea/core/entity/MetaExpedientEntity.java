@@ -25,9 +25,9 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -39,7 +39,6 @@ import lombok.Setter;
         @UniqueConstraint(name = "ipa_metaexp_entitat_codi_uk", columnNames = { "entitat_id", "codi" }) })
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
 public class MetaExpedientEntity extends MetaNodeEntity {
 
     @Column(name = "clasif_sia", length = 30, nullable = false)
@@ -116,7 +115,25 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<MetaExpedientComentariEntity> comentaris = new ArrayList<MetaExpedientComentariEntity>();
+	
+	
+	@Column(name = "crear_regla_dist_estat", length = 10)
+	@Enumerated(EnumType.STRING)
+	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
+	@Column(name = "crear_regla_dist_error", length = 1024)
+	private String crearReglaDistribucioError;
 
+	public void updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat) {
+		this.crearReglaDistribucioEstat = crearReglaDistribucioEstat;
+	}
+	public void updateCrearReglaDistribucioError(String crearReglaDistribucioError) {
+		this.crearReglaDistribucioEstat = CrearReglaDistribucioEstatEnumDto.ERROR;
+		this.crearReglaDistribucioError = crearReglaDistribucioError;
+	}
+	
+	public boolean isCrearReglaDistribucio() {
+		return crearReglaDistribucioEstat != null;
+	}
 	public void addGrup(GrupEntity grup) {
 		grups.add(grup);
 	}

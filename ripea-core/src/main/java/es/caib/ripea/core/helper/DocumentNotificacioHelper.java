@@ -375,8 +375,7 @@ public class DocumentNotificacioHelper {
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
 			MetaDocumentEntity metaDocument,
 			RespostaConsultaEstatEnviament resposta) {
-		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		return contingutHelper.generarDocumentDto(notificacio, metaDocument, resposta);
+		return contingutHelper.generarDocumentDto(documentEnviamentInteressatEntity, metaDocument, resposta);
 	}
 	
 	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {

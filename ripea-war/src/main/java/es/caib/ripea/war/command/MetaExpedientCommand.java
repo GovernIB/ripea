@@ -76,6 +76,9 @@ public class MetaExpedientCommand {
 	
 	private boolean comu = true;
 	
+	private boolean crearReglaDistribucio;
+	
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -143,6 +146,7 @@ public class MetaExpedientCommand {
 		this.isRolAdminOrgan = true;
 	}
 
+	
 	public static List<MetaExpedientCommand> toEntitatCommands(List<MetaExpedientDto> dtos) {
 		List<MetaExpedientCommand> commands = new ArrayList<MetaExpedientCommand>();
 		for (MetaExpedientDto dto : dtos) {
@@ -188,5 +192,9 @@ public class MetaExpedientCommand {
 	public void setComu(boolean comu) {
 		this.comu = comu;
 	}
+	public void setCrearReglaDistribucio(boolean crearReglaDistribucio) {
+		this.crearReglaDistribucio = crearReglaDistribucio;
+	}
 
+	
 }
