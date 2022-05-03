@@ -96,14 +96,9 @@ body.loading .rmodal {
 	margin-top: 3%;
 }
 .scan-profile > span {
-	border-radius: 0px;
-	color: #fff;
-	background-color: #c4c4c4;
 	border-color: #c4c4c4;
 }
-.scan-profile > span:hover {
-	color: #fff;
-} 
+
 </style>
 <script>
 function mostrarDocument(fileName) {
@@ -260,8 +255,11 @@ $(document).ready(function() {
 	
 	//Recuperar perfils disponibles en cas de no definir un per defecte
 	$('.start-scan-btn').on('click', function(){
+		
 		$('#escaneig').find('.alert').remove();
 		$('.start-scan-btn').hide();
+		$("body").addClass("loading");
+		
 		$.ajax({
 			type: 'GET',
 			url: "<c:url value='/digitalitzacio/perfils'/>",
@@ -272,13 +270,22 @@ $(document).ready(function() {
 					$('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>'+perfils[0].descripcio+'</div></div>');
 				} else {
 					for ( var i in perfils) {
-						$('.scan-profile').append('<span class="btn btn-lg btn-block" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+						$('.scan-profile').append('<span class="btn btn-lg btn-block btn-default" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
 						$('.scan-profile').append('</br>');
 					}
-					$('.scan-profile').show();
-					$('.scan-back-btn').removeClass('hidden');
-					webutilModalAdjustHeight();
+					
+					if (perfils.length==1) {
+						$('#'+perfils[0].codi).click();
+					} else {
+						removeLoading();
+						$('.scan-profile').show();
+						$('.scan-back-btn').removeClass('hidden');
+						webutilModalAdjustHeight();
+					}
+					
+
 				}
+
 			},
 			error: function(err) {
 				console.log("Error tancant la transacció");
