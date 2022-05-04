@@ -28,6 +28,7 @@ public class RegistreAnnexDto {
 	private String tipusMime;
 	private String titol;
 	private String uuid;
+	private String nom;
 
 	private RegistreAnnexEstatEnumDto estat;
 	private String error;
@@ -142,6 +143,12 @@ public class RegistreAnnexDto {
 		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
 	}
 	
+	public String getNom() {
+		return nom;
+	}
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
 	public boolean isAmbFirma() {
 		return firmaTipus != null;
 	}

@@ -16,7 +16,7 @@ public class RegistreAnnexCommand {
 	private String uuid;
 	
 	private Long metaDocumentId;
-	
+	private String nom;
 
 
 	public Long getId() {
@@ -45,6 +45,15 @@ public class RegistreAnnexCommand {
 	}
 	public void setMetaDocumentId(Long metaDocumentId) {
 		this.metaDocumentId = metaDocumentId;
+	}
+	public String getNom() {
+		return nom;
+	}
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+	public String getTitolINom() {
+		return titol + " (" + nom + ")";
 	}
 	
 
