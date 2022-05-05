@@ -307,7 +307,7 @@ $(document).ready(function() {
 			success: function(transaccioResponse) {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="140%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
 					$('.scan-result').append(iframeScan);
 					$('.scan-back-btn').addClass('hidden');
 					webutilModalAdjustHeight();
@@ -346,6 +346,9 @@ $(document).ready(function() {
 		$('.scan-back-btn').addClass('hidden');
 	});
 
+	$('#escaneigTab').on('click', function(){
+		$('.start-scan-btn').click();
+	});
 	
 	$('#ntiEstadoElaboracion').on('change', function() {
 		if ($(this).val() && ($(this).val()=='EE02' || $(this).val()=='EE03' ||  $(this).val()=='EE04')) {
@@ -526,7 +529,7 @@ function removeLoading() {
 		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
-				<li role="presentation"><a href="#escaneig" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
+				<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
 			</ul>
 			<br/>
 			<div class="tab-content">
