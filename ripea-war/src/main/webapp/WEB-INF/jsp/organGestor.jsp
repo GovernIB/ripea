@@ -82,7 +82,7 @@
 				<th data-col-name="nom" >
 					<spring:message code="organgestor.list.columna.nom" />
 				</th>
-				<th data-col-name="pareCodiNom" >
+				<th data-col-name="pareCodiNom" data-orderable="false">
 					<spring:message code="organgestor.list.columna.pare" />
 				</th>
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">

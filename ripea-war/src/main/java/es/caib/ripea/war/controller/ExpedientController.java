@@ -744,27 +744,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			
 			if (RolHelper.isRolActualAdministrador(request)) {
-				expedientService.agafarAdmin(entitatActual.getId(), 
-									null, 
-									expedientId, 
-									aplicacioService.getUsuariActual().getCodi());
-				
-			}
-			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
-				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
-					expedientService.agafarAdmin(entitatActual.getId(), 
-										null, 
-										expedientId, 
-										aplicacioService.getUsuariActual().getCodi());
+				expedientService.agafarAdmin(entitatActual.getId(),
+						null,
+						expedientId,
+						aplicacioService.getUsuariActual().getCodi());
 
-				}
-				else {
+			} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
+					expedientService.agafarAdmin(entitatActual.getId(),
+							null,
+							expedientId,
+							aplicacioService.getUsuariActual().getCodi());
+				} else {
 					expedientService.agafarUser(
 							entitatActual.getId(),
 							expedientId);
 				}
-			}
-			else {
+			} else {
 				expedientService.agafarUser(
 						entitatActual.getId(),
 						expedientId);
@@ -780,7 +776,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				return getAjaxControllerReturnValueError(
 						request,
 						url,
-						"expedient.controller.agafat.error"
+						"expedient.controller.agafat.error.perm"
 						);
 			} else {
 				throw e;
@@ -804,12 +800,55 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					getMessage(
 							request, 
 							"expedient.controller.exportacio.seleccio.buida"));
-			return "redirect:../../expedient";
+			return "redirect:/expedient";
 		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			int ok = 0;
+			int errors = 0;
 			for (Long expedientId : seleccio) {
-				this.agafar(request, expedientId, COOKIE_MEUS_EXPEDIENTS, model);
+				try {
+					if (RolHelper.isRolActualAdministrador(request)) {
+						expedientService.agafarAdmin(entitatActual.getId(),
+								null,
+								expedientId,
+								aplicacioService.getUsuariActual().getCodi());
+
+					} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+						if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
+							expedientService.agafarAdmin(entitatActual.getId(),
+									null,
+									expedientId,
+									aplicacioService.getUsuariActual().getCodi());
+						} else {
+							expedientService.agafarUser(
+									entitatActual.getId(),
+									expedientId);
+						}
+					} else {
+						expedientService.agafarUser(
+								entitatActual.getId(),
+								expedientId);
+					}
+					ok++;
+				} catch (Exception e) {
+					errors++;
+					logger.error("Error al agafar expedeint", e);
+					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
+					MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}));
+					
+				}
 			}
-			return null;
+			deselect(request, null);
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple", new Object[]{errors}));
+			}
+			if (ok > 0) {
+				MissatgesHelper.success(request, getMessage(request, "expedient.controller.agafat.ok.multiple", new Object[]{ok}));
+			}
+			
+			return "redirect:/expedient";
+
 		}
 	}
 
@@ -900,12 +939,40 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					getMessage(
 							request, 
 							"expedient.controller.exportacio.seleccio.buida"));
-			return "redirect:../../expedient";
+			return "redirect:/expedient";
 		} else {
+			
+			
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			int ok = 0;
+			int errors = 0;
 			for (Long expedientId : seleccio) {
-				this.alliberar(request, expedientId, null, model);
+				try {
+					expedientService.alliberarUser(
+							entitatActual.getId(),
+							expedientId);
+					ok++;
+				} catch (Exception e) {
+					errors++;
+					logger.error("Error al alliberar expedeint", e);
+					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
+					MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}));
+				
+				}
 			}
-			return null;
+			deselect(request, null);
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple", new Object[]{errors}));
+			}
+			if (ok > 0) {
+				MissatgesHelper.success(request, getMessage(request, "expedient.controller.alliberat.ok.multiple", new Object[]{ok}));
+			}
+			
+			return "redirect:/expedient";
+			
+			
+
 		}
 	}
 	
@@ -1442,7 +1509,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 	}
 	
-	@RequestMapping(value = "/contingut/delete", method = RequestMethod.GET)
+	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String deleteMultiple(
 			HttpServletRequest request,
 			HttpServletResponse response,
@@ -1459,7 +1526,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					getMessage(
 							request, 
 							"expedient.controller.exportacio.seleccio.buida"));
-			return "redirect:../../expedient";
+			return "redirect:/expedient";
 		} else {
 			int borrados = 0;
 			int errors = 0;
@@ -1472,7 +1539,18 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					borrados++;
 				} catch (Exception e) {
 					errors++;
-					mostrarErrorBorrar(request, contingutId, e);
+					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), contingutId, RolHelper.getRolActual(request));
+					logger.error("Error al esborrar el contingut", e);
+					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+					if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+						MissatgesHelper.error(
+								request, 
+								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), getMessage(request, "error.arxiu.connectTimedOut")}));
+					} else {
+						MissatgesHelper.error(
+								request, 
+								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), root.getMessage()}));
+					}
 				}
 			}
 			deselect(request, null);
@@ -1482,26 +1560,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			if (borrados > 0) {
 				MissatgesHelper.success(request, getMessage(request, "contingut.controller.element.esborrat.ok.multiple", new Object[]{borrados}));
 			}
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					"redirect:../../expedient",
-					"contingut.controller.element.esborrat.ok");
+			return "redirect:/expedient";
 		}
 	}
 	
-	private void mostrarErrorBorrar(HttpServletRequest request, Long contingutId, Exception e) {
-		logger.error("Error al esborrar el contingut", e);
-		Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-		if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
-			MissatgesHelper.error(
-					request, 
-					getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
-		} else {
-			MissatgesHelper.error(
-					request, 
-					getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
-		}
-	}
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
