@@ -26,13 +26,13 @@ public interface DadaRepository extends JpaRepository<DadaEntity, Long> {
 	List<DadaEntity> findByNodeAndMetaDadaOrderByOrdreAsc(NodeEntity node, MetaDadaEntity metaDada);
 	List<DadaEntity> findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(Collection<Long> nodeIds);
 	@Query(	"select" +
-			"    distinct d.metaDada " +
+			"    distinct md " +
 			"from" +
-			"    DadaEntity d " +
+			"    DadaEntity d inner join d.metaDada md " +
 			"where " +
 			"    d.node.id in (:nodeIds) " +
 			"order by " +
-			"    d.metaDada.codi asc ")
+			"    md.codi asc ")
 	List<MetaDadaEntity> findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
 			@Param("nodeIds") Collection<Long> nodeIds); 
 
