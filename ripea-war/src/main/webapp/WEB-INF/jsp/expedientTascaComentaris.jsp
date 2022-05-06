@@ -47,9 +47,19 @@
 			});
 			
 			enviarLlistarComentaris("");
+
+			$('textarea').keyup(function(e) {
+			    var $lines = $(this).val().split(/\r|\r\n|\n/).length;
+			    if ($lines>10) {
+			    	$lines = 10;
+				}
+			    $(this).get(0).rows = $lines;
+			    window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+			});			
 		});
 		
 		function enviarLlistarComentaris(text) {
+			$('textarea').get(0).rows = 1;
 			$.ajax({
 				type: 'POST',
 				url: "<c:url value="/expedientTasca/${expedientTasca.id}/comentaris/publicar"/>",
@@ -84,7 +94,7 @@
 				if (!propi)
 					comentariHtml += '<div class="comentari-autor"><strong>' + comentari.createdBy.nom + '</strong></div>';
 				
-				comentariHtml +='<p>' + comentari.text + '</p>' +
+				comentariHtml +='<p style="white-space: pre;">' + comentari.text + '</p>' +
 				'<small class="pull-right comentari-autor">' + comentari.createdDateAmbFormat + '</small>' +
 				'</div>';
 				$("#comentaris_content").append(comentariHtml);
@@ -105,7 +115,7 @@
 	</div>
 	
 	<div class="col-xs-10">
-		<input id="comentari_text" class="form-control" placeholder="<spring:message code="contingut.comentaris.text.placeholder"/>" maxlength="1024"/>
+		<textarea id="comentari_text" rows="1" style="resize: none;" class="form-control" placeholder="<spring:message code="contingut.comentaris.text.placeholder"/>" maxlength="1024"></textarea>
 	</div>
 	<div class="col-xs-2">
 		<button class="btn btn-success enviar-comentari"><span class="fa fa-paper-plane-o"></span>&nbsp;<spring:message code="comu.boto.enviar"/></button>
