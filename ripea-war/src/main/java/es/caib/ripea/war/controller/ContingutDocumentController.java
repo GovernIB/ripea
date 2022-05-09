@@ -159,10 +159,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
-		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
-				request,
-				command,
-				model);
+		if (!command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+			FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+					request,
+					command,
+					model);
+		}
 		
 		if (command.isOnlyFileSubmit()) {
 			fillModelFileSubmit(command, model, request);
@@ -188,7 +190,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					pareId,
 					model);
-			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
 		try {
@@ -213,13 +214,17 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (throwable!=null) {
 				SistemaExternException sisExtExc = (SistemaExternException) throwable;
 				MissatgesHelper.error(request, sisExtExc.getMessage());
-				omplirModelFormulari(
-						request,
-						command,
-						null,
-						pareId,
-						model);
-				return "contingutDocumentForm";
+				if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+					return modalUrlTancar();
+				} else {
+					omplirModelFormulari(
+							request,
+							command,
+							null,
+							pareId,
+							model);
+					return "contingutDocumentForm";
+				}
 			} else {
 				throw ex;
 			}
@@ -409,6 +414,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			//Amb firma?
 			if (returnSignedFile) {
 				command.setAmbFirma(true);
+				if (!resultat.getEniTipoFirma().equals("TF02") && !resultat.getEniTipoFirma().equals("TF04")) {
+					command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+				} else {
+					command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+				}
 			}
 		} else {
 			omplirModelFormulari(
@@ -1221,6 +1231,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute(
 				"isPermesModificarCustodiats",
 				modificacioCustodiatsActiva);
+		
+		model.addAttribute("contingutId", contingutId);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

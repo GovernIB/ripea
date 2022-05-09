@@ -2630,6 +2630,7 @@ public class PluginHelper {
 				resultatDto.setContingut(resultat.getContingut());
 				resultatDto.setNomDocument(resultat.getNomDocument());
 				resultatDto.setMimeType(resultat.getMimeType());
+				resultatDto.setEniTipoFirma(resultat.getEniTipoFirma());
 			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
@@ -3571,6 +3572,12 @@ public class PluginHelper {
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
+			
+			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+			if (validationStatus.getStatus() != 1) {
+				throw new RuntimeException(validationStatus.getErrorMsg());
+			}
+			
 			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
 			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
 			ArxiuFirmaDto firma = new ArxiuFirmaDto();

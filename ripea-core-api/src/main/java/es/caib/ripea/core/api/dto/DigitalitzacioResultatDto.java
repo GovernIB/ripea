@@ -8,6 +8,7 @@ public class DigitalitzacioResultatDto {
 	private byte[] contingut;
 	private String nomDocument;
 	private String mimeType;
+	private String eniTipoFirma;
 	
 	public boolean isError() {
 		return error;
@@ -44,6 +45,12 @@ public class DigitalitzacioResultatDto {
 	}
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
+	}
+	public String getEniTipoFirma() {
+		return eniTipoFirma;
+	}
+	public void setEniTipoFirma(String eniTipoFirma) {
+		this.eniTipoFirma = eniTipoFirma;
 	}
 		
 }
