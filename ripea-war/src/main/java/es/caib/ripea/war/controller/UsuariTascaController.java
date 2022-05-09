@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -46,10 +48,12 @@ import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.FitxerTemporalDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -57,6 +61,7 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DigitalitzacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -97,6 +102,10 @@ public class UsuariTascaController extends BaseUserController {
 
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
+	
+	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
+	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
+	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
 
 	@Autowired
 	private ExpedientTascaService expedientTascaService;
@@ -116,6 +125,8 @@ public class UsuariTascaController extends BaseUserController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
+	@Autowired
+	private DigitalitzacioService digitalitzacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -338,11 +349,30 @@ public class UsuariTascaController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	
+		//TODO: make one method for ContingutDocumentController.postNew() and UsuariTascaController.postNew()
+		
 		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
 				request,
 				command,
 				model);
 		
+		if (command.isOnlyFileSubmit()) {
+			fillModelFileSubmit(command, model, request);
+			return "fileUploadResult";
+		}
+
+		if ((command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE02 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE03 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE04) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
+			bindingResult.rejectValue("ntiIdDocumentoOrigen", "NotNull");
+		}
+		
+		//Recuperar document escanejat
+		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+			recuperarResultatEscaneig(
+					request,
+					pareId,
+					command,
+					model);
+		}
 		
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(
@@ -709,6 +739,10 @@ public class UsuariTascaController extends BaseUserController {
 				documentId);
 		
 		model.addAttribute("document", document);
+		model.addAttribute("annexos", 
+				documentService.findAnnexosAmbExpedient(
+						entitatActual.getId(), 
+						document));
 		
 		PortafirmesEnviarCommand command = new PortafirmesEnviarCommand();
 		command.setMotiu(
@@ -723,15 +757,14 @@ public class UsuariTascaController extends BaseUserController {
 		
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
 		command.setPortafirmesResponsables(metaDocument.getPortafirmesResponsables());
-		if (metaDocument.getPortafirmesFluxTipus() != null) {
-			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
-		} else if (metaDocument.getPortafirmesFluxId() == null) {
-			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
-		} else {
-			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB);
-		}
-		
+		setFluxPredefinit(
+				metaDocument, 
+				model, 
+				command);
+		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
+		model.addAttribute("isNouEnviament", true);
 		model.addAttribute(command);
+		
 		model.addAttribute("tascaId", tascaId);
 		return "portafirmesForm";
 	}
@@ -1006,7 +1039,18 @@ public class UsuariTascaController extends BaseUserController {
 		}
 	}
 	
-	
+	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
+		if (command.isUnselect()) {
+			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
+		}
+		FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
+		if (fitxerTemp != null) {
+			SignatureInfoDto signatureInfoDto = documentService.checkIfSignedAttached(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
+			model.addAttribute("isError", signatureInfoDto.isError());
+			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
+		}
+	}
 	
 	private void emplenarModelFirmaClient(
 			HttpServletRequest request,
@@ -1018,6 +1062,95 @@ public class UsuariTascaController extends BaseUserController {
 				model);
 	}
 	
+	private void setFluxPredefinit(
+			MetaDocumentDto metaDocument,
+			Model model,
+			PortafirmesEnviarCommand command) {
+		if (metaDocument.getPortafirmesFluxTipus() != null) {
+			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());
+			model.addAttribute("portafirmesFluxId", metaDocument.getPortafirmesFluxId());
+			if (metaDocument.getPortafirmesFluxTipus().equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB) && metaDocument.getPortafirmesFluxId() == null) {
+				model.addAttribute("nouFluxDeFirma", true);
+			} else {
+				model.addAttribute("nouFluxDeFirma", false);
+			}
+		} else {
+			model.addAttribute("nouFluxDeFirma", false);
+			command.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
+		}
+		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
+	}
+	
+	private String recuperarResultatEscaneig(
+			HttpServletRequest request,
+			Long contingutId,
+			DocumentCommand command,
+			Model model) throws ClassNotFoundException, IOException {
+		boolean returnScannedFile = false;
+		boolean returnSignedFile = false;
+		
+		String idTransaccio = (String) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO);
+		
+		Object scannedFile = RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_SCANNED);
+		Object signedFile = RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_SIGNED);
+		
+		if (scannedFile != null) {
+			returnScannedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RETURN_SCANNED);
+		}
+		if (signedFile != null) {
+			returnSignedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RETURN_SIGNED);
+		}
+		if (idTransaccio != null) { 
+			DigitalitzacioResultatDto resultat = digitalitzacioService.recuperarResultat(
+					idTransaccio, 
+					returnScannedFile, 
+					returnSignedFile);
+			if (resultat != null && resultat.isError() && !resultat.getEstat().equals(DigitalitzacioEstatDto.FINAL_OK)) {
+				MissatgesHelper.error(
+						request,
+						getMessage(
+								request, 
+								"document.digitalitzacio.estat.enum."+ resultat.getEstat()));
+				omplirModelFormulari(
+						request,
+						command,
+						contingutId,
+						model);
+				model.addAttribute("contingutId", contingutId);
+				return "contingutDocumentForm";
+			}
+			model.addAttribute("nomDocument", resultat.getNomDocument());
+			model.addAttribute("idTransaccio", idTransaccio);
+			command.setFitxerNom(resultat.getNomDocument());
+			command.setFitxerContentType(resultat.getMimeType());
+			command.setFitxerContingut(resultat.getContingut());
+				
+			//Amb firma?
+			if (returnSignedFile) {
+				command.setAmbFirma(true);
+			}
+		} else {
+			omplirModelFormulari(
+					request,
+					command,
+					contingutId,
+					model);
+			model.addAttribute("contingutId", contingutId);
+			model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");	
+			return "contingutDocumentForm";
+		}
+		return idTransaccio;
+	}
 	
 	private void emplenarModelPortafirmes(
 			HttpServletRequest request,
