@@ -363,7 +363,7 @@ public class DocumentHelper {
 				true);
 		
 		
-//		if (pluginHelper.getPropertyArxiuMetadadesAddicionalsActiu()) {
+		if (pluginHelper.getPropertyArxiuMetadadesAddicionalsActiu()) {
 		
 			FitxerDto fitxer = null;
 			List<ArxiuFirmaDto> firmes = null;
@@ -396,9 +396,9 @@ public class DocumentHelper {
 					firmes, 
 					false);
 			return true;
-//		} else {
-//			return true;
-//		}
+		} else {
+			return true;
+		}
 		
 	}
 	
