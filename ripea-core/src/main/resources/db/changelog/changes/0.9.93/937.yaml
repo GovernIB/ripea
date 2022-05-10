@@ -15,7 +15,7 @@ databaseChangeLog:
         columns:
         - column:
             name: crear_regla_dist_estat
-            type: varchar(10)
+            type: varchar(10 ${varcharunit})
         - column:
             name: crear_regla_dist_error
             type: varchar(1024 ${varcharunit})

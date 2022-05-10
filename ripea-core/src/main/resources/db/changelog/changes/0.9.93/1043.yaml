@@ -23,11 +23,6 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
-                  name: ID
-                  type: NUMBER(19)
-              - column:
-                  constraints:
-                    nullable: false
                   name: ASSUMPTE
                   type: VARCHAR(256 ${varcharUnit})
               - column:
