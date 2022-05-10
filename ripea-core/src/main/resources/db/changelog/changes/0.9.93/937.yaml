@@ -20,7 +20,6 @@ databaseChangeLog:
             name: crear_regla_dist_error
             type: varchar(1024 ${varcharunit})
         tableName: ipa_metaexpedient
-    changes:   
     - sql:
         sql: "
           INSERT INTO IPA_CONFIG_GROUP (POSITION, PARENT_CODE, CODE, DESCRIPTION) VALUES (11, 'PLUGINS', 'DISTRIBUCIO_REGLA', 'Plugin de creació de regla en DISTRIBUCIO' );
