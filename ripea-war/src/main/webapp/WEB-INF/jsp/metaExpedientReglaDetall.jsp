@@ -20,7 +20,7 @@
 </head>
 <body>
     <c:if test="${metaExpedient.crearReglaDistribucioEstat=='ERROR'}">
-		<a href="<c:url value="/modal/metaExpedient/${metaExpedient.id}/reglaReintentar"/>" class="btn btn-xs btn-default pull-right processarBtn" style="margin-right: 10px;"><span class="fa fa-refresh"></span> <spring:message code="metaexpedient.regla.detalls.reintentar"/></a>
+		<a href="<c:url value="/modal/metaExpedient/${metaExpedient.id}/reglaCrear"/>" class="btn btn-xs btn-default pull-right processarBtn" style="margin-right: 10px;"><span class="fa fa-refresh"></span> <spring:message code="metaexpedient.regla.detalls.reintentar"/></a>
     </c:if>	
 	<div class="processamentInfo">
 		<dl class="dl-horizontal">

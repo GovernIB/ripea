@@ -232,7 +232,7 @@
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true" readonly="${bloquejarCamps}"/>
-				<c:if test="${empty metaExpedientCommand.id}">
+				<c:if test="${empty metaExpedientCommand.id && isRolActualAdministrador}">
 					<rip:inputCheckbox name="crearReglaDistribucio" textKey="metaexpedient.form.camp.crear.regla.distribucio" disabled="${bloquejarCamps}" />
 				</c:if>
 				<rip:inputTextarea name="nom" textKey="metaexpedient.form.camp.nom" required="true" disabled="${bloquejarCamps}"/>

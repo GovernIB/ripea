@@ -761,7 +761,7 @@ public class MetaExpedientController extends BaseAdminController {
 		return "metaExpedientReglaDetall";
 	}
 	
-	@RequestMapping(value = "/{metaExpedientId}/reglaReintentar", method = RequestMethod.GET)
+	@RequestMapping(value = "/{metaExpedientId}/reglaCrear", method = RequestMethod.GET)
 	public String reglaReintentar(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 
