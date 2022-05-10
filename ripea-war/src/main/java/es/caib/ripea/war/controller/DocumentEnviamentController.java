@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -46,6 +47,7 @@ import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
@@ -59,7 +61,6 @@ import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
  * Controlador per als enviaments dels expedients.
@@ -70,7 +71,6 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
 @RequestMapping("/document")
 public class DocumentEnviamentController extends BaseUserController {
 
-	private static final String SESSION_ATTRIBUTE_ENTREGA_POSTAL = "ContingutDocumentController.session.entregaPostal";
 	
 	@Autowired
 	private DocumentEnviamentService documentEnviamentService;
@@ -82,6 +82,8 @@ public class DocumentEnviamentController extends BaseUserController {
 	private DocumentService documentService;
 	@Autowired
 	private DadesExternesService dadesExternesService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(value = "/{documentId}/notificar", method = RequestMethod.GET)
 	public String notificarGet(
@@ -95,7 +97,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				request,
 				documentId,
 				command,
-				model);
+				model, null);
 		return "notificacioForm";
 	}
 
@@ -112,7 +114,7 @@ public class DocumentEnviamentController extends BaseUserController {
 					request,
 					documentId,
 					command,
-					model);
+					model, null);
 			return "notificacioForm";
 		}
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -256,13 +258,15 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@PathVariable Long notificacioId,
+			@RequestParam(required = false) Boolean notificacioConcatenatEntregaPostal,
 			Model model) throws JsonProcessingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		emplenarModelNotificacio(
 				request,
 				documentId,
 				null,
-				model);
+				model, 
+				notificacioConcatenatEntregaPostal);
 		DocumentNotificacionsCommand command = DocumentNotificacionsCommand.asCommand(
 				documentEnviamentService.notificacioFindAmbIdAndDocument(
 						entitatActual.getId(),
@@ -285,7 +289,7 @@ public class DocumentEnviamentController extends BaseUserController {
 					request,
 					documentId,
 					null,
-					model);
+					model, null);
 			return "notificacioForm";
 		}
 		documentEnviamentService.notificacioUpdate(
@@ -544,7 +548,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			Long documentId,
 			DocumentNotificacionsCommand command,
-			Model model) throws JsonProcessingException {
+			Model model, 
+			Boolean notificacioConcatenatEntregaPostal) throws JsonProcessingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -582,15 +587,18 @@ public class DocumentEnviamentController extends BaseUserController {
 				"expedientId",
 				document.getExpedientPare().getId());
 		
-		Object entrega_postal_sessio = RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_ENTREGA_POSTAL);
-		if (entrega_postal_sessio != null) {
-			boolean entregaPostalHablitada = (boolean)entrega_postal_sessio;
-			model.addAttribute("entregaPostal", entregaPostalHablitada);
+		boolean enviamentPostalProperty = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.notificacio.enviament.postal.actiu", true);
+		
+		if (enviamentPostalProperty) {
+			if (notificacioConcatenatEntregaPostal != null) {
+				model.addAttribute("entregaPostal", (boolean) notificacioConcatenatEntregaPostal);
+			} else {
+				model.addAttribute("entregaPostal", true);
+			}
 		} else {
-			model.addAttribute("entregaPostal", true);
+			model.addAttribute("entregaPostal", false);
 		}
+
 		model.addAttribute(
 				"serveiTipusEstats",
 				EnumHelper.getOptionsForEnum(
