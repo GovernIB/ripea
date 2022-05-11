@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +20,10 @@ public class CrearReglaResponseDto  {
 			String msg) {
 		this.status = status;
 		this.msg = msg;
+	}
+	
+	public String getMsgEscapeXML(){
+		return StringEscapeUtils.escapeXml(msg);
 	}
 
 }

@@ -637,16 +637,14 @@ public class MetaExpedientHelper {
 			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
 				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
 			} else {
-				metaExpedient.updateCrearReglaDistribucioError(rearReglaResponseDto.getMsg());
+				metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(rearReglaResponseDto.getMsg(), 1024));
 			}
 
 			return rearReglaResponseDto;
 
 		} catch (Exception e) {
-			logger.error("Error al crear regla en distribucio ",
-					e);
-			metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(e.getMessage() + ": " + ExceptionUtils.getStackTrace(e),
-					1024));
+			logger.error("Error al crear regla en distribucio ", e);
+			metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(e.getMessage() + ": " + ExceptionUtils.getStackTrace(e), 1024));
 
 			return new CrearReglaResponseDto(StatusEnumDto.ERROR,
 					ExceptionHelper.getRootCauseOrItself(e).getMessage());

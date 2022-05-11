@@ -35,7 +35,6 @@ public class DistribucioReglaHelper  {
 					entitat,
 					sia,
 					getCodiBackoffice());
-
 			int status = response.getStatus();
 			String reasonPhrase = response.getStatusInfo().getReasonPhrase();
 			String resp = response.getEntity(String.class);
@@ -47,6 +46,9 @@ public class DistribucioReglaHelper  {
 				statusEnumDto = StatusEnumDto.OK;
 			} else if (response.getStatus() == 404) {
 				statusEnumDto = StatusEnumDto.WARNING;
+			} else {
+				statusEnumDto = StatusEnumDto.ERROR;
+				logger.error("Error retornat al crear regla en distribucio: " + status + " " + reasonPhrase + ": " + resp);
 			}
 
 			return new CrearReglaResponseDto(

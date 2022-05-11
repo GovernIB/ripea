@@ -11,6 +11,9 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -138,7 +141,7 @@ public class ReglesRestClient {
 			String username,
 			String password) throws InstanceNotFoundException, MalformedObjectNameException, RemoteException, NamingException {
 		if (!autenticacioBasic) {
-			System.out.println(
+			logger.debug(
 					"Autenticant client REST per a fer peticions cap a servei desplegat a damunt jBoss (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " +
 					"username=" + username +
@@ -147,12 +150,15 @@ public class ReglesRestClient {
 			Form form = new Form();
 			form.putSingle("j_username", username);
 			form.putSingle("j_password", password);
-			jerseyClient.
+			ClientResponse clientResponse = jerseyClient.
 			resource(baseUrl + "/j_security_check").
 			type("application/x-www-form-urlencoded").
-			post(form);
+			post(ClientResponse.class, form);
+			if (clientResponse.getCookies() == null || clientResponse.getCookies().isEmpty()) {
+				throw new RuntimeException("No s'ha pogut autenticar l'usuari. Comproveu si l'usuari i la contrasenya són correctes");
+			}
 		} else {
-			System.out.println(
+			logger.debug(
 					"Autenticant REST amb autenticació de tipus HTTP basic (" +
 					"urlAmbMetode=" + urlAmbMetode + ", " +
 					"username=" + username +
@@ -161,4 +167,6 @@ public class ReglesRestClient {
 					new HTTPBasicAuthFilter(username, password));
 		}
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ReglesRestClient.class);
 }

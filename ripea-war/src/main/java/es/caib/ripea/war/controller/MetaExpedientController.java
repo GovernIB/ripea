@@ -107,10 +107,12 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
+		boolean isRolAdmin = RolHelper.isRolActualAdministrador(request);
+		model.addAttribute("isRolAdmin", isRolAdmin);
 		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
 		
-		if (RolHelper.isRolActualAdministrador(request)) {
+		if (isRolAdmin) {
 			boolean revisioActiva = metaExpedientService.isRevisioActiva();
 			int count = metaExpedientService.countMetaExpedientsPendentRevisar(entitatActual.getId());
 			if (revisioActiva && count > 0) {
@@ -207,6 +209,9 @@ public class MetaExpedientController extends BaseAdminController {
 			command = new MetaExpedientCommand();
 			if (isRolActualAdminOrgan)
 				command.setComu(false);
+			if (RolHelper.isRolActualAdministrador(request)) {
+				command.setCrearReglaDistribucio(true);
+			}
 		}
 		command.setRolAdminOrgan(isRolActualAdminOrgan);
 		command.setEntitatId(entitatActual.getId());
@@ -312,21 +317,21 @@ public class MetaExpedientController extends BaseAdminController {
 								getMessage(
 										request,
 										"metaexpedient.controller.regla.crear.result",
-										new Object[] { crearReglaResponse.getMsg() }));
+										new Object[] { crearReglaResponse.getMsgEscapeXML() }));
 					} else if (crearReglaResponse.getStatus() == StatusEnumDto.WARNING) {
 						MissatgesHelper.warning(
 								request,
 								getMessage(
 										request,
 										"metaexpedient.controller.regla.crear.result",
-										new Object[] { crearReglaResponse.getMsg() }));
+										new Object[] { crearReglaResponse.getMsgEscapeXML() }));
 					} else {
 						MissatgesHelper.error(
 								request,
 								getMessage(
 										request,
 										"metaexpedient.controller.regla.crear.result",
-										new Object[] { crearReglaResponse.getMsg() }));
+										new Object[] { crearReglaResponse.getMsgEscapeXML() }));
 					}
 				}
 
@@ -762,7 +767,7 @@ public class MetaExpedientController extends BaseAdminController {
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/reglaCrear", method = RequestMethod.GET)
-	public String reglaReintentar(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+	public String reglaCrear(HttpServletRequest request, @PathVariable Long metaExpedientId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
 
 		CrearReglaResponseDto crearReglaResponseDto = metaExpedientService.reintentarCreacioReglaDistribucio(
@@ -774,20 +779,20 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsg() });
+					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
 
 		} else if (crearReglaResponseDto.getStatus() == StatusEnumDto.WARNING) {
 			return getModalControllerReturnValueWarning(
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsg() });
+					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
 		} else {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsg() });
+					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
 		}
 		
 	}
@@ -1066,6 +1071,7 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("hasOrganGestor", hasOrganGestor);
 		model.addAttribute("isCarpetaDefecte", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.defecte")));
 		model.addAttribute("isRevisioActiva", metaExpedientService.isRevisioActiva());
+		model.addAttribute("isRolAdmin", RolHelper.isRolActualAdministrador(request));
 
 		List<OrganGestorDto> organGestorsList = new ArrayList<>();
 		if (RolHelper.isRolActualAdministradorOrgan(request)) {
