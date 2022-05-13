@@ -163,6 +163,9 @@ $(document).ready(function() {
  			tipusInt = 1;
  		} else if (this.value == '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.PERSONA_JURIDICA%>') {
  			tipusInt = 2;
+			$('#documentTipus').val("NIF");
+			$('#documentTipus').change();
+			$('#documentTipus').prop("disabled", true);
  	 	} else {
  	 		tipusInt = 3;
  	 		if (organsCarregats == false) {
