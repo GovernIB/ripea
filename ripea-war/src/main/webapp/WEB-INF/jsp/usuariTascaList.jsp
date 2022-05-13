@@ -43,7 +43,6 @@
 					</script>
 				</th>
 				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
-				<th data-col-name="comentari" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
 				<th data-col-name="agafada" data-visible="false"></th>

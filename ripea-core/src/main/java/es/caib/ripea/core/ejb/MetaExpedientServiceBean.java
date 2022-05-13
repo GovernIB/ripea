@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
@@ -447,6 +448,16 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				metaExpedient,
 				rolActual,
 				organId);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public CrearReglaResponseDto reintentarCreacioReglaDistribucio(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegate.reintentarCreacioReglaDistribucio(
+				entitatId,
+				metaExpedientId);
 	}
 
 }

@@ -43,6 +43,17 @@
 	        }
 	    });
 	});
+	
+	$(document).ready(function(){
+		$('#revisioEstat').on('change', function() {
+			var estat = $(this).val();
+			if (estat=='REBUTJAT') {
+	        	$("label[for='revisioComentari']").append( " *" );
+			} else {
+				$("label[for='revisioComentari']").text( $("label[for='revisioComentari']").text().replace(' *', '') );
+			}
+		});
+	});
 	</script>
 </head>
 <body>
@@ -62,6 +73,9 @@
 			</div>
 		</div>
 		<div class="row">
+			<div class="col-md-4">
+				<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" emptyOption="true" placeholderKey="metaexpedient.list.filtre.camp.revisioEstat" inline="true"/>
+			</div>
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>

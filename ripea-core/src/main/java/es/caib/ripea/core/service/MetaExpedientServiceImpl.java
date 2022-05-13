@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.GrupDto;
@@ -205,13 +206,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedientEntity);
 		}
 		
+		MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
+			if (metaExpedient.isCrearReglaDistribucio()) {
+				metaExpedientDto.setCrearReglaResponse(metaExpedientHelper.crearReglaDistribucio(metaExpedientEntity.getId()));
+			}
 		}
-		
-		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
+		return metaExpedientDto;
 	}
 
 	@Transactional
@@ -1309,6 +1313,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						false), // TODO especificar organId quan és admin organ
 				MetaExpedientDto.class);
 
+	}
+	
+	@Transactional
+	@Override
+	public CrearReglaResponseDto reintentarCreacioReglaDistribucio(Long entitatId, Long metaExpedientId) {
+		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		return metaExpedientHelper.crearReglaDistribucio(metaExpedientId);
 	}
 	
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {

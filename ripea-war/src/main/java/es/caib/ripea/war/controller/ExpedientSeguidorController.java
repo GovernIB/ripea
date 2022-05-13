@@ -92,12 +92,12 @@ public class ExpedientSeguidorController extends BaseUserController {
 					getMessage(
 							request, 
 							"expedient.controller.exportacio.seleccio.buida"));
-			return "redirect:../../expedient";
+			return ajaxUrlOk();
 		} else {
 			for (Long expedientId : seleccio) {
 				this.follow(request, expedientId, null, model);
 			}
-			return null;
+			return ajaxUrlOk();
 		}
 	}
 	
@@ -144,12 +144,12 @@ public class ExpedientSeguidorController extends BaseUserController {
 					getMessage(
 							request, 
 							"expedient.controller.exportacio.seleccio.buida"));
-			return "redirect:../../expedient";
+			return ajaxUrlOk();
 		} else {
 			for (Long expedientId : seleccio) {
 				this.unfollow(request, expedientId, null, model);
 			}
-			return null;
+			return ajaxUrlOk();
 		}
 	}
 	

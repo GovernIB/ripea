@@ -76,6 +76,7 @@
 	pageContext.setAttribute(
 			"isUrlValidacioDefinida",
 			es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>

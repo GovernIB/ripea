@@ -319,7 +319,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				"responsablesCodi=" + responsablesCodi +
 				")");
 
-		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
 		
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi: responsablesCodi) {

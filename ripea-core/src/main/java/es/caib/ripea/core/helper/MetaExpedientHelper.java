@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,14 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
@@ -84,6 +89,8 @@ public class MetaExpedientHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private DistribucioReglaHelper distribucioReglaHelper;
     
 	public synchronized long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
@@ -617,10 +624,37 @@ public class MetaExpedientHelper {
 	
 	
 	
+	public CrearReglaResponseDto crearReglaDistribucio(Long metaExpedientId) {
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
+		metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
+
+		try {
+
+			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.crearRegla(
+					metaExpedient.getEntitat().getUnitatArrel(),
+					metaExpedient.getClassificacioSia());
+
+			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
+				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
+			} else {
+				metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(rearReglaResponseDto.getMsg(), 1024));
+			}
+
+			return rearReglaResponseDto;
+
+		} catch (Exception e) {
+			logger.error("Error al crear regla en distribucio ", e);
+			metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(e.getMessage() + ": " + ExceptionUtils.getStackTrace(e), 1024));
+
+			return new CrearReglaResponseDto(StatusEnumDto.ERROR,
+					ExceptionHelper.getRootCauseOrItself(e).getMessage());
+		}
+	}
+
 	
-	
-	
-	
+
+		
+
 	
 	
 

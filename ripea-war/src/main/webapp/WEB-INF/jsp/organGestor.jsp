@@ -42,7 +42,7 @@
 				<rip:inputText name="nom" inline="true" placeholderKey="organgestor.list.filtre.camp.nom"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputSelect name="pareId" optionItems="${organsSuperior}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" optionMinimumResultsForSearch="3" placeholderKey="organgestor.list.filtre.camp.pare" inline="true"/>
+				<rip:inputSelect name="pareId" optionItems="${organsSuperior}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiINom" optionMinimumResultsForSearch="3" placeholderKey="organgestor.list.filtre.camp.pare" inline="true"/>
 			</div>	
 
 			<div class="col-md-2 pull-right">
@@ -82,7 +82,7 @@
 				<th data-col-name="nom" >
 					<spring:message code="organgestor.list.columna.nom" />
 				</th>
-				<th data-col-name="pareCodiNom" >
+				<th data-col-name="pareCodiNom" data-orderable="false">
 					<spring:message code="organgestor.list.columna.pare" />
 				</th>
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
