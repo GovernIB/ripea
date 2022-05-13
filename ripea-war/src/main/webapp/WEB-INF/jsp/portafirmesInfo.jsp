@@ -307,9 +307,13 @@ $(document).ready(function() {
 														${signer.signerCodi}
 													</c:otherwise>
 												</c:choose>
-												<c:if test="${not empty signer.data}"><br><fmt:formatDate value="${signer.data}" pattern="dd/MM/yyyy HH:mm:ss"/></c:if>
+												<c:if test="${not empty signer.data}"><br>
+													<fmt:formatDate var="signDay" value="${signer.data}" pattern="dd/MM/yyyy"/>
+													<fmt:formatDate var="signHour" value="${signer.data}" pattern="HH:mm:ss"/>
+													<spring:message code="firma.info.data.firma" arguments="${signDay},${signHour}" htmlEscape="false"/>
+												</c:if>
 												<br>
-												${signer.signerId}
+												${signer.signerId} 
 											</div>
 										</c:forEach>
 									</div>
