@@ -198,7 +198,7 @@ $(document).ready(function() {
 			$('#municipi').prop("disabled", true);
 			$('#codiPostal').prop("readonly", true);
 			$('#adresa').prop("readonly", true);
-			$('#documentTipus').val("NIF");
+			$('#documentTipus').val("CODI_ORIGEN");
 			$('#documentTipus').change();
 			$('#documentTipus').prop("disabled", true);
 			$('#documentNum').prop("readonly", true);
