@@ -227,7 +227,7 @@
 								<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
-								<c:if test="${isRolAdmin}">
+								<c:if test="${isRolAdmin || isRolAdminOrgan}">
 									{{if crearReglaDistribucio}}
 										<li><a href="metaExpedient/{{:id}}/regla" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.regla"/></a></li>
 									{{else}}
