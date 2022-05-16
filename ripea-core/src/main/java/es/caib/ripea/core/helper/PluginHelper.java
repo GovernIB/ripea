@@ -4503,10 +4503,10 @@ public class PluginHelper {
 				firma.setPerfil(FirmaPerfil.A);
 				break;
 			case BASIC:
-				firma.setPerfil(FirmaPerfil.BASIC);
+				firma.setPerfil(FirmaPerfil.BES);
 				break;
 			case Basic:
-				firma.setPerfil(FirmaPerfil.Basic);
+				firma.setPerfil(FirmaPerfil.BES);
 				break;
 			case BASELINE_B_LEVEL:
 				firma.setPerfil(FirmaPerfil.BASELINE_B_LEVEL);
