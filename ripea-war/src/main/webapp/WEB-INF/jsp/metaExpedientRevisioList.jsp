@@ -130,7 +130,7 @@
 					</script>
 				</th>
 				
-				<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" data-orderable="false" width="10%">
+				<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" width="10%">
 					<spring:message code="metaexpedient.list.columna.revisioEstat"/>
 					<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
 						{{if revisioEstat == 'DISSENY'}}
