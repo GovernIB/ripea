@@ -261,9 +261,6 @@ public class MetaExpedientController extends BaseAdminController {
 		if (command.isComu() && !hasPermisAdmComu(request)) {
 			bindingResult.reject("metaexpedient.controller.comu.permis.error");
 		}
-		if (command.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REBUTJAT && (command.getRevisioComentari() == null || command.getRevisioComentari().isEmpty())) {
-			bindingResult.rejectValue("revisioComentari", "NotNull");
-		}
 		if (bindingResult.hasErrors()) {
 			fillFormModel(request, dto, model);
 			return "metaExpedientForm";
