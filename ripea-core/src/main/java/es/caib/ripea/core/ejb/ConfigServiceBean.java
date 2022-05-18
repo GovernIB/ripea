@@ -41,7 +41,12 @@ public class ConfigServiceBean implements ConfigService {
 	public List<String> syncFromJBossProperties(){
 		return delegate.syncFromJBossProperties();
 	}
-	
+
+	@Override
+	@RolesAllowed({"IPA_SUPER"})
+	public List<ConfigDto> findEntitatsConfigByKey(String key) {
+		return delegate.findEntitatsConfigByKey(key);
+	}
 	@Override
 	public String getConfigValue(String configKey) throws NotDefinedConfigException {
 		return delegate.getConfigValue(configKey);

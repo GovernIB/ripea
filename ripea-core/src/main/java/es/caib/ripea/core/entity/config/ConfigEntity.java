@@ -1,15 +1,27 @@
 package es.caib.ripea.core.entity.config;
 
-import es.caib.ripea.core.entity.UsuariEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.core.entity.UsuariEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una alerta d'error en segón pla.
@@ -17,6 +29,7 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@Setter
 @Entity
 @Table(	name = "IPA_CONFIG")
 @NoArgsConstructor
@@ -42,6 +55,13 @@ public class ConfigEntity {
     @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)
     @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
     private ConfigTypeEntity type;
+    
+    @Column(name = "ENTITAT_CODI", length = 64)
+    private String entitatCodi;
+    
+    @Column(name = "CONFIGURABLE")
+    private boolean configurable;
+     
 
     @Column(name = "POSITION")
     private int position;
@@ -71,4 +91,16 @@ public class ConfigEntity {
     public void update(String value) {
         this.value = value;
     }
+    
+    public void crearConfigNova(String key, String entitatCodi, ConfigEntity entitat) {
+
+        this.key = key;
+        this.value = null;
+        this.description = entitat.getDescription();
+        this.jbossProperty = entitat.isJbossProperty();
+        this.groupCode = entitat.getGroupCode();
+        this.type = entitat.getType();
+        this.entitatCodi = entitatCodi;
+    }
+    
 }

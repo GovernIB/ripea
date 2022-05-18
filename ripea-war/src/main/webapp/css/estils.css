@@ -1,7 +1,7 @@
 .container-caib {
-	width: 96% !important;
-	padding-left: 60px !important;
-	padding-right: 20px !important;
+	width: 100% !important;
+	padding-left: 35px !important;
+	padding-right: 35px !important;
 	margin-left: 0 !important;
 	margin-right: 0 !important;
 	min-width: 1000px;
@@ -225,4 +225,20 @@ div.exemple {
 }
 .avisCardError button{
 	color: #721c24CC;
+}
+
+.entitats-config {
+	background-color: #f2f2f2;
+	border-radius:4px;
+	display: none;
+}
+
+.margin-bottom {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.flex-space-between {
+	display:flex;
+	justify-content: space-between;
 }

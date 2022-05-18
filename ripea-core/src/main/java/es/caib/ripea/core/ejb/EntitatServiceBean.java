@@ -154,4 +154,10 @@ public class EntitatServiceBean implements EntitatService {
 		return delegate.findByUnitatArrel(unitatArrel);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN"})
+	public List<EntitatDto> findAll() {
+		return delegate.findAll();
+	}
+
 }

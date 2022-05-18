@@ -214,5 +214,8 @@ public interface EntitatService {
 
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	EntitatDto findByUnitatArrel(String unitatArrel);
+	
+	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN')")
+	List<EntitatDto> findAll();
 
 }

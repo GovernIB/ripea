@@ -72,6 +72,9 @@ public class EntitatServiceImpl implements EntitatService {
 				capsaleraColorFons(entitat.getCapsaleraColorFons()).
 				capsaleraColorLletra(entitat.getCapsaleraColorLletra()).
 				build();
+		
+		configHelper.crearConfigsEntitat(entitat.getCodi());
+		
 		return conversioTipusHelper.convertir(
 				entitatRepository.save(entity),
 				EntitatDto.class);
@@ -223,6 +226,15 @@ public class EntitatServiceImpl implements EntitatService {
 				true);
 		return resposta;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<EntitatDto> findAll() {
+		logger.debug("Consulta de totes les entitats");
+		return conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
+	}
+	
 
 	@Transactional(readOnly = true)
 	@Override

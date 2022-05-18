@@ -1,20 +1,30 @@
 package es.caib.ripea.core.helper;
 
-import es.caib.ripea.core.api.exception.NotDefinedConfigException;
-import es.caib.ripea.core.entity.config.ConfigEntity;
-import es.caib.ripea.core.entity.config.ConfigGroupEntity;
-import es.caib.ripea.core.repository.config.ConfigGroupRepository;
-import es.caib.ripea.core.repository.config.ConfigRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import es.caib.ripea.core.api.dto.config.ConfigDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.entity.config.ConfigGroupEntity;
+import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.config.ConfigGroupRepository;
+import es.caib.ripea.core.repository.config.ConfigRepository;
+import es.caib.ripea.core.service.EntitatServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -24,6 +34,49 @@ public class ConfigHelper {
     private ConfigRepository configRepository;
     @Autowired
     private ConfigGroupRepository configGroupRepository;
+    @Autowired
+    private EntitatRepository entitatRepository;
+    
+    
+    /** Mètode que revisa després d'iniciar Distribucio que totes les entitats tinguin una entrada
+     * per cada propietat configurable a nivell d'entitat.
+     */
+    @PostConstruct
+    @Transactional
+    public void postConstruct() {
+		// Recuperar totes les propietats configurables que no siguin d'entitat
+    	List<ConfigEntity> listConfigEntity = configRepository.findConfigurablesAmbEntitatNull();
+    	List<ConfigEntity> llistatPropietatsConfigurables = configRepository.findConfigurables();
+	    List<EntitatEntity> llistatEntitats = entitatRepository.findAll();
+	    int propietatsNecessaries = listConfigEntity.size() * (llistatEntitats.size() + 1);
+		// Mirar que la propietat existeixi per a la entitat, si no crear-la amb el valor null
+	    if (llistatPropietatsConfigurables.size() != propietatsNecessaries) {
+		    for (ConfigEntity cGroup : listConfigEntity) {
+		    	int lengthKey = cGroup.getKey().length();
+		    	for (EntitatEntity entitat : llistatEntitats) {
+		    		if (cGroup.getEntitatCodi() == null) {
+		        		String cercarPropietat = cGroup.getKey().substring(0, 14) + entitat.getCodi() + cGroup.getKey().substring(13, lengthKey);
+		        		ConfigEntity configEntity = configRepository.findPerKey(cercarPropietat);
+		        		if (configEntity == null) {
+		        			ConfigEntity novaPropietat = new ConfigEntity();
+			        		novaPropietat.setDescription(cGroup.getDescription());
+			        		novaPropietat.setEntitatCodi(entitat.getCodi());
+			        		novaPropietat.setGroupCode(cGroup.getGroupCode());
+			        		novaPropietat.setJbossProperty(cGroup.isJbossProperty());
+			        		novaPropietat.setKey(cercarPropietat);
+			        		novaPropietat.setPosition(cGroup.getPosition());
+			        		novaPropietat.setConfigurable(cGroup.isConfigurable());			        		
+//			        		novaPropietat.setTypeCode(cGroup.getTypeCode());
+			        		
+		                    logger.info("Guardant la propietat: " + novaPropietat.getKey());		        		
+			        		configRepository.save(novaPropietat);
+		        		}
+		    		}
+		    	}
+		    }	
+	    }
+    }
+    
 
     @Transactional(readOnly = true)
     public String getConfig(String key) throws NotDefinedConfigException {
@@ -46,7 +99,7 @@ public class ConfigHelper {
         if (configGroup == null) {
             return;
         }
-		for (ConfigEntity config : configGroup.getConfigs()) {
+        for (ConfigEntity config : configGroup.getConfigs()) {
 			String conf = getConfig(config);
 			if (conf != null) {
 				outProperties.put(config.getKey(), conf);
@@ -226,4 +279,28 @@ public class ConfigHelper {
             return properties;
         }
     }
+
+    public void crearConfigsEntitat(String codiEntitat) {
+
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        ConfigDto dto = new ConfigDto();
+        dto.setEntitatCodi(codiEntitat);
+        ConfigEntity nova;
+        List<ConfigEntity> confs = new ArrayList<>();
+        for (ConfigEntity config : configs) {
+            dto.setKey(config.getKey());
+            String key = dto.crearEntitatKey();
+            nova = new ConfigEntity();
+            nova.crearConfigNova(key, codiEntitat, config);
+            confs.add(nova);
+        }
+        configRepository.save(confs);
+    }
+
+    public void deleteConfigEntitat(String codiEntitat) {
+        configRepository.deleteByEntitatCodi(codiEntitat);
+    }
+    
+    
+	private static final Logger logger = LoggerFactory.getLogger(ConfigHelper.class);
 }

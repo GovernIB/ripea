@@ -1,12 +1,13 @@
 package es.caib.ripea.core.api.service;
 
-import es.caib.ripea.core.api.dto.config.ConfigDto;
-import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
-import es.caib.ripea.core.api.exception.NotDefinedConfigException;
+
+import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import java.util.List;
+import es.caib.ripea.core.api.dto.config.ConfigDto;
+import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 
 /**
  * Declaració dels mètodes per a la gestió dels paràmetres de configuració de l'aplicació.
@@ -47,7 +48,9 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	List<String> syncFromJBossProperties();
 
-	
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	List<ConfigDto> findEntitatsConfigByKey(String key);
+
 	String getConfigValue(String configKey) throws NotDefinedConfigException;
 
 }
