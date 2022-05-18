@@ -28,7 +28,9 @@ import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -58,6 +60,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Resource
+	private GrupRepository grupRepository;
 
 
 	@Transactional
@@ -247,8 +251,18 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<String> permisosFindRolsDistinctAll() {
 		logger.debug("Consulta dels rols definits a les ACLs");
-		return cacheHelper.rolsDisponiblesEnAcls();
-		//return aclSidRepository.findSidByPrincipalFalse();
+		List<String> rolsAcls = cacheHelper.rolsDisponiblesEnAcls();
+		
+		
+		List<GrupEntity> grups = grupRepository.findAll();
+		List<String> grupRols = new ArrayList<>();
+		if (grups != null) {
+			for (GrupEntity grup : grups) {
+				grupRols.add(grup.getRol());
+			}
+		}
+		rolsAcls.addAll(grupRols);
+		return rolsAcls;
 	}
 	@Override
 	public void evictRolsDisponiblesEnAcls() {

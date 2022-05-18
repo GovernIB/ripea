@@ -29,7 +29,7 @@ public class RolesBasedMappableAttributesRetriever implements MappableAttributes
 
 	public Set<String> getMappableAttributes() {
 		// Aquest mètode es crida cada vegada que un usuari s'autentica
-		refrescarMappableAttributes(true);
+		refrescarMappableAttributes();
 		return mappableAttributes;
 	}
 
@@ -40,7 +40,7 @@ public class RolesBasedMappableAttributesRetriever implements MappableAttributes
 		this.applicationContext = applicationContext;
 	}
 
-	private void refrescarMappableAttributes(boolean forceRefresh) {
+	private void refrescarMappableAttributes() {
 		LOGGER.debug("Refrescant el llistat de rols per mapejar");
 		mappableAttributes.clear();
 		if (defaultMappableAttributes != null) {
