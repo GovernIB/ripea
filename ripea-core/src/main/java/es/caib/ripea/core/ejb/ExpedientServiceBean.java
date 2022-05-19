@@ -281,8 +281,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual) {
-		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual);
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
+		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId);
 	}
 
 

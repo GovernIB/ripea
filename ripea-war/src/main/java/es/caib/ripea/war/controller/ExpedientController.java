@@ -573,7 +573,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getAny(),
 					command.getMetaNodeDominiId(), 
 					command.getOrganGestorId(), 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					command.getGrupId());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",

@@ -76,6 +76,7 @@ import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -116,6 +117,7 @@ import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -189,6 +191,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private CarpetaHelper carpetaHelper;
 	@Autowired
 	private CarpetaRepository carpetaRepository;
+	@Autowired
+	private GrupRepository grupRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -435,7 +439,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual) {
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
@@ -454,6 +458,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
+		GrupEntity grupEntity = grupRepository.findOne(grupId);
+		expedient.setGrup(grupEntity);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
