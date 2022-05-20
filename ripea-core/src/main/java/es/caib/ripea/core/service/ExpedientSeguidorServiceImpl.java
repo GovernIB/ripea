@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientSeguidorService;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -58,10 +57,10 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false, false, null);
 		
 		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-		if (expedient.getSeguidors().contains(usuariActual)) 
-			throw new ValidationException("L'usuari actual " + usuariActual.getCodi() + " ja és seguidor de l'expedient seleccionat");
+		if (!expedient.getSeguidors().contains(usuariActual)) 
+//			throw new ValidationException("L'usuari actual " + usuariActual.getCodi() + " ja és seguidor de l'expedient seleccionat");
+			expedient.addSeguidor(usuariActual);
 		
-		expedient.addSeguidor(usuariActual);
 	}
 	
 	@Override
@@ -83,10 +82,9 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				false, false, null);
 		
 		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-		if (!expedient.getSeguidors().contains(usuariActual))
-			throw new ValidationException("L'usuari actual " + usuariActual.getCodi() + " no és seguidor de l'expedient seleccionat");
-	
-		expedient.getSeguidors().remove(usuariActual);
+		if (expedient.getSeguidors().contains(usuariActual))
+//			throw new ValidationException("L'usuari actual " + usuariActual.getCodi() + " no és seguidor de l'expedient seleccionat");
+			expedient.getSeguidors().remove(usuariActual);
 	}
 	
 	@Override

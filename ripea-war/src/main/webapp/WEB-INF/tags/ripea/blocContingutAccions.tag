@@ -63,7 +63,7 @@
 					</c:choose>	
 				</c:when>
 				<c:otherwise>
-					<li><a href="${contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+					<li><a href="${(contingut.carpeta && not empty contingut.expedientRelacionat) ? contingut.expedientRelacionat.id : contingut.id}"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 				</c:otherwise>
 			</c:choose>
 			<c:set var="mostrarSeparador" value="${true}"/>

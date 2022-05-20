@@ -169,7 +169,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "fileUploadResult";
 		}
 
-		
+		if ((command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE02 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE03 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE04) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
+			bindingResult.rejectValue("ntiIdDocumentoOrigen", "NotNull");
+		}
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 			recuperarResultatEscaneig(

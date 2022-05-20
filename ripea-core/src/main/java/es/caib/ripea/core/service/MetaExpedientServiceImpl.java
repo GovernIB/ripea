@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.GrupDto;
@@ -71,6 +72,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DominiHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientEstatHelper;
 import es.caib.ripea.core.helper.GrupHelper;
@@ -162,6 +164,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired
 	private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	@Transactional
 	@Override
@@ -202,13 +206,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedientEntity);
 		}
 		
+		MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else {
 			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
+			if (metaExpedient.isCrearReglaDistribucio()) {
+				metaExpedientDto.setCrearReglaResponse(metaExpedientHelper.crearReglaDistribucio(metaExpedientEntity.getId()));
+			}
 		}
-		
-		return conversioTipusHelper.convertir(metaExpedientEntity, MetaExpedientDto.class);
+		return metaExpedientDto;
 	}
 
 	@Transactional
@@ -1133,6 +1140,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient, 
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
+		
+		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
+		
 		return true;
 	}
 	
@@ -1305,6 +1315,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	}
 	
+	@Transactional
+	@Override
+	public CrearReglaResponseDto reintentarCreacioReglaDistribucio(Long entitatId, Long metaExpedientId) {
+		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		return metaExpedientHelper.crearReglaDistribucio(metaExpedientId);
+	}
+	
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
 		List<Long> metaExpedientIds = new ArrayList<Long>();
 		for (MetaExpedientDto metaExpedient : metaExpedients) {
@@ -1372,14 +1389,14 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id) {
+	public MetaExpedientDto marcarProcesDisseny(Long entitatId, Long id, Long organId) {
 		logger.debug(
 				"Marcant com en procés de disseny un meta-expedient existent (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, null);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientAdmin(entitat, id, organId);
 
-		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), null);
+		metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		
 		return conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 	}

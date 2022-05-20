@@ -142,8 +142,10 @@ $(document).ready(function() {
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 					$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-					$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					if(!$('#ntiEstadoElaboracion').val()){
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+					}
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
@@ -153,8 +155,10 @@ $(document).ready(function() {
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
 						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						if(!$('#ntiEstadoElaboracion').val()){
+							$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+							$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
+						}
 						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 					})
@@ -335,9 +339,18 @@ $(document).ready(function() {
 		$('.scan-back-btn').addClass('hidden');
 	});
 
+	
+	$('#ntiEstadoElaboracion').on('change', function() {
+		if ($(this).val() && ($(this).val()=='EE02' || $(this).val()=='EE03' ||  $(this).val()=='EE04')) {
+			$('#ntiIdDocumentoOrigenDiv').show();
+		} else {
+			$('#ntiIdDocumentoOrigenDiv').hide();
+		}
+	});
+	$('#ntiEstadoElaboracion').trigger('change');
 
 
-
+	
 	$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
 		 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
 	     $('#loading').show();
@@ -499,6 +512,10 @@ function removeLoading() {
 		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
 		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		
+		<div id="ntiIdDocumentoOrigenDiv">
+			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true"/>
+		</div>
 		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>

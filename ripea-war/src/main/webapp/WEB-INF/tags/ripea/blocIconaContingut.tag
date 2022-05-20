@@ -50,8 +50,14 @@
 					</c:otherwise>
 				</c:choose>
 			</c:when>
-			<c:when test="${contingut.carpeta}">
+			<c:when test="${contingut.carpeta && empty contingut.expedientRelacionat}">
 				<span class="fa ${iconaCarpeta} ${iconaTamany}" title="<spring:message code="contingut.icona.carpeta"/>"></span>
+			</c:when>
+			<c:when test="${contingut.carpeta && not empty contingut.expedientRelacionat && contingut.expedientRelacionat.estat == 'OBERT'}">
+				<span class="fa ${iconaExpedientObert} ${iconaTamany}" title="<spring:message code="contingut.icona.expedient"/>"></span>
+			</c:when>
+			<c:when test="${contingut.carpeta && not empty contingut.expedientRelacionat && contingut.expedientRelacionat.estat != 'OBERT'}">
+				<span class="fa ${iconaExpedientTancat} ${iconaTamany}" title="<spring:message code="contingut.icona.expedient"/>"></span>
 			</c:when>
 		</c:choose>
 	</c:otherwise>

@@ -90,11 +90,12 @@ import es.caib.ripea.war.helper.RolHelper;
 public class ExpedientController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
-	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
+	public static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
+	private static final String SESSION_ATTRIBUTE_RELACIONATS_FILTRE = "ExpedientUserController.session.relacionats.filtre";
 	
 	@Autowired
 	private ContingutService contingutService;
@@ -134,6 +135,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		@SuppressWarnings("unused")
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
 
 		if (filtreCommand.getOrganGestorId() != null) {
@@ -571,7 +573,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getAny(),
 					command.getMetaNodeDominiId(), 
 					command.getOrganGestorId(), 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					command.getGrupId());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
@@ -742,27 +745,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			
 			if (RolHelper.isRolActualAdministrador(request)) {
-				expedientService.agafarAdmin(entitatActual.getId(), 
-									null, 
-									expedientId, 
-									aplicacioService.getUsuariActual().getCodi());
-				
-			}
-			else if (RolHelper.isRolActualAdministradorOrgan(request)) {
-				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
-					expedientService.agafarAdmin(entitatActual.getId(), 
-										null, 
-										expedientId, 
-										aplicacioService.getUsuariActual().getCodi());
+				expedientService.agafarAdmin(entitatActual.getId(),
+						null,
+						expedientId,
+						aplicacioService.getUsuariActual().getCodi());
 
-				}
-				else {
+			} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
+					expedientService.agafarAdmin(entitatActual.getId(),
+							null,
+							expedientId,
+							aplicacioService.getUsuariActual().getCodi());
+				} else {
 					expedientService.agafarUser(
 							entitatActual.getId(),
 							expedientId);
 				}
-			}
-			else {
+			} else {
 				expedientService.agafarUser(
 						entitatActual.getId(),
 						expedientId);
@@ -778,11 +777,79 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				return getAjaxControllerReturnValueError(
 						request,
 						url,
-						"expedient.controller.agafat.error"
+						"expedient.controller.agafat.error.perm"
 						);
 			} else {
 				throw e;
 			}
+		}
+	}
+	
+	@RequestMapping(value = "/agafar", method = RequestMethod.GET)
+	public String agafarMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:/expedient";
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			int ok = 0;
+			int errors = 0;
+			for (Long expedientId : seleccio) {
+				try {
+					if (RolHelper.isRolActualAdministrador(request)) {
+						expedientService.agafarAdmin(entitatActual.getId(),
+								null,
+								expedientId,
+								aplicacioService.getUsuariActual().getCodi());
+
+					} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
+						if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
+							expedientService.agafarAdmin(entitatActual.getId(),
+									null,
+									expedientId,
+									aplicacioService.getUsuariActual().getCodi());
+						} else {
+							expedientService.agafarUser(
+									entitatActual.getId(),
+									expedientId);
+						}
+					} else {
+						expedientService.agafarUser(
+								entitatActual.getId(),
+								expedientId);
+					}
+					ok++;
+				} catch (Exception e) {
+					errors++;
+					logger.error("Error al agafar expedeint", e);
+					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
+					MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}));
+					
+				}
+			}
+			deselect(request, null);
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple", new Object[]{errors}));
+			}
+			if (ok > 0) {
+				MissatgesHelper.success(request, getMessage(request, "expedient.controller.agafat.ok.multiple", new Object[]{ok}));
+			}
+			
+			return "redirect:/expedient";
+
 		}
 	}
 
@@ -853,6 +920,59 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request,
 					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
 					ExceptionHelper.getRootCauseOrItself(e).getMessage());
+
+		}
+	}
+	
+	@RequestMapping(value = "/alliberar", method = RequestMethod.GET)
+	public String alliberarMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:/expedient";
+		} else {
+			
+			
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			int ok = 0;
+			int errors = 0;
+			for (Long expedientId : seleccio) {
+				try {
+					expedientService.alliberarUser(
+							entitatActual.getId(),
+							expedientId);
+					ok++;
+				} catch (Exception e) {
+					errors++;
+					logger.error("Error al alliberar expedeint", e);
+					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
+					MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}));
+				
+				}
+			}
+			deselect(request, null);
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple", new Object[]{errors}));
+			}
+			if (ok > 0) {
+				MissatgesHelper.success(request, getMessage(request, "expedient.controller.alliberat.ok.multiple", new Object[]{ok}));
+			}
+			
+			return "redirect:/expedient";
+			
+			
 
 		}
 	}
@@ -1076,40 +1196,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		model.addAttribute(
-				"expedient",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						expedientId,
-						true,
-						false, null, null));
-		model.addAttribute("expedientId", expedientId);
-		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
-		model.addAttribute(filtre);
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActius(
-						entitatActual.getId(), 
-						null, 
-						rolActual, 
-						false, 
-						null));
-		model.addAttribute(
-				"expedientEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						ExpedientEstatEnumDto.class,
-						"expedient.estat.enum."));
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
-				entitatActual.getId(), 
-				null, 
-				rolActual, 
-				false, 
-				null);
-		model.addAttribute(
-				"metaExpedientsPermisLectura",
-				metaExpedientsPermisLectura);
+		emplenarFiltreRelacionats(request, model, expedientId);
+		
 		ExpedientFiltreCommand expedientFiltreCommand = getRelacionarFiltreCommand(request);
 //		Long metaExpedientId = null;
 //		if (expedientFiltreCommand != null) {
@@ -1126,13 +1214,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
-		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"expedient.controller.sense.permis.lectura"));
-		}
 		return "expedientRelacionarForm";
 	}
 
@@ -1335,6 +1416,156 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				"id");
 	}
 	
+	@RequestMapping(value = "/{expedientId}/relacionats/{destiId}/list", method = RequestMethod.GET)
+	public String getRelacionatsByExpedientGetList(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long destiId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		emplenarFiltreRelacionats(request, model, expedientId);
+		model.addAttribute("destiId", destiId);
+		ExpedientFiltreCommand expedientFiltreCommand = getRelacionatsFiltreCommand(request);
+		model.addAttribute(
+				"expedientFiltreCommand",
+				expedientFiltreCommand);
+		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one type 
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name(), Long.valueOf(0)));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), expedientFiltreCommand.getMetaExpedientId()));
+		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name(), Long.valueOf(-1)));
+		model.addAttribute(
+				"expedientEstatsOptions",
+				expedientEstatsOptions);
+		return "expedientRelacionatsList";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/relacionats/{destiId}/list", method = RequestMethod.POST)
+	public String getRelacionatsByExpedientPostList(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable Long destiId,
+			@Valid ExpedientFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+		getEntitatActualComprovantPermisos(request);
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONATS_FILTRE);
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_RELACIONATS_FILTRE,
+						filtreCommand);
+			}
+		}
+		return "redirect:/modal/expedient/" + expedientId + "/relacionats/" + destiId + "/list";
+	}
+	
+	@RequestMapping(value = "/{expedientId}/relacionats/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse getRelacionatsByExpedientDatatable(HttpServletRequest request,
+								   @PathVariable Long expedientId,
+								   Model model) {
+		ExpedientFiltreCommand filtreCommand = getRelacionatsFiltreCommand(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return DatatablesHelper.getDatatableResponse(
+				request,
+				expedientService.relacioFindAmbExpedientPaginat(
+						entitatActual.getId(),
+						ExpedientFiltreCommand.asDto(filtreCommand),
+						expedientId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+				"id");
+	}
+	
+	@RequestMapping(value = "/{expedientPareId}/relacionats/{destiId}/importarExpedient/{expedientId}", method = RequestMethod.GET)
+	public String importarExpedient(
+			HttpServletRequest request,
+			@PathVariable Long expedientPareId,
+			@PathVariable Long destiId,
+			@PathVariable Long expedientId) throws IOException {
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			expedientService.importarExpedient(
+					entitatActual.getId(),
+					destiId,
+					expedientId, 
+					RolHelper.getRolActual(request));
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:/../../contingut/" + destiId,
+					"expedient.controller.importacio.relacionat.ok");
+			
+		} catch (Exception e) {
+			logger.error("Error al importar expedient relacionat", e);
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:/../../contingut/" + destiId,
+					e.getMessage());
+
+		}
+	}
+	
+	@RequestMapping(value = "/delete", method = RequestMethod.GET)
+	public String deleteMultiple(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"));
+			return "redirect:/expedient";
+		} else {
+			int borrados = 0;
+			int errors = 0;
+			for (Long contingutId : seleccio) {
+				try {
+					contingutService.deleteReversible(
+							entitatActual.getId(),
+							contingutId, 
+							RolHelper.getRolActual(request));
+					borrados++;
+				} catch (Exception e) {
+					errors++;
+					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), contingutId, RolHelper.getRolActual(request));
+					logger.error("Error al esborrar el contingut", e);
+					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+					if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+						MissatgesHelper.error(
+								request, 
+								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), getMessage(request, "error.arxiu.connectTimedOut")}));
+					} else {
+						MissatgesHelper.error(
+								request, 
+								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), root.getMessage()}));
+					}
+				}
+			}
+			deselect(request, null);
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.esborrat.error.multiple", new Object[]{errors}));
+			}
+			if (borrados > 0) {
+				MissatgesHelper.success(request, getMessage(request, "contingut.controller.element.esborrat.ok.multiple", new Object[]{borrados}));
+			}
+			return "redirect:/expedient";
+		}
+	}
+	
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -1344,6 +1575,54 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	    				true));
 	}
 
+	private void emplenarFiltreRelacionats(
+			HttpServletRequest request, 
+			Model model, 
+			Long expedientId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"expedient",
+				contingutService.findAmbIdUser(
+						entitatActual.getId(),
+						expedientId,
+						true,
+						false, null, null));
+		model.addAttribute("expedientId", expedientId);
+		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
+		model.addAttribute(filtre);
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActius(
+						entitatActual.getId(), 
+						null, 
+						rolActual, 
+						false, 
+						null));
+		model.addAttribute(
+				"expedientEstatEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						ExpedientEstatEnumDto.class,
+						"expedient.estat.enum."));
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
+				entitatActual.getId(), 
+				null, 
+				rolActual, 
+				false, 
+				null);
+		model.addAttribute(
+				"metaExpedientsPermisLectura",
+				metaExpedientsPermisLectura);
+		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
+			MissatgesHelper.warning(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.sense.permis.lectura"));
+		}
+	}
+	
 	private ExpedientFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
 		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
@@ -1387,6 +1666,21 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		return filtreCommand;
 	}
 
+	private ExpedientFiltreCommand getRelacionatsFiltreCommand(
+			HttpServletRequest request) {
+		ExpedientFiltreCommand filtreCommand = (ExpedientFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RELACIONATS_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new ExpedientFiltreCommand();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONATS_FILTRE,
+					filtreCommand);
+		}
+		return filtreCommand;
+	}
+	
 	private void omplirModelTancarExpedient(
 			Long expedientId,
 			HttpServletRequest request,

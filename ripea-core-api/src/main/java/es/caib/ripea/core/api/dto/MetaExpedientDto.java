@@ -40,6 +40,11 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private String revisioComentari;
 	private long numComentaris;
 	
+	private boolean crearReglaDistribucio;
+	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
+	private String crearReglaDistribucioError;
+	private CrearReglaResponseDto crearReglaResponse;
+	
     public String getCodiSiaINom() {
     	return classificacioSia + " - " + nom;
     }

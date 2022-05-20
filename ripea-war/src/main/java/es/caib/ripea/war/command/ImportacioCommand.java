@@ -8,63 +8,33 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
+import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.Importacio;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per al manteniment d'importació de documents.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 @Importacio
 public class ImportacioCommand {
 
-	@NotEmpty
+	private TipusImportEnumDto tipusImportacio;
+	private String codiEni;
 	private String numeroRegistre;
-	@NotEmpty
-	private String dataPresentacio;
-	
+	private String dataPresentacio;	
 	private TipusDestiEnumDto destiTipus;
-	
 	private String carpetaNom;
-	
 	protected Long pareId;
 	
-	public String getNumeroRegistre() {
-		return numeroRegistre;
-	}
-	public Long getPareId() {
-		return pareId;
-	}
-	public void setPareId(Long pareId) {
-		this.pareId = pareId;
-	}
-	public void setNumeroRegistre(String numeroRegistre) {
-		this.numeroRegistre = numeroRegistre != null ? numeroRegistre.trim() : null;
-	}
-	public String getDataPresentacio() {
-		return dataPresentacio;
-	}
-	public void setDataPresentacio(String dataPresentacio) {
-		this.dataPresentacio = dataPresentacio != null ? dataPresentacio.trim() : null;
-	}
-	public TipusDestiEnumDto getDestiTipus() {
-		return destiTipus;
-	}
-	public void setDestiTipus(TipusDestiEnumDto destiTipus) {
-		this.destiTipus = destiTipus;
-	}
-	public String getCarpetaNom() {
-		return carpetaNom;
-	}
-	public void setCarpetaNom(String carpetaNom) {
-		this.carpetaNom = carpetaNom;
-	}
 	public static ImportacioCommand asCommand(ImportacioDto dto) {
 		ImportacioCommand command = ConversioTipusHelper.convertir(
 				dto,
@@ -75,8 +45,10 @@ public class ImportacioCommand {
 		ImportacioDto importacioDto = ConversioTipusHelper.convertir(
 				command,
 				ImportacioDto.class);
-		importacioDto.setDataPresentacioFormatted(convertToDateViaSqlTimestamp(command.getDataPresentacio()));
-		importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);
+		if (command.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE)) {
+			importacioDto.setDataPresentacioFormatted(convertToDateViaSqlTimestamp(command.getDataPresentacio()));
+			importacioDto.setTipusRegistre(TipusRegistreEnumDto.ENTRADA);
+		}
 		return importacioDto;
 	}
 	

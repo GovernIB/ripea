@@ -194,6 +194,7 @@
 				<th data-col-name="expedientEstatsCount" data-visible="false"></th>
 				<th data-col-name="expedientTasquesCount" data-visible="false"></th>
 				<th data-col-name="grupsCount" data-visible="false"></th>
+				<th data-col-name="crearReglaDistribucio" data-visible="false"></th>
 				
 				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
@@ -226,6 +227,13 @@
 								<li><a href="expedient/metaExpedient/{{:id}}/list" data-toggle="modal" data-maximized="true"><span class="fa fa-briefcase"></span>&nbsp;&nbsp;<spring:message code="decorator.menu.expedients"/></a></li>
 								<li><a href="metaExpedient/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="metaExpedient/{{:id}}/export"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="comu.boto.exportar"/></a></li>
+								<c:if test="${isRolAdmin || isRolAdminOrgan}">
+									{{if crearReglaDistribucio}}
+										<li><a href="metaExpedient/{{:id}}/regla" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.boto.regla"/></a></li>
+									{{else}}
+										<li><a href="metaExpedient/{{:id}}/reglaCrear"><span class="fa fa-share"></span>&nbsp;&nbsp;<spring:message code="metaexpedient.list.accio.boto.crear.regla"/></a></li>
+									{{/if}}
+								</c:if>
 								{^{if !~hlpIsAdministradorOrgan() || (~hlpIsAdministradorOrgan() && revisioEstat != 'REVISAT')}}
 									{{if !actiu}}
 									<li><a href="metaExpedient/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>

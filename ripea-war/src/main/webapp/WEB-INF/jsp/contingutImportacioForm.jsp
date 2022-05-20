@@ -23,10 +23,17 @@
 	<rip:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
+	$("#codiEni").mask("**_*********_9999_******************************",{ 
+		placeholder:"_"
+	});
 	$("#dataPresentacio").mask("99/99/9999 99:99:99",{ 
 		placeholder:"_"
 	});
+	// Amagar codi ENI per defecte
+	$('.tipus-eni').hide();
+	// Amagar nom carpeta nova per defecte
 	$('#carpetaNom').closest('.form-group').hide();
+	// Mostrar/amagar nom carpeta
 	$('input[type=radio][name=destiTipus]').on('change', function() {
 		if ($(this).val() == 'CARPETA_NOVA') {
 			$('#carpetaNom').closest('.form-group').show();
@@ -35,7 +42,19 @@ $(document).ready(function() {
 		}
 		webutilModalAdjustHeight();
 	});
+	// Mostrar/amagar codi ENI
+	$('input[type=radio][name=tipusImportacio]').on('change', function() {
+		if ($(this).val() == 'CODI_ENI') {
+			$('.tipus-eni').show();
+			$('.tipus-registre').hide ();
+		} else {
+			$('.tipus-eni').hide();
+			$('.tipus-registre').show();
+		}
+		webutilModalAdjustHeight();
+	});
 	$('input[type=radio][name=destiTipus][value=${importacioCommand.destiTipus}]').trigger('change');
+	$('input[type=radio][name=tipusImportacio][value=${importacioCommand.tipusImportacio}]').trigger('change');
 })
 </script>
 </head>
@@ -43,8 +62,14 @@ $(document).ready(function() {
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${importacioCommand.pareId}/importacio/new"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="importacioCommand">
 		<br/>
-		<rip:inputText name="numeroRegistre" textKey="contingut.importacio.form.camp.nom" required="true"/>
-		<rip:inputText name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true" placeholder="__/__/____  __:__:__"/>
+		<rip:inputRadio name="tipusImportacio" textKey="contingut.importacio.form.camp.tipus" botons="true" optionItems="${tipusImportacioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+		<div class="tipus-registre">
+			<rip:inputText name="numeroRegistre" textKey="contingut.importacio.form.camp.nom" required="true"/>
+			<rip:inputText name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true" placeholder="__/__/____  __:__:__"/>
+		</div>
+		<div class="tipus-eni">
+			<rip:inputText name="codiEni" textKey="contingut.importacio.form.camp.eni" required="true" placeholder="ES _________ ____ ______________________________"/>
+		</div>
 		<rip:inputRadio name="destiTipus" textKey="contingut.importacio.form.camp.desti" botons="true" optionItems="${tipusDestiOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<rip:inputText name="carpetaNom" textKey="contingut.importacio.form.camp.carpeta" required="true"/>
 		<%-- <rip:inputDateTime name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true"/>--%>

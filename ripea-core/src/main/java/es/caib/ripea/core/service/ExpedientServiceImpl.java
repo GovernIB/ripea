@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -66,6 +67,7 @@ import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusE
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -74,6 +76,7 @@ import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -84,6 +87,7 @@ import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.CarpetaHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -106,12 +110,14 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientComentariRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -181,7 +187,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-
+	@Autowired
+	private CarpetaHelper carpetaHelper;
+	@Autowired
+	private CarpetaRepository carpetaRepository;
+	@Autowired
+	private GrupRepository grupRepository;
+	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
 	@Transactional
@@ -427,7 +439,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual) {
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
@@ -446,6 +458,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
 		expedientHelper.updateOrganGestor(expedient, organGestorId, rolActual);
+		GrupEntity grupEntity = grupRepository.findOne(grupId);
+		expedient.setGrup(grupEntity);
 		ExpedientDto dto = toExpedientDto(expedient, true, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
 		return dto;
@@ -1903,6 +1917,163 @@ public class ExpedientServiceImpl implements ExpedientService {
 				});
 	}
 	
+	@Transactional
+	@Override
+	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
+			Long entitatId, 
+			ExpedientFiltreDto filtre,
+			Long expedientId,
+			PaginacioParamsDto paginacioDtoFromRequest) {
+		logger.debug("Obtenint la pàgina d'expedients relacionats (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ")");
+		long t0 = System.currentTimeMillis();
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false, false, null);
+		Page<ExpedientEntity> paginaExpedientsRelacionats = null;
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
+		Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioDtoFromRequest, ordenacioMap);
+		List<Long> expedientsRelacionatsIdx = new ArrayList<Long>();
+		for (ExpedientEntity expedientRelacionatAmb: expedient.getRelacionatsAmb()) {
+			expedientsRelacionatsIdx.add(expedientRelacionatAmb.getId());
+		}
+		for (ExpedientEntity expedientRelacionatPer: expedient.getRelacionatsPer()) {
+			expedientsRelacionatsIdx.add(expedientRelacionatPer.getId());
+		}
+		if (!expedientsRelacionatsIdx.isEmpty()) {
+			long t1 = System.currentTimeMillis();
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+			logger.debug("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
+			// metaexpedient
+			MetaExpedientEntity metaExpedientFiltre = null;
+			if (filtre.getMetaExpedientId() != null) {
+				long t2 = System.currentTimeMillis();
+				metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+						entitat,
+						filtre.getMetaExpedientId(),
+						true,
+						false,
+						false,
+						false,
+						false, 
+						"tothom",
+						null);
+				logger.debug("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
+			}
+			// estats
+			ExpedientEstatEnumDto chosenEstatEnum = null;
+			ExpedientEstatEntity chosenEstat = null;
+			Long estatId = filtre.getExpedientEstatId();
+			if (estatId != null) {
+				long t3 = System.currentTimeMillis();
+				if (estatId.intValue() <= 0) { // if estat is 0 or less the given estat is enum
+					int estatIdInt = -estatId.intValue();
+					chosenEstatEnum = ExpedientEstatEnumDto.values()[estatIdInt];
+				} else { // given estat is estat from database
+					chosenEstat = expedientEstatRepository.findOne(estatId);
+				}
+				logger.debug("getEstat time:  " + (System.currentTimeMillis() - t3) + " ms");
+			}
+			
+			long t4 = System.currentTimeMillis();
+			paginaExpedientsRelacionats = expedientRepository.findExpedientsRelacionatsByIdIn(
+				entitat,
+				metaExpedientFiltre == null,
+				metaExpedientFiltre,
+				filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
+				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
+				filtre.getNom() == null || filtre.getNom().isEmpty(),
+				filtre.getNom() != null ? filtre.getNom().trim() : "",
+				chosenEstatEnum == null,
+				chosenEstatEnum,
+				chosenEstat == null,
+				chosenEstat,
+				expedientsRelacionatsIdx,
+				pageable);
+			logger.debug("findExpedientsRelacionatsByIdIn time:  " + (System.currentTimeMillis() - t4) + " ms");
+			
+			long t5 = System.currentTimeMillis();
+			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
+					paginaExpedientsRelacionats,
+					ExpedientDto.class,
+					"tothom",
+					new ConverterParam<ExpedientEntity, ExpedientDto>() {
+						@Override
+						public ExpedientDto convert(ExpedientEntity source, String param) {
+							return toExpedientDto(source, false, param, true);
+						}
+					});
+			logger.debug("toPaginaDto time:  " + (System.currentTimeMillis() - t5) + " ms");
+			logger.debug("relacioFindAmbExpedientPaginat ids (size: " + expedientsRelacionatsIdx.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+			return paginaDto;
+		} else {
+			return paginacioHelper.getPaginaDtoBuida(ExpedientDto.class);
+		}
+	}
+
+	@Transactional
+	@Override
+	public void importarExpedient(
+			Long entitatId, 
+			Long pareId, 
+			Long expedientId, 
+			String rolActual)
+			throws NotFoundException {
+		logger.debug("Important un expedient relacionat a la llista de documents (" +
+				"entitatId=" + entitatId + ", " +
+				"pareId=" + pareId + "," + 
+				"expedientId=" + expedientId + ")");
+		if (!isImportacioRelacionatsActiva()) {
+			throw new ValidationException("La importació d'expedients relacionats no està activa");
+		}
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		ContingutEntity contingutPare = entityComprovarHelper.comprovarContingut(
+				entitat,
+				pareId);
+		ExpedientEntity expedientFill = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				false,
+				null);
+		CarpetaEntity expedientFillExists = carpetaRepository.findByPareAndExpedientRelacionatAndEsborrat(contingutPare, expedientFill, 0);
+		if (expedientFillExists != null) {
+			throw new ValidationException("L'expedient " + expedientFillExists.getNom() + " s'ha importat prèviament");
+		}
+		// Crear l'expedient a importar com una carpeta de l'expedient pare
+		CarpetaDto expedientFillImported = carpetaHelper.create(
+				entitatId, 
+				pareId, 
+				expedientFill.getNom(),
+				false,
+				null,
+				false,
+				null,
+				false,
+				rolActual);
+		CarpetaEntity expedientFillImportedEntity = carpetaRepository.findOne(expedientFillImported.getId());
+		expedientFillImportedEntity.updateExpedientRelacionat(expedientFill);
+	}
+
+	@Override
+	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
+			throws NotFoundException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	
 	private ExpedientDto toExpedientDto(ExpedientEntity entity) {
 		ExpedientDto dto = new ExpedientDto();
 		
@@ -1956,6 +2127,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 	private boolean isIncorporacioJustificantActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.incorporar.justificant");
+	}
+	
+	private boolean isImportacioRelacionatsActiva() {
+		return configHelper.getAsBoolean("es.caib.ripea.importacio.expedient.relacionat.activa");
 	}
 
 	private List<Long> toListLong(List<Serializable> original) {

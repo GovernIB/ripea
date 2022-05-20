@@ -162,11 +162,10 @@
 			$('form').on('submit', function(){
 				window.parent.addLoading(idModal);
 			});
-
-			$('.modal-cancel').on('click', function(){
-				localStorage.removeItem('transaccioId');
-			});
-
+			
+			// Tancar transacció i esborrar localstorage
+			window.parent.removeTransactionId(idModal);
+			
 			// Flux de firma simple - Responsables
 			$(".portafirmesResponsables_btn").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.carrecs"/>");
 

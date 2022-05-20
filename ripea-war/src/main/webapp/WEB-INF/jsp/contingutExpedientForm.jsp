@@ -75,36 +75,41 @@ function recuperarDominisMetaExpedient() {
 }
 
 function refrescarGrups() {
-	let metaExpedientId = $('#metaNodeId').val();
-	if (metaExpedientId != undefined && metaExpedientId != "") {
-		if (id != undefined && id != "") {
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
-				success: function(data) {
-					$('#gestioAmbGrupsActiva').val(data);
-					if (data) {
-						$.ajax({
-							type: 'GET',
-							url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
-							success: function(data) {
-								$('#grupId').closest('.form-group').show();
-								$('#grupId option[value!=""]').remove();
-								for (var i = 0; i < data.length; i++) {
-									$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+	let expedientId = $('#id').val();
+
+	if(expedientId == undefined || expedientId == "") {
+		let metaExpedientId = $('#metaNodeId').val();
+		if (metaExpedientId != undefined && metaExpedientId != "") {
+			if (id != undefined && id != "") {
+				$.ajax({
+					type: 'GET',
+					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
+					success: function(data) {
+						$('#gestioAmbGrupsActiva').val(data);
+						if (data) {
+							$.ajax({
+								type: 'GET',
+								url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+								success: function(data) {
+									$('#grupId').closest('.form-group').show();
+									$('#grupId option[value!=""]').remove();
+									for (var i = 0; i < data.length; i++) {
+										$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+									}
 								}
-							}
-						});
-					} else {
-						$('#grupId option[value!=""]').remove();
-						$('#grupId').closest('.form-group').hide();
+							});
+						} else {
+							$('#grupId option[value!=""]').remove();
+							$('#grupId').closest('.form-group').hide();
+						}
 					}
-				}
-			});
-		} else {
-			$('#grupId').prop('disabled', 'disabled');
+				});
+			} else {
+				$('#grupId').prop('disabled', 'disabled');
+			}
 		}
 	}
+
 }
 
 function refrescarOrgan() {

@@ -5,11 +5,16 @@ package es.caib.ripea.core.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa una carpeta.
@@ -19,13 +24,23 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 @Entity
 @Table(name = "ipa_carpeta")
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 public class CarpetaEntity extends ContingutEntity {
-
+ 
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "expedient_relacionat")
+	@ForeignKey(name = "ipa_carpeta_exprel_fk")
+	private ExpedientEntity expedientRelacionat;
+	
 	public void update(
 			String nom) {
 		this.nom = nom;
 	}
-
+	
+	public void updateExpedientRelacionat(ExpedientEntity expedientRelacionat) {
+		this.expedientRelacionat = expedientRelacionat;
+	}
+	
 	public static Builder getBuilder(
 			String nom,
 			ContingutEntity pare,

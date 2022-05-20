@@ -1716,6 +1716,26 @@ function removeLoading(idModal) {
 	}
 }
 
+function removeTransactionId(idModal) {
+	if (idModal) {
+		$('#' + idModal).on('hidden.bs.modal', function() {
+			var idTransaccio = localStorage.getItem('transaccioId');
+			if (idTransaccio) {
+				$.ajax({
+			    	type: 'GET',
+					url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
+					success: function() {
+						localStorage.removeItem('transaccioId');
+					},
+					error: function(err) {
+						console.log("Error tancant la transacció");
+					}
+			    });
+			}
+		});
+	}
+}
+
 function modalLoading(modalDivId, modalData, message){
 	return  '<div id="' + modalDivId + '"' + modalData + '>' +
 			'	<div class="modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
@@ -2300,6 +2320,9 @@ $.views.helpers(myHelpers);
 									<c:if test="${tascaEstat=='INICIADA'}">
 										<a href="<c:url value="/usuariTasca/${tascaId}/finalitzar"/>" class="btn btn-default" style="float: right;" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzarTasca" /></a>
 									</c:if>
+									<c:if test="${tascaEstat=='PENDENT'}">
+										<a href="<c:url value="/usuariTasca/${tascaId}/iniciar?redirectATasca=true"/>" class="btn btn-default" style="float: right;"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a>
+									</c:if>									
 									<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 								</div>
 							</c:if>							
@@ -2465,6 +2488,9 @@ $.views.helpers(myHelpers);
 												</c:if>
 												<c:if test="${isMostrarImportacio}">
 													<li><a href="<c:url value="/contingut/${contingut.id}/importacio/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaImportacio}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.importacio"/>...</a></li>
+												</c:if>
+												<c:if test="${isImportacioRelacionatsActiva}">
+													<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/relacionats/${contingut.id}/list"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.expedient.relacionat"/>...</a></li>
 												</c:if>	
 											</c:if>											
 										</ul>
@@ -2927,8 +2953,7 @@ $.views.helpers(myHelpers);
 								<thead>
 									<tr>
 										<th data-col-name="id" data-visible="false"></th>
-										<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>								
-										<th data-col-name="comentari" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.comentari"/></th>	
+										<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>									
 										<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 										<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="20%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
 										<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>	
@@ -2960,7 +2985,9 @@ $.views.helpers(myHelpers);
 												<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 												<ul class="dropdown-menu">
 													<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-													<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
+													{{if estat != 'FINALITZADA'}}
+														<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
+													{{/if}}
 													<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT')}">
 														{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
 															<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>

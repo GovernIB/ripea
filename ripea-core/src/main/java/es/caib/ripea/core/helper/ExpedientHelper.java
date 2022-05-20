@@ -848,15 +848,20 @@ public class ExpedientHelper {
 				}
 
 				if (contingut instanceof CarpetaEntity) {
+					CarpetaEntity carpeta = (CarpetaEntity)contingut;
 					String ruta = "";
 					try {
-						num = crearFilesCarpetaActual(
-								num, 
-								sum, 
-								contingut, 
-								entitatActual, 
-								ruta,
-								zos);
+						if (carpeta.getExpedientRelacionat() != null) {
+							num = num.add(sum);
+						} else {
+							num = crearFilesCarpetaActual(
+									num, 
+									sum, 
+									carpeta, 
+									entitatActual, 
+									ruta,
+									zos);
+						}
 					} catch (Exception ex) {
 						logger.error("Hi ha hagut un error generant l'entrada " + num + " dins del fitxer comprimit", ex);
 					}
@@ -914,14 +919,18 @@ public class ExpedientHelper {
 		
 		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
 			if (contingutCarpetaActual instanceof CarpetaEntity) {
-				
-				num = crearFilesCarpetaActual(
-						num, 
-						sum,
-						contingutCarpetaActual, 
-						entitatActual,  
-						ruta,
-						zos);
+				CarpetaEntity subCarpeta = (CarpetaEntity)contingutCarpetaActual;
+				if (subCarpeta.getExpedientRelacionat() != null) {
+					num = num.add(sum);
+				} else {
+					num = crearFilesCarpetaActual(
+							num, 
+							sum,
+							subCarpeta, 
+							entitatActual,  
+							ruta,
+							zos);
+				}
 			} else {
 				ContingutEntity pare = contingutCarpetaActual.getPare();
 				List<String> estructuraCarpetes = new ArrayList<String>();

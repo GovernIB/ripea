@@ -25,6 +25,13 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitat(EntitatEntity entitat);
 	public Page<OrganGestorEntity> findByEntitat(EntitatEntity entitat, Pageable paginacio);
 	public OrganGestorEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where (og.entitat = :entitat)" +
+			" and (og.id in (select distinct pare.id from OrganGestorEntity))")
+	public List<OrganGestorEntity> findByEntitatAndHasPare(
+			@Param("entitat") EntitatEntity entitat);
 
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
@@ -64,13 +71,16 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where " +
 			"    (og.entitat = :entitat) " +
 			"and (:esNullCodi = true or lower(og.codi) like lower('%'||:codi||'%')) " +
-			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%'))")
+			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%'))" +
+			"and (:esNullOrganSuperior = true or og.pare.id = :organSuperiorId) ")
 	public Page<OrganGestorEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullCodi") boolean esNullCodi,
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
+			@Param("esNullOrganSuperior") boolean esNullOrganSuperior,
+			@Param("organSuperiorId") Long organSuperiorId,
 			Pageable paginacio);
 
 	@Query(	"select " +

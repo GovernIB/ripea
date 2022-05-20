@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -25,8 +26,9 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
-import es.caib.ripea.core.api.dto.TipusRegistreEnumDto;
+import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.war.command.ImportacioCommand;
 import es.caib.ripea.war.helper.EnumHelper;
@@ -44,7 +46,8 @@ public class ContingutImportacioController extends BaseUserController {
 
 	@Autowired
 	private ImportacioService importacioService;
-
+	
+	private final Semaphore semafor = new Semaphore(1, true);
 
 	@RequestMapping(value = "/{contingutId}/importacio/new", method = RequestMethod.GET)
 	public String get(
@@ -61,6 +64,7 @@ public class ContingutImportacioController extends BaseUserController {
 			Model model) {
 		ImportacioCommand command = new ImportacioCommand();
 		command.setDestiTipus(TipusDestiEnumDto.CARPETA_ACTUAL);
+		command.setTipusImportacio(TipusImportEnumDto.NUMERO_REGISTRE);
 		emplenarModelImportacio(contingutId, command, model);
 		return "contingutImportacioForm";
 	}
@@ -93,13 +97,21 @@ public class ContingutImportacioController extends BaseUserController {
 		}
 		int documentsRepetits = 0;
 		try {
-			documentsRepetits = importacioService.getDocuments(
-						entitatActual.getId(), 
-						contingutId,
-						ImportacioCommand.asDto(command));
+			synchronized (semafor) {
+				documentsRepetits = importacioService.importarDocuments(
+							entitatActual.getId(), 
+							contingutId,
+							ImportacioCommand.asDto(command));
+			}
 		} catch (Exception ex) {
 			emplenarModelImportacio(contingutId, command, model);
-			
+			// Excepció si d'alguna forma s'intenta importar el document dues vegades al mateix moment
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DocumentAlreadyImportedException.class)) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:../../../contingut/" + contingutId,
+						null);
+			}
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ContingutNotUniqueException.class)) {
 				MissatgesHelper.error(
 						request, 
@@ -134,10 +146,10 @@ public class ContingutImportacioController extends BaseUserController {
 		command.setPareId(contingutId);
 		model.addAttribute(command);
 		model.addAttribute(
-			"tipusRegistreOptions",
-			EnumHelper.getOptionsForEnum(
-					TipusRegistreEnumDto.class,
-					"contingut.importacio.tipus.enum."));
+				"tipusImportacioOptions",
+				EnumHelper.getOptionsForEnum(
+						TipusImportEnumDto.class,
+						"contingut.importacio.tipus.enum."));
 		model.addAttribute(
 				"tipusDestiOptions",
 				EnumHelper.getOptionsForEnum(

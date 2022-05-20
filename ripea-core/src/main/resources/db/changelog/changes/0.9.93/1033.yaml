@@ -1,0 +1,7 @@
+databaseChangeLog:
+- changeSet:
+    id: 1649333286379-1
+    author: limit
+    changes:   
+    - sql:
+        sql: "Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE,LASTMODIFIEDBY_CODI,LASTMODIFIEDDATE) values ('es.caib.ripea.conversio.definitiu.propagar.arxiu','false','Propagar la conversió a definitiu de documents a l''arxiu','ALTRES','1','0','BOOL',null,null);"

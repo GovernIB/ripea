@@ -193,6 +193,20 @@
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AnotacionsPendentsInterceptor"/>
 		</mvc:interceptor>	
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<mvc:exclude-mapping path="/js/**"/>
+			<mvc:exclude-mapping path="/css/**"/>
+			<mvc:exclude-mapping path="/fonts/**"/>
+			<mvc:exclude-mapping path="/img/**"/>
+			<mvc:exclude-mapping path="/extensions/**"/>
+			<mvc:exclude-mapping path="/webjars/**"/>
+			<mvc:exclude-mapping path="/**/datatable/**"/>
+			<mvc:exclude-mapping path="/**/selection/**"/>
+			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<bean class="es.caib.ripea.war.interceptor.AvisosInterceptor"/>
+		</mvc:interceptor>		
 		
 		
 		<!-- Rutes només accessibles amb el rol d'administrador d'organ o d'entitat -->
@@ -259,6 +273,8 @@
 			<mvc:mapping path="/excepcio/**"/>
 			<mvc:mapping path="/config**"/>
 			<mvc:mapping path="/config/**"/>
+			<mvc:mapping path="/avis**"/>
+			<mvc:mapping path="/avis/**"/>
 			<mvc:exclude-mapping path="/entitat/getEntitatLogo"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesSuperInterceptor"/>
 		</mvc:interceptor>		

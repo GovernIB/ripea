@@ -22,6 +22,8 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -135,6 +137,16 @@ public class ConversioTipusHelper {
 						target.setDataLimit(source.getDataLimit());
 						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
+						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
+						
+						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+						boolean usuariActualReposnable = false;
+						for (UsuariEntity usuari : source.getResponsables()) {
+							if (usuari.getCodi().equals(auth.getName())) {
+								usuariActualReposnable = true;
+							}
+						}
+						target.setUsuariActualResponsable(usuariActualReposnable);
 						return target;
 					}
 				});
@@ -531,6 +543,23 @@ public class ConversioTipusHelper {
 						CodiValorDto target = new CodiValorDto();
 						target.setCodi(source.getId().toString());
 						target.setValor(source.getNom());
+						return target;
+					}
+				});
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<OrganGestorEntity, OrganGestorDto>() {
+					@Override
+					public OrganGestorDto convert(OrganGestorEntity source, Type<? extends OrganGestorDto> destinationClass) {
+						OrganGestorDto target = new OrganGestorDto();
+						target.setId(source.getId());
+						target.setCodi(source.getCodi());
+						target.setNom(source.getNom());
+						target.setEntitatId(source.getEntitat() != null ? source.getEntitat().getId().toString() : null);
+						target.setEntitatNom(source.getEntitat() != null ? source.getEntitat().getNom() : null);
+						target.setPareId(source.getPare() != null ? source.getPare().getId() : null);
+						target.setPareCodi(source.getPare() != null ? source.getPare().getCodi() : null);
+						target.setPareNom(source.getPare() != null ? source.getPare().getNom() : null);
+						target.setGestioDirect(source.isGestioDirect());
 						return target;
 					}
 				});

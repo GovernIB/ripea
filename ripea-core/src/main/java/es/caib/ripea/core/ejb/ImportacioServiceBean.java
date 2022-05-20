@@ -15,7 +15,6 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ImportacioService;
 
 /**
@@ -33,12 +32,8 @@ public class ImportacioServiceBean implements ImportacioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public int getDocuments(
-			Long entitatId, 
-			Long contingutId, 
-			ImportacioDto dades)
-			throws NotFoundException, ValidationException {
-		return delegate.getDocuments(
+	public int importarDocuments(Long entitatId, Long contingutId, ImportacioDto dades) throws NotFoundException {
+		return delegate.importarDocuments(
 				entitatId, 
 				contingutId,
 				dades);

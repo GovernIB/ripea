@@ -212,4 +212,9 @@ public class OrganGestorServiceBean implements OrganGestorService {
 				entitatId);
 	}
 
+	@Override
+	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
+		return delegate.findOrgansSuperiorByEntitat(entitatId);
+	}
+
 }

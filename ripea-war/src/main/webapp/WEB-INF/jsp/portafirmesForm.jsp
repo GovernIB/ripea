@@ -173,6 +173,9 @@ $(document).ready(function() {
 	$('form').on('submit', function(){
 		window.parent.addLoading(idModal);
 	});
+
+	// Tancar transacció i esborrar localstorage
+	window.parent.removeTransactionId(idModal);
 	
 	//crear nou flux
 	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function() {		
@@ -287,10 +290,7 @@ $(document).ready(function() {
 			$(".portafirmesEnviarFluxId_btn_edicio").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.flux.iniciar"/>");
 		}
 	});
-						
-	$('.modal-cancel').on('click', function(){
-		localStorage.removeItem('transaccioId');
-	});
+	
 	$("#portafirmesEnviarFluxId").trigger('change');
 	$(".portafirmesResponsables_btn").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.carrecs"/>");
 	

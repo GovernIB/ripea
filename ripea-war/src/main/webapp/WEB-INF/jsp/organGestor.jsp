@@ -10,6 +10,10 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
@@ -31,14 +35,17 @@
 	<c:url value="organgestor/filtrar" var="formAction"/>
 	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="organGestorFiltreCommand">
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-2">
 				<rip:inputText name="codi" inline="true" placeholderKey="organgestor.list.filtre.camp.codi"/>
 			</div>		
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="organgestor.list.filtre.camp.nom"/>
 			</div>
+			<div class="col-md-4">
+				<rip:inputSelect name="pareId" optionItems="${organsSuperior}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiINom" optionMinimumResultsForSearch="3" placeholderKey="organgestor.list.filtre.camp.pare" inline="true"/>
+			</div>	
 
-			<div class="col-md-4 pull-right">
+			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -74,6 +81,9 @@
 				</th>
 				<th data-col-name="nom" >
 					<spring:message code="organgestor.list.columna.nom" />
+				</th>
+				<th data-col-name="pareCodiNom" data-orderable="false">
+					<spring:message code="organgestor.list.columna.pare" />
 				</th>
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">

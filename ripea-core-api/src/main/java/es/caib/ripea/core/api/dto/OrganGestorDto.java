@@ -24,6 +24,7 @@ public class OrganGestorDto extends AuditoriaDto {
     private String entitatId;
     private String pareCodi;
     private Long pareId;
+    private String pareNom;
     private String entitatNom;
     private List<PermisDto> permisos;
     private boolean gestioDirect;
@@ -37,6 +38,12 @@ public class OrganGestorDto extends AuditoriaDto {
     
     public String getCodiINom() {
     	return codi + " - " + nom;
+    }
+    
+    public String getPareCodiNom() {
+    	if (pareCodi == null) 
+    		return null;
+    	return pareCodi + " - " + pareNom;
     }
        
 }

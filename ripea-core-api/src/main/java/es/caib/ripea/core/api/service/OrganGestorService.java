@@ -261,4 +261,8 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<OrganGestorDto> findOrganismesEntitatAmbPermisCache(
 			Long entitatId);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public List<OrganGestorDto> findOrgansSuperiorByEntitat(
+			Long entitatId);
 }
