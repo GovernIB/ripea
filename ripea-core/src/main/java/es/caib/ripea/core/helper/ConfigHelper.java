@@ -112,29 +112,27 @@ public class ConfigHelper {
 		if (configPerEntitat != null) {
 			String valueConfigPerEntitat = getConfig(configPerEntitat);
 			if (valueConfigPerEntitat != null) {
-				return new ConfigResult(valueConfigPerEntitat, entitatActualCodi);
+				return new ConfigResult(entitatActualCodi, valueConfigPerEntitat);
 			} else {
 				ConfigEntity configGeneral = configRepository.findOne(keyGeneral);
 				String valueConfigGeneral = getConfig(configGeneral);
 				if (valueConfigGeneral != null) {
-					return new ConfigResult(valueConfigGeneral, null);
+					return new ConfigResult(null, valueConfigGeneral);
 				} else {
 					String valueEntitat = getJBossProperty(keyPerEntitat);
 					if (valueEntitat != null) {
-						return new ConfigResult(valueEntitat, entitatActualCodi);
+						return new ConfigResult(entitatActualCodi, valueEntitat);
 					} else {
-						return new ConfigResult(getJBossProperty(keyGeneral), entitatActualCodi);
+						return new ConfigResult(null, getJBossProperty(keyGeneral));
 					}
 				}
 			}
 		} else {
 			String valueEntitat = getJBossProperty(keyPerEntitat);
 			if (valueEntitat != null) {
-				return new ConfigResult(valueEntitat,
-						entitatActual.getCodi());
+				return new ConfigResult(entitatActualCodi, valueEntitat);
 			} else {
-				return new ConfigResult(getJBossProperty(keyGeneral),
-						entitatActual.getCodi());
+				return new ConfigResult(null, getJBossProperty(keyGeneral));
 			}
 		}
 	}
@@ -143,7 +141,14 @@ public class ConfigHelper {
     public String getConfig(String keyGeneral)  {
     	
 		EntitatDto entitatActual = ConfigHelper.entitat.get();			
-		return this.getConfig(entitatActual, keyGeneral).getCodiEntitat();
+		return this.getConfig(entitatActual, keyGeneral).getConfigValue();
+		
+	}
+    
+    @Transactional(readOnly = true)
+    public ConfigResult getConfigIEntitatCodi(String keyGeneral)  {
+		EntitatDto entitatActual = ConfigHelper.entitat.get();			
+		return this.getConfig(entitatActual, keyGeneral);
 		
 	}
     

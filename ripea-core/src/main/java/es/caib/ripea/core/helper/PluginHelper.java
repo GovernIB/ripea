@@ -97,6 +97,7 @@ import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.config.ConfigResult;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -5248,8 +5249,9 @@ public class PluginHelper {
 		IArxiuPlugin arxiuPlugin = arxiuPlugins.get(currentEntitatCodi);
 		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
-			String pluginClass = getPropertyPluginArxiu();
-			String entitatCodiUsedPerProperty = getUsedEntitatPropertyPluginArxiu();
+			ConfigResult configResult = getPropertyPluginArxiu();
+			String pluginClass = configResult.getConfigValue();
+			String entitatCodiUsedPerProperty = configResult.getCodiEntitat();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
@@ -5633,13 +5635,9 @@ public class PluginHelper {
 	private String getPropertyPluginUnitatsOrganitzatives() {
 		return configHelper.getConfig("es.caib.ripea.plugin.unitats.organitzatives.class");
 	}
-	private String getPropertyPluginArxiu() {
-		return configHelper.getConfig("es.caib.ripea.plugin.arxiu.class");
+	private ConfigResult getPropertyPluginArxiu() {
+		return configHelper.getConfigIEntitatCodi("es.caib.ripea.plugin.arxiu.class");
 	}
-	private String getUsedEntitatPropertyPluginArxiu() {
-		return configHelper.getEntitatUsedPerConfig("es.caib.ripea.plugin.arxiu.class");
-	}
-	
 	private String getPropertyPluginPortafirmes() {
 		return configHelper.getConfig("es.caib.ripea.plugin.portafirmes.class");
 	}
