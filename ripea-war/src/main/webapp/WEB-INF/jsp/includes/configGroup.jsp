@@ -1,6 +1,6 @@
 <%--
   Created by IntelliJ IDEA.
-  User: limit
+  User: Limit Tecnologies <limit@limit.es>
   Date: 12/7/21
   Time: 17:03
   To change this template use File | Settings | File Templates.
@@ -12,6 +12,11 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
+<script type="text/javascript">
+  
+
+</script>
+
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h${level + 4}>${ group.description }</h${level + 4}>
@@ -19,7 +24,8 @@
     <div class="panel-body">
         <c:forEach items="${ group.configs }" var="config" varStatus="status_group">
             <c:set var = "configKey" value = "${fn:replace(config.key,'.','_')}"/>
-            <form:form id="filtre" method="post" cssClass="form-update-config form-horizontal" commandName="config_${configKey}">
+
+            <form:form method="post" cssClass="config-form form-update-config form-horizontal" action="config/update" commandName="config_${configKey}">
                 <form:hidden path="key"/>
                 <div class="form-group">
                     <label for="config_${config.key}" class="col-sm-3 control-label" style="word-wrap: break-word;">${ config.description }</label>
@@ -54,10 +60,10 @@
                                 </form:select>
                             </c:when>
                             <c:when test="${config.validValues != null and fn:length(config.validValues) == 2}">
-                                <label class="radio-inline">
+                                <label id="config_${config.key}_1" class="radio-inline">
                                     <form:radiobutton path="value" value="${config.validValues[0]}"/> ${config.validValues[0]}
                                 </label>
-                                <label class="radio-inline">
+                                <label id="config_${config.key}_2" class="radio-inline">
                                     <form:radiobutton path="value" value="${config.validValues[1]}"/> ${config.validValues[1]}
                                 </label>
                             </c:when>
@@ -66,16 +72,16 @@
                                              type="text" maxlength="2048" disabled="${config.jbossProperty}"/>
                             </c:otherwise>
                         </c:choose>
-                        <span class="help-block">${config.key}</span>
+                        <div id="config_${config.key}_key"><span class="help-block display-inline">${config.key}</span></div>
                     </div>
                     <div class="col-sm-1">
                         <c:if test="${not config.jbossProperty}">
-                        <button class="btn btn-success">
-                            <i class="fa fa-edit"></i>
-                        </button>
+                            <button class="btn btn-success"><i class="fa fa-save"></i></button>
                         </c:if>
+                        <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
                     </div>
                 </div>
+                <div class="form-group entitats-config"></div>
             </form:form>
         </c:forEach>
 

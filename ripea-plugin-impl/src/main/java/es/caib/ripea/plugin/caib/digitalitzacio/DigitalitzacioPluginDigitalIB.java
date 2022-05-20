@@ -225,6 +225,7 @@ public class DigitalitzacioPluginDigitalIB implements DigitalitzacioPlugin {
 							resposta.setContingut(result.getSignedFile().getData());
 							resposta.setNomDocument(result.getSignedFile().getNom());
 							resposta.setMimeType(result.getSignedFile().getMime());
+							resposta.setEniTipoFirma(result.getSignedFileInfo().getEniTipoFirma());
 							logger.debug(errorMsg);
 						}
 					}

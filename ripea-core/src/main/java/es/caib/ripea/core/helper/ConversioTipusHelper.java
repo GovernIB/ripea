@@ -197,6 +197,7 @@ public class ConversioTipusHelper {
 						} 
 						target.setId(source.getId());
 						target.setDocumentNum(source.getDocumentNum());
+						target.setDocumentTipus(source.getDocumentTipus());
 						target.setPais(source.getPais());
 						target.setProvincia(source.getProvincia());
 						target.setMunicipi(source.getMunicipi());

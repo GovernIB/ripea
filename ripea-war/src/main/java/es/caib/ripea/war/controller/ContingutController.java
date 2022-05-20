@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
@@ -160,18 +159,24 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					contingutId, 
-					null);
+					null,
+					true);
 			List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
 			List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
+			List<MetaDocumentDto> metaDocumentsAllNoPinball = new ArrayList<MetaDocumentDto>();
 			for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
 				if (metaDocument.isPinbalActiu()) {
 					metaDocumentsPinbal.add(metaDocument);
 				} else {
-					metaDocumentsNoPinbal.add(metaDocument);
+					if (metaDocument.isLeftPerCreacio()) {
+						metaDocumentsNoPinbal.add(metaDocument);
+					} 
+					metaDocumentsAllNoPinball.add(metaDocument);
 				}
 			}
 			model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
 			model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
+			model.addAttribute("metaDocumentsAllNoPinball", metaDocumentsAllNoPinball);
 	
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(EnviamentEstat.class,
@@ -778,7 +783,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
 						contingut.getId(), 
-						null));
+						null, 
+						false));
 		
 		if (contingut instanceof CarpetaDto) {
 			contingut = contingut.getExpedientPare();

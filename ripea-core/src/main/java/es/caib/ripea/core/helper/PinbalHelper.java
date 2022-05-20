@@ -197,9 +197,6 @@ public class PinbalHelper {
 			boolean ambNomSencer) {
 		ScspTitular titular = new ScspTitular();
 		switch (interessat.getDocumentTipus()) {
-		case CIF:
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.CIF);
-			break;
 		case DOCUMENT_IDENTIFICATIU_ESTRANGERS:
 			titular.setTipoDocumentacion(ScspTipoDocumentacion.NIE);
 			break;

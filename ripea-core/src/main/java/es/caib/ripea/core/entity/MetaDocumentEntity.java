@@ -13,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.ForeignKey;
@@ -107,6 +108,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	
 	@Column(name = "per_defecte")
 	private boolean perDefecte;
+	
+	@Transient
+	private boolean leftPerCreacio;
+	
 
 	public MultiplicitatEnumDto getMultiplicitat() {
 		return multiplicitat;
@@ -183,6 +188,12 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		return perDefecte;
 	}
 	
+	public boolean isLeftPerCreacio() {
+		return leftPerCreacio;
+	}
+	public void setLeftPerCreacio(boolean leftPerCreacio) {
+		this.leftPerCreacio = leftPerCreacio;
+	}
 	public void update(
 			String codi,
 			String nom,

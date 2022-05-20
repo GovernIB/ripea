@@ -11,7 +11,11 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.war.command.DocumentNotificacionsCommand;
 import es.caib.ripea.war.helper.MessageHelper;
 
@@ -23,6 +27,9 @@ import es.caib.ripea.war.helper.MessageHelper;
  */
 public class ValidFormatValidator implements ConstraintValidator<ValidFormat, DocumentNotificacionsCommand> {
 
+	@Autowired
+	private ExpedientInteressatService expedientInteressatService;
+	
 	private static final String CARACTERS_VALIDS = " aàáäbcçdeèéëfghiìíïjklmnñoòóöpqrstuùúüvwxyzAÀÁÄBCÇDEÈÉËFGHIÌÍÏJKLMNÑOÒÓÖPQRSTUÙÚÜVWXYZ0123456789-_'\"/:().,¿?!¡;·";
 
 	@Override
@@ -55,6 +62,24 @@ public class ValidFormatValidator implements ConstraintValidator<ValidFormat, Do
 							.addNode("observacions").addConstraintViolation();
 				}
 			}
+			
+			// Validació de email per interessats sin NIF
+			if (command.getInteressatsIds() != null) {
+				boolean val = true;
+				for (Long id : command.getInteressatsIds()) {
+					InteressatDto interessatDto = expedientInteressatService.findById(id, false);
+					if (interessatDto.getRepresentant() == null && interessatDto.getDocumentTipus() != InteressatDocumentTipusEnumDto.NIF && interessatDto.getDocumentTipus() != InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && (interessatDto.getEmail() == null || interessatDto.getEmail().isEmpty())) {
+						val = false;
+					} else if (interessatDto.getRepresentant() != null && interessatDto.getRepresentant().getDocumentTipus() != InteressatDocumentTipusEnumDto.NIF && interessatDto.getRepresentant().getDocumentTipus() != InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && (interessatDto.getRepresentant().getEmail() == null || interessatDto.getRepresentant().getEmail().isEmpty())) {
+						val = false;
+					}
+				}
+				if (!val) {
+					valid = false;
+					context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("notificacio.form.valid.sin.nif.no.email")).addConstraintViolation();
+				}
+			}
+			
 			context.disableDefaultConstraintViolation();
 			return valid;
 		} catch (final Exception ex) {

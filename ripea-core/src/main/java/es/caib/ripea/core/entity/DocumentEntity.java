@@ -164,11 +164,22 @@ public class DocumentEntity extends NodeEntity {
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			String ntiTipoDocumental) {
 		this.metaNode = metaDocument;
-		this.ntiOrigen = ntiOrigen;
-		this.ntiTipoDocumental = ntiTipoDocumental;
-		this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+		if (ntiOrigen != null) {
+			this.ntiOrigen = ntiOrigen;
+		}
+		if (ntiTipoDocumental != null) {
+			this.ntiTipoDocumental = ntiTipoDocumental;
+		}
+		if (ntiEstadoElaboracion != null) {
+			this.ntiEstadoElaboracion = ntiEstadoElaboracion;
+		}
 	}
-	
+
+	public void updateTipusDocument(
+			MetaDocumentEntity metaDocument) {
+		this.metaNode = metaDocument;
+	}
+
 	public void update(
 			MetaDocumentEntity metaDocument,
 			String nom,
@@ -281,6 +292,11 @@ public class DocumentEntity extends NodeEntity {
 		}
 		return false;
 	}
+
+	public boolean isDocFromAnnex() {
+		return this.getExpedientPare().getPeticions() != null && !this.getExpedientPare().getPeticions().isEmpty() && this.getPare() instanceof CarpetaEntity && this.getPare().getNom().startsWith("Registre entrada:");
+	}
+
 	
 	public static Builder getBuilder(
 			DocumentTipusEnumDto documentTipus,

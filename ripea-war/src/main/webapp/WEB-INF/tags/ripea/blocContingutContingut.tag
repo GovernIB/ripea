@@ -241,26 +241,31 @@
 						</c:if>
 						</td>
 						<td width="25%">
-							<c:choose>
-								<c:when test="${not fill.carpeta && fill.metaNode != null}">
-									${fill.metaNode.nom}
-								</c:when>
-								<c:when test="${not fill.carpeta && fill.metaNode == null}">
-									<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable col-md-12 hidden">
-										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
-										<spring:message code="contingut.info.document.tipusdocument"/>
-									</div>
-									<select id="${fill.id}" class="select-tipus-document" ${expedientPareAgafatPerUsuariActual ? '' : 'disabled'}>
-										<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option>
-										<c:forEach items="${metaDocumentsLeft}" var="metaDocument">
-											<option id="${metaDocument.id}">
-												${metaDocument.nom}
-											</option>
-										</c:forEach>
-									</select>
-								</c:when>
-							</c:choose>
+							<c:if test="${not fill.carpeta}">
+								<c:choose>
+								<c:when test="${fill.expedientPare.estat != 'TANCAT' && fill.docFromAnnex}"> 
+										<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable col-md-12 hidden">
+											<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
+											<spring:message code="contingut.info.document.tipusdocument"/>
+										</div>
+										<select id="${fill.id}" class="select-tipus-document" ${expedientPareAgafatPerUsuariActual or fill.expedientPare.admin ? '' : 'disabled'}>
+											<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option>
+											<c:forEach items="${metaDocumentsAllNoPinball}" var="metaDocument">
+												<c:if test="${metaDocument.leftPerCreacio || fill.metaNode.id == metaDocument.id}">
+													<option id="${metaDocument.id}" ${fill.metaNode.id == metaDocument.id ? 'selected' : ''}>
+														${metaDocument.nom}
+													</option>
+												</c:if>
+											</c:forEach>
+										</select>
+									</c:when>
+									<c:otherwise>
+										${fill.metaNode.nom}
+									</c:otherwise>
+								</c:choose>
+							</c:if>
 						</td>
+						
 						<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${fill.createdBy.codiAndNom}</td>
 						<td>

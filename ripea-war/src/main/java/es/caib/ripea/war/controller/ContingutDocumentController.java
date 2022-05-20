@@ -71,7 +71,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_ORDRE = "ContingutDocumentController.session.ordre";
-	private static final String SESSION_ATTRIBUTE_ENTREGA_POSTAL = "ContingutDocumentController.session.entregaPostal";
 	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
 	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
@@ -159,10 +158,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
-		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
-				request,
-				command,
-				model);
+		if (!command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+			FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+					request,
+					command,
+					model);
+		}
 		
 		if (command.isOnlyFileSubmit()) {
 			fillModelFileSubmit(command, model, request);
@@ -188,7 +189,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					pareId,
 					model);
-			model.addAttribute("contingutId", pareId);
 			return "contingutDocumentForm";
 		}
 		try {
@@ -197,7 +197,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request), null);
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
@@ -213,13 +213,17 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (throwable!=null) {
 				SistemaExternException sisExtExc = (SistemaExternException) throwable;
 				MissatgesHelper.error(request, sisExtExc.getMessage());
-				omplirModelFormulari(
-						request,
-						command,
-						null,
-						pareId,
-						model);
-				return "contingutDocumentForm";
+				if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+					return modalUrlTancar();
+				} else {
+					omplirModelFormulari(
+							request,
+							command,
+							null,
+							pareId,
+							model);
+					return "contingutDocumentForm";
+				}
 			} else {
 				throw ex;
 			}
@@ -272,7 +276,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request), null);
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(
@@ -285,12 +289,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 	
-	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument/{tipusDocumentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument", method = RequestMethod.GET)
 	@ResponseBody
 	public JsonResponse updateTipusDocument(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
-			@PathVariable Long tipusDocumentId,
+			@RequestParam(value = "tipusDocumentId", required = false) Long tipusDocumentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
@@ -409,6 +413,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			//Amb firma?
 			if (returnSignedFile) {
 				command.setAmbFirma(true);
+				if (!resultat.getEniTipoFirma().equals("TF02") && !resultat.getEniTipoFirma().equals("TF04")) {
+					command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+				} else {
+					command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+				}
 			}
 		} else {
 			omplirModelFormulari(
@@ -579,12 +588,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 		boolean totsFinals = true;
 		boolean totsDocumentsPdf = true;
-		boolean mostrarTextLoading = true;
+		boolean notificacioConcatenatEntregaPostal;
 		
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_ENTREGA_POSTAL,
-				mostrarTextLoading);
 		
 		ContingutDto contingut = contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -637,12 +642,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (totsDocumentsPdf && totsFinals) {
 			model.addAttribute("documents", documents);
 			model.addAttribute("contingut", contingut);
-			boolean entregaPostal = true;
-			
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_ENTREGA_POSTAL,
-					entregaPostal);
+			notificacioConcatenatEntregaPostal = true;
 			
 			MissatgesHelper.warning(
 					request, 
@@ -653,12 +653,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		} else {
 			DocumentGenericCommand command = new DocumentGenericCommand();
 			command.setPareId(contingutId);
-			boolean entregaPostal = false;
-			
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_ENTREGA_POSTAL,
-					entregaPostal);
+			notificacioConcatenatEntregaPostal = false;
 			
 			documentHelper.generarFitxerZip(
 					entitatActual.getId(),
@@ -678,7 +673,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false, null);
+					false, 
+					null, 
+					notificacioConcatenatEntregaPostal);
 		}
 	}
 	
@@ -711,7 +708,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false, null);
+					false, null, null);
 		} catch (Exception exception) {
 			return getModalControllerReturnValueErrorMessageText(
 					request, 
@@ -992,7 +989,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
 				contingutId, 
-				null);
+				null, 
+				false);
 		for (MetaDocumentDto metaDocument: metaDocuments) {
 			if (metaDocument.getId().equals(metaDocumentId))
 				return metaDocument;
@@ -1065,7 +1063,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			DocumentGenericCommand commandGeneric,
 			boolean notificar,
 			boolean comprovarMetaExpedient, 
-			String rolActual) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+			String rolActual, 
+			Boolean notificacioConcatenatEntregaPostal) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
 		List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -1126,7 +1125,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				
 			} else {
 				modalUrlTancar();
-				return "redirect:../../document/" + document.getId() + "/notificar";
+				return "redirect:../../document/" + document.getId() + "/notificar?" + notificacioConcatenatEntregaPostal;
 			}
 		} else {
 			documentService.update(
@@ -1169,7 +1168,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
 							contingutId, 
-							null));
+							null, 
+							false));
 		} else {
 			model.addAttribute(
 					"metaDocuments",
@@ -1219,6 +1219,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute(
 				"isPermesModificarCustodiats",
 				modificacioCustodiatsActiva);
+		
+		model.addAttribute("contingutId", contingutId);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

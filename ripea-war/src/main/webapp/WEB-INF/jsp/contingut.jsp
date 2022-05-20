@@ -1272,11 +1272,10 @@ $(document).ready(function() {
 	selTipusDocument.on('change', function(event){
 
 		var tipusDocumentId = $(':selected', $(this)).attr('id');
-		if (tipusDocumentId) {
 			showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
 			var documentId = $(this).attr('id');
 			
-			var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument/"/>' + tipusDocumentId;
+			var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument"/>' +'?tipusDocumentId=' + tipusDocumentId;
 			$.ajax({
 				type: 'GET',
 		        url: updateUrl,
@@ -1293,7 +1292,6 @@ $(document).ready(function() {
 		        	location.reload();
 		        }
 		    });	
-		}
 	});
 
 						
@@ -2154,7 +2152,7 @@ $.views.helpers(myHelpers);
 			<c:if test="${!isTasca}">
 				<ul class="nav nav-tabs">
 					<li class="active" id="pipella-contingut">
-						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${isMostrarCarpetesPerAnotacions ? contingut.fillsHierarchicalCount : contingut.fillsFlatCount}</span></a>
+						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsHierarchicalCount}</span></a>
 					</li>
 					<c:if test="${((contingut.document or contingut.expedient) and fn:length(contingut.metaNode.metaDades) gt 0) || ((contingut.carpeta) and fn:length(contingut.expedientPare.metaNode.metaDades) gt 0)}">
 						<li>

@@ -108,7 +108,7 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 			<div class="well"> 
 				<form:hidden path="annexos[${vs.index}].id" />
 				
-				<rip:inputText name="annexos[${vs.index}].titol" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
+				<rip:inputText name="annexos[${vs.index}].titolINom" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
 				<rip:inputSelect name="annexos[${vs.index}].metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
 			</div>
 		</c:forEach>

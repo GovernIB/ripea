@@ -41,9 +41,17 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private String pinbalFinalitat;
 	private boolean perDefecte;
 	private Long metaExpedientId;
+	private boolean leftPerCreacio;
+	
 	
 	public boolean isPermetMultiple() {
 		return multiplicitat.equals(MultiplicitatEnumDto.M_0_N) || multiplicitat.equals(MultiplicitatEnumDto.M_1_N);
+	}
+	public boolean isLeftPerCreacio() {
+		return leftPerCreacio;
+	}
+	public void setLeftPerCreacio(boolean leftPerCreacio) {
+		this.leftPerCreacio = leftPerCreacio;
 	}
 	
 	@Override

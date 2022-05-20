@@ -1359,7 +1359,7 @@ public class ExpedientHelper {
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.NIF;
 				break;
 			case CIF:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.CIF;
+				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.NIF;
 				break;
 			case PASSAPORT:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.PASSAPORT;

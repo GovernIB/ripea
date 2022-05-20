@@ -168,7 +168,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					expedientPeticioDto.getExpedientId(), 
-					null);
+					null, 
+					false);
 		model.addAttribute(
 				"metaDocuments",
 				metaDocumentsQueQuedenPerCreacio);
@@ -223,7 +224,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
 						expedientPeticioDto.getExpedientId(), 
-						null);
+						null, 
+						false);
 			model.addAttribute(
 					"metaDocuments",
 					metaDocumentsQueQuedenPerCreacio);
@@ -426,12 +428,14 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					null, 
-					command.getMetaExpedientId());
+					command.getMetaExpedientId(), 
+					false);
 		} else {
 			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					command.getExpedientId(), 
-					null);
+					null, 
+					false);
 		}
 		model.addAttribute(
 				"metaDocuments",
@@ -495,12 +499,14 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					null, 
-					command.getMetaExpedientId());
+					command.getMetaExpedientId(), 
+					false);
 		} else {
 			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					command.getExpedientId(), 
-					null);
+					null, 
+					false);
 		}
 		
 		if (bindingResult.hasErrors()) {

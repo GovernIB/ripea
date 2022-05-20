@@ -6,8 +6,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.war.helper.ContingutEstaticHelper;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.OrganGestorHelper;
@@ -36,6 +38,12 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
             EntitatHelper.processarCanviOrganGestor(request);
             EntitatHelper.findEntitatsAccessibles(request, entitatService);
         }
+        
+    	EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
+		if (entitatDto != null) {
+			ConfigHelper.setEntitat(entitatDto);
+		}		
+        
         return true;
     }
 }

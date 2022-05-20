@@ -29,6 +29,7 @@ pageContext.setAttribute(
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/bootbox.all.min.js"/>"></script>
 	<rip:modalHead/>
 	
 <style type="text/css">
@@ -91,16 +92,83 @@ $(document).ready(function() {
 		var interessatsSelected = $(this).val();
 		var notificacions = eval(${notificacions});
 		var notificacionsSeleccionades = [];
+		var noNif = false;
 		$(notificacions).each(function(index, notificacio) {
 			//if selected
 			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
 	    		notificacionsSeleccionades.push(notificacio);
+	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+	    			noNif = true;
+				}
 			}
 	    });
+		if (noNif) {
+			$("#alertNoNif").show();
+		} else {
+			$("#alertNoNif").hide();
+		}
+		
 
 		mostrarNotificacions(notificacionsSeleccionades);
 		$('#entregaPostal').trigger('change');
 	});
+
+
+
+
+	
+	$(".notificarSubmit").click(function(event) {
+
+		event.stopImmediatePropagation();
+		event.preventDefault();
+
+		let continuar = true;
+
+
+		const notificacioSenseNifMsg = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm" />";
+
+		let enviamentsSenseNif = getNotificacionsSenseNif();
+
+
+		if (enviamentsSenseNif.length > 0) {
+			continuar = false;
+			let missatge = "<spring:message code="notificacio.form.notificacio.sense.nif.confirm" />";
+
+			missatge += "<ul>";
+			enviamentsSenseNif.forEach(function(notificacio, index) {
+				missatge += "<li>Notificació " + (index + 1) + " - Titular : " + notificacio.titular.nom + " " + notificacio.titular.llinatge1 + "</li>";
+			});
+			missatge += "</ul>";
+
+			bootbox.confirm({
+				title: "Enviar?",
+				size: "large",
+				message: missatge,
+				locale: 'ca',
+				callback: function(result){
+					if (result) {
+						submitNotificacio();
+					}
+				}
+			})
+		}
+		
+		if (continuar) {
+			submitNotificacio();
+		}
+	});
+
+	function submitNotificacio(){
+		$("#notificacioForm").submit();
+		$('.notificarSubmit', parent.document).parent().parent().find(".modal-body iframe").hide();
+		$('.modal-body .datatable-dades-carregant', parent.document).css('padding-bottom', '0px');
+		$('.modal-body .datatable-dades-carregant', parent.document).css('padding-top', '60px');
+		$('.modal-body .datatable-dades-carregant', parent.document).show();
+		$('.notificarSubmit', parent.document).attr('disabled', true);
+		
+	}
+
+	
 	$('#entregaPostal').on('change', function() {
 		if ($(this).is(':checked')) {
 			$('.entrega_postal').removeClass('hidden');
@@ -110,6 +178,22 @@ $(document).ready(function() {
 	})
 	$('#interessatsIds').trigger('change');
 });
+
+function getNotificacionsSenseNif() {
+	var interessatsSelected = $('#interessatsIds').val();
+	var notificacions = eval(${notificacions});
+	var notificacionsSenseNif = [];
+	
+	$(notificacions).each(function(index, notificacio) {
+		//if selected
+		if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
+    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+    			notificacionsSenseNif.push(notificacio);
+			}
+		}
+    });
+    return notificacionsSenseNif;
+}
 
 function mostrarNotificacions(notificacions) {
 	var notificacions_container = document.getElementById('container-envios');
@@ -469,6 +553,7 @@ function destinitarisNoResults() {
 		<rip:inputSelect disabled="true" labelSize="2" name="estat" textKey="notificacio.form.camp.estat" optionItems="${notificacioEstatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
 		<!----  TITULARS   ------->
 		<rip:inputSelect required="true" labelSize="2" name="interessatsIds" multiple="true" textKey="notificacio.form.camp.destinatari" optionItems="${interessats}" optionValueAttribute="id" optionTextAttribute="identificador" placeholderKey="notificacio.form.camp.destinatari" noResultsFunction="destinitarisNoResults"/>
+		<div id="alertNoNif" style="display: none;" class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span> <spring:message code="notificacio.form.camp.interessat.no.nif.alert"/></div>
 		<!---  CONCEPTE   ---->
 		<rip:inputText labelSize="2" name="assumpte" textKey="notificacio.form.camp.concepte" required="true"/>
 		<!---- TIPUS DE SERVEI  ------->	
@@ -497,7 +582,7 @@ function destinitarisNoResults() {
 			<c:otherwise><c:set var="urlTancar"><c:url value="/contingut/${document.id}"/></c:set></c:otherwise>
 		</c:choose>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-floppy-o"></span> <spring:message code="comu.boto.notificar"/></button>
+			<button type="button" class="btn btn-success notificarSubmit"><span class="fa fa-floppy-o"></span> <spring:message code="comu.boto.notificar"/></button>
 			<a href="${urlTancar}" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

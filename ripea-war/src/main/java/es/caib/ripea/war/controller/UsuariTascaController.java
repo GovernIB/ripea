@@ -595,7 +595,8 @@ public class UsuariTascaController extends BaseUserController {
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
 							pareId, 
-							null));
+							null, 
+							false));
 		} else {
 			model.addAttribute(
 					"metaDocuments",
@@ -683,7 +684,8 @@ public class UsuariTascaController extends BaseUserController {
 				metaDocumentService.findActiusPerCreacio(
 						entitatActual.getId(),
 						contingut.getId(), 
-						null));
+						null, 
+						false));
 
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)

@@ -34,6 +34,25 @@
 	table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
 		cursor: pointer;
 	}
+.rmodal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+body.loading {
+    overflow: hidden;   
+}
+body.loading .rmodal {
+    display: block;
+}
 </style>
 <script>
 $(document).ready(function() {
@@ -72,7 +91,7 @@ $(document).ready(function() {
 		
 		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 			$.get(
-					accio,
+					"csv/" + accio,
 					{ids: ids},
 					function(data) {
 						$("#seleccioCount").html(data);
@@ -83,7 +102,7 @@ $(document).ready(function() {
 		$('#taulaDades').one('draw.dt', function () {
 			$('#seleccioAll').on('click', function() {
 				$.get(
-						"select",
+						"csv/select",
 						function(data) {
 							$("#seleccioCount").html(data);
 							$('#taulaDades').webutilDatatable('refresh');
@@ -93,7 +112,7 @@ $(document).ready(function() {
 			});
 			$('#seleccioNone').on('click', function() {
 				$.get(
-						"deselect",
+						"csv/deselect",
 						function(data) {
 							$("#seleccioCount").html(data);
 							$('#taulaDades').webutilDatatable('select-none');
@@ -102,24 +121,36 @@ $(document).ready(function() {
 				);
 				return false;
 			});
-		});
 
-		$('#taulaDades').on('draw.dt', function () {
-			if (${portafirmes}) {
-				var tipus = $('#metaDocumentId').val();
-				$('thead tr th:nth-child(1)', $('#taulaDades')).each(function () {
-					enableDisableSelection($(this), tipus);
-				});
-				$('tbody tr td:nth-child(1)', $('#taulaDades')).each(function () {
-					enableDisableSelection($(this), tipus);
-				});
-				updateSelectionForTipusDocument(tipus);
-			}
+			$('.copy_csv').on('click', function() {
+				$("body").addClass("loading");
+				$.get('<c:url value="/massiu/csv/urlValidacio"/>', function() {}).done(function(data) {
+					var dummy = $('<textarea id="contentToCopy">').append(data).appendTo('body').select();
+					copyToClipboard('contentToCopy');
+					$("body").removeClass("loading");
+					$(dummy).remove();
+					document.location.reload()
+				})
+			});
 		});
 
 		$('#metaExpedientId').trigger('change');
 		$('#metaDocumentId').trigger('change');
 });
+
+function copyToClipboard(containerid) {
+  if (document.selection) {
+    var range = document.body.createTextRange();
+    range.moveToElementText(document.getElementById(containerid));
+    range.select().createTextRange();
+    document.execCommand("copy");
+  } else if (window.getSelection) {
+    var range = document.createRange();
+    range.selectNode(document.getElementById(containerid));
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+  }
+}
 
 function enableDisableSelection($this, tipus) {
     if (tipus != undefined && tipus != "") {
@@ -161,6 +192,7 @@ function updateSelectionForTipusDocument(currentTipus) {
 
 </head>
 <body>
+	<div class="rmodal"></div>
 	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
@@ -205,24 +237,15 @@ function updateSelectionForTipusDocument(currentTipus) {
 		<div class="btn-group pull-right">
 			<button type="button" id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 			<button type="button" id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			{{if ${portafirmes}}}
-				<button type="button" class="btn btn-default" href="./crear/portafirmes" data-toggle="modal" data-refresh-pagina="false">
-					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
-				</button>
-			{{else}}
-				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
-					<button type="button" class="btn btn-default" data-refresh-pagina="false">
-						<a style="text-decoration: none; color: black;" href="<c:url value="/massiu/marcar/definitiu"/>" data-confirm="${definitiuConfirmacioMsg}">
-							<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
-						</a>
-					</button>
-			{{/if}}
+			<button type="button" class="btn btn-default copy_csv" data-refresh-pagina="false">
+				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
+			</button>
 		</div>
 	</script>
 		
 	<table id="taulaDades" 
 		data-toggle="datatable" 
-		data-url="<c:url value="/massiu/datatable"/>"
+		data-url="<c:url value="/massiu/csv/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
 		data-default-order="7" 

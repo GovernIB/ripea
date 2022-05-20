@@ -4,15 +4,8 @@
 package es.caib.ripea.core.api.dto;
 
 
-/**
- * Enumeració amb els possibles estats del contingut pendent
- * d'una bústia.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
 public enum InteressatDocumentTipusEnumDto {
 	NIF ("N"),
-	CIF ("C"),
 	PASSAPORT ("P"),
 	DOCUMENT_IDENTIFICATIU_ESTRANGERS ("E"),
 	ALTRES_DE_PERSONA_FISICA ("X"),

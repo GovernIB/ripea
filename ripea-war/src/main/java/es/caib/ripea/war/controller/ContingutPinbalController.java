@@ -102,7 +102,8 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		List <MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
 				contingutId, 
-				null);
+				null, 
+				false);
 		Iterator<MetaDocumentDto> itmd = metaDocuments.iterator();
 		while (itmd.hasNext()) {
 			MetaDocumentDto metaDocument = itmd.next();

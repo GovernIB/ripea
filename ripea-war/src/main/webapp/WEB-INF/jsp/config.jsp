@@ -31,9 +31,88 @@
     <script src="<c:url value="/js/webutil.common.js"/>"></script>
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
+    <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
 </head>
 <body>
 <script>
+
+    let getValueRadio = elem => {
+        let inputs = $(elem).find("input");
+        if (!inputs || (inputs && inputs.length !== 2)) {
+            return null;
+        }
+        return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
+    }
+
+    let removeValueRadio = elem => $(elem).find('input:radio').attr("checked", false);
+
+    let addSpinner = id => {
+
+        let spinner;
+        if (!document.getElementById(id + "_spinner")) {
+            spinner = document.createElement("span");
+            spinner.setAttribute("aria-hidden", true);
+            spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
+            spinner.setAttribute("id", id + "_spinner");
+            let elem = document.getElementById(id + "_key");
+            elem.append(spinner);
+        }
+        return spinner;
+    };
+
+    let removeSpinner = spinner =>  {
+        if (spinner) {
+            spinner.remove();
+        }
+    }
+
+    let mostrarMissatge = (id, data) => {
+
+        let elem = document.getElementById(id);
+        elem = !elem ? document.getElementById(id + "_1") : elem;
+        let tagId = elem.getAttribute("id") + "_msg";
+        let msg = document.getElementById(tagId);
+        if (msg) {
+            let el = document.getElementById(msg);
+            if (el) {
+                el.remove();
+            }
+        }
+        let div = document.createElement("div");
+        div.setAttribute("id", tagId);
+        div.className = "flex-space-between alert-config " +  (data.status === 1 ?  "alert-config-ok" : "alert-config-error");
+        div.append(data.message);
+        let span = document.createElement("span");
+        span.className = "fa fa-times alert-config-boto";
+        div.append(span);
+        elem.closest(".col-sm-8").append(div);
+        span.addEventListener("click", () => div.remove());
+        window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
+    }
+
+    let guardarPropietat = (configKey, natejar) => {
+
+        let configKeyReplaced = configKey.replaceAll("_",".");
+        let spinner = addSpinner(configKey);
+        let elem = $("#" + configKey);
+        let value = !natejar ? (elem.is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val()) : null;
+        let formData = new FormData();
+        formData.append("key", configKeyReplaced);
+        formData.append("value", value);
+        $.ajax({
+            url: "/ripea/config/update",
+            type: "post",
+            processData: false,
+            contentType: false,
+            enctype: "multipart/form-data",
+            data: formData,
+            success: data => {
+                removeSpinner(spinner);
+                mostrarMissatge(configKey + "_key", data);
+            }
+        });
+    };
+
     $(document).ready(function() {
         $("#btn-sync").on("click", function () {
             $.get('<c:url value="/config/sync"/>', function( data ) {
@@ -56,41 +135,155 @@
         <c:url var="urlEdit" value="/config/update"/>
         $(".form-update-config").submit(function(e) {
 
-            //prevent Default functionality
             e.preventDefault();
-
-            let self = this;
             let formData = new FormData(this);
-            $('#syncModal-body').html(
-                '<div class="datatable-dades-carregant" style="text-align: center; padding-bottom: 100px;">' +
-                '	<span class="fa fa-circle-o-notch fa-spin fa-3x"></span> <br>' +
-                '   Sincronitzant la propietat: ' + formData.get('key') +
-                '</div>');
-            $("#syncModal").modal("show");
+            let id = "config_" + formData.get("key");
+            let spinner = addSpinner(id);
 
-            //do your own request an handle the results
             $.ajax({
-                url: '${urlEdit}',
-                type: 'post',
+                url: "${urlEdit}",
+                type: "post",
                 processData: false,
                 contentType: false,
-                enctype: 'multipart/form-data',
+                enctype: "multipart/form-data",
                 data: formData,
-                success: function(data) {
-                    $("#syncModal").modal("hide");
-                    if (data.status === 1) {
-                        alert("La propietat " + formData.get('key') + " s'ha editat satisfactoriament");
-                    } else {
-                        alert("Hi ha hagut un error editant la propietat");
-                        document.location.reload();
-                    }
+                success: data => {
+                    removeSpinner(spinner);
+                    mostrarMissatge(id, data);
                 }
             });
-
         });
-
         $('.a-config-group:first').tab('show');
     });
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        $(document).ready(() => {
+
+            $(".entitats").click(e => {
+
+                e.stopPropagation();
+
+                let div = $(e.currentTarget).parent().parent().next();
+                div.empty();
+                let span = $(e.currentTarget).find("span");
+                if ($(div).is(":visible")) {
+                    span.removeClass("fa-caret-up");
+                    span.addClass("fa-caret-down");
+                    div.toggle();
+                    return;
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "config/entitat/" + e.currentTarget.id.replace(/\./g,"-"),
+                    success: entitats => {
+
+                        if (!entitats) {
+                            return;
+                        }
+                        div.toggle();
+                        if ($(div).is(":visible")) {
+                            span.removeClass("fa-caret-down");
+                            span.addClass("fa-caret-up");
+                        }
+
+                        for (let entitat of entitats) {
+                            let keyReplaced = entitat.key.replaceAll('.', '_');
+                            let string = '<div>';
+                            string += '<label for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;"></label>';
+                            string += '<div class="col-sm-8 margin-bottom">';
+                            let disabled = entitat.jbossProperty ? 'disabled' : '';
+                            let placeHolder = "placeholder=" + entitat.key;
+                            if (entitat.typeCode === "INT") {
+                                string += '<input id="' + keyReplaced + '" class="form-control" type="number" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
+                            } else if(entitat.typeCode === "FLOAT") {
+                                string += '<input id="' + keyReplaced + '" class="form-control" type="number" step="0.01" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
+                            } else if(entitat.typeCode === "CREDENTIALS") {
+                               string += '<input id="' + keyReplaced + '" class="form-control" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
+                            } else if(entitat.typeCode === "BOOL") {
+                               let checked = entitat.value === "true" ? 'checked' : '';
+                               string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar" type="checkbox" ' + disabled + ' ' + checked + '>';
+                            } else if (entitat.validValues && entitat.validValues.length > 2) {
+                                string += '<select id="' + keyReplaced + '" class="form-control">';
+                                let selected = "";
+                                string += '<option value=""></option>';
+                                entitat.validValues.map(x => {
+                                    selected = x === entitat.value ? "selected" : "";
+                                    string += '<option value="' + x + '"' + ' ' + selected + '>' + x + '</option>';
+                                });
+                                string += '<select>';
+                            } else if (entitat.validValues && entitat.validValues.length === 2) {
+                                let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
+                                let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
+                                string += '<div id="' + keyReplaced + '"><label for="' + keyReplaced + '_1" class="radio-inline">'
+                                    + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + '>'
+                                    + entitat.validValues[0]
+                                    + '</label>'
+                                    + '<label for="' + keyReplaced+ '_2" class="radio-inline">'
+                                    + '<input id="' + keyReplaced + '_2" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[1] + '"' + ' ' + checked2 + '>'
+                                    + entitat.validValues[1]
+                                    + '</label></div>';
+                            } else {
+                                string += '<input id="' + keyReplaced + '" class="form-control" type="text" maxlength="2048" value="'
+                                        + (entitat.value ? entitat.value : "" )+ '"' + disabled + ' ' + placeHolder + '>';
+                            }
+                            string +='<div><div id="'+ keyReplaced + '_key" class="display-inline"><span class="help-block display-inline"> ' + entitat.key + '</span></div>';
+                            string += '</div></div>'
+                            string += '<div class="col-sm-1 margin-bottom flex-space-between">';
+                            if (!entitat.jbossProperty) {
+                                string += '<button id="' + keyReplaced + '_button_save" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>';
+                                string += '<button id="' + keyReplaced + '_button_trash" name=' + entitat.entitatCodi + ' type="button" class="btn btn-danger entitat-trash"><i class="fa fa-trash"></i></button>';
+                            }
+                            string += '</div></div>';
+                            div.append(string);
+                        }
+
+                        $("select", div).select2({
+                            theme: "bootstrap",
+                            allowClear: true,
+                            minimumResultsForSearch: -1,
+                            placeholder: ""
+                        });
+
+                        $(".entitat-save").unbind("click").click(e =>  {
+                            let configKey = e.currentTarget.id.replace("_button_save", "");
+                            guardarPropietat(configKey);
+                        });
+
+                        $(".entitat-trash").unbind("click").click(e => {
+                            let configKey = e.currentTarget.id.replace("_button_trash", "");
+                            let elem = $("#" + configKey);
+                            if (elem.is(':checkbox')) {
+                                $(elem).prop("checked", false);
+                            } else if ($(elem).is("div") ) {
+                                removeValueRadio(elem);
+                            } else if ($(elem).is("select")) {
+                                let options = $("#" + elem[0].id + " option");
+                                console.log(options);
+                                // $("#" + elem[0].id + " option:selected").prop("selected", false);
+                                $(elem).empty();
+                                $(elem).append(options);
+                            } else {
+                                elem.val("");
+                            }
+                            guardarPropietat(configKey, true);
+                        });
+                    }
+                });
+            });
+        });
+            
 </script>
 <div class="text-right" data-toggle="botons-titol">
     <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
@@ -110,7 +303,6 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Tanca</button>
             </div>
         </div>
-
     </div>
 </div>
     <div class="row">

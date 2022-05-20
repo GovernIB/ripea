@@ -226,7 +226,7 @@ public class DocumentHelper {
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) && !documentEntity.isDocFromAnnex()) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
@@ -327,26 +327,30 @@ public class DocumentHelper {
 					metaDocumentId,
 					false,
 					comprovarMetaExpedient);
-		} else {
-			throw new ValidationException(
-					documentEntity.getId(),
-					DocumentEntity.class,
-					"No es pot actualitzar un document sense un meta-document associat");
-		}
+		} 
+//		else {
+//			throw new ValidationException(
+//					documentEntity.getId(),
+//					DocumentEntity.class,
+//					"No es pot actualitzar un document sense un meta-document associat");
+//		}
 		if (!isModificacioCustodiatsActiva() && (
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL))) {
+				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) && !documentEntity.isDocFromAnnex()) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
 					"No es pot actualitzar un document custodiat");
 		}
-		documentEntity.updateTipusDocument(
-				metaDocument,
-				metaDocument.getNtiOrigen(),
-				metaDocument.getNtiEstadoElaboracion(),
-				metaDocument.getNtiTipoDocumental());
+		if (metaDocument != null) {
+			documentEntity.updateTipusDocument(
+					metaDocument,
+					metaDocument.getNtiOrigen(),
+					metaDocument.getNtiEstadoElaboracion(),
+					metaDocument.getNtiTipoDocumental());
+		} 
+
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
 		// Registra al log la modificació del document
