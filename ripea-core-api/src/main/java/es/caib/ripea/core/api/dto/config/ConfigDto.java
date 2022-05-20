@@ -53,6 +53,6 @@ ConfigDto {
             return null;
         }
         String [] split = key.split(prefix);
-        return (prefix + "." + entitatCodi + split[1]).toLowerCase();
+        return (prefix + "." + entitatCodi + split[1]);
     }
 }

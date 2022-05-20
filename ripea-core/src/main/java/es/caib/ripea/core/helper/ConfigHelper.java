@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
+import es.caib.ripea.core.api.dto.config.ConfigResult;
 import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
@@ -23,7 +25,6 @@ import es.caib.ripea.core.entity.config.ConfigGroupEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.config.ConfigGroupRepository;
 import es.caib.ripea.core.repository.config.ConfigRepository;
-import es.caib.ripea.core.service.EntitatServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,6 +37,18 @@ public class ConfigHelper {
     private ConfigGroupRepository configGroupRepository;
     @Autowired
     private EntitatRepository entitatRepository;
+    
+    
+    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();    
+    
+    public static ThreadLocal<EntitatDto> getEntitat() {
+		return entitat;
+	}
+
+
+	public static void setEntitat(EntitatDto entitat) {
+		ConfigHelper.entitat.set(entitat);
+	}
     
     
     /** Mètode que revisa després d'iniciar Distribucio que totes les entitats tinguin una entrada
@@ -77,15 +90,92 @@ public class ConfigHelper {
 	    }
     }
     
-
+    
     @Transactional(readOnly = true)
-    public String getConfig(String key) throws NotDefinedConfigException {
-        ConfigEntity configEntity = configRepository.findOne(key);
-        if (configEntity == null) {
-            throw new NotDefinedConfigException(key);
-        }
-        return getConfig(configEntity);
+    public String getEntitatUsedPerConfig(String keyGeneral) throws NotDefinedConfigException {
+    	
+		EntitatDto entitatActual = ConfigHelper.entitat.get();			
+		return this.getConfig(entitatActual, keyGeneral).getConfigValue();
     }
+ 
+
+	@Transactional(readOnly = true)
+	public ConfigResult getConfig(EntitatDto entitatActual, String keyGeneral) {
+
+		String entitatActualCodi = entitatActual != null ? entitatActual.getCodi() : null;
+		logger.debug("Entitat actual per les propietats : " + entitatActualCodi);
+
+		String keyPerEntitat = convertirKeyGeneralToKeyPropietat(entitatActualCodi, keyGeneral);
+
+		ConfigEntity configPerEntitat = configRepository.findOne(keyPerEntitat);
+
+		if (configPerEntitat != null) {
+			String valueConfigPerEntitat = getConfig(configPerEntitat);
+			if (valueConfigPerEntitat != null) {
+				return new ConfigResult(valueConfigPerEntitat, entitatActualCodi);
+			} else {
+				ConfigEntity configGeneral = configRepository.findOne(keyGeneral);
+				String valueConfigGeneral = getConfig(configGeneral);
+				if (valueConfigGeneral != null) {
+					return new ConfigResult(valueConfigGeneral, null);
+				} else {
+					String valueEntitat = getJBossProperty(keyPerEntitat);
+					if (valueEntitat != null) {
+						return new ConfigResult(valueEntitat, entitatActualCodi);
+					} else {
+						return new ConfigResult(getJBossProperty(keyGeneral), entitatActualCodi);
+					}
+				}
+			}
+		} else {
+			String valueEntitat = getJBossProperty(keyPerEntitat);
+			if (valueEntitat != null) {
+				return new ConfigResult(valueEntitat,
+						entitatActual.getCodi());
+			} else {
+				return new ConfigResult(getJBossProperty(keyGeneral),
+						entitatActual.getCodi());
+			}
+		}
+	}
+    
+    @Transactional(readOnly = true)
+    public String getConfig(String keyGeneral)  {
+    	
+		EntitatDto entitatActual = ConfigHelper.entitat.get();			
+		return this.getConfig(entitatActual, keyGeneral).getCodiEntitat();
+		
+	}
+    
+	@Transactional(readOnly = true)
+	public String getEntitatActualCodi() {
+		EntitatDto entitatActual = ConfigHelper.entitat.get();
+		if (entitatActual != null) {
+			return entitatActual.getCodi();
+		} else {
+			return null;
+		}
+	}
+	
+	private String convertirKeyGeneralToKeyPropietat (String entitatActualCodi, String key) {
+		if (entitatActualCodi != null) {
+			String keyReplace = key.replace(".", "_");
+			String[] splitKey = keyReplace.split("_");
+			String keyEntitat = "";
+			for (int i=0; i<splitKey.length; i++) {
+				if (i == (splitKey.length - 1)) {
+					keyEntitat = keyEntitat + splitKey[i];
+				}else if (i == 2){
+					keyEntitat = keyEntitat + splitKey[i] + "." + entitatActualCodi + ".";
+				}else {				
+					keyEntitat = keyEntitat + splitKey[i] + ".";
+				}
+			}
+			key = keyEntitat;
+		}
+		return key;
+	}
+    
 
     @Transactional(readOnly = true)
     public Properties getGroupProperties(String codeGroup) {
@@ -288,11 +378,13 @@ public class ConfigHelper {
         ConfigEntity nova;
         List<ConfigEntity> confs = new ArrayList<>();
         for (ConfigEntity config : configs) {
-            dto.setKey(config.getKey());
-            String key = dto.crearEntitatKey();
-            nova = new ConfigEntity();
-            nova.crearConfigNova(key, codiEntitat, config);
-            confs.add(nova);
+        	if (config.isConfigurable()) {
+                dto.setKey(config.getKey());
+                String key = dto.crearEntitatKey();
+                nova = new ConfigEntity();
+                nova.crearConfigNova(key, codiEntitat, config);
+                confs.add(nova);
+			}
         }
         configRepository.save(confs);
     }

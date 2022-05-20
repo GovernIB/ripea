@@ -187,7 +187,8 @@ public class PluginHelper {
 	private ConversioPlugin conversioPlugin;
 	//private CiutadaPlugin ciutadaPlugin;
 	private DadesExternesPlugin dadesExternesPlugin;
-	private IArxiuPlugin arxiuPlugin;
+//	private IArxiuPlugin arxiuPlugin;
+	private Map<String, IArxiuPlugin> arxiuPlugins = new HashMap<>();
 	private IValidateSignaturePlugin validaSignaturaPlugin;
 	private NotificacioPlugin notificacioPlugin;
 	private GestioDocumentalPlugin gestioDocumentalPlugin;
@@ -5242,21 +5243,25 @@ public class PluginHelper {
 		return unitatsOrganitzativesPlugin;
 	}
 	public IArxiuPlugin getArxiuPlugin() {
+		String currentEntitatCodi = configHelper.getEntitatActualCodi();
+		
+		IArxiuPlugin arxiuPlugin = arxiuPlugins.get(currentEntitatCodi);
 		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
 			String pluginClass = getPropertyPluginArxiu();
+			String entitatCodiUsedPerProperty = getUsedEntitatPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class).newInstance(
-								"es.caib.ripea.");
+								"es.caib.ripea." + (entitatCodiUsedPerProperty != null ? (entitatCodiUsedPerProperty + ".") : ""));
 					} else {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class,
 								Properties.class).newInstance(
-								"es.caib.ripea.",
+								"es.caib.ripea." + (entitatCodiUsedPerProperty != null ? (entitatCodiUsedPerProperty + ".") : ""),
 								configHelper.findAll());
 					}
 				} catch (Exception ex) {
@@ -5270,9 +5275,13 @@ public class PluginHelper {
 						IntegracioHelper.INTCODI_ARXIU,
 						"No està configurada la classe per al plugin d'arxiu digital");
 			}
+			arxiuPlugins.put(currentEntitatCodi, arxiuPlugin);
 		}
 		return arxiuPlugin;
 	}
+	
+
+	
 	private PortafirmesPlugin getPortafirmesPlugin() {
 		loadPluginProperties("PORTAFIRMES");
 		if (portafirmesPlugin == null) {
@@ -5608,7 +5617,7 @@ public class PluginHelper {
 		digitalitzacioPlugin = null;
 		conversioPlugin = null;
 		dadesExternesPlugin = null;
-		arxiuPlugin = null;
+		arxiuPlugins = new HashMap<>();
 		validaSignaturaPlugin = null;
 		notificacioPlugin = null;
 		gestioDocumentalPlugin = null;
@@ -5627,6 +5636,10 @@ public class PluginHelper {
 	private String getPropertyPluginArxiu() {
 		return configHelper.getConfig("es.caib.ripea.plugin.arxiu.class");
 	}
+	private String getUsedEntitatPropertyPluginArxiu() {
+		return configHelper.getEntitatUsedPerConfig("es.caib.ripea.plugin.arxiu.class");
+	}
+	
 	private String getPropertyPluginPortafirmes() {
 		return configHelper.getConfig("es.caib.ripea.plugin.portafirmes.class");
 	}
@@ -5690,7 +5703,7 @@ public class PluginHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
 	}
 	public void setArxiuPlugin(IArxiuPlugin arxiuPlugin) {
-		this.arxiuPlugin = arxiuPlugin;
+		arxiuPlugins.put(null, arxiuPlugin);
 	}
 	
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
