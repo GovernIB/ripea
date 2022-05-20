@@ -5244,26 +5244,26 @@ public class PluginHelper {
 		return unitatsOrganitzativesPlugin;
 	}
 	public IArxiuPlugin getArxiuPlugin() {
-		String currentEntitatCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
 		
-		IArxiuPlugin arxiuPlugin = arxiuPlugins.get(currentEntitatCodi);
+		IArxiuPlugin arxiuPlugin = arxiuPlugins.get(entitatActualCodi);
 		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
 			ConfigResult configResult = getPropertyPluginArxiu();
 			String pluginClass = configResult.getConfigValue();
-			String entitatCodiUsedPerProperty = configResult.getCodiEntitat();
+			String codiEntitatUtilitzat = configResult.getCodiEntitatUtilitzat();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
 					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class).newInstance(
-								"es.caib.ripea." + (entitatCodiUsedPerProperty != null ? (entitatCodiUsedPerProperty + ".") : ""));
+								"es.caib.ripea." + (codiEntitatUtilitzat != null ? (codiEntitatUtilitzat + ".") : ""));
 					} else {
 						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 								String.class,
 								Properties.class).newInstance(
-								"es.caib.ripea." + (entitatCodiUsedPerProperty != null ? (entitatCodiUsedPerProperty + ".") : ""),
+								"es.caib.ripea." + (codiEntitatUtilitzat != null ? (codiEntitatUtilitzat + ".") : ""),
 								configHelper.findAll());
 					}
 				} catch (Exception ex) {
@@ -5277,7 +5277,7 @@ public class PluginHelper {
 						IntegracioHelper.INTCODI_ARXIU,
 						"No està configurada la classe per al plugin d'arxiu digital");
 			}
-			arxiuPlugins.put(currentEntitatCodi, arxiuPlugin);
+			arxiuPlugins.put(entitatActualCodi, arxiuPlugin);
 		}
 		return arxiuPlugin;
 	}

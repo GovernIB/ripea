@@ -7,13 +7,13 @@ import lombok.Data;
 @Data
 public class ConfigResult {
 
-    private String codiEntitat;
+    private String codiEntitatUtilitzat;
     private String configValue;
     
 	public ConfigResult(
-			String codiEntitat,
+			String codiEntitatUtilitzat,
 			String configValue) {
-		this.codiEntitat = codiEntitat;
+		this.codiEntitatUtilitzat = codiEntitatUtilitzat;
 		this.configValue = configValue;
 	}
     
