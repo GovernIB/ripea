@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.93</version>
+		<version>0.9.95</version>
 	</parent>
 	<artifactId>ripea-war</artifactId>
 	<packaging>war</packaging>
@@ -336,7 +336,9 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
+						<version>2.3</version>
 						<configuration>
 							<packagingExcludes>META-INF/context.xml</packagingExcludes>
 						</configuration>
@@ -395,6 +397,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.8</version>
 						<executions>
 							<execution>
 								<id>unpack dependencies</id>
