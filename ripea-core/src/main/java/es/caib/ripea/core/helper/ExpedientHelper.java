@@ -154,8 +154,12 @@ public class ExpedientHelper {
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
+	/**
+	 * 
+	 * This method is synchronized to avoid possibility of getting and using same sequence by concurrent threads
+	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public Long create(
+	public synchronized Long create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,

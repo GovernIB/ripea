@@ -92,7 +92,7 @@ public class MetaExpedientHelper {
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
     
-	public synchronized long obtenirProximaSequenciaExpedient(
+	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
 			boolean incrementar) {
