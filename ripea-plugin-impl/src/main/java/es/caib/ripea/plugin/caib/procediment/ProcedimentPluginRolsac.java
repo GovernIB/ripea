@@ -3,6 +3,7 @@ package es.caib.ripea.plugin.caib.procediment;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,21 +19,28 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de procediments emprant ROLSAC.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ProcedimentPluginRolsac implements ProcedimentPlugin {
+public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties implements ProcedimentPlugin {
 
 	private static Map<String, String> unitatsAdministratives = new HashMap<String, String>();
 	private Client jerseyClient;
 	private ObjectMapper mapper;
 
+	public ProcedimentPluginRolsac() {
+		super();
+	}
+	public ProcedimentPluginRolsac(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public ProcedimentDto findAmbCodiSia(
 			String codiDir3, 
@@ -180,21 +188,21 @@ public class ProcedimentPluginRolsac implements ProcedimentPlugin {
 	}
 
 	private String getServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.procediment.rolsac.service.url");
+		return getProperty(
+				"plugin.procediment.rolsac.service.url");
 	}
 	private String getServiceUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.procediment.rolsac.service.username");
+		return getProperty(
+				"plugin.procediment.rolsac.service.username");
 	}
 	private String getServicePassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.procediment.rolsac.service.password");
+		return getProperty(
+				"plugin.procediment.rolsac.service.password");
 	}
 	private Integer getServiceTimeout() {
-		String key = "es.caib.ripea.plugin.procediment.rolsac.service.timeout";
-		if (PropertiesHelper.getProperties().getProperty(key) != null) {
-			return PropertiesHelper.getProperties().getAsInt(key);
+		String key = "plugin.procediment.rolsac.service.timeout";
+		if (getProperty(key) != null) {
+			return getAsInt(key);
 		} else {
 			return null;
 		}

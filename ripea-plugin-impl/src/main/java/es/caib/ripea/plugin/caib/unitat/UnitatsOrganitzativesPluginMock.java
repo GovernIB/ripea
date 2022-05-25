@@ -6,7 +6,9 @@ package es.caib.ripea.plugin.caib.unitat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -20,12 +22,19 @@ import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class UnitatsOrganitzativesPluginMock implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
 
 	private static final String CODI_UNITAT_ARREL = "00000000T";
 	private static final String CODI_UNITAT_FILLA = "12345678Z";
 
 	private List<UnitatOrganitzativa> unitats;
+	
+	public UnitatsOrganitzativesPluginMock() {
+		super();
+	}
+	public UnitatsOrganitzativesPluginMock(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(

@@ -6,7 +6,9 @@ package es.caib.ripea.plugin.caib.portafirmes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
@@ -25,8 +27,16 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class PortafirmesPluginMock implements PortafirmesPlugin {
+public class PortafirmesPluginMock extends RipeaAbstractPluginProperties implements PortafirmesPlugin {
 
+	
+	public PortafirmesPluginMock() {
+		super();
+	}
+	public PortafirmesPluginMock(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public String upload(
 			PortafirmesDocument document,

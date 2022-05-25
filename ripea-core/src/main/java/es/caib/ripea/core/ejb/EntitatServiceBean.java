@@ -160,4 +160,10 @@ public class EntitatServiceBean implements EntitatService {
 		return delegate.findAll();
 	}
 
+	@Override
+	@RolesAllowed("IPA_SUPER")
+	public void setConfigEntitat(EntitatDto entitatDto) {
+		delegate.setConfigEntitat(entitatDto);		
+	}
+	
 }

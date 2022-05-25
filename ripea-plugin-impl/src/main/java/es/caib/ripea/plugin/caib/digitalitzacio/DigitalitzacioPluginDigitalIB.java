@@ -6,6 +6,7 @@ package es.caib.ripea.plugin.caib.digitalitzacio;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.fundaciobit.apisib.apiscanwebsimple.v1.ApiScanWebSimple;
 import org.fundaciobit.apisib.apiscanwebsimple.v1.beans.ScanWebSimpleAvailableProfile;
@@ -21,13 +22,13 @@ import org.fundaciobit.apisib.apiscanwebsimple.v1.jersey.ApiScanWebSimpleJersey;
 import org.slf4j.LoggerFactory;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioEstat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPerfil;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de portafirmes emprant el portafirmes
@@ -35,9 +36,16 @@ import es.caib.ripea.plugin.PropertiesHelper;
  *
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DigitalitzacioPluginDigitalIB implements DigitalitzacioPlugin {
+public class DigitalitzacioPluginDigitalIB extends RipeaAbstractPluginProperties implements DigitalitzacioPlugin {
 
 
+	public DigitalitzacioPluginDigitalIB() {
+		super();
+	}
+	public DigitalitzacioPluginDigitalIB(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public List<DigitalitzacioPerfil> recuperarPerfilsDisponibles(String idioma) throws SistemaExternException {
 		List<DigitalitzacioPerfil> perfilsDisponibles = new ArrayList<DigitalitzacioPerfil>();
@@ -321,20 +329,20 @@ public class DigitalitzacioPluginDigitalIB implements DigitalitzacioPlugin {
 	}
 
 	private String getBaseUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.digitalitzacio.digitalib.base.url");
+		return getProperty(
+				"plugin.digitalitzacio.digitalib.base.url");
 	}
 	private String getUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.digitalitzacio.digitalib.username");
+		return getProperty(
+				"plugin.digitalitzacio.digitalib.username");
 	}
 	private String getPassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.digitalitzacio.digitalib.password");
+		return getProperty(
+				"plugin.digitalitzacio.digitalib.password");
 	}
 	private String getPerfil() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.digitalitzacio.digitalib.perfil");
+		return getProperty(
+				"plugin.digitalitzacio.digitalib.perfil");
 	}
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DigitalitzacioPluginDigitalIB.class);

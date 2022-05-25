@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -19,8 +21,16 @@ import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class UnitatsOrganitzativesPluginCaibMock implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesPluginCaibMock extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
 
+	
+	public UnitatsOrganitzativesPluginCaibMock() {
+		super();
+	}
+	public UnitatsOrganitzativesPluginCaibMock(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(

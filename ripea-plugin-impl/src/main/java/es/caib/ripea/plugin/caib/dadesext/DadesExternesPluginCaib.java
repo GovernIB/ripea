@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
 import es.caib.ripea.plugin.dadesext.DadesExternesPlugin;
@@ -22,7 +24,6 @@ import es.caib.ripea.plugin.dadesext.NivellAdministracio;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.plugin.dadesext.TipusVia;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de dades externes que consulta la
@@ -30,9 +31,14 @@ import es.caib.ripea.plugin.PropertiesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DadesExternesPluginCaib implements DadesExternesPlugin {
+public class DadesExternesPluginCaib extends RipeaAbstractPluginProperties implements DadesExternesPlugin {
 
-
+	public DadesExternesPluginCaib() {
+		super();
+	}
+	public DadesExternesPluginCaib(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 	@Override
 	public List<Pais> paisFindAll() throws SistemaExternException {
 		String url = getBaseUrl() + "/services/paisos/format/JSON/idioma/ca";
@@ -296,8 +302,8 @@ public class DadesExternesPluginCaib implements DadesExternesPlugin {
 	}
 
 	private String getBaseUrl() {
-		String baseUrl = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dadesext.service.url");
+		String baseUrl = getProperty(
+				"plugin.dadesext.service.url");
 		if (baseUrl != null && baseUrl.length() > 0) {
 			return baseUrl;
 		} else {

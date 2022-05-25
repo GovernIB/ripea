@@ -97,7 +97,6 @@ import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
-import es.caib.ripea.core.api.dto.config.ConfigResult;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -181,21 +180,20 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu  
 	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating document that haven't been saved in arxiu
 
+	
 	private DadesUsuariPlugin dadesUsuariPlugin;
-	private UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin;
-	private PortafirmesPlugin portafirmesPlugin;
-	private DigitalitzacioPlugin digitalitzacioPlugin;
-	private ConversioPlugin conversioPlugin;
-	//private CiutadaPlugin ciutadaPlugin;
-	private DadesExternesPlugin dadesExternesPlugin;
-//	private IArxiuPlugin arxiuPlugin;
+	private Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugins = new HashMap<>();
+	private Map<String, PortafirmesPlugin> portafirmesPlugins = new HashMap<>();
+	private Map<String, DigitalitzacioPlugin> digitalitzacioPlugins = new HashMap<>();
+	private Map<String, ConversioPlugin> conversioPlugins = new HashMap<>();
+	private Map<String, DadesExternesPlugin> dadesExternesPlugins = new HashMap<>();
 	private Map<String, IArxiuPlugin> arxiuPlugins = new HashMap<>();
-	private IValidateSignaturePlugin validaSignaturaPlugin;
-	private NotificacioPlugin notificacioPlugin;
-	private GestioDocumentalPlugin gestioDocumentalPlugin;
-	private FirmaServidorPlugin firmaServidorPlugin;
-	private ViaFirmaPlugin viaFirmaPlugin;
-	private ProcedimentPlugin procedimentPlugin;
+	private Map<String, IValidateSignaturePlugin> validaSignaturaPlugins = new HashMap<>();
+	private Map<String, NotificacioPlugin> notificacioPlugins = new HashMap<>();
+	private Map<String, GestioDocumentalPlugin> gestioDocumentalPlugins = new HashMap<>();
+	private Map<String, FirmaServidorPlugin> firmaServidorPlugins = new HashMap<>();
+	private Map<String, ViaFirmaPlugin> viaFirmaPlugins = new HashMap<>();
+	private Map<String, ProcedimentPlugin> procedimentPlugins = new HashMap<>();
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -5206,7 +5204,11 @@ public class PluginHelper {
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					dadesUsuariPlugin = (DadesUsuariPlugin)clazz.newInstance();
+					dadesUsuariPlugin = (DadesUsuariPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_USUARIS,
@@ -5222,13 +5224,20 @@ public class PluginHelper {
 		return dadesUsuariPlugin;
 	}
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugins.get(entitatActualCodi);
 		loadPluginProperties("ORGANISMES");
 		if (unitatsOrganitzativesPlugin == null) {
 			String pluginClass = getPropertyPluginUnitatsOrganitzatives();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.newInstance();
+					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							PropertiesHelper.getProperties());
+					unitatsOrganitzativesPlugins.put(entitatActualCodi, unitatsOrganitzativesPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_UNITATS,
@@ -5243,29 +5252,23 @@ public class PluginHelper {
 		}
 		return unitatsOrganitzativesPlugin;
 	}
+	
+	
 	public IArxiuPlugin getArxiuPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
-		
 		IArxiuPlugin arxiuPlugin = arxiuPlugins.get(entitatActualCodi);
 		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
-			ConfigResult configResult = getPropertyPluginArxiu();
-			String pluginClass = configResult.getConfigValue();
-			String codiEntitatUtilitzat = configResult.getCodiEntitatUtilitzat();
+			String pluginClass = getPropertyPluginArxiu();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
-						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-								String.class).newInstance(
-								"es.caib.ripea." + (codiEntitatUtilitzat != null ? (codiEntitatUtilitzat + ".") : ""));
-					} else {
-						arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
-								String.class,
-								Properties.class).newInstance(
-								"es.caib.ripea." + (codiEntitatUtilitzat != null ? (codiEntitatUtilitzat + ".") : ""),
-								configHelper.findAll());
-					}
+					arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							PropertiesHelper.getProperties());
+					arxiuPlugins.put(entitatActualCodi, arxiuPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_ARXIU,
@@ -5277,7 +5280,6 @@ public class PluginHelper {
 						IntegracioHelper.INTCODI_ARXIU,
 						"No està configurada la classe per al plugin d'arxiu digital");
 			}
-			arxiuPlugins.put(entitatActualCodi, arxiuPlugin);
 		}
 		return arxiuPlugin;
 	}
@@ -5285,13 +5287,20 @@ public class PluginHelper {
 
 	
 	private PortafirmesPlugin getPortafirmesPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		PortafirmesPlugin portafirmesPlugin = portafirmesPlugins.get(entitatActualCodi);
 		loadPluginProperties("PORTAFIRMES");
 		if (portafirmesPlugin == null) {
 			String pluginClass = getPropertyPluginPortafirmes();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					portafirmesPlugin = (PortafirmesPlugin)clazz.newInstance();
+					portafirmesPlugin = (PortafirmesPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							PropertiesHelper.getProperties());
+					portafirmesPlugins.put(entitatActualCodi, portafirmesPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_PFIRMA,
@@ -5306,14 +5315,22 @@ public class PluginHelper {
 		}
 		return portafirmesPlugin;
 	}
+	
 	private ConversioPlugin getConversioPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		ConversioPlugin conversioPlugin = conversioPlugins.get(entitatActualCodi);
 		loadPluginProperties("CONVERSIO");
 		if (conversioPlugin == null) {
 			String pluginClass = getPropertyPluginConversio();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					conversioPlugin = (ConversioPlugin)clazz.newInstance();
+					conversioPlugin = (ConversioPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							PropertiesHelper.getProperties());
+					conversioPlugins.put(entitatActualCodi, conversioPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_CONVERT,
@@ -5329,13 +5346,20 @@ public class PluginHelper {
 		return conversioPlugin;
 	}
 	private DigitalitzacioPlugin getDigitalitzacioPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		DigitalitzacioPlugin digitalitzacioPlugin = digitalitzacioPlugins.get(entitatActualCodi);
 		loadPluginProperties("DIGITALITZACIO");
 		if (digitalitzacioPlugin == null) {
 			String pluginClass = getPropertyPluginDigitalitzacio();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					digitalitzacioPlugin = (DigitalitzacioPlugin)clazz.newInstance();
+					digitalitzacioPlugin = (DigitalitzacioPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							PropertiesHelper.getProperties());
+					digitalitzacioPlugins.put(entitatActualCodi, digitalitzacioPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_DIGITALITZACIO,
@@ -5422,13 +5446,20 @@ public class PluginHelper {
 	}
 
 	private DadesExternesPlugin getDadesExternesPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		DadesExternesPlugin dadesExternesPlugin = dadesExternesPlugins.get(entitatActualCodi);
 		loadPluginProperties("DADES_EXT");
 		if (dadesExternesPlugin == null) {
 			String pluginClass = getPropertyPluginDadesExternes();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					dadesExternesPlugin = (DadesExternesPlugin)clazz.newInstance();
+					dadesExternesPlugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							PropertiesHelper.getProperties());
+					dadesExternesPlugins.put(entitatActualCodi, dadesExternesPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_CIUTADA,
@@ -5444,23 +5475,20 @@ public class PluginHelper {
 		return dadesExternesPlugin;
 	}
 	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		IValidateSignaturePlugin validaSignaturaPlugin = validaSignaturaPlugins.get(entitatActualCodi);
 		loadPluginProperties("VALIDATE_SIGNATURE");
 		if (validaSignaturaPlugin == null) {
 			String pluginClass = getPropertyPluginValidaSignatura();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					if (ConfigHelper.JBossPropertiesHelper.getProperties().isLlegirSystem()) {
-						validaSignaturaPlugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(
-								String.class).newInstance(
-								"es.caib.ripea.");
-					} else {
-						validaSignaturaPlugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(
-								String.class,
-								Properties.class).newInstance(
-								"es.caib.ripea.",
-								configHelper.findAll());
-					}
+					validaSignaturaPlugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
+					validaSignaturaPlugins.put(entitatActualCodi, validaSignaturaPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_VALIDASIG,
@@ -5474,13 +5502,20 @@ public class PluginHelper {
 		return validaSignaturaPlugin;
 	}
 	private NotificacioPlugin getNotificacioPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		NotificacioPlugin notificacioPlugin = notificacioPlugins.get(entitatActualCodi);
 		loadPluginProperties("NOTIB");
 		if (notificacioPlugin == null) {
 			String pluginClass = getPropertyPluginNotificacio();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					notificacioPlugin = (NotificacioPlugin)clazz.newInstance();
+					notificacioPlugin = (NotificacioPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
+					notificacioPlugins.put(entitatActualCodi, notificacioPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_NOTIFICACIO,
@@ -5495,14 +5530,22 @@ public class PluginHelper {
 		}
 		return notificacioPlugin;
 	}
+	
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		FirmaServidorPlugin firmaServidorPlugin = firmaServidorPlugins.get(entitatActualCodi);
 		loadPluginProperties("FIRMA_SERVIDOR");
 		if (firmaServidorPlugin == null) {
 			String pluginClass = getPropertyPluginFirmaServidor();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					firmaServidorPlugin = (FirmaServidorPlugin)clazz.newInstance();
+					firmaServidorPlugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
+					firmaServidorPlugins.put(entitatActualCodi, firmaServidorPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_FIRMASERV,
@@ -5518,6 +5561,8 @@ public class PluginHelper {
 		return firmaServidorPlugin;
 	}
 	private ViaFirmaPlugin getViaFirmaPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		ViaFirmaPlugin viaFirmaPlugin = viaFirmaPlugins.get(entitatActualCodi);
 		loadPluginProperties("FIRMA_VIAFIRMA");
 		boolean viaFirmaPluginConfiguracioProvada = false;
 		
@@ -5527,7 +5572,12 @@ public class PluginHelper {
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					viaFirmaPlugin = (ViaFirmaPlugin)clazz.newInstance();
+					viaFirmaPlugin = (ViaFirmaPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
+					viaFirmaPlugins.put(entitatActualCodi, viaFirmaPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_VIAFIRMA,
@@ -5545,13 +5595,20 @@ public class PluginHelper {
 	
 	
 	private ProcedimentPlugin getProcedimentPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		ProcedimentPlugin procedimentPlugin = procedimentPlugins.get(entitatActualCodi);
 		loadPluginProperties("GESCONADM");
 		if (procedimentPlugin == null) {
 			String pluginClass = getPropertyPluginProcediment();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					procedimentPlugin = (ProcedimentPlugin)clazz.newInstance();
+					procedimentPlugin = (ProcedimentPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
+					procedimentPlugins.put(entitatActualCodi, procedimentPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_PROCEDIMENT,
@@ -5568,13 +5625,20 @@ public class PluginHelper {
 	}
 
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
+		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		GestioDocumentalPlugin gestioDocumentalPlugin = gestioDocumentalPlugins.get(entitatActualCodi);
 		loadPluginProperties("GES_DOC");
 		if (gestioDocumentalPlugin == null) {
 			String pluginClass = getPropertyPluginGestioDocumental();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
 					Class<?> clazz = Class.forName(pluginClass);
-					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.newInstance();
+					gestioDocumentalPlugin = (GestioDocumentalPlugin)clazz.getDeclaredConstructor(
+							String.class,
+							Properties.class).newInstance(
+							"es.caib.ripea.",
+							PropertiesHelper.getProperties());
+					gestioDocumentalPlugins.put(entitatActualCodi, gestioDocumentalPlugin);
 				} catch (Exception ex) {
 					throw new SistemaExternException(
 							IntegracioHelper.INTCODI_GESDOC,
@@ -5614,18 +5678,18 @@ public class PluginHelper {
 
 	public void resetPlugins() {
 		dadesUsuariPlugin = null;
-		unitatsOrganitzativesPlugin = null;
-		portafirmesPlugin = null;
-		digitalitzacioPlugin = null;
-		conversioPlugin = null;
-		dadesExternesPlugin = null;
+		unitatsOrganitzativesPlugins = new HashMap<>();
+		portafirmesPlugins  = new HashMap<>();
+		digitalitzacioPlugins  = new HashMap<>();
+		conversioPlugins  = new HashMap<>();
+		dadesExternesPlugins  = new HashMap<>();
 		arxiuPlugins = new HashMap<>();
-		validaSignaturaPlugin = null;
-		notificacioPlugin = null;
-		gestioDocumentalPlugin = null;
-		firmaServidorPlugin = null;
-		viaFirmaPlugin = null;
-		procedimentPlugin = null;
+		validaSignaturaPlugins  = new HashMap<>();
+		notificacioPlugins  = new HashMap<>();
+		gestioDocumentalPlugins  = new HashMap<>();
+		firmaServidorPlugins  = new HashMap<>();
+		viaFirmaPlugins  = new HashMap<>();
+		procedimentPlugins  = new HashMap<>();
 	}
 
 
@@ -5635,8 +5699,8 @@ public class PluginHelper {
 	private String getPropertyPluginUnitatsOrganitzatives() {
 		return configHelper.getConfig("es.caib.ripea.plugin.unitats.organitzatives.class");
 	}
-	private ConfigResult getPropertyPluginArxiu() {
-		return configHelper.getConfigIEntitatCodi("es.caib.ripea.plugin.arxiu.class");
+	private String getPropertyPluginArxiu() {
+		return configHelper.getConfig("es.caib.ripea.plugin.arxiu.class");
 	}
 	private String getPropertyPluginPortafirmes() {
 		return configHelper.getConfig("es.caib.ripea.plugin.portafirmes.class");
@@ -5705,11 +5769,11 @@ public class PluginHelper {
 	}
 	
 	public void setUnitatsOrganitzativesPlugin(UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin) {
-		this.unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugin;
+		unitatsOrganitzativesPlugins.put(null, unitatsOrganitzativesPlugin);
 	}
 
 	public void setPortafirmesPlugin(PortafirmesPlugin portafirmesPlugin) {
-		this.portafirmesPlugin = portafirmesPlugin;
+		portafirmesPlugins.put(null, portafirmesPlugin);
 	}
 
 	public void setDadesUsuariPlugin(DadesUsuariPlugin dadesUsuariPlugin) {

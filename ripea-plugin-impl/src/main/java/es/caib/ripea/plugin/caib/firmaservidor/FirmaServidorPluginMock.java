@@ -4,12 +4,14 @@
 package es.caib.ripea.plugin.caib.firmaservidor;
 
 import java.io.IOException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.io.IOUtils;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 
@@ -18,8 +20,14 @@ import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class FirmaServidorPluginMock implements FirmaServidorPlugin {
+public class FirmaServidorPluginMock extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
 
+	public FirmaServidorPluginMock() {
+		super();
+	}
+	public FirmaServidorPluginMock(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 	@Override
 	public SignaturaResposta firmar(
 			String nom,

@@ -41,7 +41,7 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
         
     	EntitatDto entitatDto = EntitatHelper.getEntitatActual(request);
 		if (entitatDto != null) {
-			ConfigHelper.setEntitat(entitatDto);
+			entitatService.setConfigEntitat(entitatDto);
 		}		
         
         return true;

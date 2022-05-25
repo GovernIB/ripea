@@ -6,6 +6,7 @@ package es.caib.ripea.plugin.caib.viafirma;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -26,8 +27,8 @@ import com.viafirma.documents.sdk.java.model.Signature;
 import com.viafirma.documents.sdk.java.model.Signature.CertificationLevelEnum;
 import com.viafirma.documents.sdk.java.model.Workflow;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.viafirma.OAuthType;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
@@ -41,8 +42,16 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
+public class ViaFirmaPluginImpl extends RipeaAbstractPluginProperties implements ViaFirmaPlugin {
 
+	
+	public ViaFirmaPluginImpl() {
+		super();
+	}
+	public ViaFirmaPluginImpl(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public ViaFirmaResponse uploadDocument(ViaFirmaParams parametresViaFirma) throws SistemaExternException {
 		String errorDescripcio = "No s'ha pogut enviar el document a viaFirma";
@@ -269,56 +278,56 @@ public class ViaFirmaPluginImpl implements ViaFirmaPlugin {
         return callbackAuthorization;
 	}
 	private String getApiUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.apiurl");
+		return getProperty(
+				"plugin.viafirma.caib.apiurl");
 	}
 	private String getConsumerKey() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.consumerkey");
+		return getProperty(
+				"plugin.viafirma.caib.consumerkey");
 	}
 	private String getConsumerSecret() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.consumersecret");
+		return getProperty(
+				"plugin.viafirma.caib.consumersecret");
 	}
 	private String getAuthMode() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.authmode");
+		return getProperty(
+				"plugin.viafirma.caib.authmode");
 	}
 	private OAuthType getAuthenticationType() {
-		String authenticationType = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.authtype");
+		String authenticationType = getProperty(
+				"plugin.viafirma.caib.authtype");
 		return OAuthType.valueOf(authenticationType);
 	}
 	private String getCallBackUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.callback.url");
+		return getProperty(
+				"plugin.viafirma.caib.callback.url");
 	}
 	private String getCallBackUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.callback.username");
+		return getProperty(
+				"plugin.viafirma.caib.callback.username");
 	}
 	private String getCallBackPassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.callback.password");
+		return getProperty(
+				"plugin.viafirma.caib.callback.password");
 	}
 	private String getGroupCodi() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.group.codi");
+		return getProperty(
+				"plugin.viafirma.caib.group.codi");
 	}
 	private String getProxyHost() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.proxy.host");
+		return getProperty(
+				"plugin.viafirma.caib.proxy.host");
 	}
 	private String getAppCodi() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.app.codi");
+		return getProperty(
+				"plugin.viafirma.caib.app.codi");
 	}
 	private int getProxyPort() {
-		String proxyPort = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.proxy.port");
+		String proxyPort = getProperty(
+				"plugin.viafirma.caib.proxy.port");
 		if (proxyPort != null) {
-			return Integer.valueOf(PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.viafirma.caib.proxy.port"));
+			return Integer.valueOf(getProperty(
+				"plugin.viafirma.caib.proxy.port"));
 		} else {
 			return 0;
 		}

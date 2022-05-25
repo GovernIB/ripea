@@ -396,6 +396,12 @@ public class EntitatServiceImpl implements EntitatService {
 				EntitatEntity.class,
 				permisId);
 	}
+	
+	
+	@Override
+	public void setConfigEntitat(EntitatDto entitatDto) {
+		ConfigHelper.setEntitat(entitatDto);		
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);
 

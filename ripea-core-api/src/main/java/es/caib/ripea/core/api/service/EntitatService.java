@@ -218,4 +218,13 @@ public interface EntitatService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN')")
 	List<EntitatDto> findAll();
 
+	/**
+	 * Afegeix l'entitat que està activada a l'aplicació per poder accedir a les 
+	 * seves propietats
+	 * 
+	 * @param entitatDto
+	 *            Atribut entitatDto
+	 */
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void setConfigEntitat(EntitatDto entitatDto);
 }

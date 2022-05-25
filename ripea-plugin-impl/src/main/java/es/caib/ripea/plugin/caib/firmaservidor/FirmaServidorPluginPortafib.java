@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.UUID;
 
-import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import org.apache.commons.io.FileUtils;
 import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
@@ -24,32 +23,37 @@ import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.fundaciobit.plugins.signatureserver.api.ISignatureServerPlugin;
 import org.fundaciobit.plugins.signatureserver.portafib.PortaFIBSignatureServerPlugin;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 
 /**
  * Implementació del plugin de firma en servidor emprant PortaFIB.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
+public class FirmaServidorPluginPortafib extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
 
-	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.firmaservidor.portafib.";
 	private static final String FIRMASERVIDOR_TMPDIR = "avacat_firmaservidor";
 
 	private ISignatureServerPlugin plugin;
 	private String tempDirPath;
-
+	
 	public FirmaServidorPluginPortafib() {
 		super();
-		Properties prop = PropertiesHelper.getProperties();
-		plugin = new PortaFIBSignatureServerPlugin(PROPERTIES_BASE, prop);
+	}
+	
+	public FirmaServidorPluginPortafib(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+		plugin = new PortaFIBSignatureServerPlugin(propertyKeyBase + "plugin.firmaservidor.portafib.", properties);
 		String tempDir = System.getProperty("java.io.tmpdir");
 		final File base = new File(tempDir, FIRMASERVIDOR_TMPDIR);
 		base.mkdirs();
 		tempDirPath = base.getAbsolutePath();
 	}
+
+
 
 	@Override
 	public SignaturaResposta firmar(
@@ -116,7 +120,7 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 			boolean userRequiresTimeStamp) throws Exception, FileNotFoundException, IOException {
 		// Informació comú per a totes les signatures
 		String filtreCertificats = "";
-		String username = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username", null);
+		String username = getProperty("plugin.firmaservidor.portafib.username", null);
 		String administrationID = null; // No te sentit en API Firma En Servidor
 		PolicyInfoSignature policyInfoSignature = null;
 		CommonInfoSignature commonInfoSignature = new CommonInfoSignature(
@@ -127,9 +131,9 @@ public class FirmaServidorPluginPortafib implements FirmaServidorPlugin {
 				policyInfoSignature);
 		File source = new File(sourcePath);
 		String fileName = source.getName();
-		String location = PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
-		String signerEmail = PropertiesHelper.getProperties().getProperty(
-				PROPERTIES_BASE + "signerEmail",
+		String location = getProperty("plugin.firmaservidor.portafib.location", "Palma");
+		String signerEmail = getProperty(
+				"plugin.firmaservidor.portafib.signerEmail",
 				"suport@caib.es");
 		int signNumber = 1;
 		String signAlgorithm = FileInfoSignature.SIGN_ALGORITHM_SHA1;

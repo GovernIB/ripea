@@ -91,12 +91,7 @@ public class ConfigHelper {
     }
     
     
-    @Transactional(readOnly = true)
-    public String getEntitatUsedPerConfig(String keyGeneral) throws NotDefinedConfigException {
-    	
-		EntitatDto entitatActual = ConfigHelper.entitat.get();			
-		return this.getConfig(entitatActual, keyGeneral).getConfigValue();
-    }
+
  
 
 	@Transactional(readOnly = true)
@@ -136,7 +131,7 @@ public class ConfigHelper {
 			}
 		}
 	}
-    
+
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral)  {
     	
@@ -195,7 +190,7 @@ public class ConfigHelper {
             return;
         }
         for (ConfigEntity config : configGroup.getConfigs()) {
-			String conf = getConfig(config);
+			String conf = getConfigGeneralIfConfigEntitatNull(config);
 			if (conf != null) {
 				outProperties.put(config.getKey(), conf);
 			} else {
@@ -208,20 +203,6 @@ public class ConfigHelper {
                 fillGroupProperties(child, outProperties);
             }
         }
-    }
-
-    public Properties findAll() {
-        Properties properties = new Properties();
-        List<ConfigEntity> configEntities = configRepository.findAll();
-        for (ConfigEntity configEntity: configEntities) {
-        	String conf = getConfig(configEntity);
-			if (conf != null) {
-				properties.put(configEntity.getKey(), conf);
-			} else {
-				log.debug("Configuration: " + configEntity.getKey() + " es null");
-			}
-        }
-        return properties;
     }
 
     public boolean getAsBoolean(String key) {
@@ -251,11 +232,45 @@ public class ConfigHelper {
         }
         return configEntity.getValue();
     }
+    
+    private String getConfigGeneralIfConfigEntitatNull(ConfigEntity configEntity) throws NotDefinedConfigException {
+    	
+		if (configEntity.getEntitatCodi() == null) {
+			return getConfig(configEntity);
+		} else {
+			String value = getConfig(configEntity);
+			if (value != null) {
+				return value;
+			} else {
+				ConfigEntity conf = findGeneralConfigForEntitatConfig(configEntity);
+				if (conf != null) {
+					return getConfig(conf);
+				} else {
+					return null;
+				}
+				
+			}
+		}
+    }
+    
+    private ConfigEntity findGeneralConfigForEntitatConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
+		String generalKey = configEntity.getKey().replace(configEntity.getEntitatCodi() + ".", "");
+		return configRepository.findOne(generalKey);
+    }
+    
 
+    /**
+     * 
+     * This class is used to take properties value from properties file
+     * Name of the class is incorrect, should be sth like FilePropertiesHelper
+     * In Tomcat we take properties manually from tomcat properties file specified in APPSERV_PROPS_PATH (ripea.properties)
+     * In Jboss properties are loaded to System automatically from jboss properties (jboss-service.xml)
+     *
+     */
     @Slf4j
     public static class JBossPropertiesHelper extends Properties {
 
-        private static final String APPSERV_PROPS_PATH = "es.caib.ripea.properties.path";
+        private static final String APPSERV_PROPS_PATH = "es.caib.ripea.properties.path"; //in jboss is null
 
         private static JBossPropertiesHelper instance = null;
 
@@ -267,12 +282,12 @@ public class ConfigHelper {
         public static JBossPropertiesHelper getProperties(String path) {
             String propertiesPath = path;
             if (propertiesPath == null) {
-                propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
+                propertiesPath = System.getProperty(APPSERV_PROPS_PATH); 
             }
             if (instance == null) {
                 instance = new JBossPropertiesHelper();
                 if (propertiesPath != null) {
-                    instance.llegirSystem = false;
+                    instance.llegirSystem = false; //in jboss we don't enter here
                     log.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
                     try {
                         if (propertiesPath.startsWith("classpath:")) {
@@ -297,9 +312,9 @@ public class ConfigHelper {
 
         public String getProperty(String key) {
             if (llegirSystem)
-                return System.getProperty(key);
+                return System.getProperty(key); //jboss
             else
-                return super.getProperty(key);
+                return super.getProperty(key); //tomcat
         }
         public String getProperty(String key, String defaultValue) {
             String val = getProperty(key);
