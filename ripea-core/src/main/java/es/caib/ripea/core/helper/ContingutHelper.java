@@ -1273,6 +1273,11 @@ public class ContingutHelper {
 			List<ArxiuFirmaDto> firmes, 
 			boolean fromAnotacio) {
 		
+		boolean throwExcepcion = false;//throwExcepcion = true;
+		if (throwExcepcion) {
+			throw new RuntimeException("Mock Excepcion al actualitzar contingut en arxiu");
+		}
+		
 		boolean utilitzarCarpetes = fromAnotacio || !isCarpetaLogica();
 		
 		String serieDocumental = null;

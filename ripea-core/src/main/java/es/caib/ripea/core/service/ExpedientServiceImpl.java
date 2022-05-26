@@ -243,7 +243,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"Expedient creat Service Middle(" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " " + expedient.getMetaExpedient().getCodi() + ")");
+						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 		ExpedientDto expedientDto = toExpedientDto(expedient, true, null, false);
 		
 		// if expedient comes from distribucio
@@ -300,7 +300,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				"Expedient creat Service End(" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " " + expedient.getMetaExpedient().getCodi() + ")");
+						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 		
 		return expedientDto;
 	}

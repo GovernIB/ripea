@@ -290,7 +290,7 @@ public class ExpedientHelper {
 				"Expedient creat Helper (" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " " + expedient.getMetaExpedient().getCodi() + ")");
+						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 		
 		return expedient.getId();
 	}
