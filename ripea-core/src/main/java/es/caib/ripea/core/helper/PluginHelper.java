@@ -5225,6 +5225,9 @@ public class PluginHelper {
 	}
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugins.get(entitatActualCodi);
 		loadPluginProperties("ORGANISMES");
 		if (unitatsOrganitzativesPlugin == null) {
@@ -5235,7 +5238,7 @@ public class PluginHelper {
 					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							"es.caib.ripea." + entitatActualCodi,
 							PropertiesHelper.getProperties());
 					unitatsOrganitzativesPlugins.put(entitatActualCodi, unitatsOrganitzativesPlugin);
 				} catch (Exception ex) {
@@ -5256,6 +5259,9 @@ public class PluginHelper {
 	
 	public IArxiuPlugin getArxiuPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		IArxiuPlugin arxiuPlugin = arxiuPlugins.get(entitatActualCodi);
 		loadPluginProperties("ARXIU");
 		if (arxiuPlugin == null) {
@@ -5266,7 +5272,7 @@ public class PluginHelper {
 					arxiuPlugin = (IArxiuPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							"es.caib.ripea." + entitatActualCodi,
 							PropertiesHelper.getProperties());
 					arxiuPlugins.put(entitatActualCodi, arxiuPlugin);
 				} catch (Exception ex) {
@@ -5288,6 +5294,9 @@ public class PluginHelper {
 	
 	private PortafirmesPlugin getPortafirmesPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		PortafirmesPlugin portafirmesPlugin = portafirmesPlugins.get(entitatActualCodi);
 		loadPluginProperties("PORTAFIRMES");
 		if (portafirmesPlugin == null) {
@@ -5298,7 +5307,7 @@ public class PluginHelper {
 					portafirmesPlugin = (PortafirmesPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							"es.caib.ripea." + entitatActualCodi,
 							PropertiesHelper.getProperties());
 					portafirmesPlugins.put(entitatActualCodi, portafirmesPlugin);
 				} catch (Exception ex) {
@@ -5318,6 +5327,9 @@ public class PluginHelper {
 	
 	private ConversioPlugin getConversioPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		ConversioPlugin conversioPlugin = conversioPlugins.get(entitatActualCodi);
 		loadPluginProperties("CONVERSIO");
 		if (conversioPlugin == null) {
@@ -5328,7 +5340,7 @@ public class PluginHelper {
 					conversioPlugin = (ConversioPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							"es.caib.ripea." + entitatActualCodi,
 							PropertiesHelper.getProperties());
 					conversioPlugins.put(entitatActualCodi, conversioPlugin);
 				} catch (Exception ex) {
@@ -5347,6 +5359,9 @@ public class PluginHelper {
 	}
 	private DigitalitzacioPlugin getDigitalitzacioPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		DigitalitzacioPlugin digitalitzacioPlugin = digitalitzacioPlugins.get(entitatActualCodi);
 		loadPluginProperties("DIGITALITZACIO");
 		if (digitalitzacioPlugin == null) {
@@ -5357,7 +5372,7 @@ public class PluginHelper {
 					digitalitzacioPlugin = (DigitalitzacioPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							"es.caib.ripea." + entitatActualCodi,
 							PropertiesHelper.getProperties());
 					digitalitzacioPlugins.put(entitatActualCodi, digitalitzacioPlugin);
 				} catch (Exception ex) {
@@ -5447,6 +5462,9 @@ public class PluginHelper {
 
 	private DadesExternesPlugin getDadesExternesPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		DadesExternesPlugin dadesExternesPlugin = dadesExternesPlugins.get(entitatActualCodi);
 		loadPluginProperties("DADES_EXT");
 		if (dadesExternesPlugin == null) {
@@ -5457,7 +5475,7 @@ public class PluginHelper {
 					dadesExternesPlugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + (entitatActualCodi != null ? (entitatActualCodi + ".") : ""),
+							"es.caib.ripea." + entitatActualCodi,
 							PropertiesHelper.getProperties());
 					dadesExternesPlugins.put(entitatActualCodi, dadesExternesPlugin);
 				} catch (Exception ex) {
@@ -5476,6 +5494,9 @@ public class PluginHelper {
 	}
 	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		IValidateSignaturePlugin validaSignaturaPlugin = validaSignaturaPlugins.get(entitatActualCodi);
 		loadPluginProperties("VALIDATE_SIGNATURE");
 		if (validaSignaturaPlugin == null) {
@@ -5503,6 +5524,9 @@ public class PluginHelper {
 	}
 	private NotificacioPlugin getNotificacioPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		NotificacioPlugin notificacioPlugin = notificacioPlugins.get(entitatActualCodi);
 		loadPluginProperties("NOTIB");
 		if (notificacioPlugin == null) {
@@ -5533,6 +5557,9 @@ public class PluginHelper {
 	
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		FirmaServidorPlugin firmaServidorPlugin = firmaServidorPlugins.get(entitatActualCodi);
 		loadPluginProperties("FIRMA_SERVIDOR");
 		if (firmaServidorPlugin == null) {
@@ -5562,6 +5589,9 @@ public class PluginHelper {
 	}
 	private ViaFirmaPlugin getViaFirmaPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		ViaFirmaPlugin viaFirmaPlugin = viaFirmaPlugins.get(entitatActualCodi);
 		loadPluginProperties("FIRMA_VIAFIRMA");
 		boolean viaFirmaPluginConfiguracioProvada = false;
@@ -5596,6 +5626,9 @@ public class PluginHelper {
 	
 	private ProcedimentPlugin getProcedimentPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		ProcedimentPlugin procedimentPlugin = procedimentPlugins.get(entitatActualCodi);
 		loadPluginProperties("GESCONADM");
 		if (procedimentPlugin == null) {
@@ -5626,6 +5659,9 @@ public class PluginHelper {
 
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		if (entitatActualCodi == null) {
+			throw new RuntimeException("El codi d'entitat no pot ser nul");
+		}
 		GestioDocumentalPlugin gestioDocumentalPlugin = gestioDocumentalPlugins.get(entitatActualCodi);
 		loadPluginProperties("GES_DOC");
 		if (gestioDocumentalPlugin == null) {

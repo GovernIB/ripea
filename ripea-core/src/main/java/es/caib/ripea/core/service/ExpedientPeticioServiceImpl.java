@@ -99,6 +99,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private ConfigHelper configHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private DistribucioHelper distribucioHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -391,7 +393,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 
 		try {
-			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId,
+			distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId,
 					Estat.REBUTJADA,
 					observacions);
 		} catch (Exception e) {

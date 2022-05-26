@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
@@ -37,7 +38,7 @@ import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
@@ -84,6 +85,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private InteressatRepository interessatRepository;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private DistribucioHelper distribucioHelper;
 	
 	private static final String PREFIX_RIPEA = "[RIPEA]";
 
@@ -117,7 +120,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					
 					
 					// obtain registre from DISTRIBUCIO
-					AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioServicePort().consulta(
+					AnotacioRegistreEntrada registre = distribucioHelper.getBackofficeIntegracioServicePort().consulta(
 							anotacioRegistreId);
 
 					// create registre in db and associate it with expedient peticion
@@ -131,7 +134,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							ExpedientPeticioEstatEnumDto.PENDENT);
 
 					// change state of registre in DISTRIBUCIO to BACK_REBUDA
-					DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
+					distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
 							"");
@@ -161,7 +164,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										3600));
 						
 						// change state of registre in DISTRIBUCIO to BACK_ERROR
-						DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
+						distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 								anotacioRegistreId,
 								Estat.ERROR,
 								StringUtils.abbreviate(

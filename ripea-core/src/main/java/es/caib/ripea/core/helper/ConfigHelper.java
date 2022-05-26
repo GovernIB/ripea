@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
-import es.caib.ripea.core.api.dto.config.ConfigResult;
 import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
@@ -95,9 +94,12 @@ public class ConfigHelper {
  
 
 	@Transactional(readOnly = true)
-	public ConfigResult getConfig(EntitatDto entitatActual, String keyGeneral) {
-
-		String entitatActualCodi = entitatActual != null ? entitatActual.getCodi() : null;
+	public String getConfig(String entitatActualCodi, String keyGeneral) {
+		
+		if (entitatActualCodi == null) {
+			entitatActualCodi = ConfigHelper.entitat.get().getCodi();
+		}
+		
 		logger.debug("Entitat actual per les propietats : " + entitatActualCodi);
 
 		String keyPerEntitat = convertirKeyGeneralToKeyPropietat(entitatActualCodi, keyGeneral);
@@ -107,45 +109,37 @@ public class ConfigHelper {
 		if (configPerEntitat != null) {
 			String valueConfigPerEntitat = getConfig(configPerEntitat);
 			if (valueConfigPerEntitat != null) {
-				return new ConfigResult(entitatActualCodi, valueConfigPerEntitat);
+				return valueConfigPerEntitat;
 			} else {
 				ConfigEntity configGeneral = configRepository.findOne(keyGeneral);
 				String valueConfigGeneral = getConfig(configGeneral);
 				if (valueConfigGeneral != null) {
-					return new ConfigResult(null, valueConfigGeneral);
+					return valueConfigGeneral;
 				} else {
 					String valueEntitat = getJBossProperty(keyPerEntitat);
 					if (valueEntitat != null) {
-						return new ConfigResult(entitatActualCodi, valueEntitat);
+						return valueEntitat;
 					} else {
-						return new ConfigResult(null, getJBossProperty(keyGeneral));
+						return getJBossProperty(keyGeneral);
 					}
 				}
 			}
 		} else {
 			String valueEntitat = getJBossProperty(keyPerEntitat);
 			if (valueEntitat != null) {
-				return new ConfigResult(entitatActualCodi, valueEntitat);
+				return valueEntitat;
 			} else {
-				return new ConfigResult(null, getJBossProperty(keyGeneral));
+				return getJBossProperty(keyGeneral);
 			}
 		}
 	}
 
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral)  {
-    	
-		EntitatDto entitatActual = ConfigHelper.entitat.get();			
-		return this.getConfig(entitatActual, keyGeneral).getConfigValue();
-		
+		return this.getConfig(null, keyGeneral);
 	}
     
-    @Transactional(readOnly = true)
-    public ConfigResult getConfigIEntitatCodi(String keyGeneral)  {
-		EntitatDto entitatActual = ConfigHelper.entitat.get();			
-		return this.getConfig(entitatActual, keyGeneral);
-		
-	}
+
     
 	@Transactional(readOnly = true)
 	public String getEntitatActualCodi() {
