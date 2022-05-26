@@ -286,6 +286,12 @@ public class ExpedientHelper {
 		}
 		expedient.updateArxiuIntent();
 		
+		logger.debug(
+				"Expedient creat Helper (" +
+						"sequencia=" + expedient.getSequencia() + ", " +
+						"any=" + expedient.getAny() + ", " +
+						"metaExpedient=" + expedient.getMetaExpedient().getId() + " " + expedient.getMetaExpedient().getCodi() + ")");
+		
 		return expedient.getId();
 	}
 

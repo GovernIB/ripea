@@ -62,6 +62,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -566,7 +567,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:expedientPeticio",
-						ex.getMessage());
+						getMessage(request, "expedient.peticio.controller.acceptat.ko") + ": " + ExceptionHelper.getRootCauseOrItself(ex).getMessage());
 			}
 		}
 		

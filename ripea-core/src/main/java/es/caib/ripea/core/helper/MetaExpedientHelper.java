@@ -96,6 +96,12 @@ public class MetaExpedientHelper {
 			MetaExpedientEntity metaExpedient,
 			Integer any,
 			boolean incrementar) {
+		logger.debug(
+				"Obtenir proxima sequencia expedient (" +
+						"metaExpedient=" + metaExpedient.getId() + "" +metaExpedient.getCodi() + ", " +
+						"any=" + any + ", " +
+						"incrementar=" + incrementar + ")");
+		
 		int anyExpedient;
 		if (any != null)
 			anyExpedient = any.intValue();
@@ -104,12 +110,15 @@ public class MetaExpedientHelper {
 		MetaExpedientSequenciaEntity sequencia = metaExpedientSequenciaRepository.findByMetaExpedientAndAny(
 				metaExpedient,
 				anyExpedient);
+		
 		if (sequencia == null) {
 			sequencia = MetaExpedientSequenciaEntity.getBuilder(anyExpedient, metaExpedient).build();
 			metaExpedientSequenciaRepository.save(sequencia);
+			logger.debug("Nou sequencia creada: "+ sequencia.getAny() + ", " + sequencia.getValor() + sequencia.getMetaExpedient().getId() + sequencia.getMetaExpedient().getCodi());
 			return sequencia.getValor();
 		} else if (incrementar) {
 			sequencia.incrementar();
+			logger.debug("Sequencia incrementada: "+ sequencia.getAny() + ", " + sequencia.getValor() + sequencia.getMetaExpedient().getId() + sequencia.getMetaExpedient().getCodi());
 			return sequencia.getValor();
 		} else {
 			return sequencia.getValor() + 1;
