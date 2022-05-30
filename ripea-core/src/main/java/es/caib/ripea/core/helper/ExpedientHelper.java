@@ -286,7 +286,7 @@ public class ExpedientHelper {
 		}
 		expedient.updateArxiuIntent();
 		
-		logger.debug(
+		logger.info(
 				"Expedient creat Helper (" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
@@ -383,7 +383,7 @@ public class ExpedientHelper {
 		expedientEntity = expedientRepository.findOne(expedientId);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
-		logger.debug("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
+		logger.info("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
 						expedientId + ", " + "registreAnnexId=" + registreAnnexId + 
 						", " + "registreAnnexNom=" + registreAnnexEntity.getNom() + 
 						", " + "registreAnnexTitol=" + registreAnnexEntity.getTitol() +

@@ -213,7 +213,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual, 
 			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
 
-		logger.debug(
+		logger.info(
 				"Creant nou expedient Service(" +
 						"entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ", " +
@@ -240,7 +240,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				grupId, 
 				rolActual);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		logger.debug(
+		logger.info(
 				"Expedient crear Service Middle(" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
@@ -297,7 +297,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		expedientDto.setProcessatOk(processatOk);
 		
-		logger.debug(
+		logger.info(
 				"Expedient crear Service End(" +
 						"id=" + expedient.getId() + ", " +
 						"nom=" + expedient.getNom() + ", " +
@@ -309,7 +309,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Override
 	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats, String rolActual, Map<Long, Long> anexosIdsMetaDocsIdsMap) {
-		logger.debug("Incorporant a l'expedient existent (" +
+		logger.info("Incorporant a l'expedient existent (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"expedientPeticioId=" + expedientPeticioId + ")");

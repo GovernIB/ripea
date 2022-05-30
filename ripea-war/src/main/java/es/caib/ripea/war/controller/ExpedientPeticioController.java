@@ -541,7 +541,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						anexosIdsMetaDocsIdsMap);
 				processatOk = expedientDto.isProcessatOk();
 				
-				logger.debug("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
+				logger.info("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
 				
 			} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 					processatOk = expedientService.incorporar(
@@ -551,7 +551,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							command.isAssociarInteressats(), RolHelper.getRolActual(request), 
 							anexosIdsMetaDocsIdsMap);
 					
-				logger.debug("Expedient incorporat per anotacio: " + processatOk);
+				logger.info("Expedient incorporat per anotacio: " + processatOk);
 			}
 
 			
