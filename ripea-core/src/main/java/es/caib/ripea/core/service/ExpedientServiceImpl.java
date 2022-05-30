@@ -196,7 +196,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
-	@Transactional
+
 	@Override
 	public ExpedientDto create (
 			Long entitatId,
@@ -212,8 +212,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long grupId, 
 			String rolActual, 
 			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+
 		logger.debug(
-				"Creant nou expedient (" +
+				"Creant nou expedient Service(" +
 						"entitatId=" + entitatId + ", " +
 						"metaExpedientId=" + metaExpedientId + ", " +
 						"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
@@ -240,7 +241,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				rolActual);
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		logger.debug(
-				"Expedient creat Service Middle(" +
+				"Expedient crear Service Middle(" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
 						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
@@ -265,7 +266,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()), rolActual);
 				} catch (Exception e) {
 					processatOk = false;
-					logger.info(ExceptionUtils.getStackTrace(e));
+					logger.error("Error crear doc from annex", e);
 					expedientHelper.updateRegistreAnnexError(
 							registeAnnexEntity.getId(),
 							ExceptionUtils.getStackTrace(e));
@@ -282,7 +283,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							expedientPeticioEntity.getId());
 				} catch (Exception e) {
 					processatOk = false;
-					logger.info(ExceptionUtils.getStackTrace(e));
+					logger.error("Error crear doc from uuid", e);
 				}
 				
 			}
@@ -297,10 +298,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientDto.setProcessatOk(processatOk);
 		
 		logger.debug(
-				"Expedient creat Service End(" +
-						"sequencia=" + expedient.getSequencia() + ", " +
-						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
+				"Expedient crear Service End(" +
+						"id=" + expedient.getId() + ", " +
+						"nom=" + expedient.getNom() + ", " +
+						"numero=" + expedient.getMetaExpedient().getCodi() + "/" +  expedient.getSequencia() + "/" + expedient.getAny() +
+						"metaExpedientId=" + expedient.getMetaExpedient().getId() + ")");
 		
 		return expedientDto;
 	}
@@ -1606,7 +1608,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		
 		long t1 = System.currentTimeMillis();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		logger.debug("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
+		logger.trace("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
 		MetaExpedientEntity metaExpedientFiltre = null;
 		List<Long> metaExpedientIdDomini = null;
 		
@@ -1622,7 +1624,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false, 
 					rolActual, null);
 		}
-		logger.debug("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
+		logger.trace("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		long t3 = System.currentTimeMillis();
 		OrganGestorEntity organGestorFiltre = null;
@@ -1637,7 +1639,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getOrganGestorId());
 			}
 		}
-		logger.debug("comprovarOrgan time:  " + (System.currentTimeMillis() - t3) + " ms");
+		logger.trace("comprovarOrgan time:  " + (System.currentTimeMillis() - t3) + " ms");
 		/*/ Els meta-expedients permesos son els que tenen assignat permís de lectura directament
 		// i també els que pertanyen a un òrgan sobre el que es te assignat permís de lectura.
 		List<MetaExpedientEntity> metaExpedientsPermesos;
@@ -1670,7 +1672,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					agafatPer = usuariHelper.getUsuariByCodi(filtre.getAgafatPer());
 				} 
 			}
-			logger.debug("getUsuariAgafat time:  " + (System.currentTimeMillis() - t4) + " ms");
+			logger.trace("getUsuariAgafat time:  " + (System.currentTimeMillis() - t4) + " ms");
 			
 			long t5 = System.currentTimeMillis();
 			// estats
@@ -1685,7 +1687,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					chosenEstat = expedientEstatRepository.findOne(estatId);
 				}
 			}
-			logger.debug("getEstat time:  " + (System.currentTimeMillis() - t5) + " ms");
+			logger.trace("getEstat time:  " + (System.currentTimeMillis() - t5) + " ms");
 			
 			long t6 = System.currentTimeMillis();
 			// relacionar expedient view
@@ -1711,7 +1713,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				esNullExpedientsToBeExcluded = true;
 				expedientsToBeExluded = null; // repository does not accept empty list but it accepts null value
 			}			
-			logger.debug("expedientsToBeExluded time:  " + (System.currentTimeMillis() - t6) + " ms");
+			logger.trace("expedientsToBeExluded time:  " + (System.currentTimeMillis() - t6) + " ms");
 			long t7 = System.currentTimeMillis();
 			boolean esNullRolsCurrentUser = false;
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1734,7 +1736,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						MetaNodeEntity.class,
 						ExtendedPermission.READ));
 			}
-			logger.debug("metaExpedientIdPermesos (" + (metaExpedientIdPermesos != null ? metaExpedientIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
+			logger.trace("metaExpedientIdPermesos (" + (metaExpedientIdPermesos != null ? metaExpedientIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
 			
 			// Cercam els òrgans amb permisos assignats directament
 			long t8 = System.currentTimeMillis();
@@ -1748,14 +1750,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 						OrganGestorEntity.class,
 						ExtendedPermission.READ));
 			}
-			logger.debug("organIdPermesos (" + (organIdPermesos != null ? organIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
+			logger.trace("organIdPermesos (" + (organIdPermesos != null ? organIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
 			
 			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 			long t9 = System.currentTimeMillis();
 			List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
 					ExtendedPermission.READ));
-			logger.debug("metaExpedientOrganIdPermesos (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
+			logger.trace("metaExpedientOrganIdPermesos (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
 			
 			// Cercam els òrgans amb permisos per procediemnts comuns
 			long t91 = System.currentTimeMillis();
@@ -1764,12 +1766,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExtendedPermission.COMU,
 					ExtendedPermission.READ));
 			List<Long> procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-			logger.debug("organProcedimentsComunsIdsPermesos (" + (organProcedimentsComunsIdsPermesos != null ? organProcedimentsComunsIdsPermesos.size() : "0") + " " + (procedimentsComunsIds != null ? procedimentsComunsIds.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
+			logger.trace("organProcedimentsComunsIdsPermesos (" + (organProcedimentsComunsIdsPermesos != null ? organProcedimentsComunsIdsPermesos.size() : "0") + " " + (procedimentsComunsIds != null ? procedimentsComunsIds.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
 			
 			// Cercam metaExpedients amb una meta-dada del domini del filtre
 			long t92 = System.currentTimeMillis();
 			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
-			logger.debug("metaExpedientIdDomini (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t92) + " ms");
+			logger.trace("metaExpedientIdDomini (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t92) + " ms");
 			
 			if (resultEnum == ResultEnumDto.PAGE) {
 				
@@ -1824,7 +1826,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						esNullRolsCurrentUser,
 						rolsCurrentUser,
 						pageable);
-				logger.debug("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
+				logger.trace("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
 				long t11 = System.currentTimeMillis();
 				PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
 						paginaExpedients,
@@ -1841,8 +1843,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedient.setAlerta(enAlerta);
 				}
 				result.setPagina(paginaDto);
-				logger.debug("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");			
-				logger.debug("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+				logger.trace("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");			
+				logger.trace("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 
 			} else {
 				
@@ -1893,7 +1895,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						rolsCurrentUser);
 				result.setIds(expedientsIds);
 				
-				logger.debug("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+				logger.trace("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 			}
 			
 			
@@ -1962,7 +1964,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!expedientsRelacionatsIdx.isEmpty()) {
 			long t1 = System.currentTimeMillis();
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-			logger.debug("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
+			logger.trace("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
 			// metaexpedient
 			MetaExpedientEntity metaExpedientFiltre = null;
 			if (filtre.getMetaExpedientId() != null) {
@@ -1977,7 +1979,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						false, 
 						"tothom",
 						null);
-				logger.debug("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
+				logger.trace("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 			// estats
 			ExpedientEstatEnumDto chosenEstatEnum = null;
@@ -1991,7 +1993,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				} else { // given estat is estat from database
 					chosenEstat = expedientEstatRepository.findOne(estatId);
 				}
-				logger.debug("getEstat time:  " + (System.currentTimeMillis() - t3) + " ms");
+				logger.trace("getEstat time:  " + (System.currentTimeMillis() - t3) + " ms");
 			}
 			
 			long t4 = System.currentTimeMillis();
@@ -2009,7 +2011,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				chosenEstat,
 				expedientsRelacionatsIdx,
 				pageable);
-			logger.debug("findExpedientsRelacionatsByIdIn time:  " + (System.currentTimeMillis() - t4) + " ms");
+			logger.trace("findExpedientsRelacionatsByIdIn time:  " + (System.currentTimeMillis() - t4) + " ms");
 			
 			long t5 = System.currentTimeMillis();
 			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
@@ -2022,8 +2024,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 							return toExpedientDto(source, false, param, true);
 						}
 					});
-			logger.debug("toPaginaDto time:  " + (System.currentTimeMillis() - t5) + " ms");
-			logger.debug("relacioFindAmbExpedientPaginat ids (size: " + expedientsRelacionatsIdx.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+			logger.trace("toPaginaDto time:  " + (System.currentTimeMillis() - t5) + " ms");
+			logger.trace("relacioFindAmbExpedientPaginat ids (size: " + expedientsRelacionatsIdx.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 			return paginaDto;
 		} else {
 			return paginacioHelper.getPaginaDtoBuida(ExpedientDto.class);

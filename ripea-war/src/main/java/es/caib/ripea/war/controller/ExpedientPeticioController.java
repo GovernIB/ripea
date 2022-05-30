@@ -541,6 +541,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						anexosIdsMetaDocsIdsMap);
 				processatOk = expedientDto.isProcessatOk();
 				
+				logger.debug("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
+				
 			} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 					processatOk = expedientService.incorporar(
 							entitat.getId(),
@@ -548,8 +550,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							expedientPeticioDto.getId(),
 							command.isAssociarInteressats(), RolHelper.getRolActual(request), 
 							anexosIdsMetaDocsIdsMap);
-			}
 					
+				logger.debug("Expedient incorporat per anotacio: " + processatOk);
+			}
+
+			
 		} catch (Exception ex) {
 			if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 				logger.error("Error al crear expedient per anotacio", ex);
@@ -578,6 +583,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							request, 
 							"expedient.peticio.controller.acceptat.warning"));
 		}
+		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:expedientPeticio",

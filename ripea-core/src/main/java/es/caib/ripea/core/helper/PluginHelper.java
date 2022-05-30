@@ -1,6 +1,3 @@
-/**
- *
- */
 package es.caib.ripea.core.helper;
 
 import java.io.ByteArrayInputStream;
@@ -1736,6 +1733,11 @@ public class PluginHelper {
 		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
 		long t0 = System.currentTimeMillis();
 		try {
+			boolean throwException = false;//throwException = true
+			if (throwException) {
+				throw new RuntimeException("Mock excepcion moving document ");
+			}
+			
 			ContingutArxiu nouDocumentArxiu = getArxiuPlugin().documentMoure(
 					document.getArxiuUuid(),
 					arxiuUuidDesti,

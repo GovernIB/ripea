@@ -249,7 +249,7 @@ public class ContingutHelper {
 				dto.setUsuariActualDelete(true);
 			} catch (PermissionDeniedException ex) {
 			}
-			logger.debug("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
+			logger.trace("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
 			
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
@@ -315,7 +315,7 @@ public class ContingutHelper {
 			}
 
 
-			logger.debug("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
+			logger.trace("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
 
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
@@ -398,7 +398,7 @@ public class ContingutHelper {
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			resposta = dto;
 
-			logger.debug("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
+			logger.trace("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
@@ -585,7 +585,7 @@ public class ContingutHelper {
 		}
 
 
-		logger.debug("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
+		logger.trace("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
 	

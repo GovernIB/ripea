@@ -151,7 +151,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					false, 
 					null);
 		}
-		logger.debug("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
+		logger.trace("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
 		long t2 = System.currentTimeMillis();
 		model.addAttribute(
 				"rolActual",
@@ -170,7 +170,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
 		
-		logger.debug("findActiusAmbEntitatPerCreacio time:  " + (System.currentTimeMillis() - t2) + " ms");
+		logger.trace("findActiusAmbEntitatPerCreacio time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		long t3 = System.currentTimeMillis();
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
@@ -194,9 +194,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 							request, 
 							"expedient.controller.sense.permis.lectura"));
 		}
-		logger.debug("findEstats time:  " + (System.currentTimeMillis() - t3) + " ms");
+		logger.trace("findEstats time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
-		logger.debug("Getting page of expedients time " + (System.currentTimeMillis() - t0) + " ms");
+		logger.trace("Getting page of expedients time " + (System.currentTimeMillis() - t0) + " ms");
 		
 		return "expedientUserList";
 	}
@@ -507,12 +507,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			if (expedientDto.getArxiuUuid() != null) {
 				return getModalControllerReturnValueSuccess(
 						request,
-						"",
+						"redirect:../expedient",
 						"expedient.controller.creat.ok");
 			} else {
 				return getModalControllerReturnValueWarning(
 						request,
-						"",
+						"redirect:../expedient",
 						"expedient.controller.creat.error.arxiu",
 						null);
 			}

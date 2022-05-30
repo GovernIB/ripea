@@ -384,7 +384,9 @@ public class ExpedientHelper {
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
 		logger.debug("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
-						expedientId + ", " + "registreAnnexId=" + registreAnnexId +
+						expedientId + ", " + "registreAnnexId=" + registreAnnexId + 
+						", " + "registreAnnexNom=" + registreAnnexEntity.getNom() + 
+						", " + "registreAnnexTitol=" + registreAnnexEntity.getTitol() +
 						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 
 		// ########################## CREATE CARPETA IN DB AND IN ARXIU ######################
