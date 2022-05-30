@@ -3,54 +3,13 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
-
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
-import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.dto.StatusEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -74,6 +33,28 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -1086,7 +1067,57 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		model.addAttribute("organsGestors", organGestorsList);
 	}
-	
+
+	@RequestMapping(value = "/sincronitzar", method = RequestMethod.GET)
+	public String actualitzacioAutomaticaGet(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		model.addAttribute("isUpdatingProcediments", metaExpedientService.isUpdatingProcediments(entitat));
+		return "metaExpedientActualitzacioForm";
+	}
+
+	@RequestMapping(value = "/sincronitzar", method = RequestMethod.POST)
+	public String actualitzacioAutomaticaPost(
+			HttpServletRequest request,
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		try {
+			metaExpedientService.actualitzaProcediments(entitat);
+		} catch (Exception e) {
+			logger.error("Error inesperat al actualitzar els procediments", e);
+			model.addAttribute("errors", e.getMessage());
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			MissatgesHelper.error(request, "Error: \n" + sw.toString());
+			return "metaExpedientActualitzacioForm";
+		}
+
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"/metaExpedientActualitzacioForm",
+				"procediment.controller.update.auto.ok");
+	}
+
+	@RequestMapping(value = "/sincronitzar/progres", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ProgresActualitzacioDto progresActualitzacioDto = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
+		if (progresActualitzacioDto != null)
+			for (ActualitzacioInfo info: progresActualitzacioDto.getInfo()) {
+				if (info.isHasInfo()) {
+					String titol = getMessage(request, info.getInfoTitol());
+					String text = getMessage(request, info.getInfoText(), info.getInfoParams());
+					logger.info("INFO - titol: " + info.getInfoTitol() + " --> " + titol + ", text: " + info.getInfoText() + " --> " + text);
+					info.setInfoTitol(titol);
+					info.setInfoText(text);
+				}
+			}
+		return progresActualitzacioDto;
+	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientController.class);
 

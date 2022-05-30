@@ -3,31 +3,16 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -174,6 +159,15 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.revisioEstat = revisioEstat;
         this.revisioComentari = revisioComentari;
     }
+
+	public void updateSync(
+			String nom,
+			String descripcio,
+			OrganGestorEntity organGestor) {
+		this.nom = nom;
+		this.descripcio = descripcio;
+		this.organGestor = organGestor;
+	}
 
 	public static Builder getBuilder(
 			String codi,

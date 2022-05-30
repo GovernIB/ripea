@@ -3,18 +3,19 @@
  */
 package es.caib.ripea.plugin.caib.unitat;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
+import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
+import es.caib.dir3caib.ws.api.unidad.UnidadTF;
+import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.unitat.NodeDir3;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
+import org.apache.commons.io.IOUtils;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -24,22 +25,19 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-
-import org.apache.commons.io.IOUtils;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-
-import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
-import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
-import es.caib.dir3caib.ws.api.unidad.UnidadTF;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.unitat.NodeDir3;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.
@@ -161,6 +159,53 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
         return unitats;
     }
 
+
+    // Mètodes SOAP per sincronització
+    // //////////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public UnitatOrganitzativa findUnidad(
+            String pareCodi,
+            Timestamp fechaActualizacion,
+            Timestamp fechaSincronizacion) throws MalformedURLException {
+
+        UnidadTF unidad = getObtenerUnidadesService().obtenerUnidad(
+                pareCodi,
+                fechaActualizacion,
+                fechaSincronizacion);
+        if (unidad != null) {
+            return toUnitatOrganitzativa(unidad);
+        } else {
+            return null;
+        }
+
+    }
+
+    @Override
+    public List<UnitatOrganitzativa> findAmbPare(
+            String pareCodi,
+            Timestamp fechaActualizacion,
+            Timestamp fechaSincronizacion) throws SistemaExternException {
+        try {
+            List<UnitatOrganitzativa> unitatOrganitzativa = new ArrayList<UnitatOrganitzativa>();
+            List<UnidadTF> arbol = getObtenerUnidadesService().obtenerArbolUnidades(
+                    pareCodi,
+                    fechaActualizacion,
+                    fechaSincronizacion);
+
+            for(UnidadTF unidadTF: arbol){
+                unitatOrganitzativa.add(toUnitatOrganitzativa(unidadTF));
+            }
+            return unitatOrganitzativa;
+        } catch (Exception ex) {
+            throw new SistemaExternException(
+                    "No s'han pogut consultar les unitats organitzatives via WS (pareCodi=" + pareCodi + ")",
+                    ex);
+        }
+    }
+
+
+
     private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
         Dir3CaibObtenerUnidadesWs client = null;
         String urlServei = getServiceUrl() + SERVEI_OBTENIR_UNITATS;
@@ -189,12 +234,24 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
     }
 
     private UnitatOrganitzativa toUnitatOrganitzativa(UnidadTF unidad) {
-        UnitatOrganitzativa unitat = new UnitatOrganitzativa(unidad.getCodigo(), unidad.getDenominacion(),
-                unidad.getCodigo(), // CifNif
-                unidad.getFechaAltaOficial(), unidad.getCodigoEstadoEntidad(), unidad.getCodUnidadSuperior(),
-                unidad.getCodUnidadRaiz(), unidad.getCodigoAmbPais(), unidad.getCodAmbComunidad(),
-                unidad.getCodAmbProvincia(), unidad.getCodPostal(), unidad.getDescripcionLocalidad(),
-                unidad.getCodigoTipoVia(), unidad.getNombreVia(), unidad.getNumVia());
+        UnitatOrganitzativa unitat = UnitatOrganitzativa.builder()
+                .codi(unidad.getCodigo())
+                .denominacio(unidad.getDenominacion())
+                .nifCif(unidad.getCodigo())
+                .dataCreacioOficial(unidad.getFechaAltaOficial())
+                .estat(unidad.getCodigoEstadoEntidad())
+                .codiUnitatSuperior(unidad.getCodUnidadSuperior())
+                .codiUnitatArrel(unidad.getCodUnidadRaiz())
+                .codiPais(unidad.getCodigoAmbPais() != null ? unidad.getCodigoAmbPais().toString() : "")
+                .codiComunitat(unidad.getCodAmbComunidad() != null ? unidad.getCodAmbComunidad().toString() : "")
+                .codiProvincia(unidad.getCodAmbProvincia() != null ? unidad.getCodAmbProvincia().toString() : "")
+                .codiPostal(unidad.getCodPostal())
+                .nomLocalitat(unidad.getDescripcionLocalidad())
+                .tipusVia(unidad.getCodigoTipoVia())
+                .nomVia(unidad.getNombreVia())
+                .numVia(unidad.getNumVia())
+                .historicosUO(unidad.getHistoricosUO())
+                .build();
         return unitat;
     }
 

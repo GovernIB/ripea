@@ -68,6 +68,7 @@
 					</ul>
 				</div>
 			
+			<a class="btn btn-default" href="metaExpedient/sincronitzar" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="metaexpedient.list.boto.sincronitzar"/></a>
 			<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
 		</div>
 	</div>

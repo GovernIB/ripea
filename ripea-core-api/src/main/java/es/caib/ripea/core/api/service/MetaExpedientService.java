@@ -3,26 +3,12 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.sql.SQLException;
-import java.util.List;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
-import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió de meta-expedients.
@@ -575,4 +561,18 @@ public interface MetaExpedientService {
 			Long entitatId,
 			Long metaExpedientId);
 
+	/**
+	 * Consulta si existeix un procés en curs actualitzant els procediments de l'entitat indicada.
+	 *
+	 * @param entitatDto Entitat que es vol consultar
+	 * @return boolean indicant si existeix un procés en segon pla actualitzant els procediements de l'entitat indicada.
+	 */
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	boolean isUpdatingProcediments(EntitatDto entitatDto);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	ProgresActualitzacioDto getProgresActualitzacio(String codi);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	void actualitzaProcediments(EntitatDto entitat);
 }

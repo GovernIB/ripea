@@ -5,14 +5,23 @@ package es.caib.ripea.core.service;
 
 //import com.codahale.metrics.Timer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ActualitzacioInfo;
+import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.repository.*;
+import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,80 +34,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.DominiDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
-import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
-import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.PermissionDeniedException;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.entity.DominiEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.GrupEntity;
-import es.caib.ripea.core.entity.HistoricExpedientEntity;
-import es.caib.ripea.core.entity.HistoricInteressatEntity;
-import es.caib.ripea.core.entity.HistoricUsuariEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DominiHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExpedientEstatHelper;
-import es.caib.ripea.core.helper.GrupHelper;
-import es.caib.ripea.core.helper.MetaDadaHelper;
-import es.caib.ripea.core.helper.MetaDocumentHelper;
-import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.MetaNodeHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
-import es.caib.ripea.core.repository.DominiRepository;
-import es.caib.ripea.core.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.GrupRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
-import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
-import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
-import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
+import javax.annotation.Resource;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -166,7 +109,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private HistoricUsuariRepository historicUsuariRepository;
 	@Autowired
 	private EmailHelper emailHelper;
-	
+
+	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
+
 	@Transactional
 	@Override
 	public MetaExpedientDto create(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, Long organId) {
@@ -1321,7 +1266,140 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		return metaExpedientHelper.crearReglaDistribucio(metaExpedientId);
 	}
-	
+
+    @Override
+    public boolean isUpdatingProcediments(EntitatDto entitatDto) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getCodi());
+		return progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError();
+    }
+
+	@Override
+	public ProgresActualitzacioDto getProgresActualitzacio(String codi) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(codi);
+		if (progres != null && progres.isFinished()) {
+			progresActualitzacio.remove(codi);
+		}
+		return progres;
+	}
+
+	@Override
+	@Transactional
+	public void actualitzaProcediments(EntitatDto entitatDto) {
+
+		logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
+		// Comprova si hi ha una altre instància del procés en execució
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getCodi());
+		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+			logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+			return;
+		}
+
+		// inicialitza el seguiment del prgrés d'actualització
+		progres = new ProgresActualitzacioDto();
+		progresActualitzacio.put(entitatDto.getCodi(), progres);
+
+		try {
+
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatDto.getId());
+			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+			progres.setNumProcediments(metaExpedients.size());
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
+					.infoTitol("metaexpedient.actualitzacio.inici.titol")
+					.infoText("metaexpedient.actualitzacio.inici.text")
+					.infoParams(new String[] { Integer.toString(metaExpedients.size()) }).build());
+
+			Integer modificats = 0;
+			Integer fallat = 0;
+			for(MetaExpedientEntity metaExpedient: metaExpedients) {
+				ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder()
+						.codiSia(metaExpedient.getClassificacioSia())
+						.nomAntic(metaExpedient.getNom())
+						.descripcioAntiga(metaExpedient.getDescripcio())
+						.comuAntic(metaExpedient.isComu());
+				if (metaExpedient.getOrganGestor() != null)
+					infoBuilder.organAntic(metaExpedient.getOrganGestor().getCodi());
+
+				ProcedimentDto procedimentGga = null;
+				try {
+					procedimentGga = pluginHelper.procedimentFindByCodiSia(
+							entitat.getUnitatArrel(),
+							metaExpedient.getClassificacioSia());
+					infoBuilder.exist(procedimentGga != null);
+				} catch (SistemaExternException se) {
+					infoBuilder.hasError(true);
+					infoBuilder.errorText("Error al recuperar el procediment de Rolsac: " + se.getMessage());
+					progres.addInfo(infoBuilder.build());
+					fallat++;
+					continue;
+				}
+
+				if (procedimentGga == null) {
+					infoBuilder.hasError(true);
+					infoBuilder.errorText("No existeix cap procediment actiu amb codi SIA " + metaExpedient.getClassificacioSia() + " a Rolsac.");
+					progres.addInfo(infoBuilder.build());
+					fallat++;
+					continue;
+				}
+
+				ActualitzacioInfo info = infoBuilder.nomNou(procedimentGga.getNom())
+						.descripcioNova(procedimentGga.getResum())
+						.comuNou(procedimentGga.isComu())
+						.organNou(procedimentGga.getUnitatOrganitzativaCodi())
+						.build();
+
+				if (!info.hasChange()) {
+					progres.addInfo(info);
+					continue;
+				}
+
+				String nom = metaExpedient.getNom();
+				String descripcio = metaExpedient.getDescripcio();
+				OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+
+				if (!procedimentGga.getNom().equals(metaExpedient.getNom())) {
+					nom = procedimentGga.getNom();
+				}
+				if (!procedimentGga.getResum().equals(metaExpedient.getDescripcio())) {
+					descripcio = procedimentGga.getResum();
+				}
+				if (procedimentGga.isComu() != metaExpedient.isComu() && procedimentGga.isComu()) {
+					organGestor = null;
+				} else if (!procedimentGga.getUnitatOrganitzativaCodi().equals(metaExpedient.getOrganGestor().getCodi())) {
+					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
+					if (organGestor == null) {
+						info.setHasError(true);
+						info.setErrorText("L'òrgan gestor no existeix a RIPEA. Realitzi una sincronització d'òrgans, i si tot i així encara no es troba l'òrgan, comprovi que està correctament configurat a ROLSAC.");
+						fallat++;
+					}
+				}
+
+				progres.addInfo(info);
+
+				if (!info.isHasCanvis())
+					modificats++;
+			}
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
+					.infoTitol("metaexpedient.actualitzacio.fi.titol")
+					.infoText("metaexpedient.actualitzacio.fi.text")
+					.infoParams(new String[] { modificats.toString(), fallat.toString() }).build());
+
+			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
+			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			progresActualitzacio.get(entitatDto.getCodi()).setError(true);
+			progresActualitzacio.get(entitatDto.getCodi()).setErrorMsg(sw.toString());
+			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
+			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+			throw e;
+		}
+	}
+
 	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
 		List<Long> metaExpedientIds = new ArrayList<Long>();
 		for (MetaExpedientDto metaExpedient : metaExpedients) {

@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.plugin.unitat;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'una unitat organitzativa.
@@ -19,9 +22,13 @@ import lombok.Setter;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter @Setter
+@Builder
+@NoArgsConstructor @AllArgsConstructor
 public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrganitzativa> {
 
+	@JsonProperty("codigo")
 	private String codi;
+	@JsonProperty("denominacion")
 	private String denominacio;
 	private String nifCif;
 	private String nivellAdministracio;
@@ -41,145 +48,16 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private String codiComunitat;
 	private String codiProvincia;
 	private String codiPostal;
+	@JsonProperty("localidad")
 	private String nomLocalitat;
 	private String adressa;
 	private Long tipusVia;
 	private String nomVia;
-	private String numVia; 
+	private String numVia;
 
+	protected List<String> historicosUO;
+	private List<UnitatOrganitzativa> lastHistoricosUnitats;
 
-	public UnitatOrganitzativa() {
-		
-	}
-	
-	public UnitatOrganitzativa(
-			String codi,
-			String denominacio,
-			String nifCif,
-			Date dataCreacioOficial,
-			String estat) {
-		this.codi = codi;
-		this.denominacio = denominacio;
-		this.nifCif = nifCif;
-		this.dataCreacioOficial = dataCreacioOficial;
-		this.estat = estat;
-	}
-	public UnitatOrganitzativa(
-			String codi,
-			String denominacio,
-			String nifCif,
-			Date dataCreacioOficial,
-			String estat,
-			String codiUnitatSuperior,
-			String codiUnitatArrel) {
-		this.codi = codi;
-		this.denominacio = denominacio;
-		this.nifCif = nifCif;
-		this.dataCreacioOficial = dataCreacioOficial;
-		this.estat = estat;
-		this.codiUnitatSuperior = codiUnitatSuperior;
-		this.codiUnitatArrel = codiUnitatArrel;
-	}
-	public UnitatOrganitzativa(
-			String codi,
-			String denominacio,
-			String nifCif,
-			Date dataCreacioOficial,
-			String estat,
-			String codiUnitatSuperior,
-			String codiUnitatArrel,
-			Long codiPais,
-			Long codiComunitat,
-			Long codiProvincia,
-			String codiPostal,
-			String nomLocalitat,
-			Long tipusVia,
-			String nomVia,
-			String numVia) {
-		this.codi = codi;
-		this.denominacio = denominacio;
-		this.nifCif = nifCif;
-		this.dataCreacioOficial = dataCreacioOficial;
-		this.estat = estat;
-		this.codiUnitatSuperior = codiUnitatSuperior;
-		this.codiUnitatArrel = codiUnitatArrel;
-		this.codiPais = codiPais != null? codiPais.toString() : "";
-		this.codiComunitat = codiComunitat != null? codiComunitat.toString() : "";
-		this.codiProvincia = codiProvincia != null? codiProvincia.toString() : "";
-		this.codiPostal = codiPostal;
-		this.nomLocalitat = nomLocalitat;
-		this.tipusVia = tipusVia;
-		this.nomVia = nomVia;
-		this.numVia = numVia;
-	}
-	
-	public UnitatOrganitzativa(
-			String codi, 
-			String denominacio, 
-			String nifCif, 
-			String nivellAdministracio,
-			String tipusEntitatPublica, 
-			String tipusUnitatOrganica, 
-			String poder, 
-			String sigles,
-			String codiUnitatSuperior, 
-			String codiUnitatArrel, 
-			Long nivellJerarquic, 
-			Date dataCreacioOficial,
-			Date dataSupressioOficial, 
-			Date dataExtincioFuncional, 
-			Date dataAnulacio, 
-			String estat, 
-			String codiPais,
-			String codiComunitat, 
-			String codiProvincia, 
-			String codiPostal, 
-			String nomLocalitat, 
-			String adressa,
-			Long tipusVia, 
-			String nomVia, 
-			String numVia) {
-		super();
-		this.codi = codi;
-		this.denominacio = denominacio;
-		this.nifCif = nifCif;
-		this.nivellAdministracio = nivellAdministracio;
-		this.tipusEntitatPublica = tipusEntitatPublica;
-		this.tipusUnitatOrganica = tipusUnitatOrganica;
-		this.poder = poder;
-		this.sigles = sigles;
-		this.codiUnitatSuperior = codiUnitatSuperior;
-		this.codiUnitatArrel = codiUnitatArrel;
-		this.nivellJerarquic = nivellJerarquic;
-		this.dataCreacioOficial = dataCreacioOficial;
-		this.dataSupressioOficial = dataSupressioOficial;
-		this.dataExtincioFuncional = dataExtincioFuncional;
-		this.dataAnulacio = dataAnulacio;
-		this.estat = estat;
-		this.codiPais = codiPais;
-		this.codiComunitat = codiComunitat;
-		this.codiProvincia = codiProvincia;
-		this.codiPostal = codiPostal;
-		this.nomLocalitat = nomLocalitat;
-		this.adressa = adressa;
-		this.tipusVia = tipusVia;
-		this.nomVia = nomVia;
-		this.numVia = numVia;
-	}
-
-	@JsonProperty("codigo")
-	public void setCodi(String codi) {
-		this.codi = codi;
-	}
-	@JsonProperty("denominacion")
-	public void setDenominacio(String denominacio) {
-		this.denominacio = denominacio;
-	}
-
-	@JsonProperty("localidad")
-	public void setNomLocalitat(String nomLocalitat) {
-		this.nomLocalitat = nomLocalitat;
-	}
 
 	@Override
 	public int compareTo(UnitatOrganitzativa o) {

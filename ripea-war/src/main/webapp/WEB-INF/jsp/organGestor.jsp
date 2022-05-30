@@ -21,7 +21,7 @@
 </head>
 <body>
 
-	<div class="text-right" data-toggle="botons-titol">
+	<div class="text-right" data-toggle="botons-titol" data-btn-title-col-size="4">
 		<a id="organgestor-boto-nou" class="btn btn-default" href="organgestor/sync/dir3">
 				<span class="fa fa-refresh"></span>&nbsp; <spring:message code="organgestor.list.boto.actualitzar"/>
 		</a>

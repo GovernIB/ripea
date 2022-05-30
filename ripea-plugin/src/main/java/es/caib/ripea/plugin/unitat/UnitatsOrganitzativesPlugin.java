@@ -3,10 +3,12 @@
  */
 package es.caib.ripea.plugin.unitat;
 
+import es.caib.ripea.plugin.SistemaExternException;
+
+import java.net.MalformedURLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-
-import es.caib.ripea.plugin.SistemaExternException;
 
 
 /**
@@ -85,5 +87,49 @@ public interface UnitatsOrganitzativesPlugin {
 			Boolean esUnitatArrel,
 			Long provincia, 
 			String municipi) throws SistemaExternException;
+
+
+
+	// Mètodes SOAP per sincronització
+	// //////////////////////////////////////////////////////////////////////////////////////
+
+	/**
+	 * Retorna la unitat organtizativa donat el pareCodi
+	 *
+	 * @param pareCodi
+	 *            Codi de la unitat pare.
+	 * @param fechaActualizacion
+	 *            Data de la darrera actualització.
+	 * @param fechaSincronizacion
+	 *            Data de la primera sincronització.
+	 * @return La unitat organitzativa trobada.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public UnitatOrganitzativa findUnidad(
+			String pareCodi,
+			Timestamp fechaActualizacion,
+			Timestamp fechaSincronizacion) throws MalformedURLException;
+
+	/**
+	 * Retorna la llista d'unitats organitzatives filles donada
+	 * una unitat pare.
+	 * If you put fechaActualizacion==null and fechaSincronizacion==null it returns all unitats that are now vigent (current tree)
+	 * If you put fechaActualizacion!=null and fechaSincronizacion!=null it returns all the changes in unitats from the time of last syncronization (@param fechaActualizacion) to now
+	 *
+	 * @param pareCodi
+	 *            Codi de la unitat pare. It doesnt have to be arrel
+	 * @param fechaActualizacion
+	 *            Data de la darrera actualització.
+	 * @param fechaSincronizacion
+	 *            Data de la primera sincronització.
+	 * @return La llista d'unitats organitzatives.
+	 * @throws SistemaExternException
+	 *            Si es produeix un error al consultar les unitats organitzatives.
+	 */
+	public List<UnitatOrganitzativa> findAmbPare(
+			String pareCodi,
+			Timestamp fechaActualizacion,
+			Timestamp fechaSincronizacion) throws SistemaExternException;
 
 }

@@ -3,31 +3,16 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
-import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.MetaExpedientService;
+import java.util.List;
 
 /**
  * Implementació de MetaExpedientService com a EJB que empra una clase
@@ -458,6 +443,24 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		return delegate.reintentarCreacioReglaDistribucio(
 				entitatId,
 				metaExpedientId);
+	}
+
+    @Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+    public boolean isUpdatingProcediments(EntitatDto entitatDto) {
+        return delegate.isUpdatingProcediments(entitatDto);
+    }
+
+    @Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+    public ProgresActualitzacioDto getProgresActualitzacio(String codi) {
+        return delegate.getProgresActualitzacio(codi);
+    }
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public void actualitzaProcediments(EntitatDto entitat) {
+		delegate.actualitzaProcediments(entitat);
 	}
 
 }

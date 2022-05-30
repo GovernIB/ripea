@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.plugin.caib.unitat;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
+import lombok.SneakyThrows;
+
+import java.net.MalformedURLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives.
@@ -50,19 +53,6 @@ public class UnitatsOrganitzativesPluginMock implements UnitatsOrganitzativesPlu
 		return null;
 	}
 
-	/*@Override
-	public List<UnitatOrganitzativaD3> cercaUnitatsD3(
-			String codiUnitat, 
-			String denominacioUnitat,
-			Long codiNivellAdministracio, 
-			Long codiComunitat, 
-			Boolean ambOficines, 
-			Boolean esUnitatArrel,
-			Long codiProvincia, 
-			String codiLocalitat) throws SistemaExternException {
-		throw new SistemaExternException("Mètode no implementat");
-	}*/
-
 	private List<UnitatOrganitzativa> getUnitats() {
 		if (unitats == null) {
 			unitats = new ArrayList<UnitatOrganitzativa>();
@@ -94,4 +84,20 @@ public class UnitatsOrganitzativesPluginMock implements UnitatsOrganitzativesPlu
 		return null;
 	}
 
+	@SneakyThrows
+	@Override
+	public UnitatOrganitzativa findUnidad(
+			String pareCodi,
+			Timestamp fechaActualizacion,
+			Timestamp fechaSincronizacion) throws MalformedURLException {
+		return findAmbCodi(pareCodi);
+	}
+
+	@Override
+	public List<UnitatOrganitzativa> findAmbPare(
+			String pareCodi,
+			Timestamp fechaActualizacion,
+			Timestamp fechaSincronizacion) throws SistemaExternException {
+		return findAmbPare(pareCodi);
+	}
 }
