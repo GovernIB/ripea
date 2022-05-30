@@ -686,9 +686,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	public String descarregarAnnex(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable Long annexId) throws IOException {
+			@PathVariable Long annexId,
+			@RequestParam boolean versioImprimible) throws IOException {
 		try{
-			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId);
+			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, versioImprimible);
 			writeFileToResponse(
 					fitxer.getNom(),
 					fitxer.getContingut(),
@@ -711,7 +712,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long annexId) throws Exception {
 		FitxerDto fitxer = null;
 		try {
-			fitxer = expedientPeticioService.getAnnexContent(annexId);
+			fitxer = expedientPeticioService.getAnnexContent(annexId, true);
 		} catch (Exception ex) {
 			throw new Exception(ex.getMessage());
 		}

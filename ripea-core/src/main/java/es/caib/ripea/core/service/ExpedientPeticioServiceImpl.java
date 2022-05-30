@@ -280,21 +280,24 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto getAnnexContent(Long annexId) {
+	public FitxerDto getAnnexContent(Long annexId, boolean versioImprimible) {
 		RegistreAnnexEntity annex = registreAnnexRepository.findOne(annexId);
 		FitxerDto fitxer = new FitxerDto();
 
 		Document document = null;
-		document = pluginHelper.arxiuDocumentConsultar(null,
+		document = pluginHelper.arxiuDocumentConsultar(
+				null,
 				annex.getUuid(),
 				null,
 				true,
-				true);
+				versioImprimible);
 
+		RegistreAnnexEntity registreAnnex = registreAnnexRepository.findOne(annexId);
+		
 		if (document != null) {
 			DocumentContingut documentContingut = document.getContingut();
 			if (documentContingut != null) {
-				fitxer.setNom(documentContingut.getArxiuNom());
+				fitxer.setNom(versioImprimible ? documentContingut.getArxiuNom() : registreAnnex.getNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
 				fitxer.setTamany(documentContingut.getContingut().length);

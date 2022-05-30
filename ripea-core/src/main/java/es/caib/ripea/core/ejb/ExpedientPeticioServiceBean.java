@@ -61,8 +61,8 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	@Override
 	@RolesAllowed("tothom")
 	public FitxerDto getAnnexContent(
-			Long annexId) {
-		return delegate.getAnnexContent(annexId);
+			Long annexId, boolean versioImprimible) {
+		return delegate.getAnnexContent(annexId, versioImprimible);
 	}
 
 	@Override

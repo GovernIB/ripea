@@ -26,7 +26,7 @@ public interface ExpedientPeticioService {
 			Long expedientPeticioId);
 
 	FitxerDto getAnnexContent(
-			Long annexId);
+			Long annexId, boolean versioImprimible);
 
 	List<ArxiuFirmaDto> annexFirmaInfo(
 			String fitxerArxiuUuid);

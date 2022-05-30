@@ -114,11 +114,11 @@ public class MetaExpedientHelper {
 		if (sequencia == null) {
 			sequencia = MetaExpedientSequenciaEntity.getBuilder(anyExpedient, metaExpedient).build();
 			metaExpedientSequenciaRepository.save(sequencia);
-			logger.info("Nou sequencia creada: "+ sequencia.getAny() + ", " + sequencia.getValor() + sequencia.getMetaExpedient().getId()+ " - " +sequencia.getMetaExpedient().getCodi());
+			logger.info("Nou sequencia creada: "+ sequencia.getAny() + ", " + sequencia.getValor() + ", "  + sequencia.getMetaExpedient().getId()+ " - " +sequencia.getMetaExpedient().getCodi());
 			return sequencia.getValor();
 		} else if (incrementar) {
 			sequencia.incrementar();
-			logger.info("Sequencia incrementada: "+ sequencia.getAny() + ", " + sequencia.getValor() + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
+			logger.info("Sequencia incrementada: "+ sequencia.getAny() + ", " + sequencia.getValor() + ", "  + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
 			return sequencia.getValor();
 		} else {
 			return sequencia.getValor() + 1;

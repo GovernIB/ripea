@@ -527,7 +527,7 @@ tr.clicable {
 										<td><c:if test="${not empty annex.ntiOrigen}">${annex.ntiOrigen}</c:if></td>
 										<td><c:if test="${not empty annex.ntiEstadoElaboracion}"><spring:message code="registre.annex.detalls.camp.ntiElaboracioEstat.${annex.ntiEstadoElaboracion}"/></c:if></td>
 										<td>
-											<a href="descarregarAnnex/${annex.id}" class="btn btn-default btn-sm pull-right arxiu-download">
+											<a href="descarregarAnnex/${annex.id}?versioImprimible=true" class="btn btn-default btn-sm pull-right arxiu-download">
 												<span class="fa fa-download" title="<spring:message code="registre.annex.detalls.camp.fitxer.descarregar"/>"></span>
 											</a>
 										</td>												
@@ -913,7 +913,7 @@ tr.clicable {
 										<td><strong><spring:message code="registre.annex.detalls.camp.fitxer"/></strong></td>
 										<td>
 											${annex.titol}
-											<a href="descarregarAnnex/${annex.id}" class="btn btn-default btn-sm pull-right">
+											<a href="descarregarAnnex/${annex.id}?versioImprimible=true" class="btn btn-default btn-sm pull-right">
 												<span class="fa fa-download" title="<spring:message code="registre.annex.detalls.camp.fitxer.descarregar"/>"></span>
 											</a>
 										</td>
