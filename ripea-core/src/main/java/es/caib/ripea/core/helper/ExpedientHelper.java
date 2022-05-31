@@ -343,17 +343,22 @@ public class ExpedientHelper {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		
 		try {
-		//create expedient in arxiu
-		contingutHelper.arxiuPropagarModificacio(
-				expedient,
-				null,
-				false,
-				false,
-				null, false);
+			// create expedient in arxiu
+			contingutHelper.arxiuPropagarModificacio(
+					expedient,
+					null,
+					false,
+					false,
+					null,
+					false);
+
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(true);
+			}
 		} catch (Exception ex) {
 			ok = false;
-			logger.error("Error al custodiar expedient en arxiu  (" +
-					"id=" + expedient.getId() + ")",
+			logger.error(
+					"Error al custodiar expedient en arxiu  (" + "id=" + expedient.getId() + ")",
 					ex);
 		}
 		expedient.updateArxiuIntent();
