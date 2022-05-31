@@ -1084,7 +1084,7 @@ public class MetaExpedientController extends BaseAdminController {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		try {
-			metaExpedientService.actualitzaProcediments(entitat);
+			metaExpedientService.actualitzaProcediments(entitat, request.getLocale().getLanguage());
 		} catch (Exception e) {
 			logger.error("Error inesperat al actualitzar els procediments", e);
 			model.addAttribute("errors", e.getMessage());
@@ -1105,18 +1105,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@ResponseBody
 	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		ProgresActualitzacioDto progresActualitzacioDto = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
-		if (progresActualitzacioDto != null)
-			for (ActualitzacioInfo info: progresActualitzacioDto.getInfo()) {
-				if (info.isHasInfo()) {
-					String titol = getMessage(request, info.getInfoTitol());
-					String text = getMessage(request, info.getInfoText(), info.getInfoParams());
-					logger.info("INFO - titol: " + info.getInfoTitol() + " --> " + titol + ", text: " + info.getInfoText() + " --> " + text);
-					info.setInfoTitol(titol);
-					info.setInfoText(text);
-				}
-			}
-		return progresActualitzacioDto;
+		return metaExpedientService.getProgresActualitzacio(entitat.getCodi());
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientController.class);

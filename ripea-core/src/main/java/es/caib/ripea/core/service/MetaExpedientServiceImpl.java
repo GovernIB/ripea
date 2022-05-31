@@ -1284,7 +1284,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Override
 	@Transactional
-	public void actualitzaProcediments(EntitatDto entitatDto) {
+	public void actualitzaProcediments(EntitatDto entitatDto, String lang) {
 
 		logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 		// Comprova si hi ha una altre instància del procés en execució
@@ -1305,9 +1305,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			progres.setNumProcediments(metaExpedients.size());
 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
-					.infoTitol("metaexpedient.actualitzacio.inici.titol")
-					.infoText("metaexpedient.actualitzacio.inici.text")
-					.infoParams(new String[] { Integer.toString(metaExpedients.size()) }).build());
+					.infoTitol("es".equalsIgnoreCase(lang) ? "Inicio del proceso de actualitzaci&#243;n de procedimientos" : "Inici del proc&#233;s d&#39;actualitzaci&#243; de procediments")
+					.infoText("es".equalsIgnoreCase(lang) ? "Se actualizar&#225;n " + metaExpedients.size() + " procedimientos" : "S&#39;actualitzaran " + metaExpedients.size() + " procediments").build());
 
 			Integer modificats = 0;
 			Integer fallat = 0;
@@ -1328,7 +1327,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					infoBuilder.exist(procedimentGga != null);
 				} catch (SistemaExternException se) {
 					infoBuilder.hasError(true);
-					infoBuilder.errorText("Error al recuperar el procediment de Rolsac: " + se.getMessage());
+					infoBuilder.errorText(("es".equalsIgnoreCase(lang) ? "Error al recuperar el procedimiento de Rolsac" : "Error al recuperar el procediment de Rolsac: ") + se.getMessage());
 					progres.addInfo(infoBuilder.build());
 					fallat++;
 					continue;
@@ -1336,7 +1335,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 				if (procedimentGga == null) {
 					infoBuilder.hasError(true);
-					infoBuilder.errorText("No existeix cap procediment actiu amb codi SIA " + metaExpedient.getClassificacioSia() + " a Rolsac.");
+					infoBuilder.errorText("es".equalsIgnoreCase(lang) ? "No existe ning&#250;n procedimiento activo con el c&#243;digo SIA " + metaExpedient.getClassificacioSia() + " en Rolsac.": "No existeix cap procediment actiu amb el codi SIA " + metaExpedient.getClassificacioSia() + " a Rolsac.");
 					progres.addInfo(infoBuilder.build());
 					fallat++;
 					continue;
@@ -1356,6 +1355,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				String nom = metaExpedient.getNom();
 				String descripcio = metaExpedient.getDescripcio();
 				OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+				boolean organNoSincronitzat = false;
 
 				if (!procedimentGga.getNom().equals(metaExpedient.getNom())) {
 					nom = procedimentGga.getNom();
@@ -1368,22 +1368,25 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				} else if (!procedimentGga.getUnitatOrganitzativaCodi().equals(metaExpedient.getOrganGestor().getCodi())) {
 					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
 					if (organGestor == null) {
+						organNoSincronitzat = true;
+						organGestor = metaExpedient.getOrganGestor();
 						info.setHasError(true);
-						info.setErrorText("L'òrgan gestor no existeix a RIPEA. Realitzi una sincronització d'òrgans, i si tot i així encara no es troba l'òrgan, comprovi que està correctament configurat a ROLSAC.");
+						info.setErrorText("es".equalsIgnoreCase(lang) ?
+								"El &#243;rgano gestor no existe en RIPEA. Realice una sincronizaci&#243;n de &#243;rganos, y si a&#250;n no se encuentra el &#243;rgano, compruebe que est&#225; correctamente configurado en ROLSAC." :
+								"L&#39;&#242;rgan gestor no existeix a RIPEA. Realitzi una sincronitzaci&#243; d&#39;&#242;rgans, i si tot i aix&#237; encara no es troba l&#39;&#242;rgan, comprovi que est&#224; correctament configurat a ROLSAC.");
 						fallat++;
 					}
 				}
 
+				metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
 				progres.addInfo(info);
+				modificats++;
 
-				if (!info.isHasCanvis())
-					modificats++;
 			}
 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
-					.infoTitol("metaexpedient.actualitzacio.fi.titol")
-					.infoText("metaexpedient.actualitzacio.fi.text")
-					.infoParams(new String[] { modificats.toString(), fallat.toString() }).build());
+					.infoTitol("es".equalsIgnoreCase(lang) ? "Fin del proceso de actualitzaci&#243; de procedimientos" : "Fi del proc&#233;s d&#39;actualitzaci&#243; de procediments")
+					.infoText("es".equalsIgnoreCase(lang) ? "Se han modificado " + modificats + " procedimientos, y " + fallat + " han dado error" : "S&#39;han modificat " + modificats + " procediments, i " + fallat + " han donat error").build());
 
 			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
 			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);

@@ -574,5 +574,5 @@ public interface MetaExpedientService {
 	ProgresActualitzacioDto getProgresActualitzacio(String codi);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	void actualitzaProcediments(EntitatDto entitat);
+	void actualitzaProcediments(EntitatDto entitat, String lang);
 }

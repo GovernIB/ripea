@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - property:
+      name: booleanUnit
+      value: 1
+      dbms: oracle
+  - property:
+      name: booleanUnit
+      value: true
+      dbms: postgresql
+  - changeSet:
+      id: 1653978777186-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_metaexpedient
+            columns:
+              - column:
+                  name: oragan_no_sinc
+                  type: boolean
+                  valueBoolean: false

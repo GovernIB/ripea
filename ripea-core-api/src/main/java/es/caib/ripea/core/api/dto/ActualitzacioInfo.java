@@ -34,7 +34,6 @@ public class ActualitzacioInfo {
     String errorText;
     String infoTitol;
     String infoText;
-    String[] infoParams;
 
     public void setNomNou(String nomNou) {
         this.nomNou = nomNou;

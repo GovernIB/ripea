@@ -459,8 +459,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public void actualitzaProcediments(EntitatDto entitat) {
-		delegate.actualitzaProcediments(entitat);
+	public void actualitzaProcediments(EntitatDto entitat, String lang) {
+		delegate.actualitzaProcediments(entitat, lang);
 	}
 
 }

@@ -108,6 +108,9 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@Column(name = "crear_regla_dist_error", length = 1024)
 	private String crearReglaDistribucioError;
 
+	@Column(name = "oragan_no_sinc", nullable = false)
+	private boolean organNoSincronitzat;
+
 	public void updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat) {
 		this.crearReglaDistribucioEstat = crearReglaDistribucioEstat;
 	}
@@ -163,10 +166,12 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	public void updateSync(
 			String nom,
 			String descripcio,
-			OrganGestorEntity organGestor) {
+			OrganGestorEntity organGestor,
+			boolean organNoSincronitzat) {
 		this.nom = nom;
 		this.descripcio = descripcio;
 		this.organGestor = organGestor;
+		this.organNoSincronitzat = organNoSincronitzat;
 	}
 
 	public static Builder getBuilder(
