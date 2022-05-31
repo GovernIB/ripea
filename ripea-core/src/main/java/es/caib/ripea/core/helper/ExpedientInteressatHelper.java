@@ -157,6 +157,12 @@ public class ExpedientInteressatHelper {
 					interessatAdministracioDto.getEntregaDehObligat(),
 					interessatAdministracioDto.getIncapacitat()).build();
 		}
+		
+		boolean throwException = false;//throwException = true
+		if (throwException) {
+			throw new RuntimeException("Mock excepcion al crear interessat ");
+		}
+		
 		if (pare != null) {
 			interessatEntity.updateEsRepresentant(true);
 		}
