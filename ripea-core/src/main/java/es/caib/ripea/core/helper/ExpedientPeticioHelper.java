@@ -96,7 +96,6 @@ public class ExpedientPeticioHelper {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void canviEstatExpedientPeticio(
 			Long expedientPeticioId,
 			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
@@ -105,6 +104,13 @@ public class ExpedientPeticioHelper {
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null)
 			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void canviEstatExpedientPeticioNewTransaction(
+			Long expedientPeticioId,
+			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
+		canviEstatExpedientPeticio(expedientPeticioId, expedientPeticioEstatEnumDto);
 	}
 
 	@Transactional

@@ -84,7 +84,6 @@ import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -162,8 +161,7 @@ public class ContingutHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+
 
 
 	public ContingutDto toContingutDto(

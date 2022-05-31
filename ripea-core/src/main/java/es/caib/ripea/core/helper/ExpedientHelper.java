@@ -49,6 +49,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
@@ -161,6 +162,8 @@ public class ExpedientHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private ExpedientPeticioHelper expedientPeticioHelper;
 	
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
@@ -197,6 +200,13 @@ public class ExpedientHelper {
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
 		
+		
+//		try {
+//			Thread.sleep(5000L);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		if (metaExpedientId == null) {
 			throw new ValidationException(
@@ -312,6 +322,7 @@ public class ExpedientHelper {
 			if (associarInteressats) {
 				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
 			}
+			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioId, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 		}
 		// crear carpetes per defecte del procediment
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
@@ -463,6 +474,11 @@ public class ExpedientHelper {
 		expedientEntity = expedientRepository.findOne(expedientId);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
+		
+		if (expedientEntity.getArxiuUuid() == null) {
+			throw new RuntimeException("Annex no s'ha processat perque expedient no es creat en arxiu");
+		}
+		
 		logger.info("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
 						expedientId + ", " + "registreAnnexId=" + registreAnnexId + 
 						", " + "registreAnnexNom=" + registreAnnexEntity.getNom() + 

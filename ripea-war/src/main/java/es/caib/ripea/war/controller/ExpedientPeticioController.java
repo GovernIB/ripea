@@ -519,6 +519,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		
 		boolean processatOk = true;
+		boolean expCreatArxiuOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		
@@ -540,6 +541,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						RolHelper.getRolActual(request), 
 						anexosIdsMetaDocsIdsMap);
 				processatOk = expedientDto.isProcessatOk();
+				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				
 				logger.info("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
 				
@@ -576,18 +578,29 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			}
 		}
 		
-		if (!processatOk) {
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"expedient.peticio.controller.acceptat.warning"));
+		if (!expCreatArxiuOk) {
+
+			return getModalControllerReturnValueWarning(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.warning.arxiu");
+			
+		} else {
+			if (!processatOk) {
+				MissatgesHelper.warning(
+						request, 
+						getMessage(
+								request, 
+								"expedient.peticio.controller.acceptat.warning"));
+			}
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.ok");
 		}
+
 		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:expedientPeticio",
-				"expedient.peticio.controller.acceptat.ok");
+
 	}
 	
 	

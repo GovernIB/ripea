@@ -241,7 +241,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual);
 		}
 		
-		expedientHelper.createArxiu(expedientId);
+		boolean expCreatArxiuOk = expedientHelper.createArxiu(expedientId);
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		logger.info(
@@ -256,48 +256,63 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean processatOk = true;
 		ExpedientPeticioEntity expedientPeticioEntity = null;
 		if (expedientPeticioId != null) {
+			
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			if (expCreatArxiuOk) {
+				expedientDto.setExpCreatArxiuOk(true);
 
-			expedientHelper.inicialitzarExpedientsWithImportacio();
-			for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
-				try {
-					expedientHelper.crearDocFromAnnex(
-							expedient.getId(),
-							registeAnnexEntity.getId(),
-							expedientPeticioEntity.getId(), 
-							anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()), rolActual);
-				} catch (Exception e) {
-					processatOk = false;
-					logger.error("Error crear doc from annex", e);
+				expedientHelper.inicialitzarExpedientsWithImportacio();
+				for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
+					try {
+						expedientHelper.crearDocFromAnnex(
+								expedient.getId(),
+								registeAnnexEntity.getId(),
+								expedientPeticioEntity.getId(), 
+								anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()), rolActual);
+					} catch (Exception e) {
+						processatOk = false;
+						logger.error("Error crear doc from annex", e);
+						expedientHelper.updateRegistreAnnexError(
+								registeAnnexEntity.getId(),
+								ExceptionUtils.getStackTrace(e));
+
+					}
+				}
+				String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
+				if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
+					try {
+						expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+						expedientHelper.crearDocFromUuid(
+								expedient.getId(),
+								arxiuUuid, 
+								expedientPeticioEntity.getId());
+					} catch (Exception e) {
+						processatOk = false;
+						logger.error("Error crear doc from uuid", e);
+					}
+					
+				}
+				if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
+					throw new DocumentAlreadyImportedException();
+				}
+				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity.getId(), ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+				if (processatOk) {
+					notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
+				}
+				expedientDto.setProcessatOk(processatOk);
+				
+			} else {
+				
+				for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 					expedientHelper.updateRegistreAnnexError(
 							registeAnnexEntity.getId(),
-							ExceptionUtils.getStackTrace(e));
+							"Annex no s'ha processat perque expedient na s'ha creat en arxiu");
+				}
+				expedientDto.setExpCreatArxiuOk(false);
+			}
 
-				}
-			}
-			String arxiuUuid = expedientPeticioEntity.getRegistre().getJustificantArxiuUuid();
-			if (arxiuUuid != null && isIncorporacioJustificantActiva()) {
-				try {
-					expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-					expedientHelper.crearDocFromUuid(
-							expedient.getId(),
-							arxiuUuid, 
-							expedientPeticioEntity.getId());
-				} catch (Exception e) {
-					processatOk = false;
-					logger.error("Error crear doc from uuid", e);
-				}
-				
-			}
-			if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
-				throw new DocumentAlreadyImportedException();
-			}
-			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity.getId(), ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
-			if (processatOk) {
-				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
-			}
 		}
-		expedientDto.setProcessatOk(processatOk);
+
 		
 		logger.info(
 				"Expedient crear Service End(" +
