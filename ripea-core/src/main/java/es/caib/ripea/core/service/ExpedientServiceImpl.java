@@ -295,7 +295,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				if (!expedientHelper.consultaExpedientsAmbImportacio().isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 					throw new DocumentAlreadyImportedException();
 				}
-				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity.getId(), ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 				if (processatOk) {
 					notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 				}
