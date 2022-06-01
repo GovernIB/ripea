@@ -45,6 +45,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
@@ -91,6 +92,8 @@ public class MetaExpedientHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired
+	private ExpedientRepository expedientRepository;
     
 	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
@@ -118,7 +121,13 @@ public class MetaExpedientHelper {
 			return sequencia.getValor();
 		} else if (incrementar) {
 			sequencia.incrementar();
-			logger.info("Sequencia incrementada: "+ sequencia.getAny() + ", " + sequencia.getValor() + ", "  + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
+			logger.info("Sequencia incrementada: " + sequencia.getAny() + ", " + sequencia.getValor() + ", " + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
+			long max = expedientRepository.findMaxSequencia(metaExpedient, any);
+			long valor = sequencia.getValor();
+			if (max + 1 > valor) {
+				logger.error("Sequenia no correcta: valorSequenciaIncrementada=" + valor + ", maxSequenciaExp=" + max + ". Actualitzant valor de sequncia manualment...");
+				sequencia.updateValor(max + 1);
+			}
 			return sequencia.getValor();
 		} else {
 			return sequencia.getValor() + 1;
