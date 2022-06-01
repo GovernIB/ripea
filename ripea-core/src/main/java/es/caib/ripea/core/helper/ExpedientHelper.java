@@ -167,7 +167,7 @@ public class ExpedientHelper {
  				throw new ValidationException(
 						"<creacio>",
 						ExpedientEntity.class,
-						"Ja s'ha creat expedient per aquesta anotació");
+						"Aquesta anotació ja està relacionada amb algun expedient");
 			}
 		}
 		ExpedientDto exp = findByMetaExpedientAndPareAndNomAndEsborrat(
@@ -383,8 +383,25 @@ public class ExpedientHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
 			Long expedientPeticioId,
-			Long expedientId) {
+			Long expedientId, 
+			String rolActual, 
+			Long entitatId, 
+			boolean associarInteressats) {
+		
+		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findOne(expedientPeticioId);
+		if (expedientPeticio.getExpedient() != null) {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"Aquesta anotació ja està relacionada amb algun expedient");
+		}
+		
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
+		expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioId, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+		
+		if (associarInteressats) {
+			associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual);
+		}
 	}
 
 	@Transactional

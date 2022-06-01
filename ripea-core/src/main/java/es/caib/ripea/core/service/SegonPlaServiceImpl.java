@@ -122,11 +122,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							registre,
 							expedientPeticioEntity);
 					
-					// change state of expedient peticion to pendent of acceptar or rebutjar
-					expedientPeticioHelper.canviEstatExpedientPeticio(
-							expedientPeticioEntity.getId(),
-							ExpedientPeticioEstatEnumDto.PENDENT);
-
 					// change state of registre in DISTRIBUCIO to BACK_REBUDA
 					DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 							anotacioRegistreId,

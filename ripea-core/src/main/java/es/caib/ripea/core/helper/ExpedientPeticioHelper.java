@@ -133,7 +133,7 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
 				registreEntrada.getEntitatCodi());
@@ -218,6 +218,12 @@ public class ExpedientPeticioHelper {
 							annex,
 							registreEntity));
 		}
+		
+		// change state of expedient peticion to pendent of acceptar or rebutjar
+		canviEstatExpedientPeticio(
+				expedientPeticioEntity.getId(),
+				ExpedientPeticioEstatEnumDto.PENDENT);
+		
 	}
 
 	private RegistreInteressatEntity crearInteressatEntity(
