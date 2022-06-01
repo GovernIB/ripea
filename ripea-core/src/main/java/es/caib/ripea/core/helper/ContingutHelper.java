@@ -266,6 +266,8 @@ public class ContingutHelper {
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
 			
+			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
+			
 			
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());
