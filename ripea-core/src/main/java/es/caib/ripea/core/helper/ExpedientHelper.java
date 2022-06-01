@@ -103,15 +103,25 @@ public class ExpedientHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
+	@Autowired
+	private AlertaRepository alertaRepository;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
+	@Autowired
+	private ExpedientPeticioHelper expedientPeticioHelper;
+
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
+
 	/**
 	 * 
-	 * This method is synchronized to avoid possibility of getting and using same sequence by concurrent threads
+	 * This method is synchronized to avoid possibility of getting and using same sequence by concurrent threads, to avoid creating expedients with the same name by concurrent threads, to avoid creating expedients from the same annotation by concurrent threads
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public synchronized Long create(
+	public Long create(
 			Long entitatId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
@@ -124,12 +134,57 @@ public class ExpedientHelper {
 			boolean associarInteressats,
 			Long grupId, 
 			String rolActual) {
+
+		logger.info(
+				"Expedient crear Helper START(" +
+						"entitatId=" + entitatId + ", " +
+						"metaExpedientId=" + metaExpedientId + ", " +
+						"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
+						"organGestorId=" + organGestorId + ", " +
+						"pareId=" + pareId + ", " +
+						"any=" + any + ", " +
+						"sequencia=" + sequencia + ", " +
+						"nom=" + nom + ", " +
+						"expedientPeticioId=" + expedientPeticioId + ")");
+
+
+//		try {
+//			Thread.sleep(5000L);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+
 		if (metaExpedientId == null) {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
 					"No es pot crear un expedient sense un meta-expedient associat");
 		}
+		if (expedientPeticioId != null) {
+			ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findOne(expedientPeticioId);
+			if (expedientPeticio.getExpedient() != null) {
+ 				throw new ValidationException(
+						"<creacio>",
+						ExpedientEntity.class,
+						"Ja s'ha creat expedient per aquesta anotació");
+			}
+		}
+		ExpedientDto exp = findByMetaExpedientAndPareAndNomAndEsborrat(
+				entitatId,
+				metaExpedientId,
+				pareId,
+				nom,
+				0,
+				rolActual,
+				organGestorId);
+		if (exp != null) {
+			throw new ValidationException(
+					"<creacio>",
+					ExpedientEntity.class,
+					"Ja existeix expedient amb aquest nom");
+		}
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
 				entitat,
@@ -214,6 +269,7 @@ public class ExpedientHelper {
 			if (associarInteressats) {
 				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
 			}
+			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioId, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 		}
 		// crear carpetes per defecte del procediment
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
@@ -223,29 +279,57 @@ public class ExpedientHelper {
 			throw new RuntimeException("Mock excepcion al crear expedient");
 		}
 		
+		logger.info(
+				"Expedient crear Helper END(" +
+						"sequencia=" + expedient.getSequencia() + ", " +
+						"any=" + expedient.getAny() + ", " +
+						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
+
+		return expedient.getId();
+	}
+
+
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public boolean createArxiu(
+			Long expedientId) {
+
+		logger.info(
+				"Expedient crear ARXIU Helper START(" +
+						"expedientId=" + expedientId + ")");
+		boolean ok = true;
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+
 		try {
-		//create expedient in arxiu
-		contingutHelper.arxiuPropagarModificacio(
-				expedient,
-				null,
-				false,
-				false,
-				null, false);
+			// create expedient in arxiu
+			contingutHelper.arxiuPropagarModificacio(
+					expedient,
+					null,
+					false,
+					false,
+					null,
+					false);
+
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(true);
+			}
 		} catch (Exception ex) {
-			logger.error("Error al custodiar expedient en arxiu  (" +
-					"id=" + expedient.getId() + ")",
+			ok = false;
+			logger.error(
+					"Error al custodiar expedient en arxiu  (" + "id=" + expedient.getId() + ")",
 					ex);
 		}
 		expedient.updateArxiuIntent();
 		
 		logger.info(
-				"Expedient creat Helper (" +
+				"Expedient crear ARXIU Helper END(" +
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
 						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 		
-		return expedient.getId();
+		return ok;
 	}
+
 
 	@Transactional
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
@@ -335,6 +419,11 @@ public class ExpedientHelper {
 		expedientEntity = expedientRepository.findOne(expedientId);
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
+
+		if (expedientEntity.getArxiuUuid() == null) {
+			throw new RuntimeException("Annex no s'ha processat perque expedient no es creat en arxiu");
+		}
+
 		logger.info("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
 						expedientId + ", " + "registreAnnexId=" + registreAnnexId + 
 						", " + "registreAnnexNom=" + registreAnnexEntity.getNom() + 
@@ -659,6 +748,66 @@ public class ExpedientHelper {
 		return expedient;
 	}
 	
+
+
+	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
+			Long entitatId,
+			Long metaExpedientId,
+			Long pareId,
+			String nom,
+			int esborrat,
+			String rolActual,
+			Long organId) {
+		logger.debug(
+				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
+						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + "organId=" + organId + "rolActual=" + rolActual + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+				entitat,
+				metaExpedientId,
+				false,
+				false,
+				true,
+				false,
+				false,
+				rolActual,
+				organId);
+
+		ContingutEntity contingutPare = null;
+		if (pareId != null) {
+			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					pareId,
+					false,
+					false,
+					true,
+					false, false, null);
+		}
+		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
+				metaExpedient,
+				contingutPare,
+				nom,
+				esborrat);
+		return expedient == null ? null : toExpedientDto(expedient, true, null, false);
+	}
+
+
+	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {
+		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(
+				expedient,
+				ambPathIPermisos,
+				false,
+				false,
+				false,
+				ambPathIPermisos,
+				false,
+				false,
+				rolActual,
+				onlyForList, null);
+		return expedientDto;
+	}
+
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public List<Long> getMetaExpedientIdDomini(String dominiCodi) {
 		List<Long> metaExpedientIdDomini = new ArrayList<Long>();
@@ -705,6 +854,32 @@ public class ExpedientHelper {
 				false, null, false, null);
 	}
 
+
+	public ExpedientDto toExpedientDto(ExpedientEntity entity) {
+		ExpedientDto dto = new ExpedientDto();
+
+		dto.setNumero(calcularNumero(entity));
+		dto.setNom(entity.getNom());
+		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, entity.getId()) > 0);
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity).isEmpty());
+		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(entity));
+		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(entity));
+		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(entity));
+		dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(entity));
+		dto.setArxiuUuid(entity.getArxiuUuid());
+		dto.setId(entity.getId());
+		dto.setCreatedDate(entity.getCreatedDate().toDate());
+		dto.setEstat(entity.getEstat());
+		dto.setAgafatPer(conversioTipusHelper.convertir(entity.getAgafatPer(),UsuariDto.class));
+		// expedient estat
+		if (entity.getExpedientEstat() != null) {
+			dto.setExpedientEstat(conversioTipusHelper.convertir(
+					entity.getExpedientEstat(),
+					ExpedientEstatDto.class));
+		}
+
+		return dto;
+	}
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
 
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false, null);

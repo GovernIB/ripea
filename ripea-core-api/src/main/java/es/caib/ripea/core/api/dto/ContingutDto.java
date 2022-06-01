@@ -38,6 +38,8 @@ public abstract class ContingutDto extends AuditoriaDto {
 	private boolean hasFills;
 	protected Date esborratData;
 	private boolean admin;
+	
+	private boolean conteDocumentsDefinitius;
 
 	protected int ordre;
 	

@@ -160,7 +160,7 @@
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.node"/></c:set>
 				</c:otherwise>
 			</c:choose>
-			<c:if test="${!contingut.document || (contingut.document && contingut.estat != 'DEFINITIU')}">
+			<c:if test="${(!contingut.document && !contingut.conteDocumentsDefinitius) || (contingut.document && contingut.estat != 'DEFINITIU')}">
 				<c:choose>
 					<c:when test="${isTasca}">
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>

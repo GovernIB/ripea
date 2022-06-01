@@ -106,8 +106,7 @@ public class ContingutHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-	@Autowired
-	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+
 
 
 	public ContingutDto toContingutDto(
@@ -212,6 +211,7 @@ public class ContingutHelper {
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
 
+			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
 
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());

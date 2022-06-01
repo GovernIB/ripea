@@ -9,12 +9,16 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.war.command.ContenidorCommand.Create;
+import es.caib.ripea.war.command.ContenidorCommand.Update;
+import es.caib.ripea.war.validation.ExpedientODocumentNom;
 
 /**
  * Command per al expedient peticio rebutjar
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ExpedientODocumentNom(groups = {Create.class, Update.class})
 public class ExpedientPeticioAcceptarCommand {
 
 	private Long id;

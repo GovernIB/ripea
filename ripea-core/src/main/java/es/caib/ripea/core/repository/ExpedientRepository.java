@@ -563,5 +563,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIdsPermitted") List<Long> organsIdsPermitted,
 			@Param("metaNode") MetaNodeEntity metaNode);
+	
+	
+	@Query(	"select" +
+			"    max(e.sequencia) " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"e.metaNode = :metaNode " +
+			"and e.any = :any")
+	long findMaxSequencia(
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("any") int any);
+	
 
 }
