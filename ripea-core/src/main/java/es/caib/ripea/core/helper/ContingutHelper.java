@@ -3,6 +3,31 @@
  */
 package es.caib.ripea.core.helper;
 
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.registre.RegistreInteressat;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.repository.*;
+import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
+import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,87 +41,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfDictionary;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfReader;
-
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DadaDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentVersioDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaNodeDto;
-import es.caib.ripea.core.api.dto.NodeDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.PermissionDeniedException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.registre.RegistreInteressat;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.ContingutMovimentEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.GrupEntity;
-import es.caib.ripea.core.entity.InteressatAdministracioEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
-import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.TipusDocumentalEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ContingutMovimentRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.ExpedientTascaRepository;
-import es.caib.ripea.core.repository.GrupRepository;
-import es.caib.ripea.core.repository.InteressatRepository;
-import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
-import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 
 /**
  * Utilitat per a gestionar contenidors.
@@ -186,9 +130,9 @@ public class ContingutHelper {
 			boolean ambDades,
 			boolean ambPath,
 			boolean pathNomesFinsExpedientArrel,
-			boolean ambVersions, 
-			String rolActual, 
-			boolean onlyForList, 
+			boolean ambVersions,
+			String rolActual,
+			boolean onlyForList,
 			Long organActualId) {
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
@@ -201,7 +145,7 @@ public class ContingutHelper {
 
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
 			ExpedientDto dto = new ExpedientDto();
-			
+
 			dto.setEstat(expedient.getEstat());
 			dto.setNumero(expedientHelper.calcularNumero(expedient));
 			dto.setAgafatPer(
@@ -210,7 +154,7 @@ public class ContingutHelper {
 							UsuariDto.class));
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
-			
+
 			// expedient estat
 			if (expedient.getExpedientEstat() != null) {
 				dto.setExpedientEstat(conversioTipusHelper.convertir(
@@ -226,14 +170,14 @@ public class ContingutHelper {
 						false,
 						true,
 						false,
-						false, 
-						false, 
-						rolActual, 
+						false,
+						false,
+						rolActual,
 						null);
 				dto.setUsuariActualWrite(true);
 			} catch (PermissionDeniedException ex) {
 			}
-			
+
 			try {
 				dto.setUsuariActualDelete(false);
 				entityComprovarHelper.comprovarPermisosMetaNode(
@@ -242,21 +186,21 @@ public class ContingutHelper {
 						false,
 						false,
 						false,
-						true, 
-						false, 
-						rolActual, 
+						true,
+						false,
+						rolActual,
 						null);
 				dto.setUsuariActualDelete(true);
 			} catch (PermissionDeniedException ex) {
 			}
 			logger.trace("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
-			
+
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			if (auth != null) {
 				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-				if (expedient.getSeguidors().contains(usuariActual)) 
+				if (expedient.getSeguidors().contains(usuariActual))
 					dto.setSeguidor(true);
 			}
 			dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
@@ -267,8 +211,8 @@ public class ContingutHelper {
 					expedient.getMetaNode(),
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
-			
-			
+
+
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());
 				dto.setTancatMotiu(expedient.getTancatMotiu());
@@ -285,9 +229,9 @@ public class ContingutHelper {
 				dto.setSistraUnitatAdministrativa(expedient.getSistraUnitatAdministrativa());
 				dto.setSistraClau(expedient.getSistraClau());
 				dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions( ).isEmpty() ? true : false);
-				
 
-				
+
+
 				dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
 				dto.setConteDocumentsFirmats(
 						documentRepository.countByExpedientAndEstat(
@@ -299,16 +243,16 @@ public class ContingutHelper {
 					ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getExpedientEstat().getMetaExpedient(), expedient.getExpedientEstat().getOrdre()+1);
 					if (estat != null) {
 						dto.setExpedientEstatNextInOrder(estat.getId());
-					} else {//if there is no estat with higher order, choose previous 
+					} else {//if there is no estat with higher order, choose previous
 						dto.setExpedientEstatNextInOrder(expedient.getExpedientEstat().getId());
 					}
 				}
-				
+
 				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
 				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
 						expedient), InteressatDto.class));
 				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
-				
+
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
 						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
@@ -366,12 +310,12 @@ public class ContingutHelper {
 				TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
 						document.getNtiTipoDocumental(),
 						contingut.getEntitat());
-				
+
 				if (tipusDocumental != null) {
 					dto.setNtiTipoDocumentalNom(tipusDocumental.getNom());
 				} else {
 					List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
-					
+
 					for (TipusDocumentalDto docAddicional : docsAddicionals) {
 						if (docAddicional.getCodi().equals(document.getNtiTipoDocumental())) {
 							dto.setNtiTipoDocumentalNom(docAddicional.getNom());
@@ -415,33 +359,33 @@ public class ContingutHelper {
 								false,
 								false, null, true, null));
 			resposta = dto;
-		} 
+		}
 
 		long t3 = System.currentTimeMillis();
 		// ##################### CONTINGUT ##################################
-		
+
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setCreatedDate(contingut.getCreatedDate().toDate());
-		
+
 		resposta.setAlerta(
 				alertaRepository.countByLlegidaAndContingutId(
 				false,
 				contingut.getId()) > 0);
-		
+
 		if (!onlyForList) {
-			
+
 			resposta.setEsborrat(contingut.getEsborrat());
 			resposta.setEsborratData(contingut.getEsborratData());
 			resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
-			
+
 			if (!contingut.getFills().isEmpty()) {
 				resposta.setHasFills(true);
 			} else {
 				resposta.setHasFills(false);
 			}
-			
+
 			if (contingut.getExpedient() != null) {
 				resposta.setExpedientPare(
 						(ExpedientDto)toContingutDto(
@@ -452,7 +396,7 @@ public class ContingutHelper {
 								true,
 								false,
 								false,
-								false, 
+								false,
 								rolActual, onlyForList, organActualId));
 			}
 			resposta.setEntitat(
@@ -468,16 +412,16 @@ public class ContingutHelper {
 				resposta.setDarrerMovimentData(darrerMoviment.getCreatedDate().toDate());
 				resposta.setDarrerMovimentComentari(darrerMoviment.getComentari());
 			}
-			
+
 			if (ambPermisos && metaNode != null) {
 				// Omple els permisos
 				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
 			}
-			
+
 			if (ambPermisos) {
 				resposta.setAdmin(checkIfUserIsAdminOfContingut(contingut.getId(), rolActual));
 			}
-			
+
 			// Omple la informació d'auditoria
 			resposta.setCreatedBy(
 					conversioTipusHelper.convertir(
@@ -488,7 +432,7 @@ public class ContingutHelper {
 							contingut.getLastModifiedBy(),
 							UsuariDto.class));
 			resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
-		
+
 
 			if (ambPath) {
 				// Calcula el path
@@ -511,15 +455,15 @@ public class ContingutHelper {
 						contingut,
 						0,
 						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-				
+
 				List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
 						contingut,
 						0,
 						new Sort("createdDate"));
-				
+
 				fills.addAll(fillsOrder1);
 				fills.addAll(fillsOrder2);
-				
+
 				if (filtrarFillsSegonsPermisRead) {
 					// Filtra els fills que no tenen permis de lectura
 					Iterator<ContingutEntity> it = fills.iterator();
@@ -588,9 +532,9 @@ public class ContingutHelper {
 		logger.trace("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
-	
+
 	public boolean checkIfUserIsAdminOfContingut(Long contingutId, String rolActual) {
-		
+
 		ContingutEntity contingut = contingutRepository.findOne(contingutId);
 		boolean admin = false;
 		if (rolActual != null) {
@@ -618,7 +562,7 @@ public class ContingutHelper {
 		}
 		return admin;
 	}
-	
+
 	public DocumentDto generarDocumentDto(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
 			MetaDocumentEntity metaDocument,
@@ -627,7 +571,7 @@ public class ContingutHelper {
 		MetaNodeDto metaNode = null;
 		String interessatNif = null;
 		String interessatNom = null;
-		
+
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		InteressatEntity interessat = HibernateHelper.deproxy(documentEnviamentInteressatEntity.getInteressat());
 		if (interessat instanceof InteressatPersonaFisicaEntity) {
@@ -645,7 +589,7 @@ public class ContingutHelper {
 			interessatNif = interessatA.getDocumentNum();
 			interessatNom = interessatA.getOrganNom();
 		}
-		
+
 		if (interessatNif != null && interessatNom != null)
 			dto.setNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom);
 		else
@@ -662,7 +606,7 @@ public class ContingutHelper {
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
-			
+
 //			## Comprovar si la certificació està firmada
 			if (resposta.getCertificacioTipusMime() != null && resposta.getCertificacioTipusMime().equals("application/pdf") && isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
 				dto.setAmbFirma(true);
@@ -677,9 +621,9 @@ public class ContingutHelper {
 		dto.setNtiOrigen(metaDocument.getNtiOrigen());
 		dto.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
 		dto.setNtiTipoDocumental(metaDocument.getNtiTipoDocumental());
-		
+
 		dto.setNtiCsv(resposta.getCertificacioCsv());
-		
+
 		metaNode = conversioTipusHelper.convertir(
 				metaDocument,
 				MetaDocumentDto.class);
@@ -693,8 +637,8 @@ public class ContingutHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin, 
+			boolean comprovarPermisDelete,
+			boolean checkPerMassiuAdmin,
 			String rolActual) {
 		ContingutEntity contingut = comprovarContingutDinsExpedientModificable(
 				entitatId,
@@ -702,8 +646,8 @@ public class ContingutHelper {
 				comprovarPermisRead,
 				comprovarPermisWrite,
 				comprovarPermisCreate,
-				comprovarPermisDelete, 
-				checkPerMassiuAdmin, 
+				comprovarPermisDelete,
+				checkPerMassiuAdmin,
 				rolActual);
 		if (!(contingut instanceof NodeEntity)) {
 			throw new ValidationException(
@@ -721,14 +665,14 @@ public class ContingutHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin, 
+			boolean comprovarPermisDelete,
+			boolean checkPerMassiuAdmin,
 			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
-				false, 
+				false,
 				true, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
@@ -739,8 +683,8 @@ public class ContingutHelper {
 				contingut,
 				true,
 				false,
-				true, 
-				checkPerMassiuAdmin, 
+				true,
+				checkPerMassiuAdmin,
 				rolActual);
 		if (expedient == null) {
 			throw new ValidationException(
@@ -770,7 +714,7 @@ public class ContingutHelper {
 			}
 		}
 
-		
+
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
 			if (comprovarPermisWrite) {
@@ -785,8 +729,8 @@ public class ContingutHelper {
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
-					comprovarPermisDelete, 
-					checkPerMassiuAdmin, 
+					comprovarPermisDelete,
+					checkPerMassiuAdmin,
 					rolActual);
 		}
 		return contingut;
@@ -820,7 +764,7 @@ public class ContingutHelper {
 				entitatId,
 				false,
 				false,
-				false, 
+				false,
 				true, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				entitat,
@@ -830,7 +774,7 @@ public class ContingutHelper {
 				contingut,
 				true,
 				false,
-				false, 
+				false,
 				false, null);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			comprovarPermisosExpedient(
@@ -842,13 +786,13 @@ public class ContingutHelper {
 		}
 		return contingut;
 	}
-	
-	
+
+
 	public ContingutEntity comprovarContingutPertanyTascaAccesible(
 			Long entitatId,
 			Long tascaId,
 			Long contingutId) {
-		
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
@@ -859,15 +803,15 @@ public class ContingutHelper {
 				contingutId);
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(tascaId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
-		
+
+
 		if (!expedientTascaEntity.getExpedient().getId().equals(contingut.getExpedientPare().getId())) {
 			throw new SecurityException("Contingut no pertany a la tasca accesible("
 					+ "tascaId=" + expedientTascaEntity.getId() + ", "
 					+ "contingutId=" + contingutId + ", "
 					+ "usuari=" + auth.getName() + ")");
 		}
-		
+
 		if (expedientTascaEntity.getResponsables() != null) {
 			boolean pemitted = false;
 			for (UsuariEntity responsable : expedientTascaEntity.getResponsables()) {
@@ -881,15 +825,15 @@ public class ContingutHelper {
 						+ "usuari=" + auth.getName() + ")");
 			}
 		}
-		
+
 		return contingut;
 	}
-	
-	
+
+
 
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			ContingutEntity contingut, 
+			ContingutEntity contingut,
 			String rolActual) throws IOException {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
@@ -916,10 +860,10 @@ public class ContingutHelper {
 		// Marca el contingut i tots els seus fills com a esborrats
 		//  de forma recursiva
 		marcarEsborrat(contingut);
-		
+
 		// Valida si conté documents definitius
 		if (!conteDocumentsDefinitius(contingut)) {
-			
+
 			// Si el contingut és un document guarda una còpia del fitxer esborrat
 			// per a poder recuperar-lo posteriorment
 			if (contingut instanceof DocumentEntity) {
@@ -946,7 +890,7 @@ public class ContingutHelper {
 		}
 		return dto;
 	}
-	
+
 	private boolean conteDocumentsDefinitius(ContingutEntity contingut) {
 		boolean conteDefinitius = false;
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
@@ -962,7 +906,7 @@ public class ContingutHelper {
 		}
 		return conteDefinitius;
 	}
-	
+
 	private void fitxerDocumentEsborratGuardarEnTmp(
 			DocumentEntity document) throws IOException {
 		File fContent = new File(getBaseDir() + "/" + document.getId());
@@ -981,8 +925,8 @@ public class ContingutHelper {
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete, 
-			boolean checkPerMassiuAdmin, 
+			boolean comprovarPermisDelete,
+			boolean checkPerMassiuAdmin,
 			String rolActual) {
 		if (expedient.getMetaNode() != null) {
 			entityComprovarHelper.comprovarPermisosMetaNode(
@@ -991,9 +935,9 @@ public class ContingutHelper {
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
-					comprovarPermisDelete, 
-					checkPerMassiuAdmin, 
-					rolActual, 
+					comprovarPermisDelete,
+					checkPerMassiuAdmin,
+					rolActual,
 					null);
 		} else {
 			throw new ValidationException(
@@ -1007,8 +951,8 @@ public class ContingutHelper {
 			ContingutEntity contingut,
 			boolean incloureActual,
 			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite, 
-			boolean checkPerMassiuAdmin, 
+			boolean comprovarPermisWrite,
+			boolean checkPerMassiuAdmin,
 			String rolActual) {
 		ExpedientEntity expedient = null;
 		if (incloureActual && contingut instanceof ExpedientEntity) {
@@ -1035,13 +979,13 @@ public class ContingutHelper {
 						true,
 						false,
 						false,
-						false, 
-						false, 
-						rolActual, 
+						false,
+						false,
+						rolActual,
 						null);
 			}
 			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
-				
+
 				// if user has write permissions to expedient estat don't need to check metaExpedient permissions
 				if (expedient.getExpedientEstat() == null || !hasEstatPermissons(expedient.getExpedientEstat().getId())) {
 
@@ -1050,10 +994,10 @@ public class ContingutHelper {
 							false,
 							true,
 							false,
-							false, 
-							false, 
+							false,
+							false,
 							rolActual);
-					
+
 				}
 			}
 		}
@@ -1067,7 +1011,7 @@ public class ContingutHelper {
 	 */
 	private boolean hasEstatPermissons(Long estatId){
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		return permisosHelper.isGrantedAll(
 				estatId,
 				ExpedientEstatEntity.class,
@@ -1194,9 +1138,9 @@ public class ContingutHelper {
 		UsuariEntity usuariAutenticat = usuariHelper.getUsuariAutenticat();
 		if (usuariAutenticat == null && contingut.getDarrerMoviment() != null)
 			usuariHelper.generarUsuariAutenticat(
-					contingut.getDarrerMoviment().getRemitent().getCodi(), 
+					contingut.getDarrerMoviment().getRemitent().getCodi(),
 					true);
-		
+
 		ContingutMovimentEntity contenidorMoviment = ContingutMovimentEntity.getBuilder(
 				contingut.getId(),
 				contingut.getPare().getId(),
@@ -1206,13 +1150,13 @@ public class ContingutHelper {
 		contingut.updateDarrerMoviment(
 				contenidorMovimentRepository.save(contenidorMoviment));
 		contingut.updatePare(desti);
-		
+
 		if (desti.getExpedient() == null) {
 			contingut.updateExpedient((ExpedientEntity) desti);
 		} else {
 			contingut.updateExpedient(desti.getExpedient());
 		}
-		
+
 		return contenidorMoviment;
 	}
 
@@ -1224,7 +1168,7 @@ public class ContingutHelper {
 		}
 		return contingutRepository.findOne(contingutActual.getId());
 	}
-	
+
 	public void findDescendants(
 			ContingutEntity contingut,
 			List<ContingutEntity> descendants) {
@@ -1243,7 +1187,7 @@ public class ContingutHelper {
 	 * Check if given name (@param nom) doesnt already exist inside given container (@param contingutPare)
 	 * @param contingutPare
 	 * @param nom
-	 * @param objectId
+	 * @param id
 	 * @param objectClass
 	 */
 	public void comprovarNomValid(
@@ -1270,16 +1214,16 @@ public class ContingutHelper {
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes, 
+			List<ArxiuFirmaDto> firmes,
 			boolean fromAnotacio) {
-		
+
 		boolean throwExcepcion = false;//throwExcepcion = true;
 		if (throwExcepcion) {
 			throw new RuntimeException("Mock Excepcion al actualitzar contingut en arxiu");
 		}
-		
+
 		boolean utilitzarCarpetes = fromAnotacio || !isCarpetaLogica();
-		
+
 		String serieDocumental = null;
 		ExpedientEntity expedient = contingut.getExpedient();
 		if (expedient != null) {
@@ -1382,7 +1326,7 @@ public class ContingutHelper {
 					desti.getArxiuUuid());
 		}
 	}
-	
+
 	public ContingutArxiu arxiuPropagarLink(
 			ContingutEntity contingut,
 			ContingutEntity desti) {
@@ -1463,17 +1407,17 @@ public class ContingutHelper {
 		}
 		return pathDto;
 	}
-	
+
 	public FitxerDto generarIndex(
-			EntitatEntity entitatActual, 
+			EntitatEntity entitatActual,
 			List<ExpedientEntity> expedients,
 			boolean exportar) throws IOException {
-		
+
 		byte[] indexGenerated = indexHelper.generarIndexPerExpedient(
 				expedients,
 				entitatActual,
 				exportar);
-		
+
 		FitxerDto fitxer = new FitxerDto();
 		if (expedients.size() > 1)
 			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".pdf");
@@ -1496,7 +1440,7 @@ public class ContingutHelper {
 			zos.write(fitxer.getContingut());
 		zos.closeEntry();
 	}
-	
+
 	public void tractarInteressats(List<RegistreInteressat> interessats) {
 		ListIterator<RegistreInteressat> iter = interessats.listIterator();
 		while(iter.hasNext()){
@@ -1505,16 +1449,16 @@ public class ContingutHelper {
 		    }
 		}
 	}
-	
-	
+
+
 	public void marcarEsborrat(ContingutEntity contingut) {
-		
+
 		if (contingut.getEsborrat() == 0) {
-			
+
 			for (ContingutEntity contingutFill: contingut.getFills()) {
 				marcarEsborrat(contingutFill);
 			}
-			
+
 			List<ContingutEntity> continguts = contingutRepository.findByPareAndNomOrderByEsborratAsc(
 					contingut.getPare(),
 					contingut.getNom());
@@ -1541,7 +1485,7 @@ public class ContingutHelper {
 		}
 
 	}
-	
+
 	public FitxerDto fitxerDocumentEsborratLlegir(
 			DocumentEntity document)  {
 		File fContent = new File(getBaseDir() + "/" + document.getId());
@@ -1555,7 +1499,7 @@ public class ContingutHelper {
 				inContent.close();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
-			} 
+			}
 			ArxiuDocumentContingut contingut = new ArxiuDocumentContingut(
 					ArxiuContingutTipusEnum.CONTINGUT,
 					null,
@@ -1592,11 +1536,11 @@ public class ContingutHelper {
 	public String getBaseDir() {
 		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
 	}
-	
+
 	public boolean isCarpetaLogica() {
 		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
 	}
-	
+
 	public boolean isOrdenacioPermesa() {
 		return configHelper.getAsBoolean("es.caib.ripea.ordenacio.contingut.habilitada");
 	}
@@ -1606,7 +1550,7 @@ public class ContingutHelper {
 		try {
 			PdfReader reader = new PdfReader(certificacioContingut);
 			AcroFields fields = reader.getAcroFields();
-			
+
 			@SuppressWarnings("unchecked")
 			List<String> signatureNames = fields.getSignatureNames();
 			if (signatureNames != null) {
@@ -1624,7 +1568,8 @@ public class ContingutHelper {
 		}
 		return hasFirma;
 	}
-	
+
+
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 
 }

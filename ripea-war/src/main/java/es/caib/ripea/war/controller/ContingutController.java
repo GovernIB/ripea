@@ -3,21 +3,13 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.registre.RegistreTipusEnum;
+import es.caib.ripea.core.api.service.*;
+import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
+import es.caib.ripea.war.helper.*;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,49 +23,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NodeDto;
-import es.caib.ripea.core.api.registre.RegistreTipusEnum;
-import es.caib.ripea.core.api.service.AlertaService;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.plugin.notificacio.EnviamentEstat;
-import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
-import es.caib.ripea.war.helper.BeanGeneratorHelper;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.JsonResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.helper.SessioHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre
@@ -885,6 +849,30 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"contingutOrigen",
 				contingutOrigen);
+	}
+
+	@RequestMapping(value = "/contingut/orfes/delete", method = RequestMethod.GET)
+	@ResponseBody
+	public String netejaContingutsOrfes(HttpServletRequest request) {
+		Boolean result = contingutService.netejaContingutsOrfes();
+		if (!result) {
+			logger.error("Procés de neteja de continguts orfes executat amb error");
+			return getMessage(request, "contingut.orfe.delete.ko");
+		}
+		logger.info("Procés de neteja de continguts orfes executat correctament");
+		return getMessage(request, "contingut.orfe.delete.ok");
+	}
+
+//	@PostConstruct
+	public void netejaContingutsOrfes() {
+		try {
+			Boolean result = contingutService.netejaContingutsOrfes();
+			if (result) {
+				logger.info("Procés de neteja de continguts orfes executat correctament");
+				return;
+			}
+		} catch (Exception e) {}
+		logger.error("Procés de neteja de continguts orfes executat amb error");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutController.class);

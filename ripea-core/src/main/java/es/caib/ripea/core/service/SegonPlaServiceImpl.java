@@ -3,25 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
@@ -37,7 +18,6 @@ import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
@@ -49,6 +29,23 @@ import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'entitats.

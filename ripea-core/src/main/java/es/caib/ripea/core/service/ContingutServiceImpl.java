@@ -3,17 +3,28 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.ExpedientMetadades;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.MetaNodeRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,78 +36,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.ExpedientMetadades;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.ArxiuContingutDto;
-import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.ContingutLogDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutMovimentDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.entity.AlertaEntity;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.ContingutMovimentEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.TipusDocumentalEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DateHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -142,6 +91,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private ContingutsOrfesHelper contingutRepositoryHelper;
 
 	@Transactional
 	@Override
@@ -2037,6 +1988,22 @@ public class ContingutServiceImpl implements ContingutService {
 		return conteDefinitius;
 	}
 
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+	@Override
+	@Transactional
+//	@Scheduled(cron = "0 0 5 * * ?")
+	public Boolean netejaContingutsOrfes() {
+		try {
+			contingutRepositoryHelper.deleteContingutsOrfes();
+			return true;
+		} catch (Exception ex) {
+			logger.error("No s'han pogut eliminar els continguts orfes.", ex);
+		}
+		return false;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 

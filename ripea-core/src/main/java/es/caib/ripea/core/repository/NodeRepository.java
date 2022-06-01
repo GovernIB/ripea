@@ -6,6 +6,7 @@ package es.caib.ripea.core.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -53,5 +54,16 @@ public interface NodeRepository extends JpaRepository<NodeEntity, Long> {
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pares") List<? extends ContingutEntity> pares,
 			@Param("metaNodesPermesos") List<MetaNodeEntity> metaNodesPermesos);
+
+
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+	@Modifying
+	@Query(value = "delete from ipa_node " +
+			" where id not in (select id from ipa_expedient) " +
+			"   and id not in (select id from ipa_document)", nativeQuery = true)
+	int deleteNodesOrfes();
 
 }
