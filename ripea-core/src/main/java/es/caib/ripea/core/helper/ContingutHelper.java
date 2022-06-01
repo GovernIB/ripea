@@ -358,6 +358,9 @@ public class ContingutHelper {
 								false,
 								false,
 								false, null, true, null));
+			
+			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
+			dto.setConteDocumentsDefinitius(conteDocsDef);
 			resposta = dto;
 		}
 
