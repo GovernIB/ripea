@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -16,17 +17,24 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
+public class DadesUsuariPluginJdbc extends RipeaAbstractPluginProperties implements DadesUsuariPlugin {
+	
+	public DadesUsuariPluginJdbc() {
+		super();
+	}
+	public DadesUsuariPluginJdbc(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 
 	@Override
 	public List<String> findRolsAmbCodi(
@@ -189,22 +197,22 @@ public class DadesUsuariPluginJdbc implements DadesUsuariPlugin {
 	}
 
 	private String getDatasourceJndiName() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.datasource.jndi.name");
+		return getProperty("plugin.dades.usuari.jdbc.datasource.jndi.name");
 	}
 	private String getJdbcQueryUsuariCodi() {
-		String query = PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query");
+		String query = getProperty("plugin.dades.usuari.jdbc.query");
 		if (query == null || query.isEmpty())
-			query = PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.codi");
+			query = getProperty("plugin.dades.usuari.jdbc.query.codi");
 		return query;
 	}
 	private String getJdbcQueryUsuariGrup() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.grup");
+		return getProperty("plugin.dades.usuari.jdbc.query.grup");
 	}
 	private String getJdbcQueryUsuariFiltre() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre");
+		return getProperty("plugin.dades.usuari.jdbc.query.filtre");
 	}
 	private String getJdbcFiltreRolsCodi() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.jdbc.query.rols");
+		return getProperty("plugin.dades.usuari.jdbc.query.rols");
 	}
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginJdbc.class);
 

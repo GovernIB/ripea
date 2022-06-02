@@ -5,12 +5,13 @@ package es.caib.ripea.plugin.caib.viafirma;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDispositiu;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.plugin.viafirma.ViaFirmaError;
@@ -23,8 +24,15 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ViaFirmaPluginMock implements ViaFirmaPlugin {
+public class ViaFirmaPluginMock extends RipeaAbstractPluginProperties implements ViaFirmaPlugin {
 
+	public ViaFirmaPluginMock() {
+		super();
+	}
+	public ViaFirmaPluginMock(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public ViaFirmaResponse uploadDocument(ViaFirmaParams parametresViaFirma) throws SistemaExternException {
 		String errorDescripcio = "No s'ha pogut enviar el document a viaFirma";
@@ -90,7 +98,7 @@ public class ViaFirmaPluginMock implements ViaFirmaPlugin {
 	}
 	
 	private String getTestLink() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.viafirma.mock.link");
+		return getProperty("plugin.viafirma.mock.link");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ViaFirmaPluginMock.class);
 

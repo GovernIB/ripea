@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +34,7 @@ import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.SOAPBinding;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
@@ -44,7 +46,6 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.caib.ripea.plugin.PropertiesHelper;
 import es.indra.portafirmasws.cws.Annex;
 import es.indra.portafirmasws.cws.Annexes;
 import es.indra.portafirmasws.cws.Application;
@@ -77,8 +78,15 @@ import es.indra.portafirmasws.cws.UploadStep;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
+public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties implements PortafirmesPlugin {
 
+	public PortafirmesPluginCwsJaxws() {
+		super();
+	}
+	public PortafirmesPluginCwsJaxws(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public String upload(
 			PortafirmesDocument document,
@@ -474,32 +482,32 @@ public class PortafirmesPluginCwsJaxws implements PortafirmesPlugin {
 	}
 
 	private String getServiceUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.portafirmes.cws.service.url");
+		return getProperty(
+				"plugin.portafirmes.cws.service.url");
 	}
 	private String getUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.portafirmes.cws.username");
+		return getProperty(
+				"plugin.portafirmes.cws.username");
 	}
 	private String getPassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.portafirmes.cws.password");
+		return getProperty(
+				"plugin.portafirmes.cws.password");
 	}
 	private boolean isCheckCert() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.plugin.portafirmes.cws.check.cert");
+		return getAsBoolean(
+				"plugin.portafirmes.cws.check.cert");
 	}
 	private String getSignaturaTipus() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.portafirmes.cws.signatura.tipus");
+		return getProperty(
+				"plugin.portafirmes.cws.signatura.tipus");
 	}
 	private String getExtensionsPermeses() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.portafirmes.cws.extensions.permeses");
+		return getProperty(
+				"plugin.portafirmes.cws.extensions.permeses");
 	}
 	private boolean isLogMissatgesActiu() {
-		return PropertiesHelper.getProperties().getAsBoolean(
-				"es.caib.ripea.plugin.portafirmes.cws.log.actiu");
+		return getAsBoolean(
+				"plugin.portafirmes.cws.log.actiu");
 	}
 
 	private class LogMessageHandler implements SOAPHandler<SOAPMessageContext> {

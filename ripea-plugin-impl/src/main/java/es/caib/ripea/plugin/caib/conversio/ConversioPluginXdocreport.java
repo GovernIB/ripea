@@ -6,6 +6,7 @@ package es.caib.ripea.plugin.caib.conversio;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.poi.xwpf.usermodel.IBodyElement;
 import org.apache.poi.xwpf.usermodel.IRunElement;
@@ -34,6 +35,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
@@ -49,13 +51,21 @@ import fr.opensagres.xdocreport.core.document.DocumentKind;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ConversioPluginXdocreport implements ConversioPlugin {
+public class ConversioPluginXdocreport extends RipeaAbstractPluginProperties implements ConversioPlugin {
 
 	private static final int BARCODE_POSITION_TOP = 0;
 	private static final int BARCODE_POSITION_BOTTOM = 1;
 	private static final int BARCODE_POSITION_LEFT = 2;
 	private static final int BARCODE_POSITION_RIGHT = 3;
 
+	
+	public ConversioPluginXdocreport() {
+		super();
+	}
+	public ConversioPluginXdocreport(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public ConversioArxiu convertirPdf(
 			ConversioArxiu arxiu) throws SistemaExternException {

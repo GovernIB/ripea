@@ -6,10 +6,8 @@ package es.caib.ripea.plugin.caib.firmaservidor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
 
-import es.caib.ripea.plugin.firmaservidor.SignaturaConsulta;
-import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
-import es.caib.ripea.plugin.firmaservidor.TipusMime;
 import org.fundaciobit.apisib.apifirmasimple.v1.ApiFirmaEnServidorSimple;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleAvailableProfile;
 import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleCommonInfo;
@@ -23,9 +21,12 @@ import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaEnServidorSimpleJ
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
+import es.caib.ripea.plugin.firmaservidor.SignaturaConsulta;
+import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
+import es.caib.ripea.plugin.firmaservidor.TipusMime;
 
 /**
  * Implementació del plugin de signatura emprant el portafirmes
@@ -33,10 +34,16 @@ import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-	public class FirmaSimpleServidorPluginPortafib implements FirmaServidorPlugin {
+	public class FirmaSimpleServidorPluginPortafib extends RipeaAbstractPluginProperties implements FirmaServidorPlugin {
 
-	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.firmaservidor.portafib.";
 
+	public FirmaSimpleServidorPluginPortafib() {
+		super();
+	}
+	public FirmaSimpleServidorPluginPortafib(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
 
@@ -160,33 +167,32 @@ import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 		    }
 	 }
 
-
 	private String getPropertyEndpoint() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "endpoint");
+		return getProperty("plugin.firmaservidor.portafib.endpoint");
 	}
 
 	private String getPropertyUsername() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "auth.username");
+		return getProperty("plugin.firmaservidor.portafib.auth.username");
 	}
 
 	private String getPropertyPassword() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "auth.password");
+		return getProperty("plugin.firmaservidor.portafib.auth.password");
 	}
 
 	private String getPropertyPerfil() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "perfil");
+		return getProperty("plugin.firmaservidor.portafib.perfil");
 	}
 
 	private String getPropertyLocation() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "location", "Palma");
+		return getProperty("plugin.firmaservidor.portafib.location", "Palma");
 	}
 
 	private String getPropertySignerEmail() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "signerEmail", "suport@caib.es");
+		return getProperty("plugin.firmaservidor.portafib.signerEmail", "suport@caib.es");
 	}
 
 	private String getPropertyUsuariFirma() {
-		return PropertiesHelper.getProperties().getProperty(PROPERTIES_BASE + "username");
+		return getProperty("plugin.firmaservidor.portafib.username");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FirmaSimpleServidorPluginPortafib.class);

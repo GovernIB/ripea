@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -31,7 +32,7 @@ import es.caib.notib.ws.notificacio.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.ws.notificacio.RespostaAlta;
 import es.caib.notib.ws.notificacio.RespostaConsultaJustificantEnviament;
 import es.caib.ripea.plugin.NotibRepostaException;
-import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.notificacio.Enviament;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
@@ -52,12 +53,18 @@ import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class NotificacioPluginNotib implements NotificacioPlugin {
+public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implements NotificacioPlugin {
 
 	
 	private NotificacioRestClient clientV2;
 
-
+	public NotificacioPluginNotib() {
+		super();
+	}
+	public NotificacioPluginNotib(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public RespostaEnviar enviar(
 			Notificacio notificacio) throws SistemaExternException {
@@ -380,7 +387,7 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 	
 	private NotificacioRestClient getNotificacioService() {
 		// If Notib server uses basic authentication set autenticacioBasic=true, if uses form authentication (as in Jboss CAIB) set autenticacioBasic=false
-		String autenticacioBasicString = PropertiesHelper.getProperties().getProperty("es.caib.ripea.notificacio.autenticacioBasic");
+		String autenticacioBasicString = getProperty("notificacio.autenticacioBasic");
 		boolean autenticacioBasic;
 		if (autenticacioBasicString != null) {
 			autenticacioBasic = new Boolean(autenticacioBasicString).booleanValue();
@@ -398,16 +405,16 @@ public class NotificacioPluginNotib implements NotificacioPlugin {
 	}
 
 	private String getUrl() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.notificacio.url");
+		return getProperty(
+				"plugin.notificacio.url");
 	}
 	private String getUsername() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.notificacio.username");
+		return getProperty(
+				"plugin.notificacio.username");
 	}
 	private String getPassword() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.notificacio.password");
+		return getProperty(
+				"plugin.notificacio.password");
 	}
 
 	

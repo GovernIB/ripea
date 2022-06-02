@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -24,6 +25,7 @@ import es.caib.dir3caib.ws.api.catalogo.CatProvinciaTF;
 import es.caib.dir3caib.ws.api.catalogo.CatTipoVia;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWs;
 import es.caib.dir3caib.ws.api.catalogo.Dir3CaibObtenerCatalogosWsService;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.dadesext.ComunitatAutonoma;
 import es.caib.ripea.plugin.dadesext.DadesExternesPlugin;
@@ -33,7 +35,6 @@ import es.caib.ripea.plugin.dadesext.NivellAdministracio;
 import es.caib.ripea.plugin.dadesext.Pais;
 import es.caib.ripea.plugin.dadesext.Provincia;
 import es.caib.ripea.plugin.dadesext.TipusVia;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de dades externes que consulta la informació
@@ -41,8 +42,14 @@ import es.caib.ripea.plugin.PropertiesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DadesExternesPluginDir3 implements DadesExternesPlugin {
+public class DadesExternesPluginDir3 extends RipeaAbstractPluginProperties implements DadesExternesPlugin {
 
+	public DadesExternesPluginDir3() {
+		super();
+	}
+	public DadesExternesPluginDir3(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 	@Override
 	public List<Pais> paisFindAll() throws SistemaExternException {
 		try {
@@ -286,33 +293,33 @@ public class DadesExternesPluginDir3 implements DadesExternesPlugin {
 	}
 
 	private String getServiceUrl() {
-		String url = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dadesext.dir3.service.url");
+		String url = getProperty(
+				"plugin.dadesext.dir3.service.url");
 		if (url != null) {
 			return url;
 		} else {
-			return PropertiesHelper.getProperties().getProperty(
-					"es.caib.ripea.plugin.dadesext.service.url");
+			return getProperty(
+					"plugin.dadesext.service.url");
 		}
 	}
 	private String getUsername() {
-		String username = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dadesext.dir3.service.username");
+		String username = getProperty(
+				"plugin.dadesext.dir3.service.username");
 		if (username != null) {
 			return username;
 		} else {
-			return PropertiesHelper.getProperties().getProperty(
-					"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username");
+			return getProperty(
+					"plugin.unitats.organitzatives.dir3.service.username");
 		}
 	}
 	private String getPassword() {
-		String password = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.dadesext.dir3.service.password");
+		String password = getProperty(
+				"plugin.dadesext.dir3.service.password");
 		if (password != null) {
 			return password;
 		} else {
-			return PropertiesHelper.getProperties().getProperty(
-					"es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password");
+			return getProperty(
+					"plugin.unitats.organitzatives.dir3.service.password");
 		}
 	}
 

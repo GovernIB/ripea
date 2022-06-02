@@ -88,14 +88,6 @@ databaseChangeLog:
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.conversio.ooffice.host';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.conversio.ooffice.port';
                 
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.class';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.jdbc.query.codi';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.jdbc.query.nif';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.jdbc.query.rols';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.jdbc.query.grup';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.jdbc.query.filtre';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dades.usuari.jdbc.datasource.jndi.name';
-                
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dadesext.class';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.dadesext.service.url';
                 

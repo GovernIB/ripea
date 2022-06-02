@@ -6,10 +6,13 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
- * Utilitat per accedir a les entrades del fitxer de properties.
+ * This class is used to take properties value from properties file
+ * It is used by Plugins
+ * In Tomcat we take properties manually from tomcat properties file specified in APPSERV_PROPS_PATH (ripea.properties)
+ * In Jboss properties are loaded to System automatically from jboss properties (jboss-service.xml)
  * 
- * @author Limit Tecnologies <limit@limit.es>
  */
 public class PropertiesHelper extends Properties {
 
@@ -28,11 +31,11 @@ public class PropertiesHelper extends Properties {
 	public static PropertiesHelper getProperties(String path) {
 		String propertiesPath = path;
 		if (propertiesPath == null) {
-			propertiesPath = System.getProperty(APPSERV_PROPS_PATH);
+			propertiesPath = System.getProperty(APPSERV_PROPS_PATH);//in jboss is always null
 		}
 		if (instance == null) {
-			instance = new PropertiesHelper(System.getProperties());
-			if (propertiesPath != null) {
+			instance = new PropertiesHelper(System.getProperties());//in jboss we load from System
+			if (propertiesPath != null) { //in tomcat we load from propertiesPath
 				logger.info("Llegint les propietats de l'aplicació del path: " + propertiesPath);
 				try {
 					if (propertiesPath.startsWith("classpath:")) {

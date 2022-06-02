@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.plugin.caib.unitat;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -15,6 +16,12 @@ import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.unitat.NodeDir3;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives que
@@ -22,7 +29,15 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class UnitatsOrganitzativesPluginCaibMock implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesPluginCaibMock extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
+
+
+	public UnitatsOrganitzativesPluginCaibMock() {
+		super();
+	}
+	public UnitatsOrganitzativesPluginCaibMock(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override

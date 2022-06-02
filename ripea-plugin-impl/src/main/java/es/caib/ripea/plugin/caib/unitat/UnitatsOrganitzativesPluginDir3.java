@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWs;
 import es.caib.dir3caib.ws.api.unidad.Dir3CaibObtenerUnidadesWsService;
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.NodeDir3;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,11 +46,18 @@ import java.util.logging.Logger;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlugin {
+public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
 
     private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
     private static final String SERVEI_OBTENIR_UNITATS = "/ws/Dir3CaibObtenerUnidades";
     
+	public UnitatsOrganitzativesPluginDir3() {
+		super();
+	}
+	public UnitatsOrganitzativesPluginDir3(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+
     public Map<String, NodeDir3> organigrama(String codi) throws SistemaExternException {
         Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
         try {
@@ -293,39 +302,33 @@ public class UnitatsOrganitzativesPluginDir3 implements UnitatsOrganitzativesPlu
     }
 
     private String getServiceUrl() {
-        return PropertiesHelper.getProperties()
-                .getProperty("es.caib.ripea.plugin.unitats.organitzatives.dir3.service.url");
+        return getProperty("plugin.unitats.organitzatives.dir3.service.url");
     }
 
     private String getServiceUsername() {
-        return PropertiesHelper.getProperties()
-                .getProperty("es.caib.ripea.plugin.unitats.organitzatives.dir3.service.username");
+        return getProperty("plugin.unitats.organitzatives.dir3.service.username");
     }
 
     private String getServicePassword() {
-        return PropertiesHelper.getProperties()
-                .getProperty("es.caib.ripea.plugin.unitats.organitzatives.dir3.service.password");
+        return getProperty("plugin.unitats.organitzatives.dir3.service.password");
     }
 
     private boolean isLogMissatgesActiu() {
-        return PropertiesHelper.getProperties()
-                .getAsBoolean("es.caib.ripea.plugin.unitats.organitzatives.dir3.service.log.actiu");
+        return getAsBoolean("plugin.unitats.organitzatives.dir3.service.log.actiu");
     }
 
     private Integer getServiceTimeout() {
-        String key = "es.caib.ripea.plugin.unitats.organitzatives.dir3.service.timeout";
-        if (PropertiesHelper.getProperties().getProperty(key) != null)
-            return PropertiesHelper.getProperties().getAsInt(key);
+        String key = "plugin.unitats.organitzatives.dir3.service.timeout";
+        if (getProperty(key) != null)
+            return getAsInt(key);
         else
             return null;
     }
 
     private String getServiceCercaUrl() {
-        String serviceUrl = PropertiesHelper.getProperties()
-                .getProperty("es.caib.ripea.plugin.unitats.organitzatives.dir3.consulta.rest.service.url");
+        String serviceUrl = getProperty("plugin.unitats.organitzatives.dir3.consulta.rest.service.url");
         if (serviceUrl == null) {
-            serviceUrl = PropertiesHelper.getProperties()
-                    .getProperty("es.caib.ripea.plugin.unitats.cerca.dir3.service.url");
+            serviceUrl = getProperty("plugin.unitats.cerca.dir3.service.url");
         }
         return serviceUrl;
     }

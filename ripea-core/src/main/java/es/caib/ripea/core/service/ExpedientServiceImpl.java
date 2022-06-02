@@ -193,6 +193,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private CarpetaRepository carpetaRepository;
 	@Autowired
 	private GrupRepository grupRepository;
+	@Autowired
+	private DistribucioHelper distribucioHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 
@@ -365,7 +367,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 		try {
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
+			distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
 			// change state of expedient peticion to processat and notificat to DISTRIBUCIO
 			expedientPeticioHelper.canviEstatExpedientPeticio(
 					expedientPeticioEntity.getId(),
@@ -405,7 +407,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
+			distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
 			expedientPeticioEntity.updateNotificaDistError(null);
 		} catch (Exception e) {
 			expedientPeticioEntity.updateNotificaDistError(ExceptionUtils.getStackTrace(e));

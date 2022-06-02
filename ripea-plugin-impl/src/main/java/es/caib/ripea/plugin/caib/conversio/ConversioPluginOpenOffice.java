@@ -6,6 +6,7 @@ package es.caib.ripea.plugin.caib.conversio;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Properties;
 
 import com.artofsolving.jodconverter.DefaultDocumentFormatRegistry;
 import com.artofsolving.jodconverter.DocumentConverter;
@@ -27,10 +28,10 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de conversió de documents
@@ -38,7 +39,7 @@ import es.caib.ripea.plugin.PropertiesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class ConversioPluginOpenOffice implements ConversioPlugin {
+public class ConversioPluginOpenOffice extends RipeaAbstractPluginProperties implements ConversioPlugin {
 
 	private static final int BARCODE_POSITION_TOP = 0;
 	private static final int BARCODE_POSITION_BOTTOM = 1;
@@ -48,7 +49,12 @@ public class ConversioPluginOpenOffice implements ConversioPlugin {
 	private DocumentConverter documentConverter;
 	private DocumentFormatRegistry documentFormatRegistry = new DefaultDocumentFormatRegistry();
 
-
+	public ConversioPluginOpenOffice() {
+		super();
+	}
+	public ConversioPluginOpenOffice(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 
 	@Override
 	public ConversioArxiu convertirPdf(
@@ -252,12 +258,12 @@ public class ConversioPluginOpenOffice implements ConversioPlugin {
 	}
 
 	private String getOpenOfficeHost() {
-		return PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.conversio.ooffice.host");
+		return getProperty(
+				"plugin.conversio.ooffice.host");
 	}
 	private int getOpenOfficePort() {
-		return PropertiesHelper.getProperties().getAsInt(
-				"es.caib.ripea.plugin.conversio.ooffice.port");
+		return getAsInt(
+				"plugin.conversio.ooffice.port");
 	}
 
 }

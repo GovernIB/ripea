@@ -8,12 +8,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
  * Implementació del plugin de gestió documental que
@@ -22,8 +23,15 @@ import es.caib.ripea.plugin.PropertiesHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin {
+public class GestioDocumentalPluginFilesystem extends RipeaAbstractPluginProperties implements GestioDocumentalPlugin {
 
+	public GestioDocumentalPluginFilesystem() {
+		super();
+	}
+	public GestioDocumentalPluginFilesystem(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
+	
 	@Override
 	public String create(
 			String agrupacio,
@@ -119,8 +127,8 @@ public class GestioDocumentalPluginFilesystem implements GestioDocumentalPlugin 
 
 
 	private String getBaseDir(String agrupacio) {
-		String baseDir = PropertiesHelper.getProperties().getProperty(
-				"es.caib.ripea.plugin.gesdoc.filesystem.base.dir");
+		String baseDir = getProperty(
+				"plugin.gesdoc.filesystem.base.dir");
 		if (baseDir != null) {
 			if (baseDir.endsWith("/")) {
 				return baseDir + agrupacio;
