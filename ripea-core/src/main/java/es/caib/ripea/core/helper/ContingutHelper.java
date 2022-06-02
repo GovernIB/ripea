@@ -249,7 +249,7 @@ public class ContingutHelper {
 				}
 
 				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
-				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndAmbDocuments(
 						expedient), InteressatDto.class));
 				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 

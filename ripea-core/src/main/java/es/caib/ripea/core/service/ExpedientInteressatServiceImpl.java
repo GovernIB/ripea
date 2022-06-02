@@ -169,7 +169,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatPersonaFisicaDto.getTelefon(),
 					interessatPersonaFisicaDto.getObservacions(),
 					interessatPersonaFisicaDto.getPreferenciaIdioma(),
-					interessatPersonaFisicaDto.getNotificacioAutoritzat(),
 					interessatPersonaFisicaDto.getEntregaDeh(),
 					interessatPersonaFisicaDto.getEntregaDehObligat(),
 					interessatPersonaFisicaDto.getIncapacitat());
@@ -189,7 +188,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatPersonaJuridicaDto.getTelefon(),
 					interessatPersonaJuridicaDto.getObservacions(),
 					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-					interessatPersonaJuridicaDto.getNotificacioAutoritzat(),
 					interessatPersonaJuridicaDto.getEntregaDeh(),
 					interessatPersonaJuridicaDto.getEntregaDehObligat(),
 					interessatPersonaJuridicaDto.getIncapacitat());
@@ -212,7 +210,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 					interessatAdministracioDto.getTelefon(),
 					interessatAdministracioDto.getObservacions(),
 					interessatAdministracioDto.getPreferenciaIdioma(),
-					interessatAdministracioDto.getNotificacioAutoritzat(),
 					interessatAdministracioDto.getEntregaDeh(),
 					interessatAdministracioDto.getEntregaDehObligat(),
 					interessatAdministracioDto.getIncapacitat());
@@ -471,7 +468,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
 		if (nomesAmbNotificacioActiva) {
-			interessats = interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+			interessats = interessatRepository.findByExpedientAndNotRepresentantAndAmbDocuments(
 					expedient);
 		} else {
 			interessats = interessatRepository.findByExpedientAndNotRepresentant(
