@@ -16,16 +16,19 @@ import es.caib.distribucio.ws.client.BackofficeIntegracioWsClientFactory;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Component
 public class DistribucioHelper {
 	
 	@Autowired
 	private ConfigHelper configHelper;
-	
-	private String url = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.url");
-	private String usuari = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.username");
-	private String contrasenya = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.password");
+
 	
 	public BackofficeIntegracio getBackofficeIntegracioServicePort() throws IOException {
+		
+		String url = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.url");
+		String usuari = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.username");
+		String contrasenya = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.password");
+		
 		return BackofficeIntegracioWsClientFactory.getWsClient(
 				url,
 				usuari,

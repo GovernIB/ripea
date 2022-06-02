@@ -87,6 +87,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private DistribucioHelper distribucioHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
+	
 	
 	private static final String PREFIX_RIPEA = "[RIPEA]";
 
@@ -317,7 +320,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	
 	
-	
 	@Override
 	@Transactional
 	public void guardarExpedientsDocumentsArxiu() {
@@ -332,9 +334,19 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				arxiuMaxReintentsDocuments);
 		
 		for (ContingutEntity contingut : pendents) {
+			final EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class); 
 			
 			if (contingut instanceof ExpedientEntity) {
-				expedientHelper.guardarExpedientArxiu(contingut.getId());
+//				expedientHelper.guardarExpedientArxiu(contingut.getId());
+				final Long id = contingut.getId();
+				Thread t = new Thread(new Runnable() {
+					public void run() {
+						ConfigHelper.setEntitat(entitat);
+						expedientHelper.guardarExpedientArxiu(id);
+					}
+				});
+				t.start();
+				
 			} else if (contingut instanceof DocumentEntity) {
 				documentHelper.guardarDocumentArxiu(contingut.getId());
 			}

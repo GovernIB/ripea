@@ -97,7 +97,9 @@ public class ConfigHelper {
 	public String getConfig(String entitatActualCodi, String keyGeneral) {
 		
 		if (entitatActualCodi == null) {
-			entitatActualCodi = ConfigHelper.entitat.get().getCodi();
+			EntitatDto entitatActual = ConfigHelper.entitat.get();
+			if (entitatActual != null)
+				entitatActualCodi = entitatActual.getCodi();
 		}
 		
 		logger.debug("Entitat actual per les propietats : " + entitatActualCodi);
