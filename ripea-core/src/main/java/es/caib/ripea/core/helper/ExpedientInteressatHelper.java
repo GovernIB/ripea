@@ -1,5 +1,8 @@
 package es.caib.ripea.core.helper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,11 +135,16 @@ public class ExpedientInteressatHelper {
 					interessatPersonaJuridicaDto.getIncapacitat()).build();
 		} else {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
-					interessatAdministracioDto.getOrganCodi());
+			
+			UnitatOrganitzativaDto unitat = null;
+			if (interessatAdministracioDto.getOrganCodi() != null) {
+				unitat = unitatOrganitzativaHelper.findAmbCodi(
+						interessatAdministracioDto.getOrganCodi());
+			}
+
 			interessatEntity = InteressatAdministracioEntity.getBuilder(
-					unitat.getCodi(),
-					unitat.getDenominacio(),
+					unitat != null ? unitat.getCodi() : null,
+					unitat != null ? unitat.getDenominacio() : null,
 					interessatAdministracioDto.getDocumentTipus(),
 					interessatAdministracioDto.getDocumentNum(),
 					interessatAdministracioDto.getPais(),
@@ -321,6 +329,17 @@ public class ExpedientInteressatHelper {
 			exception = new RuntimeException("Expedient de aquest interessat no es guardat en arxiu");
 		}
 		return exception;
+	}
+	
+	public List<InteressatEntity> findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
+			ExpedientEntity expedient) {
+
+		List<InteressatEntity> interessats = new ArrayList<>();
+
+		interessats.addAll(interessatRepository.findPersFisicByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
+		interessats.addAll(interessatRepository.findPersJuridByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
+		interessats.addAll(interessatRepository.findAdminByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient));
+		return interessats;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);

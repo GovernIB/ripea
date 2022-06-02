@@ -106,6 +106,8 @@ public class ContingutHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ExpedientInteressatHelper expedientInteressatHelper;
 
 
 
@@ -249,8 +251,7 @@ public class ContingutHelper {
 				}
 
 				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
-				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(interessatRepository.findByExpedientAndNotRepresentantAndAmbDocuments(
-						expedient), InteressatDto.class));
+				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);

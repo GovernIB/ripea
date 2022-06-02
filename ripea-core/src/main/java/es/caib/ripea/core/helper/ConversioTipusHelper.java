@@ -206,7 +206,6 @@ public class ConversioTipusHelper {
 						target.setTelefon(source.getTelefon());
 						target.setObservacions(source.getObservacions());
 						target.setPreferenciaIdioma(source.getPreferenciaIdioma());
-						target.setNotificacioAutoritzat(source.isNotificacioAutoritzat());
 						target.setRepresentantId(source.getRepresentantId());
 						target.setIdentificador(source.getIdentificador());
 						target.setRepresentantIdentificador(source.getRepresentantIdentificador());

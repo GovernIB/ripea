@@ -340,7 +340,7 @@ public class ExpedientHelper {
 			boolean alreadyExists = false;
 			InteressatEntity interessatExpedient = null;
 			for (InteressatEntity interessatExp : existingInteressats) {
-				if (interessatExp.getDocumentNum().equals(interessatRegistre.getDocumentNumero())) {
+				if (interessatExp.getDocumentNum() != null && interessatRegistre.getDocumentNumero() != null && interessatExp.getDocumentNum().equals(interessatRegistre.getDocumentNumero())) {
 					alreadyExists = true;
 					interessatExpedient = interessatExp;
 				}
@@ -1457,7 +1457,6 @@ public class ExpedientHelper {
 			interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
 			interessatPersonaFisicaDto.setTelefon(registreInteressatEntity.getTelefon());
 			interessatPersonaFisicaDto.setObservacions(registreInteressatEntity.getObservacions());
-			interessatPersonaFisicaDto.setNotificacioAutoritzat(false);
 			interessatPersonaFisicaDto.setTipus(InteressatTipusEnumDto.PERSONA_FISICA);
 			interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
 			interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
@@ -1478,7 +1477,6 @@ public class ExpedientHelper {
 			interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
 			interessatPersonaJuridicaDto.setTelefon(registreInteressatEntity.getTelefon());
 			interessatPersonaJuridicaDto.setObservacions(registreInteressatEntity.getObservacions());
-			interessatPersonaJuridicaDto.setNotificacioAutoritzat(false);
 			interessatPersonaJuridicaDto.setTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
 			interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
 			interessatPersonaJuridicaDto.setId(existingInteressatId);
@@ -1497,7 +1495,6 @@ public class ExpedientHelper {
 			interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());
 			interessatAdministracioDto.setTelefon(registreInteressatEntity.getTelefon());
 			interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
-			interessatAdministracioDto.setNotificacioAutoritzat(false);
 			interessatAdministracioDto.setTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());
 			interessatAdministracioDto.setId(existingInteressatId);

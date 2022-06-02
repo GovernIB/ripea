@@ -31,7 +31,6 @@ public abstract class InteressatDto implements Serializable {
 	protected String telefon;
 	protected String observacions;
 	protected InteressatIdiomaEnumDto preferenciaIdioma;
-	protected Boolean notificacioAutoritzat;
 	protected Long representantId;
 	protected String representantIdentificador;
 	protected String identificador;
@@ -126,12 +125,6 @@ public abstract class InteressatDto implements Serializable {
 	}
 	public void setPreferenciaIdioma(InteressatIdiomaEnumDto preferenciaIdioma) {
 		this.preferenciaIdioma = preferenciaIdioma;
-	}
-	public Boolean getNotificacioAutoritzat() {
-		return notificacioAutoritzat;
-	}
-	public void setNotificacioAutoritzat(Boolean notificacioAutoritzat) {
-		this.notificacioAutoritzat = notificacioAutoritzat;
 	}
 	public Long getRepresentantId() {
 		return representantId;

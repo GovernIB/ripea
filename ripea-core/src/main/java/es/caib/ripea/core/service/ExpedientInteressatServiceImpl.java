@@ -468,7 +468,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
 		if (nomesAmbNotificacioActiva) {
-			interessats = interessatRepository.findByExpedientAndNotRepresentantAndAmbDocuments(
+			interessats = expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
 					expedient);
 		} else {
 			interessats = interessatRepository.findByExpedientAndNotRepresentant(
