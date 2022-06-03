@@ -68,7 +68,7 @@ public class ContingutsOrfesHelper {
 		alertaRepository.deleteAlertesFromContingutsOrfes(contingutId);
 		execucioMassivaContingutRepository.deleteExecucioMassivaFromContingutsOrfes(contingutId);
 		contingutMovimentRepository.deleteMovimentsFromContingutsOrfes(contingutId);
-		contingutComentariRepository.deleteComentarisFromContingutsOrfes(contingutId);
+//		contingutComentariRepository.deleteComentarisFromContingutsOrfes(contingutId);
 		contingutLogRepository.deleteLogsFromContingutsOrfes(contingutId);
 		contingutRepository.deleteContingutsOrfes(contingutId);
 	}
