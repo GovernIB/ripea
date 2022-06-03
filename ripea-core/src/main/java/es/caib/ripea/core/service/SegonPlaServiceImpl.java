@@ -92,7 +92,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		logger.debug(
 				"Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
-		// find peticions with no registre associated and with no errors from previous invocation of this method
+		// find peticions with no anotació associated and with no errors from previous invocation of this method
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(
 				ExpedientPeticioEstatEnumDto.CREAT);
 
@@ -113,16 +113,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 						throw new RuntimeException("EXCEPION BEFORE CONSULTING ANOTACIO!!!!!! ");
 					
 					
-					// obtain registre from DISTRIBUCIO
+					// obtain anotació from DISTRIBUCIO
 					AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioServicePort().consulta(
 							anotacioRegistreId);
 
-					// create registre in db and associate it with expedient peticion
+					// create anotació in db and associate it with expedient peticion
 					expedientPeticioHelper.crearRegistrePerPeticio(
 							registre,
 							expedientPeticioEntity);
 					
-					// change state of registre in DISTRIBUCIO to BACK_REBUDA
+					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 					DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
@@ -152,7 +152,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										ExceptionUtils.getStackTrace(e),
 										3600));
 						
-						// change state of registre in DISTRIBUCIO to BACK_ERROR
+						// change state of anotació in DISTRIBUCIO to BACK_ERROR
 						DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 								anotacioRegistreId,
 								Estat.ERROR,

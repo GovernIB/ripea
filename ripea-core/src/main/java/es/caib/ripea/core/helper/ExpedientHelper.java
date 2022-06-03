@@ -1715,7 +1715,7 @@ public class ExpedientHelper {
 		String carpetaUuid = null;
 		if (expedient.getContinguts() != null) {
 			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-				String replacedNom = nom.replace("/", "_");
+				String replacedNom = revisarContingutNom(nom);
 				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
 						contingutArxiu.getNom().equals(replacedNom)) {
 					carpetaExistsInArxiu = true;
@@ -1740,6 +1740,14 @@ public class ExpedientHelper {
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
+	}
+	
+	
+	private String revisarContingutNom(String nom) {
+		if (nom == null) {
+			return null;
+		}
+		return nom.replace("&", "&amp;").replaceAll("[\\\\/:*?\"<>|]", "_");
 	}
 	
 	//crea les carpetes per defecte definides al procediment

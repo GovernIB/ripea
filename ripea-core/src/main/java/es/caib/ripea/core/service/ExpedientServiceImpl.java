@@ -414,10 +414,23 @@ public class ExpedientServiceImpl implements ExpedientService {
 			logger.debug(ExceptionUtils.getStackTrace(e));
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
 		}
-		notificarICanviEstatToProcessatNotificat(expedientPeticioId);
+		
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+		boolean allOk = true;
+		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
+			if (registreAnnex.getError() != null) {
+				allOk = false;
+			}
+		}
+		if (allOk) {
+			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
+		}
+	
 		return processatOk;
 	}
 
+	@Transactional
 	@Override
 	public boolean retryNotificarDistribucio(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = new ExpedientPeticioEntity();
