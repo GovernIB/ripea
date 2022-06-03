@@ -3,118 +3,15 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.codec.binary.Base64;
-import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
-import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
-import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
-import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
-import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
-import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
-import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
-import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
-
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.ContingutOrigen;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
-import es.caib.plugins.arxiu.api.DocumentExtensio;
-import es.caib.plugins.arxiu.api.DocumentFormat;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.DocumentTipus;
-import es.caib.plugins.arxiu.api.DocumentTipusAddicional;
-import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.ExpedientEstat;
-import es.caib.plugins.arxiu.api.ExpedientMetadades;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaPerfil;
-import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.api.*;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.ArbreNodeDto;
-import es.caib.ripea.core.api.dto.ArxiuAccioEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.ImportacioDto;
-import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NivellAdministracioDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockInfoDto;
-import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
-import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.TipusImportEnumDto;
-import es.caib.ripea.core.api.dto.TipusViaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.InteressatAdministracioEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
-import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.*;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
@@ -131,28 +28,8 @@ import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
-import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
-import es.caib.ripea.plugin.notificacio.Enviament;
-import es.caib.ripea.plugin.notificacio.EnviamentTipus;
-import es.caib.ripea.plugin.notificacio.Notificacio;
-import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
-import es.caib.ripea.plugin.notificacio.Persona;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
-import es.caib.ripea.plugin.notificacio.RespostaEnviar;
-import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
-import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.notificacio.*;
+import es.caib.ripea.plugin.portafirmes.*;
 import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -164,6 +41,33 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
 import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
+import org.apache.commons.codec.binary.Base64;
+import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
+import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
+import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
+import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
+import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -363,16 +267,70 @@ public class PluginHelper {
 		return organigrama;
 	}
 
-	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
-			String pareCodi) {
+//	public List<UnitatOrganitzativaDto> unitatsOrganitzativesFindListByPare(
+//			String pareCodi) {
+//		String accioDescripcio = "Consulta llista d'unitats donat un pare";
+//		Map<String, String> accioParams = new HashMap<String, String>();
+//		accioParams.put("unitatPare", pareCodi);
+//		long t0 = System.currentTimeMillis();
+//		try {
+//			List<UnitatOrganitzativa> resposta = getUnitatsOrganitzativesPlugin().findAmbPare(
+//					pareCodi);
+//			return conversioTipusHelper.convertirList(resposta, UnitatOrganitzativaDto.class);
+//		} catch (Exception ex) {
+//			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
+//			integracioHelper.addAccioError(
+//					IntegracioHelper.INTCODI_UNITATS,
+//					accioDescripcio,
+//					accioParams,
+//					IntegracioAccioTipusEnumDto.ENVIAMENT,
+//					System.currentTimeMillis() - t0,
+//					errorDescripcio,
+//					ex);
+//			throw new SistemaExternException(
+//					IntegracioHelper.INTCODI_UNITATS,
+//					errorDescripcio,
+//					ex);
+//		}
+//	}
+
+	public List<UnitatOrganitzativa> unitatsOrganitzativesFindArbreByPare(
+			String pareCodi,
+			Date dataActualitzacio,
+			Date dataSincronitzacio) {
 		String accioDescripcio = "Consulta llista d'unitats donat un pare";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("unitatPare", pareCodi);
+		accioParams.put("fechaActualizacion", dataActualitzacio == null ? null : dataActualitzacio.toString());
+		accioParams.put("fechaSincronizacion", dataSincronitzacio == null ? null : dataSincronitzacio.toString());
 		long t0 = System.currentTimeMillis();
 		try {
-			List<UnitatOrganitzativa> resposta = getUnitatsOrganitzativesPlugin().findAmbPare(
-					pareCodi);
-			return conversioTipusHelper.convertirList(resposta, UnitatOrganitzativaDto.class);
+			List<UnitatOrganitzativa> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(
+					pareCodi,
+					dataActualitzacio,
+					dataSincronitzacio);
+
+			if (unitatsOrganitzatives != null && !unitatsOrganitzatives.isEmpty()) {
+				integracioHelper.addAccioOk(
+						IntegracioHelper.INTCODI_UNITATS,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0);
+				return unitatsOrganitzatives;
+			} else {
+				String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_UNITATS,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorMissatge);
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_UNITATS,
+						errorMissatge);
+			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(
@@ -389,7 +347,6 @@ public class PluginHelper {
 					ex);
 		}
 	}
-
 	public ArbreDto<UnitatOrganitzativaDto> unitatsOrganitzativesFindArbreByPare(
 			String pareCodi) {
 		String accioDescripcio = "Consulta de l'arbre d'unitats donat un pare";
@@ -397,8 +354,7 @@ public class PluginHelper {
 		accioParams.put("unitatPare", pareCodi);
 		long t0 = System.currentTimeMillis();
 		try {
-			List<UnitatOrganitzativa> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(
-					pareCodi);
+			List<UnitatOrganitzativa> unitatsOrganitzatives = getUnitatsOrganitzativesPlugin().findAmbPare(pareCodi);
 			ArbreDto<UnitatOrganitzativaDto> resposta = new ArbreDto<UnitatOrganitzativaDto>(false);
 			// Cerca l'unitat organitzativa arrel
 			UnitatOrganitzativa unitatOrganitzativaArrel = null;

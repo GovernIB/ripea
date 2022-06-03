@@ -4,12 +4,19 @@
 package es.caib.ripea.war.controller;
 
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import com.fasterxml.jackson.databind.JsonMappingException;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.command.OrganGestorCommand;
+import es.caib.ripea.war.command.OrganGestorFiltreCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +29,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.war.command.OrganGestorCommand;
-import es.caib.ripea.war.command.OrganGestorFiltreCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -123,6 +121,8 @@ public class OrganGestorController extends BaseUserOAdminController {
 					"L'entitat actual no té cap codi DIR3 associat");
 		}
 		try {
+
+			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
 			organGestorService.syncDir3OrgansGestors(entitat.getId());
 			
 		} catch (Exception e) {

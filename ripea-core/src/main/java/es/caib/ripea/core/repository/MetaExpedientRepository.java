@@ -282,4 +282,5 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("ids") List<Long> ids, 
 			@Param("isAdmin") boolean isAdmin);
 
+    Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
 }

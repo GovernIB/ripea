@@ -111,6 +111,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private EmailHelper emailHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
+	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
 
 	@Transactional
 	@Override
@@ -1283,6 +1284,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	}
 
 	@Override
+	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
+		Integer organsNoSincronitzats = metaExpedientsAmbOrganNoSincronitzat.get(entitatId);
+		if (organsNoSincronitzats == null) {
+			organsNoSincronitzats = metaExpedientRepository.countByEntitatIdAndOrganNoSincronitzatTrue(entitatId);
+			metaExpedientsAmbOrganNoSincronitzat.put(entitatId, organsNoSincronitzats);
+		}
+		return organsNoSincronitzats;
+	}
+
+	@Override
 	@Transactional
 	public void actualitzaProcediments(EntitatDto entitatDto, String lang) {
 
@@ -1308,6 +1319,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					.infoTitol("es".equalsIgnoreCase(lang) ? "Inicio del proceso de actualitzaci&#243;n de procedimientos" : "Inici del proc&#233;s d&#39;actualitzaci&#243; de procediments")
 					.infoText("es".equalsIgnoreCase(lang) ? "Se actualizar&#225;n " + metaExpedients.size() + " procedimientos" : "S&#39;actualitzaran " + metaExpedients.size() + " procediments").build());
 
+			Integer organsNoSincronitzats = 0;
 			Integer modificats = 0;
 			Integer fallat = 0;
 			for(MetaExpedientEntity metaExpedient: metaExpedients) {
@@ -1369,6 +1381,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
 					if (organGestor == null) {
 						organNoSincronitzat = true;
+						organsNoSincronitzats++;
 						organGestor = metaExpedient.getOrganGestor();
 						info.setHasError(true);
 						info.setErrorText("es".equalsIgnoreCase(lang) ?
@@ -1391,6 +1404,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
 			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
 
+			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);

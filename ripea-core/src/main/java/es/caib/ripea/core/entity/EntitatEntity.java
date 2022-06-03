@@ -3,8 +3,10 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,13 +14,12 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Version;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.audit.RipeaAuditable;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa una Entitat.
@@ -53,6 +54,12 @@ public class EntitatEntity extends RipeaAuditable<Long> {
 	private String capsaleraColorFons;
 	@Column(name = "capsalera_color_lletra", length = 7)
 	private String capsaleraColorLletra;
+	@Column(name = "data_sincronitzacio")
+	@Temporal(TemporalType.TIMESTAMP)
+	Date dataSincronitzacio;
+	@Column(name = "data_actualitzacio")
+	@Temporal(TemporalType.TIMESTAMP)
+	Date dataActualitzacio;
 	
 	public void update(
 			String codi,

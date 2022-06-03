@@ -14,14 +14,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.unitat.NodeDir3;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
 
 /**
  * Implementació de proves del plugin d'unitats organitzatives que
@@ -55,6 +51,11 @@ public class UnitatsOrganitzativesPluginCaibMock extends RipeaAbstractPluginProp
 	}
 
 	@Override
+	public List<UnitatOrganitzativa> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
+		return findAmbPare(pareCodi);
+	}
+
+	@Override
 	public UnitatOrganitzativa findAmbCodi(
 			String codi) throws SistemaExternException {
 		List<UnitatOrganitzativa> unitats = findAmbPare(null);
@@ -63,6 +64,12 @@ public class UnitatsOrganitzativesPluginCaibMock extends RipeaAbstractPluginProp
 				return unitat;
 		}
 		return null;
+	}
+
+	@SneakyThrows
+	@Override
+	public UnitatOrganitzativa findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
+		return findAmbCodi(pareCodi);
 	}
 
 	@Override

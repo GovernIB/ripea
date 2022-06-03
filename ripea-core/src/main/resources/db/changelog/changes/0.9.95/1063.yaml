@@ -18,3 +18,12 @@ databaseChangeLog:
                   name: oragan_no_sinc
                   type: boolean
                   valueBoolean: false
+        - addColumn:
+            tableName: ipa_entitat
+            columns:
+              - column:
+                  name: data_sincronitzacio
+                  type: timestamp
+              - column:
+                  name: data_actualitzacio
+                  type: timestamp

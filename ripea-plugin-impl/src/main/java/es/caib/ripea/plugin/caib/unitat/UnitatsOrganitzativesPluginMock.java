@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,6 +54,11 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	}
 
 	@Override
+	public List<UnitatOrganitzativa> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
+		return findAmbPare(pareCodi);
+	}
+
+	@Override
 	public UnitatOrganitzativa findAmbCodi(
 			String codi) throws SistemaExternException {
 		for (UnitatOrganitzativa unitat: getUnitats()) {
@@ -60,6 +66,12 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 				return unitat;
 		}
 		return null;
+	}
+
+	@SneakyThrows
+	@Override
+	public UnitatOrganitzativa findAmbCodi(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws MalformedURLException {
+		return findAmbCodi(pareCodi);
 	}
 
 	private List<UnitatOrganitzativa> getUnitats() {

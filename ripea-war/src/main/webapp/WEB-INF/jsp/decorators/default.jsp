@@ -76,6 +76,9 @@
 	pageContext.setAttribute(
 			"isUrlValidacioDefinida",
 			es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+	pageContext.setAttribute(
+			"organsNoSincronitzats",
+			es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
 
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
@@ -330,14 +333,14 @@ body {
 						<%---- Expedients ----%>
 						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>								
 						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary" style="padding-bottom: 5px;">
+						<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary">
 							<spring:message code="decorator.menu.expedientPeticions"/>
 							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
 						</a>
 						<div class="btn-group">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
+								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats > 0}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats}</span></c:if></a></li>
 								<c:if test="${sessionScope['SessionHelper.isDocumentsGeneralsEnabled']!=null  && sessionScope['SessionHelper.isDocumentsGeneralsEnabled']}">
 									<li><a href="<c:url value="/metaDocument"/>"><spring:message code="decorator.menu.metadocuments"/></a></li>
 								</c:if>
@@ -413,7 +416,7 @@ body {
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.configurar"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
 								 <%---- Procediments ----%>
-								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/></a></li>
+								<li><a href="<c:url value="/metaExpedient"/>"><spring:message code="decorator.menu.metaexpedients"/><c:if test="${organsNoSincronitzats}"><span class="badge small" title="<spring:message code='metaexpedient.actualitzacio.organs.no.sync'/>" style="background-color: #a94442; float: right;">${organsNoSincronitzats > 0}</span></c:if></a></li>
 							</ul>
 						</div>
 					</c:when>

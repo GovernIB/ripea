@@ -144,11 +144,17 @@
 		data-mantenir-paginacio="${mantenirPaginacio}">
 		<thead>
 			<tr>
-				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
+				<th data-col-name="codi" width="1%"></th>
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
-				<th data-col-name="organGestor.codiINom" width="20%"><spring:message code="metaexpedient.list.columna.organGestor"/></th>
+				<th data-col-name="organGestor.codiINom" data-template="#cellSyncTemplate" width="20%">
+					<spring:message code="metaexpedient.list.columna.organGestor"/>
+					<script id="cellSyncTemplate" type="text/x-jsrender">
+						{{:organGestor?.codiINom}}
+						{{if organNoSincronitzat}}<span class="fa fa-warning text-danger" title="<spring:message code='metaexpedient.actualitzacio.organ.no.sync'/>"></span>{{/if}}
+					</script>
+				</th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.comu"/>
 					<script id="cellComuTemplate" type="text/x-jsrender">
@@ -196,6 +202,7 @@
 				<th data-col-name="expedientTasquesCount" data-visible="false"></th>
 				<th data-col-name="grupsCount" data-visible="false"></th>
 				<th data-col-name="crearReglaDistribucio" data-visible="false"></th>
+				<th data-col-name="organNoSincronitzat" data-visible="false"></th>
 				
 				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">

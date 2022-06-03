@@ -33,6 +33,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,6 +115,30 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     }
 
     @Override
+    public List<UnitatOrganitzativa> findAmbPare(
+            String pareCodi,
+            Date dataActualitzacio,
+            Date dataSincronitzacio) throws SistemaExternException {
+        try {
+            List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
+            List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(
+                    pareCodi,
+                    dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
+                    dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
+
+            if (unidades != null) {
+                for (UnidadTF unidad : unidades) {
+                    unitats.add(toUnitatOrganitzativa(unidad));
+                }
+            }
+            return unitats;
+        } catch (Exception ex) {
+            throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS ("
+                    + "pareCodi=" + pareCodi + ")", ex);
+        }
+    }
+
+    @Override
     public UnitatOrganitzativa findAmbCodi(String codi) throws SistemaExternException {
         try {
             UnitatOrganitzativa unitat = null;
@@ -131,6 +156,19 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
             throw new SistemaExternException(
                     "No s'ha pogut consultar la unitat organitzativa (" + "codi=" + codi + ")", ex);
         }
+    }
+
+    @Override
+    public UnitatOrganitzativa findAmbCodi(
+            String pareCodi,
+            Date dataActualitzacio,
+            Date dataSincronitzacio) throws MalformedURLException {
+
+            UnidadTF unidad = getObtenerUnidadesService().obtenerUnidad(
+                    pareCodi,
+                    dataActualitzacio != null ? new Timestamp(dataActualitzacio.getTime()) : null,
+                    dataSincronitzacio != null ? new Timestamp(dataSincronitzacio.getTime()) : null);
+            return unidad != null ? toUnitatOrganitzativa(unidad) : null;
     }
 
     public List<UnitatOrganitzativa> cercaUnitats(String codi, String denominacio, Long nivellAdministracio,
@@ -328,7 +366,8 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     private String getServiceCercaUrl() {
         String serviceUrl = getProperty("plugin.unitats.organitzatives.dir3.consulta.rest.service.url");
         if (serviceUrl == null) {
-            serviceUrl = getProperty("plugin.unitats.cerca.dir3.service.url");
+            serviceUrl = PropertiesHelper.getProperties()
+                    .getProperty("es.caib.ripea.plugin.unitats.cerca.dir3.service.url");
         }
         return serviceUrl;
     }

@@ -2,6 +2,7 @@ package es.caib.ripea.core.api.service;
 
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.OrganGestorDto;
@@ -90,6 +91,9 @@ public interface OrganGestorService {
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId);
 
 	/**
 	 * Obté un llistat de tots els organs gestors accessibles per a 
@@ -265,4 +269,5 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(
 			Long entitatId);
+
 }

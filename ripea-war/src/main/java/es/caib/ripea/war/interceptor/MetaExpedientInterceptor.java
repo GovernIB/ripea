@@ -3,14 +3,14 @@
  */
 package es.caib.ripea.war.interceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.helper.MetaExpedientHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.helper.MetaExpedientHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 public class MetaExpedientInterceptor extends HandlerInterceptorAdapter {
@@ -28,6 +28,9 @@ public class MetaExpedientInterceptor extends HandlerInterceptorAdapter {
 				request, 
 				metaExpedientService);
 
+		if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
+			MetaExpedientHelper.setOrgansNoSincronitzats(request, metaExpedientService);
+		}
 		return true;
 	}
 

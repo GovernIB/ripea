@@ -1,30 +1,16 @@
 package es.caib.ripea.core.service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -46,6 +32,23 @@ import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
@@ -251,6 +254,39 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+
+		boolean isFirstSincronization = entitat.getDataSincronitzacio() == null;
+		List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();
+
+		if (isFirstSincronization) {
+			return PrediccioSincronitzacio.builder()
+					.isFirstSincronization(isFirstSincronization)
+					.unitatsVigents(predictFirstSynchronization(entitat))
+					.build();
+		}
+
+		return null;
+	}
+
+	private List<UnitatOrganitzativaDto> predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
+
+		List<UnitatOrganitzativa> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindArbreByPare(
+				entitat.getUnitatArrel(),
+				entitat.getDataActualitzacio(),
+				entitat.getDataSincronitzacio());
+		// converting form UnitatOrganitzativa to UnitatOrganitzativaDto
+		List<UnitatOrganitzativaDto> unitatsVigentWSDto = new ArrayList<>();
+		for(UnitatOrganitzativa vigentObsolete : unitatsVigentsWS){
+			unitatsVigentWSDto.add(conversioTipusHelper.convertir(
+					vigentObsolete,
+					UnitatOrganitzativaDto.class));
+		}
+		return unitatsVigentWSDto;
 	}
 
 	@Override

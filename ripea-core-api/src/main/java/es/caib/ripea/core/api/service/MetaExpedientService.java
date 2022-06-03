@@ -575,4 +575,6 @@ public interface MetaExpedientService {
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	void actualitzaProcediments(EntitatDto entitat, String lang);
+
+	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 }

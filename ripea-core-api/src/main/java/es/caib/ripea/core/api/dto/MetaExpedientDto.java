@@ -3,13 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Informació d'un MetaExpedient.
@@ -44,6 +43,8 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private CrearReglaDistribucioEstatEnumDto crearReglaDistribucioEstat;
 	private String crearReglaDistribucioError;
 	private CrearReglaResponseDto crearReglaResponse;
+
+    private boolean organNoSincronitzat;
 	
     public String getCodiSiaINom() {
     	return classificacioSia + " - " + nom;
