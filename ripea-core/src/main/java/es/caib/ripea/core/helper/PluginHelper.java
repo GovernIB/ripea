@@ -294,7 +294,7 @@ public class PluginHelper {
 //		}
 //	}
 
-	public List<UnitatOrganitzativa> unitatsOrganitzativesFindArbreByPare(
+	public List<UnitatOrganitzativa> unitatsOrganitzativesFindByPare(
 			String pareCodi,
 			Date dataActualitzacio,
 			Date dataSincronitzacio) {
@@ -5185,8 +5185,8 @@ public class PluginHelper {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
 		UnitatsOrganitzativesPlugin unitatsOrganitzativesPlugin = unitatsOrganitzativesPlugins.get(entitatActualCodi);
-		loadPluginProperties("ORGANISMES");
 		if (unitatsOrganitzativesPlugin == null) {
+			loadPluginProperties("ORGANISMES");
 			String pluginClass = getPropertyPluginUnitatsOrganitzatives();
 			if (pluginClass != null && pluginClass.length() > 0) {
 				try {
@@ -5194,7 +5194,7 @@ public class PluginHelper {
 					unitatsOrganitzativesPlugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(
 							String.class,
 							Properties.class).newInstance(
-							"es.caib.ripea." + entitatActualCodi + ".",
+							"es.caib.ripea.",
 							PropertiesHelper.getProperties());
 					unitatsOrganitzativesPlugins.put(entitatActualCodi, unitatsOrganitzativesPlugin);
 				} catch (Exception ex) {

@@ -111,7 +111,8 @@ public class OrganGestorController extends BaseUserOAdminController {
     }
 
     @RequestMapping(value = "/sync/dir3", method = RequestMethod.GET)
-    public String syncDir3(HttpServletRequest request) {
+    public String syncDir3(HttpServletRequest request,
+						   Model model) {
 
         EntitatDto entitat = getEntitatActualComprovantPermisos(request);
         if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
@@ -123,7 +124,16 @@ public class OrganGestorController extends BaseUserOAdminController {
 		try {
 
 			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
-			organGestorService.syncDir3OrgansGestors(entitat.getId());
+
+			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
+//			model.addAttribute("unitatsVigentsFirstSincro", unitatsVigentsFirstSincro);
+
+			model.addAttribute("splitMap", prediccio.getSplitMap());
+			model.addAttribute("mergeMap", prediccio.getMergeMap());
+			model.addAttribute("substMap", prediccio.getSubstMap());
+			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
+			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
+//			organGestorService.syncDir3OrgansGestors(entitat.getId());
 			
 		} catch (Exception e) {
 			logger.error("Error al synchronizacio", e);
@@ -133,8 +143,9 @@ public class OrganGestorController extends BaseUserOAdminController {
 					e.getMessage());
 		}
 
-        return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
-                "organgestor.controller.update.nom.tots.ok");
+//        return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
+//                "organgestor.controller.update.nom.tots.ok");
+		return "synchronizationPrediction";
     }
     
 

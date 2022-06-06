@@ -19,11 +19,11 @@ import java.util.List;
 public class PrediccioSincronitzacio {
 
     MultiMap splitMap = new MultiValueMap();
-    MultiMap mergeOrSubstMap = new MultiValueMap();
     MultiMap mergeMap = new MultiValueMap();
     MultiMap substMap = new MultiValueMap();
     List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();
     List<UnitatOrganitzativaDto> unitatsNew = new ArrayList<>();
+    List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
     boolean isFirstSincronization;
 
 }

@@ -5,6 +5,7 @@ package es.caib.ripea.core.repository;
 
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -187,4 +188,7 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	List<MetaExpedientOrganGestorEntity> findMetaExpedientOrganGestorsByMetaExpedientId(
 			@Param("metaExpedientId") Long metaExpedientId);
 
+	public List<OrganGestorEntity> findByEntitatIdAndEstat(Long entitatId, OrganEstatEnumDto estat);
+
+	public OrganGestorEntity findByCodi(String codi);
 }

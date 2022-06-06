@@ -1,14 +1,6 @@
 package es.caib.ripea.core.service;
 
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
-import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.OrganGestorService;
@@ -18,21 +10,15 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.OrganGestorHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.RolHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.helper.*;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +35,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
@@ -257,6 +244,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 
@@ -270,12 +258,111 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					.build();
 		}
 
-		return null;
+		try {
+			// Obtenir lista de canvis del servei web
+			List<UnitatOrganitzativa> unitatsWS = pluginHelper.unitatsOrganitzativesFindByPare(
+					entitat.getUnitatArrel(),
+					entitat.getDataActualitzacio(),
+					entitat.getDataSincronitzacio());
+
+			// Obtenir els òrgans vigents a la BBDD
+			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);
+			logger.debug("Consulta d'unitats vigents a DB");
+			for(OrganGestorEntity organVigent: organsVigents){
+				logger.debug(organVigent.toString());
+			}
+
+			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
+			List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = getObsoletesFromWS(entitat, unitatsWS, organsVigents);
+			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
+
+			// Distinció entre divisió i (substitució o fusió)
+			MultiMap splitMap = new MultiHashMap();
+			MultiMap mergeOrSubstMap = new MultiHashMap();
+
+			for (UnitatOrganitzativaDto vigentObsolete : unitatsVigentObsoleteDto) {
+				// Comprovam que no estigui extingida
+				int transicionsVigents = 0;
+				if (!vigentObsolete.getLastHistoricosUnitats().isEmpty()) {
+					boolean extingit = true;
+					for (UnitatOrganitzativaDto hist: vigentObsolete.getLastHistoricosUnitats()) {
+						if (OrganEstatEnumDto.V.name().equals(hist.getEstat())) {
+							transicionsVigents++;
+						}
+					}
+				}
+
+				// En cas de no estar extingida comprovam el tipus de operació
+//				if (vigentObsolete.getLastHistoricosUnitats().size() > 1) {
+				if (transicionsVigents > 1) {
+					for (UnitatOrganitzativaDto hist : vigentObsolete.getLastHistoricosUnitats()) {
+						splitMap.put(vigentObsolete, hist);
+					}
+//				} else if (vigentObsolete.getLastHistoricosUnitats().size() == 1) {
+				} else if (transicionsVigents == 1) {
+					// check if the map already contains key with this codi
+					UnitatOrganitzativaDto mergeOrSubstKeyWS = vigentObsolete.getLastHistoricosUnitats().get(0);
+					UnitatOrganitzativaDto keyWithTheSameCodi = null;
+					Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
+					for (UnitatOrganitzativaDto mergeOrSubstKeyMap : keysMergeOrSubst) {
+						if (mergeOrSubstKeyMap.getCodi().equals(mergeOrSubstKeyWS.getCodi())) {
+							keyWithTheSameCodi = mergeOrSubstKeyMap;
+						}
+					}
+					// if it contains already key with the same codi, assign found key
+					if (keyWithTheSameCodi != null) {
+						mergeOrSubstMap.put(keyWithTheSameCodi, vigentObsolete);
+					} else {
+						mergeOrSubstMap.put(mergeOrSubstKeyWS, vigentObsolete);
+					}
+				} else if (transicionsVigents == 0) {
+					unitatsExtingides.add(vigentObsolete);
+				}
+			}
+
+			// Distinció entre substitució i fusió
+			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
+			MultiMap mergeMap = new MultiHashMap();
+			MultiMap substMap = new MultiHashMap();
+			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
+				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap
+						.get(mergeOrSubstKey);
+				if (values.size() > 1) {
+					for (UnitatOrganitzativaDto value : values) {
+						mergeMap.put(mergeOrSubstKey, value);
+					}
+				} else {
+					substMap.put(mergeOrSubstKey, values.get(0));
+				}
+			}
+
+			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
+			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
+
+			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
+			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, organsVigents);
+
+			return PrediccioSincronitzacio.builder()
+					.unitatsVigents(unitatsVigents)
+					.unitatsNew(unitatsNew)
+					.unitatsExtingides(unitatsExtingides)
+					.splitMap(splitMap)
+					.substMap(substMap)
+					.mergeMap(mergeMap)
+					.build();
+
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_UNITATS,
+					"No ha estat possible obtenir la predicció de canvis de unitats organitzatives",
+					ex);
+		}
+
 	}
 
 	private List<UnitatOrganitzativaDto> predictFirstSynchronization(EntitatEntity entitat) throws SistemaExternException {
 
-		List<UnitatOrganitzativa> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindArbreByPare(
+		List<UnitatOrganitzativa> unitatsVigentsWS = pluginHelper.unitatsOrganitzativesFindByPare(
 				entitat.getUnitatArrel(),
 				entitat.getDataActualitzacio(),
 				entitat.getDataSincronitzacio());
@@ -287,6 +374,192 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					UnitatOrganitzativaDto.class));
 		}
 		return unitatsVigentWSDto;
+	}
+
+	private List<UnitatOrganitzativaDto> getObsoletesFromWS(
+			EntitatEntity entitat,
+			List<UnitatOrganitzativa> unitatsWS,
+			List<OrganGestorEntity> organsVigents) {
+
+		// Llista d'òrgans obsolets des del servei web, que eren vignets a la última sincronització (vigent a BBDD i obsolet al servei web)
+		// No obtenim la llista d'òrgans obsolets directament de BBDD degut a que hi pot haver canvis acumulats:
+		// si a la darrere sincrocització la unitat A cavia a B, i després a C, llavors en la BBDD tindrem A(vigent) però des del servei web tindrem: A(Extingit) -> B(Extingit) -> C(Vigent)
+		// Només volem retornar A (no volem B) perquè la predicció ha de mostrar la transició (A -> C) [entre A (vigent a BBDD) i C (vigent al servei web)]
+		List<UnitatOrganitzativa> organsVigentObsolete = new ArrayList<>();
+		for (OrganGestorEntity organVigent : organsVigents) {
+			for (UnitatOrganitzativa unitatWS : unitatsWS) {
+				if (organVigent.getCodi().equals(unitatWS.getCodi()) && !unitatWS.getEstat().equals("V")
+						&& !organVigent.getCodi().equals(entitat.getUnitatArrel())) {
+					organsVigentObsolete.add(unitatWS);
+				}
+			}
+		}
+		logger.debug("Consulta unitats obsolete ");
+		for (UnitatOrganitzativa vigentObsolete : organsVigentObsolete) {
+			logger.debug(vigentObsolete.getCodi()+" "+vigentObsolete.getEstat()+" "+vigentObsolete.getHistoricosUO());
+		}
+		for (UnitatOrganitzativa vigentObsolete : organsVigentObsolete) {
+
+			// Fer que un òrgan obsolet apunti a l'últim òrgan/s al que ha fet la transició
+			// El nom del camp historicosUO és totalment erroni, ja que el camp mostra unitats futures, no històric. Però així és com s'anomena al servei web, i no ho podem canviar.
+			// El camp lastHistoricosUnitats hauria d'apuntar a la darrera unitat a la que ha fet la trasició. Necessitem trobar la darrera unitat de forma recursiva, perquè és possible que hi hagi canvis acumulats:
+			// Si la darrera sincronització de la unitat A canvia a B, i després a C, des del servei web tindrés la unitat A apuntant a B (A -> B) i la unitat B apuntant a C (B -> C)
+			// El que volem és afegir un punter directe des de la unitat A a la unitat C (A -> C)
+			vigentObsolete.setLastHistoricosUnitats(getLastHistoricos(vigentObsolete, unitatsWS));
+		}
+		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
+		List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = new ArrayList<>();
+		for(UnitatOrganitzativa vigentObsolete : organsVigentObsolete){
+			unitatsVigentObsoleteDto.add(conversioTipusHelper.convertir(
+					vigentObsolete,
+					UnitatOrganitzativaDto.class));
+		}
+		return unitatsVigentObsoleteDto;
+	}
+
+	// Obtenir unitats que no fan cap transició a cap altre unitat, però a la que se'ls canvia alguna propietat
+	private List<UnitatOrganitzativaDto> getVigentsFromWebService(
+			EntitatEntity entitat,
+			List<UnitatOrganitzativa> unitatsWS,
+			List<OrganGestorEntity> organsVigents){
+		// list of vigent unitats from webservice
+		List<UnitatOrganitzativa> unitatsVigentsWithChangedAttributes = new ArrayList<>();
+		for (OrganGestorEntity unitatV : organsVigents) {
+			for (UnitatOrganitzativa unitatWS : unitatsWS) {
+				if (unitatV.getCodi().equals(unitatWS.getCodi()) && unitatWS.getEstat().equals("V")
+						&& (unitatWS.getHistoricosUO() == null || unitatWS.getHistoricosUO().isEmpty())
+						&& !unitatV.getCodi().equals(entitat.getUnitatArrel())) {
+					unitatsVigentsWithChangedAttributes.add(unitatWS);
+				}
+			}
+		}
+		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
+		List<UnitatOrganitzativaDto> unitatsVigentsWithChangedAttributesDto = new ArrayList<>();
+		for(UnitatOrganitzativa vigent : unitatsVigentsWithChangedAttributes){
+			unitatsVigentsWithChangedAttributesDto.add(conversioTipusHelper.convertir(
+					vigent,
+					UnitatOrganitzativaDto.class));
+		}
+		return unitatsVigentsWithChangedAttributesDto;
+	}
+
+	// Obtenir unitats organitzatives noves (No provenen de cap transició d'una altre unitat)
+	private List<UnitatOrganitzativaDto> getNewFromWS(
+			EntitatEntity entitat,
+			List<UnitatOrganitzativa> unitatsWS,
+			List<OrganGestorEntity> organsVigents){
+		//List of new unitats that are vigent
+		List<UnitatOrganitzativa> vigentUnitatsWS = new ArrayList<>();
+		//List of new unitats that are vigent and does not exist in database
+		List<UnitatOrganitzativa> vigentNotInDBUnitatsWS = new ArrayList<>();
+		//List of new unitats (that are vigent, not pointed by any obsolete unitat and does not exist in database)
+		List<UnitatOrganitzativa> newUnitatsWS = new ArrayList<>();
+		//Filtering to only obtain vigents
+		for (UnitatOrganitzativa unitatWS : unitatsWS) {
+			if (unitatWS.getEstat().equals("V") && !unitatWS.getCodi().equals(entitat.getUnitatArrel())) {
+				vigentUnitatsWS.add(unitatWS);
+			}
+		}
+		// Filtering to only obtain vigents that does not already exist in database
+		for (UnitatOrganitzativa vigentUnitat : vigentUnitatsWS) {
+			boolean found = false;
+			for (OrganGestorEntity vigentUnitatDB : organsVigents) {
+				if (vigentUnitatDB.getCodi().equals(vigentUnitat.getCodi())) {
+					found = true;
+					break;
+				}
+			}
+			if (found == false) {
+				vigentNotInDBUnitatsWS.add(vigentUnitat);
+			}
+		}
+		// Filtering to obtain unitats that are vigent, not pointed by any obsolete unitat and does not already exist in database
+		for (UnitatOrganitzativa vigentNotInDBUnitatWS : vigentNotInDBUnitatsWS) {
+			boolean pointed = false;
+			for (UnitatOrganitzativa unitatWS : unitatsWS) {
+				if(unitatWS.getHistoricosUO()!=null){
+					for(String novaCodi: unitatWS.getHistoricosUO()){
+						if(novaCodi.equals(vigentNotInDBUnitatWS.getCodi())){
+							pointed = true;
+							break;
+						}
+					}
+				}
+				if (pointed) break;
+			}
+			if (pointed == false) {
+				newUnitatsWS.add(vigentNotInDBUnitatWS);
+			}
+		}
+		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
+		List<UnitatOrganitzativaDto> newUnitatsDto = new ArrayList<>();
+		for (UnitatOrganitzativa vigent : newUnitatsWS){
+			newUnitatsDto.add(conversioTipusHelper.convertir(
+					vigent,
+					UnitatOrganitzativaDto.class));
+		}
+		return newUnitatsDto;
+	}
+
+	// Retorna la/les unitat/s a la que un organ obsolet ha fet la transició
+	// Inici de mètode recursiu
+	private List<UnitatOrganitzativa> getLastHistoricos(
+			UnitatOrganitzativa unitat,
+			List<UnitatOrganitzativa> unitatsFromWebService){
+
+		List<UnitatOrganitzativa> lastHistorcos = new ArrayList<>();
+		getLastHistoricosRecursive(
+				unitat,
+				unitatsFromWebService,
+				lastHistorcos);
+		return lastHistorcos;
+	}
+
+	private void getLastHistoricosRecursive(
+			UnitatOrganitzativa unitat,
+			List<UnitatOrganitzativa> unitatsFromWebService,
+			List<UnitatOrganitzativa> lastHistorics) {
+
+		logger.debug("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
+
+		if (unitat.getHistoricosUO() == null || unitat.getHistoricosUO().isEmpty()) {
+			lastHistorics.add(unitat);
+		} else {
+			for (String historicCodi : unitat.getHistoricosUO()) {
+				UnitatOrganitzativa unitatFromCodi = getUnitatFromCodi(historicCodi, unitatsFromWebService);
+				if (unitatFromCodi == null) {
+					// Looks for historico in database
+					OrganGestorEntity entity = organGestorRepository.findByCodi(historicCodi);
+					if (entity != null) {
+						UnitatOrganitzativa uo = conversioTipusHelper.convertir(entity, UnitatOrganitzativa.class);
+						lastHistorics.add(uo);
+					} else {
+						String errorMissatge = "Error en la sincronització amb DIR3. La unitat orgánica (" + unitat.getCodi()
+								+ ") té l'estat (" + unitat.getEstat() + ") i l'històrica (" + historicCodi
+								+ ") però no s'ha retornat la unitat orgánica (" + historicCodi
+								+ ") en el resultat de la consulta del WS ni en la BBDD.";
+						throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
+					}
+				} else {
+					getLastHistoricosRecursive(
+							unitatFromCodi,
+							unitatsFromWebService,
+							lastHistorics);
+				}
+			}
+		}
+	}
+
+	private UnitatOrganitzativa getUnitatFromCodi(
+			String codi,
+			List<UnitatOrganitzativa> allUnitats){
+
+		for (UnitatOrganitzativa unitatWS : allUnitats) {
+			if (unitatWS.getCodi().equals(codi)) {
+				return unitatWS;
+			}
+		}
+		return null;
 	}
 
 	@Override

@@ -1,26 +1,16 @@
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PreRemove;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classe de model de dades que conté la informació dels organs gestors.
@@ -33,6 +23,7 @@ import lombok.Setter;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
+@ToString
 public class OrganGestorEntity extends RipeaAuditable<Long> {
 
     @Column(name = "codi", length = 64, nullable = false)
@@ -46,6 +37,7 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @ForeignKey(name = "ipa_entitat_organ_gestor_fk")
     private EntitatEntity entitat;
 
+    @ToString.Exclude
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "pare_id")
     private OrganGestorEntity pare;
@@ -55,12 +47,18 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     
     @Column(name = "gestio_direct")
     private boolean gestioDirect;
-    
+
+    @Column(name = "estat", length = 1)
+    @Enumerated(EnumType.STRING)
+    private OrganEstatEnumDto estat;
+
+    @ToString.Exclude
     @OneToMany(			
     		mappedBy = "organGestor",
 			fetch = FetchType.LAZY)
     private List<MetaExpedientEntity> metaExpedients;
-    
+
+    @ToString.Exclude
     @OneToMany(			
     		mappedBy = "pare",
 			fetch = FetchType.LAZY,

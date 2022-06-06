@@ -7,6 +7,14 @@ databaseChangeLog:
       name: booleanUnit
       value: true
       dbms: postgresql
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
   - changeSet:
       id: 1653978777186-1
       author: limit
@@ -27,3 +35,10 @@ databaseChangeLog:
               - column:
                   name: data_actualitzacio
                   type: timestamp
+        - addColumn:
+            tableName: ipa_organ_gestor
+            columns:
+              - column:
+                  name: estat
+                  type: varchar(1 ${varcharUnit})
+                  defaultValue: 'V'
