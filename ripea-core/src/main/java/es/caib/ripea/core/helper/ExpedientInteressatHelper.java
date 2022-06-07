@@ -304,6 +304,8 @@ public class ExpedientInteressatHelper {
 	public Exception guardarInteressatsArxiu(
 			Long expId) {
 		
+		logger.info("Guardar interessats arxiu (expId=" + expId + ")");
+		
 		Exception exception = null;
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
 			

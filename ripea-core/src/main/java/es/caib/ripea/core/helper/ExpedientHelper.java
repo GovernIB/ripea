@@ -928,6 +928,7 @@ public class ExpedientHelper {
 	public Exception guardarExpedientArxiu(
 			Long expId) {
 		
+		logger.info("Guardar expedient arxiu (id=" + expId + ")");
 		Exception exception = null;
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expId);

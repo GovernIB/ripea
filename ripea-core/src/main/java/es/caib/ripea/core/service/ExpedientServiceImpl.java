@@ -505,7 +505,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientDto findById(Long entitatId, Long id, String rolActual) {
-		logger.debug("Obtenint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
+		logger.trace("Obtenint l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -520,7 +520,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientDto> findByIds(Long entitatId, Set<Long> ids) {
-		logger.debug("Obtenint l'expedients (" + "entitatId=" + entitatId + ", " + "ids=" + ids + ")");
+		logger.trace("Obtenint l'expedients (" + "entitatId=" + entitatId + ", " + "ids=" + ids + ")");
 		List<ExpedientDto> expedients = new ArrayList<>();
 		
 		for (Long id : ids) {
@@ -643,7 +643,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
 			String rolActual) {
-		logger.debug(
+		logger.trace(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
@@ -657,7 +657,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams) {
-		logger.debug(
+		logger.trace(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
@@ -1291,7 +1291,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<ExpedientDto> relacioFindAmbExpedient(Long entitatId, Long expedientId) {
-		logger.debug(
+		logger.trace(
 				"Obtenint la llista d'expedients relacionats (" + "entitatId=" + entitatId + ", " + "expedientId=" +
 						expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(

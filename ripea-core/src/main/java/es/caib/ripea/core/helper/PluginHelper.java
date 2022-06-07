@@ -32,6 +32,9 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 
 import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ConsultaFiltre;
+import es.caib.plugins.arxiu.api.ConsultaOperacio;
+import es.caib.plugins.arxiu.api.ConsultaResultat;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
@@ -576,28 +579,55 @@ public class PluginHelper {
 					interessats.add(interessat.getDocumentNum());
 				}
 			}
+			
 			if (expedient.getArxiuUuid() == null) {
-				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
-						toArxiuExpedient(
-								null,
-								expedient.getNom(),
-								null,
-								Arrays.asList(organCodiDir3),
-								expedient.getCreatedDate().toDate(),
-								classificacio,
-								expedient.getEstat(),
-								interessats,
-								metaExpedient.getSerieDocumental()));
-				if (getArxiuPlugin().suportaMetadadesNti()) {
-					Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
-							expedientCreat.getIdentificador(),
-							null);
-					propagarMetadadesExpedient(
-							expedientDetalls,
-							expedient);
+				
+				List<ConsultaFiltre> filtre = new ArrayList<ConsultaFiltre>();
+				ConsultaFiltre consultaFiltre = new ConsultaFiltre();
+				consultaFiltre.setOperacio(ConsultaOperacio.IGUAL);
+				consultaFiltre.setMetadada("cm:name");
+				consultaFiltre.setValorOperacio1(expedient.getNom());
+				filtre.add(consultaFiltre);
+				ConsultaResultat consultaResultat = getArxiuPlugin().expedientConsulta(filtre, 0, 10);
+				
+				List<ContingutArxiu> contingutsArxiu = consultaResultat.getResultats();
+				
+				if (contingutsArxiu != null && !contingutsArxiu.isEmpty()) {
+					if (contingutsArxiu.size() > 1) {
+						String arxiuUuids = "";
+						for (ContingutArxiu contingutArxiu : contingutsArxiu) {
+							arxiuUuids += contingutArxiu.getIdentificador() + ", ";
+						}
+						logger.error("Hi ha multiple expedients amb aquest nom en arxiu: id=" + expedient.getId() + ", titol=" + expedient.getNom() + ", arxiuUuids=" + arxiuUuids);
+						throw new RuntimeException("Hi ha multiple expedients amb aquest nom en arxiu: " + arxiuUuids);
+					}
+					
+					ContingutArxiu contingutArxiu = contingutsArxiu.get(0);
+					expedient.updateArxiu(contingutArxiu.getIdentificador());
+					logger.info("Expedient ja s'ha creat en arxiu. Enllaçant existent en arxiu amb existent en db: id=" + expedient.getId() + ",idArxiu=" + contingutArxiu.getIdentificador() + ", titol=" + expedient.getNom());
+				} else {
+					ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
+							toArxiuExpedient(
+									null,
+									expedient.getNom(),
+									null,
+									Arrays.asList(organCodiDir3),
+									expedient.getCreatedDate().toDate(),
+									classificacio,
+									expedient.getEstat(),
+									interessats,
+									metaExpedient.getSerieDocumental()));
+					if (getArxiuPlugin().suportaMetadadesNti()) {
+						Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
+								expedientCreat.getIdentificador(),
+								null);
+						propagarMetadadesExpedient(
+								expedientDetalls,
+								expedient);
+					}
+					expedient.updateArxiu(
+							expedientCreat.getIdentificador());
 				}
-				expedient.updateArxiu(
-						expedientCreat.getIdentificador());
 			} else {
 				if (interessats.isEmpty())
 					interessats = null;
