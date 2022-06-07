@@ -145,6 +145,7 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"where " +
 			"c.arxiuUuid = null " +
 			"and ((c.tipus = 0 and c.arxiuReintents < :arxiuMaxReintentsExpedients) or (c.tipus = 2 and c.arxiuReintents < :arxiuMaxReintentsDocuments)) " +
+			"and c.arxiuReintents > 0 " +
 			"and c.esborrat = 0 " +
 			"order by c.arxiuIntentData asc")
 	public List<ContingutEntity> findContingutsPendentsArxiu(

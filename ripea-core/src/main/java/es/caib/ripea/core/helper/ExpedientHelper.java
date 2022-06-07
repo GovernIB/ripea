@@ -318,6 +318,9 @@ public class ExpedientHelper {
 			logger.error(
 					"Error al custodiar expedient en arxiu  (" + "id=" + expedient.getId() + ")",
 					ex);
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(false);
+			}
 		}
 		expedient.updateArxiuIntent();
 		
@@ -936,11 +939,19 @@ public class ExpedientHelper {
 					false,
 					false,
 					null, false);
+			
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(true);
+			}
+			
 		} catch (Exception ex) {
 			logger.error("Error al custodiar expedient en arxiu  (" +
 					"id=" + expedient.getId() + ")",
 					ex);
 			exception = ex;
+			for (InteressatEntity interessat : expedient.getInteressats()) {
+				interessat.updateArxiuIntent(false);
+			}
 		}
 		expedient.updateArxiuIntent();
 		

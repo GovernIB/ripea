@@ -226,6 +226,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"where " +
 			"i.arxiuPropagat = false " +
 			"and i.arxiuReintents < :arxiuMaxReintents " +
+			"and i.arxiuReintents > 0 " +
 			"order by i.arxiuIntentData asc")
 	public List<InteressatEntity> findInteressatsPendentsArxiu(
 			@Param("arxiuMaxReintents") int arxiuMaxReintents);
