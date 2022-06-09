@@ -324,6 +324,11 @@ public class ExpedientHelper {
 		}
 		expedient.updateArxiuIntent();
 		
+		boolean throwExcepcion = false;//throwExcepcion = true;
+		if (throwExcepcion) {
+			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
+		}
+		
 		logger.info(
 				"Expedient crear ARXIU Helper END(" +
 						"sequencia=" + expedient.getSequencia() + ", " +

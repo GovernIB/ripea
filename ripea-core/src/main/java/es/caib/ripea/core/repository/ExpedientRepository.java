@@ -48,6 +48,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			long sequencia);
 	
 	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	
+	List<ExpedientEntity> findByArxiuUuid(String arxiuUuid);
 
 	@Query(	"from" +
 			"    ExpedientEntity e "

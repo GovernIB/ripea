@@ -115,6 +115,7 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
@@ -210,6 +211,9 @@ public class PluginHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private ExpedientRepository expedientRepository;
+	
 
 	public List<String> rolsUsuariFindAmbCodi(
 			String usuariCodi) {
@@ -588,6 +592,17 @@ public class PluginHelper {
 				consultaFiltre.setMetadada("cm:name");
 				consultaFiltre.setValorOperacio1(expedient.getNom());
 				filtre.add(consultaFiltre);
+				ConsultaFiltre consultaFiltre2 = new ConsultaFiltre();
+				consultaFiltre2.setOperacio(ConsultaOperacio.IGUAL);
+				consultaFiltre2.setMetadada("eni:cod_clasificacion");
+				consultaFiltre2.setValorOperacio1(expedient.getMetaExpedient().getSerieDocumental());
+				filtre.add(consultaFiltre2);
+				ConsultaFiltre consultaFiltre3 = new ConsultaFiltre();
+				consultaFiltre3.setOperacio(ConsultaOperacio.IGUAL);
+				consultaFiltre3.setMetadada("eni:id_tramite");
+				consultaFiltre3.setValorOperacio1(expedient.getMetaExpedient().getClassificacioSia());
+				filtre.add(consultaFiltre3);
+				
 				ConsultaResultat consultaResultat = getArxiuPlugin().expedientConsulta(filtre, 0, 10);
 				
 				List<ContingutArxiu> contingutsArxiu = consultaResultat.getResultats();
@@ -603,30 +618,44 @@ public class PluginHelper {
 					}
 					
 					ContingutArxiu contingutArxiu = contingutsArxiu.get(0);
+					List<ExpedientEntity> expedients = expedientRepository.findByArxiuUuid(contingutArxiu.getIdentificador());
+					if (expedients != null && !expedients.isEmpty()) {
+						throw new RuntimeException("Expedient amb aquest nom ja s'ha creat en ripea. Per favor, canvieu el nom d'expedient en ripea"); // this should never happen, if it happens there is some problem of concurrency in ripea
+					}
 					expedient.updateArxiu(contingutArxiu.getIdentificador());
 					logger.info("Expedient ja s'ha creat en arxiu. Enllaçant existent en arxiu amb existent en db: id=" + expedient.getId() + ",idArxiu=" + contingutArxiu.getIdentificador() + ", titol=" + expedient.getNom());
 				} else {
-					ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
-							toArxiuExpedient(
-									null,
-									expedient.getNom(),
-									null,
-									Arrays.asList(organCodiDir3),
-									expedient.getCreatedDate().toDate(),
-									classificacio,
-									expedient.getEstat(),
-									interessats,
-									metaExpedient.getSerieDocumental()));
-					if (getArxiuPlugin().suportaMetadadesNti()) {
-						Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
-								expedientCreat.getIdentificador(),
-								null);
-						propagarMetadadesExpedient(
-								expedientDetalls,
-								expedient);
+					try {
+						ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
+								toArxiuExpedient(
+										null,
+										expedient.getNom(),
+										null,
+										Arrays.asList(organCodiDir3),
+										expedient.getCreatedDate().toDate(),
+										classificacio,
+										expedient.getEstat(),
+										interessats,
+										metaExpedient.getSerieDocumental()));
+						if (getArxiuPlugin().suportaMetadadesNti()) {
+							Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(
+									expedientCreat.getIdentificador(),
+									null);
+							propagarMetadadesExpedient(
+									expedientDetalls,
+									expedient);
+						}
+						expedient.updateArxiu(
+								expedientCreat.getIdentificador());
+					} catch (Exception e) {
+						if (e.getMessage().contains("Duplicate child name not allowed")) {
+							logger.error("Error al crear expedient en arxiu. Duplicate child name not allowed", e);
+							throw new RuntimeException("Ja s'ha creat un expedient amb el mateix nom a l'arxiu. Per restriccions pròpies de l'Arxiu, no és possible crear expedients amb el mateix nom el mateix dia. Per favor, canvieu el nom de l'expedient a Ripea, o proveu de guardar l'arxiu més tard.");
+						} else {
+							throw e;
+						}
 					}
-					expedient.updateArxiu(
-							expedientCreat.getIdentificador());
+					
 				}
 			} else {
 				if (interessats.isEmpty())
