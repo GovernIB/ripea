@@ -122,9 +122,9 @@ public class MetaExpedientHelper {
 		} else if (incrementar) {
 			sequencia.incrementar();
 			logger.info("Sequencia incrementada: " + sequencia.getAny() + ", " + sequencia.getValor() + ", " + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
-			long max = expedientRepository.findMaxSequencia(metaExpedient, any);
+			Long max = expedientRepository.findMaxSequencia(metaExpedient, any);
 			long valor = sequencia.getValor();
-			if (max + 1 > valor) {
+			if (max != null && max + 1 > valor) {
 				logger.error("Sequenia no correcta: valorSequenciaIncrementada=" + valor + ", maxSequenciaExp=" + max + ". Actualitzant valor de sequncia manualment...");
 				sequencia.updateValor(max + 1);
 			}

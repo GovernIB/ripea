@@ -574,7 +574,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where " +
 			"e.metaNode = :metaNode " +
 			"and e.any = :any")
-	long findMaxSequencia(
+	Long findMaxSequencia(
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("any") int any);
 	
