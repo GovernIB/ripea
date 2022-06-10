@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -53,6 +54,7 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaPerfil;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
@@ -586,11 +588,13 @@ public class PluginHelper {
 			
 			if (expedient.getArxiuUuid() == null) {
 				
+				String nomArxiu = ArxiuConversioHelper.revisarContingutNom(expedient.getNom());
+				
 				List<ConsultaFiltre> filtre = new ArrayList<ConsultaFiltre>();
 				ConsultaFiltre consultaFiltre = new ConsultaFiltre();
 				consultaFiltre.setOperacio(ConsultaOperacio.IGUAL);
 				consultaFiltre.setMetadada("cm:name");
-				consultaFiltre.setValorOperacio1(expedient.getNom());
+				consultaFiltre.setValorOperacio1(nomArxiu);
 				filtre.add(consultaFiltre);
 				ConsultaFiltre consultaFiltre2 = new ConsultaFiltre();
 				consultaFiltre2.setOperacio(ConsultaOperacio.IGUAL);
@@ -604,8 +608,22 @@ public class PluginHelper {
 				filtre.add(consultaFiltre3);
 				
 				ConsultaResultat consultaResultat = getArxiuPlugin().expedientConsulta(filtre, 0, 10);
-				
+
 				List<ContingutArxiu> contingutsArxiu = consultaResultat.getResultats();
+				if (contingutsArxiu != null && !contingutsArxiu.isEmpty()) {
+					String arxiuUuidsNoms = "";
+					for (ContingutArxiu contingutArxiu : contingutsArxiu) {
+						arxiuUuidsNoms += contingutArxiu.getNom() + "=" + contingutArxiu.getIdentificador() + ", ";
+					}
+					logger.info("Arxius trobats per nom " + nomArxiu + ": " + arxiuUuidsNoms);
+					Iterator<ContingutArxiu> it = contingutsArxiu.iterator();
+					while (it.hasNext()) {
+						ContingutArxiu i = it.next();
+						if (!i.getNom().equals(nomArxiu)) {
+							it.remove();
+						}
+					}
+				}
 				
 				if (contingutsArxiu != null && !contingutsArxiu.isEmpty()) {
 					if (contingutsArxiu.size() > 1) {
@@ -1130,6 +1148,8 @@ public class PluginHelper {
 
 	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid) {
 		List<ContingutArxiu> continguts = arxiuExpedientConsultarPerUuid(expedientUuid).getContinguts();
+		
+		nomPerComprovar = ArxiuConversioHelper.revisarContingutNom(nomPerComprovar);
 		int ocurrences = 0;
 		if (continguts != null) {
 			List<String> noms = new ArrayList<String>();

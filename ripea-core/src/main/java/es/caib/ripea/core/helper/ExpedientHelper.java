@@ -18,6 +18,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.*;
@@ -1732,7 +1733,7 @@ public class ExpedientHelper {
 		String carpetaUuid = null;
 		if (expedient.getContinguts() != null) {
 			for (ContingutArxiu contingutArxiu : expedient.getContinguts()) {
-				String replacedNom = revisarContingutNom(nom);
+				String replacedNom = ArxiuConversioHelper.revisarContingutNom(nom);
 				if (contingutArxiu.getTipus() == ContingutTipus.CARPETA &&
 						contingutArxiu.getNom().equals(replacedNom)) {
 					carpetaExistsInArxiu = true;
@@ -1759,13 +1760,6 @@ public class ExpedientHelper {
 		return carpetaId;
 	}
 	
-	
-	private String revisarContingutNom(String nom) {
-		if (nom == null) {
-			return null;
-		}
-		return nom.replace("&", "&amp;").replaceAll("[\\\\/:*?\"<>|]", "_");
-	}
 	
 	//crea les carpetes per defecte definides al procediment
 	private void crearCarpetesMetaExpedient(
