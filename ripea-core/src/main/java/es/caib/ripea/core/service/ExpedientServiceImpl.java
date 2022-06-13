@@ -462,7 +462,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
-		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, null);
+		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, true, null);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -485,7 +485,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
-		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, rolActual);
+		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, true, rolActual);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				entitatId,
 				id,
@@ -2081,7 +2081,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null,
 				false,
-				rolActual);
+				rolActual, true);
 		CarpetaEntity expedientFillImportedEntity = carpetaRepository.findOne(expedientFillImported.getId());
 		expedientFillImportedEntity.updateExpedientRelacionat(expedientFill);
 	}

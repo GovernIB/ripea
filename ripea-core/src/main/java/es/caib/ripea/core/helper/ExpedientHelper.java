@@ -216,7 +216,7 @@ public class ExpedientHelper {
 					true,
 					false, 
 					false, 
-					rolActual);
+					true, rolActual);
 		}
 		contingutHelper.comprovarNomValid(contingutPare, nom, null, ExpedientEntity.class);
 //		comprovarSiExpedientAmbMateixNom(
@@ -822,7 +822,7 @@ public class ExpedientHelper {
 					false,
 					false,
 					true,
-					false, false, null);
+					false, false, true, null);
 		}
 		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
 				metaExpedient,
@@ -1769,7 +1769,8 @@ public class ExpedientHelper {
 					carpetaExistsInArxiu,
 					carpetaUuid, 
 					true, 
-					rolActual);
+					rolActual, 
+					false);
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
@@ -1792,7 +1793,10 @@ public class ExpedientHelper {
 					false, 
 					null, 
 					false, 
-					null, false, null);
+					null, 
+					false, 
+					null, 
+					false);
 			if (! metaExpedientCarpeta.getFills().isEmpty()) {
 				crearSubCarpetes(
 						metaExpedientCarpeta.getFills(), 
@@ -1814,7 +1818,7 @@ public class ExpedientHelper {
 					false, 
 					null, 
 					false, 
-					null, false, null);
+					null, false, null, true);
 				
 			crearSubCarpetes(
 					metaExpedientCarpetaDto.getFills(), 

@@ -56,7 +56,8 @@ public class CarpetaHelper {
 			boolean alreadyCreatedInArxiu,
 			String arxiuUuid, 
 			boolean fromAnotacio, 
-			String rolActual) {
+			String rolActual, 
+			boolean comprovarAgafatPerUsuariActual) {
 		logger.debug("Creant nova carpeta ("
 				+ "entitatId=" + entitatId + ", "
 				+ "pareId=" + pareId + ", "
@@ -81,6 +82,7 @@ public class CarpetaHelper {
 					false,
 					false, 
 					false, 
+					comprovarAgafatPerUsuariActual, 
 					rolActual);
 			ExpedientEntity expedient = contingutHelper.getExpedientSuperior(
 					pare,

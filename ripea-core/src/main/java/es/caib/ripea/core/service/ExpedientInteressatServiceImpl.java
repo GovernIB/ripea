@@ -22,7 +22,6 @@ import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -40,7 +39,6 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 
@@ -64,8 +62,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired
@@ -106,7 +102,12 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long expedientId,
 			InteressatDto interessat, 
 			String rolActual) {
-		return update(entitatId, expedientId, null, interessat, rolActual);
+		return expedientInteressatHelper.update(
+				entitatId,
+				expedientId,
+				null,
+				interessat,
+				rolActual, true);
 	}
 
 	@Transactional
@@ -117,132 +118,12 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long representatId,
 			InteressatDto interessat, 
 			String rolActual) {
-		if (representatId != null) {
-			logger.debug("Modificant un representant ("
-					+ "entitatId=" + entitatId + ", "
-					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + representatId + ", "
-					+ "interessat=" + interessat + ")");
-		} else {
-			logger.debug("Modificant un interessat ("
-					+ "entitatId=" + entitatId + ", "
-					+ "expedientId=" + expedientId + ", "
-					+ "interessat=" + interessat + ")");
-		}
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+		return expedientInteressatHelper.update(
 				entitatId,
 				expedientId,
-				true,
-				false,
-				true,
-				false,
-				false, 
-				false, 
-				rolActual);
-		InteressatEntity representat = null;
-		if (representatId != null) {
-			representat = interessatRepository.findOne(representatId);
-			if (representat == null || 
-				representat.getRepresentant() == null || 
-				!representat.getRepresentant().getId().equals(interessat.getId())) {
-				throw new NotFoundException(
-						representatId,
-						InteressatEntity.class);
-			}
-		}
-		InteressatEntity interessatEntity = null;
-		if (interessat.isPersonaFisica()) {
-			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
-			interessatEntity = interessatRepository.findPersonaFisicaById(interessat.getId());
-			((InteressatPersonaFisicaEntity)interessatEntity).update(
-					interessatPersonaFisicaDto.getNom(),
-					interessatPersonaFisicaDto.getLlinatge1(),
-					interessatPersonaFisicaDto.getLlinatge2(),
-					interessatPersonaFisicaDto.getDocumentTipus(),
-					interessatPersonaFisicaDto.getDocumentNum(),
-					interessatPersonaFisicaDto.getPais(),
-					interessatPersonaFisicaDto.getProvincia(),
-					interessatPersonaFisicaDto.getMunicipi(),
-					interessatPersonaFisicaDto.getAdresa(),
-					interessatPersonaFisicaDto.getCodiPostal(),
-					interessatPersonaFisicaDto.getEmail(),
-					interessatPersonaFisicaDto.getTelefon(),
-					interessatPersonaFisicaDto.getObservacions(),
-					interessatPersonaFisicaDto.getPreferenciaIdioma(),
-					interessatPersonaFisicaDto.getEntregaDeh(),
-					interessatPersonaFisicaDto.getEntregaDehObligat(),
-					interessatPersonaFisicaDto.getIncapacitat());
-		} else if (interessat.isPersonaJuridica()) {
-			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
-			interessatEntity = interessatRepository.findPersonaJuridicaById(interessat.getId());
-			((InteressatPersonaJuridicaEntity)interessatEntity).update(
-					interessatPersonaJuridicaDto.getRaoSocial(),
-					interessatPersonaJuridicaDto.getDocumentTipus(),
-					interessatPersonaJuridicaDto.getDocumentNum(),
-					interessatPersonaJuridicaDto.getPais(),
-					interessatPersonaJuridicaDto.getProvincia(),
-					interessatPersonaJuridicaDto.getMunicipi(),
-					interessatPersonaJuridicaDto.getAdresa(),
-					interessatPersonaJuridicaDto.getCodiPostal(),
-					interessatPersonaJuridicaDto.getEmail(),
-					interessatPersonaJuridicaDto.getTelefon(),
-					interessatPersonaJuridicaDto.getObservacions(),
-					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-					interessatPersonaJuridicaDto.getEntregaDeh(),
-					interessatPersonaJuridicaDto.getEntregaDehObligat(),
-					interessatPersonaJuridicaDto.getIncapacitat());
-		} else {
-			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
-			interessatEntity = interessatRepository.findAdministracioById(interessat.getId());
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
-					interessatAdministracioDto.getOrganCodi());
-			((InteressatAdministracioEntity)interessatEntity).update(
-					unitat.getCodi(),
-					unitat.getDenominacio(),
-					interessatAdministracioDto.getDocumentTipus(),
-					interessatAdministracioDto.getDocumentNum(),
-					interessatAdministracioDto.getPais(),
-					interessatAdministracioDto.getProvincia(),
-					interessatAdministracioDto.getMunicipi(),
-					interessatAdministracioDto.getAdresa(),
-					interessatAdministracioDto.getCodiPostal(),
-					interessatAdministracioDto.getEmail(),
-					interessatAdministracioDto.getTelefon(),
-					interessatAdministracioDto.getObservacions(),
-					interessatAdministracioDto.getPreferenciaIdioma(),
-					interessatAdministracioDto.getEntregaDeh(),
-					interessatAdministracioDto.getEntregaDehObligat(),
-					interessatAdministracioDto.getIncapacitat());
-		}
-		interessatEntity = interessatRepository.save(interessatEntity);
-		// Registra al log la modificació de l'interessat
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				interessatEntity,
-				LogObjecteTipusEnumDto.INTERESSAT,
-				LogTipusEnumDto.MODIFICACIO,
-				null,
-				null,
-				false,
-				false);
-//		##### Hi ha un mapeig dins conversioTipusHelper ###
-//		if (interessat instanceof InteressatPersonaFisicaDto) {
-//			return conversioTipusHelper.convertir(
-//					interessatEntity,
-//					InteressatPersonaFisicaDto.class);
-//		} else if (interessat instanceof InteressatPersonaJuridicaDto) {
-//			return conversioTipusHelper.convertir(
-//					interessatEntity,
-//					InteressatPersonaJuridicaDto.class);
-//		} else {
-//			return conversioTipusHelper.convertir(
-//					interessatEntity,
-//					InteressatAdministracioDto.class);
-//		}
-		return conversioTipusHelper.convertir(
-				interessatEntity,
-				InteressatDto.class);
+				representatId,
+				interessat,
+				rolActual, true);
 	}
 
 	@Transactional
@@ -300,59 +181,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long interessatId,
 			Long representantId, 
 			String rolActual) {
-		logger.debug("Esborrant interessat de l'expedient  ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "interessatId=" + interessatId + ", "
-				+ "representantId=" + representantId + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+
+		expedientInteressatHelper.delete(
 				entitatId,
 				expedientId,
-				true,
-				false,
-				true,
-				false,
-				false, 
-				false, 
+				interessatId,
+				representantId,
 				rolActual);
-		InteressatEntity interessat = interessatRepository.findOne(interessatId);
-		if (interessat != null) {
-			if (interessat.getRepresentant() != null && 
-				interessat.getRepresentant().getId().equals(representantId)) {
-				InteressatEntity representant = interessatRepository.findOne(representantId);
-				interessat.updateRepresentant(null);
-				interessatRepository.delete(representant);
-				//expedient.deleteInteressat(interessat);
-				// Registra al log la baixa de l'interessat
-				contingutLogHelper.log(
-						expedient,
-						LogTipusEnumDto.MODIFICACIO,
-						interessat,
-						LogObjecteTipusEnumDto.INTERESSAT,
-						LogTipusEnumDto.ELIMINACIO,
-						null,
-						null,
-						false,
-						false);
-			} else {
-				logger.error("No s'ha trobat el representant de l'interessat ("
-						+ "expedientId=" + expedientId + ", "
-						+ "interessatId=" + interessatId + ", "
-						+ "representantId=" + representantId + ")");
-				throw new ValidationException(
-						representantId,
-						InteressatEntity.class,
-						"No s'ha trobat el representant de l'interessat (interessatId=" + interessatId + ")");
-			}
-		} else {
-			logger.error("No s'ha trobat l'interessat a l'expedient ("
-					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + interessatId + ")");
-			throw new ValidationException(
-					interessatId,
-					InteressatEntity.class,
-					"No s'ha trobat l'interessat a l'expedient (expedientId=" + expedientId + ")");
-		}
 	}
 	
 	@Override

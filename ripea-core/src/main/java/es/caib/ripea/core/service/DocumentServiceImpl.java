@@ -179,7 +179,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false, 
 				false, 
-				rolActual);
+				true, rolActual);
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
@@ -237,7 +237,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false, 
 					false, 
-					rolActual);	
+					true, rolActual);	
 		} 
 		
 		if (! checkCarpetaUniqueContraint(documentDto.getNom(), pare, entitatId)) {
@@ -295,7 +295,7 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false, 
-					false, null);	
+					false, true, null);	
 		} 
 		
 		if (! checkCarpetaUniqueContraint(documentEntity.getNom(), pare, entitatId)) {
@@ -545,7 +545,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false, 
-				false, null);
+				false, true, null);
 		ExpedientEntity expedient = pare.getExpedientPare();
 		MetaDocumentEntity metaDocument = null;
 		if (metaDocumentId != null) {

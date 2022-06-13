@@ -110,7 +110,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false, false, null);
+				false, false, true, null);
 		contingutHelper.comprovarNomValid(
 				contingut.getPare(),
 				nom,
@@ -191,7 +191,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true, 
 				false, 
-				rolActual);
+				true, rolActual);
 		if (contingut instanceof ExpedientEntity) {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
@@ -400,7 +400,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true, 
 				false, 
-				rolActual);
+				true, rolActual);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -409,7 +409,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false, 
 				false, 
-				rolActual);
+				true, rolActual);
 		// Comprova el tipus del contingut que es vol moure
 		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -502,7 +502,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				false, null);
+				false, true, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -510,7 +510,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false, null);
+				false, true, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -603,14 +603,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, false, null);
+				false, false, true, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false, false, null);
+				false, false, true, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -1697,7 +1697,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, null);
+				false, true, null);
 		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();
