@@ -310,14 +310,14 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient) {
 		return delegate.incorporar(
 				entitatId, 
 				expedientId, 
 				expedientPeticioId,  
 				associarInteressats, 
 				rolActual, 
-				anexosIdsMetaDocsIdsMap);
+				anexosIdsMetaDocsIdsMap, agafarExpedient);
 		
 	}
 

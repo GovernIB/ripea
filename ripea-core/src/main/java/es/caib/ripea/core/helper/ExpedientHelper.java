@@ -395,7 +395,8 @@ public class ExpedientHelper {
 			Long expedientId, 
 			String rolActual, 
 			Long entitatId, 
-			boolean associarInteressats) {
+			boolean associarInteressats, 
+			boolean agafarExpedient) {
 		
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findOne(expedientPeticioId);
 		if (expedientPeticio.getExpedient() != null) {
@@ -403,6 +404,20 @@ public class ExpedientHelper {
 					"<creacio>",
 					ExpedientEntity.class,
 					"Aquesta anotació ja està relacionada amb algun expedient");
+		}
+		
+		if (agafarExpedient) {
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+					entitatId,
+					expedientId,
+					false,
+					true,
+					false,
+					false,
+					false, 
+					false, 
+					rolActual);
+			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 		}
 		
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);

@@ -386,6 +386,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			Model model) {
 		
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
+		command.setAgafarExpedient(true);
 		omplirModel(expedientPeticioId, request, model, command);
 
 		return "expedientPeticioAccept";
@@ -550,8 +551,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							entitat.getId(),
 							command.getExpedientId(),
 							expedientPeticioDto.getId(),
-							command.isAssociarInteressats(), RolHelper.getRolActual(request), 
-							anexosIdsMetaDocsIdsMap);
+							command.isAssociarInteressats(), 
+							RolHelper.getRolActual(request), 
+							anexosIdsMetaDocsIdsMap, 
+							command.isAgafarExpedient());
 					
 				logger.info("Expedient incorporat per anotacio: " + processatOk);
 			}

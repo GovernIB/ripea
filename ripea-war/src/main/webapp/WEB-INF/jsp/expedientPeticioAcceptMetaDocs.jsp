@@ -101,6 +101,7 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 		<form:hidden path="organGestorId"/>
 		<form:hidden path="any"/> 			
 		<form:hidden path="associarInteressats"/> 
+		<form:hidden path="agafarExpedient"/>
 		<form:hidden path="newExpedientTitol"/>
 		
 

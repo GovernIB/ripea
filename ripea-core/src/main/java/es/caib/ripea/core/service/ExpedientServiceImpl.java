@@ -322,14 +322,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	@Override
-	public boolean incorporar(Long entitatId, Long expedientId, Long expedientPeticioId, boolean associarInteressats, String rolActual, Map<Long, Long> anexosIdsMetaDocsIdsMap) {
-		logger.info("Incorporant a l'expedient existent (" +
-				"entitatId=" + entitatId + ", " +
+	public boolean incorporar(
+			Long entitatId,
+			Long expedientId,
+			Long expedientPeticioId,
+			boolean associarInteressats,
+			String rolActual,
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			boolean agafarExpedient) {
+		logger.info("Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"expedientPeticioId=" + expedientPeticioId + ")");
 
 		synchronized (lock) {
-			expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId, rolActual, entitatId, associarInteressats);
+			expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId, rolActual, entitatId, associarInteressats, agafarExpedient);
 		}
 
 		expedientHelper.inicialitzarExpedientsWithImportacio();

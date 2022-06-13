@@ -29,6 +29,7 @@ public class ExpedientPeticioAcceptarCommand {
 	private int any;
 	private boolean associarInteressats;
 	private ExpedientPeticioAccioEnumDto accio;
+	private boolean agafarExpedient;
 	
 	private Long organGestorId;
     private List<RegistreAnnexCommand> annexos = new ArrayList<>();
@@ -88,6 +89,12 @@ public class ExpedientPeticioAcceptarCommand {
 	}
 	public void setAnnexos(List<RegistreAnnexCommand> annexos) {
 		this.annexos = annexos;
+	}
+	public boolean isAgafarExpedient() {
+		return agafarExpedient;
+	}
+	public void setAgafarExpedient(boolean agafarExpedient) {
+		this.agafarExpedient = agafarExpedient;
 	}
 	@Override
 	public String toString() {

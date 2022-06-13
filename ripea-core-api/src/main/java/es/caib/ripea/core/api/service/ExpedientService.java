@@ -414,7 +414,7 @@ public interface ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap);
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient);
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.
