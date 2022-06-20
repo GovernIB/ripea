@@ -191,4 +191,11 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitatIdAndEstat(Long entitatId, OrganEstatEnumDto estat);
 
 	public OrganGestorEntity findByCodi(String codi);
+
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"    og.entitat = :entitat " +
+			"and og.estat != es.caib.ripea.core.api.dto.OrganEstatEnumDto.V ")
+    List<OrganGestorEntity> findByEntitatNoVigent(@Param("entitat") EntitatEntity entitat);
 }

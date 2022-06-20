@@ -3,45 +3,10 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.ArbreJsonDto;
-import es.caib.ripea.core.api.dto.ArbreNodeDto;
-import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.StatusEnumDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
-import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.entity.*;
 import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
@@ -52,6 +17,27 @@ import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
+import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
 
 /**
  * Utilitats comunes pels meta-expedients.
@@ -87,6 +73,8 @@ public class MetaExpedientHelper {
     private EmailHelper emailHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -651,6 +639,125 @@ public class MetaExpedientHelper {
 		}
 	}
 
+
+	public void actualitzarProcediments(EntitatDto entitatDto, String lang) {
+		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getCodi());
+		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+			logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+			return;
+		}
+
+		// inicialitza el seguiment del prgrés d'actualització
+		progres = new ProgresActualitzacioDto();
+		progresActualitzacio.put(entitatDto.getCodi(), progres);
+
+		try {
+
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatDto.getId());
+			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+			progres.setNumProcediments(metaExpedients.size());
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
+					.infoTitol("es".equalsIgnoreCase(lang) ? "Inicio del proceso de actualitzaci&#243;n de procedimientos" : "Inici del proc&#233;s d&#39;actualitzaci&#243; de procediments")
+					.infoText("es".equalsIgnoreCase(lang) ? "Se actualizar&#225;n " + metaExpedients.size() + " procedimientos" : "S&#39;actualitzaran " + metaExpedients.size() + " procediments").build());
+
+			Integer organsNoSincronitzats = 0;
+			Integer modificats = 0;
+			Integer fallat = 0;
+			for(MetaExpedientEntity metaExpedient: metaExpedients) {
+				ActualitzacioInfo.ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder()
+						.codiSia(metaExpedient.getClassificacioSia())
+						.nomAntic(metaExpedient.getNom())
+						.descripcioAntiga(metaExpedient.getDescripcio())
+						.comuAntic(metaExpedient.isComu());
+				if (metaExpedient.getOrganGestor() != null)
+					infoBuilder.organAntic(metaExpedient.getOrganGestor().getCodi());
+
+				ProcedimentDto procedimentGga = null;
+				try {
+					procedimentGga = pluginHelper.procedimentFindByCodiSia(
+							entitat.getUnitatArrel(),
+							metaExpedient.getClassificacioSia());
+					infoBuilder.exist(procedimentGga != null);
+				} catch (SistemaExternException se) {
+					infoBuilder.hasError(true);
+					infoBuilder.errorText(("es".equalsIgnoreCase(lang) ? "Error al recuperar el procedimiento de Rolsac" : "Error al recuperar el procediment de Rolsac: ") + se.getMessage());
+					progres.addInfo(infoBuilder.build());
+					fallat++;
+					continue;
+				}
+
+				if (procedimentGga == null) {
+					infoBuilder.hasError(true);
+					infoBuilder.errorText("es".equalsIgnoreCase(lang) ? "No existe ning&#250;n procedimiento activo con el c&#243;digo SIA " + metaExpedient.getClassificacioSia() + " en Rolsac.": "No existeix cap procediment actiu amb el codi SIA " + metaExpedient.getClassificacioSia() + " a Rolsac.");
+					progres.addInfo(infoBuilder.build());
+					fallat++;
+					continue;
+				}
+
+				ActualitzacioInfo info = infoBuilder.nomNou(procedimentGga.getNom())
+						.descripcioNova(procedimentGga.getResum())
+						.comuNou(procedimentGga.isComu())
+						.organNou(procedimentGga.getUnitatOrganitzativaCodi())
+						.build();
+
+				if (!info.hasChange()) {
+					progres.addInfo(info);
+					continue;
+				}
+
+				String nom = metaExpedient.getNom();
+				String descripcio = metaExpedient.getDescripcio();
+				OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+				boolean organNoSincronitzat = false;
+
+				if (!procedimentGga.getNom().equals(metaExpedient.getNom())) {
+					nom = procedimentGga.getNom();
+				}
+				if (!procedimentGga.getResum().equals(metaExpedient.getDescripcio())) {
+					descripcio = procedimentGga.getResum();
+				}
+				if (procedimentGga.isComu() != metaExpedient.isComu() && procedimentGga.isComu()) {
+					organGestor = null;
+				} else if (!procedimentGga.getUnitatOrganitzativaCodi().equals(metaExpedient.getOrganGestor().getCodi())) {
+					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
+					if (organGestor == null) {
+						organNoSincronitzat = true;
+						organsNoSincronitzats++;
+						organGestor = metaExpedient.getOrganGestor();
+						info.setHasError(true);
+						info.setErrorText("es".equalsIgnoreCase(lang) ?
+								"El &#243;rgano gestor no existe en RIPEA. Realice una sincronizaci&#243;n de &#243;rganos, y si a&#250;n no se encuentra el &#243;rgano, compruebe que est&#225; correctamente configurado en ROLSAC." :
+								"L&#39;&#242;rgan gestor no existeix a RIPEA. Realitzi una sincronitzaci&#243; d&#39;&#242;rgans, i si tot i aix&#237; encara no es troba l&#39;&#242;rgan, comprovi que est&#224; correctament configurat a ROLSAC.");
+						fallat++;
+					}
+				}
+
+				metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
+				progres.addInfo(info);
+				modificats++;
+
+			}
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
+					.infoTitol("es".equalsIgnoreCase(lang) ? "Fin del proceso de actualitzaci&#243; de procedimientos" : "Fi del proc&#233;s d&#39;actualitzaci&#243; de procediments")
+					.infoText("es".equalsIgnoreCase(lang) ? "Se han modificado " + modificats + " procedimientos, y " + fallat + " han dado error" : "S&#39;han modificat " + modificats + " procediments, i " + fallat + " han donat error").build());
+
+			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
+			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+
+			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			progresActualitzacio.get(entitatDto.getCodi()).setError(true);
+			progresActualitzacio.get(entitatDto.getCodi()).setErrorMsg(sw.toString());
+			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
+			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+			throw e;
+		}
+	}
 	
 
 		

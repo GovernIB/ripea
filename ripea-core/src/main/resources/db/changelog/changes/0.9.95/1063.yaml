@@ -42,3 +42,35 @@ databaseChangeLog:
                   name: estat
                   type: varchar(1 ${varcharUnit})
                   defaultValue: 'V'
+        - createTable:
+            tableName: ipa_og_sinc_rel
+            columns:
+              - column:
+                  name: antic_og
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nou_og
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnNames: antic_og
+            baseTableName: ipa_og_sinc_rel
+            constraintName: ipa_organ_antic_fk
+            referencedColumnNames: id
+            referencedTableName: ipa_organ_gestor
+        - addForeignKeyConstraint:
+            baseColumnNames: nou_og
+            baseTableName: ipa_og_sinc_rel
+            constraintName: ipa_organ_nou_fk
+            referencedColumnNames: id
+            referencedTableName: ipa_organ_gestor
+        - addUniqueConstraint:
+            tableName: ipa_og_sinc_rel
+            constraintName: ipa_uo_sinc_rel_mult_uk
+            columnNames: antic_og, nou_og
+        - sql:
+            dbms: oracle
+            sql: grant select, update, insert, delete on ipa_og_sinc_rel to www_ripea;

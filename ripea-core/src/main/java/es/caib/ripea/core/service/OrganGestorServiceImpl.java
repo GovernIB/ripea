@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 	
 	
 	@Override
@@ -202,50 +205,125 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
 			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
 		}
-		List<OrganGestorEntity> organismesDIR3 = new ArrayList<OrganGestorEntity>();
-		List<OrganGestorDto> organismes = findOrganismesByEntitat(entitat.getUnitatArrel());
-		for (OrganGestorDto o : organismes) {
-			OrganGestorEntity organDB = organGestorRepository.findByEntitatAndCodi(entitat, o.getCodi());
-			if (organDB == null) { // create it
-				organDB = new OrganGestorEntity();
-				organDB.setCodi(o.getCodi());
-				organDB.setEntitat(entitat);
-				organDB.setNom(o.getNom());
-				organDB.setPare(organGestorRepository.findByEntitatAndCodi(entitat, o.getPareCodi()));
-				organGestorRepository.save(organDB);
-			} else { // update it
-				if (!organDB.isGestioDirect()) {
-					organDB.setNom(o.getNom());
-					organDB.setActiu(true);
-					organDB.setPare(organGestorRepository.findByEntitatAndCodi(entitat, o.getPareCodi()));
-					organGestorRepository.flush();
-				}
-			}
-			organismesDIR3.add(organDB);
+
+		List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+				entitat.getUnitatArrel(),
+				entitat.getDataActualitzacio(),
+				entitat.getDataSincronitzacio());
+
+		// Agafa totes les unitats del WS i les guarda a BBDD. Si la unitat no existeix la crea, i si existeix la sobreescriu.
+		for (UnitatOrganitzativa unitatWS: unitatsWs) {
+			sincronizarUnitat(unitatWS, entitat);
 		}
-		// Processam els organs gestors que ja no estan a dir3 i tenen instancies a la bbdd
-		List<OrganGestorEntity> organismesNotInDIR3 = organGestorRepository.findByEntitat(entitat);
-		organismesNotInDIR3.removeAll(organismesDIR3);
-		for (OrganGestorEntity o : organismesNotInDIR3) {
-			if (!o.isGestioDirect()) {
-				
-				List<MetaExpedientOrganGestorEntity> metaexporg = metaExpedientOrganGestorRepository.findByOrganGestor(o);
-				List<ExpedientEntity> expedients = expedientRepository.findByOrganGestor(o);
-				
-				if ((o.getMetaExpedients() == null || o.getMetaExpedients().size() == 0) && (expedients == null || expedients.isEmpty()) && (metaexporg == null || metaexporg.isEmpty())) {
-					organGestorRepository.delete(o.getId());
+
+		// Històrics
+		for (UnitatOrganitzativa unidadWS : unitatsWs) {
+			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unidadWS.getCodi());
+			sincronizarHistoricsUnitat(unitat, unidadWS, entitat);
+		}
+		List<OrganGestorEntity> obsoleteUnitats = organGestorRepository.findByEntitatNoVigent(entitat);
+
+		List<OrganGestorEntity> organsDividits = new ArrayList<>();
+		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
+		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
+		// Definint tipus de transició
+		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
+			if (obsoleteUnitat.getNous().size() > 1) {
+				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
+				organsDividits.add(obsoleteUnitat);
+			} else {
+				if (obsoleteUnitat.getNous().size() == 1) {
+					if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
+						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.FUSIO);
+						organsFusionats.add(obsoleteUnitat);
+					} else if (obsoleteUnitat.getNous().get(0).getAntics().size() == 1) {
+						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.SUBSTITUCIO);
+						organsSubstituits.add(obsoleteUnitat);
+					}
 				} else {
-					o.setActiu(false);
-					organGestorRepository.flush();
+					obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
 				}
 			}
 		}
+
+		Date ara = new Date();
+		// Si és la primera sincronització
+		if (entitat.getDataSincronitzacio() == null) {
+			entitat.setDataSincronitzacio(ara);
+		}
+		entitat.setDataActualitzacio(ara);
+
+		// Actualitzar procediments
+		metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), "ca");
+
+		// Actualitzar permisos
+		permisosHelper.actualitzarPermisosOrgansObsolets(organsDividits, organsFusionats, organsSubstituits);
+
+		// Eliminar organs no vigents no utilitzats??
+		for(OrganGestorEntity organObsolet: obsoleteUnitats) {
+			Integer nombreProcediments = metaExpedientOrganGestorRepository.countByOrganGestor(organObsolet);
+			if (nombreProcediments > 0)
+				continue;
+			Integer nombreExpedients = expedientRepository.countByOrganGestor(organObsolet);
+			if (nombreExpedients > 0)
+				continue;
+			try {
+				permisosHelper.eliminarPermisosOrgan(organObsolet);
+				organGestorRepository.delete(organObsolet);
+			} catch (Exception ex) {
+				logger.error("No ha estat possible esborrar l'òrgan gestor.", ex);
+			}
+		}
+
+		cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
+		cacheHelper.evictAllOrganismesEntitatAmbPermis();
 		return true;
 	}
 
+	private OrganGestorEntity sincronizarUnitat(UnitatOrganitzativa unitatWS, EntitatEntity entitat) {
+		OrganGestorEntity unitat = null;
+		if (unitatWS != null) {
+			// checks if unitat already exists in database
+			unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
+			// if not it creates a new one
+			if (unitat == null) {
+				// Venen les unitats ordenades, primer el pare i després els fills?
+				unitat = OrganGestorEntity.getBuilder(unitatWS.getCodi())
+						.entitat(entitat)
+						.nom(unitatWS.getDenominacio())
+						.pare(organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior()))
+						.estat(unitatWS.getEstat())
+						.gestioDirect(false)
+						.build();
+				organGestorRepository.save(unitat);
+			} else {
+				unitat.update(
+						unitatWS.getDenominacio(),
+						unitatWS.getEstat(),
+						organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior()));
+			}
+		}
+		return unitat;
+	}
+
+	private void sincronizarHistoricsUnitat(
+			OrganGestorEntity unitat,
+			UnitatOrganitzativa unidadWS,
+			EntitatEntity entitat) {
+
+		if (unidadWS.getHistoricosUO()!=null && !unidadWS.getHistoricosUO().isEmpty()) {
+			for (String historicoCodi : unidadWS.getHistoricosUO()) {
+				OrganGestorEntity nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
+				unitat.addNou(nova);
+				nova.addAntic(unitat);
+			}
+		}
+	}
+
+
 	@Override
 	@Transactional(readOnly = true)
-	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
+	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 
 		boolean isFirstSincronization = entitat.getDataSincronitzacio() == null;

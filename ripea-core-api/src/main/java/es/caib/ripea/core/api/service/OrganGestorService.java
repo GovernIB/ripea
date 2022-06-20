@@ -1,17 +1,16 @@
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-
-import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió de meta-expedients.
@@ -93,7 +92,8 @@ public interface OrganGestorService {
 	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId);
+	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
+
 
 	/**
 	 * Obté un llistat de tots els organs gestors accessibles per a 

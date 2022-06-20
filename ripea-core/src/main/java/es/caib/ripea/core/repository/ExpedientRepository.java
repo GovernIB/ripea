@@ -564,4 +564,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("organsIdsPermitted") List<Long> organsIdsPermitted,
 			@Param("metaNode") MetaNodeEntity metaNode);
 
+	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
+	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 }

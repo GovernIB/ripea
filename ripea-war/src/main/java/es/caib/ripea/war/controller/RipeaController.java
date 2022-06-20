@@ -3,8 +3,13 @@
  */
 package es.caib.ripea.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.war.helper.AjaxHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.ModalHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,13 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.war.helper.AjaxHelper;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.ModalHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controlador amb utilitats per a l'aplicació RIPEA.
@@ -63,7 +62,7 @@ public class RipeaController {
 	public void ajaxOk() {
 	}
 	@RequestMapping(value = "/missatges", method = RequestMethod.GET)
-	public String get() {
+	public String getMissatges() {
 		return "util/missatges";
 	}
 

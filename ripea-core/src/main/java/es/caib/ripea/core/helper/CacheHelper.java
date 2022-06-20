@@ -3,16 +3,13 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.*;
+import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,53 +22,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.ComunitatDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NivellAdministracioDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.ResultatConsultaDto;
-import es.caib.ripea.core.api.dto.ResultatDominiDto;
-import es.caib.ripea.core.api.dto.TipusViaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.api.exception.DominiException;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.AclSidRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.ExpedientTascaRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.usuari.DadesUsuari;
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Utilitat per a accedir a les caches. Els mètodes cacheables es
@@ -199,6 +157,9 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "findOrganismesEntitatAmbPermis", key="{#entitatId, #usuariCodi}")
 	public void evictOrganismesEntitatAmbPermis(Long entitatId, String usuariCodi) {
+	}
+	@CacheEvict(value = "findOrganismesEntitatAmbPermis", allEntries = true)
+	public void evictAllOrganismesEntitatAmbPermis() {
 	}
 	
 

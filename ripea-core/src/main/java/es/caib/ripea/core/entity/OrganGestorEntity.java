@@ -1,6 +1,7 @@
 package es.caib.ripea.core.entity;
 
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
+import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,7 +64,20 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     		mappedBy = "pare",
 			fetch = FetchType.LAZY,
 			cascade= { CascadeType.PERSIST })
-    private List<OrganGestorEntity> fills;        
+    private List<OrganGestorEntity> fills;
+
+    @JoinTable(name = "ipa_og_sinc_rel",
+            joinColumns = { @JoinColumn(name = "antic_og", referencedColumnName = "id", nullable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "nou_og", referencedColumnName = "id", nullable = false) })
+    @ManyToMany
+    private List<OrganGestorEntity> nous = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "nous")
+    private List<OrganGestorEntity> antics = new ArrayList<>();
+
+    @Column(name = "tipus_transicio", length = 12)
+    @Enumerated(EnumType.STRING)
+    private TipusTransicioEnumDto tipusTransicio;
     
     @PreRemove
     private void preRemove() {
@@ -87,7 +101,13 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 			fill.getAllChildren(result);
 		} 
     }
-    
+
+    public void addNou(OrganGestorEntity nou) {
+        nous.add(nou);
+    }
+    public void addAntic(OrganGestorEntity antic) {
+        antics.add(antic);
+    }
     
 
     public static Builder getBuilder(String codi) {
@@ -124,6 +144,14 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
             built.gestioDirect = gestioDirect;
             return this;
         }
+        public Builder estat(String estat) {
+            built.estat = OrganGestorEntity.getEstat(estat);
+            return this;
+        }
+        public Builder estat(OrganEstatEnumDto estat) {
+            built.estat = estat;
+            return this;
+        }
     }
 
 	public void update(
@@ -136,7 +164,27 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 		this.pare = pare;
 		this.gestioDirect = gestioDirect;
 	}
-    
+
+    public void update(
+            String nom,
+            String estat,
+            OrganGestorEntity pare) {
+        this.nom = nom;
+        this.estat = getEstat(estat);
+        this.pare = pare;
+        this.gestioDirect = false;
+    }
+
+    public static OrganEstatEnumDto getEstat(String estat) {
+        switch (estat) {
+            case "E": return OrganEstatEnumDto.E;
+            case "A": return OrganEstatEnumDto.A;
+            case "T": return OrganEstatEnumDto.T;
+            case "V":
+            default:
+                return OrganEstatEnumDto.V;
+        }
+    }
     
     
     

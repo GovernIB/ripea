@@ -3,7 +3,11 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,10 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import org.springframework.data.jpa.domain.AbstractPersistable;
-
-import lombok.Getter;
+import java.util.List;
 
 /**
  * Classe del model de dades que representa un SID d'una ACL.
@@ -23,6 +24,9 @@ import lombok.Getter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "ipa_acl_object_identity")
 public class AclObjectIdentityEntity extends AbstractPersistable<Long> {

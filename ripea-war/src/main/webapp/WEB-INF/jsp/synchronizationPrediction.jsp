@@ -233,7 +233,32 @@
 						</c:forEach>
 					</div>
 				</div>
-			</c:if>			
+			</c:if>
+
+			<!-- If they exist show unitats that are extint (are not vigent and has not any transition to any other unitat) -->
+			<c:if test="${!empty unitatsExtingides}">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<spring:message code="unitat.synchronize.prediction.extingides" />
+					</div>
+					<div class="panel-body">
+						<c:forEach var="unitatExtingida" items="${unitatsExtingides}">
+							<div class=horizontal-left>
+								<div id="wrapper">
+									<span class="label bg-danger border-red right-postion-20 overflow-ellipsis" title="${unitatExtingida.codi} - ${unitatExtingida.denominacio}">
+										${unitatExtingida.codi} - ${unitatExtingida.denominacio}
+									</span>
+									<div class="branch lv1">
+										<div class="entry sole remove">
+											<span class="label bg-success border-green overflow-ellipsis remove-label"></span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</c:forEach>
+					</div>
+				</div>
+			</c:if>
 		</c:if>
 
 	</div>

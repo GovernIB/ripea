@@ -133,11 +133,12 @@ public class OrganGestorController extends BaseUserOAdminController {
 			model.addAttribute("substMap", prediccio.getSubstMap());
 			model.addAttribute("unitatsVigents", prediccio.getUnitatsVigents());
 			model.addAttribute("unitatsNew", prediccio.getUnitatsNew());
+			model.addAttribute("unitatsExtingides", prediccio.getUnitatsExtingides());
 //			organGestorService.syncDir3OrgansGestors(entitat.getId());
 			
 		} catch (Exception e) {
-			logger.error("Error al synchronizacio", e);
-			return getAjaxControllerReturnValueErrorMessage(
+			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
+			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../organgestor",
 					e.getMessage());
@@ -147,6 +148,26 @@ public class OrganGestorController extends BaseUserOAdminController {
 //                "organgestor.controller.update.nom.tots.ok");
 		return "synchronizationPrediction";
     }
+
+	@RequestMapping(value = "/saveSynchronize", method = RequestMethod.POST)
+	public String synchronizePost(HttpServletRequest request) {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			organGestorService.syncDir3OrgansGestors(entitatActual.getId());
+		} catch (Exception e) {
+			logger.error("Error al syncronitzar", e);
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../../organgestor",
+					e.getMessage());
+		}
+
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:unitatOrganitzativa",
+				"unitat.controller.synchronize.ok");
+	}
     
 
     

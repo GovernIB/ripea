@@ -86,7 +86,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) {
+	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
 		return delegate.predictSyncDir3OrgansGestors(entitatId);
 	}
 
