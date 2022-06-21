@@ -417,7 +417,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
 		} catch (Exception e) {
 			processatOk = false;
-			logger.debug(ExceptionUtils.getStackTrace(e));
+			logger.error("Error al crear doc from annex", e);
 			expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
 		}
 		
