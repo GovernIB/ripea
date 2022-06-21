@@ -24,6 +24,8 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.*;
 import es.caib.ripea.core.repository.*;
 import es.caib.ripea.core.security.ExtendedPermission;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -453,7 +455,7 @@ public class ExpedientHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
 		ExpedientEntity expedientEntity;
-		RegistreAnnexEntity registreAnnexEntity = new RegistreAnnexEntity();
+		RegistreAnnexEntity registreAnnexEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
@@ -535,32 +537,43 @@ public class ExpedientHelper {
 		if (uuidDocIfAlreadyExists != null && carpetaEntity.getArxiuUuid() == null) {
 			docEntity.updateArxiu(uuidDocIfAlreadyExists);
 		}
+		boolean mogutArxiu = true;
 		if (uuidDocIfAlreadyExists == null) {
-			String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-					docEntity,
-					carpetaEntity,
-					expedientEntity.getArxiuUuid());
-			// if document was dispatched, update uuid to new document
-			if (uuidDesti != null) {
-				docEntity.updateArxiu(uuidDesti);
+			try {
+				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
+						docEntity,
+						carpetaEntity,
+						expedientEntity.getArxiuUuid());
+				// if document was dispatched, update uuid to new document
+				if (uuidDesti != null) {
+					docEntity.updateArxiu(uuidDesti);
+				}
+				
+			} catch (Exception e) {
+				mogutArxiu = false;
+				logger.error("Error mover document en arxiu", e);
+				registreAnnexEntity.updateError(ExceptionUtils.getStackTrace(e));
 			}
 		}
 		
-		// ###################### UPDATE DOCUMENT WITH INFO FROM ARXIU ###############
-		// save ntiIdentitficador generated in arxiu in db
-		Document documentDetalls = pluginHelper.arxiuDocumentConsultar(docEntity, null, null, true, false);
-		documentDetalls.getMetadades().getIdentificadorOrigen();
-		docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
-		documentRepository.save(docEntity);
-		contingutLogHelper.logCreacio(docEntity, true, true);
-		
-		// comprovar si el justificant s'ha importat anteriorment
-		List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
-		if (documents != null && !documents.isEmpty()) {
-			for (DocumentDto documentAlreadyImported: documents) {
-				expedientsWithImportacio.add(documentAlreadyImported);
-			}
-		}		
+		if (mogutArxiu) {
+			// ###################### UPDATE DOCUMENT WITH INFO FROM ARXIU ###############
+			// save ntiIdentitficador generated in arxiu in db
+			Document documentDetalls = pluginHelper.arxiuDocumentConsultar(docEntity, null, null, true, false);
+			documentDetalls.getMetadades().getIdentificadorOrigen();
+			docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
+			documentRepository.save(docEntity);
+			contingutLogHelper.logCreacio(docEntity, true, true);
+			
+			// comprovar si el justificant s'ha importat anteriorment
+			List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
+			if (documents != null && !documents.isEmpty()) {
+				for (DocumentDto documentAlreadyImported: documents) {
+					expedientsWithImportacio.add(documentAlreadyImported);
+				}
+			}		
+		}
+
 		return docEntity;
 	}
 	
