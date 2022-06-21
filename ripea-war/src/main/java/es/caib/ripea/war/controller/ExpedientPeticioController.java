@@ -163,46 +163,68 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long registreAnnexId,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
-		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
-					entitatActual.getId(),
-					expedientPeticioDto.getExpedientId(), 
-					null);
-		model.addAttribute(
-				"metaDocuments",
-				metaDocumentsQueQuedenPerCreacio);
-		model.addAttribute(
-				"expedientPeticioId",
-				expedientPeticioId);
+		RegistreAnnexDto registreAnnex = expedientPeticioService.findAnnexById(registreAnnexId);
 		
-		RegistreAnnexCommand registreAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioService.findAnnexById(registreAnnexId), RegistreAnnexCommand.class);
-		
-		ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null);
-		
-		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
-		if (metaDocPerDefecte != null) {
-			boolean potCrearMetaDocPerDefecte = false;
-			for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
-				if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
-					potCrearMetaDocPerDefecte = true;
+		if (registreAnnex.getDocumentId() != null) {
+			
+			boolean processatOk = true;
+			processatOk = expedientService.retryMoverAnnexArxiu(
+					registreAnnexId);
+			if (processatOk) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"",
+						"expedient.peticio.detalls.controller.reintentat.ok");			
+			} else {
+				return getModalControllerReturnValueError(
+						request,
+						"",
+						"expedient.peticio.detalls.controller.reintentat.error");
+			}
+			
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+			List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
+						entitatActual.getId(),
+						expedientPeticioDto.getExpedientId(), 
+						null);
+			model.addAttribute(
+					"metaDocuments",
+					metaDocumentsQueQuedenPerCreacio);
+			model.addAttribute(
+					"expedientPeticioId",
+					expedientPeticioId);
+			
+			RegistreAnnexCommand registreAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioService.findAnnexById(registreAnnexId), RegistreAnnexCommand.class);
+			
+			ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null);
+			
+			MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
+			if (metaDocPerDefecte != null) {
+				boolean potCrearMetaDocPerDefecte = false;
+				for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
+					if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
+						potCrearMetaDocPerDefecte = true;
+					}
+				}
+				if (potCrearMetaDocPerDefecte) {
+					registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
+				} else {
+					MissatgesHelper.warning(
+							request,
+							getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
 				}
 			}
-			if (potCrearMetaDocPerDefecte) {
-				registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
-			} else {
-				MissatgesHelper.warning(
-						request,
-						getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
-			}
-		}
-		
-		model.addAttribute(
-				"registreAnnexCommand",
-				registreAnnexCommand);
+			
+			model.addAttribute(
+					"registreAnnexCommand",
+					registreAnnexCommand);
 
-		return "expedientPeticioReintentarMetaDoc";
+			return "expedientPeticioReintentarMetaDoc";
+		}
 	}
 	
 	

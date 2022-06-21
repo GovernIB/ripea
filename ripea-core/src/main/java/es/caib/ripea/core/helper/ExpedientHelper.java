@@ -529,10 +529,31 @@ public class ExpedientHelper {
 			docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 		}
 		
-		// ############################ MOVE DOCUMENT IN ARXIU ####################
+		
+		registreAnnexEntity.updateDocument(docEntity);
+		
+		contingutLogHelper.logCreacio(docEntity, true, true);
+		
+
+		
+		moveDocumentArxiu(registreAnnexEntity.getId());
+
+
+		return docEntity;
+	}
+	
+	
+	public boolean moveDocumentArxiu(Long registreAnnexId) {
+		
+		RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
+		DocumentEntity docEntity = registreAnnexEntity.getDocument();
+		CarpetaEntity carpetaEntity = (CarpetaEntity) docEntity.getPare();
+		ExpedientEntity expedientEntity = docEntity.getExpedient();
+		
 		// put arxiu uuid of annex
-		docEntity.updateArxiu(documentDto.getArxiuUuid());
+		docEntity.updateArxiu(registreAnnexEntity.getUuid());
 		documentRepository.saveAndFlush(docEntity);
+		
 		String uuidDocIfAlreadyExists = getUuidIfAlreadyExists(carpetaEntity, docEntity);
 		if (uuidDocIfAlreadyExists != null && carpetaEntity.getArxiuUuid() == null) {
 			docEntity.updateArxiu(uuidDocIfAlreadyExists);
@@ -549,6 +570,8 @@ public class ExpedientHelper {
 					docEntity.updateArxiu(uuidDesti);
 				}
 				
+				registreAnnexEntity.updateError(null);
+				
 			} catch (Exception e) {
 				mogutArxiu = false;
 				logger.error("Error mover document en arxiu", e);
@@ -563,7 +586,6 @@ public class ExpedientHelper {
 			documentDetalls.getMetadades().getIdentificadorOrigen();
 			docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
 			documentRepository.save(docEntity);
-			contingutLogHelper.logCreacio(docEntity, true, true);
 			
 			// comprovar si el justificant s'ha importat anteriorment
 			List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
@@ -571,10 +593,10 @@ public class ExpedientHelper {
 				for (DocumentDto documentAlreadyImported: documents) {
 					expedientsWithImportacio.add(documentAlreadyImported);
 				}
-			}		
+			}
 		}
-
-		return docEntity;
+		return mogutArxiu;
+		
 	}
 	
 	

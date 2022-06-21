@@ -92,6 +92,10 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	private RegistreEntity registre;
 	
 	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "document_id")
+	@ForeignKey(name = "ipa_annex_document_fk")
+	private DocumentEntity document;
 	
 	
 	public static Builder getBuilder(
@@ -307,6 +311,13 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	}
 	public String getFirmaNom() {
 		return firmaNom;
+	}
+	
+	public DocumentEntity getDocument() {
+		return document;
+	}
+	public void updateDocument(DocumentEntity document) {
+		this.document = document;
 	}
 	
 	

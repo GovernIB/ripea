@@ -387,6 +387,14 @@ public class ContingutHelper {
 			dto.setGesDocFirmatId(document.getGesDocFirmatId());
 			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
 			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
+			
+			if (document.getAnnexos() != null) {
+				String error = document.getAnnexos().get(0).getError();
+				if (error != null && !error.isEmpty()) {
+					dto.setPendentMoverArxiu(true);
+				}
+			}
+			
 			metaNode = conversioTipusHelper.convertir(
 					document.getMetaNode(),
 					MetaDocumentDto.class);

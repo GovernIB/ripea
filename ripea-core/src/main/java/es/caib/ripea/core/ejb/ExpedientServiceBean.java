@@ -449,4 +449,10 @@ public class ExpedientServiceBean implements ExpedientService {
 			throws NotFoundException {
 		return delegate.esborrarExpedientFill(entitatId, expedientPareId, expedientId, rolActual);
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public boolean retryMoverAnnexArxiu(Long registreAnnexId) {
+		return delegate.retryMoverAnnexArxiu(registreAnnexId);
+	}
 }

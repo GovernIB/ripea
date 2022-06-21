@@ -28,7 +28,8 @@ public class RegistreAnnexDto {
 	private String tipusMime;
 	private String titol;
 	private String uuid;
-
+	
+	private Long documentId;
 	private RegistreAnnexEstatEnumDto estat;
 	private String error;
 	
@@ -144,6 +145,12 @@ public class RegistreAnnexDto {
 	
 	public boolean isAmbFirma() {
 		return firmaTipus != null;
+	}
+	public Long getDocumentId() {
+		return documentId;
+	}
+	public void setDocumentId(Long documentId) {
+		this.documentId = documentId;
 	}
 
 }

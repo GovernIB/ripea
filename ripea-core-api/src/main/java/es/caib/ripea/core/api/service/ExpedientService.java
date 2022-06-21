@@ -557,4 +557,7 @@ public interface ExpedientService {
 			Long expedientId,
 			String rolActual) throws NotFoundException;
 
+	@PreAuthorize("hasRole('tothom')")
+	boolean retryMoverAnnexArxiu(Long registreAnnexId);
+
 }

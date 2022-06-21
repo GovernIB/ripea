@@ -194,6 +194,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public Object lock = new Object();
 
 	@Override
+	@Transactional
 	public ExpedientDto create (
 			Long entitatId,
 			Long metaExpedientId,
@@ -434,6 +435,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 	
 		return processatOk;
+	}
+	
+	
+	@Transactional
+	@Override
+	public boolean retryMoverAnnexArxiu(Long registreAnnexId) {
+		return expedientHelper.moveDocumentArxiu(registreAnnexId);
 	}
 
 	@Transactional

@@ -335,8 +335,14 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	public RegistreAnnexDto findAnnexById(Long annexId) {
 		RegistreAnnexEntity annexEntity = registreAnnexRepository.findOne(annexId);
 
-		return conversioTipusHelper.convertir(annexEntity,
+		RegistreAnnexDto annexDto = conversioTipusHelper.convertir(
+				annexEntity,
 				RegistreAnnexDto.class);
+		
+		if (annexEntity.getDocument() != null) {
+			annexDto.setDocumentId(annexEntity.getDocument().getId());
+		}
+		return annexDto;
 	}
 
 	@Transactional(readOnly = true)

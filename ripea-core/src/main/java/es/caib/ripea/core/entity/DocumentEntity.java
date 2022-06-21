@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -125,6 +126,13 @@ public class DocumentEntity extends NodeEntity {
 			fetch = FetchType.LAZY, targetEntity = DocumentEnviamentEntity.class)
 	@OrderBy("createdDate DESC")
 	protected List<DocumentNotificacioEntity> notificacions;
+	
+	
+	@OneToMany(
+			mappedBy = "document",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
 	
 	@Transient
 	protected boolean ambNotificacions;
