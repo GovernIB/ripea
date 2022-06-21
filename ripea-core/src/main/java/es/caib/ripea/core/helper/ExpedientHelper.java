@@ -833,6 +833,7 @@ public class ExpedientHelper {
 	}
 
 
+	@Transactional(readOnly = true)
 	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {
 		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(
 				expedient,

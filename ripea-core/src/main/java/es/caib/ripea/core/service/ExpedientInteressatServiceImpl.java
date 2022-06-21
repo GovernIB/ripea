@@ -3,25 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -41,6 +23,14 @@ import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació dels mètodes per a gestionar interessats.
@@ -455,6 +445,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				InteressatAdministracioDto.class);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<InteressatDto> findByExpedientAndDocumentNum(
 			String documentNum,
@@ -467,6 +458,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatServiceImpl.class);
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<InteressatDto> findByText(String text) {
 		return conversioTipusHelper.convertirList(
@@ -474,6 +466,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				InteressatDto.class);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException {
 		return conversioTipusHelper.convertir(
