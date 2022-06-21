@@ -453,7 +453,7 @@ public class ExpedientHelper {
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public DocumentEntity crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
+	public boolean crearDocFromAnnex(Long expedientId, Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
 		ExpedientEntity expedientEntity;
 		RegistreAnnexEntity registreAnnexEntity;
 		EntitatEntity entitat;
@@ -529,17 +529,14 @@ public class ExpedientHelper {
 			docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 		}
 		
-		
 		registreAnnexEntity.updateDocument(docEntity);
-		
 		contingutLogHelper.logCreacio(docEntity, true, true);
 		
-
 		
-		moveDocumentArxiu(registreAnnexEntity.getId());
+		// ############################ MOVE DOCUMENT IN ARXIU ####################
+		boolean processatOk = moveDocumentArxiu(registreAnnexEntity.getId());
 
-
-		return docEntity;
+		return processatOk;
 	}
 	
 	

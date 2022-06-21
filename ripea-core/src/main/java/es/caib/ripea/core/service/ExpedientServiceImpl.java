@@ -263,11 +263,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.inicialitzarExpedientsWithImportacio();
 				for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 					try {
-						expedientHelper.crearDocFromAnnex(
+						processatOk = expedientHelper.crearDocFromAnnex(
 								expedient.getId(),
 								registeAnnexEntity.getId(),
 								expedientPeticioEntity.getId(),
-								anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()), rolActual);
+								anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()),
+								rolActual);
 					} catch (Exception e) {
 						processatOk = false;
 						logger.error("Error crear doc from annex", e);
@@ -349,7 +350,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				boolean throwException1 = false;
 				if (throwException1)
 					throw new RuntimeException("EXCEPION BEFORE INCORPORAR !!!!!! ");
-				expedientHelper.crearDocFromAnnex(
+				processatOk = expedientHelper.crearDocFromAnnex(
 						expedientId,
 						annexId,
 						expedientPeticioId, 
@@ -414,8 +415,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (expedientPeticioEntity.getExpedient() == null) {
 				throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
 			}
-			expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
-			expedientHelper.updateRegistreAnnexError(registreAnnexId, null);
+			processatOk = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
 		} catch (Exception e) {
 			processatOk = false;
 			logger.error("Error al crear doc from annex", e);
