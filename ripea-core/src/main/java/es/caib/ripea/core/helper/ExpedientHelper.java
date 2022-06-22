@@ -466,76 +466,79 @@ public class ExpedientHelper {
 		if (expedientEntity.getArxiuUuid() == null) {
 			throw new RuntimeException("Annex no s'ha processat perque expedient no es creat en arxiu");
 		}
-
-		logger.info("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
-						expedientId + ", " + "registreAnnexId=" + registreAnnexId + 
-						", " + "registreAnnexNom=" + registreAnnexEntity.getNom() + 
-						", " + "registreAnnexTitol=" + registreAnnexEntity.getTitol() +
-						", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
-
-		// ########################## CREATE CARPETA IN DB AND IN ARXIU ######################
-		// create carpeta ind db and arxiu if doesnt already exists
-		Long carpetaId = createCarpetaForDocFromAnnex(
-				expedientEntity,
-				entitat.getId(),
-				"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador(), 
-				rolActual);
-		carpetaEntity = carpetaRepository.findOne(carpetaId);
-
-		// ########################### CREATE DOCUMENT IN DB ########################
-		DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
-		contingutHelper.comprovarNomValid(
-				carpetaEntity,
-				documentDto.getNom(),
-				null,
-				DocumentEntity.class);
 		
-//		Recuperar tipus document per defecte
-		MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
-
-		DocumentEntity docEntity = documentHelper.crearDocumentDB(
-				documentDto.getDocumentTipus(),
-				documentDto.getNom(),
-				documentDto.getDescripcio(),
-				documentDto.getData(),
-				documentDto.getDataCaptura(),
-				documentDto.getNtiOrgano(),
-				documentDto.getNtiOrigen(),
-				documentDto.getNtiEstadoElaboracion(),
-				documentDto.getNtiTipoDocumental(),
-				metaDocument,
-				carpetaEntity,
-				expedientEntity.getEntitat(),
-				expedientEntity,
-				documentDto.getUbicacio(),
-				documentDto.getNtiIdDocumentoOrigen(),
-				null);
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(documentDto.getFitxerNom());
-		fitxer.setContentType(documentDto.getFitxerContentType());
-		fitxer.setContingut(documentDto.getFitxerContingut());
-		if (documentDto.getFitxerContingut() != null) {
-			documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
-			if (documentDto.isAmbFirma()) {
-				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+		if (registreAnnexEntity.getDocument() == null) {
+			
+			logger.info("Creant carpeta i documents de expedient peticio (" + "expedientId=" +
+					expedientId + ", " + "registreAnnexId=" + registreAnnexId + 
+					", " + "registreAnnexNom=" + registreAnnexEntity.getNom() + 
+					", " + "registreAnnexTitol=" + registreAnnexEntity.getTitol() +
+					", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
+		
+			// ########################## CREATE CARPETA IN DB AND IN ARXIU ######################
+			// create carpeta ind db and arxiu if doesnt already exists
+			Long carpetaId = createCarpetaForDocFromAnnex(
+					expedientEntity,
+					entitat.getId(),
+					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador(), 
+					rolActual);
+			carpetaEntity = carpetaRepository.findOne(carpetaId);
+		
+			// ########################### CREATE DOCUMENT IN DB ########################
+			DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
+			contingutHelper.comprovarNomValid(
+					carpetaEntity,
+					documentDto.getNom(),
+					null,
+					DocumentEntity.class);
+			
+			//	Recuperar tipus document per defecte
+			MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
+		
+			DocumentEntity docEntity = documentHelper.crearDocumentDB(
+					documentDto.getDocumentTipus(),
+					documentDto.getNom(),
+					documentDto.getDescripcio(),
+					documentDto.getData(),
+					documentDto.getDataCaptura(),
+					documentDto.getNtiOrgano(),
+					documentDto.getNtiOrigen(),
+					documentDto.getNtiEstadoElaboracion(),
+					documentDto.getNtiTipoDocumental(),
+					metaDocument,
+					carpetaEntity,
+					expedientEntity.getEntitat(),
+					expedientEntity,
+					documentDto.getUbicacio(),
+					documentDto.getNtiIdDocumentoOrigen(),
+					null);
+			FitxerDto fitxer = new FitxerDto();
+			fitxer.setNom(documentDto.getFitxerNom());
+			fitxer.setContentType(documentDto.getFitxerContentType());
+			fitxer.setContingut(documentDto.getFitxerContingut());
+			if (documentDto.getFitxerContingut() != null) {
+				documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
+				if (documentDto.isAmbFirma()) {
+					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+				}
+			} else {
+				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
 			}
-		} else {
-			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
+			if (registreAnnexEntity.getFirmaTipus() != null) {
+				docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				docEntity.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));
+			} else {
+				docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
+			}
+			
+			registreAnnexEntity.updateDocument(docEntity);
+			contingutLogHelper.logCreacio(docEntity, true, true);
 		}
-		if (registreAnnexEntity.getFirmaTipus() != null) {
-			docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-			docEntity.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));
-		} else {
-			docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
-		}
-		
-		registreAnnexEntity.updateDocument(docEntity);
-		contingutLogHelper.logCreacio(docEntity, true, true);
-		
+
+		boolean processatOk = true;
 		
 		// ############################ MOVE DOCUMENT IN ARXIU ####################
-		boolean processatOk = moveDocumentArxiu(registreAnnexEntity.getId());
-
+		processatOk = moveDocumentArxiu(registreAnnexEntity.getId());
 		return processatOk;
 	}
 	

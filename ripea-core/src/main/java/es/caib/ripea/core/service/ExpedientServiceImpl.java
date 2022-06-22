@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.ZipOutputStream;
 
 import javax.swing.table.DefaultTableModel;
@@ -116,6 +117,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -189,6 +191,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private CarpetaRepository carpetaRepository;
 	@Autowired
 	private GrupRepository grupRepository;
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -405,35 +409,49 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e));
 		}
 	}
+	
 
+	static Map<Long, Object> locks = new ConcurrentHashMap<>();
+	
 	@Transactional
 	@Override
 	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
+
 		boolean processatOk = true;
-		try {
-			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			if (expedientPeticioEntity.getExpedient() == null) {
-				throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+		if (!locks.containsKey(registreAnnexId))
+			locks.put(registreAnnexId, new Object());
+		synchronized (locks.get(registreAnnexId)) {
+
+			try {
+				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+				if (expedientPeticioEntity.getExpedient() == null) {
+					throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
+				}
+				processatOk = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
+			} catch (Exception e) {
+				processatOk = false;
+				logger.error("Error al crear doc from annex", e);
+				expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
 			}
-			processatOk = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
-		} catch (Exception e) {
-			processatOk = false;
-			logger.error("Error al crear doc from annex", e);
-			expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
-		}
-		
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-		
-		boolean allOk = true;
-		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
-			if (registreAnnex.getError() != null) {
-				allOk = false;
-			}
-		}
-		if (allOk) {
-			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
-		}
+			
 	
+			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			
+			boolean allOk = true;
+			for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
+				if (registreAnnex.getError() != null) {
+					allOk = false;
+				}
+			}
+			if (allOk) {
+				notificarICanviEstatToProcessatNotificat(expedientPeticioId);
+			}
+		}
+		
+		if (processatOk){
+			locks.remove(registreAnnexId);
+		}
+
 		return processatOk;
 	}
 	

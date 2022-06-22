@@ -388,7 +388,7 @@ public class ContingutHelper {
 			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
 			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
 			
-			if (document.getAnnexos() != null) {
+			if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
 				String error = document.getAnnexos().get(0).getError();
 				if (error != null && !error.isEmpty()) {
 					dto.setPendentMoverArxiu(true);
