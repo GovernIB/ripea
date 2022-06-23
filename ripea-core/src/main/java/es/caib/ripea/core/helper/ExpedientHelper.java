@@ -551,7 +551,9 @@ public class ExpedientHelper {
 		ExpedientEntity expedientEntity = docEntity.getExpedient();
 		
 		// put arxiu uuid of annex
-		docEntity.updateArxiu(registreAnnexEntity.getUuid());
+		if (docEntity.getArxiuUuid() == null || docEntity.getArxiuUuid().isEmpty()) {
+			docEntity.updateArxiu(registreAnnexEntity.getUuid());
+		}
 		documentRepository.saveAndFlush(docEntity);
 		
 		String uuidDocIfAlreadyExists = getUuidIfAlreadyExists(carpetaEntity, docEntity);
@@ -580,19 +582,25 @@ public class ExpedientHelper {
 		}
 		
 		if (mogutArxiu) {
-			// ###################### UPDATE DOCUMENT WITH INFO FROM ARXIU ###############
-			// save ntiIdentitficador generated in arxiu in db
-			Document documentDetalls = pluginHelper.arxiuDocumentConsultar(docEntity, null, null, true, false);
-			documentDetalls.getMetadades().getIdentificadorOrigen();
-			docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
-			documentRepository.save(docEntity);
-			
-			// comprovar si el justificant s'ha importat anteriorment
-			List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
-			if (documents != null && !documents.isEmpty()) {
-				for (DocumentDto documentAlreadyImported: documents) {
-					expedientsWithImportacio.add(documentAlreadyImported);
+			try {
+				// ###################### UPDATE DOCUMENT WITH INFO FROM ARXIU ###############
+				// save ntiIdentitficador generated in arxiu in db
+				Document documentDetalls = pluginHelper.arxiuDocumentConsultar(docEntity, null, null, true, false);
+				documentDetalls.getMetadades().getIdentificadorOrigen();
+				docEntity.updateNtiIdentificador(documentDetalls.getMetadades().getIdentificador());
+				documentRepository.save(docEntity);
+				
+				// comprovar si el justificant s'ha importat anteriorment
+				List<DocumentDto> documents = documentHelper.findByArxiuUuid(documentDetalls.getIdentificador());
+				if (documents != null && !documents.isEmpty()) {
+					for (DocumentDto documentAlreadyImported: documents) {
+						expedientsWithImportacio.add(documentAlreadyImported);
+					}
 				}
+			} catch (Exception e) {
+				mogutArxiu = false;
+				logger.error("Error despues de mover documento en arxiu", e);
+				registreAnnexEntity.updateError(ExceptionUtils.getStackTrace(e));
 			}
 		}
 		return mogutArxiu;

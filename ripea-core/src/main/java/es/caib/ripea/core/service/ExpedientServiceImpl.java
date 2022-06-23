@@ -418,6 +418,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
 
 		boolean processatOk = true;
+		boolean creatDbOk = true;
 		if (!locks.containsKey(registreAnnexId))
 			locks.put(registreAnnexId, new Object());
 		synchronized (locks.get(registreAnnexId)) {
@@ -430,6 +431,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				processatOk = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
 			} catch (Exception e) {
 				processatOk = false;
+				creatDbOk = false;
 				logger.error("Error al crear doc from annex", e);
 				expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
 			}
@@ -448,7 +450,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 		}
 		
-		if (processatOk){
+		if (creatDbOk){
 			locks.remove(registreAnnexId);
 		}
 

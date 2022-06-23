@@ -580,14 +580,14 @@ public class DocumentHelper {
 
 			fitxer.setNom(document.getFitxerNom());
 			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(document.getFitxerContingut());
+//			fitxer.setContingut(document.getFitxerContingut());
 
-//			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-//			pluginHelper.gestioDocumentalGet(
-//					document.getGesDocAdjuntId(),
-//					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-//					streamAnnex);
-//			fitxer.setContingut(streamAnnex.toByteArray());
+			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(
+					document.getGesDocAdjuntId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+					streamAnnex);
+			fitxer.setContingut(streamAnnex.toByteArray());
 			
 		
 		}
