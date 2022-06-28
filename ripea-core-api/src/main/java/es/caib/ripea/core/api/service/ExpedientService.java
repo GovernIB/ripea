@@ -400,7 +400,7 @@ public interface ExpedientService {
 	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean retryCreateDocFromAnnex(
+	Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
 			Long metaDocumentId, String rolActual);
@@ -558,6 +558,6 @@ public interface ExpedientService {
 			String rolActual) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean retryMoverAnnexArxiu(Long registreAnnexId);
+	Exception retryMoverAnnexArxiu(Long registreAnnexId);
 
 }

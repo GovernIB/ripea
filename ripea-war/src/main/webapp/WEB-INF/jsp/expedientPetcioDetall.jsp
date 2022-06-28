@@ -871,7 +871,7 @@ tr.clicable {
  							<div id="collapse-annex-${status.index}" class="panel-collapse collapse collapse-annex" role="tabpanel" aria-labelledby="dadesAnnex${status.index}" data-registre-id="${registre.id}"  data-fitxer-arxiu-uuid="${annex.uuid}">
 
 								<div>
-									<c:if test="${annex.estat == 'PENDENT' && not empty annex.error}">
+									<c:if test="${not empty annex.expedientId && (empty annex.documentId || not empty annex.error)}">
 									
 										<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
 											<span class="fa fa-exclamation-triangle"></span>

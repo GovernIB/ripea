@@ -18,12 +18,16 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 
 /**
@@ -150,6 +154,21 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	public boolean comprovarExistenciaInteressatsPeticio(Long entitatId, Long expedientId, Long expedientPeticioId) {
 		return delegate.comprovarExistenciaInteressatsPeticio(entitatId, expedientId, expedientPeticioId);
 	}
+
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(Long entitatId,
+			MassiuAnnexProcesarFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			ResultEnumDto resultEnum) throws NotFoundException {
+		return delegate.findAnnexosPendentsProcesarMassiu(
+				entitatId,
+				filtre,
+				paginacioParams,
+				resultEnum);
+	}
+
+
 	
 	
 }

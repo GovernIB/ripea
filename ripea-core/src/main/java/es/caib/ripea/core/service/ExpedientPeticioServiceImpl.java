@@ -3,7 +3,9 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,7 +14,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -44,6 +46,8 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.RegistreJustificantDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -53,6 +57,17 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DistribucioHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -99,6 +114,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private ConfigHelper configHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -333,7 +349,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public RegistreAnnexDto findAnnexById(Long annexId) {
-		RegistreAnnexEntity annexEntity = registreAnnexRepository.findOne(annexId);
+		RegistreAnnexEntity annexEntity = registreAnnexRepository.findById(annexId);
 
 		RegistreAnnexDto annexDto = conversioTipusHelper.convertir(
 				annexEntity,
@@ -458,6 +474,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				")");
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+		expedientPeticioEntity.getRegistre().getAnnexos();
 
 		ExpedientPeticioDto expedientPeticioDto = conversioTipusHelper.convertir(expedientPeticioEntity,
 				ExpedientPeticioDto.class);
@@ -491,6 +509,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return expedientPeticioDto;
 
 	}
+	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -532,6 +551,68 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	}
 	
 	
+	@Transactional(readOnly = true)
+	@Override
+	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
+			Long entitatId,
+			MassiuAnnexProcesarFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			ResultEnumDto resultEnum) {
+		
+		ResultDto<RegistreAnnexDto> result = new ResultDto<RegistreAnnexDto>();
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false, 
+				false, 
+				true, 
+				false);
+		
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+		
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("expedientCreatedDate", new String[] {"ep.expedient.createdDate"});
+		
+		if (resultEnum == ResultEnumDto.PAGE) {
+			Page<RegistreAnnexEntity> pagina = registreAnnexRepository.findPendentsProcesar(
+					entitat,
+					filtre.getNom() == null,
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					filtre.getNumero() == null,
+					filtre.getNumero() != null ? filtre.getNumero().trim() : "",
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					filtre.getEstatProcessament() == null,
+					filtre.getEstatProcessament() != null ? filtre.getEstatProcessament().toString() : null,
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+			PaginaDto<RegistreAnnexDto> paginaDto = paginacioHelper.toPaginaDto(
+					pagina,
+					RegistreAnnexDto.class);
+			result.setPagina(paginaDto);
+			
+		} else {
+			
+			List<Long> documentsIds = registreAnnexRepository.findIdsPendentsProcesar(
+					entitat,
+					filtre.getNom() == null,
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					filtre.getNumero() == null,
+					filtre.getNumero() != null ? filtre.getNumero().trim() : "",
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi);
+			
+			result.setIds(documentsIds);
+		}
+		return result;
+	}
+	
+
 	
 
 	

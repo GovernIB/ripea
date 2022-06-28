@@ -450,6 +450,7 @@ body {
 									<spring:message code="decorator.menu.accions.massives.user"/>
 								</a>
 							</li>
+							<li><a href="<c:url value="/massiu/procesarAnnexosPendents"/>"><spring:message code="massiu.procesar.annexos.pendents"/></a></li>
 						</ul>
 					</div>
 				</c:if>

@@ -96,6 +96,7 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PinbalHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
@@ -355,8 +356,9 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception guardarDocumentArxiu(
 			Long docId) {
-		
-		return documentHelper.guardarDocumentArxiu(docId);
+		synchronized (SynchronizationHelper.get0To99Lock(docId, SynchronizationHelper.locksGuardarDocumentArxiu)) {
+			return documentHelper.guardarDocumentArxiu(docId);
+		}
 	}
 
 

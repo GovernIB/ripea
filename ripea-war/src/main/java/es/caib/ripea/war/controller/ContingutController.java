@@ -146,18 +146,23 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		} catch (Exception e) {
 			logger.error("Error al obtenir detalls del contingut", e);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-			
-			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
-				return getModalControllerReturnValueErrorMessageText(
-						request,
+			if (ModalHelper.isModal(request)) {
+				if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+					return getModalControllerReturnValueErrorMessageText(
+							request,
+							"redirect:../../contingut/" + contingutId,
+							getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+				} else {
+					return getModalControllerReturnValueErrorMessageText(
+							request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+							getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage());
+				}
 			} else {
-				return getModalControllerReturnValueErrorMessageText(
-						request,
-						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage());
+				throw e;
 			}
+			
+
 		}
 		
 		

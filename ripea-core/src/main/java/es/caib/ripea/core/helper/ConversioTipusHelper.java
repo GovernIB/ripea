@@ -563,6 +563,45 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<RegistreAnnexEntity, RegistreAnnexDto>() {
+					@Override
+					public RegistreAnnexDto convert(RegistreAnnexEntity source, Type<? extends RegistreAnnexDto> destinationClass) {
+						RegistreAnnexDto target = new RegistreAnnexDto();
+
+						target.setId(source.getId());
+						target.setFirmaPerfil(source.getFirmaPerfil() != null ? source.getFirmaPerfil().toString() : null);
+						target.setFirmaTipus(source.getFirmaTipus() != null ? source.getFirmaTipus().toString() : null);
+						target.setNtiFechaCaptura(source.getNtiFechaCaptura());
+						target.setNtiOrigen(source.getNtiOrigen() != null ? source.getNtiOrigen().toString() : null);
+						target.setNtiTipoDocumental(source.getNtiTipoDocumental() != null ? source.getNtiTipoDocumental().toString() : null);
+						target.setNtiEstadoElaboracion(source.getNtiEstadoElaboracion() != null ? source.getNtiEstadoElaboracion().toString() : null);
+						target.setObservacions(source.getObservacions());
+						target.setSicresTipoDocumento(source.getSicresTipoDocumento() != null ? source.getSicresTipoDocumento().toString() : null);
+						target.setSicresValidezDocumento(source.getSicresValidezDocumento() != null ? source.getSicresValidezDocumento().toString() : null);
+						target.setTamany(source.getTamany());
+						target.setTipusMime(source.getTipusMime());
+						target.setTitol(source.getTitol());
+						target.setUuid(source.getUuid());
+						target.setCreatedDate(source.getCreatedDate() != null ? source.getCreatedDate().toDate() : null);
+						target.setEstat(source.getEstat());
+						target.setError(source.getError());
+
+						target.setRegistreNumero(source.getRegistre().getIdentificador());
+						ExpedientEntity expedient = source.getRegistre().getExpedientPeticions().get(0).getExpedient();
+						if (expedient != null) {
+							target.setExpedientId(expedient.getId());
+							target.setExpedientNumeroNom(expedientHelper.calcularNumero(expedient) + " - " + expedient.getNom());
+							target.setExpedientCreatedDate(expedient.getCreatedDate().toDate());
+						}
+						target.setDocumentId(source.getDocument() != null ? source.getDocument().getId() : null);
+						target.setExpedientPeticioId(source.getRegistre().getExpedientPeticions().get(0).getId());
+						
+						return target;
+					}
+				});
+		
 
 //		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
 //				.byDefault()

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -170,7 +170,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			
 			boolean processatOk = true;
 			processatOk = expedientService.retryMoverAnnexArxiu(
-					registreAnnexId);
+					registreAnnexId) == null;
 			if (processatOk) {
 				return getModalControllerReturnValueSuccess(
 						request,
@@ -256,13 +256,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return "expedientPeticioReintentarMetaDoc";
 		}
 		
-		boolean processatOk = true;
-		processatOk = expedientService.retryCreateDocFromAnnex(
+		
+		Exception exception = expedientService.retryCreateDocFromAnnex(
 				command.getId(),
 				expedientPeticioId, 
 				command.getMetaDocumentId(), 
 				RolHelper.getRolActual(request));
-		if (processatOk) {
+		if (exception == null) {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"",
@@ -271,7 +271,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueError(
 					request,
 					"",
-					"expedient.peticio.detalls.controller.reintentat.error");
+					"expedient.peticio.detalls.controller.reintentat.error",
+					new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()});
 		}
 	}
 	
@@ -310,10 +311,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		boolean isErrorDocuments = false;
 		for (RegistreAnnexDto registreAnnexDto : expedientPeticioDto.getRegistre().getAnnexos()) {
-			if (registreAnnexDto.getEstat() == RegistreAnnexEstatEnumDto.PENDENT && registreAnnexDto.getError() != null && !registreAnnexDto.getError().isEmpty()) {
+			if (registreAnnexDto.getExpedientId() != null && (registreAnnexDto.getDocumentId() == null || !StringUtils.isEmpty(registreAnnexDto.getError()))) {
 				isErrorDocuments = true;
 			}
 		}
+		
+		
 		if (isErrorDocuments) {
 			
 			MissatgesHelper.warning(

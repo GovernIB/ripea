@@ -287,7 +287,7 @@ public class ExpedientServiceBean implements ExpedientService {
 
 
 	@Override
-	public boolean retryCreateDocFromAnnex(
+	public Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
 			Long metaDocumentId, String rolActual) {
@@ -452,7 +452,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	
 	@Override
 	@RolesAllowed("tothom")
-	public boolean retryMoverAnnexArxiu(Long registreAnnexId) {
+	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
 		return delegate.retryMoverAnnexArxiu(registreAnnexId);
 	}
 }

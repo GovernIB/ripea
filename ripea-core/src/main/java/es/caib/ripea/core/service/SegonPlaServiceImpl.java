@@ -23,6 +23,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.helper.TestHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
@@ -323,9 +324,13 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		for (ContingutEntity contingut : pendents) {
 			
 			if (contingut instanceof ExpedientEntity) {
-				expedientHelper.guardarExpedientArxiu(contingut.getId());
+				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
+					expedientHelper.guardarExpedientArxiu(contingut.getId());
+				}
 			} else if (contingut instanceof DocumentEntity) {
-				documentHelper.guardarDocumentArxiu(contingut.getId());
+				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
+					documentHelper.guardarDocumentArxiu(contingut.getId());
+				}
 			}
 		}
 	}
@@ -340,7 +345,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
 		
 		for (InteressatEntity interessat : pendents) {
-			expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+			synchronized (SynchronizationHelper.get0To99Lock(interessat.getExpedient().getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
+				expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+			}
 		}
 	}
 	

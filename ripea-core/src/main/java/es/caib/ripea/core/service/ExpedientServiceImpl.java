@@ -105,6 +105,7 @@ import es.caib.ripea.core.helper.PaginacioHelper.ConverterParam;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.CarpetaRepository;
@@ -272,7 +273,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 								registeAnnexEntity.getId(),
 								expedientPeticioEntity.getId(),
 								anexosIdsMetaDocsIdsMap.get(registeAnnexEntity.getId()),
-								rolActual);
+								rolActual) == null;
+						
 					} catch (Exception e) {
 						processatOk = false;
 						logger.error("Error crear doc from annex", e);
@@ -358,7 +360,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						expedientId,
 						annexId,
 						expedientPeticioId, 
-						anexosIdsMetaDocsIdsMap.get(annexId), rolActual);	
+						anexosIdsMetaDocsIdsMap.get(annexId), rolActual) == null;	
 			} catch (Exception e) {
 				processatOk = false;
 				logger.error(ExceptionUtils.getStackTrace(e));
@@ -415,9 +417,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 	@Transactional
 	@Override
-	public boolean retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
+	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
 
-		boolean processatOk = true;
+//		boolean processatOk = true;
+		Exception exception;
 		boolean creatDbOk = true;
 		if (!locks.containsKey(registreAnnexId))
 			locks.put(registreAnnexId, new Object());
@@ -428,9 +431,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				if (expedientPeticioEntity.getExpedient() == null) {
 					throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
 				}
-				processatOk = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
+				exception = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
 			} catch (Exception e) {
-				processatOk = false;
+				exception = e;
 				creatDbOk = false;
 				logger.error("Error al crear doc from annex", e);
 				expedientHelper.updateRegistreAnnexError(registreAnnexId, ExceptionUtils.getStackTrace(e));
@@ -454,15 +457,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 			locks.remove(registreAnnexId);
 		}
 
-		return processatOk;
+		return exception;
 	}
 	
+	
+	
+
 	
 	@Transactional
 	@Override
-	public boolean retryMoverAnnexArxiu(Long registreAnnexId) {
-		return expedientHelper.moveDocumentArxiu(registreAnnexId);
+	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
+		
+		synchronized (SynchronizationHelper.get0To99Lock(registreAnnexId, SynchronizationHelper.locksMoureDocumentArxiu)) {
+			return expedientHelper.moveDocumentArxiu(registreAnnexId);
+		}
 	}
+	
+
+	
 
 	@Transactional
 	@Override
@@ -1022,7 +1034,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public Exception guardarExpedientArxiu(
 			Long expId) {
 		
-		return expedientHelper.guardarExpedientArxiu(expId);
+		synchronized (SynchronizationHelper.get0To99Lock(expId, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+			return expedientHelper.guardarExpedientArxiu(expId);
+		}
 	}
 	
 
