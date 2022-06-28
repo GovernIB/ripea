@@ -118,7 +118,6 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -192,8 +191,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private CarpetaRepository carpetaRepository;
 	@Autowired
 	private GrupRepository grupRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
+
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -469,7 +467,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
 		
 		synchronized (SynchronizationHelper.get0To99Lock(registreAnnexId, SynchronizationHelper.locksMoureDocumentArxiu)) {
-			return expedientHelper.moveDocumentArxiu(registreAnnexId);
+			return expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
 		}
 	}
 	

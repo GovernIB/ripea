@@ -188,7 +188,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	public String procesarAnnexosPendentsReintentar(
 			HttpServletRequest request) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisos(request);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(

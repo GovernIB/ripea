@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.fundaciobit.pluginsib.validatecertificate.afirmacxf.validarcertificadoapi.MensajeSalida.Respuesta.Excepcion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -653,6 +652,10 @@ public class ExpedientHelper {
 		
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Exception moveDocumentArxiuNewTransaction(Long registreAnnexId) {
+		return moveDocumentArxiu(registreAnnexId);
+	}
 	
 	
 	/**
@@ -1916,20 +1919,7 @@ public class ExpedientHelper {
 					subCarpeta);
 		}
 	}
-	
-	private String getUuidIfAlreadyExists(CarpetaEntity carpetaEntity, DocumentEntity docEntity) {
-		
-		String documentUuid = null;
-		Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
-		if (carpeta != null && carpeta.getContinguts() != null) {
-			for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
-				if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT && contingutArxiu.getNom().equals(docEntity.getNom())) {
-					documentUuid = contingutArxiu.getIdentificador();
-				}
-			}
-		}
-		return documentUuid;
-	}
+
 	
 	
 	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(es.caib.distribucio.ws.backofficeintegracio.FirmaTipus firmaTipus) {

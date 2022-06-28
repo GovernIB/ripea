@@ -168,10 +168,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		if (registreAnnex.getDocumentId() != null) {
 			
-			boolean processatOk = true;
-			processatOk = expedientService.retryMoverAnnexArxiu(
-					registreAnnexId) == null;
-			if (processatOk) {
+			Exception exception = expedientService.retryMoverAnnexArxiu(
+					registreAnnexId);
+			if (exception == null) {
 				return getModalControllerReturnValueSuccess(
 						request,
 						"",
@@ -180,7 +179,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueError(
 						request,
 						"",
-						"expedient.peticio.detalls.controller.reintentat.error");
+						"expedient.peticio.detalls.controller.reintentat.error",
+						new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()});
 			}
 			
 		} else {

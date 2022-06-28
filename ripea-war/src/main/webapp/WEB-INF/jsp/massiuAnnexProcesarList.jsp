@@ -71,6 +71,10 @@ $(document).ready(function() {
 			return false;
 		});
 
+	    $("#processar").on('click', function(data){  	
+		  	$("#taulaDiv").html("<div style='text-align: center; margin-bottom: 60px; margin-top: 60px;''><span class='fa fa-circle-o-notch fa-spin fa-3x'/></div>");
+	    });
+
 		
 	});
 
@@ -132,47 +136,48 @@ $(document).ready(function() {
 
 		</div>
 	</script>
-	<table id="taula" 
-		data-toggle="datatable" 
-		data-url="<c:url value="/massiu/procesarAnnexosPendents/datatable"/>"
-		class="table table-bordered table-striped" 
-		data-default-order="6" 
-		data-default-dir="desc"
-		data-botons-template="#botonsTemplate"
-		data-selection-enabled="true"
-		style="width:100%">
-		<thead>
-			<tr>
-				<th data-col-name="rowSelectable" data-visible="false"></th>
-				<th data-col-name="expedientId" data-visible="false"></th>
-				<th data-col-name="expedientPeticioId" data-visible="false"></th>
-				<th data-col-name="titol"><spring:message code="accio.massiva.list.column.nom"/></th>
-				<th data-col-name="registreNumero" data-orderable="false"><spring:message code="accio.massiva.list.column.numero"/></th>
-				
-				<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false"><spring:message code="accio.massiva.list.column.expedient"/>
-					<script id="cellExpedientLink" type="text/x-jsrender">
+	<div id="taulaDiv">
+		<table id="taula" 
+			data-toggle="datatable" 
+			data-url="<c:url value="/massiu/procesarAnnexosPendents/datatable"/>"
+			class="table table-bordered table-striped" 
+			data-default-order="6" 
+			data-default-dir="desc"
+			data-botons-template="#botonsTemplate"
+			data-selection-enabled="true"
+			style="width:100%">
+			<thead>
+				<tr>
+					<th data-col-name="rowSelectable" data-visible="false"></th>
+					<th data-col-name="expedientId" data-visible="false"></th>
+					<th data-col-name="expedientPeticioId" data-visible="false"></th>
+					<th data-col-name="titol"><spring:message code="accio.massiva.list.column.nom"/></th>
+					<th data-col-name="registreNumero" data-orderable="false"><spring:message code="accio.massiva.list.column.numero"/></th>
+					
+					<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false"><spring:message code="accio.massiva.list.column.expedient"/>
+						<script id="cellExpedientLink" type="text/x-jsrender">
 						<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
 					</script>
-				</th>
-				<th data-col-name="expedientCreatedDate" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.expedientCreatEl"/></th>
-				
-				<th data-col-name="documentId" data-orderable="false" data-template="#cellCreatDb" width="1%">
-					<spring:message code="massiu.list.column.creatDb"/>
-					<script id="cellCreatDb" type="text/x-jsrender">
+					</th>
+					<th data-col-name="expedientCreatedDate" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.expedientCreatEl"/></th>
+					
+					<th data-col-name="documentId" data-orderable="false" data-template="#cellCreatDb" width="1%">
+						<spring:message code="massiu.list.column.creatDb"/>
+						<script id="cellCreatDb" type="text/x-jsrender">
 						{{if documentId!=null}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
-					<script id="cellAccionsTemplate" type="text/x-jsrender">
+					</th>
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
+						<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if documentId==null}}
 							<a href="<c:url value="/expedientPeticio/{{:id}}/{{:expedientPeticioId}}/reintentar"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><spring:message code="massiu.list.column.btn.crear.db"/></a>	
 						{{/if}}
 					</script>
-				</th>
-			</tr>
-		</thead>
-	</table>
-
+					</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
 	
 </body>
 </html>
