@@ -10,6 +10,42 @@
 	<c:otherwise><c:set var="titol"><spring:message code="contingut.expedient.form.titol.modificar"/></c:set></c:otherwise>
 </c:choose>
 <html>
+<body>
+<c:choose>
+	<c:when test="${empty expedientCommand.id}"><c:set var="formAction"><rip:modalUrl value="/expedient/new"/></c:set></c:when>
+	<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientCommand.id}/update"/></c:set></c:otherwise>
+</c:choose>
+<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
+	<form:hidden path="id"/>
+	<form:hidden path="entitatId"/>
+	<form:hidden path="pareId"/>
+	<c:choose>
+		<c:when test="${empty expedientCommand.id}">
+			<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" emptyOption="${fn:length(metaExpedients) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" optionMinimumResultsForSearch="0"/>
+		</c:when>
+		<c:otherwise>
+			<form:hidden path="metaNodeId"/>
+		</c:otherwise>
+	</c:choose>
+	<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true" labelSize="2"/>
+	<div id="organFixed">
+		<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"><span id="organFixedNom"></span></rip:inputFixed>
+	</div>
+	<div id="organSelect">
+		<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"/>
+	</div>
+	<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
+	<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
+	<form:hidden path="gestioAmbGrupsActiva"/>
+	<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
+		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
+	</div>
+	<div id="modal-botons" class="well">
+		<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+		<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+	</div>
+</form:form>
+</body>
 <head>
 	<title>${titol}</title>
 	<rip:modalHead/>
@@ -19,13 +55,15 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 <script type="text/javascript">
 var metaExpedientOrgan = {};
+var metaExpedientGrup = {};
 <c:forEach var="metaExpedient" items="${metaExpedients}">
 <c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${metaExpedient.organGestor.nom}'};</c:if>
+metaExpedientGrup['${metaExpedient.id}'] = {gestioAmbGrupsActiva: ${metaExpedient.gestioAmbGrupsActiva}};
 </c:forEach>
 function refrescarSequencia() {
 	let metaExpedientId = $('#metaNodeId').val();
 	let any = $('input#any').val();
-	if (metaExpedientId != undefined && any != undefined && any != "") {
+	if (metaExpedientId != undefined && metaExpedientId != "" && any != undefined && any != "") {
 		$.ajax({
 			type: 'GET',
 			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
@@ -76,36 +114,26 @@ function recuperarDominisMetaExpedient() {
 
 function refrescarGrups() {
 	let expedientId = $('#id').val();
-
+	debugger
 	if(expedientId == undefined || expedientId == "") {
 		let metaExpedientId = $('#metaNodeId').val();
 		if (metaExpedientId != undefined && metaExpedientId != "") {
-			if (id != undefined && id != "") {
+			const gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
+			if (gestioAmbGrupsActiva) {
+				$("#grupsActiu").removeClass("hidden");
 				$.ajax({
 					type: 'GET',
-					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/gestioAmbGrupsActiva',
+					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
 					success: function(data) {
-						$('#gestioAmbGrupsActiva').val(data);
-						if (data) {
-							$.ajax({
-								type: 'GET',
-								url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
-								success: function(data) {
-									$('#grupId').closest('.form-group').show();
-									$('#grupId option[value!=""]').remove();
-									for (var i = 0; i < data.length; i++) {
-										$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
-									}
-								}
-							});
-						} else {
-							$('#grupId option[value!=""]').remove();
-							$('#grupId').closest('.form-group').hide();
+						$('#grupId').closest('.form-group').show();
+						$('#grupId option[value!=""]').remove();
+						for (var i = 0; i < data.length; i++) {
+							$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
 						}
 					}
 				});
 			} else {
-				$('#grupId').prop('disabled', 'disabled');
+				$("#grupsActiu").addClass("hidden");
 			}
 		}
 	}
@@ -114,36 +142,45 @@ function refrescarGrups() {
 
 function refrescarOrgan() {
 	const metaExpedientId = $('#metaNodeId').val();
-	const organ = metaExpedientOrgan[metaExpedientId];
-	if (organ) {
-		$('#organFixed').show();
-		$('#organSelect').hide();
-		$('#organFixedNom').text(organ.codi + ' - ' + organ.nom);
-		$('#organFixedNom').after($('<input>').attr({
-		    type: 'hidden',
-		    name: 'organGestorId',
-		    value: organ.id
-		}));
-	} else {
-		$.ajax({
-			type: 'GET',
-			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos/${expedientCommand.id!=null ? expedientCommand.id : ''}',
-			success: function(organs) {
-				const selOrgans = $('select#organGestorId');
-				const organGestorId = '${expedientCommand.organGestorId}';
-				selOrgans.empty();
-				if (organs && organs.length > 0) {
-					$.each(organs, function(i, organ) {
-						const selected = (organ.id == organGestorId) ? ' selected' : '';
-						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.codi + ' - ' + organ.nom + '</option>');
+	if (metaExpedientId != undefined && metaExpedientId != "") {
+		const organ = metaExpedientOrgan[metaExpedientId];
+		if (organ) {
+			$('#organFixed').show();
+			$('#organSelect').hide();
+			$('#organFixedNom').text(organ.codi + ' - ' + organ.nom);
+			$('#organFixedNom').after($('<input>').attr({
+				type: 'hidden',
+				name: 'organGestorId',
+				value: organ.id
+			}));
+		} else {
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos/${expedientCommand.id!=null ? expedientCommand.id : ''}',
+				success: function(organs) {
+					const selOrgans = $('select#organGestorId');
+					const organGestorId = '${expedientCommand.organGestorId}';
+					selOrgans.empty();
+					if (organs && organs.length > 0) {
+						$.each(organs, function(i, organ) {
+							const selected = (organ.id == organGestorId) ? ' selected' : '';
+							selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.codi + ' - ' + organ.nom + '</option>');
+						});
+					}
+					selOrgans.select2({
+						theme: 'bootstrap',
+						width: 'auto'
 					});
 				}
-				selOrgans.select2({
-					theme: 'bootstrap',
-					width: 'auto'
-				});
-			}
-		});
+			});
+			$('#organFixed').hide();
+			$('#organSelect').show();
+			$('input', $('#organFixedNom').parent()).remove();
+		}
+	} else {
+		const selOrgans = $('select#organGestorId');
+		selOrgans.empty();
+		selOrgans.select2({ theme: 'bootstrap', width: 'auto' });
 		$('#organFixed').hide();
 		$('#organSelect').show();
 		$('input', $('#organFixedNom').parent()).remove();
@@ -166,38 +203,4 @@ $(document).ready(function() {
 });
 </script>
 </head>
-<body>
-	<c:choose>
-		<c:when test="${empty expedientCommand.id}"><c:set var="formAction"><rip:modalUrl value="/expedient/new"/></c:set></c:when>
-		<c:otherwise><c:set var="formAction"><rip:modalUrl value="/expedient/${expedientCommand.id}/update"/></c:set></c:otherwise>
-	</c:choose>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientCommand">
-		<form:hidden path="id"/>
-		<form:hidden path="entitatId"/>
-		<form:hidden path="pareId"/>
-		<c:choose>
-			<c:when test="${empty expedientCommand.id}">
-				<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" emptyOption="${fn:length(metaExpedients) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" optionMinimumResultsForSearch="0"/>
-			</c:when>
-			<c:otherwise>
-				<form:hidden path="metaNodeId"/>
-			</c:otherwise>
-		</c:choose>
-		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" required="true" labelSize="2"/>
-		<div id="organFixed">
-			<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"><span id="organFixedNom"></span></rip:inputFixed>
-		</div>
-		<div id="organSelect">
-			<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true" labelSize="2"/>
-		</div>
-		<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
-		<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
-		<form:hidden path="gestioAmbGrupsActiva"/>
-		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
-		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
-		</div>
-	</form:form>
-</body>
 </html>

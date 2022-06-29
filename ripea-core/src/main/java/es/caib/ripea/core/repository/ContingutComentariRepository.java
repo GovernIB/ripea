@@ -3,14 +3,14 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.List;
-
+import es.caib.ripea.core.entity.ContingutComentariEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.ContingutComentariEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -32,4 +32,12 @@ public interface ContingutComentariRepository extends JpaRepository<ContingutCom
 	long countByContingut(
 			@Param("contingut") ContingutEntity contingut);
 
+
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+	@Modifying
+	@Query(value = "delete from ipa_cont_comment where contingut_id = :contingutId ", nativeQuery = true)
+	int deleteComentarisFromContingutsOrfes(@Param("contingutId") Long contingutId);
 }

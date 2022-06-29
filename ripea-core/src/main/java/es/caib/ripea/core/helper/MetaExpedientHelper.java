@@ -45,6 +45,7 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
@@ -91,11 +92,19 @@ public class MetaExpedientHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired
+	private ExpedientRepository expedientRepository;
     
-	public synchronized long obtenirProximaSequenciaExpedient(
+	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
 			boolean incrementar) {
+		logger.info(
+				"Obtenir proxima sequencia expedient (" +
+						"metaExpedient=" + metaExpedient.getId() + " - " +metaExpedient.getCodi() + ", " +
+						"any=" + any + ", " +
+						"incrementar=" + incrementar + ")");
+		
 		int anyExpedient;
 		if (any != null)
 			anyExpedient = any.intValue();
@@ -104,12 +113,21 @@ public class MetaExpedientHelper {
 		MetaExpedientSequenciaEntity sequencia = metaExpedientSequenciaRepository.findByMetaExpedientAndAny(
 				metaExpedient,
 				anyExpedient);
+		
 		if (sequencia == null) {
 			sequencia = MetaExpedientSequenciaEntity.getBuilder(anyExpedient, metaExpedient).build();
 			metaExpedientSequenciaRepository.save(sequencia);
+			logger.info("Nou sequencia creada: "+ sequencia.getAny() + ", " + sequencia.getValor() + ", "  + sequencia.getMetaExpedient().getId()+ " - " +sequencia.getMetaExpedient().getCodi());
 			return sequencia.getValor();
 		} else if (incrementar) {
 			sequencia.incrementar();
+			logger.info("Sequencia incrementada: " + sequencia.getAny() + ", " + sequencia.getValor() + ", " + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
+			Long max = expedientRepository.findMaxSequencia(metaExpedient, any);
+			long valor = sequencia.getValor();
+			if (max != null && max + 1 > valor) {
+				logger.error("Sequenia no correcta: valorSequenciaIncrementada=" + valor + ", maxSequenciaExp=" + max + ". Actualitzant valor de sequncia manualment...");
+				sequencia.updateValor(max + 1);
+			}
 			return sequencia.getValor();
 		} else {
 			return sequencia.getValor() + 1;

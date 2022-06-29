@@ -584,14 +584,14 @@ public class DocumentHelper {
 
 			fitxer.setNom(document.getFitxerNom());
 			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(document.getFitxerContingut());
+//			fitxer.setContingut(document.getFitxerContingut());
 
-//			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-//			pluginHelper.gestioDocumentalGet(
-//					document.getGesDocAdjuntId(),
-//					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-//					streamAnnex);
-//			fitxer.setContingut(streamAnnex.toByteArray());
+			ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+			pluginHelper.gestioDocumentalGet(
+					document.getGesDocAdjuntId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+					streamAnnex);
+			fitxer.setContingut(streamAnnex.toByteArray());
 			
 		
 		}
@@ -769,6 +769,7 @@ public class DocumentHelper {
 	public Exception guardarDocumentArxiu(
 			Long docId) {
 		
+		logger.info("Guardar document arxiu (id=" + docId + ")");
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);

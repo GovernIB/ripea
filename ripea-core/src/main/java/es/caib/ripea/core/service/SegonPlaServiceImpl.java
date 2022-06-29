@@ -3,25 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
@@ -44,12 +25,30 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.helper.TestHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -101,7 +100,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		logger.debug(
 				"Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
-		// find peticions with no registre associated and with no errors from previous invocation of this method
+		// find peticions with no anotació associated and with no errors from previous invocation of this method
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(
 				ExpedientPeticioEstatEnumDto.CREAT);
 
@@ -122,21 +121,23 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 						throw new RuntimeException("EXCEPION BEFORE CONSULTING ANOTACIO!!!!!! ");
 					
 					
-					// obtain registre from DISTRIBUCIO
+
+					//obtain anotació from DISTRIBUCIO
 					AnotacioRegistreEntrada registre = distribucioHelper.getBackofficeIntegracioServicePort().consulta(
 							anotacioRegistreId);
 
-					// create registre in db and associate it with expedient peticion
+					// create anotació in db and associate it with expedient peticion
 					expedientPeticioHelper.crearRegistrePerPeticio(
 							registre,
 							expedientPeticioEntity);
 					
+
 					// change state of expedient peticion to pendent of acceptar or rebutjar
 					expedientPeticioHelper.canviEstatExpedientPeticio(
 							expedientPeticioEntity.getId(),
 							ExpedientPeticioEstatEnumDto.PENDENT);
 
-					// change state of registre in DISTRIBUCIO to BACK_REBUDA
+					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 					distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
@@ -166,7 +167,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										ExceptionUtils.getStackTrace(e),
 										3600));
 						
-						// change state of registre in DISTRIBUCIO to BACK_ERROR
+
+						// change state of anotació in DISTRIBUCIO to BACK_ERROR
 						distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
 								anotacioRegistreId,
 								Estat.ERROR,
@@ -342,13 +344,20 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				Thread t = new Thread(new Runnable() {
 					public void run() {
 						ConfigHelper.setEntitat(entitat);
-						expedientHelper.guardarExpedientArxiu(id);
+						synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+							expedientHelper.guardarExpedientArxiu(id);
+						}
 					}
 				});
 				t.start();
 				
+				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
+					expedientHelper.guardarExpedientArxiu(contingut.getId());
+				}
 			} else if (contingut instanceof DocumentEntity) {
-				documentHelper.guardarDocumentArxiu(contingut.getId());
+				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
+					documentHelper.guardarDocumentArxiu(contingut.getId());
+				}
 			}
 		}
 	}
@@ -363,7 +372,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
 		
 		for (InteressatEntity interessat : pendents) {
-			expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+			synchronized (SynchronizationHelper.get0To99Lock(interessat.getExpedient().getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
+				expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+			}
 		}
 	}
 	

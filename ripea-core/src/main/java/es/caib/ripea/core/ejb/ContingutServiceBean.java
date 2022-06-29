@@ -3,34 +3,20 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ContingutService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.ContingutLogDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutMovimentDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ContingutService;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -341,10 +327,21 @@ public class ContingutServiceBean implements ContingutService {
 		delegate.order(entitatId, contingutId, orderedElements);
 	}
 
+
 	@Override
 	public PaginaDto<DocumentDto> findDocumentsPerCopiarCsv(Long entitatId, ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
 		return delegate.findDocumentsPerCopiarCsv(entitatId, filtre, paginacioParams, rolActual);
 	}
+
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+    @Override
+    public Boolean netejaContingutsOrfes() {
+        return delegate.netejaContingutsOrfes();
+    }
+
 
 }

@@ -9,12 +9,16 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.war.command.ContenidorCommand.Create;
+import es.caib.ripea.war.command.ContenidorCommand.Update;
+import es.caib.ripea.war.validation.ExpedientODocumentNom;
 
 /**
  * Command per al expedient peticio rebutjar
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@ExpedientODocumentNom(groups = {Create.class, Update.class})
 public class ExpedientPeticioAcceptarCommand {
 
 	private Long id;
@@ -25,6 +29,7 @@ public class ExpedientPeticioAcceptarCommand {
 	private int any;
 	private boolean associarInteressats;
 	private ExpedientPeticioAccioEnumDto accio;
+	private boolean agafarExpedient;
 	
 	private Long organGestorId;
     private List<RegistreAnnexCommand> annexos = new ArrayList<>();
@@ -84,6 +89,12 @@ public class ExpedientPeticioAcceptarCommand {
 	}
 	public void setAnnexos(List<RegistreAnnexCommand> annexos) {
 		this.annexos = annexos;
+	}
+	public boolean isAgafarExpedient() {
+		return agafarExpedient;
+	}
+	public void setAgafarExpedient(boolean agafarExpedient) {
+		this.agafarExpedient = agafarExpedient;
 	}
 	@Override
 	public String toString() {

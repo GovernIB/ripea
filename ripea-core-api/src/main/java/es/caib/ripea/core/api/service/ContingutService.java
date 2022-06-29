@@ -3,28 +3,15 @@
  */
 package es.caib.ripea.core.api.service;
 
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.ContingutLogDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutMovimentDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
 
 /**
  * Declaració dels mètodes per a gestionar continguts.
@@ -558,4 +545,9 @@ public interface ContingutService {
 			Long contingutId,
 			Map<Integer, Long> orderedElements) throws NotFoundException, ValidationException;
 
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+    Boolean netejaContingutsOrfes();
 }

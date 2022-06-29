@@ -28,10 +28,20 @@ public class RegistreAnnexDto {
 	private String tipusMime;
 	private String titol;
 	private String uuid;
+
 	private String nom;
 
+
+	private Date createdDate;
+	private String registreNumero;
+	private Long expedientId;
+	private String expedientNumeroNom;
+	private Date expedientCreatedDate;
+
+	private Long documentId;
 	private RegistreAnnexEstatEnumDto estat;
 	private String error;
+	private Long expedientPeticioId;
 	
 	public RegistreAnnexEstatEnumDto getEstat() {
 		return estat;
@@ -153,4 +163,50 @@ public class RegistreAnnexDto {
 		return firmaTipus != null;
 	}
 
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+	public String getRegistreNumero() {
+		return registreNumero;
+	}
+	public void setRegistreNumero(String registreNumero) {
+		this.registreNumero = registreNumero;
+	}
+	public Long getExpedientId() {
+		return expedientId;
+	}
+	public void setExpedientId(Long expedientId) {
+		this.expedientId = expedientId;
+	}
+	public String getExpedientNumeroNom() {
+		return expedientNumeroNom;
+	}
+	public void setExpedientNumeroNom(String expedientNumeroNom) {
+		this.expedientNumeroNom = expedientNumeroNom;
+	}
+	public Date getExpedientCreatedDate() {
+		return expedientCreatedDate;
+	}
+	public void setExpedientCreatedDate(Date expedientCreatedDate) {
+		this.expedientCreatedDate = expedientCreatedDate;
+	}
+	public Long getDocumentId() {
+		return documentId;
+	}
+	public void setDocumentId(Long documentId) {
+		this.documentId = documentId;
+	}
+	public boolean isRowSelectable() {
+		return this.documentId != null;
+	}
+	public Long getExpedientPeticioId() {
+		return expedientPeticioId;
+	}
+	public void setExpedientPeticioId(Long expedientPeticioId) {
+		this.expedientPeticioId = expedientPeticioId;
+	}
+	
 }

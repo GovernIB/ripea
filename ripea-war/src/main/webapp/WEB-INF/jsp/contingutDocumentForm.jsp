@@ -448,10 +448,9 @@ $(document).ready(function() {
 	    $('#loading').hide();
 	    $('#arxiuInput').show();
 	    
-		if (!isErrorTrue) {
+		//if (!isErrorTrue) {
 			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
-			
-		}
+		//}
 
 	});
 

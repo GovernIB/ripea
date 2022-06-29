@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
@@ -95,7 +96,6 @@ public class ExpedientPeticioHelper {
 		}
 	}
 
-	@Transactional
 	public void canviEstatExpedientPeticio(
 			Long expedientPeticioId,
 			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
@@ -104,6 +104,13 @@ public class ExpedientPeticioHelper {
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null)
 			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void canviEstatExpedientPeticioNewTransaction(
+			Long expedientPeticioId,
+			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
+		canviEstatExpedientPeticio(expedientPeticioId, expedientPeticioEstatEnumDto);
 	}
 
 	@Transactional
@@ -126,7 +133,7 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
 				registreEntrada.getEntitatCodi());
@@ -211,6 +218,12 @@ public class ExpedientPeticioHelper {
 							annex,
 							registreEntity));
 		}
+		
+		// change state of expedient peticion to pendent of acceptar or rebutjar
+		canviEstatExpedientPeticio(
+				expedientPeticioEntity.getId(),
+				ExpedientPeticioEstatEnumDto.PENDENT);
+		
 	}
 
 	private RegistreInteressatEntity crearInteressatEntity(

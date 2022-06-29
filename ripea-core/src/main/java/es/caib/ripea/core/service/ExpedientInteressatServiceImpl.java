@@ -3,26 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -40,9 +21,16 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.UnitatOrganitzativaHelper;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació dels mètodes per a gestionar interessats.
@@ -64,8 +52,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired
@@ -106,7 +92,12 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long expedientId,
 			InteressatDto interessat, 
 			String rolActual) {
-		return update(entitatId, expedientId, null, interessat, rolActual);
+		return expedientInteressatHelper.update(
+				entitatId,
+				expedientId,
+				null,
+				interessat,
+				rolActual, true);
 	}
 
 	@Transactional
@@ -117,135 +108,12 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long representatId,
 			InteressatDto interessat, 
 			String rolActual) {
-		if (representatId != null) {
-			logger.debug("Modificant un representant ("
-					+ "entitatId=" + entitatId + ", "
-					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + representatId + ", "
-					+ "interessat=" + interessat + ")");
-		} else {
-			logger.debug("Modificant un interessat ("
-					+ "entitatId=" + entitatId + ", "
-					+ "expedientId=" + expedientId + ", "
-					+ "interessat=" + interessat + ")");
-		}
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+		return expedientInteressatHelper.update(
 				entitatId,
 				expedientId,
-				true,
-				false,
-				true,
-				false,
-				false, 
-				false, 
-				rolActual);
-		InteressatEntity representat = null;
-		if (representatId != null) {
-			representat = interessatRepository.findOne(representatId);
-			if (representat == null || 
-				representat.getRepresentant() == null || 
-				!representat.getRepresentant().getId().equals(interessat.getId())) {
-				throw new NotFoundException(
-						representatId,
-						InteressatEntity.class);
-			}
-		}
-		InteressatEntity interessatEntity = null;
-		if (interessat.isPersonaFisica()) {
-			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
-			interessatEntity = interessatRepository.findPersonaFisicaById(interessat.getId());
-			((InteressatPersonaFisicaEntity)interessatEntity).update(
-					interessatPersonaFisicaDto.getNom(),
-					interessatPersonaFisicaDto.getLlinatge1(),
-					interessatPersonaFisicaDto.getLlinatge2(),
-					interessatPersonaFisicaDto.getDocumentTipus(),
-					interessatPersonaFisicaDto.getDocumentNum(),
-					interessatPersonaFisicaDto.getPais(),
-					interessatPersonaFisicaDto.getProvincia(),
-					interessatPersonaFisicaDto.getMunicipi(),
-					interessatPersonaFisicaDto.getAdresa(),
-					interessatPersonaFisicaDto.getCodiPostal(),
-					interessatPersonaFisicaDto.getEmail(),
-					interessatPersonaFisicaDto.getTelefon(),
-					interessatPersonaFisicaDto.getObservacions(),
-					interessatPersonaFisicaDto.getPreferenciaIdioma(),
-					interessatPersonaFisicaDto.getNotificacioAutoritzat(),
-					interessatPersonaFisicaDto.getEntregaDeh(),
-					interessatPersonaFisicaDto.getEntregaDehObligat(),
-					interessatPersonaFisicaDto.getIncapacitat());
-		} else if (interessat.isPersonaJuridica()) {
-			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
-			interessatEntity = interessatRepository.findPersonaJuridicaById(interessat.getId());
-			((InteressatPersonaJuridicaEntity)interessatEntity).update(
-					interessatPersonaJuridicaDto.getRaoSocial(),
-					interessatPersonaJuridicaDto.getDocumentTipus(),
-					interessatPersonaJuridicaDto.getDocumentNum(),
-					interessatPersonaJuridicaDto.getPais(),
-					interessatPersonaJuridicaDto.getProvincia(),
-					interessatPersonaJuridicaDto.getMunicipi(),
-					interessatPersonaJuridicaDto.getAdresa(),
-					interessatPersonaJuridicaDto.getCodiPostal(),
-					interessatPersonaJuridicaDto.getEmail(),
-					interessatPersonaJuridicaDto.getTelefon(),
-					interessatPersonaJuridicaDto.getObservacions(),
-					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-					interessatPersonaJuridicaDto.getNotificacioAutoritzat(),
-					interessatPersonaJuridicaDto.getEntregaDeh(),
-					interessatPersonaJuridicaDto.getEntregaDehObligat(),
-					interessatPersonaJuridicaDto.getIncapacitat());
-		} else {
-			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
-			interessatEntity = interessatRepository.findAdministracioById(interessat.getId());
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
-					interessatAdministracioDto.getOrganCodi());
-			((InteressatAdministracioEntity)interessatEntity).update(
-					unitat.getCodi(),
-					unitat.getDenominacio(),
-					interessatAdministracioDto.getDocumentTipus(),
-					interessatAdministracioDto.getDocumentNum(),
-					interessatAdministracioDto.getPais(),
-					interessatAdministracioDto.getProvincia(),
-					interessatAdministracioDto.getMunicipi(),
-					interessatAdministracioDto.getAdresa(),
-					interessatAdministracioDto.getCodiPostal(),
-					interessatAdministracioDto.getEmail(),
-					interessatAdministracioDto.getTelefon(),
-					interessatAdministracioDto.getObservacions(),
-					interessatAdministracioDto.getPreferenciaIdioma(),
-					interessatAdministracioDto.getNotificacioAutoritzat(),
-					interessatAdministracioDto.getEntregaDeh(),
-					interessatAdministracioDto.getEntregaDehObligat(),
-					interessatAdministracioDto.getIncapacitat());
-		}
-		interessatEntity = interessatRepository.save(interessatEntity);
-		// Registra al log la modificació de l'interessat
-		contingutLogHelper.log(
-				expedient,
-				LogTipusEnumDto.MODIFICACIO,
-				interessatEntity,
-				LogObjecteTipusEnumDto.INTERESSAT,
-				LogTipusEnumDto.MODIFICACIO,
-				null,
-				null,
-				false,
-				false);
-//		##### Hi ha un mapeig dins conversioTipusHelper ###
-//		if (interessat instanceof InteressatPersonaFisicaDto) {
-//			return conversioTipusHelper.convertir(
-//					interessatEntity,
-//					InteressatPersonaFisicaDto.class);
-//		} else if (interessat instanceof InteressatPersonaJuridicaDto) {
-//			return conversioTipusHelper.convertir(
-//					interessatEntity,
-//					InteressatPersonaJuridicaDto.class);
-//		} else {
-//			return conversioTipusHelper.convertir(
-//					interessatEntity,
-//					InteressatAdministracioDto.class);
-//		}
-		return conversioTipusHelper.convertir(
-				interessatEntity,
-				InteressatDto.class);
+				representatId,
+				interessat,
+				rolActual, true);
 	}
 
 	@Transactional
@@ -303,59 +171,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long interessatId,
 			Long representantId, 
 			String rolActual) {
-		logger.debug("Esborrant interessat de l'expedient  ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "interessatId=" + interessatId + ", "
-				+ "representantId=" + representantId + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+
+		expedientInteressatHelper.delete(
 				entitatId,
 				expedientId,
-				true,
-				false,
-				true,
-				false,
-				false, 
-				false, 
+				interessatId,
+				representantId,
 				rolActual);
-		InteressatEntity interessat = interessatRepository.findOne(interessatId);
-		if (interessat != null) {
-			if (interessat.getRepresentant() != null && 
-				interessat.getRepresentant().getId().equals(representantId)) {
-				InteressatEntity representant = interessatRepository.findOne(representantId);
-				interessat.updateRepresentant(null);
-				interessatRepository.delete(representant);
-				//expedient.deleteInteressat(interessat);
-				// Registra al log la baixa de l'interessat
-				contingutLogHelper.log(
-						expedient,
-						LogTipusEnumDto.MODIFICACIO,
-						interessat,
-						LogObjecteTipusEnumDto.INTERESSAT,
-						LogTipusEnumDto.ELIMINACIO,
-						null,
-						null,
-						false,
-						false);
-			} else {
-				logger.error("No s'ha trobat el representant de l'interessat ("
-						+ "expedientId=" + expedientId + ", "
-						+ "interessatId=" + interessatId + ", "
-						+ "representantId=" + representantId + ")");
-				throw new ValidationException(
-						representantId,
-						InteressatEntity.class,
-						"No s'ha trobat el representant de l'interessat (interessatId=" + interessatId + ")");
-			}
-		} else {
-			logger.error("No s'ha trobat l'interessat a l'expedient ("
-					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + interessatId + ")");
-			throw new ValidationException(
-					interessatId,
-					InteressatEntity.class,
-					"No s'ha trobat l'interessat a l'expedient (expedientId=" + expedientId + ")");
-		}
 	}
 	
 	@Override
@@ -471,7 +293,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
 		if (nomesAmbNotificacioActiva) {
-			interessats = interessatRepository.findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+			interessats = expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
 					expedient);
 		} else {
 			interessats = interessatRepository.findByExpedientAndNotRepresentant(
@@ -623,6 +445,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				InteressatAdministracioDto.class);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<InteressatDto> findByExpedientAndDocumentNum(
 			String documentNum,
@@ -635,6 +458,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatServiceImpl.class);
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<InteressatDto> findByText(String text) {
 		return conversioTipusHelper.convertirList(
@@ -642,6 +466,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				InteressatDto.class);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public InteressatDto findByDocumentNum(String documentNum) throws NotFoundException {
 		return conversioTipusHelper.convertir(

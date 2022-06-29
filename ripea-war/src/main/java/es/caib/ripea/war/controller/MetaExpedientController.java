@@ -981,7 +981,7 @@ public class MetaExpedientController extends BaseAdminController {
 					true, 
 					organId);
 			
-			logger.debug("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
+			logger.trace("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
 		} else {
 			metaExpedientsPermisLectura = metaExpedientService.findActius(
 					entitatActual.getId(), 
@@ -989,7 +989,7 @@ public class MetaExpedientController extends BaseAdminController {
 					rolActual, 
 					false, 
 					null);
-			logger.debug("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
+			logger.trace("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
 		}
 
 		return metaExpedientsPermisLectura;

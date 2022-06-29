@@ -63,17 +63,54 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("expedient") ExpedientEntity expedient);
 	
 	
+	
+	
 	@Query(	  "select "
 			+ "    inter "
 			+ "from "
-			+ "    InteressatEntity inter "
+			+ "    InteressatPersonaFisicaEntity inter "
 			+ "where "
 			+ "    inter.expedient = :expedient "
 			+ "and inter.esRepresentant = false "
+			+ "and inter.documentNum is not null "
+			+ "and inter.documentTipus is not null "
 			+ "order by "
 			+ "    inter.id asc")
-	List<InteressatEntity> findByExpedientAndNotRepresentantAndNomesAmbNotificacioActiva(
+	List<InteressatPersonaFisicaEntity> findPersFisicByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
 			@Param("expedient") ExpedientEntity expedient);
+	
+	@Query(	  "select "
+			+ "    inter "
+			+ "from "
+			+ "    InteressatPersonaJuridicaEntity inter "
+			+ "where "
+			+ "    inter.expedient = :expedient "
+			+ "and inter.esRepresentant = false "
+			+ "and inter.documentNum is not null "
+			+ "and inter.documentTipus is not null "
+			+ "and inter.raoSocial is not null "
+			+ "order by "
+			+ "    inter.id asc")
+	List<InteressatPersonaJuridicaEntity> findPersJuridByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
+			@Param("expedient") ExpedientEntity expedient);
+	
+	
+	@Query(	  "select "
+			+ "    inter "
+			+ "from "
+			+ "    InteressatAdministracioEntity inter "
+			+ "where "
+			+ "    inter.expedient = :expedient "
+			+ "and inter.esRepresentant = false "
+			+ "and inter.documentNum is not null "
+			+ "and inter.documentTipus is not null "
+			+ "and inter.organCodi is not null "
+			+ "order by "
+			+ "    inter.id asc")
+	List<InteressatAdministracioEntity> findAdminByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
+			@Param("expedient") ExpedientEntity expedient);
+	
+	
 	
 	@Query(	  "select "
 			+ "    count(inter) "
@@ -189,6 +226,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"where " +
 			"i.arxiuPropagat = false " +
 			"and i.arxiuReintents < :arxiuMaxReintents " +
+			"and i.arxiuReintents > 0 " +
 			"order by i.arxiuIntentData asc")
 	public List<InteressatEntity> findInteressatsPendentsArxiu(
 			@Param("arxiuMaxReintents") int arxiuMaxReintents);

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -62,6 +62,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -162,47 +163,68 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long registreAnnexId,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		RegistreAnnexDto registreAnnex = expedientPeticioService.findAnnexById(registreAnnexId);
 		
-		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
-		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
-					entitatActual.getId(),
-					expedientPeticioDto.getExpedientId(), 
-					null, 
-					false);
-		model.addAttribute(
-				"metaDocuments",
-				metaDocumentsQueQuedenPerCreacio);
-		model.addAttribute(
-				"expedientPeticioId",
-				expedientPeticioId);
-		
-		RegistreAnnexCommand registreAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioService.findAnnexById(registreAnnexId), RegistreAnnexCommand.class);
-		
-		ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null);
-		
-		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
-		if (metaDocPerDefecte != null) {
-			boolean potCrearMetaDocPerDefecte = false;
-			for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
-				if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
-					potCrearMetaDocPerDefecte = true;
+		if (registreAnnex.getDocumentId() != null) {
+			
+			Exception exception = expedientService.retryMoverAnnexArxiu(
+					registreAnnexId);
+			if (exception == null) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"",
+						"expedient.peticio.detalls.controller.reintentat.ok");			
+			} else {
+				return getModalControllerReturnValueError(
+						request,
+						"",
+						"expedient.peticio.detalls.controller.reintentat.error",
+						new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()});
+			}
+			
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+			List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(
+						entitatActual.getId(),
+						expedientPeticioDto.getExpedientId(), 
+						null,
+						false);
+			model.addAttribute(
+					"metaDocuments",
+					metaDocumentsQueQuedenPerCreacio);
+			model.addAttribute(
+					"expedientPeticioId",
+					expedientPeticioId);
+			
+			RegistreAnnexCommand registreAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioService.findAnnexById(registreAnnexId), RegistreAnnexCommand.class);
+			
+			ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null);
+			
+			MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
+			if (metaDocPerDefecte != null) {
+				boolean potCrearMetaDocPerDefecte = false;
+				for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
+					if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
+						potCrearMetaDocPerDefecte = true;
+					}
+				}
+				if (potCrearMetaDocPerDefecte) {
+					registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
+				} else {
+					MissatgesHelper.warning(
+							request,
+							getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
 				}
 			}
-			if (potCrearMetaDocPerDefecte) {
-				registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
-			} else {
-				MissatgesHelper.warning(
-						request,
-						getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { metaDocPerDefecte.getNom() }));
-			}
-		}
-		
-		model.addAttribute(
-				"registreAnnexCommand",
-				registreAnnexCommand);
+			
+			model.addAttribute(
+					"registreAnnexCommand",
+					registreAnnexCommand);
 
-		return "expedientPeticioReintentarMetaDoc";
+			return "expedientPeticioReintentarMetaDoc";
+		}
 	}
 	
 	
@@ -235,13 +257,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return "expedientPeticioReintentarMetaDoc";
 		}
 		
-		boolean processatOk = true;
-		processatOk = expedientService.retryCreateDocFromAnnex(
+		
+		Exception exception = expedientService.retryCreateDocFromAnnex(
 				command.getId(),
 				expedientPeticioId, 
 				command.getMetaDocumentId(), 
 				RolHelper.getRolActual(request));
-		if (processatOk) {
+		if (exception == null) {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"",
@@ -250,7 +272,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueError(
 					request,
 					"",
-					"expedient.peticio.detalls.controller.reintentat.error");
+					"expedient.peticio.detalls.controller.reintentat.error",
+					new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()});
 		}
 	}
 	
@@ -289,10 +312,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		boolean isErrorDocuments = false;
 		for (RegistreAnnexDto registreAnnexDto : expedientPeticioDto.getRegistre().getAnnexos()) {
-			if (registreAnnexDto.getEstat() == RegistreAnnexEstatEnumDto.PENDENT && registreAnnexDto.getError() != null && !registreAnnexDto.getError().isEmpty()) {
+			if (registreAnnexDto.getExpedientId() != null && (registreAnnexDto.getDocumentId() == null || !StringUtils.isEmpty(registreAnnexDto.getError()))) {
 				isErrorDocuments = true;
 			}
 		}
+		
+		
 		if (isErrorDocuments) {
 			
 			MissatgesHelper.warning(
@@ -387,6 +412,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			Model model) {
 		
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
+		command.setAgafarExpedient(true);
 		omplirModel(expedientPeticioId, request, model, command);
 
 		return "expedientPeticioAccept";
@@ -524,6 +550,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		
 		boolean processatOk = true;
+		boolean expCreatArxiuOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		
@@ -545,16 +572,24 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						RolHelper.getRolActual(request), 
 						anexosIdsMetaDocsIdsMap);
 				processatOk = expedientDto.isProcessatOk();
+				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
+				
+				logger.info("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
 				
 			} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 					processatOk = expedientService.incorporar(
 							entitat.getId(),
 							command.getExpedientId(),
 							expedientPeticioDto.getId(),
-							command.isAssociarInteressats(), RolHelper.getRolActual(request), 
-							anexosIdsMetaDocsIdsMap);
-			}
+							command.isAssociarInteressats(), 
+							RolHelper.getRolActual(request), 
+							anexosIdsMetaDocsIdsMap, 
+							command.isAgafarExpedient());
 					
+				logger.info("Expedient incorporat per anotacio: " + processatOk);
+			}
+
+			
 		} catch (Exception ex) {
 			if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 				logger.error("Error al crear expedient per anotacio", ex);
@@ -572,21 +607,33 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:expedientPeticio",
-						ex.getMessage());
+						getMessage(request, "expedient.peticio.controller.acceptat.ko") + ": " + ExceptionHelper.getRootCauseOrItself(ex).getMessage());
 			}
 		}
 		
-		if (!processatOk) {
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"expedient.peticio.controller.acceptat.warning"));
+		if (!expCreatArxiuOk) {
+
+			return getModalControllerReturnValueWarning(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.warning.arxiu");
+			
+		} else {
+			if (!processatOk) {
+				MissatgesHelper.warning(
+						request, 
+						getMessage(
+								request, 
+								"expedient.peticio.controller.acceptat.warning"));
+			}
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.ok");
 		}
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:expedientPeticio",
-				"expedient.peticio.controller.acceptat.ok");
+
+		
+
 	}
 	
 	
@@ -685,9 +732,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	public String descarregarAnnex(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable Long annexId) throws IOException {
+			@PathVariable Long annexId,
+			@RequestParam boolean versioImprimible) throws IOException {
 		try{
-			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId);
+			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, versioImprimible);
 			writeFileToResponse(
 					fitxer.getNom(),
 					fitxer.getContingut(),
@@ -710,7 +758,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long annexId) throws Exception {
 		FitxerDto fitxer = null;
 		try {
-			fitxer = expedientPeticioService.getAnnexContent(annexId);
+			fitxer = expedientPeticioService.getAnnexContent(annexId, true);
 		} catch (Exception ex) {
 			throw new Exception(ex.getMessage());
 		}

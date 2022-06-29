@@ -287,7 +287,7 @@ public class ExpedientServiceBean implements ExpedientService {
 
 
 	@Override
-	public boolean retryCreateDocFromAnnex(
+	public Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
 			Long metaDocumentId, String rolActual) {
@@ -310,14 +310,14 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient) {
 		return delegate.incorporar(
 				entitatId, 
 				expedientId, 
 				expedientPeticioId,  
 				associarInteressats, 
 				rolActual, 
-				anexosIdsMetaDocsIdsMap);
+				anexosIdsMetaDocsIdsMap, agafarExpedient);
 		
 	}
 
@@ -448,5 +448,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
 			throws NotFoundException {
 		return delegate.esborrarExpedientFill(entitatId, expedientPareId, expedientId, rolActual);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
+		return delegate.retryMoverAnnexArxiu(registreAnnexId);
 	}
 }

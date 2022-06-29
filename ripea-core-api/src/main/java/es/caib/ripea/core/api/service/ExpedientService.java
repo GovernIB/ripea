@@ -400,7 +400,7 @@ public interface ExpedientService {
 	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean retryCreateDocFromAnnex(
+	Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
 			Long expedientPeticioId, 
 			Long metaDocumentId, String rolActual);
@@ -414,7 +414,7 @@ public interface ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap);
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient);
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.
@@ -556,5 +556,8 @@ public interface ExpedientService {
 			Long expedientPareId,
 			Long expedientId,
 			String rolActual) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	Exception retryMoverAnnexArxiu(Long registreAnnexId);
 
 }

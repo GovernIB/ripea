@@ -76,7 +76,6 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 			String telefon,
 			String observacions,
 			InteressatIdiomaEnumDto preferenciaIdioma,
-			Boolean notificacioAutoritzat,
 			Boolean entregaDeh,
 			Boolean entregaDehObligat,
 			Boolean incapacitat) {
@@ -94,7 +93,6 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 		this.telefon =  telefon;
 		this.observacions =  observacions;
 		this.preferenciaIdioma =  preferenciaIdioma;
-		this.notificacioAutoritzat =  notificacioAutoritzat;
 		this.entregaDeh = entregaDeh;
 		this.entregaDehObligat = entregaDehObligat;
 		this.incapacitat = incapacitat;
@@ -116,10 +114,9 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 	 * @param email	El correu electrònic de l'interessat.
 	 * @param telefon	El telèfon de l'interessat.
 	 * @param observacions	Camp per introduir observacions sobre l'interessat.
-	 * @param notificacioIdioma	Idioma en que l'interessat desitja rebre les notificacions.
-	 * @param notificacioAutoritzat	Camp per indicar si l'interessat ha autoritzat la recepció de notificacions en format electrònic.
 	 * @param expedient	Expedient on està vinculat l'interessat.
 	 * @param representant	Representant de l'interessat.
+	 * @param notificacioIdioma	Idioma en que l'interessat desitja rebre les notificacions.
 	 * @return
 	 */
 	public static Builder getBuilder(
@@ -137,7 +134,6 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 			String telefon,
 			String observacions,
 			InteressatIdiomaEnumDto preferenciaIdioma,
-			Boolean notificacioAutoritzat,
 			ExpedientEntity expedient,
 			InteressatEntity representant,
 			Boolean entregaDeh,
@@ -158,7 +154,6 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 				telefon,
 				observacions,
 				preferenciaIdioma,
-				notificacioAutoritzat,
 				expedient,
 				representant,
 				entregaDeh,
@@ -188,7 +183,6 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 				String telefon,
 				String observacions,
 				InteressatIdiomaEnumDto preferenciaIdioma,
-				Boolean notificacioAutoritzat,
 				ExpedientEntity expedient,
 				InteressatEntity representant,
 				Boolean entregaDeh,
@@ -209,7 +203,7 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 			built.telefon =  telefon;
 			built.observacions =  observacions;
 			built.preferenciaIdioma =  preferenciaIdioma;
-			built.notificacioAutoritzat =  notificacioAutoritzat;
+			built.notificacioAutoritzat = true;
 			built.expedient =  expedient;
 			built.representant =  representant;
 			built.esRepresentant = false;

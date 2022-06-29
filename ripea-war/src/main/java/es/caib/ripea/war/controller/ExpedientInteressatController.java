@@ -116,7 +116,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+
 		interessatCommand.setNotificacioAutoritzat(true);
 		interessatCommand.setIncapacitat(false);
 		
@@ -326,7 +326,6 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			break;
 		}
 		
-		representantDto.setNotificacioAutoritzat(true);
 		
 		String msgKey = "interessat.controller.representant.afegit.ok";
 		if (interessatCommand.getId() == null) {

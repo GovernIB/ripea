@@ -106,10 +106,7 @@ $(document).ready(function(){
 			$.get("<c:url value="/expedientPeticio/expedients/"/>"+${entitatId}+"/"+tipus)
 			.done(function(data){
 				for (var i = 0; i < data.length; i++) {
-					if ((data[i].agafat && data[i].agafatPer.codi === '${dadesUsuariActual.codi}') || ${isRolActualAdministrador} || ${isRolActualAdministradorOrgan})
-						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].numeroINom + '</option>');
-					else
-						$('#expedientId').append('<option value="' + data[i].id + '" disabled>' + data[i].numeroINom + '</option>');
+					$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].numeroINom + '</option>');
 				}
 				$('#expedientId').next().find('span.fa-circle-o-notch').addClass('select2-selection__arrow').removeClass('fa fa-spin fa-circle-o-notch  fa-1x');
 			})
@@ -229,6 +226,7 @@ $(document).ready(function(){
 			<rip:inputSelect name="expedientId"
 				textKey="expedient.peticio.form.acceptar.camp.expedient" required="true" 
 	 			optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="numeroINom" emptyOption="true" optionMinimumResultsForSearch="6"/> 
+	 		<rip:inputCheckbox name="agafarExpedient" textKey="expedient.peticio.form.acceptar.camp.agafarExpedient"/> 
 		</div>
 		<div id="input-accio-crear" class="hidden">
 			<rip:inputText name="newExpedientTitol" textKey="expedient.peticio.form.acceptar.camp.newExpedientTitol"
