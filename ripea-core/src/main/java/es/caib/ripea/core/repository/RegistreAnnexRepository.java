@@ -12,8 +12,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.api.dto.MassiuAnnexEstatProcessamentEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 
 
@@ -29,6 +29,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("id") Long id);
 	
 	
+	
 	@Query(	"select " +
 			"    a " +
 			"from " +
@@ -37,12 +38,12 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"    a.registre.entitat = :entitat " +
 			"and ep.expedient is not null " +
 			"and ep.expedient.esborrat = 0 " +
-			"and (a.document is null or a.error is not null) " +
+			"and (a.document is null) " +
+			"and (:esNullMetaExpedient = true or ep.expedient.metaExpedient = :metaExpedient) " +
 			"and (:esNullNom = true or lower(a.titol) like lower('%'||:nom||'%')) " +
 			"and (:esNullNumero = true or lower(a.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInici = true or ep.expedient.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) " +
-			"and (:esNullEstatProcessament = true or (:estatProcessament = 'PENDENT_CREAR_DB' and a.document is null or :estatProcessament = 'PENDENT_MOURE_ARXIU' and a.document is not null)) ")
+			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) ")
 	public Page<RegistreAnnexEntity> findPendentsProcesar(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullNom") boolean esNullNom,
@@ -53,8 +54,8 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
-			@Param("esNullEstatProcessament") boolean esNullEstatProcessament,
-			@Param("estatProcessament") String estatProcessament,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			Pageable pageable);
 	
 	
@@ -68,12 +69,12 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"    a.registre.entitat = :entitat " +
 			"and ep.expedient is not null " +
 			"and ep.expedient.esborrat = 0 " +
-			"and (a.document is null or a.error is not null) " +
+			"and (a.document is null) " +
+			"and (:esNullMetaExpedient = true or ep.expedient.metaExpedient = :metaExpedient) " +
 			"and (:esNullNom = true or lower(a.titol) like lower('%'||:nom||'%')) " +
 			"and (:esNullNumero = true or lower(a.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInici = true or ep.expedient.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) " +
-			"and a.document is not null ")
+			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) ")
 	public List<Long> findIdsPendentsProcesar(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullNom") boolean esNullNom,
@@ -83,7 +84,11 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") Date dataFi,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+	
+
 	
 	
 

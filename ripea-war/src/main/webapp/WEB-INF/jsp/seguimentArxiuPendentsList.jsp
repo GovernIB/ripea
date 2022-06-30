@@ -285,9 +285,20 @@ $(document).ready(function() {
 						<th data-col-name="expedientId" data-visible="false"></th>
 						<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.document"/></th>
-						<th data-col-name="expedientNumeroNom"><spring:message code="seguiment.list.columna.expedient"/></th>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+						<script id="cellExpedientLink" type="text/x-jsrender">
+							<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
+						</script>
+						</th>
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
+						<!--<th data-col-name="annex" data-orderable="false" data-template="#cellAnnex" width="1%">
+							<spring:message code="seguiment.list.columna.annex"/>
+							<script id="cellAnnex" type="text/x-jsrender">
+								{{if annex}}<span class="fa fa-check"></span>{{/if}}
+							</script>
+						</th>-->
+						<th data-col-name="annex" data-visible="false"></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsDocumentsTemplate" width="10%">
 							<script id="cellAccionsDocumentsTemplate" type="text/x-jsrender">
 								{{if !expedientArxiuPropagat}}
@@ -295,7 +306,9 @@ $(document).ready(function() {
 								{{else}}
 									<a href="<c:url value="/contingut/{{:expedientId}}/document/{{:id}}/guardarDocumentArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
 								{{/if}}
-								
+								{{if annex}}
+									<div id="annex" style="display: none;">
+								{{/if}}
 							</script>
 						</th>
 					</tr>

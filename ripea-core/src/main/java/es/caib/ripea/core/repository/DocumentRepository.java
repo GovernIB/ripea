@@ -348,15 +348,14 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 //			@Param("entitat") EntitatEntity entitat,
 //			Pageable pageable);
 	
-	
-	
+
 	@Query(	"select " +
 			"    d " +
 			"from " +
-			"    DocumentEntity d " +
+			"    DocumentEntity d inner join d.contingut c left join d.annexos a " +
 			"where " +
 			"    d.entitat = :entitat " +
-			"and d.arxiuUuid = null " +
+			"and (d.arxiuUuid = null or a.error is not null)" +
 			"and d.esborrat = 0 " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +

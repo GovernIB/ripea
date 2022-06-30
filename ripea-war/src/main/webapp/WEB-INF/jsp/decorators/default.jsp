@@ -310,7 +310,7 @@ body {
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
-								<li><a href="<c:url value="/contingut/orfes/delete"/>"><spring:message code="decorator.menu.config.delete.orfes"/></a></li>
+								 <!--<li><a href="<c:url value="/contingut/orfes/delete"/>"><spring:message code="decorator.menu.config.delete.orfes"/></a></li>-->
 							</ul>
 						</div>
 						

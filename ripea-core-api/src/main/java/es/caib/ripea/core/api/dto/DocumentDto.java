@@ -67,6 +67,7 @@ public class DocumentDto extends NodeDto {
 	private String pinbalIdpeticion;
 	
 	private boolean pendentMoverArxiu;
+	private Long annexId;
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {

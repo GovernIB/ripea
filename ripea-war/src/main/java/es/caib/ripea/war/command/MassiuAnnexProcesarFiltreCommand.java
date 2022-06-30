@@ -7,8 +7,8 @@ import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
 import es.caib.ripea.core.api.dto.MassiuAnnexEstatProcessamentEnumDto;
+import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
 
@@ -19,7 +19,7 @@ public class MassiuAnnexProcesarFiltreCommand {
 	private Date dataInici;
 	private Date dataFi;	
 	private MassiuAnnexEstatProcessamentEnumDto estatProcessament;
-	
+	private Long metaExpedientId;
 	
 	
 	public static MassiuAnnexProcesarFiltreCommand asCommand(MassiuAnnexProcesarFiltreDto dto) {
@@ -71,6 +71,11 @@ public class MassiuAnnexProcesarFiltreCommand {
 	public void setEstatProcessament(MassiuAnnexEstatProcessamentEnumDto estatProcessament) {
 		this.estatProcessament = estatProcessament;
 	}
-	
+	public Long getMetaExpedientId() {
+		return metaExpedientId;
+	}
+	public void setMetaExpedientId(Long metaExpedientId) {
+		this.metaExpedientId = metaExpedientId;
+	}
 	
 }

@@ -259,7 +259,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		Exception exception = expedientService.retryCreateDocFromAnnex(
 				command.getId(),
-				expedientPeticioId, 
 				command.getMetaDocumentId(), 
 				RolHelper.getRolActual(request));
 		if (exception == null) {
