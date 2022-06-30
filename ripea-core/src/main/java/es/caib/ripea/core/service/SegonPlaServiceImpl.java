@@ -3,15 +3,27 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
+import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
+import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.EventTipusEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.service.SegonPlaService;
+import es.caib.ripea.core.config.PropertiesConstants;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
+import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.ExpedientPeticioRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -22,34 +34,13 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
-import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
-import es.caib.distribucio.ws.backofficeintegracio.Estat;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.EventTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.core.api.service.SegonPlaService;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DistribucioHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.ExpedientHelper;
-import es.caib.ripea.core.helper.ExpedientInteressatHelper;
-import es.caib.ripea.core.helper.ExpedientPeticioHelper;
-import es.caib.ripea.core.helper.TestHelper;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.InteressatRepository;
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -89,8 +80,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private DistribucioHelper distribucioHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
-	
-	
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
+
+
 	private static final String PREFIX_RIPEA = "[RIPEA]";
 
 	/*
@@ -366,7 +361,34 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
 		}
 	}
-	
+
+    @Override
+	@Transactional
+    public void actualitzarProcediments() {
+
+		logger.debug("Execució tasca periòdica: Actualitzar procedimetns");
+
+		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)	// Tasca en segon pla no configurada
+			return;
+		List<EntitatDto> entitats = conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
+		for(EntitatDto entitat: entitats) {
+			metaExpedientHelper.actualitzarProcediments(entitat, "ca");
+		}
+    }
+
+	@Override
+	@Transactional
+	public void consultaCanvisOrganigrama() {
+		logger.debug("Execució tasca periòdica: Actualitzar procedimetns");
+
+		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)	// Tasca en segon pla no configurada
+			return;
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+		for(EntitatEntity entitat: entitats) {
+			organGestorHelper.consultaCanvisOrganigrama(entitat);
+		}
+	}
+
 	private int getArxiuMaxReintentsExpedients() {
 		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
 		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;

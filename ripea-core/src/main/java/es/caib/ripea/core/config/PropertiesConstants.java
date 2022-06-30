@@ -20,4 +20,9 @@ public class PropertiesConstants {
     // 6. Guardar en arxiu interessats
     public static final String GUARDAR_ARXIU_INTERESSATS = "es.caib.ripea.segonpla.guardar.arxiu.interessats";
 
+    // 7. Actualitzar procediments
+    public static final String ACTUALITZAR_PROCEDIMENTS = "es.caib.ripea.procediment.actualitzar.cron";
+
+    // 8. Consulta de canvis en l'organigrama
+    public static final String CONSULTA_CANVIS_ORGANIGRAMA = "es.caib.ripea.organs.consulta.canvis";
 }

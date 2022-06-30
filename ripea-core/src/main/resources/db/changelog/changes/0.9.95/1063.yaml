@@ -1,11 +1,11 @@
 databaseChangeLog:
   - property:
-      name: booleanUnit
-      value: 1
+      name: booleanFalse
+      value: 0
       dbms: oracle
   - property:
-      name: booleanUnit
-      value: true
+      name: booleanFalse
+      value: false
       dbms: postgresql
   - property:
       name: varcharUnit
@@ -42,6 +42,20 @@ databaseChangeLog:
                   name: estat
                   type: varchar(1 ${varcharUnit})
                   defaultValue: 'V'
+        - addColumn:
+            tableName: ipa_avis
+            columns:
+              - column:
+                  name: avis_admin
+                  type: BOOLEAN
+                  defaultValue: ${booleanFalse}
+        - addColumn:
+            tableName: ipa_avis
+            columns:
+              - column:
+                  name: entitat_id
+                  type: BIGINT
+                  defaultValue: ${booleanFalse}
         - createTable:
             tableName: ipa_og_sinc_rel
             columns:
@@ -71,6 +85,54 @@ databaseChangeLog:
             tableName: ipa_og_sinc_rel
             constraintName: ipa_uo_sinc_rel_mult_uk
             columnNames: antic_og, nou_og
+        - insert:
+            tableName: pbl_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.procediment.actualitzar.cron
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Cron per a la actualització de procediments
+              - column:
+                  name: group_code
+                  value: SCHEDULLED
+              - column:
+                  name: position
+                  value: 6
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: TEXT
+        - insert:
+            tableName: pbl_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.organs.consulta.canvis
+              - column:
+                  name: value
+                  value:
+              - column:
+                  name: description
+                  value: Cron per a la consulta de canvis a l'organigrama
+              - column:
+                  name: group_code
+                  value: SCHEDULLED
+              - column:
+                  name: position
+                  value: 7
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: TEXT
         - sql:
             dbms: oracle
             sql: grant select, update, insert, delete on ipa_og_sinc_rel to www_ripea;

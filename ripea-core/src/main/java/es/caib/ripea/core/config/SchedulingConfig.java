@@ -199,5 +199,51 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }                
         );
 
+        // 7. Actualització automàtica de procediments (MetaExpedients)
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        segonPlaService.actualitzarProcediments();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        String cron = configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS);
+                        if (cron == null)
+                            cron = "0 15 * * * *";
+                        CronTrigger trigger = new CronTrigger(cron);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+
+        // 8. Consulta de canvis en l'organigrama
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        segonPlaService.consultaCanvisOrganigrama();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        String cron = configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA);
+                        if (cron == null)
+                            cron = "0 45 2 * * *";
+                        CronTrigger trigger = new CronTrigger(cron);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+
     }
 }

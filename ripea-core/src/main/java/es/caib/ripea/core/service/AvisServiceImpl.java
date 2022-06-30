@@ -3,17 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.commons.lang3.time.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.AvisDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -22,6 +11,16 @@ import es.caib.ripea.core.entity.AvisEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.repository.AvisRepository;
+import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Implementació del servei de gestió d'avisos.
@@ -50,7 +49,9 @@ public class AvisServiceImpl implements AvisService {
 				avis.getMissatge(),
 				avis.getDataInici(),
 				avis.getDataFinal(),
-				avis.getAvisNivell()).build();
+				avis.getAvisNivell(),
+				avis.getAvisAdministrador(),
+				avis.getEntitatId()).build();
 		return conversioTipusHelper.convertir(
 				avisRepository.save(entity),
 				AvisDto.class);
@@ -149,6 +150,13 @@ public class AvisServiceImpl implements AvisService {
 	public List<AvisDto> findActive() {
 		return conversioTipusHelper.convertirList(
 				avisRepository.findActive(DateUtils.truncate(new Date(), Calendar.DATE)), 
+				AvisDto.class);
+	}
+
+	@Override
+	public List<AvisDto> findActiveAdmin(Long entitatId) {
+		return conversioTipusHelper.convertirList(
+				avisRepository.findActiveAdmin(DateUtils.truncate(new Date(), Calendar.DATE), entitatId),
 				AvisDto.class);
 	}
 

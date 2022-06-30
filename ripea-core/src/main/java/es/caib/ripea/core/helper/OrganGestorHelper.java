@@ -1,19 +1,7 @@
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
+import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
+import es.caib.ripea.core.entity.AvisEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientOrganPareEntity;
@@ -21,9 +9,25 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.repository.AvisRepository;
 import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class OrganGestorHelper {
@@ -35,7 +39,13 @@ public class OrganGestorHelper {
 	@Autowired
 	private ExpedientOrganPareRepository expedientOrganPareRepository;
 	@Autowired
+	private AvisRepository avisRepository;
+	@Autowired
 	private PermisosHelper permisosHelper;
+	@Autowired
+	private PluginHelper pluginHelper;
+
+	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
 	public List<OrganGestorEntity> findAmbEntitatPermis(
 			EntitatEntity entitat,
@@ -251,7 +261,38 @@ public class OrganGestorHelper {
 		}
 		return pares;
 	}
-	
+
+	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
+
+		Date ara = new Date();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(ara);
+		calendar.add(Calendar.YEAR, 1);
+
+		List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+				entitat.getUnitatArrel(),
+				entitat.getDataActualitzacio(),
+				entitat.getDataSincronitzacio());
+
+		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
+		if (avisosSinc != null && !avisosSinc.isEmpty()) {
+			avisRepository.delete(avisosSinc);
+		}
+
+		if (unitatsWs != null && !unitatsWs.isEmpty()) {
+			AvisEntity avis = AvisEntity.getBuilder(
+					ORGAN_NO_SYNC,
+					"Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.",
+					ara,
+					calendar.getTime(),
+					AvisNivellEnumDto.ERROR,
+					true,
+					entitat.getId()).build();
+			avisRepository.save(avis);
+		}
+
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
 }

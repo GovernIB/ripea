@@ -14,4 +14,7 @@ public interface SegonPlaService {
 
 	void guardarInteressatsArxiu();
 
+	void actualitzarProcediments();
+
+	void consultaCanvisOrganigrama();
 }

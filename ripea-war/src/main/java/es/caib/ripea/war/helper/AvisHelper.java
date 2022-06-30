@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.war.helper;
 
-import java.util.List;
+import es.caib.ripea.core.api.dto.AvisDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.service.AvisService;
 
 import javax.servlet.http.HttpServletRequest;
-
-import es.caib.ripea.core.api.dto.AvisDto;
-import es.caib.ripea.core.api.service.AvisService;
+import java.util.List;
 
 /**
  * Utilitat per obtenir els avisos de sessió..
@@ -26,8 +26,14 @@ public class AvisHelper {
 			AvisService avisService) {
 		
 		List<AvisDto> avisos = (List<AvisDto>) request.getAttribute(REQUEST_PARAMETER_AVISOS);
-		if (avisos == null && !RequestHelper.isError(request) && avisService != null) {
-			avisos = avisService.findActive();
+		boolean canviRol = request.getParameter(RolHelper.getRequestParameterCanviRol()) != null;
+		if ((avisos == null && !RequestHelper.isError(request) && avisService != null) || canviRol) {
+			if (RolHelper.isRolActualAdministrador(request)) {
+				EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+				avisos = avisService.findActiveAdmin(entitatActual.getId());
+			}
+			else
+				avisos = avisService.findActive();
 			request.setAttribute(REQUEST_PARAMETER_AVISOS, avisos);
 		}
 	}

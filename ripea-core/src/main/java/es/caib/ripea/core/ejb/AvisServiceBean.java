@@ -3,19 +3,17 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.ripea.core.api.dto.AvisDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.AvisService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de AvisService com a EJB que empra una clase
@@ -71,5 +69,11 @@ public class AvisServiceBean implements AvisService {
 	public List<AvisDto> findActive() {
 		return delegate.findActive();
 	}
+
+    @Override
+	@RolesAllowed("tothom")
+    public List<AvisDto> findActiveAdmin(Long entitatId) {
+        return delegate.findActiveAdmin(entitatId);
+    }
 
 }

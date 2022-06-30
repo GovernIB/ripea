@@ -4,6 +4,7 @@ import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.entity.AvisEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -11,6 +12,7 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.repository.AvisRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
@@ -51,6 +53,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private AvisRepository avisRepository;
 	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
@@ -277,6 +281,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
 		cacheHelper.evictAllOrganismesEntitatAmbPermis();
+
+		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, OrganGestorHelper.ORGAN_NO_SYNC);
+		if (avisosSinc != null && !avisosSinc.isEmpty()) {
+			avisRepository.delete(avisosSinc);
+		}
+
 		return true;
 	}
 

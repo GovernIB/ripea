@@ -3,7 +3,10 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.Date;
+import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
+import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,11 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
-import es.caib.ripea.core.audit.RipeaAuditable;
+import java.util.Date;
 
 /**
  * Classe del model de dades que representa una alerta d'error en segón pla.
@@ -26,6 +25,7 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  */
 @Entity
 @Table(	name = "ipa_avis")
+@Getter
 @EntityListeners(AuditingEntityListener.class)
 public class AvisEntity extends RipeaAuditable<Long> {
 	
@@ -44,6 +44,10 @@ public class AvisEntity extends RipeaAuditable<Long> {
 	@Column(name = "avis_nivell", length = 2048, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private AvisNivellEnumDto avisNivell;
+	@Column(name = "avis_admin", nullable = false)
+	private Boolean avisAdministrador;
+	@Column(name = "entitat_id")
+	private Long entitatId;
 	
 	
 	public void update(
@@ -70,13 +74,17 @@ public class AvisEntity extends RipeaAuditable<Long> {
 			String missatge,
 			Date dataInici,
 			Date dataFinal,
-			AvisNivellEnumDto avisNivell) {
+			AvisNivellEnumDto avisNivell,
+			Boolean avisAdministrador,
+			Long entitatId) {
 		return new Builder(
 				assumpte,
 				missatge,
 				dataInici,
 				dataFinal,
-				avisNivell);
+				avisNivell,
+				avisAdministrador,
+				entitatId);
 	}
 
 
@@ -87,7 +95,9 @@ public class AvisEntity extends RipeaAuditable<Long> {
 				String missatge,
 				Date dataInici,
 				Date dataFinal,
-				AvisNivellEnumDto avisNivell) {
+				AvisNivellEnumDto avisNivell,
+				Boolean avisAdministrador,
+				Long entitatId) {
 			built = new AvisEntity();
 			built.assumpte = assumpte;
 			built.missatge = missatge;
@@ -95,36 +105,14 @@ public class AvisEntity extends RipeaAuditable<Long> {
 			built.dataFinal = dataFinal;
 			built.actiu = true;
 			built.avisNivell = avisNivell;
+			built.avisAdministrador = avisAdministrador != null ? avisAdministrador : false;
+			built.entitatId = entitatId;
 		}
 		public AvisEntity build() {
 			return built;
 		}
 	}
 	
-
-	public String getAssumpte() {
-		return assumpte;
-	}
-
-	public String getMissatge() {
-		return missatge;
-	}
-
-	public Date getDataInici() {
-		return dataInici;
-	}
-
-	public Date getDataFinal() {
-		return dataFinal;
-	}
-
-	public Boolean getActiu() {
-		return actiu;
-	}
-
-	public AvisNivellEnumDto getAvisNivell() {
-		return avisNivell;
-	}
 
 	private static final long serialVersionUID = -2299453443943600172L;
 	

@@ -3,14 +3,13 @@
  */
 package es.caib.ripea.core.ejb;
 
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
+import es.caib.ripea.core.api.service.SegonPlaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.service.SegonPlaService;
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 
 /**
  * Implementació de SegonPlaService com a EJB que empra una clase
@@ -60,5 +59,15 @@ public class SegonPlaServiceBean implements SegonPlaService {
 	public void guardarInteressatsArxiu() {
 		delegate.guardarInteressatsArxiu();
 	}
+
+    @Override
+    public void actualitzarProcediments() {
+        delegate.actualitzarProcediments();
+    }
+
+    @Override
+    public void consultaCanvisOrganigrama() {
+        delegate.consultaCanvisOrganigrama();
+    }
 
 }

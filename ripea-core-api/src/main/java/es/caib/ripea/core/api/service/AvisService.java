@@ -3,13 +3,12 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.AvisDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió d'avisos.
@@ -38,6 +37,9 @@ public interface AvisService {
 
 	@PreAuthorize("hasRole('tothom')")
 	List<AvisDto> findActive();
+
+	@PreAuthorize("hasRole('tothom')")
+	List<AvisDto> findActiveAdmin(Long entitatId);
 
 
 }

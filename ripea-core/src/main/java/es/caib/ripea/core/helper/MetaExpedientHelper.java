@@ -9,6 +9,7 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.entity.*;
 import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
 import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.AvisRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -32,6 +33,8 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +72,8 @@ public class MetaExpedientHelper {
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
 	private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired
+	private AvisRepository avisRepository;
     @Autowired
     private EmailHelper emailHelper;
 	@Autowired
@@ -79,7 +84,9 @@ public class MetaExpedientHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
-    
+
+	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
+
 	public synchronized long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
@@ -651,6 +658,8 @@ public class MetaExpedientHelper {
 		progres = new ProgresActualitzacioDto();
 		progresActualitzacio.put(entitatDto.getCodi(), progres);
 
+		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
+
 		try {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatDto.getId());
@@ -730,6 +739,8 @@ public class MetaExpedientHelper {
 								"El &#243;rgano gestor no existe en RIPEA. Realice una sincronizaci&#243;n de &#243;rganos, y si a&#250;n no se encuentra el &#243;rgano, compruebe que est&#225; correctamente configurado en ROLSAC." :
 								"L&#39;&#242;rgan gestor no existeix a RIPEA. Realitzi una sincronitzaci&#243; d&#39;&#242;rgans, i si tot i aix&#237; encara no es troba l&#39;&#242;rgan, comprovi que est&#224; correctament configurat a ROLSAC.");
 						fallat++;
+
+						avisosProcedimentsOrgans.put(nom, new String[] {organGestor.getCodi() + " - " + organGestor.getNom(), procedimentGga.getUnitatOrganitzativaCodi()});
 					}
 				}
 
@@ -747,6 +758,9 @@ public class MetaExpedientHelper {
 			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
 
 			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
+
+			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
+
 		} catch (Exception e) {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
@@ -758,12 +772,34 @@ public class MetaExpedientHelper {
 			throw e;
 		}
 	}
-	
 
-		
+	private void actualitzaAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {
+		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, PROCEDIMENT_ORGAN_NO_SYNC);
+		if (avisosSinc != null && !avisosSinc.isEmpty()) {
+			avisRepository.delete(avisosSinc);
+		}
+		if (!avisosProcedimentsOrgans.isEmpty()) {
+			String missatgeAvis = "";
+			for(Map.Entry<String, String[]> avisProc: avisosProcedimentsOrgans.entrySet()) {
+				missatgeAvis += " - Procediment '" + avisProc.getKey() + "': actualment a l'òrgan " + avisProc.getValue()[0] + ", i hauria de pertànyer a l'òrgan " + avisProc.getValue()[1] + " </br>";
+			}
+			missatgeAvis += "Realitzi una actualizació d'òrgans per a resoldre aquesta situació, o revisi la configuració dels procediments al repositori de procediments";
+			Date ara = new Date();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(ara);
+			calendar.add(Calendar.YEAR, 1);
+			AvisEntity avis = AvisEntity.getBuilder(
+					PROCEDIMENT_ORGAN_NO_SYNC,
+					missatgeAvis,
+					ara,
+					calendar.getTime(),
+					AvisNivellEnumDto.ERROR,
+					true,
+					entitatId).build();
+			avisRepository.save(avis);
+		}
+	}
 
-	
-	
 
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());
