@@ -144,7 +144,7 @@ public class ConfigHelper {
 
     
 	@Transactional(readOnly = true)
-	public String getEntitatActualCodi() {
+	public static String getEntitatActualCodi() {
 		EntitatDto entitatActual = ConfigHelper.entitat.get();
 		if (entitatActual != null) {
 			return entitatActual.getCodi();

@@ -1307,9 +1307,13 @@ public class DocumentServiceImpl implements DocumentService {
 				id,
 				true,
 				false);
-		return pluginHelper.conversioConvertirPdf(
-				documentHelper.getFitxerAssociat(document, null),
-				null);
+        if (!document.isFirmat()) {
+            return pluginHelper.conversioConvertirPdf(
+                    documentHelper.getFitxerAssociat(document, null),
+                    null);
+        } else {
+            return documentHelper.getFitxerAssociat(document, null);
+        }
 	}
 
 	@Transactional

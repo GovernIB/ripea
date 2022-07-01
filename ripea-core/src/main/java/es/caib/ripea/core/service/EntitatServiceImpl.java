@@ -152,10 +152,13 @@ public class EntitatServiceImpl implements EntitatService {
 				false,
 				false,
 				false, false, false);
+		configHelper.deleteConfigEntitat(entitat.getCodi());
+		
 		entitatRepository.delete(entitat);
 		permisosHelper.deleteAcl(
 				entitat.getId(),
 				EntitatEntity.class);
+		
 		return conversioTipusHelper.convertir(
 				entitat,
 				EntitatDto.class);

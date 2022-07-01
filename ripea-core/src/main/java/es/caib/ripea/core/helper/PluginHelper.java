@@ -5305,7 +5305,7 @@ public class PluginHelper {
 		return dadesUsuariPlugin;
 	}
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5339,7 +5339,7 @@ public class PluginHelper {
 	
 	
 	public IArxiuPlugin getArxiuPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5374,7 +5374,7 @@ public class PluginHelper {
 
 	
 	private PortafirmesPlugin getPortafirmesPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5407,7 +5407,7 @@ public class PluginHelper {
 	}
 	
 	private ConversioPlugin getConversioPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5439,7 +5439,7 @@ public class PluginHelper {
 		return conversioPlugin;
 	}
 	private DigitalitzacioPlugin getDigitalitzacioPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5542,7 +5542,7 @@ public class PluginHelper {
 	}
 
 	private DadesExternesPlugin getDadesExternesPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5574,7 +5574,7 @@ public class PluginHelper {
 		return dadesExternesPlugin;
 	}
 	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5604,7 +5604,7 @@ public class PluginHelper {
 		return validaSignaturaPlugin;
 	}
 	private NotificacioPlugin getNotificacioPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5637,7 +5637,7 @@ public class PluginHelper {
 	}
 	
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5669,7 +5669,7 @@ public class PluginHelper {
 		return firmaServidorPlugin;
 	}
 	private ViaFirmaPlugin getViaFirmaPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5706,7 +5706,7 @@ public class PluginHelper {
 	
 	
 	private ProcedimentPlugin getProcedimentPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -5739,7 +5739,7 @@ public class PluginHelper {
 	}
 
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
-		String entitatActualCodi = configHelper.getEntitatActualCodi();
+		String entitatActualCodi = ConfigHelper.getEntitatActualCodi();
 		if (entitatActualCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}

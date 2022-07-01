@@ -562,9 +562,11 @@ public class DocumentHelper {
 					fitxer.setContentType(document.getFitxerContentType());
 				} else {
 					
+                    String fitxerNom = document.getFitxerNom();
+                    String fitxerFirmatNom = document.getNomFitxerFirmat();
 					fitxer = new FitxerDto();
-					fitxer.setContentType(document.getFitxerContentType());
-					fitxer.setNom(document.getFitxerNom());
+	                fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
+	                fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
 					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 							document,
 							null,
@@ -769,7 +771,7 @@ public class DocumentHelper {
 	public Exception guardarDocumentArxiu(
 			Long docId) {
 		
-		logger.info("Guardar document arxiu (id=" + docId + ")");
+		logger.info("Guardar document arxiu (id=" + docId + ", entitatCodi=" + ConfigHelper.getEntitatActualCodi() + ")");
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);

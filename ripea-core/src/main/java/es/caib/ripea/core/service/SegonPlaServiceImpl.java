@@ -3,6 +3,28 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
 import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
 import es.caib.distribucio.ws.backofficeintegracio.Estat;
@@ -17,6 +39,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -32,23 +55,6 @@ import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -320,6 +326,44 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	
+//	@Override
+//	@Transactional
+//	public void guardarExpedientsDocumentsArxiu() {
+//		
+//		logger.debug("Execució tasca periòdica: Guardar expedients i documents en arxiu");
+//		
+//		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
+//		int arxiuMaxReintentsDocuments = getArxiuMaxReintentsDocuments();
+//		
+//		List<ContingutEntity> pendents = contingutRepository.findContingutsPendentsArxiu(
+//				arxiuMaxReintentsExpedients,
+//				arxiuMaxReintentsDocuments);
+//		
+//		
+//		for (ContingutEntity contingut : pendents) {
+//			EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class); 
+//
+//			if (contingut instanceof ExpedientEntity) {
+////				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
+////					ConfigHelper.setEntitat(entitat);
+////					expedientHelper.guardarExpedientArxiu(contingut.getId());
+////				}
+//				
+////			} else if (contingut instanceof DocumentEntity) {
+////				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
+////					ConfigHelper.setEntitat(entitat);
+////					documentHelper.guardarDocumentArxiu(contingut.getId());
+////				}
+//			}
+//		}
+//		
+//		
+//		System.out.println();
+//		
+//		
+//	}
+	
+	
 	
 	
 	@Override
@@ -335,31 +379,39 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				arxiuMaxReintentsExpedients,
 				arxiuMaxReintentsDocuments);
 		
+		
+        ExecutorService executor = Executors.newFixedThreadPool(1);
 		for (ContingutEntity contingut : pendents) {
 			final EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class); 
-			
+
 			if (contingut instanceof ExpedientEntity) {
-//				expedientHelper.guardarExpedientArxiu(contingut.getId());
 				final Long id = contingut.getId();
 				Thread t = new Thread(new Runnable() {
 					public void run() {
-						ConfigHelper.setEntitat(entitat);
 						synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+							ConfigHelper.setEntitat(entitat);
 							expedientHelper.guardarExpedientArxiu(id);
 						}
 					}
 				});
-				t.start();
+				executor.execute(t);
 				
-				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
-					expedientHelper.guardarExpedientArxiu(contingut.getId());
-				}
 			} else if (contingut instanceof DocumentEntity) {
 				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
 					documentHelper.guardarDocumentArxiu(contingut.getId());
 				}
 			}
 		}
+		
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        	try {
+        		executor.awaitTermination(100, TimeUnit.MILLISECONDS);
+        	} catch (InterruptedException e) {}
+        }
+		
+		System.out.println();
+		
 	}
 	
 	

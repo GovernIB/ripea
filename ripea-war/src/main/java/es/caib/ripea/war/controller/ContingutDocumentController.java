@@ -419,6 +419,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
 				}
 			}
+			
+            FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+                    request,
+                    command,
+                    model);
+			
+			
 		} else {
 			omplirModelFormulari(
 					request,
