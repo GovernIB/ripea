@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -66,7 +65,6 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
@@ -577,6 +575,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientCreatedDate", new String[] {"ep.expedient.createdDate"});
 		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
+		}
+		
 		if (resultEnum == ResultEnumDto.PAGE) {
 			Page<RegistreAnnexEntity> pagina = registreAnnexRepository.findPendentsProcesar(
 					entitat,
@@ -588,8 +591,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					dataInici,
 					dataFi == null,
 					dataFi,
-					filtre.getEstatProcessament() == null,
-					filtre.getEstatProcessament() != null ? filtre.getEstatProcessament().toString() : null,
+					metaExpedient == null,
+					metaExpedient,
 					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			PaginaDto<RegistreAnnexDto> paginaDto = paginacioHelper.toPaginaDto(
 					pagina,
@@ -607,7 +610,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					dataInici == null,
 					dataInici,
 					dataFi == null,
-					dataFi);
+					dataFi,
+					metaExpedient == null,
+					metaExpedient);
 			
 			result.setIds(documentsIds);
 		}

@@ -16,7 +16,9 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -133,6 +135,10 @@ public class DocumentEntity extends NodeEntity {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
+	
+	@OneToOne
+	@JoinColumn(name = "id")
+	private ContingutEntity contingut;
 	
 	@Transient
 	protected boolean ambNotificacions;

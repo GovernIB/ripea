@@ -402,8 +402,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
-			Long expedientPeticioId, 
-			Long metaDocumentId, String rolActual);
+			Long metaDocumentId, 
+			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean retryNotificarDistribucio(Long expedientPeticioId);

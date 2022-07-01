@@ -62,6 +62,7 @@ import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
@@ -545,6 +546,24 @@ public class ExpedientHelper {
 			
 			//	Recuperar tipus document per defecte
 			MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
+			
+			
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+					expedientEntity,
+					metaDocument,
+					0);
+			if (documents.size() > 0 && (metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_1) || metaDocument.getMultiplicitat().equals(MultiplicitatEnumDto.M_0_1))) {
+				throw new ValidationException(
+						"<creacio>",
+						ExpedientEntity.class,
+						"La multiplicitat del meta-document no permet crear nous documents a dins l'expedient (" +
+						"metaExpedientId=" + expedientEntity.getMetaExpedient().getId() + ", " +
+						"metaDocumentId=" + metaDocumentId + ", " +
+						"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
+						"expedientId=" + expedientEntity.getId() + ")");
+			}
+			
+			
 		
 			DocumentEntity docEntity = documentHelper.crearDocumentDB(
 					documentDto.getDocumentTipus(),

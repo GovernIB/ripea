@@ -118,6 +118,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 
@@ -193,7 +194,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private GrupRepository grupRepository;
 	@Autowired
 	private DistribucioHelper distribucioHelper;
-
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -417,20 +419,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 	@Transactional
 	@Override
-	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long expedientPeticioId, Long metaDocumentId, String rolActual) {
+	public Exception retryCreateDocFromAnnex(Long registreAnnexId, Long metaDocumentId, String rolActual) {
 
 //		boolean processatOk = true;
 		Exception exception;
 		boolean creatDbOk = true;
+
+		
 		if (!locks.containsKey(registreAnnexId))
 			locks.put(registreAnnexId, new Object());
 		synchronized (locks.get(registreAnnexId)) {
 
 			try {
-				ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+				RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
+				ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
 				if (expedientPeticioEntity.getExpedient() == null) {
 					throw new RuntimeException("Anotació pendent amb id: " + expedientPeticioEntity.getId() + " no té expedient associat en la base de dades.");
 				}
+
 				exception = expedientHelper.crearDocFromAnnex(expedientPeticioEntity.getExpedient().getId(), registreAnnexId, expedientPeticioEntity.getId(), metaDocumentId, rolActual);
 			} catch (Exception e) {
 				exception = e;
@@ -440,7 +446,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			
 	
-			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
+			ExpedientPeticioEntity expedientPeticioEntity = registreAnnexEntity.getRegistre().getExpedientPeticions().get(0);
 			
 			boolean allOk = true;
 			for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
@@ -449,7 +456,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				}
 			}
 			if (allOk) {
-				notificarICanviEstatToProcessatNotificat(expedientPeticioId);
+				notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
 			}
 		}
 		

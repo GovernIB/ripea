@@ -71,20 +71,48 @@ $(document).ready(function() {
 			return false;
 		});
 
-	    $("#processar").on('click', function(data){  	
-		  	$("#taulaDiv").html("<div style='text-align: center; margin-bottom: 60px; margin-top: 60px;''><span class='fa fa-circle-o-notch fa-spin fa-3x'/></div>");
-	    });
 
 		
 	});
 
 
+	$('#taula').on('draw.dt', function () {
 
+		var metaExpedientId = $('#metaExpedientId').val();
+		$('thead tr th:nth-child(1)', $('#taula')).each(function() {
+			enableDisableSelection($(this), metaExpedientId);
+		});
+		$('tbody tr td:nth-child(1)', $('#taula')).each(function() {
+			enableDisableSelection($(this), metaExpedientId);
+		});
 
+	});	
 
+							
+
+});
 
 	
-});
+function enableDisableSelection($this, tipus) {
+    if (tipus != undefined && tipus != "") {
+    	$this.removeClass('selection-disabled');
+    	$('thead tr:nth-child(1) th:nth-child(1)').removeClass('selection-disabled');
+    	$('.botons .btn-group button').removeAttr('disabled');
+    } else {
+    	$this.addClass('selection-disabled');
+    	$('thead tr:nth-child(1) th:nth-child(1)').addClass('selection-disabled');
+		$.get(
+				"deselect",
+				function(data) {
+					$("#seleccioCount").html(data);
+					$('#taula').webutilDatatable('select-none');
+				}
+			);
+		$('.botons .btn-group button').attr('disabled','disabled');
+	}
+}
+
+
 
 </script>
 
@@ -106,13 +134,10 @@ $(document).ready(function() {
 				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
 			</div>
 			
-			<div class="col-md-4">
-				<rip:inputSelect 
-						name="estatProcessament" 
-						optionEnum="MassiuAnnexEstatProcessamentEnumDto" 
-						emptyOption="true" 
-						placeholderKey="massiu.list.filtre.camp.annex.estat.processament" inline="true"/>
-			</div>
+			<div class="col-md-4">					
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
+			</div>		
+						
 			
 		</div>
 		<div class="row">
@@ -128,11 +153,12 @@ $(document).ready(function() {
 
 	<script id="botonsTemplate" type="text/x-jsrender">
 		<div class="btn-group pull-right">
-			<a id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
-			<a id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			<a id="processar" class="btn btn-default" href="./procesarAnnexosPendents/procesarAnnexosPendents" >
-				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="massiu.list.boto.moureArxiu"/>
-			</a>
+			<button id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></button>
+			<button id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
+
+			<button id="processar" class="btn btn-default" href="./procesarAnnexosPendents/adjuntarExpedient" data-toggle="modal" data-refresh-pagina="true">
+				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="massiu.list.column.btn.crear.db"/>
+			</button>
 
 		</div>
 	</script>
@@ -141,14 +167,14 @@ $(document).ready(function() {
 			data-toggle="datatable" 
 			data-url="<c:url value="/massiu/procesarAnnexosPendents/datatable"/>"
 			class="table table-bordered table-striped" 
-			data-default-order="6" 
+			data-default-order="5" 
 			data-default-dir="desc"
 			data-botons-template="#botonsTemplate"
 			data-selection-enabled="true"
 			style="width:100%">
+
 			<thead>
 				<tr>
-					<th data-col-name="rowSelectable" data-visible="false"></th>
 					<th data-col-name="expedientId" data-visible="false"></th>
 					<th data-col-name="expedientPeticioId" data-visible="false"></th>
 					<th data-col-name="titol"><spring:message code="accio.massiva.list.column.nom"/></th>
@@ -160,13 +186,7 @@ $(document).ready(function() {
 					</script>
 					</th>
 					<th data-col-name="expedientCreatedDate" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.expedientCreatEl"/></th>
-					
-					<th data-col-name="documentId" data-orderable="false" data-template="#cellCreatDb" width="1%">
-						<spring:message code="massiu.list.column.creatDb"/>
-						<script id="cellCreatDb" type="text/x-jsrender">
-						{{if documentId!=null}}<span class="fa fa-check"></span>{{/if}}
-					</script>
-					</th>
+
 					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if documentId==null}}

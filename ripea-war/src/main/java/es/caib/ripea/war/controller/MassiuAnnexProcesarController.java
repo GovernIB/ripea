@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,16 +27,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.MassiuAnnexProcesarFiltreCommand;
+import es.caib.ripea.war.command.RegistreAnnexCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 
 @Controller
@@ -50,7 +57,11 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	private ExpedientPeticioService expedientPeticioService;
 	@Autowired
 	private ExpedientService expedientService;
-
+	@Autowired
+	private MetaDocumentService metaDocumentService;
+	@Autowired
+	private MetaExpedientService metaExpedientService;
+	
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -64,6 +75,15 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 						getSessionAttributeSelecio(request)));
 		model.addAttribute(
 				filtreCommand);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByEntitat(
+				entitatActual.getId());
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedients);
+		
+		
 		return "massiuAnnexProcesarList";
 	}
 	
@@ -241,6 +261,135 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 		
 		return "redirect:../procesarAnnexosPendents";
 	}
+	
+	
+	
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/adjuntarExpedient", method = RequestMethod.GET)
+	public String adjuntarExpedientReintentar(
+			HttpServletRequest request,
+			Model model) {
+		
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request)));
+		
+		if (seleccio == null || seleccio.isEmpty()) {
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:/massiu/procesarAnnexosPendents",
+					"accio.massiva.seleccio.buida");
+		}
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		MassiuAnnexProcesarFiltreCommand filtreCommand = getFiltreCommand(request);
+		
+		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
+					entitatActual.getId(),
+					null, 
+					filtreCommand.getMetaExpedientId(),
+					false);
+		model.addAttribute(
+				"metaDocuments",
+				metaDocuments);
+		
+
+		
+		RegistreAnnexCommand registreAnnexCommand = new RegistreAnnexCommand();
+		
+		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), filtreCommand.getMetaExpedientId());
+		if (metaDocPerDefecte != null) {
+			registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
+		}
+		
+		model.addAttribute(
+				"registreAnnexCommand",
+				registreAnnexCommand);
+
+		return "expedientPeticioReintentarMetaDocMassiu";
+
+	}
+	
+	
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/adjuntarExpedient", method = RequestMethod.POST)
+	public String adjuntarExpedientReintentarPost(
+			HttpServletRequest request,
+			@Valid RegistreAnnexCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		model.addAttribute("mantenirPaginacio", true);
+		getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			return "expedientPeticioReintentarMetaDocMassiu";
+		}
+		
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request));
+		
+		try {
+			
+			int errors = 0;
+			int correctes = 0;
+			
+			for (Long id : seleccio) {
+				Exception exception = null;
+				try {
+					exception = expedientService.retryCreateDocFromAnnex(
+							id,
+							command.getMetaDocumentId(), 
+							RolHelper.getRolActual(request));
+
+				} catch (Exception ex) {
+					exception = ex;
+				}
+				if (exception != null ) {
+					logger.error("Error al procesarAnnexosPendents document pendent", exception);
+					RegistreAnnexDto registreAnnex = expedientPeticioService.findAnnexById(id);
+					MissatgesHelper.error(request,
+							getMessage(request,
+									"massiu.controller.annex.procesar.error",
+									new Object[] { registreAnnex.getTitol(), ExceptionHelper.getRootCauseOrItself(exception).getMessage() }));
+					errors++;
+				} else {
+					correctes++;
+				}
+			}
+			
+			if (correctes > 0){
+				MissatgesHelper.success(request, getMessage(request, "massiu.controller.annex.procesar.correctes", new Object[]{correctes}));
+			} 
+			if (errors > 0) {
+				MissatgesHelper.error(request, getMessage(request, "massiu.controller.annex.procesar.errors", new Object[]{errors}));
+			} 
+			
+			seleccio.clear();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_SELECCIO,
+					seleccio);
+			
+			return modalUrlTancar();
+			
+		} catch (Exception ex) {
+			logger.error("Error al tancament massiu", ex);
+
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../massiu/tancament",
+					ex.getMessage());
+		}
+	}
+	
+	
 	
 
 	

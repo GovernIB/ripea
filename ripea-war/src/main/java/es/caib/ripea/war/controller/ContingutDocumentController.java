@@ -3,24 +3,26 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DigitalitzacioService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.war.command.DocumentCommand;
-import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
-import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
-import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
-import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
-import es.caib.ripea.war.command.DocumentGenericCommand;
-import es.caib.ripea.war.helper.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -41,24 +43,51 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DadaDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
+import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.FitxerTemporalDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DigitalitzacioService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.war.command.DocumentCommand;
+import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
+import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
+import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
+import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
+import es.caib.ripea.war.command.DocumentGenericCommand;
+import es.caib.ripea.war.helper.ArxiuTemporalHelper;
+import es.caib.ripea.war.helper.BeanGeneratorHelper;
+import es.caib.ripea.war.helper.DocumentHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.FitxerTemporalHelper;
+import es.caib.ripea.war.helper.JsonResponse;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de documents.
@@ -97,6 +126,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private DocumentHelper documentHelper;
 	@Autowired
 	private DigitalitzacioService digitalitzacioService;
+	@Autowired
+	private ExpedientService expedientService;
 	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
@@ -322,7 +353,16 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@RequestParam(value = "origin") String origin,
 			Model model)  {
 
-		Exception exception = documentService.guardarDocumentArxiu(documentId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
+		Exception exception = null;
+		if (document.getArxiuUuid() == null) {
+			exception = documentService.guardarDocumentArxiu(documentId);
+		} else if (document.isPendentMoverArxiu()) {
+			exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+		}
+		
 		
 		String redirect = null;
 		if (origin.equals("docDetail")) {

@@ -289,12 +289,12 @@ public class ExpedientServiceBean implements ExpedientService {
 	@Override
 	public Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
-			Long expedientPeticioId, 
-			Long metaDocumentId, String rolActual) {
+			Long metaDocumentId, 
+			String rolActual) {
 		return delegate.retryCreateDocFromAnnex(
 				registreAnnexId, 
-				expedientPeticioId, 
-				metaDocumentId, rolActual);		
+				metaDocumentId, 
+				rolActual);		
 	}
 
 	@Override

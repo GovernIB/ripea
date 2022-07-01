@@ -488,6 +488,7 @@ public class ConversioTipusHelper {
 						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+						target.setAnnex(source.getAnnexos() != null && !source.getAnnexos().isEmpty());
 						return target;
 					}
 				});	

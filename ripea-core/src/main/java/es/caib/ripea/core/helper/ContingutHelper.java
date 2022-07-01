@@ -77,6 +77,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
@@ -391,10 +392,12 @@ public class ContingutHelper {
 			dto.setDocFromAnnex(document.isDocFromAnnex()); 
 			
 			if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
-				String error = document.getAnnexos().get(0).getError();
+				RegistreAnnexEntity annex = document.getAnnexos().get(0);
+				String error = annex.getError();
 				if (error != null && !error.isEmpty()) {
 					dto.setPendentMoverArxiu(true);
 				}
+				dto.setAnnexId(annex.getId());
 			}
 
 			metaNode = conversioTipusHelper.convertir(
