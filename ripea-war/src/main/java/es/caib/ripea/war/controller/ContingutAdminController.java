@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -200,8 +202,15 @@ public class ContingutAdminController extends BaseAdminController {
 					request,
 					"redirect:../../esborrat",
 					"contingut.admin.controller.recuperat.duplicat");
+		}  catch (Exception ex) {
+			logger.error("Error al recuperar element", ex);
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../esborrat",
+					"contingut.admin.controller.recuperat.error",
+					new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
 		}
-	}
+	} 
 	
 	
 	
@@ -302,5 +311,7 @@ public class ContingutAdminController extends BaseAdminController {
 		}
 		return filtreCommand;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(ContingutAdminController.class);
 
 }

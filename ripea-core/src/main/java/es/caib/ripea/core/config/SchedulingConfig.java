@@ -4,6 +4,9 @@ import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.helper.ConfigHelper;
 import lombok.SneakyThrows;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -52,7 +55,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.EXECUTAR_EXECUCIONS_MASSIVES_RATE), TimeUnit.MILLISECONDS);
+                        PeriodicTrigger trigger = null;
+						try {
+							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.EXECUTAR_EXECUCIONS_MASSIVES_RATE), TimeUnit.MILLISECONDS);
+						} catch (Exception e) {
+							logger.error("Error getting next execution date for comprovarExecucionsMassives()", e);
+						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         long registrarEnviamentsPendentsInitialDelayLong = 0L;
@@ -80,7 +88,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+                         PeriodicTrigger trigger = null;
+						try {
+							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
+						} catch (Exception e) {
+							logger.error("Error getting next execution date for consultarIGuardarAnotacionsPeticionsPendents()", e);
+						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         long notificaEnviamentsRegistratsInitialDelayLong = 0L;
@@ -108,7 +121,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.BUIDAR_CACHES_DOMINIS_RATE), TimeUnit.MILLISECONDS);
+                         PeriodicTrigger trigger = null;
+						try {
+							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.BUIDAR_CACHES_DOMINIS_RATE), TimeUnit.MILLISECONDS);
+						} catch (Exception e) {
+							logger.error("Error getting next execution date for buidarCacheDominis()", e);
+						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
                         long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
@@ -137,7 +155,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        CronTrigger trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON));
+                        CronTrigger trigger = null;
+						try {
+							trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON));
+						} catch (Exception e) {
+							logger.error("Error getting next execution date for enviarEmailsPendentsAgrupats()", e);
+						}
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
@@ -158,7 +181,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_CONTINGUTS_PENDENTS), TimeUnit.MILLISECONDS);
+                         PeriodicTrigger trigger = null;
+						try {
+							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_CONTINGUTS_PENDENTS), TimeUnit.MILLISECONDS);
+						} catch (Exception e) {
+							logger.error("Error getting next execution date for guardarExpedientsDocumentsArxiu()", e);
+						}
                         // Només la primera vegada que s'executa
                         long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
                         if (primeraVez[3]) {
@@ -185,7 +213,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
-                        PeriodicTrigger trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_INTERESSATS), TimeUnit.MILLISECONDS);
+                         PeriodicTrigger trigger = null;
+						try {
+							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_INTERESSATS), TimeUnit.MILLISECONDS);
+						} catch (Exception e) {
+							logger.error("Error getting next execution date for guardarInteressatsArxiu()", e);
+						}
                         // Només la primera vegada que s'executa
                         long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
                         if (primeraVez[4]) {
@@ -200,4 +233,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
 
     }
+    
+    
+	private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
+    
 }

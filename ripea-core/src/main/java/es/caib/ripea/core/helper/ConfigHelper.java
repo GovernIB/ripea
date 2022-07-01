@@ -90,57 +90,39 @@ public class ConfigHelper {
     }
     
     
+   
 
- 
-
-	@Transactional(readOnly = true)
-	public String getConfig(String entitatActualCodi, String keyGeneral) {
-		
-		if (entitatActualCodi == null) {
-			EntitatDto entitatActual = ConfigHelper.entitat.get();
-			if (entitatActual != null)
-				entitatActualCodi = entitatActual.getCodi();
-		}
-		
-		logger.debug("Entitat actual per les propietats : " + entitatActualCodi);
-
-		String keyPerEntitat = convertirKeyGeneralToKeyPropietat(entitatActualCodi, keyGeneral);
-
-		ConfigEntity configPerEntitat = configRepository.findOne(keyPerEntitat);
-
-		if (configPerEntitat != null) {
-			String valueConfigPerEntitat = getConfig(configPerEntitat);
-			if (valueConfigPerEntitat != null) {
-				return valueConfigPerEntitat;
-			} else {
-				ConfigEntity configGeneral = configRepository.findOne(keyGeneral);
-				String valueConfigGeneral = getConfig(configGeneral);
-				if (valueConfigGeneral != null) {
-					return valueConfigGeneral;
-				} else {
-					String valueEntitat = getJBossProperty(keyPerEntitat);
-					if (valueEntitat != null) {
-						return valueEntitat;
-					} else {
-						return getJBossProperty(keyGeneral);
-					}
-				}
-			}
-		} else {
-			String valueEntitat = getJBossProperty(keyPerEntitat);
-			if (valueEntitat != null) {
-				return valueEntitat;
-			} else {
-				return getJBossProperty(keyGeneral);
-			}
-		}
-	}
 
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral)  {
-		return this.getConfig(null, keyGeneral);
+    	
+    	String entitatCodi  = getEntitatActualCodi();
+
+		String value = null;
+		ConfigEntity configEntity = configRepository.findOne(keyGeneral);
+		if (configEntity != null) {
+			// Propietat trobada en db
+			if (configEntity.isConfigurable() && entitatCodi != null) {
+	    		// Propietat a nivell d'entitat
+	    		String keyEntitat = convertirKeyGeneralToKeyPropietat(entitatCodi, keyGeneral);
+	    		ConfigEntity configEntitatEntity = configRepository.findOne(keyEntitat);
+	            if (configEntitatEntity != null) {
+	            	value = getConfig(configEntitatEntity);
+	            }
+			}
+			if (value == null) {
+				// Propietat global
+				value = getConfig(configEntity);
+			}
+		} else {
+			// Propietat JBoss
+			value = getJBossProperty(keyGeneral);
+		}
+		return value;
+    	
 	}
     
+
 
     
 	@Transactional(readOnly = true)

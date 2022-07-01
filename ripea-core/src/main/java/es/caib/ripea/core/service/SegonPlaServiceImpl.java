@@ -9,9 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -39,7 +36,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -326,46 +322,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	
-//	@Override
-//	@Transactional
-//	public void guardarExpedientsDocumentsArxiu() {
-//		
-//		logger.debug("Execució tasca periòdica: Guardar expedients i documents en arxiu");
-//		
-//		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
-//		int arxiuMaxReintentsDocuments = getArxiuMaxReintentsDocuments();
-//		
-//		List<ContingutEntity> pendents = contingutRepository.findContingutsPendentsArxiu(
-//				arxiuMaxReintentsExpedients,
-//				arxiuMaxReintentsDocuments);
-//		
-//		
-//		for (ContingutEntity contingut : pendents) {
-//			EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class); 
-//
-//			if (contingut instanceof ExpedientEntity) {
-////				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
-////					ConfigHelper.setEntitat(entitat);
-////					expedientHelper.guardarExpedientArxiu(contingut.getId());
-////				}
-//				
-////			} else if (contingut instanceof DocumentEntity) {
-////				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
-////					ConfigHelper.setEntitat(entitat);
-////					documentHelper.guardarDocumentArxiu(contingut.getId());
-////				}
-//			}
-//		}
-//		
-//		
-//		System.out.println();
-//		
-//		
-//	}
-	
-	
-	
-	
 	@Override
 	@Transactional
 	public void guardarExpedientsDocumentsArxiu() {
@@ -379,22 +335,14 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				arxiuMaxReintentsExpedients,
 				arxiuMaxReintentsDocuments);
 		
-		
-        ExecutorService executor = Executors.newFixedThreadPool(1);
 		for (ContingutEntity contingut : pendents) {
-			final EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class); 
-
+			EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class); 
+			ConfigHelper.setEntitat(entitat); // TODO: check if other scheduled tasks (methods called by SchedulingConfig or with @Scheduled annotation) need execution per entitat
+			
 			if (contingut instanceof ExpedientEntity) {
-				final Long id = contingut.getId();
-				Thread t = new Thread(new Runnable() {
-					public void run() {
-						synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksGuardarExpedientArxiu)) {
-							ConfigHelper.setEntitat(entitat);
-							expedientHelper.guardarExpedientArxiu(id);
-						}
-					}
-				});
-				executor.execute(t);
+				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
+					expedientHelper.guardarExpedientArxiu(contingut.getId());
+				}
 				
 			} else if (contingut instanceof DocumentEntity) {
 				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
@@ -403,17 +351,11 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			}
 		}
 		
-        executor.shutdown();
-        while (!executor.isTerminated()) {
-        	try {
-        		executor.awaitTermination(100, TimeUnit.MILLISECONDS);
-        	} catch (InterruptedException e) {}
-        }
-		
-		System.out.println();
-		
 	}
 	
+	
+	
+
 	
 	@Override
 	@Transactional
@@ -422,8 +364,11 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		logger.debug("Execució tasca periòdica: Guardar interessats en arxiu");
 		
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
-		
+ 
 		for (InteressatEntity interessat : pendents) {
+			EntitatDto entitat = conversioTipusHelper.convertir(interessat.getExpedient().getEntitat(), EntitatDto.class);
+			ConfigHelper.setEntitat(entitat);
+			
 			synchronized (SynchronizationHelper.get0To99Lock(interessat.getExpedient().getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
 				expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
 			}
