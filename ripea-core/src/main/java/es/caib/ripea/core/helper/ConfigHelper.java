@@ -44,7 +44,6 @@ public class ConfigHelper {
 		return entitat;
 	}
 
-
 	public static void setEntitat(EntitatDto entitat) {
 		ConfigHelper.entitat.set(entitat);
 	}
@@ -121,20 +120,13 @@ public class ConfigHelper {
 		return value;
     	
 	}
-    
 
-
-    
 	@Transactional(readOnly = true)
 	public static String getEntitatActualCodi() {
-		EntitatDto entitatActual = ConfigHelper.entitat.get();
-		if (entitatActual != null) {
-			return entitatActual.getCodi();
-		} else {
-			return null;
-		}
+
+        return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
 	}
-	
+
 	private String convertirKeyGeneralToKeyPropietat (String entitatActualCodi, String key) {
 		if (entitatActualCodi != null) {
 			String keyReplace = key.replace(".", "_");

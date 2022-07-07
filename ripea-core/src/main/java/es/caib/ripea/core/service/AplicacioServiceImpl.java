@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.helper.*;
@@ -63,6 +64,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Resource
 	private GrupRepository grupRepository;
 
+	@Override
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		configHelper.setEntitat(entitat);
+	}
 
 	@Transactional
 	@Override

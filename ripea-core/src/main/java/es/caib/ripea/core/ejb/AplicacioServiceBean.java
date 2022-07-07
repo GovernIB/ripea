@@ -10,6 +10,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,12 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Autowired
 	AplicacioService delegate;
-	
+
+	@Override
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		delegate.actualitzarEntiatThreadLocal(entitat);
+	}
+
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
 	public void processarAutenticacioUsuari() {
