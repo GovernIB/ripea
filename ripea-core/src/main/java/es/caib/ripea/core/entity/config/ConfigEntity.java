@@ -101,6 +101,7 @@ public class ConfigEntity {
         this.groupCode = entitat.getGroupCode();
         this.type = entitat.getType();
         this.entitatCodi = entitatCodi;
+        this.configurable = entitat.isConfigurable();
     }
     
 }

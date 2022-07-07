@@ -370,7 +370,7 @@ public class ConfigHelper {
 
     public void crearConfigsEntitat(String codiEntitat) {
 
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
         ConfigDto dto = new ConfigDto();
         dto.setEntitatCodi(codiEntitat);
         ConfigEntity nova;

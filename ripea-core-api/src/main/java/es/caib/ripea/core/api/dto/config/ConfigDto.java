@@ -24,6 +24,7 @@ ConfigDto {
     private List<EntitatConfig> entitatsConfig;
     private String entitatCodi;
     private String entitatValue;
+    private boolean configurable;
 
     private String typeCode;
     private List<String> validValues;

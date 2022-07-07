@@ -242,3 +242,11 @@ div.exemple {
 	display:flex;
 	justify-content: space-between;
 }
+
+.separador {
+	border-bottom: 1px solid #DDDDDD;
+}
+
+.no-display {
+	display: none;
+}
