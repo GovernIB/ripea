@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,7 +99,7 @@ public interface AplicacioService {
 	 * @throws NotFoundException Si no s'ha trobat la integració amb el codi especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_SUPER')")
-	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params);
+	PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params, IntegracioFiltreDto filtre);
 
 	/**
 	 * Emmagatzema una excepció llençada per un servei.
