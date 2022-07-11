@@ -23,7 +23,7 @@ databaseChangeLog:
             tableName: ipa_metaexpedient
             columns:
               - column:
-                  name: oragan_no_sinc
+                  name: organ_no_sinc
                   type: boolean
                   valueBoolean: false
         - addColumn:
@@ -55,7 +55,6 @@ databaseChangeLog:
               - column:
                   name: entitat_id
                   type: BIGINT
-                  defaultValue: ${booleanFalse}
         - createTable:
             tableName: ipa_og_sinc_rel
             columns:

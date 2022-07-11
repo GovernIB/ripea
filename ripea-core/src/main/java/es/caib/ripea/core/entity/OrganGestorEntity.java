@@ -69,9 +69,11 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @JoinTable(name = "ipa_og_sinc_rel",
             joinColumns = { @JoinColumn(name = "antic_og", referencedColumnName = "id", nullable = false) },
             inverseJoinColumns = { @JoinColumn(name = "nou_og", referencedColumnName = "id", nullable = false) })
+    @ToString.Exclude
     @ManyToMany
     private List<OrganGestorEntity> nous = new ArrayList<>();
 
+    @ToString.Exclude
     @ManyToMany(mappedBy = "nous")
     private List<OrganGestorEntity> antics = new ArrayList<>();
 

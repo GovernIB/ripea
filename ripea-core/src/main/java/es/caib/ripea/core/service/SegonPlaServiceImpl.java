@@ -381,7 +381,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	public void consultaCanvisOrganigrama() {
 		logger.debug("Execució tasca periòdica: Actualitzar procedimetns");
 
-		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)	// Tasca en segon pla no configurada
+		if (configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA) == null)	// Tasca en segon pla no configurada
 			return;
 		List<EntitatEntity> entitats = entitatRepository.findAll();
 		for(EntitatEntity entitat: entitats) {

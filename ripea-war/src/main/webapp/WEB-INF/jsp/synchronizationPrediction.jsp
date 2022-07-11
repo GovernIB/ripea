@@ -5,19 +5,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<c:choose>
-	<c:when test="${empty bustiaCommand.id}">
-		<c:set var="titol">
-			<spring:message code="unitat.synchronize.dialog.header" />
-		</c:set>
-	</c:when>
-	<c:otherwise>
-		<c:set var="titol">
-			<spring:message code="bustia.form.titol.modificar" />
-		</c:set>
-	</c:otherwise>
-</c:choose>
 
+<c:set var="titol"><spring:message code="unitat.synchronize.dialog.header" /></c:set>
 <c:set var="isAllEmpty" value="${empty substMap and empty splitMap and empty mergeMap and empty unitatsVigents and empty unitatsNew}" />
 
 <html>
