@@ -250,3 +250,49 @@ div.exemple {
 .no-display {
 	display: none;
 }
+
+.alert-config {
+	border: 1px solid transparent;
+	border-top-color: transparent;
+	border-right-color: transparent;
+	border-bottom-color: transparent;
+	border-left-color: transparent;
+	border-radius: 4px;
+	padding: 5px;
+	margin-bottom: 10px !important;
+}
+
+.alert-config-ok {
+	color: #3c763d;
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+
+}
+
+.spinner-config {
+	margin-left: 5px;
+	font-size: 1.2em;
+}
+
+.alert-config-error {
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+}
+
+.alert-config-boto {
+	cursor: pointer;
+	padding: 5px;
+	color: #a4a4a494;
+}
+
+
+.flex-space-between {
+	display:flex;
+	justify-content: space-between;
+}
+
+.padding-top-bottom {
+	padding-top: 10px;
+	padding-bottom:10px;
+}

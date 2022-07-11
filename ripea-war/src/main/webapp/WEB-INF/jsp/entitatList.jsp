@@ -56,6 +56,7 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="entitat/{{:id}}" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+								<li><a href="<c:url value="entitat/{{:id}}/configurar"/>"><span class="fa fa-gear"></span>&nbsp;&nbsp;<spring:message code="comu.boto.configurar"/></a></li>
 								{{if !activa}}
 								<li><a href="entitat/{{:id}}/enable" data-toggle="ajax"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.activar"/></a></li>
 								{{else}}
