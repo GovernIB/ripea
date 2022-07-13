@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.repository.EntitatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,8 @@ public class ConfigServiceImpl implements ConfigService {
     private ConfigRepository configRepository;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private EntitatRepository entitatRepository;
     @Autowired
     private PluginHelper pluginHelper;
     @Autowired
@@ -135,6 +139,26 @@ public class ConfigServiceImpl implements ConfigService {
         if (cGroup.getInnerConfigs() != null && !cGroup.getInnerConfigs().isEmpty()) {
             for (ConfigGroupDto child : cGroup.getInnerConfigs()) {
                 processPropertyValues(child);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void crearPropietatsConfigPerEntitats() {
+
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
+        List<EntitatEntity> entitats = entitatRepository.findAll();
+        ConfigEntity nova;
+        for (ConfigEntity config : configs) {
+            for (EntitatEntity entitat : entitats) {
+                String key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
+                if (configRepository.findByKey(key) != null ) {
+                    continue;
+                }
+                nova = new ConfigEntity();
+                nova.crearConfigNova(key, entitat.getCodi(), config);
+                configRepository.save(nova);
             }
         }
     }

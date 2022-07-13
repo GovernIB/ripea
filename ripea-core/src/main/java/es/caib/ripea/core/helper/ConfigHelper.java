@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,8 @@ public class ConfigHelper {
     private ConfigGroupRepository configGroupRepository;
     @Autowired
     private EntitatRepository entitatRepository;
-    
+
+    public static final String prefix = "es.caib.ripea";
     
     private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();    
     
@@ -47,50 +49,6 @@ public class ConfigHelper {
 	public static void setEntitat(EntitatDto entitat) {
 		ConfigHelper.entitat.set(entitat);
 	}
-    
-    
-    /** Mètode que revisa després d'iniciar Distribucio que totes les entitats tinguin una entrada
-     * per cada propietat configurable a nivell d'entitat.
-     */
-    @PostConstruct
-    @Transactional
-    public void postConstruct() {
-		// Recuperar totes les propietats configurables que no siguin d'entitat
-    	List<ConfigEntity> listConfigEntity = configRepository.findConfigurablesAmbEntitatNull();
-    	List<ConfigEntity> llistatPropietatsConfigurables = configRepository.findConfigurables();
-	    List<EntitatEntity> llistatEntitats = entitatRepository.findAll();
-	    int propietatsNecessaries = listConfigEntity.size() * (llistatEntitats.size() + 1);
-		// Mirar que la propietat existeixi per a la entitat, si no crear-la amb el valor null
-	    if (llistatPropietatsConfigurables.size() != propietatsNecessaries) {
-		    for (ConfigEntity cGroup : listConfigEntity) {
-		    	int lengthKey = cGroup.getKey().length();
-		    	for (EntitatEntity entitat : llistatEntitats) {
-		    		if (cGroup.getEntitatCodi() == null) {
-		        		String cercarPropietat = cGroup.getKey().substring(0, 14) + entitat.getCodi() + cGroup.getKey().substring(13, lengthKey);
-		        		ConfigEntity configEntity = configRepository.findPerKey(cercarPropietat);
-		        		if (configEntity == null) {
-		        			ConfigEntity novaPropietat = new ConfigEntity();
-			        		novaPropietat.setDescription(cGroup.getDescription());
-			        		novaPropietat.setEntitatCodi(entitat.getCodi());
-			        		novaPropietat.setGroupCode(cGroup.getGroupCode());
-			        		novaPropietat.setJbossProperty(cGroup.isJbossProperty());
-			        		novaPropietat.setKey(cercarPropietat);
-			        		novaPropietat.setPosition(cGroup.getPosition());
-			        		novaPropietat.setConfigurable(cGroup.isConfigurable());			        		
-//			        		novaPropietat.setTypeCode(cGroup.getTypeCode());
-			        		
-		                    logger.info("Guardant la propietat: " + novaPropietat.getKey());		        		
-			        		configRepository.save(novaPropietat);
-		        		}
-		    		}
-		    	}
-		    }	
-	    }
-    }
-    
-    
-   
-
 
     @Transactional(readOnly = true)
     public String getConfig(String keyGeneral)  {
@@ -193,6 +151,49 @@ public class ConfigHelper {
     }
     public String getJBossProperty(String key, String defaultValue) {
         return JBossPropertiesHelper.getProperties().getProperty(key, defaultValue);
+    }
+
+    @Transactional(readOnly = true)
+    public Properties getAllEntityProperties(String entitatCodi) {
+
+        Properties properties = new Properties();
+//        List<ConfigEntity> configs = !Strings.isNullOrEmpty(entitatCodi) ? configRepository.findConfigEntitaCodiAndGlobals(entitatCodi) : configRepository.findByEntitatCodiIsNull();
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
+        for (ConfigEntity config: configs) {
+            String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
+            if (value != null) {
+                properties.put(config.getKey(), value);
+            }
+        }
+        return properties;
+    }
+
+    @Transactional(readOnly = true)
+    public String getConfigKeyByEntitat(String entitatCodi, String property) {
+
+        String key = crearEntitatKey(entitatCodi, property);
+        ConfigEntity configEntity = configRepository.findOne(key);
+        if (configEntity != null && (configEntity.isJbossProperty() && configEntity.getValue() == null || configEntity.getValue() != null)) {
+            String config = getConfig(configEntity);
+            if (!Strings.isNullOrEmpty(config)) {
+                return config;
+            }
+        }
+        configEntity = configRepository.findOne(property);
+        if (configEntity != null) {
+            return getConfig(configEntity);
+        }
+        log.error("No s'ha trobat la propietat -> key global: " + property + " key entitat: " + key);
+        throw new NotDefinedConfigException(property);
+    }
+
+    public String crearEntitatKey(String entitatCodi, String key) {
+
+        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+            return null;
+        }
+        String [] split = key.split(prefix);
+        return split.length < 2 ? split.length == 0 ? null : split[0] : (prefix + "." + entitatCodi + split[1]);
     }
 
     private String getConfig(ConfigEntity configEntity) throws NotDefinedConfigException {

@@ -109,7 +109,6 @@
                         if (!entitat.jbossProperty) {
                             let saveDelete = entitat.value ? "" : "no-display";
                             let config = !entitat.value ? "" : "no-display";
-                            console.log("entitat.value: " + entitat.value);
                             string += '<button id="' + keyReplaced + '_button_save" name="' + entitat.entitatCodi + '" type="button" class="btn btn-success entitat-save ' + saveDelete + '"><i class="fa fa-save"></i></button>';
                             string += '<button id="' + keyReplaced + '_button_trash" name="' + entitat.entitatCodi + '" type="button" class="btn btn-danger entitat-trash ' + saveDelete + '"><i class="fa fa-trash"></i></button>';
                             string += '<button id="' + keyReplaced + '_button_config" name="' + entitat.entitatCodi + '" type="button" class="btn btn-success entitat-config ' + config + '"><i class="fa fa-pencil"></i></button>';
