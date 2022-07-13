@@ -650,6 +650,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					false,
 					false, null, null);
 			model.addAttribute("contingut", contingut);
+			if (contingut instanceof DocumentDto) {
+				model.addAttribute("documentInvalid", !((DocumentDto) contingut).isValidacioCorrecte());
+			}
 			if (contingut.isReplicatDinsArxiu()) {
 				model.addAttribute(
 						"arxiuDetall",

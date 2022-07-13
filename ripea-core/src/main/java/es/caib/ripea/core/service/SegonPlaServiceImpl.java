@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.core.service;
 
-import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
-import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
-import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,7 +114,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					
 					
 					// obtain anotació from DISTRIBUCIO
-					AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioServicePort().consulta(
+					AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioRestClient().consulta(
 							anotacioRegistreId);
 
 					// create anotació in db and associate it with expedient peticion
@@ -124,7 +123,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							expedientPeticioEntity);
 					
 					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
-					DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
+					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
 							"");
@@ -136,7 +135,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							"Error consultar i guardar anotació per petició: " +
 									expedientPeticioEntity.getIdentificador() + 
 									" RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
-					try {
+//					try {
 						boolean isRollbackException = true;
 						while (isRollbackException) {
 							if (e.getClass().toString().contains("RollbackException")) {
@@ -154,16 +153,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										3600));
 						
 						// change state of anotació in DISTRIBUCIO to BACK_ERROR
-						DistribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
+						DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 								anotacioRegistreId,
 								Estat.ERROR,
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
 										3600));
 						
-					} catch (IOException e1) {
-						logger.error(ExceptionUtils.getStackTrace(e1));
-					}
+//					} catch (IOException e1) {
+//						logger.error(ExceptionUtils.getStackTrace(e1));
+//					}
 				}
 			}
 		}

@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.api.Firma;
@@ -1351,6 +1352,12 @@ public class ContingutServiceImpl implements ContingutService {
 							arxiuDocument.getContingut().getTipusMime());
 				}
 
+			}
+			if (arxiuDocument.getEstat() != null) {
+				if (DocumentEstat.ESBORRANY.equals(arxiuDocument.getEstat()))
+					arxiuDetall.setArxiuEstat(ArxiuEstatEnumDto.ESBORRANY);
+				else if (DocumentEstat.DEFINITIU.equals(arxiuDocument.getEstat()))
+					arxiuDetall.setArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 			}
 		} else if (contingut instanceof CarpetaEntity) {
 			Carpeta arxiuCarpeta = pluginHelper.arxiuCarpetaConsultar(

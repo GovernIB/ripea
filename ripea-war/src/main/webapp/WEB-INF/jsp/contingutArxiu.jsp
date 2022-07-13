@@ -11,6 +11,12 @@
 	<rip:modalHead/>
 </head>
 <body>
+	<c:if test="${documentInvalid}">
+		<div class="alert alert-danger alert-dismissible">
+			<button type="button" class="close close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
+			<spring:message code="contingut.icona.estat.invalid.origen.form" arguments="${contingut.validacioError}"/>
+		</div>
+	</c:if>
 	<c:choose>
 		<c:when test="${not empty arxiuDetall}">
 			<ul class="nav nav-tabs" role="tablist">
@@ -42,6 +48,12 @@
 								<tr>
 									<td><strong><spring:message code="contingut.arxiu.camp.serie.doc"/></strong></td>
 									<td>${arxiuDetall.serieDocumental}</td>
+								</tr>
+							</c:if>
+							<c:if test="${not empty arxiuDetall.arxiuEstat}">
+								<tr>
+									<td><strong><spring:message code="contingut.arxiu.camp.arxiu.estat"/></strong></td>
+									<td>${arxiuDetall.arxiuEstat}</td>
 								</tr>
 							</c:if>
 						</tbody>

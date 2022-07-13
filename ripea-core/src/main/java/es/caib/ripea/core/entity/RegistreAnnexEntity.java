@@ -3,15 +3,17 @@
  */
 package es.caib.ripea.core.entity;
 
-import es.caib.distribucio.ws.backofficeintegracio.FirmaPerfil;
-import es.caib.distribucio.ws.backofficeintegracio.FirmaTipus;
-import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracion;
-import es.caib.distribucio.ws.backofficeintegracio.NtiOrigen;
-import es.caib.distribucio.ws.backofficeintegracio.NtiTipoDocumento;
-import es.caib.distribucio.ws.backofficeintegracio.SicresTipoDocumento;
-import es.caib.distribucio.ws.backofficeintegracio.SicresValidezDocumento;
+import es.caib.distribucio.rest.client.domini.FirmaPerfil;
+import es.caib.distribucio.rest.client.domini.FirmaTipus;
+import es.caib.distribucio.rest.client.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.domini.NtiTipoDocumento;
+import es.caib.distribucio.rest.client.domini.SicresTipoDocumento;
+import es.caib.distribucio.rest.client.domini.SicresValidezDocumento;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,6 +28,7 @@ import java.util.Date;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
+@Getter
 @Table(	name = "ipa_registre_annex")
 @EntityListeners(AuditingEntityListener.class)
 @SuppressWarnings("serial")
@@ -85,7 +88,15 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	private RegistreAnnexEstatEnumDto estat;
 	@Column(name = "error", length = 4000)
 	private String error;
-	
+
+	@Column(name = "val_ok")
+	private boolean validacioCorrecte;
+	@Column(name = "val_error")
+	private String validacioError;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "annex_estat")
+	private ArxiuEstatEnumDto annexEstat;
+
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "registre_id")
 	@ForeignKey(name = "ipa_annex_registre_fk")
@@ -145,6 +156,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.registre = registre;
 			built.estat = RegistreAnnexEstatEnumDto.CREAT;
 			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
+			built.validacioCorrecte = true;
 		}
 		
 		public Builder contingut(byte[] contingut) {
@@ -183,15 +195,24 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.firmaNom = firmaNom;
 			return this;
 		}
+		public Builder validacioCorrecte(Boolean validacioCorrecte) {
+			built.validacioCorrecte = validacioCorrecte != null ? validacioCorrecte : true;
+			return this;
+		}
+		public Builder validacioError(String validacioError) {
+			built.validacioError = validacioError;
+			return this;
+		}
+		public Builder annexEstat(ArxiuEstatEnumDto annexEstat) {
+			built.annexEstat = annexEstat;
+			return this;
+		}
 		public RegistreAnnexEntity build() {
 			return built;
 		}
 	}
 	
 	
-	public RegistreEntity getRegistre() {
-		return registre;
-	}
 	public void updateRegistre(RegistreEntity registre) {
 		this.registre = registre;
 	}
@@ -243,78 +264,13 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	public void updateUuid(String uuid) {
 		this.uuid = uuid;
 	}
-	public byte[] getContingut() {
-		return contingut;
-	}
-	public byte[] getFirmaContingut() {
-		return firmaContingut;
-	}
-	public FirmaPerfil getFirmaPerfil() {
-		return firmaPerfil;
-	}
-	public long getFirmaTamany() {
-		return firmaTamany;
-	}
-	public FirmaTipus getFirmaTipus() {
-		return firmaTipus;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public Date getNtiFechaCaptura() {
-		return ntiFechaCaptura;
-	}
-	public NtiOrigen getNtiOrigen() {
-		return ntiOrigen;
-	}
-	public NtiTipoDocumento getNtiTipoDocumental() {
-		return ntiTipoDocumental;
-	}
-	public String getObservacions() {
-		return observacions;
-	}
-	public SicresTipoDocumento getSicresTipoDocumento() {
-		return sicresTipoDocumento;
-	}
-	public SicresValidezDocumento getSicresValidezDocumento() {
-		return sicresValidezDocumento;
-	}
-	public long getTamany() {
-		return tamany;
-	}
-	public String getTipusMime() {
-		return tipusMime;
-	}
-	public String getTitol() {
-		return titol;
-	}
-	public String getUuid() {
-		return uuid;
-	}
-	public RegistreAnnexEstatEnumDto getEstat() {
-		return estat;
-	}
 	public void updateEstat(RegistreAnnexEstatEnumDto estat) {
 		this.estat = estat;
-	}
-	public String getError() {
-		return error;
 	}
 	public void updateError(String error) {
 		this.error = StringUtils.abbreviate(
 				error,
 				1000);
-	}
-	
-	public NtiEstadoElaboracion getNtiEstadoElaboracion() {
-		return ntiEstadoElaboracion;
-	}
-	public String getFirmaNom() {
-		return firmaNom;
-	}
-	
-	public DocumentEntity getDocument() {
-		return document;
 	}
 	public void updateDocument(DocumentEntity document) {
 		this.document = document;

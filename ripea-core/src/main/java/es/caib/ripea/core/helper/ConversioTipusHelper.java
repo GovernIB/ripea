@@ -598,6 +598,9 @@ public class ConversioTipusHelper {
 						}
 						target.setDocumentId(source.getDocument() != null ? source.getDocument().getId() : null);
 						target.setExpedientPeticioId(source.getRegistre().getExpedientPeticions().get(0).getId());
+						target.setValidacioCorrecte(source.isValidacioCorrecte());
+						target.setValidacioError(source.getValidacioError());
+						target.setAnnexEstat(source.getAnnexEstat());
 						
 						return target;
 					}

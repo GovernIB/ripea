@@ -1,11 +1,6 @@
 package es.caib.ripea.war.passarelafirma;
 
-import java.util.List;
-
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.ripea.war.helper.MissatgesHelper;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.slf4j.Logger;
@@ -17,7 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
-import es.caib.ripea.war.helper.MissatgesHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Controller per a les accions de la passarel·la de firma.
@@ -72,7 +69,12 @@ public class PassarelaFirmaController {
 			}
 			log.debug("Cap plugin de firma disponible (" +
 					"signaturesSetId = " + signaturesSetId + ")");
-			return "redirect:" + pfss.getUrlFinal();
+			String redirectUrl = pfss.getUrlFinal();
+			if (redirectUrl.startsWith(request.getContextPath())) {
+				redirectUrl = pfss.getUrlFinal().substring(request.getContextPath().length());
+			}
+//			return "redirect:" + pfss.getUrlFinal();
+			return "redirect:" + redirectUrl;
 		}
 		model.addAttribute("signaturesSetId", signaturesSetId);
 		model.addAttribute("plugins", pluginsFiltered);

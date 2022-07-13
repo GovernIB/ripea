@@ -513,6 +513,7 @@ tr.clicable {
 									<th><spring:message code="registre.annex.detalls.camp.eni.data.captura"/></th>
 									<th style="width: 250px;"><spring:message code="registre.annex.detalls.camp.eni.origen"/></th>
 									<th style="width: 250px;"><spring:message code="registre.annex.detalls.camp.eni.estat.elaboracio"/></th>
+									<th style="width: 120px;"><spring:message code="registre.annex.detalls.camp.estat.arxiu"/></th>
 									<th style="width: 50px;"><spring:message code="registre.annex.detalls.camp.fitxer"/></th>
 									<th style="width: 50px;"></th>
 								</tr>
@@ -520,12 +521,13 @@ tr.clicable {
 							<tbody>
 								<c:forEach var="annex" items="${registre.annexos}" varStatus="status">
 									<tr title="<spring:message code="registre.annex.detalls.previsualitzar"/>" <c:choose><c:when test="${annex.tipusMime == 'application/pdf' }">onclick="showViewer(event, ${annex.id}, '${annex.observacions}', '${annex.ntiFechaCaptura}', '${annex.ntiOrigen}')"</c:when><c:otherwise>class="invalid-format"</c:otherwise></c:choose>>
-										<td>${annex.titol}</td>
+										<td>${annex.titol} <c:if test="${!annex.validacioCorrecte}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${annex.validacioError}"/>"></span></c:if></td>
 										<td><c:if test="${not empty annex.ntiTipoDocumental}"><spring:message code="registre.annex.detalls.camp.ntiTipusDocument.${annex.ntiTipoDocumental}"/></c:if></td>
 										<td>${annex.observacions}</td>
 										<td><c:if test="${not empty annex.ntiFechaCaptura}"><fmt:formatDate value="${annex.ntiFechaCaptura}" pattern="dd/MM/yyyy HH:mm:ss"/></c:if></td>
 										<td><c:if test="${not empty annex.ntiOrigen}">${annex.ntiOrigen}</c:if></td>
 										<td><c:if test="${not empty annex.ntiEstadoElaboracion}"><spring:message code="registre.annex.detalls.camp.ntiElaboracioEstat.${annex.ntiEstadoElaboracion}"/></c:if></td>
+										<td><c:if test="${not empty annex.annexEstat}">${annex.annexEstat}</c:if></td>
 										<td>
 											<a href="descarregarAnnex/${annex.id}?versioImprimible=true" class="btn btn-default btn-sm pull-right arxiu-download">
 												<span class="fa fa-download" title="<spring:message code="registre.annex.detalls.camp.fitxer.descarregar"/>"></span>
@@ -864,7 +866,7 @@ tr.clicable {
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									<span class="fa fa-file"></span>
-									${annex.titol}
+									${annex.titol} <c:if test="${!annex.validacioCorrecte}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${annex.validacioError}"/>"></span></c:if>
 									<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapse-annex-${status.index}"><span class="fa fa-chevron-down"></span></button>
 								</h3>
 							</div>
@@ -909,6 +911,10 @@ tr.clicable {
 											<td>${annex.observacions}</td>
 										</tr>
 									</c:if>
+									<tr>
+										<td><strong><spring:message code="registre.annex.detalls.camp.estat.arxiu"/></strong></td>
+										<td><c:if test="${not empty annex.annexEstat}">${annex.annexEstat}</c:if></td>
+									</tr>
 									<tr>
 										<td><strong><spring:message code="registre.annex.detalls.camp.fitxer"/></strong></td>
 										<td>

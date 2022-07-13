@@ -3,20 +3,12 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.util.Date;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
+import es.caib.distribucio.rest.client.domini.Annex;
+import es.caib.distribucio.rest.client.domini.AnnexEstat;
+import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.domini.Interessat;
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
-import es.caib.distribucio.ws.backofficeintegracio.Annex;
-import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreEntrada;
-import es.caib.distribucio.ws.backofficeintegracio.Interessat;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -34,6 +26,15 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -142,7 +143,7 @@ public class ExpedientPeticioHelper {
 		}
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
-				registreEntrada.getData().toGregorianCalendar().getTime(),
+				registreEntrada.getData(),
 				registreEntrada.getEntitatCodi(),
 				registreEntrada.getIdentificador(),
 				registreEntrada.getIdiomaCodi(),
@@ -166,7 +167,7 @@ public class ExpedientPeticioHelper {
 				llibreDescripcio(registreEntrada.getLlibreDescripcio()).
 				observacions(registreEntrada.getObservacions()).
 				oficinaDescripcio(registreEntrada.getOficinaDescripcio()).
-				origenData(registreEntrada.getOrigenData() != null ? registreEntrada.getOrigenData().toGregorianCalendar().getTime() : null).
+				origenData(registreEntrada.getOrigenData() != null ? registreEntrada.getOrigenData() : null).
 				origenRegistreNumero(registreEntrada.getOrigenRegistreNumero()).
 				refExterna(registreEntrada.getRefExterna()).
 				solicita(registreEntrada.getSolicita()).
@@ -285,7 +286,7 @@ public class ExpedientPeticioHelper {
 	private RegistreAnnexEntity crearAnnexEntity(Annex annex, RegistreEntity registreEntity) {
 		RegistreAnnexEntity annexEntity = RegistreAnnexEntity.getBuilder(
 				annex.getNom(),
-				annex.getNtiFechaCaptura().toGregorianCalendar().getTime(),
+				annex.getNtiFechaCaptura(),
 				annex.getNtiOrigen(),
 				annex.getNtiTipoDocumental(),
 				annex.getSicresTipoDocumento(),
@@ -301,6 +302,9 @@ public class ExpedientPeticioHelper {
 				tipusMime(annex.getTipusMime()).
 				uuid(annex.getUuid()).
 				firmaNom(annex.getFirmaNom()).
+				validacioCorrecte(annex.isDocumentValid()).
+				validacioError(annex.getDocumentError()).
+				annexEstat(getAnnexEstat(annex.getEstat())).
 				build();
 		if (annex.getFirmaTipus() != null) {
 			annexEntity.updateFirmaTipus(annex.getFirmaTipus());
@@ -310,6 +314,12 @@ public class ExpedientPeticioHelper {
 		}
 		registreAnnexRepository.save(annexEntity);
 		return annexEntity;
+	}
+
+	private ArxiuEstatEnumDto getAnnexEstat(AnnexEstat estat) {
+		if (AnnexEstat.ESBORRANY.equals(estat))
+			return ArxiuEstatEnumDto.ESBORRANY;
+		return ArxiuEstatEnumDto.DEFINITIU;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioHelper.class);
