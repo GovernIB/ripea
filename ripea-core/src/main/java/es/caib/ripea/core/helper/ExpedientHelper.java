@@ -462,6 +462,15 @@ public class ExpedientHelper {
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = expedientPeticioEntity.getRegistre().getEntitat();
 
+//		if (registreAnnexEntity.getAnnexEstat() == null) {
+//			try {
+//				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(null, registreAnnexEntity.getUuid(), null, false);
+//				registreAnnexEntity.updateAnnexEstat(DocumentEstat.ESBORRANY.equals(documentArxiu.getEstat()) ? ArxiuEstatEnumDto.ESBORRANY : ArxiuEstatEnumDto.DEFINITIU);
+//			} catch (Exception ex) {
+//				logger.debug("No s'ha pogut obtenir informació del document a l'arxiu");
+//			}
+//		}
+
 		if (expedientEntity.getArxiuUuid() == null) {
 			throw new RuntimeException("Annex no s'ha processat perque expedient no es creat en arxiu");
 		}
@@ -544,7 +553,7 @@ public class ExpedientHelper {
 			} else {
 				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
 			}
-			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexEstat())) {
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexEstat()) || registreAnnexEntity.getAnnexEstat() == null) {
 				if (registreAnnexEntity.getFirmaTipus() != null) {
 					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 					docEntity.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));

@@ -275,6 +275,9 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	public void updateDocument(DocumentEntity document) {
 		this.document = document;
 	}
+	public void updateAnnexEstat(ArxiuEstatEnumDto annexEstat) {
+		this.annexEstat = annexEstat;
+	}
 	
 	
 	

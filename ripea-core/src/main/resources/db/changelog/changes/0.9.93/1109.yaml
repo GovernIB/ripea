@@ -31,6 +31,7 @@ databaseChangeLog:
         - column:
             name: annex_estat
             type: varchar(16 ${varcharUnit})
+            defaultValue: 'DEFINITIU'
         tableName: ipa_registre_annex
     - addColumn:
         columns:
@@ -44,4 +45,5 @@ databaseChangeLog:
         - column:
             name: annex_estat
             type: varchar(16 ${varcharUnit})
+            defaultValue: 'DEFINITIU'
         tableName: ipa_document
