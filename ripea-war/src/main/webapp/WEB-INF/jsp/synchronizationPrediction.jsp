@@ -253,7 +253,7 @@
 	</div>
 
 	<c:set var="formAction">
-		<dis:modalUrl value="/unitatOrganitzativa/saveSynchronize" />
+		<rip:modalUrl value="/unitatOrganitzativa/saveSynchronize" />
 	</c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 		<div id="modal-botons">
