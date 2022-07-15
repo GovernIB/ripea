@@ -53,8 +53,10 @@ public interface ConfigService {
 
 	String getConfigValue(String configKey) throws NotDefinedConfigException;
 
-	@PreAuthorize("hasRole('NOT_SUPER')")
+	@PreAuthorize("hasRole('IPA_SUPER')")
 	void crearPropietatsConfigPerEntitats();
 
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	void actualitzarPropietatsJBossBdd();
 }
 

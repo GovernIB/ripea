@@ -58,4 +58,9 @@ public class ConfigServiceBean implements ConfigService {
 	public void crearPropietatsConfigPerEntitats() {
 		delegate.crearPropietatsConfigPerEntitats();
 	}
+
+	@Override
+	public void actualitzarPropietatsJBossBdd() {
+		delegate.actualitzarPropietatsJBossBdd();
+	}
 }

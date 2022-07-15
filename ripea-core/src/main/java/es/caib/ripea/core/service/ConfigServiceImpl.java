@@ -119,14 +119,15 @@ public class ConfigServiceImpl implements ConfigService {
             return new ArrayList<>();
         }
         String [] split = key.split(ConfigDto.prefix);
-        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNull(split[1]), ConfigDto.class);
+        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(split[1]), ConfigDto.class);
     }
     @Override
     @Transactional(readOnly = true)
     public String getConfigValue(String configKey) throws NotDefinedConfigException {
     	return configHelper.getConfig(configKey);
     }
-    private void processPropertyValues(ConfigGroupDto cGroup) {
+
+    public void processPropertyValues(ConfigGroupDto cGroup) {
         for (ConfigDto config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){
                 config.setValue("*****");
@@ -162,4 +163,16 @@ public class ConfigServiceImpl implements ConfigService {
             }
         }
     }
+
+    @Override
+    public void actualitzarPropietatsJBossBdd() {
+
+        List<ConfigEntity> configs = configRepository.findJBossConfigurables();
+        for(ConfigEntity config : configs) {
+            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            config.setValue(property);
+            configRepository.save(config);
+        }
+    }
+
 }
