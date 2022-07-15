@@ -1061,7 +1061,7 @@ public class ExpedientHelper {
 	public Exception guardarExpedientArxiu(
 			Long expId) {
 		
-		logger.info("Guardar expedient arxiu (id=" + expId + ", entitatCodi=" + ConfigHelper.getEntitatActualCodi() + ")");
+		logger.info("Guardar expedient arxiu (id=" + expId + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")");
 		Exception exception = null;
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
@@ -1080,7 +1080,7 @@ public class ExpedientHelper {
 			
 		} catch (Exception ex) {
 			logger.error("Error al custodiar expedient en arxiu  (" +
-					"id=" + expedient.getId() + ", entitatCodi=" + ConfigHelper.getEntitatActualCodi() + ")",
+					"id=" + expedient.getId() + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")",
 					ex);
 			exception = ex;
 			for (InteressatEntity interessat : expedient.getInteressats()) {

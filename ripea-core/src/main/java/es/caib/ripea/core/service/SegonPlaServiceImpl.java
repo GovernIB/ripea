@@ -376,16 +376,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	private int getArxiuMaxReintentsExpedients() {
-		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
+		String arxiuMaxReintentsExpedients = configHelper.getConfigKeyByEntitat("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
 		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;
 	}
 	
 	private int getArxiuMaxReintentsDocuments() {
-		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
+		String arxiuMaxReintentsDocuments = configHelper.getConfigKeyByEntitat("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
 	}
 	private int getArxiuMaxReintentsInteressats() {
-		String arxiuMaxReintentsInteressats = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats");
+		String arxiuMaxReintentsInteressats = configHelper.getConfigKeyByEntitat("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats");
 		return arxiuMaxReintentsInteressats != null && !arxiuMaxReintentsInteressats.isEmpty() ? Integer.valueOf(arxiuMaxReintentsInteressats) : 0;
 	}
 	

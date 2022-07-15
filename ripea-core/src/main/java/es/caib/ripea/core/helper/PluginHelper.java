@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.google.common.base.Strings;
+import es.caib.ripea.core.api.dto.config.ConfigDto;
 import org.apache.commons.codec.binary.Base64;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -3816,7 +3817,7 @@ public class PluginHelper {
 
 	private UnitatsOrganitzativesPlugin getUnitatsOrganitzativesPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (Strings.isNullOrEmpty(entitatCodi)) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -3832,7 +3833,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			unitatsOrganitzativesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3842,7 +3843,7 @@ public class PluginHelper {
 
 	public IArxiuPlugin getArxiuPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -3858,7 +3859,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			arxiuPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3868,7 +3869,7 @@ public class PluginHelper {
 
 	private PortafirmesPlugin getPortafirmesPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -3884,7 +3885,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (PortafirmesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class).
-						newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			portafirmesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3894,7 +3895,7 @@ public class PluginHelper {
 	
 	private ConversioPlugin getConversioPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -3910,7 +3911,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ConversioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			conversioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3920,7 +3921,7 @@ public class PluginHelper {
 
 	private DigitalitzacioPlugin getDigitalitzacioPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -3936,7 +3937,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DigitalitzacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			digitalitzacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4014,7 +4015,7 @@ public class PluginHelper {
 
 	private DadesExternesPlugin getDadesExternesPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4030,7 +4031,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			dadesExternesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4040,7 +4041,7 @@ public class PluginHelper {
 
 	private IValidateSignaturePlugin getValidaSignaturaPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4056,7 +4057,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			validaSignaturaPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4066,7 +4067,7 @@ public class PluginHelper {
 
 	private NotificacioPlugin getNotificacioPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4082,7 +4083,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (NotificacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			notificacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4092,7 +4093,7 @@ public class PluginHelper {
 	
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4108,7 +4109,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			firmaServidorPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4117,7 +4118,7 @@ public class PluginHelper {
 	}
 	private ViaFirmaPlugin getViaFirmaPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4135,7 +4136,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ViaFirmaPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			viaFirmaPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -4145,7 +4146,7 @@ public class PluginHelper {
 
 	private ProcedimentPlugin getProcedimentPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4161,7 +4162,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			procedimentPlugin = (ProcedimentPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			procedimentPlugins.put(entitatCodi, procedimentPlugin);
 			return procedimentPlugin;
 		} catch (Exception ex) {
@@ -4171,7 +4172,7 @@ public class PluginHelper {
 
 	private GestioDocumentalPlugin getGestioDocumentalPlugin() {
 
-		String entitatCodi = ConfigHelper.getEntitatActualCodi();
+		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
@@ -4187,7 +4188,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (GestioDocumentalPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigHelper.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
 			gestioDocumentalPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

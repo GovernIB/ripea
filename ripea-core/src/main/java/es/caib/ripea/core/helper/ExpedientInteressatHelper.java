@@ -44,6 +44,8 @@ public class ExpedientInteressatHelper {
 	@Autowired
 	private PluginHelper pluginHelper;
 	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
 	private ExpedientRepository expedientRepository;
 	
 	@Transactional
@@ -508,7 +510,7 @@ public class ExpedientInteressatHelper {
 	public Exception guardarInteressatsArxiu(
 			Long expId) {
 		
-		logger.info("Guardar interessats arxiu (id=" + expId + ", entitatCodi=" + ConfigHelper.getEntitatActualCodi() + ")");
+		logger.info("Guardar interessats arxiu (id=" + expId + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")");
 		
 		Exception exception = null;
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
@@ -521,7 +523,7 @@ public class ExpedientInteressatHelper {
 				}
 			} catch (Exception e) {
 				logger.error("Error al custodiar interessats en arxiu (" +
-						"expedient id=" + expedient.getId() + ", entitatCodi=" + ConfigHelper.getEntitatActualCodi() + ")",
+						"expedient id=" + expedient.getId() + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")",
 						e);
 				exception = e;
 				for (InteressatEntity interessat : expedient.getInteressats()) {

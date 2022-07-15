@@ -5,6 +5,7 @@ import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.helper.ConfigHelper;
 import lombok.SneakyThrows;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Configuration
 @EnableScheduling
 public class SchedulingConfig implements SchedulingConfigurer {
@@ -59,7 +61,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.EXECUTAR_EXECUCIONS_MASSIVES_RATE), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-							logger.error("Error getting next execution date for comprovarExecucionsMassives()", e);
+							log.error("Error getting next execution date for comprovarExecucionsMassives()", e);
 						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
@@ -92,7 +94,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-							logger.error("Error getting next execution date for consultarIGuardarAnotacionsPeticionsPendents()", e);
+                            log.error("Error getting next execution date for consultarIGuardarAnotacionsPeticionsPendents()", e);
 						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
@@ -125,7 +127,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.BUIDAR_CACHES_DOMINIS_RATE), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-							logger.error("Error getting next execution date for buidarCacheDominis()", e);
+                            log.error("Error getting next execution date for buidarCacheDominis()", e);
 						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
@@ -159,7 +161,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON));
 						} catch (Exception e) {
-							logger.error("Error getting next execution date for enviarEmailsPendentsAgrupats()", e);
+                            log.error("Error getting next execution date for enviarEmailsPendentsAgrupats()", e);
 						}
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
@@ -185,7 +187,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_CONTINGUTS_PENDENTS), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-							logger.error("Error getting next execution date for guardarExpedientsDocumentsArxiu()", e);
+                            log.error("Error getting next execution date for guardarExpedientsDocumentsArxiu()", e);
 						}
                         // Només la primera vegada que s'executa
                         long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
@@ -217,7 +219,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.GUARDAR_ARXIU_INTERESSATS), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-							logger.error("Error getting next execution date for guardarInteressatsArxiu()", e);
+                            log.error("Error getting next execution date for guardarInteressatsArxiu()", e);
 						}
                         // Només la primera vegada que s'executa
                         long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
@@ -233,8 +235,4 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
 
     }
-    
-    
-	private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
-    
 }

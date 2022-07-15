@@ -771,7 +771,7 @@ public class DocumentHelper {
 	public Exception guardarDocumentArxiu(
 			Long docId) {
 		
-		logger.info("Guardar document arxiu (id=" + docId + ", entitatCodi=" + ConfigHelper.getEntitatActualCodi() + ")");
+		logger.info("Guardar document arxiu (id=" + docId + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")");
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);
