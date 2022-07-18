@@ -47,6 +47,13 @@ public class ConfigHelper {
 	}
 
     @Transactional(readOnly = true)
+    public String getConfig(String keyGeneral, String valorDefecte) {
+
+        String valor = getConfig(keyGeneral);
+        return !Strings.isNullOrEmpty(valor) ? valor : valorDefecte;
+    }
+
+    @Transactional(readOnly = true)
     public String getConfig(String keyGeneral)  {
     	
     	String entitatCodi  = getEntitatActualCodi();
@@ -56,9 +63,9 @@ public class ConfigHelper {
             return getJBossProperty(keyGeneral);
         }
         // Propietat trobada en db
-        if (configEntity.isConfigurable() && entitatCodi != null) {
+        if (configEntity.isConfigurable() && !Strings.isNullOrEmpty(entitatCodi)) {
             // Propietat a nivell d'entitat
-            String keyEntitat = convertirKeyGeneralToKeyPropietat(entitatCodi, keyGeneral);
+            String keyEntitat = crearEntitatKey(entitatCodi, keyGeneral);
             ConfigEntity configEntitatEntity = configRepository.findOne(keyEntitat);
             if (configEntitatEntity != null) {
                 value = getConfig(configEntitatEntity);
@@ -70,26 +77,6 @@ public class ConfigHelper {
         }
 		return value;
 	}
-
-	private String convertirKeyGeneralToKeyPropietat (String entitatActualCodi, String key) {
-		if (entitatActualCodi != null) {
-			String keyReplace = key.replace(".", "_");
-			String[] splitKey = keyReplace.split("_");
-			String keyEntitat = "";
-			for (int i=0; i<splitKey.length; i++) {
-				if (i == (splitKey.length - 1)) {
-					keyEntitat = keyEntitat + splitKey[i];
-				}else if (i == 2){
-					keyEntitat = keyEntitat + splitKey[i] + "." + entitatActualCodi + ".";
-				}else {				
-					keyEntitat = keyEntitat + splitKey[i] + ".";
-				}
-			}
-			key = keyEntitat;
-		}
-		return key;
-	}
-    
 
     @Transactional(readOnly = true)
     public Properties getGroupProperties(String codeGroup) {
@@ -120,13 +107,13 @@ public class ConfigHelper {
     }
 
     public boolean getAsBoolean(String key) {
-        return Boolean.parseBoolean(getConfigKeyByEntitat(key));
+        return Boolean.parseBoolean(getConfig(key));
     }
     public int getAsInt(String key) {
-        return new Integer(getConfigKeyByEntitat(key));
+        return new Integer(getConfig(key));
     }
     public long getAsLong(String key) {
-        return new Long(getConfigKeyByEntitat(key));
+        return new Long(getConfig(key));
     }
     public float getAsFloat(String key) {
         return new Float(getConfig(key));
@@ -161,12 +148,6 @@ public class ConfigHelper {
     }
 
     @Transactional(readOnly = true)
-    public String getConfigKeyByEntitat(String property) {
-
-        return entitat == null || entitat.get() == null ? getConfig(property) : getConfigKeyByEntitat(entitat.get().getCodi(), property);
-    }
-
-    @Transactional(readOnly = true)
     public String getConfigKeyByEntitat(String entitatCodi, String property) {
 
         String key = crearEntitatKey(entitatCodi, property);
@@ -187,7 +168,7 @@ public class ConfigHelper {
 
     public String crearEntitatKey(String entitatCodi, String key) {
 
-        if (entitatCodi == null || entitatCodi == "" || key == null || key == "") {
+        if (Strings.isNullOrEmpty(entitatCodi) || Strings.isNullOrEmpty(key)) {
             String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
             log.error(msg);
             throw new RuntimeException(msg);
