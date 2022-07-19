@@ -3,41 +3,13 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.sun.jersey.core.util.Base64;
-
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -47,6 +19,23 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -257,7 +246,7 @@ public class DocumentHelper {
 				document.getNtiCsvRegulacion());
 		FitxerDto fitxer = null;
 		if (document.getFitxerContingut() != null && (
-				document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ||
+				(document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) && !documentEntity.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) ||
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
 				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
@@ -293,6 +282,12 @@ public class DocumentHelper {
 						documentEntity, 
 						fitxer,
 						document.getFirmaContingut());
+			}
+			// Al modificar el document, eliminam l'alerta de document invàlid,
+			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
+			if (!documentEntity.isValidacioCorrecte()) {
+				documentEntity.setValidacioCorrecte(true);
+//				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 			}
 		}
 		// Registra al log la modificació del document
@@ -401,7 +396,7 @@ public class DocumentHelper {
 		}
 		
 	}
-	
+
 	public DocumentEntity crearDocumentDB(
 			DocumentTipusEnumDto documentTipus,
 			String nom,
@@ -419,6 +414,29 @@ public class DocumentHelper {
 			String ubicacio,
 			String ntiIdDocumentoOrigen,
 			String pinbalIdpeticion) {
+		return crearDocumentDB(documentTipus, nom, descripcio, data, dataCaptura, ntiOrgano, ntiOrigen, ntiEstadoElaboracion, ntiTipoDocumental, metaDocument, pare, entitat, expedient, ubicacio, ntiIdDocumentoOrigen, pinbalIdpeticion, true, null, ArxiuEstatEnumDto.DEFINITIU);
+	}
+
+	public DocumentEntity crearDocumentDB(
+			DocumentTipusEnumDto documentTipus,
+			String nom,
+			String descripcio,
+			Date data,
+			Date dataCaptura,
+			String ntiOrgano,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
+			String ntiTipoDocumental,
+			MetaDocumentEntity metaDocument,
+			ContingutEntity pare,
+			EntitatEntity entitat,
+			ExpedientEntity expedient,
+			String ubicacio,
+			String ntiIdDocumentoOrigen,
+			String pinbalIdpeticion,
+			boolean validacioCorrecte,
+			String validacioError,
+			ArxiuEstatEnumDto annexEstat) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
 				DocumentEstatEnumDto.REDACCIO,
@@ -438,6 +456,9 @@ public class DocumentHelper {
 				expedient).
 				ubicacio(ubicacio).
 				pinbalIdpeticion(pinbalIdpeticion).
+				validacioCorrecte(validacioCorrecte).
+				validacioError(validacioError).
+				annexEstat(annexEstat).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);
 		calcularIdentificadorDocument(

@@ -185,7 +185,7 @@ public class PluginHelper {
 	public static final String GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB = "docsFirmats"; //documents signed by portafib that haven't been saved in arxiu  
 	public static final String GESDOC_AGRUPACIO_DOCS_ADJUNTS = "docsAdjunts"; // documents adjunts when creating document that haven't been saved in arxiu
 
-	
+
 	private DadesUsuariPlugin dadesUsuariPlugin;
 	private Map<String, UnitatsOrganitzativesPlugin> unitatsOrganitzativesPlugins = new HashMap<>();
 	private Map<String, PortafirmesPlugin> portafirmesPlugins = new HashMap<>();
@@ -736,7 +736,7 @@ public class PluginHelper {
 								document.getNom(),
 								document.getDescripcio(),
 								document.getMetaDocument().getNom(),
-								false,
+								DocumentTipusEnumDto.IMPORTAT.equals(document.getDocumentTipus()),
 								fitxer,
 								documentAmbFirma,
 								firmaSeparada,
@@ -2472,12 +2472,12 @@ public class PluginHelper {
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
-			
+
 			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
 			if (validationStatus.getStatus() != 1) {
 				throw new RuntimeException(validationStatus.getErrorMsg());
 			}
-			
+
 			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
 			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
 			ArxiuFirmaDto firma = new ArxiuFirmaDto();
@@ -3892,7 +3892,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, "Error al crear la instància del plugin de portafirmes", ex);
 		}
 	}
-	
+
 	private ConversioPlugin getConversioPlugin() {
 
 		String entitatCodi = configHelper.getEntitatActualCodi();
@@ -4090,7 +4090,7 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, "Error al crear la instància del plugin de notificació", ex);
 		}
 	}
-	
+
 	private FirmaServidorPlugin getFirmaServidorPlugin() {
 
 		String entitatCodi = configHelper.getEntitatActualCodi();

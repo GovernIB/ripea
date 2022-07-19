@@ -3,13 +3,8 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import es.caib.distribucio.ws.backofficeintegracio.BackofficeIntegracio;
-import es.caib.distribucio.ws.client.BackofficeIntegracioWsClientFactory;
+import es.caib.distribucio.rest.client.BackofficeIntegracioRestClient;
+import es.caib.distribucio.rest.client.BackofficeIntegracioRestClientFactory;
 
 /**
  * Mètodes comuns per cridar WebService de Distribucio
@@ -19,20 +14,12 @@ import es.caib.distribucio.ws.client.BackofficeIntegracioWsClientFactory;
 @Component
 public class DistribucioHelper {
 	
-	@Autowired
-	private ConfigHelper configHelper;
-
+	private static String url = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.url");
+	private static String usuari = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.username");
+	private static String contrasenya = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty("es.caib.ripea.distribucio.backofficeIntegracio.ws.password");
 	
-	public BackofficeIntegracio getBackofficeIntegracioServicePort() throws IOException {
-		
-		String url = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.url");
-		String usuari = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.username");
-		String contrasenya = configHelper.getConfig("es.caib.ripea.distribucio.backofficeIntegracio.ws.password");
-		
-		return BackofficeIntegracioWsClientFactory.getWsClient(
-				url,
-				usuari,
-				contrasenya);
+	public static BackofficeIntegracioRestClient getBackofficeIntegracioRestClient() {
+		return BackofficeIntegracioRestClientFactory.getRestClient(url, usuari, contrasenya);
 	}
 
 	

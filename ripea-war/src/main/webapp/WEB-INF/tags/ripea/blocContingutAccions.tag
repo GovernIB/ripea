@@ -228,7 +228,7 @@
 			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 			
 				<%---- Enviar a portafirmes ----%>
-				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
+				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && (contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT') && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<c:choose>
@@ -248,7 +248,7 @@
 				</c:if>
 				
 				<%---- Firmar al navegador ----%>
-				<c:if test="${contingut.metaNode.firmaPassarelaActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && contingut.documentTipus == 'DIGITAL' && contingut.fitxerExtension!='zip'}">
+				<c:if test="${contingut.metaNode.firmaPassarelaActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && (contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT') && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<c:choose>
@@ -268,7 +268,7 @@
 				</c:if>
 				
 				<%---- Enviar a viaFirma ----%>
-				<c:if test="${!isTasca and (contingut.estat == 'REDACCIO' && contingut.metaNode.firmaBiometricaActiva && contingut.documentTipus == 'DIGITAL' && isFirmaBiometrica) && contingut.fitxerExtension!='zip'}">
+				<c:if test="${!isTasca and (contingut.estat == 'REDACCIO' && contingut.metaNode.firmaBiometricaActiva && (contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT') && isFirmaBiometrica) && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
 							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/viafirma/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-square"></span>&nbsp;<spring:message code="contingut.boto.viafirma.enviar"/>...</a></li>

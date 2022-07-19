@@ -4,6 +4,36 @@
  */
 package es.caib.ripea.core.helper;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import es.caib.distribucio.rest.client.domini.DocumentTipus;
+import es.caib.distribucio.rest.client.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.domini.NtiTipoDocumento;
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.ContingutTipus;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.repository.*;
+import es.caib.ripea.core.security.ExtendedPermission;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
@@ -16,89 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-
-import es.caib.distribucio.ws.backofficeintegracio.DocumentTipus;
-import es.caib.distribucio.ws.backofficeintegracio.NtiEstadoElaboracion;
-import es.caib.distribucio.ws.backofficeintegracio.NtiOrigen;
-import es.caib.distribucio.ws.backofficeintegracio.NtiTipoDocumento;
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.ContingutTipus;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.RegistreAnnexEntity;
-import es.caib.ripea.core.entity.RegistreInteressatEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.CarpetaRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Mètodes comuns per a la gestió d'expedients.
@@ -515,6 +462,15 @@ public class ExpedientHelper {
 		registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = expedientPeticioEntity.getRegistre().getEntitat();
 
+//		if (registreAnnexEntity.getAnnexEstat() == null) {
+//			try {
+//				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(null, registreAnnexEntity.getUuid(), null, false);
+//				registreAnnexEntity.updateAnnexEstat(DocumentEstat.ESBORRANY.equals(documentArxiu.getEstat()) ? ArxiuEstatEnumDto.ESBORRANY : ArxiuEstatEnumDto.DEFINITIU);
+//			} catch (Exception ex) {
+//				logger.debug("No s'ha pogut obtenir informació del document a l'arxiu");
+//			}
+//		}
+
 		if (expedientEntity.getArxiuUuid() == null) {
 			throw new RuntimeException("Annex no s'ha processat perque expedient no es creat en arxiu");
 		}
@@ -581,7 +537,10 @@ public class ExpedientHelper {
 					expedientEntity,
 					documentDto.getUbicacio(),
 					documentDto.getNtiIdDocumentoOrigen(),
-					null);
+					null,
+					registreAnnexEntity.isValidacioCorrecte(),
+					registreAnnexEntity.getValidacioError(),
+					registreAnnexEntity.getAnnexEstat());
 			FitxerDto fitxer = new FitxerDto();
 			fitxer.setNom(documentDto.getFitxerNom());
 			fitxer.setContentType(documentDto.getFitxerContentType());
@@ -594,11 +553,13 @@ public class ExpedientHelper {
 			} else {
 				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
 			}
-			if (registreAnnexEntity.getFirmaTipus() != null) {
-				docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-				docEntity.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));
-			} else {
-				docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexEstat()) || registreAnnexEntity.getAnnexEstat() == null) {
+				if (registreAnnexEntity.getFirmaTipus() != null) {
+					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+					docEntity.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));
+				} else {
+					docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
+				}
 			}
 			
 			registreAnnexEntity.updateDocument(docEntity);
@@ -681,7 +642,7 @@ public class ExpedientHelper {
 	 * Creates document from registre annex
 	 * @param expedientId 
 	 * 
-	 * @param registreAnnexId
+	 * @param arxiuUuid
 	 * @param expedientPeticioId
 	 * @return
 	 */
@@ -1383,6 +1344,9 @@ public class ExpedientHelper {
 		String codiDir3 = entitatRepository.findByUnitatArrel(
 				registreAnnexEntity.getRegistre().getEntitatCodi()).getUnitatArrel();
 		document.setNtiOrgano(codiDir3);
+		document.setValidacioCorrecte(registreAnnexEntity.isValidacioCorrecte());
+		document.setValidacioError(registreAnnexEntity.getValidacioError());
+		document.setAnnexEstat(registreAnnexEntity.getAnnexEstat());
 		return document;
 	}
 	
@@ -1941,7 +1905,7 @@ public class ExpedientHelper {
 
 	
 	
-	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(es.caib.distribucio.ws.backofficeintegracio.FirmaTipus firmaTipus) {
+	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(es.caib.distribucio.rest.client.domini.FirmaTipus firmaTipus) {
 		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto = null;
 		
 		switch (firmaTipus) {

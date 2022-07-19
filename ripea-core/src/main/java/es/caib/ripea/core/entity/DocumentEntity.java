@@ -3,30 +3,7 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -35,6 +12,13 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa un document.
@@ -118,6 +102,14 @@ public class DocumentEntity extends NodeEntity {
 	private String gesDocAdjuntFirmaId;
 	@Column(name = "pinbal_idpeticion", length = 64)
 	private String pinbalIdpeticion;
+
+	@Column(name = "val_ok")
+	private boolean validacioCorrecte;
+	@Column(name = "val_error")
+	private String validacioError;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "annex_estat")
+	private ArxiuEstatEnumDto annexEstat;
 	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
@@ -255,6 +247,9 @@ public class DocumentEntity extends NodeEntity {
 	public void updateEstat(
 			DocumentEstatEnumDto estat) {
 		this.estat = estat;
+		if (!validacioCorrecte && !DocumentEstatEnumDto.REDACCIO.equals(estat)) {
+			this.validacioCorrecte = true;
+		}
 	}
 	public void updateInformacioCustodia(
 			Date custodiaData,
@@ -386,6 +381,7 @@ public class DocumentEntity extends NodeEntity {
 			built.expedient = expedient;
 			built.tipus = ContingutTipusEnumDto.DOCUMENT;
 			built.versioCount = 0;
+			built.validacioCorrecte = true;
 		}
 		public Builder ubicacio(String ubicacio) {
 			built.ubicacio = ubicacio;
@@ -406,6 +402,18 @@ public class DocumentEntity extends NodeEntity {
 		}
 		public Builder pinbalIdpeticion(String pinbalIdpeticion) {
 			built.pinbalIdpeticion = pinbalIdpeticion;
+			return this;
+		}
+		public Builder validacioCorrecte(Boolean validacioCorrecte) {
+			built.validacioCorrecte = validacioCorrecte != null ? validacioCorrecte : true;
+			return this;
+		}
+		public Builder validacioError(String validacioError) {
+			built.validacioError = validacioError;
+			return this;
+		}
+		public Builder annexEstat(ArxiuEstatEnumDto annexEstat) {
+			built.annexEstat = annexEstat;
 			return this;
 		}
 		public DocumentEntity build() {

@@ -1,0 +1,49 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- property:
+    name: booleanTrue
+    value: 1
+    dbms: oracle
+- property:
+    name: booleanTrue
+    value: true
+    dbms: postgresql
+- changeSet:
+    id: 1657536749461-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: val_ok
+            type: boolean
+            defaultValue: ${booleanTrue}
+        - column:
+            name: val_error
+            type: varchar(1000 ${varcharUnit})
+        - column:
+            name: annex_estat
+            type: varchar(16 ${varcharUnit})
+            defaultValue: 'DEFINITIU'
+        tableName: ipa_registre_annex
+    - addColumn:
+        columns:
+        - column:
+            name: val_ok
+            type: boolean
+            defaultValue: ${booleanTrue}
+        - column:
+            name: val_error
+            type: varchar(1000 ${varcharUnit})
+        - column:
+            name: annex_estat
+            type: varchar(16 ${varcharUnit})
+            defaultValue: 'DEFINITIU'
+        tableName: ipa_document
