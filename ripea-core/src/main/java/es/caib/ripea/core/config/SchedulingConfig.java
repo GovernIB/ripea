@@ -84,7 +84,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
+                        segonPlaService.reintentarCanviEstatDistribucio();
                     }
                 },
                 new Trigger() {
@@ -94,21 +94,54 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-                            log.error("Error getting next execution date for consultarIGuardarAnotacionsPeticionsPendents()", e);
+                            log.error("Error getting next execution date for reintentarCanviEstatDistribucio()", e);
 						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        long notificaEnviamentsRegistratsInitialDelayLong = 0L;
+                        long delay = 0L;
                         if (primeraVez[1]) {
-                        	notificaEnviamentsRegistratsInitialDelayLong = DEFAULT_INITIAL_DELAY_MS;
+                            delay = DEFAULT_INITIAL_DELAY_MS;
                         	primeraVez[1] = false;
                         }
-                        trigger.setInitialDelay(notificaEnviamentsRegistratsInitialDelayLong);
+                        trigger.setInitialDelay(delay);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }
                 }
         );
+
+        // 2.5 Reintentar canvi estat BACK_REBUDA a DISTRIBUCIO
+        //////////////////////////////////////////////////////////////////
+
+        taskRegistrar.addTriggerTask( new Runnable() {
+                                          @SneakyThrows
+                                          @Override
+                                          public void run() {
+                                              segonPlaService.buidarCacheDominis();
+                                          }
+                                      },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        PeriodicTrigger trigger = null;
+                        try {
+                            trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.BUIDAR_CACHES_DOMINIS_RATE), TimeUnit.MILLISECONDS);
+                        } catch (Exception e) {
+                            log.error("Error getting next execution date for buidarCacheDominis()", e);
+                        }
+                        trigger.setFixedRate(true);
+                        // Només la primera vegada que s'executa
+                        long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+                        if (primeraVez[2]) {
+                            enviamentRefrescarEstatPendentsInitialDelayLong = DEFAULT_INITIAL_DELAY_MS;
+                            primeraVez[2] = false;
+                        }
+                        trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                });
+
 
         // 3. Buidar caches dominis
         //////////////////////////////////////////////////////////////////
