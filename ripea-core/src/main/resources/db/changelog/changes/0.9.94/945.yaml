@@ -45,14 +45,10 @@ databaseChangeLog:
       dbms: oracle
   - property:
       name: boolean.type
-      value: number(1,0)
-      dbms: oracle
-  - property:
-      name: boolean.type
       value: boolean
       dbms: postgresql
   - changeSet:
-      id: 11651146740000-2
+      id: 11651146740000-3
       author: limit
       changes:
         - createTable:

@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - property:
+      name: boolean.type
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolean.type
+      value: boolean
+      dbms: postgresql
+  - property:
+      name: int.type
+      value: number(10,0)
+      dbms: oracle
+  - property:
+      name: int.type
+      value: smallint
+      dbms: postgresql
+  - changeSet:
+      id: 1651146740001-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_expedient_peticio
+            columns:
+              - column:
+                  name: enviat_distribucio
+                  type: ${boolean.type}
+                  defaultValue: 0
+              - column:
+                  name: reintents_enviat_distribucio
+                  type: ${int.type}
+                  defaultValue: 3

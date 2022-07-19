@@ -96,14 +96,14 @@ public class ExpedientPeticioHelper {
 		}
 	}
 
-	public void canviEstatExpedientPeticio(
-			Long expedientPeticioId,
-			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
+	public void canviEstatExpedientPeticio(Long expedientPeticioId, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
+
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateEstat(expedientPeticioEstatEnumDto);
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
-		if (entitatAnotacio != null)
+		if (entitatAnotacio != null) {
 			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+		}
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

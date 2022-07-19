@@ -14,4 +14,6 @@ public interface SegonPlaService {
 
 	void guardarInteressatsArxiu();
 
+	void reintentarCanviEstatDistribucio();
+
 }

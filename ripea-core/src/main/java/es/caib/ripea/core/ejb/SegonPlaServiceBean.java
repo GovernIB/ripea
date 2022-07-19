@@ -61,4 +61,9 @@ public class SegonPlaServiceBean implements SegonPlaService {
 		delegate.guardarInteressatsArxiu();
 	}
 
+	@Override
+	public void reintentarCanviEstatDistribucio() {
+		delegate.reintentarCanviEstatDistribucio();
+	}
+
 }

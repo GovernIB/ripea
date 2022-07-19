@@ -99,93 +99,75 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 */
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
-		logger.debug(
-				"Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
+
+		logger.debug("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
 		// find peticions with no anotació associated and with no errors from previous invocation of this method
-		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(
-				ExpedientPeticioEstatEnumDto.CREAT);
+		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto.CREAT);
 
-		if (peticions != null &&
-				!peticions.isEmpty()) {
-			for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
+		if (peticions == null || peticions.isEmpty()) {
+			return;
+		}
 
-				AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
-				anotacioRegistreId.setIndetificador(
-						expedientPeticioEntity.getIdentificador());
-				anotacioRegistreId.setClauAcces(
-						expedientPeticioEntity.getClauAcces());
+		for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
 
+			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
+			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
+			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
+			try {
+				boolean throwException = false;
+				if(throwException) {
+					throw new RuntimeException("EXCEPION BEFORE CONSULTING ANOTACIO!!!!!! ");
+				}
+
+				//obtain anotació from DISTRIBUCIO
+				AnotacioRegistreEntrada registre = distribucioHelper.getBackofficeIntegracioServicePort().consulta(anotacioRegistreId);
+
+				// create anotació in db and associate it with expedient peticion
+				expedientPeticioHelper.crearRegistrePerPeticio(registre, expedientPeticioEntity);
+
+				// change state of expedient peticion to pendent of acceptar or rebutjar
+				expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity.getId(), ExpedientPeticioEstatEnumDto.PENDENT);
+
+				// change state of anotació in DISTRIBUCIO to BACK_REBUDA
+				distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.REBUDA, "");
+				EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
+				if (entitatAnotacio != null) {
+					cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+				}
+
+			} catch (Throwable e) {
+				logger.error("Error consultar i guardar anotació per petició: " + expedientPeticioEntity.getIdentificador()
+							+ " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
 				try {
-					
-					boolean throwException = false;
-					if(throwException)
-						throw new RuntimeException("EXCEPION BEFORE CONSULTING ANOTACIO!!!!!! ");
-					
-					
-
-					//obtain anotació from DISTRIBUCIO
-					AnotacioRegistreEntrada registre = distribucioHelper.getBackofficeIntegracioServicePort().consulta(
-							anotacioRegistreId);
-
-					// create anotació in db and associate it with expedient peticion
-					expedientPeticioHelper.crearRegistrePerPeticio(
-							registre,
-							expedientPeticioEntity);
-					
-
-					// change state of expedient peticion to pendent of acceptar or rebutjar
-					expedientPeticioHelper.canviEstatExpedientPeticio(
-							expedientPeticioEntity.getId(),
-							ExpedientPeticioEstatEnumDto.PENDENT);
-
-					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
-					distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
-							anotacioRegistreId,
-							Estat.REBUDA,
-							"");
-					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
-					if (entitatAnotacio != null)
-						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
-				} catch (Throwable e) {
-					logger.error(
-							"Error consultar i guardar anotació per petició: " +
-									expedientPeticioEntity.getIdentificador() + 
-									" RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
-					try {
-						boolean isRollbackException = true;
-						while (isRollbackException) {
-							if (e.getClass().toString().contains("RollbackException")) {
-								e = e.getCause();
-							} else {
-								isRollbackException = false;
-							}
+					boolean isRollbackException = true;
+					while (isRollbackException) {
+						if (e.getClass().toString().contains("RollbackException")) {
+							e = e.getCause();
+						} else {
+							isRollbackException = false;
 						}
-
-						// add error to peticio, so it will not be processed anymore until it will be resent from DISTRIBUCIO 
-						expedientPeticioHelper.addExpedientPeticioConsultaError(
-								expedientPeticioEntity.getId(),
-								StringUtils.abbreviate(
-										ExceptionUtils.getStackTrace(e),
-										3600));
-						
-
-						// change state of anotació in DISTRIBUCIO to BACK_ERROR
-						distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(
-								anotacioRegistreId,
-								Estat.ERROR,
-								StringUtils.abbreviate(
-										ExceptionUtils.getStackTrace(e),
-										3600));
-						
-					} catch (IOException e1) {
-						logger.error(ExceptionUtils.getStackTrace(e1));
 					}
+
+					// add error to peticio, so it will not be processed anymore until it will be resent from DISTRIBUCIO
+					expedientPeticioHelper.addExpedientPeticioConsultaError(expedientPeticioEntity.getId(),
+																			StringUtils.abbreviate(ExceptionUtils.getStackTrace(e), 3600));
+
+					// change state of anotació in DISTRIBUCIO to BACK_ERROR
+					distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId, Estat.ERROR,
+										StringUtils.abbreviate(ExceptionUtils.getStackTrace(e), 3600));
+				} catch (IOException e1) {
+					logger.error(ExceptionUtils.getStackTrace(e1));
 				}
 			}
 		}
 	}
-	
+
+	@Override
+	public void reintentarCanviEstatDistribucio() {
+		System.out.println("REINTENTAT");
+	}
+
 	@Override
 	public void buidarCacheDominis() {
 		logger.debug("Execució tasca periòdica: Buidar cachés dominis");
@@ -374,7 +356,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			}
 		}
 	}
-	
+
 	private int getArxiuMaxReintentsExpedients() {
 		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
 		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;
