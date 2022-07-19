@@ -23,7 +23,7 @@ databaseChangeLog:
             tableName: ipa_expedient_peticio
             columns:
               - column:
-                  name: enviat_distribucio
+                  name: reintents_enviar_distribucio
                   type: ${boolean.type}
                   defaultValue: 0
               - column:
