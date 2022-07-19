@@ -5,6 +5,7 @@ package es.caib.ripea.core.helper;
 
 import es.caib.distribucio.rest.client.BackofficeIntegracioRestClient;
 import es.caib.distribucio.rest.client.BackofficeIntegracioRestClientFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * Mètodes comuns per cridar WebService de Distribucio
