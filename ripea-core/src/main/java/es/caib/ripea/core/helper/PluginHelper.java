@@ -1175,13 +1175,18 @@ public class PluginHelper {
 		}
 		accioParams.put("versio", versio);
 		accioParams.put("ambContingut", new Boolean(ambContingut).toString());
+		accioParams.put("ambVersioImprimible", new Boolean(ambVersioImprimible).toString());
 		long t0 = System.currentTimeMillis();
 		try {
 			String arxiuUuidConsulta = (contingut != null && contingut instanceof DocumentEntity) ? contingut.getArxiuUuid() : arxiuUuid;
+			accioParams.put("arxiuUuidConsulta", arxiuUuidConsulta);
 			Document documentDetalls = getArxiuPlugin().documentDetalls(
 					arxiuUuidConsulta,
 					versio,
 					ambContingut);
+			if (ambContingut && documentDetalls.getContingut() == null) {
+				logger.error("El plugin no ha retornat el contingut del document ({})", accioParams.toString());
+			}
 			boolean generarVersioImprimible = false;
 			if (ambVersioImprimible && ambContingut && documentDetalls.getFirmes() != null && !documentDetalls.getFirmes().isEmpty()) {
 				for (Firma firma : documentDetalls.getFirmes()) {
