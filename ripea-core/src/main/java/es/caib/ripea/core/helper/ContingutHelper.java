@@ -1608,6 +1608,7 @@ public class ContingutHelper {
 				return resultBuilder.error(true).errorMessage("El document associat a l'annex no té UUID de l'arxiu").build();
 			}
 
+			resultBuilder.documentId(document.getId()).documentNom(document.getNom()).expedient(document.getExpedient().getCodi());
 
 			String documentUuid = document.getArxiuUuid();
 			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(document, documentUuid, null, true);
@@ -1618,6 +1619,11 @@ public class ContingutHelper {
 
 			if (annexId.equals(documentUuid)) {
 				return resultBuilder.uuidDesti(documentUuid).error(true).errorMessage("El document origen i destí són el mateix a l'arxiu").build();
+			}
+
+			Document documentAnnex = pluginHelper.arxiuDocumentConsultar(null, annexUuid, null, true);
+			if (documentAnnex.getContingut() == null) {
+				return resultBuilder.error(true).errorMessage("El document de l'annex no té contingut a l'arxiu").build();
 			}
 
 			// Annex associat amb document sense uuid
@@ -1632,7 +1638,7 @@ public class ContingutHelper {
 					document.getExpedient().getArxiuUuid());
 			// 4. Assignam el nou uuid al document
 			if (uuidDesti == null) {
-				return resultBuilder.uuidDesti(documentUuid).error(true).errorMessage("No s'ha generat un uuid per un nou document a l'arxiu").build();
+				return resultBuilder.error(true).errorMessage("No s'ha generat un uuid per un nou document a l'arxiu").build();
 			}
 			document.updateArxiu(uuidDesti);
 			return resultBuilder.uuidDesti(uuidDesti).build();

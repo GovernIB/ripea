@@ -31,6 +31,9 @@ public class ResultDocumentsSenseContingut {
     @Data
     @Builder
     public static class ResultDocumentSenseContingut {
+        String expedient;
+        Long documentId;
+        String documentNom;
         String uuidOrigen;
         String uuidDestiSenseContingut;
         String uuidDesti;
