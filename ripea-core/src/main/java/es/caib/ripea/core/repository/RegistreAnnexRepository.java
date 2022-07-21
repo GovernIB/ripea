@@ -87,10 +87,14 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("dataFi") Date dataFi,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
-	
 
-	
-	
+
+	@Query(	"select a.id " +
+			"from RegistreAnnexEntity a " +
+			"where a.annexEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.ESBORRANY " +
+			"and a.document is not null " )
+	public List<Long> findIdsEsborranysAmbDocument();
+
 
 
 	

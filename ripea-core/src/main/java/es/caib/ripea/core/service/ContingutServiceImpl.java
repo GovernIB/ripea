@@ -17,15 +17,7 @@ import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.entity.*;
 import es.caib.ripea.core.helper.*;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +62,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
 	@Autowired
@@ -2012,6 +2006,18 @@ public class ContingutServiceImpl implements ContingutService {
 		return false;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
+    @Override
+    public ResultDocumentsSenseContingut arreglaDocumentsSenseContingut() {
+		ResultDocumentsSenseContingut result = ResultDocumentsSenseContingut.builder().build();
+
+		List<Long> idsAnnexEsborranysAmbDocument = registreAnnexRepository.findIdsEsborranysAmbDocument();
+		for (Long annexId : idsAnnexEsborranysAmbDocument) {
+			result.addResultDocument(contingutHelper.arreglaDocumentSenseContingut(annexId));
+		}
+
+		return result;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 
 }

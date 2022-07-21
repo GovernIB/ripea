@@ -472,7 +472,7 @@ public class ExpedientHelper {
 //		}
 
 		if (expedientEntity.getArxiuUuid() == null) {
-			throw new RuntimeException("Annex no s'ha processat perque expedient no es creat en arxiu");
+			throw new RuntimeException("Annex no s'ha processat perque l'expedient no s'ha creat a l'arxiu");
 		}
 		
 		if (registreAnnexEntity.getDocument() == null) {
@@ -484,7 +484,7 @@ public class ExpedientHelper {
 					", " + "expedientPeticioId=" + expedientPeticioEntity.getId() + ")");
 		
 			// ########################## CREATE CARPETA IN DB AND IN ARXIU ######################
-			// create carpeta ind db and arxiu if doesnt already exists
+			// create carpeta in db and arxiu if doesnt already exists
 			Long carpetaId = createCarpetaForDocFromAnnex(
 					expedientEntity,
 					entitat.getId(),

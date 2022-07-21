@@ -232,7 +232,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				for (RegistreAnnexEntity registeAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 					expedientHelper.updateRegistreAnnexError(
 							registeAnnexEntity.getId(),
-							"Annex no s'ha processat perque expedient na s'ha creat en arxiu");
+							"Annex no s'ha processat perque l'expedient no s'ha creat en arxiu");
 				}
 				expedientDto.setExpCreatArxiuOk(false);
 			}

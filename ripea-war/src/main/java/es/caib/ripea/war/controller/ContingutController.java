@@ -871,6 +871,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		return getMessage(request, "contingut.orfe.delete.ok");
 	}
 
+	@RequestMapping(value = "/documents/sense/contingut", method = RequestMethod.GET)
+	@ResponseBody
+	public ResultDocumentsSenseContingut arreglaDocumentsSenseContingut(HttpServletRequest request) {
+		return contingutService.arreglaDocumentsSenseContingut();
+	}
+
+
+
 //	@PostConstruct
 	public void netejaContingutsOrfes() {
 		try {

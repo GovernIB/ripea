@@ -533,4 +533,6 @@ public interface ContingutService {
 	// ////////////////////////////////////////////////////////////////////
 
     Boolean netejaContingutsOrfes();
+	@PreAuthorize("hasRole('IPA_SUPER')")
+    ResultDocumentsSenseContingut arreglaDocumentsSenseContingut();
 }

@@ -1,0 +1,41 @@
+package es.caib.ripea.core.api.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@Builder
+public class ResultDocumentsSenseContingut {
+    List<ResultDocumentSenseContingut> resultDocumentsSenseContigut;
+    @Builder.Default
+    Integer documentsArreglats = 0;
+    @Builder.Default
+    Integer documentsError = 0;
+
+    public void addResultDocument(ResultDocumentSenseContingut resultDocument) {
+        if (resultDocumentsSenseContigut == null) {
+            resultDocumentsSenseContigut = new ArrayList<>();
+        }
+        resultDocumentsSenseContigut.add(resultDocument);
+        if (resultDocument.error) {
+            documentsError++;
+        } else {
+            documentsArreglats++;
+        }
+    }
+
+
+    @Data
+    @Builder
+    public static class ResultDocumentSenseContingut {
+        String uuidOrigen;
+        String uuidDestiSenseContingut;
+        String uuidDesti;
+
+        boolean error = false;
+        String errorMessage;
+    }
+}

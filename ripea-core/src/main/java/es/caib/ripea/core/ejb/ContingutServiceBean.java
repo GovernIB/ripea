@@ -336,4 +336,10 @@ public class ContingutServiceBean implements ContingutService {
         return delegate.netejaContingutsOrfes();
     }
 
+    @Override
+	@RolesAllowed("IPA_SUPER")
+    public ResultDocumentsSenseContingut arreglaDocumentsSenseContingut() {
+        return delegate.arreglaDocumentsSenseContingut();
+    }
+
 }
