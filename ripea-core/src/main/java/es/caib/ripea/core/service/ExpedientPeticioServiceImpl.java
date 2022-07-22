@@ -85,6 +85,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private DistribucioHelper distribucioHelper;
+	@Autowired
+	private ContingutHelper contingutHelper;
 
 	
 	@Transactional(readOnly = true)
@@ -589,9 +591,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		return result;
 	}
-	
 
-	
+	@Override
+	public PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		Map<String, String[]> ordenacioMap = new HashMap<>();
+//		Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findByEntitatAndPendentsCanviEstat(entitat, paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
+		Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findPendentsCanviEstat(paginacioHelper.toSpringDataPageable(paginacioParams));
+		return paginacioHelper.toPaginaDto(pagina, ExpedientPeticioPendentDist.class);
+	}
 
 	
 

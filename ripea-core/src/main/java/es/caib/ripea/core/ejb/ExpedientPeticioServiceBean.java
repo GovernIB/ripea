@@ -9,6 +9,8 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
@@ -168,7 +170,10 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 				resultEnum);
 	}
 
+	@Override
+	public PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+		return delegate.findPendentsCanviEstatAnotacioDistribucio(entitatId, filtre, paginacioParams);
+	}
 
-	
-	
+
 }

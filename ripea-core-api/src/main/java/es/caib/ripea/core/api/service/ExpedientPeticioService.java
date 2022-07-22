@@ -2,6 +2,8 @@ package es.caib.ripea.core.api.service;
 
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
@@ -94,4 +96,7 @@ public interface ExpedientPeticioService {
 			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum) throws NotFoundException;
 
-}
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams);
+ }

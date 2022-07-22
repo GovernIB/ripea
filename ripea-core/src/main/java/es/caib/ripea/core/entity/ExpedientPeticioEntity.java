@@ -17,6 +17,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -30,6 +32,8 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "ipa_expedient_peticio")
 @EntityListeners(AuditingEntityListener.class)
@@ -76,112 +80,82 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "expedient_id")
 	@ForeignKey(name = "ipa_expedient_registre_fk")
 	private ExpedientEntity expedient;
-	
-	
+
+	@Column(name = "pendent_enviar_distribucio")
+	private boolean pendentEnviarDistribucio;
+	@Column(name = "reintents_enviar_distribucio")
+	private Integer reintentsEnviarDistribucio;
 	
 
-	public String getNotificaDistError() {
-		return notificaDistError;
-	}
 	public void updateNotificaDistError(String notificaDistError) {
-		this.notificaDistError = StringUtils.abbreviate(
-				notificaDistError,
-				4000);
+		this.notificaDistError = StringUtils.abbreviate(notificaDistError, 4000);
 	}
-	public ExpedientEntity getExpedient() {
-		return expedient;
-	}
+
 	public void updateExpedient(ExpedientEntity expedient) {
 		this.expedient = expedient;
 	}
+
 	public boolean isConsultaWsError() {
 		return consultaWsError;
 	}
-	public void updateConsultaWsError(
-			boolean consultaWsError) {
+
+	public void updateConsultaWsError(boolean consultaWsError) {
 		this.consultaWsError = consultaWsError;
 	}
 
-	public String getConsultaWsErrorDesc() {
-		return consultaWsErrorDesc;
-	}
 	public void updateConsultaWsErrorDesc(
 			String consultaWsErrorDesc) {
 		this.consultaWsErrorDesc = consultaWsErrorDesc;
 	}
-	public Date getConsultaWsErrorDate() {
-		return consultaWsErrorDate;
-	}
+
 	public void updateConsultaWsErrorDate(
 			Date consultaWsErrorDate) {
 		this.consultaWsErrorDate = consultaWsErrorDate;
 	}
 
-	public ExpedientPeticioAccioEnumDto getExpedientPeticioAccioEnumDto() {
-		return expedientPeticioAccioEnumDto;
-	}
-	public String getIdentificador() {
-		return identificador;
-	}
 	public void updateIdentificador(
 			String identificador) {
 		this.identificador = identificador;
 	}
+
 	public void updateRegistre(
 			RegistreEntity registre) {
 		this.registre = registre;
 	}
+
 	public void updateClauAcces(
 			String clauAcces) {
 		this.clauAcces = clauAcces;
 	}
+
 	public void updateExpedientPeticioAccioEnumDto(
 			ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
 		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
 	}
+
 	public void updateDataAlta(
 			Date dataAlta) {
 		this.dataAlta = dataAlta;
 	}
-	public Date getDataAlta() {
-		return dataAlta;
-	}
+
 	public void updateEstat(
 			ExpedientPeticioEstatEnumDto estat) {
 		this.estat = estat;
 	}
-	public ExpedientPeticioEstatEnumDto getEstat() {
-		return estat;
-	}
 
-	public RegistreEntity getRegistre() {
-		return registre;
-	}
-	public String getClauAcces() {
-		return clauAcces;
-	}
 	public void updateMetaExpedient(MetaExpedientEntity metaExpedient) {
 		this.metaExpedient = metaExpedient;
 	}
-	public MetaExpedientEntity getMetaExpedient() {
-		return metaExpedient;
-	}
-	public static Builder getBuilder(
-			String identificador,
-			String clauAcces,
-			Date dataAlta,
-			ExpedientPeticioEstatEnumDto estat) {
+
+	public static Builder getBuilder(String identificador, String clauAcces, Date dataAlta, ExpedientPeticioEstatEnumDto estat) {
 		return new Builder(identificador, clauAcces, dataAlta, estat);
 	}
 	
 	public static class Builder {
 		ExpedientPeticioEntity built;
 
-		Builder(
-				String identificador,
-				String clauAcces,
-				Date dataAlta,
-				ExpedientPeticioEstatEnumDto estat) {
+		Builder(String identificador, String clauAcces, Date dataAlta, ExpedientPeticioEstatEnumDto estat) {
+
 			built = new ExpedientPeticioEntity();
 			built.identificador = identificador;
 			built.clauAcces = clauAcces;
@@ -193,6 +167,7 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 			built.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
 			return this;
 		}
+
 		public ExpedientPeticioEntity build() {
 			return built;
 		}

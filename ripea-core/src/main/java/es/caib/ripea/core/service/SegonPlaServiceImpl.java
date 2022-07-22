@@ -10,6 +10,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
+import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
@@ -48,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -106,43 +108,40 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			return;
 		}
 
+		if (true) return;
+
 		for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
 
 			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
-			anotacioRegistreId.setIndetificador(
-					expedientPeticioEntity.getIdentificador());
-			anotacioRegistreId.setClauAcces(
-					expedientPeticioEntity.getClauAcces());
-
+			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
+			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
 			try {
-
 				boolean throwException = false;
-				if(throwException)
+				if(throwException) {
 					throw new RuntimeException("EXCEPION BEFORE CONSULTING ANOTACIO!!!!!! ");
-
+				}
 
 				// obtain anotació from DISTRIBUCIO
-				AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioRestClient().consulta(
-						anotacioRegistreId);
+				AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioRestClient().consulta(anotacioRegistreId);
 
 				// create anotació in db and associate it with expedient peticion
-				expedientPeticioHelper.crearRegistrePerPeticio(
-						registre,
-						expedientPeticioEntity);
+				expedientPeticioHelper.crearRegistrePerPeticio(registre, expedientPeticioEntity);
 
 				// change state of anotació in DISTRIBUCIO to BACK_REBUDA
-				DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
-						anotacioRegistreId,
-						Estat.REBUDA,
-						"");
+				try {
+					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.REBUDA, "");
+				} catch (Exception e) {
+					expedientPeticioEntity.setPendentEnviarDistribucio(true);
+					expedientPeticioEntity.setReintentsEnviarDistribucio(configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS));
+					expedientPeticioRepository.save(expedientPeticioEntity);
+				}
 				EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
-				if (entitatAnotacio != null)
+				if (entitatAnotacio != null) {
 					cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+				}
 			} catch (Throwable e) {
-				logger.error(
-						"Error consultar i guardar anotació per petició: " +
-								expedientPeticioEntity.getIdentificador() +
-								" RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
+				logger.error("Error consultar i guardar anotació per petició: " + expedientPeticioEntity.getIdentificador()
+							+ " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
 //					try {
 					boolean isRollbackException = true;
 					while (isRollbackException) {
@@ -154,20 +153,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					}
 
 					// add error to peticio, so it will not be processed anymore until it will be resent from DISTRIBUCIO
-					expedientPeticioHelper.addExpedientPeticioConsultaError(
-							expedientPeticioEntity.getId(),
-							StringUtils.abbreviate(
-									ExceptionUtils.getStackTrace(e),
-									3600));
+					expedientPeticioHelper.addExpedientPeticioConsultaError(expedientPeticioEntity.getId(),
+							StringUtils.abbreviate(ExceptionUtils.getStackTrace(e), 3600));
 
 					// change state of anotació in DISTRIBUCIO to BACK_ERROR
-					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
-							anotacioRegistreId,
-							Estat.ERROR,
-							StringUtils.abbreviate(
-									ExceptionUtils.getStackTrace(e),
-									3600));
-
+					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.ERROR,
+							StringUtils.abbreviate(ExceptionUtils.getStackTrace(e), 3600));
 //					} catch (IOException e1) {
 //						logger.error(ExceptionUtils.getStackTrace(e1));
 //					}
@@ -175,11 +166,26 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		}
 	}
 
-
-
 	@Override
+	@Transactional
 	public void reintentarCanviEstatDistribucio() {
-		System.out.println("REINTENTAT");
+
+		List<ExpedientPeticioEntity> pendents = expedientPeticioRepository.findPendentsCanviEstat();
+		AnotacioRegistreId anotacio;
+		for (ExpedientPeticioEntity pendent : pendents) {
+			anotacio = new AnotacioRegistreId();
+			anotacio.setIndetificador(pendent.getIdentificador());
+			anotacio.setClauAcces(pendent.getClauAcces());
+			try {
+				DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
+				pendent.setPendentEnviarDistribucio(false);
+				expedientPeticioRepository.save(pendent);
+			} catch (Throwable e) {
+				Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
+				pendent.setReintentsEnviarDistribucio(reintents);
+				expedientPeticioRepository.save(pendent);
+			}
+		}
 	}
 
 	@Override

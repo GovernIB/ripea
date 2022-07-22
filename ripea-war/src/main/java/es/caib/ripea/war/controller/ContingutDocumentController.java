@@ -281,7 +281,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					false,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
 					RolHelper.getRolActual(request), null);
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request), null);
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage());
 			omplirModelFormulari(

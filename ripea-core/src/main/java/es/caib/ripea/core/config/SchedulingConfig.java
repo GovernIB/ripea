@@ -84,7 +84,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.reintentarCanviEstatDistribucio();
+                        segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
                     }
                 },
                 new Trigger() {
@@ -94,7 +94,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
 						try {
 							trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE), TimeUnit.MILLISECONDS);
 						} catch (Exception e) {
-                            log.error("Error getting next execution date for reintentarCanviEstatDistribucio()", e);
+                            log.error("Error getting next execution date for consultarIGuardarAnotacionsPeticionsPendents()", e);
 						}
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
@@ -117,7 +117,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                                           @SneakyThrows
                                           @Override
                                           public void run() {
-                                              segonPlaService.buidarCacheDominis();
+                                              segonPlaService.reintentarCanviEstatDistribucio();
                                           }
                                       },
                 new Trigger() {
@@ -125,18 +125,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     public Date nextExecutionTime(TriggerContext triggerContext) {
                         PeriodicTrigger trigger = null;
                         try {
-                            trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.BUIDAR_CACHES_DOMINIS_RATE), TimeUnit.MILLISECONDS);
+                            trigger = new PeriodicTrigger(configHelper.getAsLong(PropertiesConstants.REINTENTAR_CANVI_ESTAT_DISTRIBUCIO), TimeUnit.MILLISECONDS);
                         } catch (Exception e) {
                             log.error("Error getting next execution date for buidarCacheDominis()", e);
                         }
                         trigger.setFixedRate(true);
                         // Només la primera vegada que s'executa
-                        long enviamentRefrescarEstatPendentsInitialDelayLong = 0L;
+                        long delay = 0L;
                         if (primeraVez[2]) {
-                            enviamentRefrescarEstatPendentsInitialDelayLong = DEFAULT_INITIAL_DELAY_MS;
+                            delay = DEFAULT_INITIAL_DELAY_MS;
                             primeraVez[2] = false;
                         }
-                        trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
+                        trigger.setInitialDelay(delay);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
                         return nextExecution;
                     }

@@ -6,6 +6,10 @@ package es.caib.ripea.core.repository;
 import java.util.Date;
 import java.util.List;
 
+import es.caib.pinbal.client.comu.Entitat;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,35 +27,25 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 
 	
 	@Query("select peticio.registre.id from ExpedientPeticioEntity peticio where peticio.id = :id")
-	Long getRegistreId(
-			@Param("id") Long id);
+	Long getRegistreId(@Param("id") Long id);
 	
 	@Query("select annex.id from" +
 			"    RegistreAnnexEntity annex " +
 			"where " +
 			"annex.registre.id = :id ")
-	List<Long> getRegistreAnnexosId(
-			@Param("id") Long id);
+	List<Long> getRegistreAnnexosId(@Param("id") Long id);
 	
 	@Query("select registre.justificantArxiuUuid from" +
 			"    RegistreEntity registre " +
 			"where " +
 			"registre.id = :id")
-	String getRegistreJustificantArxiuUuid(
-			@Param("id") Long id);
+	String getRegistreJustificantArxiuUuid(@Param("id") Long id);
 	
-	ExpedientPeticioEntity findByIdentificador(
-			String identificador);
-	
-	
+	ExpedientPeticioEntity findByIdentificador(String identificador);
 
-	List<ExpedientPeticioEntity> findByEstatAndConsultaWsErrorIsFalse(
-			ExpedientPeticioEstatEnumDto estat);
+	List<ExpedientPeticioEntity> findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto estat);
 	
-	
-	List<ExpedientPeticioEntity> findByExpedient(
-			ExpedientEntity expedient,
-			Pageable pageable);
+	List<ExpedientPeticioEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 
 	@Query("from" +
 			"    ExpedientPeticioEntity e " +
@@ -130,6 +124,13 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	long countAnotacionsPendentsAdminOrgan(
 			@Param("entitatActual") EntitatEntity entitatActual,
 			@Param("organsCodisPermitted") List<String> organsCodisPermitted);
-	
-	
+
+	@Query("FROM ExpedientPeticioEntity e WHERE e.pendentEnviarDistribucio = true AND e.reintentsEnviarDistribucio > 0")
+	List<ExpedientPeticioEntity> findPendentsCanviEstat();
+
+//	@Query("FROM ExpedientPeticioEntity e WHERE e.pendentEnviarDistribucio = true AND e.reintentsEnviarDistribucio > 0 AND e.expedient.entitat = :entitat")
+	@Query("SELECT e.id, e.identificador, e.dataAlta FROM ExpedientPeticioEntity e WHERE e.pendentEnviarDistribucio = true AND e.reintentsEnviarDistribucio > 0")
+//	Page<ExpedientPeticioEntity> findByEntitatAndPendentsCanviEstat(@Param("entitat") EntitatEntity entitat, Pageable pageable);
+	Page<ExpedientPeticioEntity> findPendentsCanviEstat(Pageable pageable);
+
 }

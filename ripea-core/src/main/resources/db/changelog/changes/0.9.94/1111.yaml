@@ -30,3 +30,13 @@ databaseChangeLog:
                   name: reintents_enviat_distribucio
                   type: ${int.type}
                   defaultValue: 3
+        - sql:
+            sql: "
+            INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE)
+            VALUES ('es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio', 3,
+            'Interval de temps (ms) en que executa la tasca periodica de reintentar canviar estat de anotacions a Distribucio',
+            'SCHEDULLED', 0, 0, 'INT', 0);
+            INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) 
+            VALUES ('es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio', 60000, 
+            'Interval de temps (ms) en que executa la tasca periodica de reintentar canviar estat de anotacions a Distribucio',
+            'SCHEDULLED', 0, 0, 'INT', 0);"

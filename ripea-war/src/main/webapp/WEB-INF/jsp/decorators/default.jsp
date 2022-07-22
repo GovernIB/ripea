@@ -461,6 +461,7 @@ body {
 								<li><a href="<c:url value="/massiu/csv"/>"><spring:message code="massiu.documents.csv"/></a></li>
 							</c:if>
 							<li><a href="<c:url value="/massiu/procesarAnnexosPendents"/>"><spring:message code="massiu.procesar.annexos.pendents"/></a></li>
+							<li><a href="<c:url value="/massiu/anotacionsPendentsCanviEstat"/>"><spring:message code="massiu.anotacions.pendents.canvi.estat"/></a></li>
 						</ul>
 					</div>
 				</c:if>
