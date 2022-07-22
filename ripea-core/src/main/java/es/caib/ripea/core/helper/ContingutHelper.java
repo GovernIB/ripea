@@ -1617,7 +1617,7 @@ public class ContingutHelper {
 			}
 			resultBuilder.uuidDestiSenseContingut(documentUuid);
 
-			if (annexId.equals(documentUuid)) {
+			if (annexUuid.equals(documentUuid)) {
 				return resultBuilder.uuidDesti(documentUuid).error(true).errorMessage("El document origen i destí són el mateix a l'arxiu").build();
 			}
 
