@@ -30,6 +30,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -1591,7 +1592,7 @@ public class ContingutHelper {
 	}
 
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ResultDocumentSenseContingut arreglaDocumentSenseContingut(Long annexId) {
 		ResultDocumentSenseContingutBuilder resultBuilder = ResultDocumentSenseContingut.builder();
 
@@ -1602,47 +1603,67 @@ public class ContingutHelper {
 
 			DocumentEntity document = registreAnnex.getDocument();
 			if (document == null) {
+				logger.info("[DOCS_SENSE_CONT] L'annex no té un document associat a l'expedient");
 				return resultBuilder.error(true).errorMessage("L'annex no té un document associat a l'expedient").build();
 			}
 			if (document.getArxiuUuid() == null) {
-				return resultBuilder.error(true).errorMessage("El document associat a l'annex no té UUID de l'arxiu").build();
+				if (registreAnnex.getError() != null && !registreAnnex.getError().isEmpty()) {
+					return resultBuilder.error(true).errorMessage("El document associat a l'annex no té UUID de l'arxiu, i està pendent de reintent.").build();
+				} else {
+					logger.info("[DOCS_SENSE_CONT] El document associat a l'annex no té UUID de l'arxiu, i no està pendnet de reintent. El crearem!");
+					resultBuilder.errorMessage("El document associat a l'annex no té UUID de l'arxiu, i no està pendent de reintent. El crearem!").build();
+				}
 			}
-
-			resultBuilder.documentId(document.getId()).documentNom(document.getNom()).expedient(document.getExpedient().getCodi());
 
 			String documentUuid = document.getArxiuUuid();
-			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(document, documentUuid, null, true);
-			if (documentArxiu.getContingut() != null) {
-				return resultBuilder.uuidDesti(documentUuid).error(false).errorMessage("El document associat ja té contingut").build();
-			}
-			resultBuilder.uuidDestiSenseContingut(documentUuid);
+			resultBuilder.documentId(document.getId()).documentNom(document.getNom()).expedient(document.getExpedient().getCodi());
 
-			if (annexUuid.equals(documentUuid)) {
-				return resultBuilder.uuidDesti(documentUuid).error(true).errorMessage("El document origen i destí són el mateix a l'arxiu").build();
+			if (documentUuid != null && annexUuid.equals(documentUuid)) {
+				logger.info("[DOCS_SENSE_CONT] El document de l'annex i del document actual són el mateix a l'arxiu");
+				return resultBuilder.uuidDesti(documentUuid).error(true).errorMessage("El document de l'annex i del document actual són el mateix a l'arxiu").build();
+			}
+
+			if (documentUuid != null) {
+				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(document, documentUuid, null, true);
+				if (documentArxiu.getContingut() != null) {
+					logger.info("[DOCS_SENSE_CONT] El document associat ja té contingut");
+					return resultBuilder.uuidDesti(documentUuid).error(false).errorMessage("El document associat ja té contingut").build();
+				}
+				resultBuilder.uuidDestiSenseContingut(documentUuid);
 			}
 
 			Document documentAnnex = pluginHelper.arxiuDocumentConsultar(null, annexUuid, null, true);
 			if (documentAnnex.getContingut() == null) {
+				logger.info("[DOCS_SENSE_CONT]");
 				return resultBuilder.error(true).errorMessage("El document de l'annex no té contingut a l'arxiu").build();
 			}
 
 			// Annex associat amb document sense uuid
 			// 1. Eliminam el document incorrecte de l'arxiu
-			pluginHelper.arxiuDocumentEsborrar(document);
+			if (documentUuid != null) {
+				pluginHelper.arxiuDocumentEsborrar(document);
+				logger.info("[DOCS_SENSE_CONT] El document sense contingut amb uuid '{}' ha estat esborrat.", documentUuid);
+			}
+
 			// 2. Posam l'uuid de l'annex al document
 			document.updateArxiu(annexUuid);
+
 			// 3. Tornam a crear el document a partir de l'annex
 			String uuidDesti = pluginHelper.arxiuDocumentMoure(
 					document,
 					document.getPare().getArxiuUuid(),
 					document.getExpedient().getArxiuUuid());
+
 			// 4. Assignam el nou uuid al document
 			if (uuidDesti == null) {
+				logger.info("[DOCS_SENSE_CONT] No s'ha generat un uuid per un nou document a l'arxiu");
 				return resultBuilder.error(true).errorMessage("No s'ha generat un uuid per un nou document a l'arxiu").build();
 			}
 			document.updateArxiu(uuidDesti);
+			logger.info("[DOCS_SENSE_CONT] S'ha assignat un nou document a l'arxiu per al document, amb uuid '{}'", uuidDesti);
 			return resultBuilder.uuidDesti(uuidDesti).build();
 		} catch (Exception ex) {
+			logger.info("[DOCS_SENSE_CONT] Error inesperat", ex);
 			return resultBuilder.error(true).errorMessage("Error inesperat: " + ex.getMessage()).build();
 		}
 

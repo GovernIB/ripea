@@ -11,6 +11,7 @@ import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -2011,8 +2012,12 @@ public class ContingutServiceImpl implements ContingutService {
 		ResultDocumentsSenseContingut result = ResultDocumentsSenseContingut.builder().build();
 
 		List<Long> idsAnnexEsborranysAmbDocument = registreAnnexRepository.findIdsEsborranysAmbDocument();
+		logger.info("[DOCS_SENSE_CONT] Detectats {} esborranys amb document associat.", idsAnnexEsborranysAmbDocument.size());
 		for (Long annexId : idsAnnexEsborranysAmbDocument) {
-			result.addResultDocument(contingutHelper.arreglaDocumentSenseContingut(annexId));
+			logger.info("[DOCS_SENSE_CONT] Processant annex: {}", annexId);
+			ResultDocumentSenseContingut resultat = contingutHelper.arreglaDocumentSenseContingut(annexId);
+			result.addResultDocument(resultat);
+			logger.info("[DOCS_SENSE_CONT] Resultat del procés: {}", resultat.toString());
 		}
 
 		return result;
