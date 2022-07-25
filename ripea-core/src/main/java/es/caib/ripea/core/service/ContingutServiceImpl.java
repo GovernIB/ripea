@@ -35,6 +35,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -2011,7 +2012,9 @@ public class ContingutServiceImpl implements ContingutService {
     public ResultDocumentsSenseContingut arreglaDocumentsSenseContingut() {
 		ResultDocumentsSenseContingut result = ResultDocumentsSenseContingut.builder().build();
 
-		List<Long> idsAnnexEsborranysAmbDocument = registreAnnexRepository.findIdsEsborranysAmbDocument();
+//		List<Long> idsAnnexEsborranysAmbDocument = registreAnnexRepository.findIdsEsborranysAmbDocument();
+		List<Long> idsAnnexEsborranysAmbDocument = Arrays.asList(2124706L, 2124707L, 2124767L, 2124768L, 2124771L, 2124776L, 2124783L, 2124784L, 2130635L, 2130636L, 2130637L, 2130638L, 2130639L, 2121164L, 2106239L, 2125312L, 2121243L, 2121256L, 2121263L, 2121343L, 2121345L, 2121348L, 2121361L, 2130992L, 2131025L, 2121380L, 2122778L, 2122779L, 2122821L, 2122837L, 2121395L, 2122311L, 2122312L, 2122313L, 2150632L);
+
 		logger.info("[DOCS_SENSE_CONT] Detectats {} esborranys amb document associat.", idsAnnexEsborranysAmbDocument.size());
 		for (Long annexId : idsAnnexEsborranysAmbDocument) {
 			logger.info("[DOCS_SENSE_CONT] Processant annex: {}", annexId);
