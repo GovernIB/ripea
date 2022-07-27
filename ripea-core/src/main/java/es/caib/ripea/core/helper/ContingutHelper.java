@@ -7,8 +7,10 @@ import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfReader;
+import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
@@ -38,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -67,6 +70,8 @@ public class ContingutHelper {
 	private ContingutMovimentRepository contenidorMovimentRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
+	@Autowired
+	private CarpetaRepository carpetaRepository;
 	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
@@ -1689,23 +1694,60 @@ public class ContingutHelper {
 
 			// Annex associat amb document sense uuid
 
-			// 1. Posam l'uuid de l'annex al document
-			document.updateArxiu(annexUuid);
+			CarpetaEntity carpetaEntity = carpetaRepository.findOne(document.getPareId());
+			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 
-			// 2. Crear el document a partir de l'annex
-			String uuidDesti = pluginHelper.arxiuDocumentMoure(
-					document,
-					document.getPare().getArxiuUuid(),
-					document.getExpedient().getArxiuUuid());
-
-			// 3. Assignam el nou uuid al document
-			if (uuidDesti == null) {
-				logger.info("[DOCS_SENSE_CONT] No s'ha generat un uuid per un nou document a l'arxiu");
-				return resultBuilder.error(true).errorMessage("No s'ha generat un uuid per un nou document a l'arxiu").build();
+			logger.info("Contingut de la carpeta '{}';", carpeta.getNom());
+			resultBuilder.carpeta(carpeta.getNom() + " (" + carpeta.getIdentificador() + ")");
+			List<String> documentsCarpeta = new ArrayList<>();
+			Document documentArxiu = null;
+			for (ContingutArxiu contingut : carpeta.getContinguts()) {
+				logger.info(" - {}: UUID {}", contingut.getNom(), contingut.getIdentificador());
+				documentsCarpeta.add(contingut.getNom() + " (" + contingut.getIdentificador() + ")");
+				if (ArxiuConversioHelper.revisarContingutNom(document.getNom()).equals(contingut.getNom())) {
+					documentArxiu = pluginHelper.arxiuDocumentConsultar(null, contingut.getIdentificador(), null, true);
+				}
 			}
-			document.updateArxiu(uuidDesti);
-			logger.info("[DOCS_SENSE_CONT] S'ha assignat un nou document a l'arxiu per al document, amb uuid '{}'", uuidDesti);
-			return resultBuilder.uuidDesti(uuidDesti).build();
+			resultBuilder.documentsCarpeta(documentsCarpeta);
+			if (documentArxiu != null && documentArxiu.getContingut() != null && Arrays.equals(documentArxiu.getContingut().getContingut(), documentAnnex.getContingut().getContingut())) {
+				if (documentArxiu.getIdentificador().equals(documentAnnex.getIdentificador())) {
+					resultBuilder.errorMessage("El document de la carpeta és el mateix que el de l'annex.");
+				}
+				document.updateArxiu(documentArxiu.getIdentificador());
+				logger.info("[DOCS_SENSE_CONT] S'ha assignat el document que ja es trobava a l'arxiu amb uuid '{}'", documentArxiu.getIdentificador());
+				return resultBuilder.uuidDesti(documentArxiu.getIdentificador()).build();
+			} else if (documentArxiu != null) {
+				if (documentArxiu.getContingut() == null) {
+					resultBuilder.errorMessage("El document trobat a l'arxiu no té contingut.");
+					// 1. Eliminam el document que es troba actualment a l'arxiu
+					document.updateArxiu(documentArxiu.getIdentificador());
+					pluginHelper.arxiuDocumentEsborrar(document);
+
+					// 2. Posam l'uuid de l'annex al document
+					document.updateArxiu(annexUuid);
+
+					// 3. Crear el document a partir de l'annex
+					String uuidDesti = pluginHelper.arxiuDocumentMoure(
+							document,
+							document.getPare().getArxiuUuid(),
+							document.getExpedient().getArxiuUuid());
+
+					// 4. Assignam el nou uuid al document
+					if (uuidDesti == null) {
+						logger.info("[DOCS_SENSE_CONT] No s'ha generat un uuid per un nou document a l'arxiu");
+						return resultBuilder.error(true).errorMessage("El document trobat a l'arxiu no té contingut, però no s'ha generat un uuid per un nou document a l'arxiu").build();
+					}
+					document.updateArxiu(uuidDesti);
+					logger.info("[DOCS_SENSE_CONT] S'ha assignat un nou document a l'arxiu per al document, amb uuid '{}'", uuidDesti);
+					return resultBuilder.uuidDesti(uuidDesti).build();
+				} else {
+					resultBuilder.error(true).errorMessage("El document trobat a l'arxiu no té el mateix contingut que el document de l'annex. S'ha de revisar manualment.");
+				}
+				return resultBuilder.build();
+			} else {
+				return resultBuilder.error(true).errorMessage("No s'ha trobat document amb el mateix nom a la carpeta de l'anotació").build();
+			}
+
 		} catch (Exception ex) {
 			logger.info("[DOCS_SENSE_CONT] Error inesperat", ex);
 			return resultBuilder.error(true).errorMessage("Error inesperat: " + ex.getMessage()).build();
