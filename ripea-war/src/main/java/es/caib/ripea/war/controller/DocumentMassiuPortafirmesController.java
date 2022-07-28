@@ -136,7 +136,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/portafirmes",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -162,7 +163,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/portafirmes",
-					"accio.massiva.seleccio.document.biud");
+					"accio.massiva.seleccio.document.biud",
+					null);
 		}
 		return "enviarPortafirmes";
 	}

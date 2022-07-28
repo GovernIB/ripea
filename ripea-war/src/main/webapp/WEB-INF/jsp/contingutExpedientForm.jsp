@@ -114,7 +114,6 @@ function recuperarDominisMetaExpedient() {
 
 function refrescarGrups() {
 	let expedientId = $('#id').val();
-	debugger
 	if(expedientId == undefined || expedientId == "") {
 		let metaExpedientId = $('#metaNodeId').val();
 		if (metaExpedientId != undefined && metaExpedientId != "") {

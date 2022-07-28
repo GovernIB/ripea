@@ -201,16 +201,18 @@ public class ContingutAdminController extends BaseAdminController {
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../esborrat",
-					"contingut.admin.controller.recuperat.duplicat");
+					"contingut.admin.controller.recuperat.duplicat",
+					ex);
 		}  catch (Exception ex) {
 			logger.error("Error al recuperar element", ex);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../esborrat",
 					"contingut.admin.controller.recuperat.error",
-					new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
+					new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() },
+					ex);
 		}
-	} 
+	}
 	
 	
 	
@@ -261,7 +263,8 @@ public class ContingutAdminController extends BaseAdminController {
 							request,
 							"redirect:../../contingut/" + expedientId,
 							"expedient.assignar.controller.no.permis",
-							new Object[] {command.getUsuariCodi()});
+							new Object[] {command.getUsuariCodi()},
+							e);
 				} else {
 					throw e;
 				}
@@ -311,7 +314,7 @@ public class ContingutAdminController extends BaseAdminController {
 		}
 		return filtreCommand;
 	}
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(ContingutAdminController.class);
 
 }

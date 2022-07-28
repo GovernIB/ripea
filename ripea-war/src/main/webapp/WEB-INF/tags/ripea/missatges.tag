@@ -20,10 +20,18 @@
 		"sessionErrors",
 		session.getAttribute(es.caib.ripea.war.helper.MissatgesHelper.SESSION_ATTRIBUTE_ERROR));
 %>
-<c:forEach var="text" items="${sessionErrors}">
+<c:forEach var="alert" items="${sessionErrors}">
 	<div class="alert alert-danger">
 		<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
-		${text}
+		${alert.text}
+		<c:if test="${not empty alert.trace}">
+			<div id="trace-container">
+				<div class="trace">
+					<h3><spring:message code="comu.error.mostrartrasa" /><span class="fa fa-clipboard trace-copy" title="<spring:message code="comu.copiar.portapapers"/>" style="float: right; color: gray;"></span></h3>
+					<div style="display:none;">${alert.trace}</div>
+				</div>
+			</div>
+		</c:if>
 	</div>
 </c:forEach>
 <%
@@ -35,10 +43,10 @@
 		"sessionWarnings",
 		session.getAttribute(es.caib.ripea.war.helper.MissatgesHelper.SESSION_ATTRIBUTE_WARNING));
 %>
-<c:forEach var="text" items="${sessionWarnings}">
+<c:forEach var="alert" items="${sessionWarnings}">
 	<div class="alert alert-warning">
 		<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
-		${text}
+		${alert.text}
 	</div>
 </c:forEach>
 <%
@@ -50,10 +58,10 @@
 		"sessionSuccesses",
 		session.getAttribute(es.caib.ripea.war.helper.MissatgesHelper.SESSION_ATTRIBUTE_SUCCESS));
 %>
-<c:forEach var="text" items="${sessionSuccesses}">
+<c:forEach var="alert" items="${sessionSuccesses}">
 	<div class="alert alert-success">
 		<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
-		${text}
+		${alert.text}
 	</div>
 </c:forEach>
 <%
@@ -65,12 +73,39 @@
 		"sessionInfos",
 		session.getAttribute(es.caib.ripea.war.helper.MissatgesHelper.SESSION_ATTRIBUTE_INFO));
 %>
-<c:forEach var="text" items="${sessionInfos}">
+<c:forEach var="alert" items="${sessionInfos}">
 	<div class="alert alert-info">
 		<button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
-		${text}
+		${alert.text}
 	</div>
 </c:forEach>
 <%
 	session.removeAttribute(es.caib.ripea.war.helper.MissatgesHelper.SESSION_ATTRIBUTE_INFO);
 %>
+
+<div id="modal-copied" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-body"><spring:message code="comu.copiat.portapapers"/></div>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$(".trace").accordion({
+			active: false,
+			collapsible: true,
+			heightStyle: "content"
+		});
+		$(".trace-copy").click(function (event) {
+			event.stopPropagation();
+			navigator.clipboard.writeText($(this).parent().next().text());
+			$("#modal-copied").modal();
+			setTimeout(hideCopyTrace, 2000);
+		});
+	});
+	function hideCopyTrace() {
+		$("#modal-copied").modal('hide');
+	}
+</script>

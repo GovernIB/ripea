@@ -3,11 +3,12 @@
  */
 package es.caib.ripea.war.helper;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper per a mostrar missatges d'alerta o informació.
@@ -23,11 +24,13 @@ public class MissatgesHelper {
 
 	public static void error(
 			HttpServletRequest request,
-			String text) {
+			String text,
+			Throwable ex) {
 		newAlert(
 				request,
 				SESSION_ATTRIBUTE_ERROR,
-				text);
+				text,
+				ex);
 	}
 	public static void warning(
 			HttpServletRequest request,
@@ -54,7 +57,7 @@ public class MissatgesHelper {
 				text);
 	}
 
-	public List<String> getErrors(
+	public List<Alert> getErrors(
 			HttpServletRequest request,
 			boolean delete) {
 		return getAlerts(
@@ -62,7 +65,7 @@ public class MissatgesHelper {
 				SESSION_ATTRIBUTE_ERROR,
 				delete);
 	}
-	public List<String> getWarnings(
+	public List<Alert> getWarnings(
 			HttpServletRequest request,
 			boolean delete) {
 		return getAlerts(
@@ -70,7 +73,7 @@ public class MissatgesHelper {
 				SESSION_ATTRIBUTE_WARNING,
 				delete);
 	}
-	public List<String> getSuccesses(
+	public List<Alert> getSuccesses(
 			HttpServletRequest request,
 			boolean delete) {
 		return getAlerts(
@@ -78,7 +81,7 @@ public class MissatgesHelper {
 				SESSION_ATTRIBUTE_SUCCESS,
 				delete);
 	}
-	public List<String> getInfos(
+	public List<Alert> getInfos(
 			HttpServletRequest request,
 			boolean delete) {
 		return getAlerts(
@@ -87,28 +90,49 @@ public class MissatgesHelper {
 				delete);
 	}
 
-
 	@SuppressWarnings("unchecked")
 	private static void newAlert(
 			HttpServletRequest request,
 			String attributeName,
 			String text) {
 		HttpSession session = request.getSession();
-		List<String> alerts = (List<String>)session.getAttribute(attributeName);
+		List<Alert> alerts = (List<Alert>)session.getAttribute(attributeName);
 		if (alerts == null) {
-			alerts = new ArrayList<String>();
+			alerts = new ArrayList<>();
 			session.setAttribute(attributeName, alerts);
 		}
-		alerts.add(text);
+		alerts.add(Alert.builder().text(text).build());
+	}
+	private static void newAlert(
+			HttpServletRequest request,
+			String attributeName,
+			String message,
+			Throwable ex) {
+		newAlert(request, attributeName, message, ex != null ? ExceptionUtils.getStackTrace(ex) : null);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static List<String> getAlerts(
+	private static void newAlert(
+			HttpServletRequest request,
+			String attributeName,
+			String text,
+			String trace) {
+		HttpSession session = request.getSession();
+		List<Alert> alerts = (List<Alert>)session.getAttribute(attributeName);
+		if (alerts == null) {
+			alerts = new ArrayList<>();
+			session.setAttribute(attributeName, alerts);
+		}
+		alerts.add(Alert.builder().text(text).trace(trace).build());
+	}
+
+	@SuppressWarnings("unchecked")
+	private static List<Alert> getAlerts(
 			HttpServletRequest request,
 			String attributeName,
 			boolean delete) {
 		HttpSession session = request.getSession();
-		List<String> alerts = (List<String>)session.getAttribute(attributeName);
+		List<Alert> alerts = (List<Alert>)session.getAttribute(attributeName);
 		if (delete)
 			session.removeAttribute(attributeName);
 		return alerts;

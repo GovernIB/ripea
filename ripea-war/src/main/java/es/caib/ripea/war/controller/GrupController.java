@@ -3,9 +3,12 @@
  */
 package es.caib.ripea.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.service.GrupService;
+import es.caib.ripea.war.command.GrupCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,12 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.service.GrupService;
-import es.caib.ripea.war.command.GrupCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 
 @Controller
@@ -128,7 +127,8 @@ public class GrupController extends BaseAdminController {
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
 					"redirect:../../grup",
-					ExceptionUtils.getRootCause(e).getMessage());
+					ExceptionUtils.getRootCause(e).getMessage(),
+					e);
 		}
 	}
 	

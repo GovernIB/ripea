@@ -3,54 +3,13 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
-
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
-import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.dto.StatusEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -74,6 +33,26 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -328,7 +307,8 @@ public class MetaExpedientController extends BaseAdminController {
 								getMessage(
 										request,
 										"metaexpedient.controller.regla.crear.result",
-										new Object[] { crearReglaResponse.getMsgEscapeXML() }));
+										new Object[] { crearReglaResponse.getMsgEscapeXML() }),
+								null);
 					}
 				}
 
@@ -340,7 +320,8 @@ public class MetaExpedientController extends BaseAdminController {
 						request,
 						"redirect:metaExpedient",
 						"metaexpedient.controller.creat.error",
-						new String[] {throwable.getMessage()});
+						new String[] {throwable.getMessage()},
+						throwable);
 			}
 		}
 	}
@@ -518,12 +499,12 @@ public class MetaExpedientController extends BaseAdminController {
 		} catch (Exception e) {
 			
 			logger.error("Error al importar procediment", e);
-
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.import.controller.import.error",
-					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() });
+					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() }, e);
 		} finally {
 			request.getSession().removeAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
 		}
@@ -741,7 +722,8 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.form.import.rolsac.error",
-					new Object[] {ExceptionHelper.getRootCauseOrItself(e).getMessage()});
+					new Object[] {ExceptionHelper.getRootCauseOrItself(e).getMessage()},
+					e);
 		}
 		
 		return "metaExpedientForm";
@@ -789,7 +771,8 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
+					new Object[] { crearReglaResponseDto.getMsgEscapeXML() },
+					null);
 		}
 		
 	}
@@ -899,23 +882,27 @@ public class MetaExpedientController extends BaseAdminController {
 					"metaexpedient.controller.esborrat.ok");
 		} catch (Exception ex) {
 			logger.error("Error al esborrar metaexpedient", ex);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
 					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
 						"metaexpedient.controller.esborrar.error.fk",
-						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
+						new Object[] { root.getMessage() },
+						root);
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsEsborratsException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"metaexpedient.controller.esborrar.error.fk.esborrats");
+						"metaexpedient.controller.esborrar.error.fk.esborrats",
+						root);
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"metaexpedient.controller.esborrar.error.fk.expedients");
+						"metaexpedient.controller.esborrar.error.fk.expedients",
+						root);
 			} else {
 				throw ex;
 			}

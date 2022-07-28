@@ -3,27 +3,17 @@
  */
 package es.caib.ripea.core.api.service;
 
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import es.caib.ripea.core.api.dto.CodiValorDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.ExpedientComentariDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
 
 /**
  * Declaració dels mètodes per a gestionar contenidors.
@@ -406,7 +396,7 @@ public interface ExpedientService {
 			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean retryNotificarDistribucio(Long expedientPeticioId);
+	Exception retryNotificarDistribucio(Long expedientPeticioId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean incorporar(Long entitatId,

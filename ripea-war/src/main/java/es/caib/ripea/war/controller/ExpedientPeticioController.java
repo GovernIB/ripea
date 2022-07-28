@@ -3,49 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -66,6 +24,33 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador per al llistat d'expedients peticions.
@@ -167,8 +152,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		if (registreAnnex.getDocumentId() != null) {
 			
-			Exception exception = expedientService.retryMoverAnnexArxiu(
-					registreAnnexId);
+			Exception exception = expedientService.retryMoverAnnexArxiu(registreAnnexId);
 			if (exception == null) {
 				return getModalControllerReturnValueSuccess(
 						request,
@@ -179,7 +163,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						request,
 						"",
 						"expedient.peticio.detalls.controller.reintentat.error",
-						new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()});
+						new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()},
+						exception);
 			}
 			
 		} else {
@@ -272,7 +257,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					request,
 					"",
 					"expedient.peticio.detalls.controller.reintentat.error",
-					new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()});
+					new Object[]{ExceptionHelper.getRootCauseOrItself(exception).getMessage()},
+					exception);
 		}
 	}
 	
@@ -283,8 +269,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
 			Model model) {
-		boolean processatOk = expedientService.retryNotificarDistribucio(expedientPeticioId);
-		if (processatOk) {
+		Exception exception = expedientService.retryNotificarDistribucio(expedientPeticioId);
+		if (exception == null) {
 			MissatgesHelper.success(
 					request, 
 					getMessage(
@@ -297,7 +283,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					getMessage(
 							request, 
 							"expedient.peticio.detalls.controller.reintentat.notificar.error",
-							null));
+							null),
+					exception);
 		}
 		return "redirect:/modal/expedientPeticio/" + expedientPeticioId;
 	}
@@ -399,7 +386,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:expedientPeticio",
-					ex.getMessage());
+					ex.getMessage(),
+					ex);
 		}
 	}
 	
@@ -601,12 +589,14 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueError(
 						request,
 						"redirect:expedientPeticio",
-						"expedient.peticio.controller.acceptat.ko");
+						"expedient.peticio.controller.acceptat.ko",
+						ex);
 			} else {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:expedientPeticio",
-						getMessage(request, "expedient.peticio.controller.acceptat.ko") + ": " + ExceptionHelper.getRootCauseOrItself(ex).getMessage());
+						getMessage(request, "expedient.peticio.controller.acceptat.ko") + ": " + ExceptionHelper.getRootCauseOrItself(ex).getMessage(),
+						ex);
 			}
 		}
 		
@@ -744,7 +734,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueError(
 					request,
 					"/expedientPeticio",
-					"contingut.controller.document.descarregar.error");
+					"contingut.controller.document.descarregar.error",
+					ex);
 		}
 		return null;
 	}
@@ -800,7 +791,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueError(
 					request,
 					"/expedientPeticio",
-					"contingut.controller.document.descarregar.error");
+					"contingut.controller.document.descarregar.error",
+					ex);
 		}
 		return null;
 	}

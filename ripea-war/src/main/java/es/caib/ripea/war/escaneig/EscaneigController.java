@@ -1,11 +1,6 @@
 package es.caib.ripea.war.escaneig;
 
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.ripea.war.helper.MissatgesHelper;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.scanweb.api.ScanWebStatus;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
@@ -16,7 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
-import es.caib.ripea.war.helper.MissatgesHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controller per a les accions de l'escaneig de documents.
@@ -57,7 +55,7 @@ public class EscaneigController {
 					request,
 					scanWebId);
 			if (swc == null) {
-				MissatgesHelper.error(request, msg);
+				MissatgesHelper.error(request, msg, null);
 			} else {
 				ScanWebStatus sws = swc.getStatus();
 				sws.setErrorMsg(msg);

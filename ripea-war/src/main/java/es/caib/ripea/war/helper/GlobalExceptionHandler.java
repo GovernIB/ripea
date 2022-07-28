@@ -1,7 +1,5 @@
 package es.caib.ripea.war.helper;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -10,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.support.RequestContext;
+
+import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler implements MessageSourceAware {
@@ -22,9 +22,9 @@ public class GlobalExceptionHandler implements MessageSourceAware {
     	logger.error("Multipart Excepcion", ex);
 
     	if (ex.getCause().getMessage().contains("No queda espacio en el dispositivo")){
-    		return getModalControllerReturnValueError(request, null, "error.multipart.noQuedaEspacioEnElDispositivo", null);
+    		return getModalControllerReturnValueError(request, null, "error.multipart.noQuedaEspacioEnElDispositivo", null, ex.getCause());
     	} else {
-    		return getModalControllerReturnValueErrorMessageText(request, null, ex.getCause().getCause().getMessage());
+    		return getModalControllerReturnValueErrorMessageText(request, null, ex.getCause().getCause().getMessage(), ex.getCause().getCause());
     	}
     }
     
@@ -32,14 +32,16 @@ public class GlobalExceptionHandler implements MessageSourceAware {
 			HttpServletRequest request,
 			String url,
 			String messageKey,
-			Object[] messageArgs) {
+			Object[] messageArgs,
+			Throwable ex) {
 		if (messageKey != null) {
 			MissatgesHelper.error(
 					request, 
 					getMessage(
 							request, 
 							messageKey,
-							messageArgs));
+							messageArgs),
+					ex);
 		}
 		if (ModalHelper.isRequestPathModal(request)) {
 			return modalUrlTancar();
@@ -50,11 +52,13 @@ public class GlobalExceptionHandler implements MessageSourceAware {
 	protected String getModalControllerReturnValueErrorMessageText(
 			HttpServletRequest request,
 			String url,
-			String message) {
+			String message,
+			Throwable ex) {
 		if (message != null) {
 			MissatgesHelper.error(
 					request, 
-					message);
+					message,
+					ex);
 		}
 		if (ModalHelper.isRequestPathModal(request)) {
 			return modalUrlTancar();

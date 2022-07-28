@@ -157,12 +157,12 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					return getModalControllerReturnValueErrorMessageText(
 							request,
 							"redirect:../../contingut/" + contingutId,
-							getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+							getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 				} else {
 					return getModalControllerReturnValueErrorMessageText(
 							request,
 						"redirect:../../contingut/" + contingutId,
-							getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage());
+							getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage(), root);
 				}
 			} else {
 				throw e;
@@ -215,13 +215,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 				
 			} else {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage(), root);
 			}
 		}
 	}
@@ -675,13 +675,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 				
 			} else {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + root.getMessage());
+						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + root.getMessage(), root);
 			}
 		}
 	}

@@ -316,7 +316,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return "redirect:../../expedient";
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -384,7 +385,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return "redirect:../../expedient";
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -501,7 +503,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 
 			
 		} catch (ValidationException ex) {
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
@@ -514,13 +516,15 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					return getModalControllerReturnValueError(
 							request,
 							"redirect:../expedient",
-							"expedient.controller.crear.error.serie.documental.not.found");
+							"expedient.controller.crear.error.serie.documental.not.found",
+							e);
 				} else {
 					return getModalControllerReturnValueError(
 							request,
 							"redirect:../expedient",
 							"expedient.controller.creat.error",
-							new Object[] {e.getMessage()});
+							new Object[] {e.getMessage()},
+							e);
 				}
 
 			} else { 
@@ -528,7 +532,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						request,
 						"redirect:../expedient",
 						"expedient.controller.creat.error",
-						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
+						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() },
+						e);
 			}
 		}
 	}
@@ -563,7 +568,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					"expedient.controller.modificat.ok");
 		} catch (ValidationException ex) {
 			logger.error("Error al modificar expedient", ex);
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom"));
@@ -606,7 +611,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request,
 					redirect,
 					"expedient.controller.guardar.arxiu.error",
-					new Object[] {msg});
+					new Object[] {msg},
+					exception);
 		}
 	}
 	
@@ -759,8 +765,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				return getAjaxControllerReturnValueError(
 						request,
 						url,
-						"expedient.controller.agafat.error.perm"
-						);
+						"expedient.controller.agafat.error.perm",
+						e);
 			} else {
 				throw e;
 			}
@@ -782,7 +788,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return "redirect:/expedient";
 		} else {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -818,13 +825,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					errors++;
 					logger.error("Error al agafar expedeint", e);
 					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
-					MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}));
+					MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}), e);
 					
 				}
 			}
 			deselect(request, null);
 			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple", new Object[]{errors}));
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.agafat.error.multiple", new Object[]{errors}), null);
 			}
 			if (ok > 0) {
 				MissatgesHelper.success(request, getMessage(request, "expedient.controller.agafat.ok.multiple", new Object[]{ok}));
@@ -901,7 +908,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
 					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
-					ExceptionHelper.getRootCauseOrItself(e).getMessage());
+					ExceptionHelper.getRootCauseOrItself(e).getMessage(),
+					e);
 
 		}
 	}
@@ -921,7 +929,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return "redirect:/expedient";
 		} else {
 			
@@ -940,13 +949,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					errors++;
 					logger.error("Error al alliberar expedeint", e);
 					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientId, RolHelper.getRolActual(request));
-					MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}));
+					MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple.one.msg", new Object[]{expedientDto.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage()}), e);
 				
 				}
 			}
 			deselect(request, null);
 			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple", new Object[]{errors}));
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.alliberat.error.multiple", new Object[]{errors}), null);
 			}
 			if (ok > 0) {
 				MissatgesHelper.success(request, getMessage(request, "expedient.controller.alliberat.ok.multiple", new Object[]{ok}));
@@ -999,7 +1008,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 							request,
 							"redirect:../../contingut/" + expedientId,
 							"expedient.assignar.controller.no.permis",
-							new Object[] { command.getUsuariCodi() });
+							new Object[] { command.getUsuariCodi() },
+							e);
 				} else {
 					throw e;
 				}
@@ -1067,7 +1077,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						getMessage(
 								request, 
 								"expedient.controller.tancar.nodefinitius",
-								null));
+								null),
+						ex);
 				return "expedientTancarForm";
 			}
 			throw ex;			
@@ -1247,7 +1258,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../esborrat",
-					e.getMessage());
+					e.getMessage(),
+					e);
 
 		}
 	}
@@ -1292,7 +1304,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.relacio.esborrada.error"));
+							"expedient.controller.relacio.esborrada.error"),
+					null);
 		}
 		return "redirect:/contingut/" + expedientId;
 	}
@@ -1487,7 +1500,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:/../../contingut/" + destiId,
-					e.getMessage());
+					e.getMessage(),
+					e);
 
 		}
 	}
@@ -1508,7 +1522,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return "redirect:/expedient";
 		} else {
 			int borrados = 0;
@@ -1528,17 +1543,18 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 						MissatgesHelper.error(
 								request, 
-								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), getMessage(request, "error.arxiu.connectTimedOut")}));
+								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), getMessage(request, "error.arxiu.connectTimedOut")}), e);
 					} else {
 						MissatgesHelper.error(
 								request, 
-								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), root.getMessage()}));
+								getMessage(request, "expedient.controller.esborrar.error.multiple.one.msg", new Object[]{expedientDto.getNom(), root.getMessage()}),
+								e);
 					}
 				}
 			}
 			deselect(request, null);
 			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.esborrat.error.multiple", new Object[]{errors}));
+				MissatgesHelper.error(request, getMessage(request, "contingut.controller.element.esborrat.error.multiple", new Object[]{errors}), null);
 			}
 			if (borrados > 0) {
 				MissatgesHelper.success(request, getMessage(request, "contingut.controller.element.esborrat.ok.multiple", new Object[]{borrados}));
