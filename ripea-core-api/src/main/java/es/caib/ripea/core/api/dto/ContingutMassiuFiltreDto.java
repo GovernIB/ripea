@@ -6,6 +6,8 @@ package es.caib.ripea.core.api.dto;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 
@@ -14,6 +16,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class ContingutMassiuFiltreDto implements Serializable {
 
 	private ContingutTipusEnumDto tipusElement;
@@ -25,6 +29,7 @@ public class ContingutMassiuFiltreDto implements Serializable {
 	private String nom;
 	private Date dataInici;
 	private Date dataFi;
+	private String identificador;
 	
 	private boolean bloquejarTipusElement;
 	private boolean bloquejarMetaDada;
