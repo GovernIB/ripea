@@ -404,9 +404,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public boolean retryNotificarDistribucio(Long expedientPeticioId) {
+	public Exception retryNotificarDistribucio(Long expedientPeticioId) {
 		ExpedientPeticioEntity expedientPeticioEntity = new ExpedientPeticioEntity();
-		boolean processatOk = true;
+		Exception exception = null;
 		try {
 			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
@@ -417,9 +417,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedientPeticioEntity.updateNotificaDistError(null);
 		} catch (Exception e) {
 			expedientPeticioEntity.updateNotificaDistError(ExceptionUtils.getStackTrace(e));
-			processatOk = false;
+			exception = e;
 		}
-		return processatOk;
+		return exception;
 	}
 
 	@Transactional

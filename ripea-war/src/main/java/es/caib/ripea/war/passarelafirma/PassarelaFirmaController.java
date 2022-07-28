@@ -60,7 +60,7 @@ public class PassarelaFirmaController {
 					request,
 					signaturesSetId);
 			if (pfss == null) {
-				MissatgesHelper.error(request, msg);
+				MissatgesHelper.error(request, msg, null);
 			} else {
 				StatusSignaturesSet sss = pfss.getStatusSignaturesSet();
 				sss.setErrorMsg(msg);

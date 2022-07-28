@@ -222,7 +222,8 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/definitiu",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 		omplirModelTancarExpedient(request, model);
 		ExpedientMassiuTancamentCommand command = new ExpedientMassiuTancamentCommand();
@@ -275,7 +276,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					} else {
 						errors++;
 						ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientTancar.getId(), RolHelper.getRolActual(request));
-						MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.error", new Object[]{expedientDto.getNom(), throwable.getMessage()}));
+						MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.error", new Object[]{expedientDto.getNom(), throwable.getMessage()}), throwable);
 					}
 				}
 			}
@@ -293,7 +294,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 				MissatgesHelper.warning(request, getMessage(request, "expedient.controller.tancar.massiu.nodefinitius", new Object[]{nodefinitius}));
 			} 
 			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.errors", new Object[]{errors}));
+				MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.errors", new Object[]{errors}), null);
 			} 
 			return modalUrlTancar();
 			
@@ -303,7 +304,8 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../massiu/tancament",
-					ex.getMessage());
+					ex.getMessage(),
+					ex);
 		}
 	}
 	

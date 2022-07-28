@@ -3,23 +3,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
@@ -31,6 +14,21 @@ import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PinbalConsultaCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Controlador per a la gestió de peticions a PINBAL.
@@ -90,7 +88,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueSuccess(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.ok");
 		} catch (Exception ex) {
 			logger.error("Error en la consulta PINBAL", ex);
-			return getModalControllerReturnValueError(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.error", new String[] {ex.getMessage()});
+			return getModalControllerReturnValueError(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.error", new String[] {ex.getMessage()}, ex);
 		}
 	}
 

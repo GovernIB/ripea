@@ -4,24 +4,6 @@
 package es.caib.ripea.war.controller;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -36,6 +18,22 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per al manteniment de seguiment de elements pendents de guardar a dins l'arxiu
@@ -473,7 +471,8 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/seguimentArxiuPendents",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 
 		int errors = 0;
@@ -495,7 +494,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.expedients.massiu.correctes", new Object[]{correctes}));
 		}
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.expedients.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.expedients.massiu.errors", new Object[]{errors}), null);
 		}
 
 		seleccio.clear();
@@ -520,7 +519,8 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/seguimentArxiuPendents/#documents",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 		
 		EntitatDto entitatActual = getEntitatActual(request);
@@ -556,7 +556,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.documents.massiu.correctes", new Object[]{correctes}));
 		}
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.documents.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.documents.massiu.errors", new Object[]{errors}), null);
 		}
 
 		seleccio.clear();
@@ -581,7 +581,8 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/seguimentArxiuPendents/#interessats",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 
 		int errors = 0;
@@ -608,7 +609,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.interessats.massiu.correctes", new Object[]{correctes}));
 		}
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.interessats.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.interessats.massiu.errors", new Object[]{errors}), null);
 		}
 
 		seleccio.clear();

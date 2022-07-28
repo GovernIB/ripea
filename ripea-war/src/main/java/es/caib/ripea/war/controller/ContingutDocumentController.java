@@ -202,7 +202,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					false,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
 					request,
 					command,
@@ -215,7 +215,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Throwable throwable = ExceptionHelper.findExceptionInstance(ex, SistemaExternException.class, 3);
 			if (throwable!=null) {
 				SistemaExternException sisExtExc = (SistemaExternException) throwable;
-				MissatgesHelper.error(request, sisExtExc.getMessage());
+				MissatgesHelper.error(request, sisExtExc.getMessage(), ex);
 				omplirModelFormulari(
 						request,
 						command,
@@ -278,7 +278,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
 					RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
 					request,
 					command,
@@ -353,13 +353,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 				msg = getMessage(request,"error.arxiu.connectTimedOut");
 			} else {
-				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+				msg = root.getMessage();
 			}
 			return getAjaxControllerReturnValueError(
 					request,
 					redirect,
 					"document.controller.guardar.arxiu.error",
-					new Object[] {msg});
+					new Object[] {msg},
+					root);
 		}
 	}
 
@@ -403,7 +404,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						request,
 						getMessage(
 								request, 
-								"document.digitalitzacio.estat.enum."+ resultat.getEstat()));
+								"document.digitalitzacio.estat.enum."+ resultat.getEstat()),
+						null);
 				omplirModelFormulari(
 						request,
 						command,
@@ -515,7 +517,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					return getAjaxControllerReturnValueError(
 							request,
 							"redirect:../../",
-							"document.controller.descarregar.error.arxiuNoTrobat");
+							"document.controller.descarregar.error.arxiuNoTrobat",
+							e);
 				} else {
 					
 					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
@@ -523,11 +526,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					if (root.getMessage() != null && root.getMessage().contains("timed out")) {
 						MissatgesHelper.error(
 								request, 
-								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 					} else {
 						MissatgesHelper.error(
 								request, 
-								getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage());
+								getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
 					}
 					return "redirect:../../../../contingut/" + pareId;
 				}
@@ -538,7 +541,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request, 
 					getMessage(
 							request, 
-							"document.controller.descarregar.error"));
+							"document.controller.descarregar.error"),
+					null);
 			if (contingut.getPare() != null)
 				return "redirect:../../contingut/" + pareId;
 			else
@@ -729,7 +733,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return getModalControllerReturnValueErrorMessageText(
 					request, 
 					null, 
-					exception.getMessage());
+					exception.getMessage(),
+					exception);
 		}
 	}
 	
@@ -776,7 +781,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return this.getModalControllerReturnValueError(
 					request,
 					"redirect:../../contingut/" + contingut.getId(),
-					"document.controller.estat.canviat.ko");
+					"document.controller.estat.canviat.ko",
+					null);
 		}
 	}
 
@@ -965,11 +971,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 				MissatgesHelper.error(
 						request, 
-						getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+						getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 			} else {
 				MissatgesHelper.error(
 						request, 
-						getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage());
+						getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
 			}
 			return "redirect:../../../../contingut/" + contingutId;
 		}

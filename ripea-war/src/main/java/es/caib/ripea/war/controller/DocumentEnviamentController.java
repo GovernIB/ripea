@@ -3,17 +3,23 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DadesExternesService;
+import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.plugin.NotibRepostaException;
+import es.caib.ripea.war.command.DocumentNotificacionsCommand;
+import es.caib.ripea.war.command.DocumentPublicacioCommand;
+import es.caib.ripea.war.command.InteressatCommand;
+import es.caib.ripea.war.command.NotificacioEnviamentCommand;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,37 +35,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
-import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
-import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DadesExternesService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.plugin.NotibRepostaException;
-import es.caib.ripea.war.command.DocumentNotificacionsCommand;
-import es.caib.ripea.war.command.DocumentPublicacioCommand;
-import es.caib.ripea.war.command.InteressatCommand;
-import es.caib.ripea.war.command.NotificacioEnviamentCommand;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador per als enviaments dels expedients.
@@ -131,7 +115,8 @@ public class DocumentEnviamentController extends BaseUserController {
 							getMessage(
 									request, 
 									"document.controller.notificacio.ko", 
-									new Object[] {errorNotib.getKey(), errorNotib.getValue()}));
+									new Object[] {errorNotib.getKey(), errorNotib.getValue()}),
+							null);
 				}
 			}
 			return this.getModalControllerReturnValueSuccess(
@@ -155,7 +140,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"",
-					msg);
+					msg,
+					e);
 		}
 	}
 	
@@ -219,7 +205,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			return this.getModalControllerReturnValueError(
 					request,
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
-					"expedient.controller.notificacio.justificant.ko");
+					"expedient.controller.notificacio.justificant.ko",
+					null);
 		}
 		return "notificacioForm";
 	}
@@ -244,7 +231,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			return this.getModalControllerReturnValueError(
 					request,
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
-					"expedient.controller.notificacio.justificant.ko");
+					"expedient.controller.notificacio.justificant.ko",
+					null);
 		}
 		return null;
 	}
@@ -344,7 +332,8 @@ public class DocumentEnviamentController extends BaseUserController {
 				request, 
 				getMessage(
 						request, 
-						"document.controller.descarregar.error"));
+						"document.controller.descarregar.error"),
+				null);
 		if (contingut.getPare() != null)
 			return "redirect:../../contingut/" + pareId;
 		else

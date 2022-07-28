@@ -226,3 +226,14 @@ div.exemple {
 .avisCardError button{
 	color: #721c24CC;
 }
+
+.trace h3 {
+	background: none repeat scroll 0 0 #FFFFFF;
+	border-color: #EBCCD1;
+	color: #A94442;
+}
+
+.trace .ui-widget-content {
+	border-color: #EBCCD1;
+	color: #A94442;
+}

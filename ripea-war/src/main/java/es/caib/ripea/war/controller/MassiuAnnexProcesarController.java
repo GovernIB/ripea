@@ -3,29 +3,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -43,6 +20,27 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Controller
@@ -219,7 +217,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/procesarAnnexosPendents",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 		
 		int errors = 0;
@@ -239,7 +238,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 				MissatgesHelper.error(request,
 						getMessage(request,
 								"massiu.controller.annex.procesar.error",
-								new Object[] { registreAnnex.getTitol(), ExceptionHelper.getRootCauseOrItself(exception).getMessage() }));
+								new Object[] { registreAnnex.getTitol(), ExceptionHelper.getRootCauseOrItself(exception).getMessage() }),
+						exception);
 				errors++;
 			} else {
 				correctes++;
@@ -250,7 +250,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			MissatgesHelper.success(request, getMessage(request, "massiu.controller.annex.procesar.correctes", new Object[]{correctes}));
 		} 
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "massiu.controller.annex.procesar.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "massiu.controller.annex.procesar.errors", new Object[]{errors}), null);
 		} 
 		
 		seleccio.clear();
@@ -281,7 +281,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/procesarAnnexosPendents",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -356,7 +357,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 					MissatgesHelper.error(request,
 							getMessage(request,
 									"massiu.controller.annex.procesar.error",
-									new Object[] { registreAnnex.getTitol(), ExceptionHelper.getRootCauseOrItself(exception).getMessage() }));
+									new Object[] { registreAnnex.getTitol(), ExceptionHelper.getRootCauseOrItself(exception).getMessage() }),
+							exception);
 					errors++;
 				} else {
 					correctes++;
@@ -367,7 +369,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 				MissatgesHelper.success(request, getMessage(request, "massiu.controller.annex.procesar.correctes", new Object[]{correctes}));
 			} 
 			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "massiu.controller.annex.procesar.errors", new Object[]{errors}));
+				MissatgesHelper.error(request, getMessage(request, "massiu.controller.annex.procesar.errors", new Object[]{errors}), null);
 			} 
 			
 			seleccio.clear();
@@ -384,7 +386,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../massiu/tancament",
-					ex.getMessage());
+					ex.getMessage(),
+					ex);
 		}
 	}
 	
