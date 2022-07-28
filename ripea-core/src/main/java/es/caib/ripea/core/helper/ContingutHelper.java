@@ -7,8 +7,13 @@ import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
 import com.lowagie.text.pdf.PdfReader;
+import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreInteressat;
@@ -27,12 +32,15 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -63,11 +71,15 @@ public class ContingutHelper {
 	@Autowired
 	private DocumentRepository documentRepository;
 	@Autowired
+	private CarpetaRepository carpetaRepository;
+	@Autowired
 	private ExpedientEstatRepository expedientEstatRepository;
 	@Autowired
 	private GrupRepository grupRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
@@ -1586,6 +1598,164 @@ public class ContingutHelper {
 		return hasFirma;
 	}
 
+
+//	@Transactional(propagation = Propagation.REQUIRES_NEW)
+//	public ResultDocumentSenseContingut arreglaDocumentSenseContingut(Long annexId) {
+//		ResultDocumentSenseContingutBuilder resultBuilder = ResultDocumentSenseContingut.builder();
+//
+//		try {
+//			RegistreAnnexEntity registreAnnex = registreAnnexRepository.findById(annexId);
+//			String annexUuid = registreAnnex.getUuid();
+//			resultBuilder.uuidOrigen(annexUuid);
+//
+//			DocumentEntity document = registreAnnex.getDocument();
+//			if (document == null) {
+//				logger.info("[DOCS_SENSE_CONT] L'annex no té un document associat a l'expedient");
+//				return resultBuilder.error(true).errorMessage("L'annex no té un document associat a l'expedient").build();
+//			}
+//			if (document.getArxiuUuid() == null) {
+//				if (registreAnnex.getError() != null && !registreAnnex.getError().isEmpty()) {
+//					return resultBuilder.error(true).errorMessage("El document associat a l'annex no té UUID de l'arxiu, i està pendent de reintent.").build();
+//				} else {
+//					logger.info("[DOCS_SENSE_CONT] El document associat a l'annex no té UUID de l'arxiu, i no està pendnet de reintent. El crearem!");
+//					resultBuilder.errorMessage("El document associat a l'annex no té UUID de l'arxiu, i no està pendent de reintent. El crearem!").build();
+//				}
+//			}
+//
+//			String documentUuid = document.getArxiuUuid();
+//			resultBuilder.documentId(document.getId()).documentNom(document.getNom()).expedient(document.getExpedient().getCodi());
+//
+//			if (documentUuid != null && annexUuid.equals(documentUuid)) {
+//				logger.info("[DOCS_SENSE_CONT] El document de l'annex i del document actual són el mateix a l'arxiu");
+//				return resultBuilder.uuidDesti(documentUuid).error(true).errorMessage("El document de l'annex i del document actual són el mateix a l'arxiu").build();
+//			}
+//
+//			if (documentUuid != null) {
+//				Document documentArxiu = pluginHelper.arxiuDocumentConsultar(document, documentUuid, null, true);
+//				if (documentArxiu.getContingut() != null) {
+//					logger.info("[DOCS_SENSE_CONT] El document associat ja té contingut");
+//					return resultBuilder.uuidDesti(documentUuid).error(false).errorMessage("El document associat ja té contingut").build();
+//				}
+//				resultBuilder.uuidDestiSenseContingut(documentUuid);
+//			}
+//
+//			Document documentAnnex = pluginHelper.arxiuDocumentConsultar(null, annexUuid, null, true);
+//			if (documentAnnex.getContingut() == null) {
+//				logger.info("[DOCS_SENSE_CONT]");
+//				return resultBuilder.error(true).errorMessage("El document de l'annex no té contingut a l'arxiu").build();
+//			}
+//
+//			// Annex associat amb document sense uuid
+//			// 1. Eliminam el document incorrecte de l'arxiu
+//			if (documentUuid != null) {
+//				pluginHelper.arxiuDocumentEsborrar(document);
+//				logger.info("[DOCS_SENSE_CONT] El document sense contingut amb uuid '{}' ha estat esborrat.", documentUuid);
+//			}
+//
+//			// 2. Posam l'uuid de l'annex al document
+//			document.updateArxiu(annexUuid);
+//
+//			// 3. Tornam a crear el document a partir de l'annex
+//			String uuidDesti = pluginHelper.arxiuDocumentMoure(
+//					document,
+//					document.getPare().getArxiuUuid(),
+//					document.getExpedient().getArxiuUuid());
+//
+//			// 4. Assignam el nou uuid al document
+//			if (uuidDesti == null) {
+//				logger.info("[DOCS_SENSE_CONT] No s'ha generat un uuid per un nou document a l'arxiu");
+//				return resultBuilder.error(true).errorMessage("No s'ha generat un uuid per un nou document a l'arxiu").build();
+//			}
+//			document.updateArxiu(uuidDesti);
+//			logger.info("[DOCS_SENSE_CONT] S'ha assignat un nou document a l'arxiu per al document, amb uuid '{}'", uuidDesti);
+//			return resultBuilder.uuidDesti(uuidDesti).build();
+//		} catch (Exception ex) {
+//			logger.info("[DOCS_SENSE_CONT] Error inesperat", ex);
+//			return resultBuilder.error(true).errorMessage("Error inesperat: " + ex.getMessage()).build();
+//		}
+//
+//	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public ResultDocumentSenseContingut arreglaDocumentSenseContingut(Long annexId) {
+		ResultDocumentSenseContingutBuilder resultBuilder = ResultDocumentSenseContingut.builder();
+
+		try {
+			RegistreAnnexEntity registreAnnex = registreAnnexRepository.findById(annexId);
+			String annexUuid = registreAnnex.getUuid();
+			resultBuilder.uuidOrigen(annexUuid);
+
+			DocumentEntity document = registreAnnex.getDocument();
+			resultBuilder.documentId(document.getId()).documentNom(document.getNom()).expedient(document.getExpedient().getCodi());
+
+			Document documentAnnex = pluginHelper.arxiuDocumentConsultar(null, annexUuid, null, true);
+			if (documentAnnex.getContingut() == null) {
+				logger.info("[DOCS_SENSE_CONT]");
+				return resultBuilder.error(true).errorMessage("El document de l'annex no té contingut a l'arxiu").build();
+			}
+
+			// Annex associat amb document sense uuid
+
+			CarpetaEntity carpetaEntity = carpetaRepository.findOne(document.getPareId());
+			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
+
+			logger.info("Contingut de la carpeta '{}';", carpeta.getNom());
+			resultBuilder.carpeta(carpeta.getNom() + " (" + carpeta.getIdentificador() + ")");
+			List<String> documentsCarpeta = new ArrayList<>();
+			Document documentArxiu = null;
+			for (ContingutArxiu contingut : carpeta.getContinguts()) {
+				logger.info(" - {}: UUID {}", contingut.getNom(), contingut.getIdentificador());
+				documentsCarpeta.add(contingut.getNom() + " (" + contingut.getIdentificador() + ")");
+				if (ArxiuConversioHelper.revisarContingutNom(document.getNom()).equals(contingut.getNom())) {
+					documentArxiu = pluginHelper.arxiuDocumentConsultar(null, contingut.getIdentificador(), null, true);
+				}
+			}
+			resultBuilder.documentsCarpeta(documentsCarpeta);
+			if (documentArxiu != null && documentArxiu.getContingut() != null && Arrays.equals(documentArxiu.getContingut().getContingut(), documentAnnex.getContingut().getContingut())) {
+				if (documentArxiu.getIdentificador().equals(documentAnnex.getIdentificador())) {
+					resultBuilder.errorMessage("El document de la carpeta és el mateix que el de l'annex.");
+				}
+				document.updateArxiu(documentArxiu.getIdentificador());
+				logger.info("[DOCS_SENSE_CONT] S'ha assignat el document que ja es trobava a l'arxiu amb uuid '{}'", documentArxiu.getIdentificador());
+				return resultBuilder.uuidDesti(documentArxiu.getIdentificador()).build();
+			} else if (documentArxiu != null) {
+				if (documentArxiu.getContingut() == null) {
+					resultBuilder.errorMessage("El document trobat a l'arxiu no té contingut.");
+					// 1. Eliminam el document que es troba actualment a l'arxiu
+					document.updateArxiu(documentArxiu.getIdentificador());
+					pluginHelper.arxiuDocumentEsborrar(document);
+
+					// 2. Posam l'uuid de l'annex al document
+					document.updateArxiu(annexUuid);
+
+					// 3. Crear el document a partir de l'annex
+					String uuidDesti = pluginHelper.arxiuDocumentMoure(
+							document,
+							document.getPare().getArxiuUuid(),
+							document.getExpedient().getArxiuUuid());
+
+					// 4. Assignam el nou uuid al document
+					if (uuidDesti == null) {
+						logger.info("[DOCS_SENSE_CONT] No s'ha generat un uuid per un nou document a l'arxiu");
+						return resultBuilder.error(true).errorMessage("El document trobat a l'arxiu no té contingut, però no s'ha generat un uuid per un nou document a l'arxiu").build();
+					}
+					document.updateArxiu(uuidDesti);
+					logger.info("[DOCS_SENSE_CONT] S'ha assignat un nou document a l'arxiu per al document, amb uuid '{}'", uuidDesti);
+					return resultBuilder.uuidDesti(uuidDesti).build();
+				} else {
+					resultBuilder.error(true).errorMessage("El document trobat a l'arxiu no té el mateix contingut que el document de l'annex. S'ha de revisar manualment.");
+				}
+				return resultBuilder.build();
+			} else {
+				return resultBuilder.error(true).errorMessage("No s'ha trobat document amb el mateix nom a la carpeta de l'anotació").build();
+			}
+
+		} catch (Exception ex) {
+			logger.info("[DOCS_SENSE_CONT] Error inesperat", ex);
+			return resultBuilder.error(true).errorMessage("Error inesperat: " + ex.getMessage()).build();
+		}
+
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 
