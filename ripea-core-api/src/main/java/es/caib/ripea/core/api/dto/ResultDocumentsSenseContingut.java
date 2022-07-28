@@ -37,6 +37,8 @@ public class ResultDocumentsSenseContingut {
         String uuidOrigen;
         String uuidDestiSenseContingut;
         String uuidDesti;
+        String carpeta;
+        List<String> documentsCarpeta;
 
         boolean error = false;
         String errorMessage;
