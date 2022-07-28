@@ -1,5 +1,6 @@
 package es.caib.ripea.war.controller;
 
+import com.google.common.collect.Lists;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -19,10 +20,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -43,13 +47,17 @@ public class MassiuCanviEstatAnotacionsPendentsDistribucioController extends Bas
         ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
         model.addAttribute(filtreCommand);
         model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request)));
-        String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-//		boolean checkPerMassiuAdmin = false;
-//		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-//			checkPerMassiuAdmin = true;
-//		}
         model.addAttribute("metaExpedients", new ArrayList<>());
         return "anotacionsPendentsCanviEstatDistribucio";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String post(HttpServletRequest request, @Valid ContingutMassiuFiltreCommand filtreCommand, BindingResult bindingResult, Model model) {
+
+        if (!bindingResult.hasErrors()) {
+            RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
+        }
+        return "redirect:/massiu/anotacionsPendentsCanviEstat";
     }
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -68,27 +76,62 @@ public class MassiuCanviEstatAnotacionsPendentsDistribucioController extends Bas
         }
     }
 
-    @RequestMapping(value = "/canviarEstat", method = RequestMethod.POST)
-    public String canviarEstat(HttpServletRequest request, Model model) {
+    @RequestMapping(value = "/select", method = RequestMethod.GET)
+    @ResponseBody
+    public int select(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
 
-        model.addAttribute("mantenirPaginacio", true);
-        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
         Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request));
-        String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-        boolean checkPerMassiuAdmin = false;
-        if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-            checkPerMassiuAdmin = true;
+        if (seleccio == null) {
+            seleccio = new HashSet<>();
+            RequestSessionHelper.actualitzarObjecteSessio(request, getSessionAttributeSelecio(request), seleccio);
+        }
+        if (ids != null) {
+            for (Long id: ids) {
+                seleccio.add(id);
+            }
+            return seleccio.size();
+        }
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+        ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+        ContingutMassiuFiltreDto filtre = ContingutMassiuFiltreCommand.asDto(filtreCommand);
+        seleccio.addAll(expedientPeticioService.findIdsPendentsCanviEstatAnotacioDistribucio(entitatActual.getId(), filtre));
+        return seleccio.size();
+    }
+
+    @RequestMapping(value = "/deselect", method = RequestMethod.GET)
+    @ResponseBody
+    public int deselect(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
+        @SuppressWarnings("unchecked")
+        Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request));
+        if (seleccio == null) {
+            seleccio = new HashSet<>();
+            RequestSessionHelper.actualitzarObjecteSessio(request, getSessionAttributeSelecio(request), seleccio);
+        }
+        if (ids == null) {
+            seleccio.clear();
+            return 0;
+        }
+        for (Long id: ids) {
+            seleccio.remove(id);
+        }
+        return seleccio.size();
+    }
+
+    @RequestMapping(value = "/canviarEstat", method = RequestMethod.GET)
+    public String canviarEstat(HttpServletRequest request) {
+
+        EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+        @SuppressWarnings("unchecked")
+        Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request)));
+
+        if (seleccio == null || seleccio.isEmpty()) {
+            return getModalControllerReturnValueError(request, "redirect:/massiu/custodiar", "accio.massiva.seleccio.buida");
         }
 
-//        for (Long expedientId : seleccio) {
-//            expedientEstatService.changeEstatOfExpedient(
-//                    entitatActual.getId(),
-//                    expedientId,
-//                    command.getExpedientEstatId(),
-//                    checkPerMassiuAdmin
-//            );
-//        }
-        return getModalControllerReturnValueSuccess(request, "redirect:../expedient", "expedient.controller.estatsModificats.ok");
+        boolean ok = expedientPeticioService.canviarEstatAnotacioDistribucio(Lists.newArrayList(seleccio));
+        String msg = ok ? "massiu.canvi.estat.anotacio.distribucio.ok" : "massiu.canvi.estat.anotacio.distribucio.reintents";
+        return getModalControllerReturnValueSuccess(request, "redirect:../anotacionsPendentsCanviEstat", msg);
     }
 
 

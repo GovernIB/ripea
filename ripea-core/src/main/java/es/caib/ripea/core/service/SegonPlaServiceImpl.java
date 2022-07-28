@@ -33,6 +33,7 @@ import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -57,6 +58,7 @@ import java.util.Properties;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
+@Slf4j
 public class SegonPlaServiceImpl implements SegonPlaService {
 
 	@Autowired
@@ -107,8 +109,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		if (peticions == null || peticions.isEmpty()) {
 			return;
 		}
-
-		if (true) return;
 
 		for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
 
@@ -180,7 +180,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
 				pendent.setPendentEnviarDistribucio(false);
 				expedientPeticioRepository.save(pendent);
-			} catch (Throwable e) {
+			} catch (Throwable ex) {
+				log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
 				Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
 				pendent.setReintentsEnviarDistribucio(reintents);
 				expedientPeticioRepository.save(pendent);
