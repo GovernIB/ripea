@@ -76,17 +76,6 @@
                     return false;
                 });
             });
-
-            // $('#taulaDades').on('draw.dt', function () {
-            //
-            //     var metaExpedientId = $('#metaExpedientId').val();
-            //     $('thead tr th:nth-child(1)', $('#taulaDades')).each(function() {
-            //         enableDisableSelection($(this), metaExpedientId);
-            //     });
-            //     $('tbody tr td:nth-child(1)', $('#taulaDades')).each(function() {
-            //         enableDisableSelection($(this), metaExpedientId);
-            //     });
-            // });
         });
 
         function enableDisableSelection($this, tipus) {
@@ -114,7 +103,7 @@
 <form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
     <div class="row">
         <div class="col-md-4">
-            <rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true"/>
+            <rip:inputText name="identificador" inline="true" placeholderKey="expedient.peticio.list.columna.numero"/>
         </div>
         <div class="col-md-4">
             <rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
@@ -139,14 +128,15 @@
 </form:form>
 
 <script id="botonsTemplate" type="text/x-jsrender">
-		<div class="btn-group pull-right">
-			<button type="button" id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
-			<button type="button" id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-			<button type="button" class="btn btn-default" href="./anotacionsPendentsCanviEstat/canviarEstat" data-refresh-pagina="false" data-maximized="true">
-				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.boto.canviEstat"/>
-			</button>
-		</div>
-	</script>
+    <div class="btn-group pull-right">
+        <a id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
+        <a id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
+        <a class="btn btn-default" href="./anotacionsPendentsCanviEstat/canviarEstat" >
+            <span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.boto.canviEstat"/>
+        </a>
+
+    </div>
+</script>
 
 <table id="taulaDades"
        data-toggle="datatable"
@@ -163,29 +153,14 @@
         <th data-col-name="id" data-visible="false"></th>
         <th data-col-name="identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
         <th data-col-name="dataAlta" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data.alta"/></th>
-<%--        <th data-col-name="expedientEstat" data-visible="false"></th>--%>
-<%--        <th data-col-name="metaExpedient.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>--%>
-<%--        <th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>--%>
-<%--        <th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate" width="11%">--%>
-<%--            <spring:message code="expedient.list.user.columna.estat"/>--%>
-<%--            <script id="cellEstatTemplate" type="text/x-jsrender">--%>
-<%--						{{if expedientEstat != null && estat != 'TANCAT'}}--%>
-<%--							<span class="fa fa-folder-open"></span>&nbsp;{{:expedientEstat.nom}}--%>
-<%--						{{else}}--%>
-<%--							{{if estat == 'OBERT'}}--%>
-<%--								<span class="fa fa-folder-open"></span>&nbsp;<spring:message code="expedient.estat.enum.OBERT"/>--%>
-<%--							{{else}}--%>
-<%--								<span class="fa fa-folder"></span>&nbsp;<spring:message code="expedient.estat.enum.TANCAT"/>--%>
-<%--							{{/if}}--%>
-<%--						{{/if}}--%>
-
-<%--						{{if expedientEstat != null && expedientEstat.color!=null}}--%>
-<%--							<span class="stateColor-{{:expedientEstat.color}}"></span>--%>
-<%--						{{/if}}--%>
-<%--					</script>--%>
-<%--        </th>--%>
-<%--        <th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>--%>
-<%--        <th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>--%>
+        <th data-col-name="expedientNom" data-visible="false"></th>
+        <th data-col-name="expedientId" data-visible="false"></th>
+        <th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
+            <spring:message code="accio.massiva.list.column.expedient"/>
+            <script id="cellPathTemplate" type="text/x-jsrender">
+                    <a href="../contingut/{{:expedientId}}"><span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span> {{:expedientNom}}</a>
+            </script>
+        </th>
     </tr>
     </thead>
 </table>

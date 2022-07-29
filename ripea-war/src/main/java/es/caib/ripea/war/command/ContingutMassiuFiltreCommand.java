@@ -5,6 +5,8 @@ package es.caib.ripea.war.command;
 
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
@@ -17,6 +19,8 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class ContingutMassiuFiltreCommand {
 
 	private ContingutTipusEnumDto tipusElement;
@@ -27,7 +31,8 @@ public class ContingutMassiuFiltreCommand {
 	private String metaDada;
 	private String nom;
 	private Date dataInici;
-	private Date dataFi;	
+	private Date dataFi;
+	private String identificador;
 	
 	private boolean bloquejarTipusElement;
 	private boolean bloquejarMetaDada;

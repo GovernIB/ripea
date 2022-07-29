@@ -387,6 +387,7 @@ public class ConversioTipusHelper {
 						target.setEstat(source.getEstat());
 						target.setIdentificador(source.getIdentificador());
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
+						target.setPendentEnviarDistribucio(source.isPendentEnviarDistribucio());
 						return target;
 					}
 				});

@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import com.google.common.base.Strings;
 import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.plugins.arxiu.api.Document;
@@ -11,6 +12,7 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
@@ -27,6 +29,7 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,7 @@ import java.util.Set;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
+@Slf4j
 public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Autowired
@@ -593,17 +597,55 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	}
 
 	@Override
-	public PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+	public PaginaDto<ExpedientPeticioPendentDist>  findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		Map<String, String[]> ordenacioMap = new HashMap<>();
-//		Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findByEntitatAndPendentsCanviEstat(entitat, paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
-		Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findPendentsCanviEstat(paginacioHelper.toSpringDataPageable(paginacioParams));
+		boolean identNull = Strings.isNullOrEmpty(filtre.getIdentificador());
+		boolean nomNull = Strings.isNullOrEmpty(filtre.getNom());
+		boolean dataIniciNull = filtre.getDataInici() == null;
+		boolean dataFiNull = filtre.getDataFi() == null;
+		Page<ExpedientPeticioPendentDist> pagina = expedientPeticioRepository.findPendentsCanviEstat(entitat, identNull, filtre.getIdentificador(),
+				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi(), paginacioHelper.toSpringDataPageable(paginacioParams));
 		return paginacioHelper.toPaginaDto(pagina, ExpedientPeticioPendentDist.class);
 	}
 
-	
+	@Override
+	public List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre) {
 
+		boolean identNull = Strings.isNullOrEmpty(filtre.getIdentificador());
+		boolean nomNull = Strings.isNullOrEmpty(filtre.getNom());
+		boolean dataIniciNull = filtre.getDataInici() == null;
+		boolean dataFiNull = filtre.getDataFi() == null;
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		return expedientPeticioRepository.findIdsPendentsCanviEstat(entitat, identNull, filtre.getIdentificador(),
+				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi());
+	}
+
+	@Override
+	public boolean canviarEstatAnotacioDistribucio(List<Long> ids) {
+
+		List<ExpedientPeticioEntity> pendents = expedientPeticioRepository.findAll(ids);
+		AnotacioRegistreId anotacio;
+		boolean ok = true;
+		for (ExpedientPeticioEntity pendent : pendents) {
+			anotacio = new AnotacioRegistreId();
+			anotacio.setIndetificador(pendent.getIdentificador());
+			anotacio.setClauAcces(pendent.getClauAcces());
+			try {
+				DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
+				pendent.setPendentEnviarDistribucio(false);
+				expedientPeticioRepository.save(pendent);
+			} catch (Throwable ex) {
+				ok = false;
+				log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
+				Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
+				reintents = reintents > 0 ? reintents : configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS);
+				pendent.setReintentsEnviarDistribucio(reintents);
+				expedientPeticioRepository.save(pendent);
+			}
+		}
+		return ok;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
 

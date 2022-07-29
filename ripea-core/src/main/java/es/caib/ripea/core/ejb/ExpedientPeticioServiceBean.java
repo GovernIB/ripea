@@ -175,5 +175,15 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 		return delegate.findPendentsCanviEstatAnotacioDistribucio(entitatId, filtre, paginacioParams);
 	}
 
+	@Override
+	public List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre) {
+		return delegate.findIdsPendentsCanviEstatAnotacioDistribucio(entitatId, filtre);
+	}
+
+	@Override
+	public boolean canviarEstatAnotacioDistribucio(List<Long> ids) {
+		return delegate.canviarEstatAnotacioDistribucio(ids);
+	}
+
 
 }
