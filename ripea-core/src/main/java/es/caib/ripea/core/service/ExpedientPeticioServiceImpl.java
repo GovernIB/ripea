@@ -621,6 +621,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi());
 	}
 
+	@Transactional
 	@Override
 	public boolean canviarEstatAnotacionsDistribucio(List<Long> ids) {
 
