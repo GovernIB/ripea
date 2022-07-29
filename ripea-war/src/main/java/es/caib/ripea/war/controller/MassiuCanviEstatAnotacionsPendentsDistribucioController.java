@@ -3,15 +3,11 @@ package es.caib.ripea.war.controller;
 import com.google.common.collect.Lists;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.command.ExpedientMassiuCanviEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -126,10 +121,10 @@ public class MassiuCanviEstatAnotacionsPendentsDistribucioController extends Bas
         Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request)));
 
         if (seleccio == null || seleccio.isEmpty()) {
-            return getModalControllerReturnValueError(request, "redirect:/massiu/custodiar", "accio.massiva.seleccio.buida");
+            return getModalControllerReturnValueError(request, "redirect:/massiu/custodiar", "accio.massiva.seleccio.buida", null);
         }
 
-        boolean ok = expedientPeticioService.canviarEstatAnotacioDistribucio(Lists.newArrayList(seleccio));
+        boolean ok = expedientPeticioService.canviarEstatAnotacionsDistribucio(Lists.newArrayList(seleccio));
         String msg = ok ? "massiu.canvi.estat.anotacio.distribucio.ok" : "massiu.canvi.estat.anotacio.distribucio.reintents";
         return getModalControllerReturnValueSuccess(request, "redirect:../anotacionsPendentsCanviEstat", msg);
     }

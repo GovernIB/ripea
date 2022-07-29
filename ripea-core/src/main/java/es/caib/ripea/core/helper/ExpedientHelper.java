@@ -378,7 +378,7 @@ public class ExpedientHelper {
 				}
 			} else {
 				RegistreInteressatEntity representantRegistre = interessatRegistre.getRepresentant();
-				Long idRepresentantExpedient = representantRegistre != null && interessatExpedient.getRepresentant() != null ? interessatExpedient.getRepresentant().getId() : null; //modificar o afegir
+				Long idRepresentantExpedient = representantRegistre != null && interessatExpedient != null && interessatExpedient.getRepresentant() != null ? interessatExpedient.getRepresentant().getId() : null; //modificar o afegir
 				expedientInteressatHelper.update(
 						entitatId, 
 						expedientId, 
@@ -1555,8 +1555,7 @@ public class ExpedientHelper {
 		switch (registreInteressatEntity.getTipus()) {
 		case PERSONA_FISICA:
 			InteressatPersonaFisicaDto interessatPersonaFisicaDto = new InteressatPersonaFisicaDto();
-			interessatPersonaFisicaDto.setDocumentTipus(
-					toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
 			interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
 			interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
@@ -1575,8 +1574,7 @@ public class ExpedientHelper {
 			break;
 		case PERSONA_JURIDICA:
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = new InteressatPersonaJuridicaDto();
-			interessatPersonaJuridicaDto.setDocumentTipus(
-					toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
 			interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
 			interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
@@ -1593,8 +1591,7 @@ public class ExpedientHelper {
 			break;
 		case ADMINISTRACIO:
 			InteressatAdministracioDto interessatAdministracioDto = new InteressatAdministracioDto();
-			interessatAdministracioDto.setDocumentTipus(
-					toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+			interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
 			interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
 			interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
 			interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
@@ -1618,8 +1615,6 @@ public class ExpedientHelper {
 		if (documentTipus != null) {
 			switch (documentTipus) {
 			case NIF:
-				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.NIF;
-				break;
 			case CIF:
 				interessatDocumentTipusEnumDto = InteressatDocumentTipusEnumDto.NIF;
 				break;

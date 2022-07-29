@@ -30,8 +30,6 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -101,7 +99,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			PaginacioParamsDto paginacioParams, 
 			String rolActual, 
 			Long organActualId) {
-		logger.debug("Consultant els expedient peticions segons el filtre (" +
+		log.debug("Consultant els expedient peticions segons el filtre (" +
 				"entitatId=" +
 				entitatId +
 				", filtre=" +
@@ -209,7 +207,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Long entitatId,
 			Long metaExpedientId,
 			String expedientNumero) {
-		logger.debug("Consultant el expedient("
+		log.debug("Consultant el expedient("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientNumero=" + expedientNumero + ", "
 				+ "metaExpedientId=" + metaExpedientId + ")");
@@ -341,7 +339,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<ArxiuFirmaDto> annexFirmaInfo(String fitxerArxiuUuid) {
-		logger.debug("Obtenint annex firma info (" +
+		log.debug("Obtenint annex firma info (" +
 				"fitxerArxiuUuid=" +
 				fitxerArxiuUuid +
 				")");
@@ -380,7 +378,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Override
 	public void rebutjar(Long expedientPeticioId,
 			String observacions) {
-		logger.debug("Reutjant el expedient peticio " +
+		log.debug("Reutjant el expedient peticio " +
 				"expedientPeticioId=" +
 				expedientPeticioId +
 				")");
@@ -445,7 +443,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {
-		logger.debug("Consultant el expedient peticio " +
+		log.debug("Consultant el expedient peticio " +
 				"expedientPeticioId=" +
 				expedientPeticioId +
 				")");
@@ -622,31 +620,40 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	}
 
 	@Override
-	public boolean canviarEstatAnotacioDistribucio(List<Long> ids) {
+	public boolean canviarEstatAnotacionsDistribucio(List<Long> ids) {
 
-		List<ExpedientPeticioEntity> pendents = expedientPeticioRepository.findAll(ids);
-		AnotacioRegistreId anotacio;
 		boolean ok = true;
-		for (ExpedientPeticioEntity pendent : pendents) {
-			anotacio = new AnotacioRegistreId();
-			anotacio.setIndetificador(pendent.getIdentificador());
-			anotacio.setClauAcces(pendent.getClauAcces());
-			try {
-				DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
-				pendent.setPendentEnviarDistribucio(false);
-				expedientPeticioRepository.save(pendent);
-			} catch (Throwable ex) {
+		for (Long id : ids) {
+			Throwable exception = canviarEstatAnotacioDistribucio(id);
+			if (exception != null) {
 				ok = false;
-				log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
-				Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
-				reintents = reintents > 0 ? reintents : configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS);
-				pendent.setReintentsEnviarDistribucio(reintents);
-				expedientPeticioRepository.save(pendent);
 			}
 		}
 		return ok;
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
+	@Override
+	public Throwable canviarEstatAnotacioDistribucio(Long id) {
+
+		ExpedientPeticioEntity pendent = expedientPeticioRepository.findOne(id);
+		Throwable exception = null;
+		AnotacioRegistreId anotacio = new AnotacioRegistreId();
+		anotacio.setIndetificador(pendent.getIdentificador());
+		anotacio.setClauAcces(pendent.getClauAcces());
+		try {
+			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
+			pendent.setPendentEnviarDistribucio(false);
+			expedientPeticioRepository.save(pendent);
+		} catch (Throwable ex) {
+			exception = ex;
+			log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
+			Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
+			reintents = reintents > 0 ? reintents : configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS);
+			pendent.setReintentsEnviarDistribucio(reintents);
+			expedientPeticioRepository.save(pendent);
+		}
+		return exception;
+	}
+
 
 }

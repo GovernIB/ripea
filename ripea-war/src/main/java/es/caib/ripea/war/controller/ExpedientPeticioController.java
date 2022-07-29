@@ -3,50 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -67,6 +24,33 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controlador per al llistat d'expedients peticions.
@@ -293,13 +277,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		command.setAgafarExpedient(true);
 		omplirModel(id, request, model, command);
 		if (id == null) {
-			return getModalControllerReturnValueError(request, "redirect:../", "expedient.peticio.controller.canviar.estat.anotacio.distribucio.id.inexistent");
+			return getModalControllerReturnValueError(request, "redirect:../", "expedient.peticio.controller.canviar.estat.anotacio.distribucio.id.inexistent", null);
 		}
-		List<Long> ids = new ArrayList<>();
-		ids.add(id);
-		boolean ok = expedientPeticioService.canviarEstatAnotacioDistribucio(ids);
-		return  ok ? getModalControllerReturnValueSuccess(request, "redirect:../", "expedient.peticio.controller.canviar.estat.anotacio.distribucio.ok")
-				: getModalControllerReturnValueError(request, "redirect:../", "expedient.peticio.controller.canviar.estat.anotacio.distribucio.error");
+		Throwable exception = expedientPeticioService.canviarEstatAnotacioDistribucio(id);
+		return  exception == null ? getModalControllerReturnValueSuccess(request, "redirect:../", "expedient.peticio.controller.canviar.estat.anotacio.distribucio.ok")
+				: getModalControllerReturnValueError(request, "redirect:../", "expedient.peticio.controller.canviar.estat.anotacio.distribucio.error", exception);
 	}
 	
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}/next", method = RequestMethod.POST)

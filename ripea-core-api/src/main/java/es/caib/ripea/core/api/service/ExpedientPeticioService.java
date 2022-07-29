@@ -1,27 +1,10 @@
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.dto.ResultDto;
-import es.caib.ripea.core.api.dto.ResultEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
+import java.util.List;
 
 public interface ExpedientPeticioService {
 
@@ -104,5 +87,8 @@ public interface ExpedientPeticioService {
 	List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean canviarEstatAnotacioDistribucio(List<Long> ids);
+	boolean canviarEstatAnotacionsDistribucio(List<Long> ids);
+
+	@PreAuthorize("hasRole('tothom')")
+	Throwable canviarEstatAnotacioDistribucio(Long id);
  }
