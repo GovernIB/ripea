@@ -594,6 +594,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return result;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<ExpedientPeticioPendentDist>  findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
@@ -607,6 +608,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return paginacioHelper.toPaginaDto(pagina, ExpedientPeticioPendentDist.class);
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre) {
 
@@ -632,6 +634,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return ok;
 	}
 
+	@Transactional
 	@Override
 	public Throwable canviarEstatAnotacioDistribucio(Long id) {
 
