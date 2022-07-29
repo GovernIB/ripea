@@ -57,7 +57,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: NOT_PROCESSOS_INICIALS_PK
+                    primaryKeyName: IPA_PROCESSOS_INICIALS_PK
                   name: ID
                   type: ${type.pk}
               - column:
@@ -84,7 +84,7 @@ databaseChangeLog:
                   defaultValue: 0
         - sql:
             sql: "
-                INSERT INTO NOT_PROCESSOS_INICIALS (codi, init, id) VALUES ('PROPIETATS_CONFIG_ENTITATS', 1, 2);
+                INSERT INTO IPA_PROCESSOS_INICIALS (codi, init, id) VALUES ('PROPIETATS_CONFIG_ENTITATS', 1, 2);
             
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.creacio.carpetes.activa';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.mostrar.carpetes.anotacions';
