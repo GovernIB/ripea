@@ -10,7 +10,6 @@ import com.lowagie.text.pdf.PdfReader;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
@@ -1704,7 +1703,8 @@ public class ContingutHelper {
 			for (ContingutArxiu contingut : carpeta.getContinguts()) {
 				logger.info(" - {}: UUID {}", contingut.getNom(), contingut.getIdentificador());
 				documentsCarpeta.add(contingut.getNom() + " (" + contingut.getIdentificador() + ")");
-				if (ArxiuConversioHelper.revisarContingutNom(document.getNom()).equals(contingut.getNom())) {
+//				if (ArxiuConversioHelper.revisarContingutNom(document.getNom()).equals(contingut.getNom())) {
+				if (document.getFitxerNom().equals(contingut.getNom())) {
 					documentArxiu = pluginHelper.arxiuDocumentConsultar(null, contingut.getIdentificador(), null, true);
 				}
 			}
