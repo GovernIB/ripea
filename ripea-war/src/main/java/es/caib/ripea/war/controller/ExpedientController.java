@@ -124,12 +124,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		long t0 = System.currentTimeMillis();
 		
 		long t1 = System.currentTimeMillis();
-		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if (mantenirPaginacio) {
-			model.addAttribute("mantenirPaginacio", true);
-		} else {
-			model.addAttribute("mantenirPaginacio", false);
-		}
+
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
@@ -423,7 +418,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		return get(request, null, model);
 	}
 	@RequestMapping(value = "/{expedientId}", method = RequestMethod.GET)
@@ -431,7 +425,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -478,7 +471,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@Validated({Create.class}) ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -557,7 +549,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@Validated({Update.class}) ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -734,7 +725,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			@RequestParam(required = false) String contingutId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String url = null;
 		try {
@@ -903,7 +893,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			Model model) {
 		
 		try {
-			model.addAttribute("mantenirPaginacio", true);
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			expedientService.alliberarUser(
 					entitatActual.getId(),
@@ -982,7 +971,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		getEntitatActualComprovantPermisos(request);
 
 		ExpedientAssignarCommand command = new ExpedientAssignarCommand();
@@ -998,7 +986,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@Valid ExpedientAssignarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			return "expedientAssignarForm";
@@ -1036,7 +1023,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		ExpedientTancarCommand command = new ExpedientTancarCommand();
 		command.setId(expedientId);
 		model.addAttribute(command);
@@ -1053,7 +1039,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@Valid ExpedientTancarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			omplirModelTancarExpedient(
@@ -1125,7 +1110,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -1170,7 +1154,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 //			model.addAttribute(
@@ -1293,7 +1276,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			@PathVariable Long relacionatId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (expedientService.relacioDelete(
 				entitatActual.getId(),
@@ -1324,7 +1306,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientId,
 			@PathVariable DocumentEnviamentTipusEnumDto documentEnviamentTipus,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,

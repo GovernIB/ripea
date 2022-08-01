@@ -543,7 +543,6 @@ function hexToRgb(hex) {
 		data-rowhref-template="#rowhrefTemplate"
 		data-selection-enabled="true"
 		data-save-state="true"
-		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>

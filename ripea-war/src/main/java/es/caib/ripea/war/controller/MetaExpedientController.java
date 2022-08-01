@@ -80,12 +80,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if (mantenirPaginacio) {
-			model.addAttribute("mantenirPaginacio", true);
-		} else {
-			model.addAttribute("mantenirPaginacio", false);
-		}
+
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		boolean isRolAdmin = RolHelper.isRolActualAdministrador(request);

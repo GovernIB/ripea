@@ -108,8 +108,7 @@
 		data-rowhref-template="#rowhrefTemplate" 
 		data-rowhref-toggle="modal"
 		data-save-state="true"
-		data-search-enabled="false"
-		data-mantenir-paginacio="${mantenirPaginacio}">
+		data-search-enabled="false">
 		<thead>
 			<tr>
 				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>

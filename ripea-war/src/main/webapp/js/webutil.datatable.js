@@ -436,18 +436,8 @@
 				}
 				if(plugin.settings.saveState){
 					dataTableOptions = $.extend({
-						stateSave: true,
-						stateSaveCallback: function(settings, data) {
-							sessionStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
-						}
+						stateSave: true
 					}, dataTableOptions);
-					if(plugin.settings.mantenirPaginacio){
-						dataTableOptions = $.extend({
-							stateLoadCallback: function(settings) {
-								return JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
-							}
-						}, dataTableOptions);
-					}
 				}
 			} else {
 				dataTableOptions = $.extend({

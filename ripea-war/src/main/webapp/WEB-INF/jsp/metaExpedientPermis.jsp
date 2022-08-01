@@ -83,7 +83,7 @@
 		<p style="text-align:right"><a class="btn btn-default" href="../../metaExpedient/${metaExpedient.id}/permis/new" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.permis.boto.nou.permis"/></a></p>
 		</c:if>
 	</script>
-	<a href="<c:url value="${!esRevisor ? '/metaExpedient?mantenirPaginacio=true' : '/metaExpedientRevisio?mantenirPaginacio=true'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+	<a href="<c:url value="${!esRevisor ? '/metaExpedient' : '/metaExpedientRevisio'}"/>" class="btn btn-default pull-right"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 	<div class="clearfix"></div>
 </body>
 </html>

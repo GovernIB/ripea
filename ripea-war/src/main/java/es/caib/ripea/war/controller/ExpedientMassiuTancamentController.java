@@ -239,7 +239,6 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			@Valid ExpedientMassiuTancamentCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			omplirModelTancarExpedient(request, model);

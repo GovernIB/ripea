@@ -246,7 +246,6 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 			ExpedientMassiuCanviEstatCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 

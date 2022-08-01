@@ -319,7 +319,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
 				request,

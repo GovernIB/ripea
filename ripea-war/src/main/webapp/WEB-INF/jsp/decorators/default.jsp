@@ -331,9 +331,9 @@ body {
 					</c:when>
 					<c:when test="${isRolActualAdministrador}">
 						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>								
+						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>								
 						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>" class="btn btn-primary">
+						<a href="<c:url value="/expedientPeticio"></c:url>" class="btn btn-primary">
 							<spring:message code="decorator.menu.expedientPeticions"/>
 							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
 						</a>
@@ -406,9 +406,9 @@ body {
 					</c:when>
 					<c:when test="${isRolActualAdministradorOrgan}">
 						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>									
+						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>									
 						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.expedientPeticions"/>
 							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
 						</a>
@@ -427,18 +427,18 @@ body {
 <!-- 							</a> -->
 <%-- 						</c:if> --%>
 						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"><c:param name="mantenirPaginacio" value="true" /></c:url>"class="btn btn-primary">
+						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary">
 								<spring:message code="decorator.menu.expedients"/>
 						</a>
 						
 						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.expedientPeticions"/>
 							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
 						</a>
 						
 						<%---- Tasques ----%>								
-						<a href="<c:url value="/usuariTasca"><c:param name="mantenirPaginacio" value="false"/></c:url>"class="btn btn-primary">
+						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.tasques"/>
 							<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
 						</a>						

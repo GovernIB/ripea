@@ -105,7 +105,6 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		data-default-order="1" <%-- default column number to be sorted  --%>
 		data-default-dir="desc" <%-- default ordering direction  --%>
 		data-save-state="true" 
-		data-mantenir-paginacio="true"
 		style="width:100%">
 		<thead>
 			<tr>

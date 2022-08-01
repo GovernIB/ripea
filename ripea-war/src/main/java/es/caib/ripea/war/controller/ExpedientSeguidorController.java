@@ -55,7 +55,6 @@ public class ExpedientSeguidorController extends BaseUserController {
 			@PathVariable Long expedientId,
 			@RequestParam(required = false) String contingutId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		expedientSeguidorService.follow(
 				entitatActual.getId(),
@@ -107,7 +106,6 @@ public class ExpedientSeguidorController extends BaseUserController {
 			@PathVariable Long expedientId,
 			@RequestParam(required = false) String contingutId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		expedientSeguidorService.unfollow(
 				entitatActual.getId(),

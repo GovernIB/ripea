@@ -28,7 +28,6 @@
 		data-default-dir="asc" 
 		data-botons-template="#botonsTemplate"
 		data-save-state="true"
-		data-mantenir-paginacio="${mantenirPaginacio}"
 		class="table table-striped table-bordered" 
 		style="width:100%"
 		data-rowhref-template="#rowhrefTemplate" 

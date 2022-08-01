@@ -66,6 +66,7 @@
 		class="table table-striped table-bordered" 
 		data-rowhref-template="#rowhrefTemplate" 
 		data-rowhref-toggle="modal"
+		data-save-state="true"
 		style="width:100%">
 		<thead>
 			<tr>

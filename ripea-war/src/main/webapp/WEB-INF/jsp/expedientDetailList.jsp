@@ -200,7 +200,6 @@ function getCookie(cname) {
 					data-default-dir="desc"
 					data-botons-template="#botonsTemplate"
 					data-save-state="true"
-					data-mantenir-paginacio="${mantenirPaginacio}"
 					style="width:100%">
 				<thead>
 					<tr>

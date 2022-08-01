@@ -108,7 +108,6 @@ $(document).ready(function() {
 		data-default-order="10" 
 		data-default-dir="desc"
 		data-save-state="true"
-		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>

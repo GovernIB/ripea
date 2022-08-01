@@ -210,7 +210,6 @@ public class ContingutAdminController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		getEntitatActualComprovantPermisAdminEntitat(request);
 
 		ExpedientAssignarCommand command = new ExpedientAssignarCommand();
@@ -226,7 +225,6 @@ public class ContingutAdminController extends BaseAdminController {
 			@Valid ExpedientAssignarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
 		if (bindingResult.hasErrors()) {
 			return "expedientAssignarForm";

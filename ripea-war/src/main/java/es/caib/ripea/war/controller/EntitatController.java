@@ -39,12 +39,7 @@ public class EntitatController extends BaseUserController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(Model model, HttpServletRequest request) {
-		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if (mantenirPaginacio) {
-			model.addAttribute("mantenirPaginacio", true);
-		} else {
-			model.addAttribute("mantenirPaginacio", false);
-		}
+
 		return "entitatList";
 	}
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
@@ -61,14 +56,12 @@ public class EntitatController extends BaseUserController {
 
 	@RequestMapping(value = "/new", method = RequestMethod.GET)
 	public String getNew(Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		return get(null, model);
 	}
 	@RequestMapping(value = "/{entitatId}", method = RequestMethod.GET)
 	public String get(
 			@PathVariable Long entitatId,
 			Model model) {
-		model.addAttribute("mantenirPaginacio", true);
 		EntitatDto entitat = null;
 		if (entitatId != null)
 			entitat = entitatService.findById(entitatId);
