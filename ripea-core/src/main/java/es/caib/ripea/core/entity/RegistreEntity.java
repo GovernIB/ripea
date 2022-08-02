@@ -121,6 +121,13 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
 	
 	
+	@OneToMany(
+			mappedBy = "registre",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true,
+			fetch = FetchType.LAZY)
+	private List<ExpedientPeticioEntity> expedientPeticions = new ArrayList<ExpedientPeticioEntity>();
+	
 	
 	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -608,6 +615,10 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	
 	public String getJustificantArxiuUuid() {
 		return justificantArxiuUuid;
+	}
+
+	public List<ExpedientPeticioEntity> getExpedientPeticions() {
+		return expedientPeticions;
 	}
 
 	private static final long serialVersionUID = 1815997738055924981L;

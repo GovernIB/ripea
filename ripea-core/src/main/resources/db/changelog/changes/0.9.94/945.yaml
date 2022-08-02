@@ -15,10 +15,63 @@ databaseChangeLog:
       name: booleanUnit
       value: true
       dbms: postgresql
+  - property:
+      name: tipus
+      value: NUMBER(1,0)
+      dbms: oracle
+  - property:
+      name: tipus
+      value: boolean
+      dbms: postgresql
+  - property:
+      dbms: oracle
+      name: type.pk
+      value: number(19,0)
+  - property:
+      dbms: postgresql
+      name: type.pk
+      value: SERIAL
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
+  - property:
+      name: boolean.type
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolean.type
+      value: boolean
+      dbms: postgresql
   - changeSet:
-      id: 1652794300364-1
+      id: 11651146740000-3
       author: limit
       changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: IPA_PROCESSOS_INICIALS_PK
+                  name: ID
+                  type: ${type.pk}
+              - column:
+                  constraints:
+                    nullable: false
+                  name: CODI
+                  type: varchar(100 ${varcharUnit})
+              - column:
+                  constraints:
+                    nullable: false
+                    default: 0
+                  name: INIT
+                  type: ${boolean.type}
+            tableName: IPA_PROCESSOS_INICIALS
         - addColumn:
             tableName: ipa_config
             columns:
@@ -27,10 +80,12 @@ databaseChangeLog:
                   type: varchar(64 ${varcharUnit})
               - column:
                   name: configurable
-                  type: boolean               
-                  valueBoolean: false   
+                  type: ${tipus}
+                  defaultValue: 0
         - sql:
             sql: "
+                INSERT INTO IPA_PROCESSOS_INICIALS (codi, init, id) VALUES ('PROPIETATS_CONFIG_ENTITATS', 1, 2);
+            
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.creacio.carpetes.activa';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.mostrar.carpetes.anotacions';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.carpetes.logiques';

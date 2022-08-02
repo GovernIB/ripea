@@ -3,22 +3,22 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -145,10 +145,43 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			"where " +
 			"c.arxiuUuid = null " +
 			"and ((c.tipus = 0 and c.arxiuReintents < :arxiuMaxReintentsExpedients) or (c.tipus = 2 and c.arxiuReintents < :arxiuMaxReintentsDocuments)) " +
+			"and c.arxiuReintents > 0 " +
 			"and c.esborrat = 0 " +
 			"order by c.arxiuIntentData asc")
 	public List<ContingutEntity> findContingutsPendentsArxiu(
 			@Param("arxiuMaxReintentsExpedients") int arxiuMaxReintentsExpedients,
 			@Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
 
+
+
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+	@Query(value = "select c.id from ContingutEntity c " +
+			" where c.id not in (select id from NodeEntity)" +
+			"   and c.id not in (select id from CarpetaEntity) ")
+	List<Long> getIdContingutsOrfes();
+
+	@Query(value = "select id from ipa_contingut where pare_id = :pareId", nativeQuery = true)
+	List<Long> findIdFills(@Param("pareId") Long pareId);
+
+	@Modifying
+	@Query(value = "delete from ipa_contingut where id = :contingutId", nativeQuery = true)
+	int deleteContingutsOrfes(@Param("contingutId") Long contingutId);
+
+	@Query(	"select count(c.id) " +
+			"from ContingutEntity c " +
+			"where c.arxiuUuid = null " +
+			"and ((c.tipus = 0 and c.arxiuReintents < :arxiuMaxReintentsExpedients) or (c.tipus = 2 and c.arxiuReintents < :arxiuMaxReintentsDocuments)) " +
+			"and c.esborrat = 0 " +
+			"and c.id not in (select id from NodeEntity) " +
+			"and c.id not in (select id from CarpetaEntity)")
+	public int countContingutsPendentsArxiuOrfes(
+			@Param("arxiuMaxReintentsExpedients") int arxiuMaxReintentsExpedients,
+			@Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
+
+	@Modifying
+	@Query(value = "update ipa_contingut set pare_id = null where id = :contingutId", nativeQuery = true)
+	void removePare(Long contingutId);
 }

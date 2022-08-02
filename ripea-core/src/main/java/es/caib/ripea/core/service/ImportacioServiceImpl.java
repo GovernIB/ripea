@@ -99,7 +99,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				false,
 				false,
 				false, 
-				false, null);
+				false, true, null);
 		
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(pareActual.getTipus())) {
 			expedientSuperior = (ExpedientEntity)pareActual;

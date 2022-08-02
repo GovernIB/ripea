@@ -104,6 +104,8 @@
 		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	
 	<script>
 		var requestLocale = '${requestLocale}';
@@ -319,11 +321,8 @@ body {
 						<div class="btn-group">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.config"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
-								<li>
-									<a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>">
-										<spring:message code="decorator.menu.config.properties"/>
-									</a>
-								</li>
+								<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
+								 <!--<li><a href="<c:url value="/contingut/orfes/delete"/>"><spring:message code="decorator.menu.config.delete.orfes"/></a></li>-->
 							</ul>
 						</div>
 						
@@ -466,6 +465,8 @@ body {
 							<c:if test="${isUrlValidacioDefinida}">
 								<li><a href="<c:url value="/massiu/csv"/>"><spring:message code="massiu.documents.csv"/></a></li>
 							</c:if>
+							<li><a href="<c:url value="/massiu/procesarAnnexosPendents"/>"><spring:message code="massiu.procesar.annexos.pendents"/></a></li>
+							<li><a href="<c:url value="/massiu/anotacionsPendentsCanviEstat"/>"><spring:message code="massiu.anotacions.pendents.canvi.estat"/></a></li>
 						</ul>
 					</div>
 				</c:if>

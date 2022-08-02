@@ -133,7 +133,8 @@ public class DocumentEnviamentController extends BaseUserController {
 							getMessage(
 									request, 
 									"document.controller.notificacio.ko", 
-									new Object[] {errorNotib.getKey(), errorNotib.getValue()}));
+									new Object[] {errorNotib.getKey(), errorNotib.getValue()}),
+							null);
 				}
 			}
 			return this.getModalControllerReturnValueSuccess(
@@ -157,7 +158,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"",
-					msg);
+					msg,
+					e);
 		}
 	}
 	
@@ -221,7 +223,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			return this.getModalControllerReturnValueError(
 					request,
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
-					"expedient.controller.notificacio.justificant.ko");
+					"expedient.controller.notificacio.justificant.ko",
+					null);
 		}
 		return "notificacioForm";
 	}
@@ -246,7 +249,8 @@ public class DocumentEnviamentController extends BaseUserController {
 			return this.getModalControllerReturnValueError(
 					request,
 					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
-					"expedient.controller.notificacio.justificant.ko");
+					"expedient.controller.notificacio.justificant.ko",
+					null);
 		}
 		return null;
 	}
@@ -265,7 +269,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				request,
 				documentId,
 				null,
-				model, 
+				model,
 				notificacioConcatenatEntregaPostal);
 		DocumentNotificacionsCommand command = DocumentNotificacionsCommand.asCommand(
 				documentEnviamentService.notificacioFindAmbIdAndDocument(
@@ -348,7 +352,8 @@ public class DocumentEnviamentController extends BaseUserController {
 				request, 
 				getMessage(
 						request, 
-						"document.controller.descarregar.error"));
+						"document.controller.descarregar.error"),
+				null);
 		if (contingut.getPare() != null)
 			return "redirect:../../contingut/" + pareId;
 		else
@@ -548,7 +553,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			Long documentId,
 			DocumentNotificacionsCommand command,
-			Model model, 
+			Model model,
 			Boolean notificacioConcatenatEntregaPostal) throws JsonProcessingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
@@ -588,7 +593,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				document.getExpedientPare().getId());
 		
 		boolean enviamentPostalProperty = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.notificacio.enviament.postal.actiu", true);
-		
+
 		if (enviamentPostalProperty) {
 			if (notificacioConcatenatEntregaPostal != null) {
 				model.addAttribute("entregaPostal", (boolean) notificacioConcatenatEntregaPostal);

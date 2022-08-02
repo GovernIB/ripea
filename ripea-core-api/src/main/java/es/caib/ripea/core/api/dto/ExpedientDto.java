@@ -49,6 +49,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean usuariActualDelete;
 	private boolean peticions;
 	private boolean processatOk;
+	private boolean expCreatArxiuOk = true;
 	private boolean tasques;
 	private boolean hasEsborranys;
 	private List<DocumentDto> esborranys;

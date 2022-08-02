@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.Date;
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Informació d'un document.
@@ -55,7 +55,7 @@ public class DocumentDto extends NodeDto {
 	private boolean errorDarreraNotificacio;
 	private String estatDarreraNotificacio;
 	private boolean errorEnviamentPortafirmes;
-	private String Descripcio;
+	private String descripcio;
 	
 	private Long pareId;
 	private boolean docFromAnnex;
@@ -66,6 +66,13 @@ public class DocumentDto extends NodeDto {
 	private String gesDocAdjuntFirmaId;
 	
 	private String pinbalIdpeticion;
+	
+	private boolean pendentMoverArxiu;
+	private Long annexId;
+
+	private boolean validacioCorrecte;
+	private String validacioError;
+	private ArxiuEstatEnumDto annexEstat; // Estat a l'arxiu en l'origen
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
@@ -79,14 +86,6 @@ public class DocumentDto extends NodeDto {
 	
 	public String getFitxerExtensionUpperCase() {
 		return getFitxerExtension().toUpperCase();
-	}
-
-	public String getDescripcio() {
-		return Descripcio;
-	}
-
-	public void setDescripcio(String descripcio) {
-		Descripcio = descripcio;
 	}
 
 	public MetaDocumentDto getMetaDocument() {

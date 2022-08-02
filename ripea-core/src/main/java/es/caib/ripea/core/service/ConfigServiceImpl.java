@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.repository.EntitatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,8 @@ public class ConfigServiceImpl implements ConfigService {
     private ConfigRepository configRepository;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private EntitatRepository entitatRepository;
     @Autowired
     private PluginHelper pluginHelper;
     @Autowired
@@ -115,14 +119,15 @@ public class ConfigServiceImpl implements ConfigService {
             return new ArrayList<>();
         }
         String [] split = key.split(ConfigDto.prefix);
-        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNull(split[1]), ConfigDto.class);
+        return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(split[1]), ConfigDto.class);
     }
     @Override
     @Transactional(readOnly = true)
     public String getConfigValue(String configKey) throws NotDefinedConfigException {
     	return configHelper.getConfig(configKey);
     }
-    private void processPropertyValues(ConfigGroupDto cGroup) {
+
+    public void processPropertyValues(ConfigGroupDto cGroup) {
         for (ConfigDto config: cGroup.getConfigs()) {
             if ("PASSWORD".equals(config.getTypeCode())){
                 config.setValue("*****");
@@ -138,4 +143,36 @@ public class ConfigServiceImpl implements ConfigService {
             }
         }
     }
+
+    @Override
+    @Transactional
+    public void crearPropietatsConfigPerEntitats() {
+
+        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
+        List<EntitatEntity> entitats = entitatRepository.findAll();
+        ConfigEntity nova;
+        for (ConfigEntity config : configs) {
+            for (EntitatEntity entitat : entitats) {
+                String key = configHelper.crearEntitatKey(entitat.getCodi(), config.getKey());
+                if (configRepository.findByKey(key) != null ) {
+                    continue;
+                }
+                nova = new ConfigEntity();
+                nova.crearConfigNova(key, entitat.getCodi(), config);
+                configRepository.save(nova);
+            }
+        }
+    }
+
+    @Override
+    public void actualitzarPropietatsJBossBdd() {
+
+        List<ConfigEntity> configs = configRepository.findJBossConfigurables();
+        for(ConfigEntity config : configs) {
+            String property = ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(config.getKey());
+            config.setValue(property);
+            configRepository.save(config);
+        }
+    }
+
 }

@@ -3,15 +3,15 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.Date;
-import java.util.List;
-
+import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
+import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -38,4 +38,14 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 			"					and dataFi is null) " +
 			"	and	e.dataFi is null ")
 	public Long findExecucioMassivaContingutId(@Param("ara") Date ara);
+
+
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+	@Modifying
+	@Query(value = "delete from ipa_massiva_contingut where contingut_id = :contingutId ", nativeQuery = true)
+	int deleteExecucioMassivaFromContingutsOrfes(@Param("contingutId") Long contingutId);
+
 }

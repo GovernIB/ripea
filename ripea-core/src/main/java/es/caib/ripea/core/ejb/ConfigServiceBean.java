@@ -47,8 +47,20 @@ public class ConfigServiceBean implements ConfigService {
 	public List<ConfigDto> findEntitatsConfigByKey(String key) {
 		return delegate.findEntitatsConfigByKey(key);
 	}
+
 	@Override
 	public String getConfigValue(String configKey) throws NotDefinedConfigException {
 		return delegate.getConfigValue(configKey);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_SUPER"})
+	public void crearPropietatsConfigPerEntitats() {
+		delegate.crearPropietatsConfigPerEntitats();
+	}
+
+	@Override
+	public void actualitzarPropietatsJBossBdd() {
+		delegate.actualitzarPropietatsJBossBdd();
 	}
 }

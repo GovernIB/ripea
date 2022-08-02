@@ -28,6 +28,7 @@ public class SeguimentArxiuPendentsDto implements Serializable {
 	private Date dataDarrerIntent;
 	private boolean expedientArxiuPropagat;
 	
+	private boolean annex;
 
 	@Override
 	public String toString() {

@@ -69,5 +69,10 @@ public class SegonPlaServiceBean implements SegonPlaService {
     public void consultaCanvisOrganigrama() {
         delegate.consultaCanvisOrganigrama();
     }
+    
+	@Override
+	public void reintentarCanviEstatDistribucio() {
+		delegate.reintentarCanviEstatDistribucio();
+	}
 
 }

@@ -1,24 +1,5 @@
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.util.WebUtils;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -28,6 +9,23 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.war.command.ExpedientFiltreCommand;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.WebUtils;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per als seguidors dels expedients.
@@ -90,7 +88,8 @@ public class ExpedientSeguidorController extends BaseUserController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return ajaxUrlOk();
 		} else {
 			for (Long expedientId : seleccio) {
@@ -141,7 +140,8 @@ public class ExpedientSeguidorController extends BaseUserController {
 					request, 
 					getMessage(
 							request, 
-							"expedient.controller.exportacio.seleccio.buida"));
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
 			return ajaxUrlOk();
 		} else {
 			for (Long expedientId : seleccio) {

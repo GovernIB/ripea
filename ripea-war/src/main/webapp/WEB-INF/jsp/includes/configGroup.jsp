@@ -78,10 +78,12 @@
                         <c:if test="${not config.jbossProperty}">
                             <button class="btn btn-success"><i class="fa fa-save"></i></button>
                         </c:if>
-                        <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
+                        <c:if test="${config.configurable}">
+                            <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
+                        </c:if>
                     </div>
                 </div>
-                <div class="form-group entitats-config"></div>
+                <div class="form-group entitats-config separador"></div>
             </form:form>
         </c:forEach>
 

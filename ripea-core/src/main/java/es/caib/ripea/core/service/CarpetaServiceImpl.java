@@ -83,7 +83,10 @@ public class CarpetaServiceImpl implements CarpetaService {
 				false,
 				null,
 				false,
-				null, false, null);
+				null, 
+				false, 
+				null, 
+				true);
 	}
 
 	@Transactional
@@ -102,7 +105,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				false,
 				false,
 				false,
-				false, false, null);
+				false, false, true, null);
 		if (! checkCarpetaUniqueContraint(nom, contingut.getPare(), entitatId)) {
 			throw new ContingutNotUniqueException();
 		}

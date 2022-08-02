@@ -1,69 +1,94 @@
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
+import java.util.List;
 
 public interface ExpedientPeticioService {
 
-	PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
+	@PreAuthorize("hasRole('tothom')")
+	public PaginaDto<ExpedientPeticioListDto> findAmbFiltre(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual, Long organActualId);
 
-	ExpedientPeticioDto findOne(
+	@PreAuthorize("hasRole('tothom')")
+	public ExpedientPeticioDto findOne(
 			Long expedientPeticioId);
 
-	FitxerDto getAnnexContent(
-			Long annexId);
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto getAnnexContent(
+			Long annexId, boolean versioImprimible);
 
-	List<ArxiuFirmaDto> annexFirmaInfo(
+	@PreAuthorize("hasRole('tothom')")
+	public List<ArxiuFirmaDto> annexFirmaInfo(
 			String fitxerArxiuUuid);
 
-	RegistreAnnexDto findAnnexById(
+	@PreAuthorize("hasRole('tothom')")
+	public RegistreAnnexDto findAnnexById(
 			Long annexId);
 
-	FitxerDto getAnnexFirmaContingut(
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto getAnnexFirmaContingut(
 			Long annexId);
 
-	void rebutjar(
+	@PreAuthorize("hasRole('tothom')")
+	public void rebutjar(
 			Long expedientPeticioId,
 			String observacions);
 
-
-	MetaExpedientDto findMetaExpedientByEntitatAndProcedimentCodi(String entitatCodi,
+	@PreAuthorize("hasRole('tothom')")
+	public MetaExpedientDto findMetaExpedientByEntitatAndProcedimentCodi(String entitatCodi,
 			String procedimentCodi);
 
-	List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi);
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi);
 
-	RegistreDto findRegistreById(Long registreId);
+	@PreAuthorize("hasRole('tothom')")
+	public RegistreDto findRegistreById(Long registreId);
 
-	List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
+	@PreAuthorize("hasRole('tothom')")
+	public List<ExpedientPeticioListDto> findByExpedientAmbFiltre(
 			Long entitatId,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams);
 
-	ExpedientDto findByEntitatAndMetaExpedientAndExpedientNumero(Long entitatId,
+	@PreAuthorize("hasRole('tothom')")
+	public ExpedientDto findByEntitatAndMetaExpedientAndExpedientNumero(Long entitatId,
 			Long metaExpedientId,
 			String expedientNumero);
 
-	FitxerDto getJustificantContent(String arxiuUuid);
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto getJustificantContent(String arxiuUuid);
 
+	@PreAuthorize("hasRole('tothom')")
 	public long countAnotacionsPendents(Long entitatId, String rolActual, Long organActualId);
 
-	boolean comprovarExistenciaInteressatsPeticio(
+	@PreAuthorize("hasRole('tothom')")
+	public boolean comprovarExistenciaInteressatsPeticio(
 			Long entitatId, 
 			Long expedientId, 
 			Long expedientPeticioId);
-}
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
+			Long entitatId,
+			MassiuAnnexProcesarFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			ResultEnumDto resultEnum) throws NotFoundException;
+
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre);
+
+	@PreAuthorize("hasRole('tothom')")
+	boolean canviarEstatAnotacionsDistribucio(List<Long> ids);
+
+	@PreAuthorize("hasRole('tothom')")
+	Throwable canviarEstatAnotacioDistribucio(Long id);
+ }

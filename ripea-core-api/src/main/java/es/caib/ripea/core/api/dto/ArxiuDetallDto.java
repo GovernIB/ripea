@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +15,7 @@ import java.util.Map;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter @Setter
 public class ArxiuDetallDto extends ArxiuContingutDto {
 
 	private String eniVersio;
@@ -38,126 +42,7 @@ public class ArxiuDetallDto extends ArxiuContingutDto {
 	private List<ArxiuFirmaDto> firmes;
 	private List<ArxiuContingutDto> fills;
 
-	public String getEniVersio() {
-		return eniVersio;
-	}
-	public void setEniVersio(String eniVersio) {
-		this.eniVersio = eniVersio;
-	}
-	public String getEniIdentificador() {
-		return eniIdentificador;
-	}
-	public void setEniIdentificador(String eniIdentificador) {
-		this.eniIdentificador = eniIdentificador;
-	}
-	public NtiOrigenEnumDto getEniOrigen() {
-		return eniOrigen;
-	}
-	public void setEniOrigen(NtiOrigenEnumDto eniOrigen) {
-		this.eniOrigen = eniOrigen;
-	}
-	public Date getEniDataObertura() {
-		return eniDataObertura;
-	}
-	public void setEniDataObertura(Date eniDataObertura) {
-		this.eniDataObertura = eniDataObertura;
-	}
-	public String getEniClassificacio() {
-		return eniClassificacio;
-	}
-	public void setEniClassificacio(String eniClassificacio) {
-		this.eniClassificacio = eniClassificacio;
-	}
-	public ExpedientEstatEnumDto getEniEstat() {
-		return eniEstat;
-	}
-	public void setEniEstat(ExpedientEstatEnumDto eniEstat) {
-		this.eniEstat = eniEstat;
-	}
-	public List<String> getEniOrgans() {
-		return eniOrgans;
-	}
-	public void setEniOrgans(List<String> eniOrgans) {
-		this.eniOrgans = eniOrgans;
-	}
-	public List<String> getEniInteressats() {
-		return eniInteressats;
-	}
-	public void setEniInteressats(List<String> eniInteressats) {
-		this.eniInteressats = eniInteressats;
-	}
-	public Date getEniDataCaptura() {
-		return eniDataCaptura;
-	}
-	public void setEniDataCaptura(Date eniDataCaptura) {
-		this.eniDataCaptura = eniDataCaptura;
-	}
-	public DocumentNtiEstadoElaboracionEnumDto getEniEstatElaboracio() {
-		return eniEstatElaboracio;
-	}
-	public void setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto eniEstatElaboracio) {
-		this.eniEstatElaboracio = eniEstatElaboracio;
-	}
-	public DocumentNtiTipoDocumentalEnumDto getEniTipusDocumental() {
-		return eniTipusDocumental;
-	}
-	public void setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto eniTipusDocumental) {
-		this.eniTipusDocumental = eniTipusDocumental;
-	}
-	public String getEniTipusDocumentalAddicional() {
-		return eniTipusDocumentalAddicional;
-	}
-	public void setEniTipusDocumentalAddicional(String eniTipusDocumentalAddicional) {
-		this.eniTipusDocumentalAddicional = eniTipusDocumentalAddicional;
-	}
-	public String getEniFormat() {
-		return eniFormat;
-	}
-	public void setEniFormat(String eniFormat) {
-		this.eniFormat = eniFormat;
-	}
-	public String getEniDocumentOrigenId() {
-		return eniDocumentOrigenId;
-	}
-	public void setEniDocumentOrigenId(String eniDocumentOrigenId) {
-		this.eniDocumentOrigenId = eniDocumentOrigenId;
-	}
-	public String getSerieDocumental() {
-		return serieDocumental;
-	}
-	public void setSerieDocumental(String serieDocumental) {
-		this.serieDocumental = serieDocumental;
-	}
-	public Map<String, Object> getMetadadesAddicionals() {
-		return metadadesAddicionals;
-	}
-	public void setMetadadesAddicionals(Map<String, Object> metadadesAddicionals) {
-		this.metadadesAddicionals = metadadesAddicionals;
-	}
-	public String getContingutTipusMime() {
-		return contingutTipusMime;
-	}
-	public void setContingutTipusMime(String contingutTipusMime) {
-		this.contingutTipusMime = contingutTipusMime;
-	}
-	public String getContingutArxiuNom() {
-		return contingutArxiuNom;
-	}
-	public void setContingutArxiuNom(String contingutArxiuNom) {
-		this.contingutArxiuNom = contingutArxiuNom;
-	}
-	public List<ArxiuFirmaDto> getFirmes() {
-		return firmes;
-	}
-	public void setFirmes(List<ArxiuFirmaDto> firmes) {
-		this.firmes = firmes;
-	}
-	public List<ArxiuContingutDto> getFills() {
-		return fills;
-	}
-	public void setFills(List<ArxiuContingutDto> fills) {
-		this.fills = fills;
-	}
+	private ArxiuEstatEnumDto arxiuEstat;
 
 	private static final long serialVersionUID = -2124829280908976623L;
 

@@ -3,48 +3,16 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
-import es.caib.ripea.core.helper.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import es.caib.distribucio.ws.backofficeintegracio.AnotacioRegistreId;
-import es.caib.distribucio.ws.backofficeintegracio.Estat;
+import com.google.common.base.Strings;
+import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.dto.RegistreJustificantDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
@@ -53,6 +21,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
+import es.caib.ripea.core.helper.*;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -60,6 +29,22 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
@@ -67,6 +52,7 @@ import es.caib.ripea.core.repository.RegistreRepository;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Service
+@Slf4j
 public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Autowired
@@ -101,6 +87,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private DistribucioHelper distribucioHelper;
+	@Autowired
+	private ContingutHelper contingutHelper;
+
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -110,7 +99,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			PaginacioParamsDto paginacioParams, 
 			String rolActual, 
 			Long organActualId) {
-		logger.debug("Consultant els expedient peticions segons el filtre (" +
+		log.debug("Consultant els expedient peticions segons el filtre (" +
 				"entitatId=" +
 				entitatId +
 				", filtre=" +
@@ -218,7 +207,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Long entitatId,
 			Long metaExpedientId,
 			String expedientNumero) {
-		logger.debug("Consultant el expedient("
+		log.debug("Consultant el expedient("
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientNumero=" + expedientNumero + ", "
 				+ "metaExpedientId=" + metaExpedientId + ")");
@@ -282,21 +271,24 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto getAnnexContent(Long annexId) {
+	public FitxerDto getAnnexContent(Long annexId, boolean versioImprimible) {
 		RegistreAnnexEntity annex = registreAnnexRepository.findOne(annexId);
 		FitxerDto fitxer = new FitxerDto();
 
 		Document document = null;
-		document = pluginHelper.arxiuDocumentConsultar(null,
+		document = pluginHelper.arxiuDocumentConsultar(
+				null,
 				annex.getUuid(),
 				null,
 				true,
-				true);
+				versioImprimible);
 
+		RegistreAnnexEntity registreAnnex = registreAnnexRepository.findOne(annexId);
+		
 		if (document != null) {
 			DocumentContingut documentContingut = document.getContingut();
 			if (documentContingut != null) {
-				fitxer.setNom(documentContingut.getArxiuNom());
+				fitxer.setNom(versioImprimible ? documentContingut.getArxiuNom() : registreAnnex.getNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
 				fitxer.setTamany(documentContingut.getContingut().length);
@@ -332,16 +324,22 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public RegistreAnnexDto findAnnexById(Long annexId) {
-		RegistreAnnexEntity annexEntity = registreAnnexRepository.findOne(annexId);
+		RegistreAnnexEntity annexEntity = registreAnnexRepository.findById(annexId);
 
-		return conversioTipusHelper.convertir(annexEntity,
+		RegistreAnnexDto annexDto = conversioTipusHelper.convertir(
+				annexEntity,
 				RegistreAnnexDto.class);
+		
+		if (annexEntity.getDocument() != null) {
+			annexDto.setDocumentId(annexEntity.getDocument().getId());
+		}
+		return annexDto;
 	}
 
 	@Transactional(readOnly = true)
 	@Override
 	public List<ArxiuFirmaDto> annexFirmaInfo(String fitxerArxiuUuid) {
-		logger.debug("Obtenint annex firma info (" +
+		log.debug("Obtenint annex firma info (" +
 				"fitxerArxiuUuid=" +
 				fitxerArxiuUuid +
 				")");
@@ -380,7 +378,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Override
 	public void rebutjar(Long expedientPeticioId,
 			String observacions) {
-		logger.debug("Reutjant el expedient peticio " +
+		log.debug("Reutjant el expedient peticio " +
 				"expedientPeticioId=" +
 				expedientPeticioId +
 				")");
@@ -393,7 +391,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
 
 		try {
-			distribucioHelper.getBackofficeIntegracioServicePort().canviEstat(anotacioRegistreId,
+			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId,
 					Estat.REBUTJADA,
 					observacions);
 		} catch (Exception e) {
@@ -445,12 +443,14 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {
-		logger.debug("Consultant el expedient peticio " +
+		log.debug("Consultant el expedient peticio " +
 				"expedientPeticioId=" +
 				expedientPeticioId +
 				")");
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+		expedientPeticioEntity.getRegistre().getAnnexos();
 
 		ExpedientPeticioDto expedientPeticioDto = conversioTipusHelper.convertir(expedientPeticioEntity,
 				ExpedientPeticioDto.class);
@@ -484,6 +484,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return expedientPeticioDto;
 
 	}
+	
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -525,11 +526,138 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	}
 	
 	
-	
+	@Transactional(readOnly = true)
+	@Override
+	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
+			Long entitatId,
+			MassiuAnnexProcesarFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			ResultEnumDto resultEnum) {
+		
+		ResultDto<RegistreAnnexDto> result = new ResultDto<RegistreAnnexDto>();
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false, 
+				false, 
+				true, 
+				false);
+		
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+		
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("expedientCreatedDate", new String[] {"ep.expedient.createdDate"});
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
+		}
+		
+		if (resultEnum == ResultEnumDto.PAGE) {
+			Page<RegistreAnnexEntity> pagina = registreAnnexRepository.findPendentsProcesar(
+					entitat,
+					filtre.getNom() == null,
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					filtre.getNumero() == null,
+					filtre.getNumero() != null ? filtre.getNumero().trim() : "",
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					metaExpedient == null,
+					metaExpedient,
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+			PaginaDto<RegistreAnnexDto> paginaDto = paginacioHelper.toPaginaDto(
+					pagina,
+					RegistreAnnexDto.class);
+			result.setPagina(paginaDto);
+			
+		} else {
+			
+			List<Long> documentsIds = registreAnnexRepository.findIdsPendentsProcesar(
+					entitat,
+					filtre.getNom() == null,
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					filtre.getNumero() == null,
+					filtre.getNumero() != null ? filtre.getNumero().trim() : "",
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					metaExpedient == null,
+					metaExpedient);
+			
+			result.setIds(documentsIds);
+		}
+		return result;
+	}
 
-	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ExpedientPeticioPendentDist>  findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
 
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		boolean identNull = Strings.isNullOrEmpty(filtre.getIdentificador());
+		boolean nomNull = Strings.isNullOrEmpty(filtre.getNom());
+		boolean dataIniciNull = filtre.getDataInici() == null;
+		boolean dataFiNull = filtre.getDataFi() == null;
+		Page<ExpedientPeticioPendentDist> pagina = expedientPeticioRepository.findPendentsCanviEstat(entitat, identNull, filtre.getIdentificador(),
+				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi(), paginacioHelper.toSpringDataPageable(paginacioParams));
+		return paginacioHelper.toPaginaDto(pagina, ExpedientPeticioPendentDist.class);
+	}
 
-	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioServiceImpl.class);
+	@Transactional(readOnly = true)
+	@Override
+	public List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre) {
+
+		boolean identNull = Strings.isNullOrEmpty(filtre.getIdentificador());
+		boolean nomNull = Strings.isNullOrEmpty(filtre.getNom());
+		boolean dataIniciNull = filtre.getDataInici() == null;
+		boolean dataFiNull = filtre.getDataFi() == null;
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		return expedientPeticioRepository.findIdsPendentsCanviEstat(entitat, identNull, filtre.getIdentificador(),
+				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi());
+	}
+
+	@Transactional
+	@Override
+	public boolean canviarEstatAnotacionsDistribucio(List<Long> ids) {
+
+		boolean ok = true;
+		for (Long id : ids) {
+			Throwable exception = canviarEstatAnotacioDistribucio(id);
+			if (exception != null) {
+				ok = false;
+			}
+		}
+		return ok;
+	}
+
+	@Transactional
+	@Override
+	public Throwable canviarEstatAnotacioDistribucio(Long id) {
+
+		ExpedientPeticioEntity pendent = expedientPeticioRepository.findOne(id);
+		Throwable exception = null;
+		AnotacioRegistreId anotacio = new AnotacioRegistreId();
+		anotacio.setIndetificador(pendent.getIdentificador());
+		anotacio.setClauAcces(pendent.getClauAcces());
+		try {
+			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
+			pendent.setPendentEnviarDistribucio(false);
+			expedientPeticioRepository.save(pendent);
+		} catch (Throwable ex) {
+			exception = ex;
+			log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
+			Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
+			reintents = reintents > 0 ? reintents : configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS);
+			pendent.setReintentsEnviarDistribucio(reintents);
+			expedientPeticioRepository.save(pendent);
+		}
+		return exception;
+	}
+
 
 }

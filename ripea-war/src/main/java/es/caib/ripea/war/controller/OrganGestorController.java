@@ -9,6 +9,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
+
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.OrganGestorCommand;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
@@ -104,8 +105,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 					DatatablesHelper.getPaginacioDtoFromRequest(request));
         } catch (SecurityException e) {
         	logger.error("Error al obtenir el llistat de permisos", e);
-            MissatgesHelper.error(request,
-                    getMessage(request, e.getMessage()));
+            MissatgesHelper.error(request, getMessage(request, e.getMessage()), e);
         }
         return DatatablesHelper.getDatatableResponse(request, organs, "codi");
     }
@@ -119,7 +119,8 @@ public class OrganGestorController extends BaseUserOAdminController {
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../organgestor",
-					"L'entitat actual no té cap codi DIR3 associat");
+					"L'entitat actual no té cap codi DIR3 associat",
+					null);
 		}
 		try {
 
@@ -141,7 +142,8 @@ public class OrganGestorController extends BaseUserOAdminController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../organgestor",
-					e.getMessage());
+					e.getMessage(),
+					e);
 		}
 
 //        return getAjaxControllerReturnValueSuccess(request, "redirect:../../organgestor",
@@ -239,17 +241,20 @@ public class OrganGestorController extends BaseUserOAdminController {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"organgestor.controller.esborrar.error.fk.metaexp");
+						"organgestor.controller.esborrar.error.fk.metaexp",
+						root);
 			} else if (root instanceof SQLIntegrityConstraintViolationException && root.getMessage().contains("IPA_ORGAN_GESTOR_EXP_FK")) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"organgestor.controller.esborrar.error.fk.exp");
+						"organgestor.controller.esborrar.error.fk.exp",
+						root);
 			} else {
 				return getAjaxControllerReturnValueErrorMessage(
 						request,
 						"redirect:../../esborrat",
-						root.getMessage());
+						root.getMessage(),
+						root);
 			}
 		}
 	}

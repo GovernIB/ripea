@@ -1,11 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: limit
-  Date: 9/7/21
-  Time: 14:45
-
-  Pagina per a la gestió de les propietats de configuració de l'aplicació.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="not"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -21,7 +13,7 @@
     <link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
     <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
     <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
-    <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+    <script src="<c:url value="/webjars/select2/4.0.5/dist/js/i18n/${requestLocale}.js"/>"></script>
     <script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
     <link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
     <link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
@@ -31,89 +23,114 @@
     <script src="<c:url value="/js/webutil.common.js"/>"></script>
     <script src="<c:url value="/js/webutil.datatable.js"/>"></script>
     <script src="<c:url value="/js/webutil.modal.js"/>"></script>
-    <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>
+<%--    <script src="<c:url value="/js/jquery.fileDownload.js"/>"></script>--%>
+    <script src="<c:url value="/js/configProperties/configProperties.js"/>"></script>
 </head>
 <body>
 <script>
 
-    let getValueRadio = elem => {
-        let inputs = $(elem).find("input");
-        if (!inputs || (inputs && inputs.length !== 2)) {
-            return null;
-        }
-        return $(inputs[0]).is(":checked") ? inputs[0].value : $(inputs[1]).is(":checked") ? inputs[1].value : null;
-    }
-
-    let removeValueRadio = elem => $(elem).find('input:radio').attr("checked", false);
-
-    let addSpinner = id => {
-
-        let spinner;
-        if (!document.getElementById(id + "_spinner")) {
-            spinner = document.createElement("span");
-            spinner.setAttribute("aria-hidden", true);
-            spinner.className = "fa fa-circle-o-notch fa-spin fa-1x spinner-config";
-            spinner.setAttribute("id", id + "_spinner");
-            let elem = document.getElementById(id + "_key");
-            elem.append(spinner);
-        }
-        return spinner;
-    };
-
-    let removeSpinner = spinner =>  {
-        if (spinner) {
-            spinner.remove();
-        }
-    }
-
-    let mostrarMissatge = (id, data) => {
-
-        let elem = document.getElementById(id);
-        elem = !elem ? document.getElementById(id + "_1") : elem;
-        let tagId = elem.getAttribute("id") + "_msg";
-        let msg = document.getElementById(tagId);
-        if (msg) {
-            let el = document.getElementById(msg);
-            if (el) {
-                el.remove();
-            }
-        }
-        let div = document.createElement("div");
-        div.setAttribute("id", tagId);
-        div.className = "flex-space-between alert-config " +  (data.status === 1 ?  "alert-config-ok" : "alert-config-error");
-        div.append(data.message);
-        let span = document.createElement("span");
-        span.className = "fa fa-times alert-config-boto";
-        div.append(span);
-        elem.closest(".col-sm-8").append(div);
-        span.addEventListener("click", () => div.remove());
-        window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
-    }
-
-    let guardarPropietat = (configKey, natejar) => {
-
-        let configKeyReplaced = configKey.replaceAll("_",".");
-        let spinner = addSpinner(configKey);
-        let elem = $("#" + configKey);
-        let value = !natejar ? (elem.is(':checkbox') ? $(elem).is(":checked") : $(elem).is("div") ? getValueRadio(elem) :  $(elem).val()) : null;
-        let formData = new FormData();
-        formData.append("key", configKeyReplaced);
-        formData.append("value", value);
-        $.ajax({
-            url: "/ripea/config/update",
-            type: "post",
-            processData: false,
-            contentType: false,
-            enctype: "multipart/form-data",
-            data: formData,
-            success: data => {
-                removeSpinner(spinner);
-                mostrarMissatge(configKey + "_key", data);
-            }
-        });
-    };
-
     $(document).ready(function() {
+
+        $(".entitats").click(e => {
+
+            e.stopPropagation();
+
+            let div = $(e.currentTarget).parent().parent().next();
+            div.empty();
+            let span = $(e.currentTarget).find("span");
+            if ($(div).is(":visible")) {
+                span.removeClass("fa-caret-up");
+                span.addClass("fa-caret-down");
+                addSeparador(e.target);
+                div.toggle();
+                return;
+            }
+            $.ajax({
+                type: "GET",
+                url: "config/entitat/" + e.currentTarget.id.replace(/\./g,"-"),
+                success: entitats => {
+
+                    if (!entitats) {
+                        return;
+                    }
+                    removeSeparador(e.currentTarget);
+                    div.toggle();
+                    if ($(div).is(":visible")) {
+                        span.removeClass("fa-caret-down");
+                        span.addClass("fa-caret-up");
+                    }
+
+                    for (let entitat of entitats) {
+                        let keyReplaced = entitat.key.replaceAll('.', '_');
+                        let string = '<div>';
+                        let disabled = entitat.jbossProperty || !entitat.value ? 'disabled' : '';
+                        let textGray = disabled ? "text-gray" : "";
+                        string += '<label id="' + keyReplaced + '_codi_entitat" for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom ' + textGray + '" style="word-wrap: break-word;">- ' + entitat.entitatCodi + '</label>';
+                        string += '<div class="col-sm-8 margin-bottom">';
+                        let placeHolder = "placeholder=" + entitat.key;
+                        let configurable = "";
+                        if (entitat.typeCode === "INT") {
+                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input" type="number" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
+                        } else if(entitat.typeCode === "FLOAT") {
+                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input" type="number" step="0.01" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
+                        } else if(entitat.typeCode === "CREDENTIALS") {
+                            string += '<input id="' + keyReplaced + '" class="form-control entitat-input" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + ' ' + placeHolder + '>';
+                        } else if(entitat.typeCode === "BOOL") {
+                            let checked = entitat.value === "true" ? 'checked' : '';
+                            string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar entitat-input" type="checkbox" ' + disabled + ' ' + checked + '>';
+                        } else if (entitat.validValues && entitat.validValues.length > 2) {
+                            string += '<select id="' + keyReplaced + '" class="form-control" ' + disabled + '>';
+                            let selected = "";
+                            string += '<option value=""></option>';
+                            entitat.validValues.map(x => {
+                                selected = x === entitat.value ? "selected" : "";
+                                string += '<option value="' + x + '"' + ' ' + selected + '>' + x + '</option>';
+                            });
+                            string += '<select>';
+                        } else if (entitat.validValues && entitat.validValues.length === 2) {
+                            let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
+                            let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
+                            string += '<div id="' + keyReplaced + '" class="visualitzar entitat-input radio-div">'
+                                + '<label id="' + keyReplaced+ '_radio_1" for="' + keyReplaced + '_1" class="radio-inline ' + textGray + '">'
+                                + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + ' ' + disabled + '>'
+                                + entitat.validValues[0]
+                                + '</label>'
+                                + '<label id="' + keyReplaced+ '_radio_2" for="' + keyReplaced+ '_2" class="radio-inline ' + textGray + '">'
+                                + '<input id="' + keyReplaced + '_2" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[1] + '"' + ' ' + checked2 + ' ' + disabled + '>'
+                                + entitat.validValues[1]
+                                + '</label></div>';
+                        } else {
+                            string += '<input id="' + keyReplaced + '" class="form-control" type="text" maxlength="2048" value="'
+                                + (entitat.value ? entitat.value : "" )+ '"' + disabled + ' ' + placeHolder + '>';
+                        }
+                        string +='<div><div id="'+ keyReplaced + '_key" class="display-inline"><span id="' + keyReplaced+ '_key_entitat" class="help-block display-inline ' + textGray + '"> ' + entitat.key + '</span></div>';
+                        string += '</div></div>'
+                        string += '<div class="col-sm-1 margin-bottom flex-space-between">';
+                        if (!entitat.jbossProperty) {
+                            let saveDelete = entitat.value ? "" : "no-display";
+                            let config = !entitat.value ? "" : "no-display";
+                            string += '<button id="' + keyReplaced + '_button_save" name="' + entitat.entitatCodi + '" type="button" class="btn btn-success entitat-save ' + saveDelete + '"><i class="fa fa-save"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_trash" name="' + entitat.entitatCodi + '" type="button" class="btn btn-danger entitat-trash ' + saveDelete + '"><i class="fa fa-trash"></i></button>';
+                            string += '<button id="' + keyReplaced + '_button_config" name="' + entitat.entitatCodi + '" type="button" class="btn btn-success entitat-config ' + config + '"><i class="fa fa-pencil"></i></button>';
+                        }
+                        string += '</div></div>';
+                        div.append(string);
+                    }
+
+                    $("select", div).select2({
+                        theme: "bootstrap",
+                        allowClear: true,
+                        minimumResultsForSearch: -1,
+                        placeholder: ""
+                    });
+
+                    $(".entitat-save").click(e =>  entitatSave(e));
+                    $(".entitat-trash").click(e => entitatTrash(e));
+                    $(".entitat-config").click(e => entitatConfig(e));
+                }
+            });
+        });
+
         $("#btn-sync").on("click", function () {
             $.get('<c:url value="/config/sync"/>', function( data ) {
                 $('#syncModal-body').html(
@@ -155,135 +172,6 @@
         });
         $('.a-config-group:first').tab('show');
     });
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-        $(document).ready(() => {
-
-            $(".entitats").click(e => {
-
-                e.stopPropagation();
-
-                let div = $(e.currentTarget).parent().parent().next();
-                div.empty();
-                let span = $(e.currentTarget).find("span");
-                if ($(div).is(":visible")) {
-                    span.removeClass("fa-caret-up");
-                    span.addClass("fa-caret-down");
-                    div.toggle();
-                    return;
-                }
-                $.ajax({
-                    type: "GET",
-                    url: "config/entitat/" + e.currentTarget.id.replace(/\./g,"-"),
-                    success: entitats => {
-
-                        if (!entitats) {
-                            return;
-                        }
-                        div.toggle();
-                        if ($(div).is(":visible")) {
-                            span.removeClass("fa-caret-down");
-                            span.addClass("fa-caret-up");
-                        }
-
-                        for (let entitat of entitats) {
-                            let keyReplaced = entitat.key.replaceAll('.', '_');
-                            let string = '<div>';
-                            string += '<label for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom" style="word-wrap: break-word;"></label>';
-                            string += '<div class="col-sm-8 margin-bottom">';
-                            let disabled = entitat.jbossProperty ? 'disabled' : '';
-                            let placeHolder = "placeholder=" + entitat.key;
-                            if (entitat.typeCode === "INT") {
-                                string += '<input id="' + keyReplaced + '" class="form-control" type="number" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
-                            } else if(entitat.typeCode === "FLOAT") {
-                                string += '<input id="' + keyReplaced + '" class="form-control" type="number" step="0.01" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
-                            } else if(entitat.typeCode === "CREDENTIALS") {
-                               string += '<input id="' + keyReplaced + '" class="form-control" type="password" maxlength="2048" value="' + entitat.value + '"' + disabled + '' + placeHolder + '>';
-                            } else if(entitat.typeCode === "BOOL") {
-                               let checked = entitat.value === "true" ? 'checked' : '';
-                               string += '<input id="' + keyReplaced + '" name="booleanValue" class="visualitzar" type="checkbox" ' + disabled + ' ' + checked + '>';
-                            } else if (entitat.validValues && entitat.validValues.length > 2) {
-                                string += '<select id="' + keyReplaced + '" class="form-control">';
-                                let selected = "";
-                                string += '<option value=""></option>';
-                                entitat.validValues.map(x => {
-                                    selected = x === entitat.value ? "selected" : "";
-                                    string += '<option value="' + x + '"' + ' ' + selected + '>' + x + '</option>';
-                                });
-                                string += '<select>';
-                            } else if (entitat.validValues && entitat.validValues.length === 2) {
-                                let checked = entitat.validValues[0] === entitat.value ? 'checked="checked"' : "";
-                                let checked2 = entitat.validValues[1] === entitat.value ? 'checked="checked"' : "";
-                                string += '<div id="' + keyReplaced + '"><label for="' + keyReplaced + '_1" class="radio-inline">'
-                                    + '<input id="' + keyReplaced + '_1" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[0] + '"' + ' ' + checked + '>'
-                                    + entitat.validValues[0]
-                                    + '</label>'
-                                    + '<label for="' + keyReplaced+ '_2" class="radio-inline">'
-                                    + '<input id="' + keyReplaced + '_2" name="' + keyReplaced + '" type=radio value="' + entitat.validValues[1] + '"' + ' ' + checked2 + '>'
-                                    + entitat.validValues[1]
-                                    + '</label></div>';
-                            } else {
-                                string += '<input id="' + keyReplaced + '" class="form-control" type="text" maxlength="2048" value="'
-                                        + (entitat.value ? entitat.value : "" )+ '"' + disabled + ' ' + placeHolder + '>';
-                            }
-                            string +='<div><div id="'+ keyReplaced + '_key" class="display-inline"><span class="help-block display-inline"> ' + entitat.key + '</span></div>';
-                            string += '</div></div>'
-                            string += '<div class="col-sm-1 margin-bottom flex-space-between">';
-                            if (!entitat.jbossProperty) {
-                                string += '<button id="' + keyReplaced + '_button_save" name=' + entitat.entitatCodi + ' type="button" class="btn btn-success entitat-save"><i class="fa fa-save"></i></button>';
-                                string += '<button id="' + keyReplaced + '_button_trash" name=' + entitat.entitatCodi + ' type="button" class="btn btn-danger entitat-trash"><i class="fa fa-trash"></i></button>';
-                            }
-                            string += '</div></div>';
-                            div.append(string);
-                        }
-
-                        $("select", div).select2({
-                            theme: "bootstrap",
-                            allowClear: true,
-                            minimumResultsForSearch: -1,
-                            placeholder: ""
-                        });
-
-                        $(".entitat-save").unbind("click").click(e =>  {
-                            let configKey = e.currentTarget.id.replace("_button_save", "");
-                            guardarPropietat(configKey);
-                        });
-
-                        $(".entitat-trash").unbind("click").click(e => {
-                            let configKey = e.currentTarget.id.replace("_button_trash", "");
-                            let elem = $("#" + configKey);
-                            if (elem.is(':checkbox')) {
-                                $(elem).prop("checked", false);
-                            } else if ($(elem).is("div") ) {
-                                removeValueRadio(elem);
-                            } else if ($(elem).is("select")) {
-                                let options = $("#" + elem[0].id + " option");
-                                console.log(options);
-                                // $("#" + elem[0].id + " option:selected").prop("selected", false);
-                                $(elem).empty();
-                                $(elem).append(options);
-                            } else {
-                                elem.val("");
-                            }
-                            guardarPropietat(configKey, true);
-                        });
-                    }
-                });
-            });
-        });
-            
 </script>
 <div class="text-right" data-toggle="botons-titol">
     <a id="btn-sync" class="btn btn-default" data-toggle="modal" data-target="#syncModal"><span class="fa fa-refresh"></span>&nbsp;Sincronitzar amb JBoss</a>
@@ -305,18 +193,18 @@
         </div>
     </div>
 </div>
-    <div class="row">
-        <div class="col-md-3">
-            <ul id="tab-list" class="nav nav-pills nav-stacked">
-                <c:forEach items="${config_groups}" var="group" varStatus="status_group">
-                    <li role="presentation">
-                        <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
-                    </li>
-                </c:forEach>
-            </ul>
-        </div>
-        <div class="col-md-9">
-            <div class="tab-content">
+<div class="row">
+    <div class="col-md-3">
+        <ul id="tab-list" class="nav nav-pills nav-stacked">
+            <c:forEach items="${config_groups}" var="group" varStatus="status_group">
+                <li role="presentation">
+                    <a class="a-config-group" data-toggle="tab" href="#group-${group.key}">${group.description}</a>
+                </li>
+            </c:forEach>
+        </ul>
+    </div>
+    <div class="col-md-9">
+        <div class="tab-content">
             <c:forEach items="${config_groups}" var="group" varStatus="status_group">
                 <c:set var="group" value="${group}" scope="request"/>
                 <c:set var="level" value="0" scope="request"/>
@@ -324,8 +212,8 @@
                     <jsp:include page="includes/configGroup.jsp"/>
                 </div>
             </c:forEach>
-            </div>
         </div>
     </div>
+</div>
 </body>
 </html>

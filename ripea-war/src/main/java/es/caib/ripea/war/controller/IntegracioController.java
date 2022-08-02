@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.base.Strings;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.war.command.IntegracioFiltreCommand;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,52 +40,44 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
 public class IntegracioController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "IntegracioController.session.filtre";
+	private static final String INTEGRACIO_FILTRE = "integracio_filtre";
 
 	@Autowired
 	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
 		return getAmbCodi(request, null, model);
 	}
+
+	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
+	public String post(HttpServletRequest request, @PathVariable @NonNull String codi, IntegracioFiltreCommand command, Model model) {
+
+		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
+		return getAmbCodi(request, codi, model);
+	}
+
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
-	public String getAmbCodi(
-			HttpServletRequest request,
-			@PathVariable String codi,
-			Model model) {
+	public String getAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {
+
 		List<IntegracioDto> integracions = aplicacioService.integracioFindAll();
-		
 		for (IntegracioDto integracio : integracions) {
 			for (IntegracioEnumDto integracioEnum : IntegracioEnumDto.values()) {
 				if (integracio.getCodi() == integracioEnum.name()) {
-					integracio.setNom(
-							EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class,
-							"integracio.list.pipella." + integracio.getCodi()).getText());
+					integracio.setNom(EnumHelper.getOneOptionForEnum(IntegracioEnumDto.class, "integracio.list.pipella." + integracio.getCodi()).getText());
 				}
 			}
 		}
-		
-		model.addAttribute(
-				"integracions",
-				integracions);
+		IntegracioFiltreCommand command = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		model.addAttribute(command);
+		RequestSessionHelper.actualitzarObjecteSessio(request, INTEGRACIO_FILTRE, command);
+		model.addAttribute("integracions", integracions);
 		if (codi != null) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					codi);
+			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, codi);
 		} else if (integracions.size() > 0) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					integracions.get(0).getCodi());
+			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, integracions.get(0).getCodi());
 		}
-		model.addAttribute(
-				"codiActual",
-				RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						SESSION_ATTRIBUTE_FILTRE));
+		model.addAttribute("codiActual", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE));
 		return "integracioList";
 	}
 
@@ -111,16 +106,19 @@ public class IntegracioController extends BaseUserController {
 
 		String codi = (String)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
 		PaginacioParamsDto params = DatatablesHelper.getPaginacioDtoFromRequest(request);
-		return Strings.isNullOrEmpty(codi) ? DatatablesHelper.getDatatableResponse(request, new ArrayList<IntegracioAccioDto>())
-				: DatatablesHelper.getDatatableResponse(request, aplicacioService.integracioFindDarreresAccionsByCodiPaginat(codi, params));
+		if (Strings.isNullOrEmpty(codi)) {
+			return DatatablesHelper.getDatatableResponse(request, new ArrayList<IntegracioAccioDto>());
+		}
+		IntegracioFiltreCommand filtre = IntegracioFiltreCommand.getFiltreCommand(request, INTEGRACIO_FILTRE);
+		List<PaginacioParamsDto.FiltreDto> filtres = new ArrayList<>();
+		filtres.add((new PaginacioParamsDto.FiltreDto("entitat_codi", filtre.getEntitatCodi())));
+		params.setFiltres(filtres);
+		return DatatablesHelper.getDatatableResponse(request, aplicacioService.integracioFindDarreresAccionsByCodiPaginat(codi, params, filtre.asDto()));
 	}
 
 	@RequestMapping(value = "/{codi}/{index}", method = RequestMethod.GET)
-	public String detall(
-			HttpServletRequest request,
-			@PathVariable String codi,
-			@PathVariable int index,
-			Model model) {
+	public String detall(HttpServletRequest request, @PathVariable String codi, @PathVariable int index, Model model) {
+
 		List<IntegracioAccioDto> accions = aplicacioService.integracioFindDarreresAccionsByCodi(codi);
 		if (accions != null && index < accions.size()) {
 			model.addAttribute("integracio", accions.get(index));

@@ -6,6 +6,7 @@ package es.caib.ripea.war.helper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -27,15 +28,10 @@ public class SessioHelper {
 	private static final String SESSION_ATTRIBUTE_PIPELLA_ANOT_REG = "SessioHelper.pipellaAnotacioRegistre";
 	private static final String SESSION_ATTRIBUTE_IDIOMA_USUARI = "SessionHelper.idiomaUsuari";
 
-	public static void processarAutenticacio(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			AplicacioService aplicacioService,
-			EntitatService entitatService) {
+	public static void processarAutenticacio(HttpServletRequest request, HttpServletResponse response, AplicacioService aplicacioService, EntitatService entitatService) {
+
 		if (request.getUserPrincipal() != null && !request.getServletPath().startsWith("/error")) {
-			Boolean autenticacioProcessada = (Boolean)request
-					.getSession()
-					.getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA);
+			Boolean autenticacioProcessada = (Boolean)request.getSession().getAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA);
 			if (autenticacioProcessada == null) {
 				aplicacioService.processarAutenticacioUsuari();
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_AUTH_PROCESSADA, new Boolean(true));
@@ -45,32 +41,15 @@ public class SessioHelper {
 			}
 			String idioma_usuari = aplicacioService.getUsuariActual().getIdioma();
 			LocaleResolver localeResolver = RequestContextUtils.getLocaleResolver(request);
-			request
-					.getSession()
-					.setAttribute("SessionHelper.capsaleraLogo", aplicacioService
-							.propertyFindByNom("es.caib.ripea.capsalera.logo"));
-			request
-					.getSession()
-					.setAttribute("SessionHelper.capsaleraColorFons", aplicacioService
-							.propertyFindByNom("es.caib.ripea.capsalera.color.fons"));
-			request
-					.getSession()
-					.setAttribute("SessionHelper.capsaleraColorLletra", aplicacioService
-							.propertyFindByNom("es.caib.ripea.capsalera.color.lletra"));
-			request
-					.getSession()
-					.setAttribute("SessionHelper.isTipusDocumentsEnabled", aplicacioService
-							.propertyBooleanFindByKey("es.caib.ripea.habilitar.tipusdocument", false));
-			request
-					.getSession()
-					.setAttribute("SessionHelper.isDocumentsGeneralsEnabled", aplicacioService
-							.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
+			request.getSession().setAttribute("SessionHelper.capsaleraLogo", aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.logo"));
+			request.getSession().setAttribute("SessionHelper.capsaleraColorFons", aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.fons"));
+			request.getSession().setAttribute("SessionHelper.capsaleraColorLletra", aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.lletra"));
+			request.getSession().setAttribute("SessionHelper.isTipusDocumentsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.tipusdocument", false));
+			request.getSession().setAttribute("SessionHelper.isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
-			localeResolver
-					.setLocale(request, response, StringUtils
-							.parseLocaleString((String)request
-									.getSession()
-									.getAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI)));
+			EntitatDto entitat = EntitatHelper.getEntitatActual(request, entitatService);
+			aplicacioService.actualitzarEntiatThreadLocal(entitat);
+			localeResolver.setLocale(request, response, StringUtils.parseLocaleString((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI)));
 		}
 	}
 

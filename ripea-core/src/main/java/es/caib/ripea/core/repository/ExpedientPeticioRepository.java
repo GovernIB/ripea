@@ -6,6 +6,8 @@ package es.caib.ripea.core.repository;
 import java.util.Date;
 import java.util.List;
 
+
+import es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,33 +25,25 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 
 	
 	@Query("select peticio.registre.id from ExpedientPeticioEntity peticio where peticio.id = :id")
-	Long getRegistreId(
-			@Param("id") Long id);
+	Long getRegistreId(@Param("id") Long id);
 	
 	@Query("select annex.id from" +
 			"    RegistreAnnexEntity annex " +
 			"where " +
 			"annex.registre.id = :id ")
-	List<Long> getRegistreAnnexosId(
-			@Param("id") Long id);
+	List<Long> getRegistreAnnexosId(@Param("id") Long id);
 	
 	@Query("select registre.justificantArxiuUuid from" +
 			"    RegistreEntity registre " +
 			"where " +
 			"registre.id = :id")
-	String getRegistreJustificantArxiuUuid(
-			@Param("id") Long id);
+	String getRegistreJustificantArxiuUuid(@Param("id") Long id);
 	
-	ExpedientPeticioEntity findByIdentificador(
-			String identificador);
+	ExpedientPeticioEntity findByIdentificador(String identificador);
 
-	List<ExpedientPeticioEntity> findByEstatAndConsultaWsErrorIsFalse(
-			ExpedientPeticioEstatEnumDto estat);
+	List<ExpedientPeticioEntity> findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto estat);
 	
-	
-	List<ExpedientPeticioEntity> findByExpedient(
-			ExpedientEntity expedient,
-			Pageable pageable);
+	List<ExpedientPeticioEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 
 	@Query("from" +
 			"    ExpedientPeticioEntity e " +
@@ -128,6 +122,42 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	long countAnotacionsPendentsAdminOrgan(
 			@Param("entitatActual") EntitatEntity entitatActual,
 			@Param("organsCodisPermitted") List<String> organsCodisPermitted);
-	
-	
+
+	@Query("FROM ExpedientPeticioEntity e WHERE e.pendentEnviarDistribucio = true AND e.reintentsEnviarDistribucio > 0")
+	List<ExpedientPeticioEntity> findPendentsCanviEstat();
+
+	@Query("SELECT new es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist(ep.id, ep.identificador, ep.dataAlta, ep.expedient.nom, ep.expedient.id) " +
+			"FROM ExpedientPeticioEntity ep " +
+			"WHERE ep.pendentEnviarDistribucio = true AND ep.reintentsEnviarDistribucio > 0 AND ep.expedient.entitat = :entitat " +
+			"AND (:identificadorNull = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
+			"AND (:nomNull = true or lower(ep.expedient.nom) like lower('%' || :nom || '%')) " +
+			"AND (:dataIniciNull = true or ep.dataAlta >= :dataInici) " +
+			"AND (:dataFiNull = true or ep.dataAlta <= :dataFi)")
+	Page<ExpedientPeticioPendentDist> findPendentsCanviEstat(@Param("entitat") EntitatEntity entitat,
+															 @Param("identificadorNull") boolean identificadorNull,
+															 @Param("identificador") String identificador,
+															 @Param("nomNull") boolean nomNull,
+															 @Param("nom") String nom,
+															 @Param("dataIniciNull") boolean dataIniciNull,
+															 @Param("dataInici") Date dataInici,
+															 @Param("dataFiNull") boolean dataFiNull,
+															 @Param("dataFi") Date dataFi,
+															 Pageable pageable);
+
+	@Query("SELECT ep.id FROM ExpedientPeticioEntity ep " +
+			"WHERE ep.pendentEnviarDistribucio = true AND ep.reintentsEnviarDistribucio > 0 AND ep.expedient.entitat = :entitat " +
+			"AND (:identificadorNull = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
+			"AND (:nomNull = true or lower(ep.expedient.nom) like lower('%' || :nom || '%')) " +
+			"AND (:dataIniciNull = true or ep.dataAlta >= :dataInici) " +
+			"AND (:dataFiNull = true or ep.dataAlta <= :dataFi)")
+	List<Long> findIdsPendentsCanviEstat(@Param("entitat") EntitatEntity entitat,
+										 @Param("identificadorNull") boolean identificadorNull,
+										 @Param("identificador") String identificador,
+										 @Param("nomNull") boolean nomNull,
+										 @Param("nom") String nom,
+										 @Param("dataIniciNull") boolean dataIniciNull,
+										 @Param("dataInici") Date dataInici,
+										 @Param("dataFiNull") boolean dataFiNull,
+										 @Param("dataFi") Date dataFi);
+
 }

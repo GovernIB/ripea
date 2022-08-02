@@ -57,6 +57,9 @@ public class MetaExpedientSequenciaEntity extends RipeaAuditable<Long> {
 	public void incrementar() {
 		this.valor++;
 	}
+	public void updateValor(long valor) {
+		this.valor = valor;
+	}
 
 	/**
 	 * Obté el Builder per a crear objectes de tipus meta-expedient.

@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -199,7 +201,16 @@ public class ContingutAdminController extends BaseAdminController {
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../esborrat",
-					"contingut.admin.controller.recuperat.duplicat");
+					"contingut.admin.controller.recuperat.duplicat",
+					ex);
+		}  catch (Exception ex) {
+			logger.error("Error al recuperar element", ex);
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../esborrat",
+					"contingut.admin.controller.recuperat.error",
+					new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() },
+					ex);
 		}
 	}
 	
@@ -250,7 +261,8 @@ public class ContingutAdminController extends BaseAdminController {
 							request,
 							"redirect:../../contingut/" + expedientId,
 							"expedient.assignar.controller.no.permis",
-							new Object[] {command.getUsuariCodi()});
+							new Object[] {command.getUsuariCodi()},
+							e);
 				} else {
 					throw e;
 				}
@@ -300,5 +312,7 @@ public class ContingutAdminController extends BaseAdminController {
 		}
 		return filtreCommand;
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(ContingutAdminController.class);
 
 }
