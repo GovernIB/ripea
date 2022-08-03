@@ -105,7 +105,6 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 		data-default-order="1" <%-- default column number to be sorted  --%>
 		data-default-dir="desc" <%-- default ordering direction  --%>
 		data-save-state="true" 
-		data-mantenir-paginacio="true"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -114,9 +113,21 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<th data-col-name="registre.extracte"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiDescripcio"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
 				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
-				<th data-col-name="estatView" data-orderable="false"><spring:message code="expedient.peticio.list.columna.estat"/></th>
-				<th data-col-name="expedientId" data-visible="false"></th>
 
+				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
+				<th data-col-name="estatView" data-orderable="false" data-template="#cellEstatTemplate">
+					<spring:message code="expedient.peticio.list.columna.estat"/>
+					<script id="cellEstatTemplate" type="text/x-jsrender">
+						{{:estatView}}
+						{{if pendentEnviarDistribucio}}
+							<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
+							class="fa fa-exclamation-triangle text-danger"></span>
+						{{/if}}
+					</script>
+
+				</th>
+
+				<th data-col-name="expedientId" data-visible="false"></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
@@ -129,6 +140,9 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 								{{/if}}
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
+								{{/if}}
+								{{if pendentEnviarDistribucio}}
+									<li><a href="<c:url value="/expedientPeticio/canviarEstat/{{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>
 								{{/if}}
 							</ul>
 						</div>

@@ -3,17 +3,22 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.ExpedientMetadades;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,78 +30,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.ExpedientMetadades;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.ArxiuContingutDto;
-import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.ContingutLogDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutMovimentDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.entity.AlertaEntity;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.ContingutMovimentEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.entity.TipusDocumentalEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DateHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.DadaRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaDadaRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -121,6 +65,8 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private AlertaRepository alertaRepository;
 	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
@@ -142,6 +88,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private ContingutsOrfesHelper contingutRepositoryHelper;
 
 	@Transactional
 	@Override
@@ -159,7 +107,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false,
-				false, false, null);
+				false, false, true, null);
 		contingutHelper.comprovarNomValid(
 				contingut.getPare(),
 				nom,
@@ -240,7 +188,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true, 
 				false, 
-				rolActual);
+				true, rolActual);
 		if (contingut instanceof ExpedientEntity) {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
@@ -449,7 +397,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true, 
 				false, 
-				rolActual);
+				true, rolActual);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -458,7 +406,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false, 
 				false, 
-				rolActual);
+				true, rolActual);
 		// Comprova el tipus del contingut que es vol moure
 		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -551,7 +499,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, 
-				false, null);
+				false, true, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
@@ -559,7 +507,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true,
 				false, 
-				false, null);
+				false, true, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -652,14 +600,14 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, false, null);
+				false, false, true, null);
 		ContingutEntity contingutDesti = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutDestiId,
 				false,
 				false,
 				false,
-				false, false, null);
+				false, false, true, null);
 		// Comprova el tipus del contingut que es vol moure
 		if (!(contingutOrigen instanceof DocumentEntity)) {
 			throw new ValidationException(
@@ -1401,6 +1349,12 @@ public class ContingutServiceImpl implements ContingutService {
 				}
 
 			}
+			if (arxiuDocument.getEstat() != null) {
+				if (DocumentEstat.ESBORRANY.equals(arxiuDocument.getEstat()))
+					arxiuDetall.setArxiuEstat(ArxiuEstatEnumDto.ESBORRANY);
+				else if (DocumentEstat.DEFINITIU.equals(arxiuDocument.getEstat()))
+					arxiuDetall.setArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+			}
 		} else if (contingut instanceof CarpetaEntity) {
 			Carpeta arxiuCarpeta = pluginHelper.arxiuCarpetaConsultar(
 					(CarpetaEntity)contingut);
@@ -1836,7 +1790,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false,
-				false, null);
+				false, true, null);
 		for (Map.Entry<Integer, Long> fill: orderedElements.entrySet()) {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();
@@ -2128,6 +2082,40 @@ public class ContingutServiceImpl implements ContingutService {
 	}
 
 
-	private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+	@Override
+	@Transactional
+//	@Scheduled(cron = "0 0 5 * * ?")
+	public Boolean netejaContingutsOrfes() {
+		try {
+			contingutRepositoryHelper.deleteContingutsOrfes();
+			return true;
+		} catch (Exception ex) {
+			logger.error("No s'han pogut eliminar els continguts orfes.", ex);
+		}
+		return false;
+	}
+
+    @Override
+    public ResultDocumentsSenseContingut arreglaDocumentsSenseContingut() {
+		ResultDocumentsSenseContingut result = ResultDocumentsSenseContingut.builder().build();
+
+//		List<Long> idsAnnexEsborranysAmbDocument = registreAnnexRepository.findIdsEsborranysAmbDocument();
+		List<Long> idsAnnexEsborranysAmbDocument = Arrays.asList(2124706L, 2124707L, 2124767L, 2124768L, 2124771L, 2124776L, 2124783L, 2124784L, 2130635L, 2130636L, 2130637L, 2130638L, 2130639L, 2121164L, 2106239L, 2125312L, 2121243L, 2121256L, 2121263L, 2121343L, 2121345L, 2121348L, 2121361L, 2130992L, 2131025L, 2121380L, 2122778L, 2122779L, 2122821L, 2122837L, 2121395L, 2122311L, 2122312L, 2122313L, 2150632L);
+
+		logger.info("[DOCS_SENSE_CONT] Detectats {} esborranys amb document associat.", idsAnnexEsborranysAmbDocument.size());
+		for (Long annexId : idsAnnexEsborranysAmbDocument) {
+			logger.info("[DOCS_SENSE_CONT] Processant annex: {}", annexId);
+			ResultDocumentSenseContingut resultat = contingutHelper.arreglaDocumentSenseContingut(annexId);
+			result.addResultDocument(resultat);
+			logger.info("[DOCS_SENSE_CONT] Resultat del procés: {}", resultat.toString());
+		}
+
+		return result;
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 
 }

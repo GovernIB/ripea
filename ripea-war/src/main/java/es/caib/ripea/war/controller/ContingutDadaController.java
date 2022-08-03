@@ -3,18 +3,17 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.NodeDto;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.war.helper.AjaxHelper;
+import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
+import es.caib.ripea.war.helper.BeanGeneratorHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -30,17 +29,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.NodeDto;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.war.helper.AjaxHelper;
-import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
-import es.caib.ripea.war.helper.BeanGeneratorHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre
@@ -87,7 +85,7 @@ public class ContingutDadaController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if (bindingResult.hasErrors()) {
-			MissatgesHelper.error(request, getMessage(request, "contingut.controller.dades.modificades.error"));
+			MissatgesHelper.error(request, getMessage(request, "contingut.controller.dades.modificades.error"), null);
 			return AjaxHelper.generarAjaxFormErrors(
 					null,
 					bindingResult);

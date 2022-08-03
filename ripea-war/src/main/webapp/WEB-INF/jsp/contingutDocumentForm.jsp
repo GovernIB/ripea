@@ -448,10 +448,9 @@ $(document).ready(function() {
 	    $('#loading').hide();
 	    $('#arxiuInput').show();
 	    
-		if (!isErrorTrue) {
+		//if (!isErrorTrue) {
 			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
-			
-		}
+		//}
 
 	});
 
@@ -498,6 +497,7 @@ function removeLoading() {
 			<a href="#" class="btn btn-xs btn-default pull-right"><spring:message code="comu.boto.descarregar"/></a>
 		</div>
 		<c:set var="isPermesModificarCustodiatsVar" value="${documentEstat != 'CUSTODIAT' && documentEstat != 'FIRMAT' && documentEstat != 'FIRMA_PARCIAL' && documentEstat != 'DEFINITIU'}"/>
+		<c:set var="isImportatNoBorrador" value="${documentCommand.documentTipus == 'IMPORTAT' && documentEstat != 'REDACCIO'}"/>
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
@@ -508,7 +508,8 @@ function removeLoading() {
 		
 
 		<c:choose>
-			<c:when test="${documentCommand.documentTipus == 'IMPORTAT' || !isPermesModificarCustodiatsVar}">
+<%--			<c:when test="${documentCommand.documentTipus == 'IMPORTAT' || !isPermesModificarCustodiatsVar}">--%>
+			<c:when test="${isImportatNoBorrador || !isPermesModificarCustodiatsVar}">
 				<c:set var="readOnlyValue" value="true"/>
 			</c:when>
 			<c:otherwise>
@@ -526,7 +527,8 @@ function removeLoading() {
 		<div id="ntiIdDocumentoOrigenDiv">
 			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true"/>
 		</div>
-		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">
+<%--		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">--%>
+		<c:if test="${!isImportatNoBorrador && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
 				<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>

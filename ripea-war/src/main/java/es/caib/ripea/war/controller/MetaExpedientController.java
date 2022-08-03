@@ -80,12 +80,7 @@ public class MetaExpedientController extends BaseAdminController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
-		Boolean mantenirPaginacio = Boolean.parseBoolean(request.getParameter("mantenirPaginacio"));
-		if (mantenirPaginacio) {
-			model.addAttribute("mantenirPaginacio", true);
-		} else {
-			model.addAttribute("mantenirPaginacio", false);
-		}
+
 		MetaExpedientFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		boolean isRolAdmin = RolHelper.isRolActualAdministrador(request);
@@ -309,7 +304,8 @@ public class MetaExpedientController extends BaseAdminController {
 								getMessage(
 										request,
 										"metaexpedient.controller.regla.crear.result",
-										new Object[] { crearReglaResponse.getMsgEscapeXML() }));
+										new Object[] { crearReglaResponse.getMsgEscapeXML() }),
+								null);
 					}
 				}
 
@@ -321,7 +317,8 @@ public class MetaExpedientController extends BaseAdminController {
 						request,
 						"redirect:metaExpedient",
 						"metaexpedient.controller.creat.error",
-						new String[] {throwable.getMessage()});
+						new String[] {throwable.getMessage()},
+						throwable);
 			}
 		}
 	}
@@ -499,12 +496,12 @@ public class MetaExpedientController extends BaseAdminController {
 		} catch (Exception e) {
 			
 			logger.error("Error al importar procediment", e);
-
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.import.controller.import.error",
-					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() });
+					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() }, e);
 		} finally {
 			request.getSession().removeAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
 		}
@@ -722,7 +719,8 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.form.import.rolsac.error",
-					new Object[] {ExceptionHelper.getRootCauseOrItself(e).getMessage()});
+					new Object[] {ExceptionHelper.getRootCauseOrItself(e).getMessage()},
+					e);
 		}
 		
 		return "metaExpedientForm";
@@ -770,7 +768,8 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:../../metaExpedient",
 					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
+					new Object[] { crearReglaResponseDto.getMsgEscapeXML() },
+					null);
 		}
 		
 	}
@@ -880,23 +879,27 @@ public class MetaExpedientController extends BaseAdminController {
 					"metaexpedient.controller.esborrat.ok");
 		} catch (Exception ex) {
 			logger.error("Error al esborrar metaexpedient", ex);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
 					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
 						"metaexpedient.controller.esborrar.error.fk",
-						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() });
+						new Object[] { root.getMessage() },
+						root);
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsEsborratsException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"metaexpedient.controller.esborrar.error.fk.esborrats");
+						"metaexpedient.controller.esborrar.error.fk.esborrats",
+						root);
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenExpedientsException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"metaexpedient.controller.esborrar.error.fk.expedients");
+						"metaexpedient.controller.esborrar.error.fk.expedients",
+						root);
 			} else {
 				throw ex;
 			}
@@ -962,7 +965,7 @@ public class MetaExpedientController extends BaseAdminController {
 					true, 
 					organId);
 			
-			logger.debug("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
+			logger.trace("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
 		} else {
 			metaExpedientsPermisLectura = metaExpedientService.findActius(
 					entitatActual.getId(), 
@@ -970,7 +973,7 @@ public class MetaExpedientController extends BaseAdminController {
 					rolActual, 
 					false, 
 					null);
-			logger.debug("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
+			logger.trace("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
 		}
 
 		return metaExpedientsPermisLectura;

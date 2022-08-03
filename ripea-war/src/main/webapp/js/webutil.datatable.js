@@ -120,14 +120,24 @@
 						}
 					}
 				},
-				rowCallback: function(row, data) {
+				rowCallback: function(row, data, displayNum, displayIndex, dataIndex ) {
 					if (plugin.settings.selectionEnabled) {
-						$(row).addClass('selectable');
-						var $cell = $('td:first', row);
-						$cell.empty().append('<span class="fa fa-square-o"></span>');
-						$('span', $cell).click(function() {
-							$(this).parent().trigger('click');
-						});
+						
+						var selectable = true;
+						if($taula.dataTable().api().column(1).header().getAttribute('data-col-name') == 'rowSelectable') {
+							if (!$taula.dataTable().api().column(1).data()[dataIndex]) {
+								selectable = false;
+							}
+						}
+						
+						if (selectable) {
+							$(row).addClass('selectable');
+							var $cell = $('td:first', row);
+							$cell.empty().append('<span class="fa fa-square-o"></span>');
+							$('span', $cell).click(function() {
+								$(this).parent().trigger('click');
+							});
+						}
 					}
 					if (plugin.settings.dragEnabled) {
 						var $cell;
@@ -436,18 +446,8 @@
 				}
 				if(plugin.settings.saveState){
 					dataTableOptions = $.extend({
-						stateSave: true,
-						stateSaveCallback: function(settings, data) {
-							sessionStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
-						}
+						stateSave: true
 					}, dataTableOptions);
-					if(plugin.settings.mantenirPaginacio){
-						dataTableOptions = $.extend({
-							stateLoadCallback: function(settings) {
-								return JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
-							}
-						}, dataTableOptions);
-					}
 				}
 			} else {
 				dataTableOptions = $.extend({
@@ -493,33 +493,66 @@
 							'selectionchange.dataTable',
 							[accio, afectatIds, selectedIds]);
 				};
+				
 				$taula.on('select.dt', function (e, dt, type, indexes) {
+					var selectableIndexes = [];
 					if (indexes) {
 						for (var i = 0; i < indexes.length; i++) {
 							var $row = $taula.dataTable().api()[type](indexes[i]).nodes().to$();
-							var $cell = $('td:first', $row);
-							$cell.html('<span class="fa fa-check-square-o"></span>');
-							$('span', $cell).click(function() {
-								$(this).parent().trigger('click');
-							});
+							var $header = headerTrFunction();
+							 
+							var selectable = true;
+							if($taula.dataTable().api().column(1).header().getAttribute('data-col-name') == 'rowSelectable') {
+								if (!$taula.dataTable().api().column(1).data()[indexes[i]]) {
+									selectable = false;
+								}
+							}
+							if (selectable) {
+								var $cell = $('td:first', $row);
+								$cell.html('<span class="fa fa-check-square-o"></span>');
+								$('span', $cell).click(function() {
+									$(this).parent().trigger('click');
+								});
+								selectableIndexes.push(indexes[i]);
+								
+							} else {
+								$row.removeClass('selected');
+							}
 						}
-						triggerSelectionChangeFunction('select', indexes);
+					}
+					if (selectableIndexes.length != 0) {
+					    triggerSelectionChangeFunction('select', selectableIndexes);
 					}
 				});
+				
 				$taula.on('deselect.dt', function (e, dt, type, indexes) {
+					var selectableIndexes = [];
 					if (indexes) {
 						for (var i = 0; i < indexes.length; i++) {
 							var $row = $taula.dataTable().api()[type](indexes[i]).nodes().to$();
-							var $cell = $('td:first', $row);
-							$cell.html('<span class="fa fa-square-o"></span>');
-							$('span', $cell).click(function() {
-								$(this).parent().trigger('click');
-							});
+							
+							var selectable = true;
+							if($taula.dataTable().api().column(1).header().getAttribute('data-col-name') == 'rowSelectable') {
+								if (!$taula.dataTable().api().column(1).data()[indexes[i]]) {
+									selectable = false;
+								}
+							}
+							if (selectable) {
+								var $cell = $('td:first', $row);
+								$cell.html('<span class="fa fa-square-o"></span>');
+								$('span', $cell).click(function() {
+									$(this).parent().trigger('click');
+								});
+								selectableIndexes.push(indexes[i]);
+							}
 						}
-						triggerSelectionChangeFunction('deselect', indexes);
+					}
+					if (selectableIndexes.length != 0) {
+					    triggerSelectionChangeFunction('deselect', selectableIndexes);
 					}
 				});
 			}
+			
 			// Configuració del filtre
 			if (plugin.settings.filtre) {
 				$(':input', $(plugin.settings.filtre)).on('change', function(e) {

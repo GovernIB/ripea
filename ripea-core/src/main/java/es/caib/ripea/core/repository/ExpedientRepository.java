@@ -48,6 +48,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			long sequencia);
 	
 	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	
+	List<ExpedientEntity> findByArxiuUuid(String arxiuUuid);
 
 	@Query(	"from" +
 			"    ExpedientEntity e "
@@ -563,6 +565,19 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organsIdsPermitted") List<Long> organsIdsPermitted,
 			@Param("metaNode") MetaNodeEntity metaNode);
+	
+	
+	@Query(	"select" +
+			"    max(e.sequencia) " +
+			"from" +
+			"    ExpedientEntity e " +
+			"where " +
+			"e.metaNode = :metaNode " +
+			"and e.any = :any")
+	Long findMaxSequencia(
+			@Param("metaNode") MetaNodeEntity metaNode,
+			@Param("any") int any);
+	
 
 	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);

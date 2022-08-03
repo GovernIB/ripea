@@ -12,6 +12,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DigitalitzacioService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.DocumentCommand;
@@ -97,6 +98,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private DocumentHelper documentHelper;
 	@Autowired
 	private DigitalitzacioService digitalitzacioService;
+	@Autowired
+	private ExpedientService expedientService;
 	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
@@ -199,7 +202,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					false,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request), null);
 		} catch (ValidationException ex) {
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
 					request,
 					command,
@@ -212,7 +215,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Throwable throwable = ExceptionHelper.findExceptionInstance(ex, SistemaExternException.class, 3);
 			if (throwable!=null) {
 				SistemaExternException sisExtExc = (SistemaExternException) throwable;
-				MissatgesHelper.error(request, sisExtExc.getMessage());
+				MissatgesHelper.error(request, sisExtExc.getMessage(), sisExtExc);
 				if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 					return modalUrlTancar();
 				} else {
@@ -276,9 +279,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command,
 					null,
 					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request), null);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
+					RolHelper.getRolActual(request), null);
 		} catch (ValidationException ex) {
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
 					request,
 					command,
@@ -322,7 +326,16 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@RequestParam(value = "origin") String origin,
 			Model model)  {
 
-		Exception exception = documentService.guardarDocumentArxiu(documentId);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
+		Exception exception = null;
+		if (document.getArxiuUuid() == null) {
+			exception = documentService.guardarDocumentArxiu(documentId);
+		} else if (document.isPendentMoverArxiu()) {
+			exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+		}
+		
 		
 		String redirect = null;
 		if (origin.equals("docDetail")) {
@@ -344,13 +357,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 				msg = getMessage(request,"error.arxiu.connectTimedOut");
 			} else {
-				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();
+				msg = root.getMessage();
 			}
 			return getAjaxControllerReturnValueError(
 					request,
 					redirect,
 					"document.controller.guardar.arxiu.error",
-					new Object[] {msg});
+					new Object[] {msg},
+					root);
 		}
 	}
 
@@ -394,7 +408,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						request,
 						getMessage(
 								request, 
-								"document.digitalitzacio.estat.enum."+ resultat.getEstat()));
+								"document.digitalitzacio.estat.enum."+ resultat.getEstat()),
+						null);
 				omplirModelFormulari(
 						request,
 						command,
@@ -419,6 +434,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
 				}
 			}
+
+            FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
+                    request,
+                    command,
+                    model);
+
+
 		} else {
 			omplirModelFormulari(
 					request,
@@ -511,19 +533,20 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					return getAjaxControllerReturnValueError(
 							request,
 							"redirect:../../",
-							"document.controller.descarregar.error.arxiuNoTrobat");
+							"document.controller.descarregar.error.arxiuNoTrobat",
+							e);
 				} else {
 					
 					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 					
-					if (root.getMessage().contains("timed out")) {
+					if (root.getMessage() != null && root.getMessage().contains("timed out")) {
 						MissatgesHelper.error(
 								request, 
-								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 					} else {
 						MissatgesHelper.error(
 								request, 
-								getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage());
+								getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
 					}
 					return "redirect:../../../../contingut/" + pareId;
 				}
@@ -534,7 +557,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request, 
 					getMessage(
 							request, 
-							"document.controller.descarregar.error"));
+							"document.controller.descarregar.error"),
+					null);
 			if (contingut.getPare() != null)
 				return "redirect:../../contingut/" + pareId;
 			else
@@ -589,7 +613,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		boolean totsFinals = true;
 		boolean totsDocumentsPdf = true;
 		boolean notificacioConcatenatEntregaPostal;
-		
+
 		
 		ContingutDto contingut = contingutService.findAmbIdUser(
 				entitatActual.getId(),
@@ -673,8 +697,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					null,
 					command,
 					true,
-					false, 
-					null, 
+					false,
+					null,
 					notificacioConcatenatEntregaPostal);
 		}
 	}
@@ -713,7 +737,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return getModalControllerReturnValueErrorMessageText(
 					request, 
 					null, 
-					exception.getMessage());
+					exception.getMessage(),
+					exception);
 		}
 	}
 	
@@ -760,7 +785,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return this.getModalControllerReturnValueError(
 					request,
 					"redirect:../../contingut/" + contingut.getId(),
-					"document.controller.estat.canviat.ko");
+					"document.controller.estat.canviat.ko",
+					null);
 		}
 	}
 
@@ -949,11 +975,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 				MissatgesHelper.error(
 						request, 
-						getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+						getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 			} else {
 				MissatgesHelper.error(
 						request, 
-						getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage());
+						getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
 			}
 			return "redirect:../../../../contingut/" + contingutId;
 		}
@@ -989,7 +1015,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		List<MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
 				entitatActual.getId(),
 				contingutId, 
-				null, 
+				null,
 				false);
 		for (MetaDocumentDto metaDocument: metaDocuments) {
 			if (metaDocument.getId().equals(metaDocumentId))
@@ -1063,7 +1089,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			DocumentGenericCommand commandGeneric,
 			boolean notificar,
 			boolean comprovarMetaExpedient, 
-			String rolActual, 
+			String rolActual,
 			Boolean notificacioConcatenatEntregaPostal) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//FitxerDto fitxer = null;
@@ -1168,7 +1194,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					metaDocumentService.findActiusPerCreacio(
 							entitatActual.getId(),
 							contingutId, 
-							null, 
+							null,
 							false));
 		} else {
 			model.addAttribute(
@@ -1219,7 +1245,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute(
 				"isPermesModificarCustodiats",
 				modificacioCustodiatsActiva);
-		
+
 		model.addAttribute("contingutId", contingutId);
 	}
 	

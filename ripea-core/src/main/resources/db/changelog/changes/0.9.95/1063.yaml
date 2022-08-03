@@ -85,7 +85,7 @@ databaseChangeLog:
             constraintName: ipa_uo_sinc_rel_mult_uk
             columnNames: antic_og, nou_og
         - insert:
-            tableName: pbl_config
+            tableName: ipa_config
             columns:
               - column:
                   name: key
@@ -108,8 +108,11 @@ databaseChangeLog:
               - column:
                   name: type_code
                   value: TEXT
+              - column:
+                  name: configurable
+                  value: 0
         - insert:
-            tableName: pbl_config
+            tableName: ipa_config
             columns:
               - column:
                   name: key
@@ -132,6 +135,9 @@ databaseChangeLog:
               - column:
                   name: type_code
                   value: TEXT
+              - column:
+                  name: configurable
+                  value: 0
         - sql:
             dbms: oracle
             sql: grant select, update, insert, delete on ipa_og_sinc_rel to www_ripea;

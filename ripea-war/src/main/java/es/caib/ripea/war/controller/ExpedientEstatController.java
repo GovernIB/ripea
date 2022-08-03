@@ -3,18 +3,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
@@ -30,6 +18,17 @@ import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -237,7 +236,7 @@ public class ExpedientEstatController extends BaseAdminController {
 		}catch (Exception e) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ValidationException.class))
 				return getAjaxControllerReturnValueError(request, "redirect:expedientEstat", 
-						"expedient.estat.controller.esborrat.error.restriccio");
+						"expedient.estat.controller.esborrat.error.restriccio", e);
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {

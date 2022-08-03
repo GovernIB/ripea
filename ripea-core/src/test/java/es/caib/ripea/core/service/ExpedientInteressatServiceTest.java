@@ -73,7 +73,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		interessatPersonaFisicaDto.setLlinatge2("Test Llinatge2");
 		interessatPersonaFisicaDto.setMunicipi("163");
 		interessatPersonaFisicaDto.setNom("Test nom");
-		interessatPersonaFisicaDto.setNotificacioAutoritzat(true);
 		interessatPersonaFisicaDto.setObservacions("Test observacions");
 		interessatPersonaFisicaDto.setPais("724");
 		interessatPersonaFisicaDto.setPreferenciaIdioma(InteressatIdiomaEnumDto.CA);
@@ -91,7 +90,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		representantPersonaFisicaDto.setLlinatge2("Test Llinatge2 representant");
 		representantPersonaFisicaDto.setMunicipi("163");
 		representantPersonaFisicaDto.setNom("Test nom representant");
-		representantPersonaFisicaDto.setNotificacioAutoritzat(true);
 		representantPersonaFisicaDto.setObservacions("Test observacions representant");
 		representantPersonaFisicaDto.setPais("724");
 		representantPersonaFisicaDto.setPreferenciaIdioma(InteressatIdiomaEnumDto.CA);
@@ -111,7 +109,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		interessatPersonaJuridicaDto.setIncapacitat(true);
 		interessatPersonaJuridicaDto.setRaoSocial("Rao social");
 		interessatPersonaJuridicaDto.setMunicipi("163");
-		interessatPersonaJuridicaDto.setNotificacioAutoritzat(true);
 		interessatPersonaJuridicaDto.setObservacions("Test observacions");
 		interessatPersonaJuridicaDto.setPais("724");
 		interessatPersonaJuridicaDto.setPreferenciaIdioma(InteressatIdiomaEnumDto.CA);
@@ -127,7 +124,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		representantPersonaJuridicaDto.setEsRepresentant(true);
 		representantPersonaJuridicaDto.setRaoSocial("Rao social");
 		representantPersonaJuridicaDto.setMunicipi("163");
-		representantPersonaJuridicaDto.setNotificacioAutoritzat(true);
 		representantPersonaJuridicaDto.setObservacions("Test observacions representant");
 		representantPersonaJuridicaDto.setPais("724");
 		representantPersonaJuridicaDto.setPreferenciaIdioma(InteressatIdiomaEnumDto.CA);
@@ -147,7 +143,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		interessatAdministracioDto.setOrganCodi("A04032369");
 		interessatAdministracioDto.setDocumentNum("A04032369");
 		interessatAdministracioDto.setMunicipi("163");
-		interessatAdministracioDto.setNotificacioAutoritzat(true);
 		interessatAdministracioDto.setObservacions("Test observacions");
 		interessatAdministracioDto.setPais("724");
 		interessatAdministracioDto.setPreferenciaIdioma(InteressatIdiomaEnumDto.CA);
@@ -491,7 +486,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		assertEquals(original.getLlinatge2(), perComprovar.getLlinatge2());
 		assertEquals(original.getMunicipi(), perComprovar.getMunicipi());
 		assertEquals(original.getNom(), perComprovar.getNom());
-		assertEquals(original.getNotificacioAutoritzat(), perComprovar.getNotificacioAutoritzat());
 		assertEquals(original.getObservacions(), perComprovar.getObservacions());
 		assertEquals(original.getPais(), perComprovar.getPais());
 		assertEquals(original.getPreferenciaIdioma(), perComprovar.getPreferenciaIdioma());
@@ -514,7 +508,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		assertEquals(original.getIncapacitat(), perComprovar.getIncapacitat());
 		assertEquals(original.getRaoSocial(), perComprovar.getRaoSocial());
 		assertEquals(original.getMunicipi(), perComprovar.getMunicipi());
-		assertEquals(original.getNotificacioAutoritzat(), perComprovar.getNotificacioAutoritzat());
 		assertEquals(original.getObservacions(), perComprovar.getObservacions());
 		assertEquals(original.getPais(), perComprovar.getPais());
 		assertEquals(original.getPreferenciaIdioma(), perComprovar.getPreferenciaIdioma());
@@ -537,7 +530,6 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		assertEquals(original.getIncapacitat(), perComprovar.getIncapacitat());
 		assertEquals(original.getOrganCodi(), perComprovar.getOrganCodi());
 		assertEquals(original.getMunicipi(), perComprovar.getMunicipi());
-		assertEquals(original.getNotificacioAutoritzat(), perComprovar.getNotificacioAutoritzat());
 		assertEquals(original.getObservacions(), perComprovar.getObservacions());
 		assertEquals(original.getPais(), perComprovar.getPais());
 		assertEquals(original.getPreferenciaIdioma(), perComprovar.getPreferenciaIdioma());

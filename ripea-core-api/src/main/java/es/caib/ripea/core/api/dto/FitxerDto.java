@@ -3,11 +3,10 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.io.Serializable;
-
+import lombok.Data;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import lombok.Data;
+import java.io.Serializable;
 
 /**
  * Informació d'un fitxer.
@@ -46,6 +45,9 @@ public class FitxerDto implements Serializable {
 	}
 	
 	public String getExtensio() {
+		if (nom == null)
+			return null;
+
 		int indexPunt = nom.lastIndexOf(".");
 		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
 			return nom.substring(indexPunt + 1);
@@ -55,6 +57,9 @@ public class FitxerDto implements Serializable {
 	}
 	
 	public String getExtensioFitxerFirmat() {
+		if (nomFitxerFirmat == null)
+			return null;
+
 		int indexPunt = nomFitxerFirmat != null ? nomFitxerFirmat.lastIndexOf(".") : -1;
 		if (indexPunt != -1 && indexPunt < nomFitxerFirmat.length() - 1) {
 			return nomFitxerFirmat.substring(indexPunt + 1);

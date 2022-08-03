@@ -22,6 +22,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Classe del model de dades que representa una alerta d'error en segón pla.
@@ -34,6 +35,7 @@ import lombok.Setter;
 @Table(	name = "IPA_CONFIG")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Transactional
 public class ConfigEntity {
     @Id
     @Column(name = "KEY", length = 256, nullable = false)
@@ -51,8 +53,8 @@ public class ConfigEntity {
     @Column(name = "GROUP_CODE", length = 2048, nullable = true)
     private String groupCode;
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "TYPE_CODE", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "TYPE_CODE", updatable = false)
     @ForeignKey(name = "NOT_CONFIG_TYPE_FK")
     private ConfigTypeEntity type;
     
@@ -101,6 +103,7 @@ public class ConfigEntity {
         this.groupCode = entitat.getGroupCode();
         this.type = entitat.getType();
         this.entitatCodi = entitatCodi;
+        this.configurable = entitat.isConfigurable();
     }
     
 }

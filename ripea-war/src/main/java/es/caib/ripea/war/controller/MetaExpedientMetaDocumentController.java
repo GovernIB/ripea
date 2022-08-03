@@ -3,38 +3,7 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
-import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -50,6 +19,23 @@ import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * Controlador per al manteniment de meta-documents asociats a un
@@ -252,24 +238,29 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					"redirect:../../metaDocument",
 					"metadocument.controller.esborrat.ok");
 		} catch (Exception ex) {
-			
+
+			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);
+
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ExisteixenDocumentsException.class)) {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						"metadocument.controller.esborrar.error.fk.documents");
+						"metadocument.controller.esborrar.error.fk.documents",
+						ex);
 			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) || ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class)) {
 
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
 						"metadocument.controller.esborrar.error.fk",
-						new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage()});
+						new Object[] { root.getMessage()},
+						root);
 			} else {
 				return getAjaxControllerReturnValueError(
 						request,
 						"redirect:../../esborrat",
-						ExceptionHelper.getRootCauseOrItself(ex).getMessage());
+						root.getMessage(),
+						root);
 			}
 
 		}
@@ -332,7 +323,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
 					"redirect:../../metaDocument",
-					e.getMessage());
+					e.getMessage(),
+					e);
 		}
 	}
 	
@@ -356,7 +348,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
 					"redirect:../../metaDocument",
-					e.getMessage());
+					e.getMessage(),
+					e);
 		}
 	}
 

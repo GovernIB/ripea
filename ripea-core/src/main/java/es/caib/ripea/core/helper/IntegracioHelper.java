@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,49 +61,24 @@ public class IntegracioHelper {
 	private Map<String, LinkedList<IntegracioAccioDto>> accionsIntegracio = Collections.synchronizedMap(new HashMap<String, LinkedList<IntegracioAccioDto>>());
 	private Map<String, Integer> maxAccionsIntegracio = new HashMap<String, Integer>();
 
-
-
 	public List<IntegracioDto> findAll() {
 		List<IntegracioDto> integracions = new ArrayList<IntegracioDto>();
-		integracions.add(
-				novaIntegracio(
-						INTCODI_PFIRMA));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_FIRMASERV));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_CALLBACK));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_ARXIU));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_PINBAL));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_USUARIS));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_CONVERT));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_DADESEXT));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_NOTIFICACIO));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_VIAFIRMA));
-		integracions.add(
-				novaIntegracio(
-						INTCODI_DIGITALITZACIO));
+		integracions.add(novaIntegracio(INTCODI_PFIRMA));
+		integracions.add(novaIntegracio(INTCODI_FIRMASERV));
+		integracions.add(novaIntegracio(INTCODI_CALLBACK));
+		integracions.add(novaIntegracio(INTCODI_ARXIU));
+		integracions.add(novaIntegracio(INTCODI_PINBAL));
+		integracions.add(novaIntegracio(INTCODI_USUARIS));
+		integracions.add(novaIntegracio(INTCODI_CONVERT));
+		integracions.add(novaIntegracio(INTCODI_DADESEXT));
+		integracions.add(novaIntegracio(INTCODI_NOTIFICACIO));
+		integracions.add(novaIntegracio(INTCODI_VIAFIRMA));
+		integracions.add(novaIntegracio(INTCODI_DIGITALITZACIO));
 		return integracions;
 	}
 
-	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(
-			String integracioCodi) {
-		return getLlistaAccions(integracioCodi);
+	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi, IntegracioFiltreDto filtre) {
+		return getLlistaAccions(integracioCodi, filtre);
 	}
 
 	public void addAccioOk(
@@ -111,6 +87,7 @@ public class IntegracioHelper {
 			Map<String, String> parametres,
 			IntegracioAccioTipusEnumDto tipus,
 			long tempsResposta) {
+
 		IntegracioAccioDto accio = new IntegracioAccioDto();
 		accio.setIntegracio(novaIntegracio(integracioCodi));
 		accio.setData(new Date());
@@ -119,9 +96,7 @@ public class IntegracioHelper {
 		accio.setTipus(tipus);
 		accio.setTempsResposta(tempsResposta);
 		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
-		addAccio(
-				integracioCodi,
-				accio);
+		addAccio(integracioCodi, accio);
 	}
 	public void addAccioError(
 			String integracioCodi,
@@ -130,6 +105,7 @@ public class IntegracioHelper {
 			IntegracioAccioTipusEnumDto tipus,
 			long tempsResposta,
 			String errorDescripcio) {
+
 		IntegracioAccioDto accio = new IntegracioAccioDto();
 		accio.setIntegracio(novaIntegracio(integracioCodi));
 		accio.setData(new Date());
@@ -139,9 +115,7 @@ public class IntegracioHelper {
 		accio.setTempsResposta(tempsResposta);
 		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
 		accio.setErrorDescripcio(errorDescripcio);
-		addAccio(
-				integracioCodi,
-				accio);
+		addAccio(integracioCodi, accio);
 	}
 	public void addAccioError(
 			String integracioCodi,
@@ -151,6 +125,7 @@ public class IntegracioHelper {
 			long tempsResposta,
 			String errorDescripcio,
 			Throwable throwable) {
+
 		IntegracioAccioDto accio = new IntegracioAccioDto();
 		accio.setIntegracio(novaIntegracio(integracioCodi));
 		accio.setData(new Date());
@@ -160,66 +135,55 @@ public class IntegracioHelper {
 		accio.setTempsResposta(tempsResposta);
 		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
 		accio.setErrorDescripcio(errorDescripcio);
-		accio.setExcepcioMessage(
-				ExceptionUtils.getMessage(throwable));
-		accio.setExcepcioStacktrace(
-				ExceptionUtils.getStackTrace(throwable));
-		addAccio(
-				integracioCodi,
-				accio);
+		accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
+		accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
+		addAccio(integracioCodi, accio);
 	}
 
+	private LinkedList<IntegracioAccioDto> getLlistaAccions(String integracioCodi, IntegracioFiltreDto filtre) {
 
-
-	private LinkedList<IntegracioAccioDto> getLlistaAccions(
-			String integracioCodi) {
 		synchronized(accionsIntegracio){
 			LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
 			if (accions == null) {
-				accions = new LinkedList<IntegracioAccioDto>();
-				accionsIntegracio.put(
-						integracioCodi,
-						accions);
-			} else {
-				int index = 0;
-				
-				Iterator<IntegracioAccioDto> iterator = accions.iterator();
-				while (iterator.hasNext()) {
-					IntegracioAccioDto accio = iterator.next();
-					accio.setIndex(new Long(index++));
-				}
+				accions = new LinkedList<>();
+				accionsIntegracio.put(integracioCodi, accions);
+				return accions;
 			}
-			return accions;
+			int index = 0;
+			LinkedList<IntegracioAccioDto> accionsBones = new LinkedList<>();
+			for(IntegracioAccioDto accio : accions) {
+				if (filtre != null && !filtre.filtresOK(accio, integracioCodi)) {
+					continue;
+				}
+				accio.setIndex(new Long(index++));
+				accionsBones.add(accio);
+			}
+			return accionsBones;
 		}
 	}
-	private int getMaxAccions(
-			String integracioCodi) {
+	private int getMaxAccions(String integracioCodi) {
+
 		Integer max = maxAccionsIntegracio.get(integracioCodi);
 		if (max == null) {
 			max = new Integer(DEFAULT_MAX_ACCIONS);
-			maxAccionsIntegracio.put(
-					integracioCodi,
-					max);
+			maxAccionsIntegracio.put(integracioCodi, max);
 		}
 		return max.intValue();
 	}
 
-	private void addAccio(
-			String integracioCodi,
-			IntegracioAccioDto accio) {
+	private void addAccio(String integracioCodi, IntegracioAccioDto accio) {
+
 		afegirParametreUsuari(accio);
-		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi);
+		LinkedList<IntegracioAccioDto> accions = getLlistaAccions(integracioCodi, null);
 		int max = getMaxAccions(integracioCodi);
 		while (accions.size() >= max) {
 			accions.remove(accions.size() - 1);
 		}
-		accions.add(
-				0,
-				accio);
+		accions.add(0, accio);
 	}
 	
-	private void afegirParametreUsuari(
-			IntegracioAccioDto accio) {
+	private void afegirParametreUsuari(IntegracioAccioDto accio) {
+
 		String usuariNomCodi = null;
 		UsuariEntity usuari = usuariHelper.getUsuariAutenticat();
 		if (usuari != null) {
@@ -238,8 +202,8 @@ public class IntegracioHelper {
 		}
 	}
 
-	private IntegracioDto novaIntegracio(
-			String codi) {
+	private IntegracioDto novaIntegracio(String codi) {
+
 		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);
 		if (INTCODI_PFIRMA.equals(codi)) {
@@ -265,8 +229,6 @@ public class IntegracioHelper {
 		} else if (INTCODI_DIGITALITZACIO.equals(codi)) {
 			integracio.setNom("Digitalització");
 		}
-		
-		
 		return integracio;
 	}
 

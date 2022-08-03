@@ -3,16 +3,20 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,20 +32,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per accio massiu de custodiar documents de portafirmes.
@@ -70,9 +68,8 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 
 
 	@RequestMapping(method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			Model model) {
+	public String get(HttpServletRequest request, Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
@@ -80,49 +77,29 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
 		model.addAttribute("portafirmes", true);
-		model.addAttribute(
-				"seleccio",
-				RequestSessionHelper.obtenirObjecteSessio(
-						request,
-						getSessionAttributeSelecio(request)));
-
-		model.addAttribute(
-				filtreCommand);
-		
-		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request)));
+		model.addAttribute(filtreCommand);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		boolean checkPerMassiuAdmin = false;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			checkPerMassiuAdmin = true;
-		} 
-		
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+		}
+		model.addAttribute("metaExpedients", metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
 		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-		if (filtreCommand.getMetaExpedientId() != null)
+		if (filtreCommand.getMetaExpedientId() != null) {
 			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
-		model.addAttribute(
-				"expedients",
-				expedients);
+		}
+		model.addAttribute("expedients", expedients);
 		return "documentMassiuCustodiarList";
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	public String post(
-			HttpServletRequest request,
-			@Valid ContingutMassiuFiltreCommand filtreCommand,
-			BindingResult bindingResult,
-			Model model) {
+	public String post(HttpServletRequest request, @Valid ContingutMassiuFiltreCommand filtreCommand, BindingResult bindingResult, Model model) {
+
 		if (!bindingResult.hasErrors()) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					filtreCommand);
+			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
 		}
-		
 		return "redirect:/massiu/custodiar";
 	}
 	
@@ -234,7 +211,8 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/custodiar",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 		
 		int errors = 0;
@@ -272,7 +250,7 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 			MissatgesHelper.success(request, getMessage(request, "expedient.controller.custodiar.massiu.correctes", new Object[]{correctes}));
 		} 
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "expedient.controller.custodiar.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "expedient.controller.custodiar.massiu.errors", new Object[]{errors}), null);
 		} 
 		
 		seleccio.clear();

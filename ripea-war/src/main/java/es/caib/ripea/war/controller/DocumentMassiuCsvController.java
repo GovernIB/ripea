@@ -123,7 +123,8 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/csv",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -144,7 +145,8 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/massiu/csv",
-					"accio.massiva.url.ko");
+					"accio.massiva.url.ko",
+					null);
 		}
 		return enllacCsv;
 	}

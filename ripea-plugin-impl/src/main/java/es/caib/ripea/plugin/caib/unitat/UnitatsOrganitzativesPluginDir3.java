@@ -51,7 +51,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 
     private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
     private static final String SERVEI_OBTENIR_UNITATS = "/ws/Dir3CaibObtenerUnidades";
-    
+
 	public UnitatsOrganitzativesPluginDir3() {
 		super();
 	}
@@ -60,6 +60,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 	}
 
     public Map<String, NodeDir3> organigrama(String codi) throws SistemaExternException {
+
         Map<String, NodeDir3> organigrama = new HashMap<String, NodeDir3>();
         try {
             URL url = new URL(getServiceUrl() + SERVEI_ORGANIGRAMA + "?codigo=" + codi);
@@ -76,41 +77,34 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
             }
             return organigrama;
         } catch (Exception ex) {
-            throw new SistemaExternException(
-                    "No s'ha pogut consultar l'organigrama de unitats organitzatives via REST ("
-                            + "codiEntitat=" + codi + ")",
-                    ex);
+            throw new SistemaExternException("No s'ha pogut consultar l'organigrama de unitats organitzatives via REST (codiEntitat=" + codi + ")", ex);
         }
     }
 
     @Override
     public List<UnitatOrganitzativa> findAmbPare(String pareCodi) throws SistemaExternException {
+
         try {
         	Dir3CaibObtenerUnidadesWs service = getObtenerUnidadesService();
             UnidadTF unidadPare = service.obtenerUnidad(pareCodi, null, null);
-            if (unidadPare != null) {
-                List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
-                List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(pareCodi, null,
-                        null);// df.format(new
-                // Date()));
-                if (unidades != null) {
-                    unidades.add(0, unidadPare);
-                    for (UnidadTF unidad : unidades) {
-                        if ("V".equalsIgnoreCase(unidad.getCodigoEstadoEntidad())) {
-                            unitats.add(toUnitatOrganitzativa(unidad));
-                        }
-                    }
-                } else {
-                    unitats.add(toUnitatOrganitzativa(unidadPare));
-                }
-                return unitats;
-            } else {
-                throw new SistemaExternException(
-                        "No s'han trobat la unitat pare (pareCodi=" + pareCodi + ")");
+            if (unidadPare == null) {
+                throw new SistemaExternException("No s'han trobat la unitat pare (pareCodi=" + pareCodi + ")");
             }
+            List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
+            List<UnidadTF> unidades = getObtenerUnidadesService().obtenerArbolUnidades(pareCodi, null, null);
+            if (unidades == null) {
+                unitats.add(toUnitatOrganitzativa(unidadPare));
+                return unitats;
+            }
+            unidades.add(0, unidadPare);
+            for (UnidadTF unidad : unidades) {
+                if ("V".equalsIgnoreCase(unidad.getCodigoEstadoEntidad())) {
+                    unitats.add(toUnitatOrganitzativa(unidad));
+                }
+            }
+            return unitats;
         } catch (Exception ex) {
-            throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS ("
-                    + "pareCodi=" + pareCodi + ")", ex);
+            throw new SistemaExternException("No s'han pogut consultar les unitats organitzatives via WS (pareCodi=" + pareCodi + ")", ex);
         }
     }
 
@@ -140,21 +134,18 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 
     @Override
     public UnitatOrganitzativa findAmbCodi(String codi) throws SistemaExternException {
+
         try {
             UnitatOrganitzativa unitat = null;
             UnidadTF unidad = getObtenerUnidadesService().obtenerUnidad(codi, null, null);
-            if (unidad != null && "V".equalsIgnoreCase(unidad.getCodigoEstadoEntidad())) {
-                unitat = toUnitatOrganitzativa(unidad);
-            } else {
-                throw new SistemaExternException(
-                        "La unitat organitzativa no està vigent (" + "codi=" + codi + ")");
+            if (unidad == null || !"V".equalsIgnoreCase(unidad.getCodigoEstadoEntidad())) {
+                throw new SistemaExternException("La unitat organitzativa no està vigent (" + "codi=" + codi + ")");
             }
-            return unitat;
+            return toUnitatOrganitzativa(unidad);
         } catch (SistemaExternException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new SistemaExternException(
-                    "No s'ha pogut consultar la unitat organitzativa (" + "codi=" + codi + ")", ex);
+            throw new SistemaExternException("No s'ha pogut consultar la unitat organitzativa (" + "codi=" + codi + ")", ex);
         }
     }
 
@@ -175,7 +166,8 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
                                                   Long comunitatAutonoma, Boolean ambOficines,
                                                   Boolean esUnitatArrel, Long provincia,
                                                   String municipi) throws SistemaExternException {
-        List<UnitatOrganitzativa> unitats = new ArrayList<UnitatOrganitzativa>();
+
+        List<UnitatOrganitzativa> unitats = new ArrayList<>();
         try {
             URL url = new URL(getServiceCercaUrl() + "?codigo=" + codi + "&denominacion=" + denominacio
                     + "&codNivelAdministracion=" + (nivellAdministracio != null ? nivellAdministracio : "-1")
@@ -190,8 +182,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
             httpConnection.setDoOutput(true);
             ObjectMapper mapper = new ObjectMapper();
             mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-            unitats = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance()
-                    .constructCollectionType(List.class, UnitatOrganitzativa.class));
+            unitats = mapper.readValue(httpConnection.getInputStream(), TypeFactory.defaultInstance().constructCollectionType(List.class, UnitatOrganitzativa.class));
             Collections.sort(unitats);
             return unitats;
         } catch (JsonMappingException e) {
@@ -254,6 +245,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
 
 
     private Dir3CaibObtenerUnidadesWs getObtenerUnidadesService() throws MalformedURLException {
+
         Dir3CaibObtenerUnidadesWs client = null;
         String urlServei = getServiceUrl() + SERVEI_OBTENIR_UNITATS;
         URL url = new URL(urlServei + "?wsdl");
@@ -299,6 +291,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
                 .numVia(unidad.getNumVia())
                 .historicosUO(unidad.getHistoricosUO())
                 .build();
+
         return unitat;
     }
 
@@ -321,14 +314,11 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
         }
 
         private void log(SOAPMessageContext messageContext) {
-            SOAPMessage msg = messageContext.getMessage();
+
             try {
-                Boolean outboundProperty = (Boolean) messageContext
-                        .get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-                if (outboundProperty)
-                    System.out.print("Missatge SOAP petició: ");
-                else
-                    System.out.print("Missatge SOAP resposta: ");
+                SOAPMessage msg = messageContext.getMessage();
+                Boolean outboundProperty = (Boolean) messageContext.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+                System.out.print(outboundProperty ? "Missatge SOAP petició: " : "Missatge SOAP resposta: ");
                 msg.writeTo(System.out);
                 System.out.println();
             } catch (SOAPException ex) {
@@ -340,7 +330,9 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     }
 
     private String getServiceUrl() {
-        return getProperty("plugin.unitats.organitzatives.dir3.service.url");
+
+        String url = getProperty("plugin.unitats.organitzatives.dir3.service.url");
+        return url.endsWith("/") ? url : url + "/";
     }
 
     private String getServiceUsername() {
@@ -356,26 +348,30 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     }
 
     private Integer getServiceTimeout() {
+
         String key = "plugin.unitats.organitzatives.dir3.service.timeout";
-        if (getProperty(key) != null)
-            return getAsInt(key);
-        else
-            return null;
+        return getProperty(key) != null ? getAsInt(key) : null;
     }
 
     private String getServiceCercaUrl() {
+
         String serviceUrl = getProperty("plugin.unitats.organitzatives.dir3.consulta.rest.service.url");
         if (serviceUrl == null) {
             serviceUrl = PropertiesHelper.getProperties()
                     .getProperty("es.caib.ripea.plugin.unitats.cerca.dir3.service.url");
         }
         return serviceUrl;
+
     }
 
     private void nodeToOrganigrama(NodeDir3 unitat, Map<String, NodeDir3> organigrama) {
+
         organigrama.put(unitat.getCodi(), unitat);
-        if (unitat.getFills() != null)
-            for (NodeDir3 fill : unitat.getFills())
-                nodeToOrganigrama(fill, organigrama);
+        if (unitat.getFills() == null) {
+            return;
+        }
+        for (NodeDir3 fill : unitat.getFills()) {
+            nodeToOrganigrama(fill, organigrama);
+        }
     }
 }

@@ -1859,10 +1859,10 @@ function closeViewer() {
 }
 
 function getDetallsSignants(idTbody, contingutId, header) {
-	
+
 	idTbody.html("");
-	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="../img/loading.gif"/></td></tr>');
-	$.get("../contingut/document/" + contingutId + "/mostraDetallSignants", function(json){
+	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="<c:url value="/img/loading.gif"/>"/></td></tr>');
+	$.get("<c:url value="/contingut/document/"/>" + contingutId + "/mostraDetallSignants", function(json){
 		if (json.error) {
 			idTbody.html('<tr><td colspan="2" style="width:100%"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="contingut.document.info.firma.error"/>: ' + json.errorMsg + '</div></td></tr>');
 		} else {
@@ -2206,10 +2206,16 @@ $.views.helpers(myHelpers);
 					<c:choose>
 						<%--------------- WHEN CONTINGUT IS DOCUMENT (SHOWS DOCUMENT DETAILS) ---------------%>
 						<c:when test="${contingut.document}">
+							<c:if test="${not contingut.validacioCorrecte}">
+								<div class="alert alert-danger alert-dismissible">
+									<button type="button" class="close close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
+									<spring:message code="contingut.icona.estat.invalid.origen.form" arguments="${contingut.validacioError}"/>
+								</div>
+							</c:if>
 							<table class="table table-bordered">
 								<tbody>
 									<c:choose>
-										<c:when test="${contingut.documentTipus == 'DIGITAL'}">
+										<c:when test="${contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT'}">
 											<tr>
 												<td><strong><spring:message code="contingut.document.camp.arxiu"/></strong></td>
 												<td>${contingut.fitxerNom}</td>

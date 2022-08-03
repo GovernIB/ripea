@@ -4,17 +4,24 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
+import es.caib.ripea.war.command.PortafirmesEnviarCommand;
+import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.ModalHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
+import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
+import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -37,37 +44,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
-import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
-import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
-import es.caib.ripea.war.command.PortafirmesEnviarCommand;
-import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.ModalHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Controlador per al manteniment de documents.
@@ -185,7 +170,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					request, 
 					getMessage(
 							request,
-							"document.controller.portafirmes.flux.ko"));
+							"document.controller.portafirmes.flux.ko"),
+					null);
 			return "portafirmesForm";
 		}
 		try {
@@ -209,7 +195,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		} catch (Exception ex) {
 			String missatge = ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)
 					? getMessage(request,"document.controller.portafirmes.upload.error.responsableNoValidPortafrimes") : ex.getCause().getMessage();
-			MissatgesHelper.error(request, missatge);
+			MissatgesHelper.error(request, missatge, ex);
 			setFluxPredefinit(metaDocument, model, command);
 			emplenarModelPortafirmes(request, documentId, model);
 			log.error("Error al upload del document ", ex);
@@ -282,7 +268,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"",
-					e.getMessage());
+					e.getMessage(),
+					e);
 			}
 		return "portafirmesInfo";
 	}
@@ -453,7 +440,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 							request,
 							getMessage(
 									request, 
-									"document.controller.firma.passarela.final.ok.nofile"));
+									"document.controller.firma.passarela.final.ok.nofile"),
+							null);
 				} else {
 					FileInputStream fis = new FileInputStream(firmaStatus.getSignedData());
 					EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -476,14 +464,16 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 						request,
 						getMessage(
 								request, 
-								"document.controller.firma.passarela.final.ok.statuserr"));
+								"document.controller.firma.passarela.final.ok.statuserr"),
+						null);
 			}
 			break;
 		case StatusSignaturesSet.STATUS_FINAL_ERROR:
 			if (status.getErrorMsg() != null) {
 				MissatgesHelper.error(
 						request,
-						status.getErrorMsg());
+						status.getErrorMsg(),
+						null);
 				break;
 			}
 		case StatusSignaturesSet.STATUS_CANCELLED:
@@ -618,7 +608,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					request,
 					documentId,
 					model);
-			MissatgesHelper.error(request, ex.getMessage());
+			MissatgesHelper.error(request, ex.getMessage(), ex);
 			return "viaFirmaForm";
 		}
 		return this.getModalControllerReturnValueSuccess(

@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - property:
+      name: boolean.type
+      value: number(1,0)
+      dbms: oracle
+  - property:
+      name: boolean.type
+      value: boolean
+      dbms: postgresql
+  - property:
+      name: int.type
+      value: number(10,0)
+      dbms: oracle
+  - property:
+      name: int.type
+      value: smallint
+      dbms: postgresql
+  - changeSet:
+      id: 1651146740001-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_expedient_peticio
+            columns:
+              - column:
+                  name: pendent_enviar_distribucio
+                  type: ${boolean.type}
+                  defaultValue: 0
+              - column:
+                  name: reintents_enviar_distribucio
+                  type: ${int.type}
+                  defaultValue: 3
+        - sql:
+            sql: "
+            INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE)
+            VALUES ('es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio', 3,
+            'Interval de temps (ms) en que executa la tasca periodica de reintentar canviar estat de anotacions a Distribucio',
+            'SCHEDULLED', 0, 0, 'INT', 0);
+            INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) 
+            VALUES ('es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio', 60000, 
+            'Interval de temps (ms) en que executa la tasca periodica de reintentar canviar estat de anotacions a Distribucio',
+            'SCHEDULLED', 0, 0, 'INT', 0);"

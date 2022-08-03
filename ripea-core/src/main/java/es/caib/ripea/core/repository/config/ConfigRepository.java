@@ -17,49 +17,42 @@ import es.caib.ripea.core.entity.config.ConfigEntity;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
-	
+
+    ConfigEntity findByKey(String key);
+
     ConfigEntity findByKeyAndEntitatCodi(String key, String entitatCodi);
 
     List<ConfigEntity> findByEntitatCodiIsNull();
 
-    @Query("FROM ConfigEntity c WHERE c.key like concat('%', lower(:key), '%') AND c.entitatCodi IS NOT NULL")
+    @Query("FROM ConfigEntity c WHERE c.key like concat('%', :key, '%') AND c.entitatCodi IS NOT NULL")
     List<ConfigEntity> findLikeKeyEntitatNotNull(@Param("key") String key);
+
+    @Query("FROM ConfigEntity c WHERE c.key like concat('%', :key, '%') AND c.entitatCodi IS NOT NULL AND c.configurable = true")
+    List<ConfigEntity> findLikeKeyEntitatNotNullAndConfigurable(@Param("key") String key);
+
+	@Query("FROM ConfigEntity c WHERE c.entitatCodi IS NULL AND c.configurable = true")
+	List<ConfigEntity> findByEntitatCodiIsNullAndConfigurableIsTrue();
+
+    @Query("FROM ConfigEntity c WHERE c.configurable = true AND c.jbossProperty = true")
+    List<ConfigEntity> findJBossConfigurables();
 
     @Transactional
     @Modifying
     @Query("DELETE FROM ConfigEntity c WHERE c.entitatCodi = :entitatCodi")
     int deleteByEntitatCodi(@Param("entitatCodi") String entitatCodi);
 
-    @Query( "from "
-			+ "ConfigEntity c "
-			+ "where "
-			+ "c.entitatCodi = :entitatCodi "
-			+ "order by c.position asc")
-	public List<ConfigEntity> findAllPerEntitat(
-			@Param("entitatCodi") String entitatCodi);
+    @Query( "from ConfigEntity c where c.entitatCodi = :entitatCodi order by c.position asc")
+	public List<ConfigEntity> findAllPerEntitat(@Param("entitatCodi") String entitatCodi);
 	
 	
-	@Query( "from "
-			+ "ConfigEntity c "
-			+ "where "
-			+ "c.key = :key")
-	public ConfigEntity findPerKey(
-			@Param("key") String key);
+	@Query( "from ConfigEntity c where c.key = :key")
+	public ConfigEntity findPerKey(@Param("key") String key);
 	
 	
-	@Query( "from "
-			+ "ConfigEntity c "
-			+ "where "
-			+ "c.configurable = true"
-			)
+	@Query( "from ConfigEntity c where c.configurable = true" )
 	public List<ConfigEntity> findConfigurables();
 	
 	
-	@Query( "from "
-			+ "ConfigEntity c "
-			+ "where "
-			+ "c.configurable = true "
-			+ "and c.entitatCodi = null"
-			)
+	@Query( "from ConfigEntity c where c.configurable = true and c.entitatCodi = null" )
 	public List<ConfigEntity> findConfigurablesAmbEntitatNull();
 }

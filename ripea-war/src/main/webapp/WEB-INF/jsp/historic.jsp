@@ -1073,7 +1073,6 @@
 						data-default-dir="desc"
 						data-selection-enabled="true"
 						data-save-state="true"
-						data-mantenir-paginacio="${mantenirPaginacio}"
 						style="width:100%">
 						<thead>
 							<tr>

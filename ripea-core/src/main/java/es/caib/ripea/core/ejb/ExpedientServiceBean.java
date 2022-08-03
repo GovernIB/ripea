@@ -3,31 +3,20 @@
  */
 package es.caib.ripea.core.ejb;
 
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.ExpedientService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.ripea.core.api.dto.CodiValorDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.ExpedientComentariDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.ExpedientService;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -287,18 +276,18 @@ public class ExpedientServiceBean implements ExpedientService {
 
 
 	@Override
-	public boolean retryCreateDocFromAnnex(
+	public Exception retryCreateDocFromAnnex(
 			Long registreAnnexId,
-			Long expedientPeticioId, 
-			Long metaDocumentId, String rolActual) {
+			Long metaDocumentId, 
+			String rolActual) {
 		return delegate.retryCreateDocFromAnnex(
 				registreAnnexId, 
-				expedientPeticioId, 
-				metaDocumentId, rolActual);		
+				metaDocumentId, 
+				rolActual);		
 	}
 
 	@Override
-	public boolean retryNotificarDistribucio(Long expedientPeticioId) {
+	public Exception retryNotificarDistribucio(Long expedientPeticioId) {
 		return delegate.retryNotificarDistribucio(expedientPeticioId);
 	}
 
@@ -310,14 +299,14 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient) {
 		return delegate.incorporar(
 				entitatId, 
 				expedientId, 
 				expedientPeticioId,  
 				associarInteressats, 
 				rolActual, 
-				anexosIdsMetaDocsIdsMap);
+				anexosIdsMetaDocsIdsMap, agafarExpedient);
 		
 	}
 
@@ -448,5 +437,11 @@ public class ExpedientServiceBean implements ExpedientService {
 	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)
 			throws NotFoundException {
 		return delegate.esborrarExpedientFill(entitatId, expedientPareId, expedientId, rolActual);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
+		return delegate.retryMoverAnnexArxiu(registreAnnexId);
 	}
 }

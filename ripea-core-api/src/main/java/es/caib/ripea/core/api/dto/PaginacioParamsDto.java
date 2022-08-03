@@ -29,21 +29,11 @@ public class PaginacioParamsDto implements Serializable {
 	private List<OrdreDto> ordres = new ArrayList<OrdreDto>();
 
 
-	public void afegirFiltre(
-			String camp,
-			String valor) {
-		getFiltres().add(
-				new FiltreDto(
-						camp,
-						valor));
+	public void afegirFiltre(String camp, String valor) {
+		getFiltres().add(new FiltreDto(camp, valor));
 	}
-	public void afegirOrdre(
-			String camp,
-			OrdreDireccioDto direccio) {
-		getOrdres().add(
-				new OrdreDto(
-						camp,
-						direccio));
+	public void afegirOrdre(String camp, OrdreDireccioDto direccio) {
+		getOrdres().add(new OrdreDto(camp, direccio));
 	}
 
 	@Override
@@ -51,12 +41,10 @@ public class PaginacioParamsDto implements Serializable {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	public class FiltreDto implements Serializable {
+	public static class FiltreDto implements Serializable {
 		private String camp;
 		private String valor;
-		public FiltreDto(
-				String camp,
-				String valor) {
+		public FiltreDto(String camp, String valor) {
 			this.camp = camp;
 			this.valor = valor;
 		}
@@ -82,9 +70,7 @@ public class PaginacioParamsDto implements Serializable {
 	public static class OrdreDto implements Serializable {
 		private String camp;
 		private OrdreDireccioDto direccio;
-		public OrdreDto(
-				String camp,
-				OrdreDireccioDto direccio) {
+		public OrdreDto(String camp, OrdreDireccioDto direccio) {
 			this.camp = camp;
 			this.direccio = direccio;
 		}

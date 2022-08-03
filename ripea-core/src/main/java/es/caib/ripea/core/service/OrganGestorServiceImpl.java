@@ -230,25 +230,25 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		List<OrganGestorEntity> organsDividits = new ArrayList<>();
 		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
 		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
-		// Definint tipus de transició
-		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
-			if (obsoleteUnitat.getNous().size() > 1) {
-				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
-				organsDividits.add(obsoleteUnitat);
-			} else {
-				if (obsoleteUnitat.getNous().size() == 1) {
-					if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
-						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.FUSIO);
-						organsFusionats.add(obsoleteUnitat);
-					} else if (obsoleteUnitat.getNous().get(0).getAntics().size() == 1) {
-						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.SUBSTITUCIO);
-						organsSubstituits.add(obsoleteUnitat);
-					}
-				} else {
-					obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
-				}
-			}
-		}
+//		// Definint tipus de transició
+//		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
+//			if (obsoleteUnitat.getNous().size() > 1) {
+//				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
+//				organsDividits.add(obsoleteUnitat);
+//			} else {
+//				if (obsoleteUnitat.getNous().size() == 1) {
+//					if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
+//						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.FUSIO);
+//						organsFusionats.add(obsoleteUnitat);
+//					} else if (obsoleteUnitat.getNous().get(0).getAntics().size() == 1) {
+//						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.SUBSTITUCIO);
+//						organsSubstituits.add(obsoleteUnitat);
+//					}
+//				} else {
+//					obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
+//				}
+//			}
+//		}
 
 		Date ara = new Date();
 		// Si és la primera sincronització

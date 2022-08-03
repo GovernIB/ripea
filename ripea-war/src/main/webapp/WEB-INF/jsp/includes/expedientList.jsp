@@ -107,7 +107,6 @@ function hexToRgb(hex) {
 	class="table table-striped table-bordered"
 	data-botons-template="#botonsTemplate"
 	data-save-state="true"
-	data-mantenir-paginacio="true"
 	style="width:100%"
 	data-filter="#filtre">
 	<thead>

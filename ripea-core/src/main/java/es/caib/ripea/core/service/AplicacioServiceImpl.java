@@ -9,6 +9,8 @@ import java.util.Properties;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.helper.*;
@@ -63,6 +65,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Resource
 	private GrupRepository grupRepository;
 
+	@Override
+	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
+		configHelper.setEntitat(entitat);
+	}
 
 	@Transactional
 	@Override
@@ -211,14 +217,14 @@ public class AplicacioServiceImpl implements AplicacioService {
 	@Override
 	public List<IntegracioAccioDto> integracioFindDarreresAccionsByCodi(String codi) {
 		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
-		return integracioHelper.findAccionsByIntegracioCodi(codi);
+		return integracioHelper.findAccionsByIntegracioCodi(codi, null);
 	}
 
 	@Override
-	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params) {
+	public PaginaDto<IntegracioAccioDto> integracioFindDarreresAccionsByCodiPaginat(String codi, PaginacioParamsDto params, IntegracioFiltreDto filtre) {
 
 		logger.debug("Consultant les darreres accions per a la integració (codi=" + codi + ")");
-		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(codi);
+		List<IntegracioAccioDto> accions = integracioHelper.findAccionsByIntegracioCodi(codi, filtre);
 		if (accions == null || accions.isEmpty()) {
 			return new PaginaDto<>();
 		}

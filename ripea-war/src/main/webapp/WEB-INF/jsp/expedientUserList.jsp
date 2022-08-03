@@ -537,13 +537,12 @@ function hexToRgb(hex) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="17" 
+		data-default-order="18" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
 		data-selection-enabled="true"
 		data-save-state="true"
-		data-mantenir-paginacio="${mantenirPaginacio}"
 		style="width:100%">
 		<thead>
 			<tr>
@@ -559,7 +558,8 @@ function hexToRgb(hex) {
 				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
-				<th data-col-name="arxiuUuid" data-visible="false"></th>			
+				<th data-col-name="arxiuUuid" data-visible="false"></th>
+				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
 				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>	
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
@@ -646,7 +646,7 @@ function hexToRgb(hex) {
 								{{else usuariActualWrite && !seguidor}}					
 									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
 								{{/if}}
-								{{if usuariActualDelete && estat != 'TANCAT'}}
+								{{if usuariActualDelete && estat != 'TANCAT' && !conteDocumentsDefinitius}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
 							</ul>

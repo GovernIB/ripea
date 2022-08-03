@@ -25,7 +25,7 @@
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="entitatCommand" role="form" enctype="multipart/form-data">
 		<form:hidden path="id"/>
-		<rip:inputText name="codi" textKey="entitat.form.camp.codi" required="true"/>
+		<rip:inputText name="codi" textKey="entitat.form.camp.codi" required="true" readonly="${!empty entitatCommand.id}"/>
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>

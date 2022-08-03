@@ -1,0 +1,11 @@
+databaseChangeLog:
+- changeSet:
+    id: 1654161395063-1
+    author: limit
+    changes:   
+    - sql:
+        sql: "alter table ipa_interessat modify (document_tipus null);
+              alter table ipa_interessat modify (document_num null);
+              ALTER TABLE IPA_INTERESSAT DROP CONSTRAINT IPA_INTERESSAT_MULT_UK;
+              DROP INDEX IPA_INTERESSAT_MULT_UK;
+              alter table ipa_hist_exp_interessat modify (interessat_doc_num null);"

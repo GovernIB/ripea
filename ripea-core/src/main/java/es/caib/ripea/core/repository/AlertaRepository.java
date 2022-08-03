@@ -3,17 +3,17 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.List;
-
+import es.caib.ripea.core.entity.AlertaEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.AlertaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -82,5 +82,24 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 			@Param("llegida") boolean llegida,
 			@Param("continguts") List<ContingutEntity> continguts,
 			Sort sort);
+
+
+
+
+	// Mètodes per evitar errors al tenir continguts orfes en base de dades
+	// ////////////////////////////////////////////////////////////////////
+
+//	@Modifying
+//	@Query(value = "delete from ipa_alerta " +
+//			" where contingut_id in (" +
+//			"	select c.id " +
+//			"	  from ipa_contingut n " +
+//			"	 where c.id not in (select id from ipa_node) " +
+//			"	   and c.id not in (select id from ipa_carpeta))", nativeQuery = true)
+//    int deleteAlertesFromContingutsOrfes();
+
+	@Modifying
+	@Query(value = "delete from ipa_alerta where contingut_id = :contingutId ", nativeQuery = true)
+	int deleteAlertesFromContingutsOrfes(@Param("contingutId") Long contingutId);
 
 }

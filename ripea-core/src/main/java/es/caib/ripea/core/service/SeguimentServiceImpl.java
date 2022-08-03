@@ -346,7 +346,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientNumeroNom", new String[] { "expedient.codi", "expedient.any", "expedient.sequencia"});
 		ordenacioMap.put("elementNom", new String[] { "nom" });
-		ordenacioMap.put("dataDarrerIntent", new String[] { "arxiuIntentData" });
+		ordenacioMap.put("dataDarrerIntent", new String[] { "c.arxiuIntentData" });
 		
 
 		Page<DocumentEntity> docs = documentRepository.findArxiuPendents(

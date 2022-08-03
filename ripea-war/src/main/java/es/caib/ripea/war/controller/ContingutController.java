@@ -3,21 +3,13 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.registre.RegistreTipusEnum;
+import es.caib.ripea.core.api.service.*;
+import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
+import es.caib.ripea.war.helper.*;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,46 +25,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NodeDto;
-import es.caib.ripea.core.api.registre.RegistreTipusEnum;
-import es.caib.ripea.core.api.service.AlertaService;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.plugin.notificacio.EnviamentEstat;
-import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
-import es.caib.ripea.war.helper.BeanGeneratorHelper;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.JsonResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.helper.SessioHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per a la gestió de contenidors i mètodes compartits entre
@@ -187,18 +152,23 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		} catch (Exception e) {
 			logger.error("Error al obtenir detalls del contingut", e);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-			
-			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
-				return getModalControllerReturnValueErrorMessageText(
-						request,
+			if (ModalHelper.isModal(request)) {
+				if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+					return getModalControllerReturnValueErrorMessageText(
+							request,
+							"redirect:../../contingut/" + contingutId,
+							getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
+				} else {
+					return getModalControllerReturnValueErrorMessageText(
+							request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+							getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage(), root);
+				}
 			} else {
-				return getModalControllerReturnValueErrorMessageText(
-						request,
-						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.descarregar.error") + ": " + root.getMessage());
+				throw e;
 			}
+			
+
 		}
 		
 		
@@ -245,13 +215,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 				
 			} else {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage());
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage(), root);
 			}
 		}
 	}
@@ -686,6 +656,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					false,
 					false, null, null);
 			model.addAttribute("contingut", contingut);
+			if (contingut instanceof DocumentDto) {
+				model.addAttribute("documentInvalid", !((DocumentDto) contingut).isValidacioCorrecte());
+			}
 			if (contingut.isReplicatDinsArxiu()) {
 				model.addAttribute(
 						"arxiuDetall",
@@ -702,13 +675,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"));
+						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
 				
 			} else {
 				return getModalControllerReturnValueErrorMessageText(
 						request,
 						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + root.getMessage());
+						getMessage(request, "contingut.controller.arxiu.info.error") + ": " + root.getMessage(), root);
 			}
 		}
 	}
@@ -891,6 +864,38 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"contingutOrigen",
 				contingutOrigen);
+	}
+
+	@RequestMapping(value = "/contingut/orfes/delete", method = RequestMethod.GET)
+	@ResponseBody
+	public String netejaContingutsOrfes(HttpServletRequest request) {
+		Boolean result = contingutService.netejaContingutsOrfes();
+		if (!result) {
+			logger.error("Procés de neteja de continguts orfes executat amb error");
+			return getMessage(request, "contingut.orfe.delete.ko");
+		}
+		logger.info("Procés de neteja de continguts orfes executat correctament");
+		return getMessage(request, "contingut.orfe.delete.ok");
+	}
+
+	@RequestMapping(value = "/documents/sense/contingut", method = RequestMethod.GET)
+	@ResponseBody
+	public ResultDocumentsSenseContingut arreglaDocumentsSenseContingut(HttpServletRequest request) {
+		return contingutService.arreglaDocumentsSenseContingut();
+	}
+
+
+
+//	@PostConstruct
+	public void netejaContingutsOrfes() {
+		try {
+			Boolean result = contingutService.netejaContingutsOrfes();
+			if (result) {
+				logger.info("Procés de neteja de continguts orfes executat correctament");
+				return;
+			}
+		} catch (Exception e) {}
+		logger.error("Procés de neteja de continguts orfes executat amb error");
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ContingutController.class);

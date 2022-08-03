@@ -4,21 +4,20 @@
 package es.caib.ripea.war.controller;
 
 
-import java.net.ConnectException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.war.command.ExpedientFiltreCommand;
-import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.core.api.service.SeguimentService;
+import es.caib.ripea.war.command.SeguimentArxiuPendentsFiltreCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +29,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.service.SeguimentService;
-import es.caib.ripea.war.command.SeguimentArxiuPendentsFiltreCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Controlador per al manteniment de seguiment de elements pendents de guardar a dins l'arxiu
@@ -187,20 +186,20 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
     @RequestMapping(value = "/documents/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatableDocuments(HttpServletRequest request) {
-		PaginaDto<SeguimentArxiuPendentsDto> docsPortafirmes = new PaginaDto<SeguimentArxiuPendentsDto>();
+		PaginaDto<SeguimentArxiuPendentsDto> docs = new PaginaDto<SeguimentArxiuPendentsDto>();
 
 		EntitatDto entitat = getEntitatActual(request);
 
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandDocuments(request);
 
-        docsPortafirmes = seguimentService.findArxiuPendentsDocuments(
+        docs = seguimentService.findArxiuPendentsDocuments(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request));
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
-				docsPortafirmes,
+				docs,
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS);
     }
@@ -472,7 +471,8 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/seguimentArxiuPendents",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 
 		int errors = 0;
@@ -494,7 +494,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.expedients.massiu.correctes", new Object[]{correctes}));
 		}
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.expedients.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.expedients.massiu.errors", new Object[]{errors}), null);
 		}
 
 		seleccio.clear();
@@ -519,20 +519,35 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/seguimentArxiuPendents/#documents",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
+		
+		EntitatDto entitatActual = getEntitatActual(request);
 
 		int errors = 0;
 		int correctes = 0;
 
 		for (Long documentId : seleccio) {
-			Exception exception = documentService.guardarDocumentArxiu(documentId);
-
-			if (exception != null ) {
-				logger.error("Error guardant document en arxiu", exception);
-				errors++;
-			} else {
-				correctes++;
+			
+			DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
+			Exception exception = null;
+			if (document.getArxiuUuid() == null) {
+				exception = documentService.guardarDocumentArxiu(documentId);
+				if (exception != null ) {
+					logger.error("Error guardant document en arxiu", exception);
+					errors++;
+				} else {
+					correctes++;
+				}
+			} else if (document.isPendentMoverArxiu()) {
+				exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+				if (exception != null ) {
+					logger.error("Error mover annex en arxiu", exception);
+					errors++;
+				} else {
+					correctes++;
+				}
 			}
 
 		}
@@ -541,7 +556,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.documents.massiu.correctes", new Object[]{correctes}));
 		}
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.documents.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.documents.massiu.errors", new Object[]{errors}), null);
 		}
 
 		seleccio.clear();
@@ -566,7 +581,8 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/seguimentArxiuPendents/#interessats",
-					"accio.massiva.seleccio.buida");
+					"accio.massiva.seleccio.buida",
+					null);
 		}
 
 		int errors = 0;
@@ -593,7 +609,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.interessats.massiu.correctes", new Object[]{correctes}));
 		}
 		if (errors > 0) {
-			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.interessats.massiu.errors", new Object[]{errors}));
+			MissatgesHelper.error(request, getMessage(request, "seguiment.controller.interessats.massiu.errors", new Object[]{errors}), null);
 		}
 
 		seleccio.clear();

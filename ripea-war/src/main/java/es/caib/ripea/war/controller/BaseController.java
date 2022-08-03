@@ -3,14 +3,9 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import es.caib.ripea.war.helper.AjaxHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.ModalHelper;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -18,9 +13,12 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.support.RequestContext;
 
-import es.caib.ripea.war.helper.AjaxHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.ModalHelper;
+import javax.activation.MimetypesFileTypeMap;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Controlador base que implementa funcionalitats comunes.
@@ -74,25 +72,29 @@ public class BaseController implements MessageSourceAware {
 	protected String getAjaxControllerReturnValueError(
 			HttpServletRequest request,
 			String url,
-			String messageKey) {
+			String messageKey,
+			Throwable ex) {
 		return getAjaxControllerReturnValueError(
 				request,
 				url,
 				messageKey,
-				null);
+				null,
+				ex);
 	}
 	protected String getAjaxControllerReturnValueError(
 			HttpServletRequest request,
 			String url,
 			String messageKey,
-			Object[] messageArgs) {
+			Object[] messageArgs,
+			Throwable ex) {
 		if (messageKey != null) {
 			MissatgesHelper.error(
 					request, 
 					getMessage(
 							request, 
 							messageKey,
-							messageArgs));
+							messageArgs),
+					ex);
 		}
 		if (AjaxHelper.isAjax(request)) {
 			return ajaxUrlOk();
@@ -100,16 +102,17 @@ public class BaseController implements MessageSourceAware {
 			return url;
 		}
 	}
-	
-	
+
 	protected String getAjaxControllerReturnValueErrorMessage(
 			HttpServletRequest request,
 			String url,
-			String message) {
+			String message,
+			Throwable ex) {
 		if (message != null) {
 			MissatgesHelper.error(
 					request, 
-					message);
+					message,
+					ex);
 		}
 		if (AjaxHelper.isAjax(request)) {
 			return ajaxUrlOk();
@@ -200,25 +203,29 @@ public class BaseController implements MessageSourceAware {
 	protected String getModalControllerReturnValueError(
 			HttpServletRequest request,
 			String url,
-			String messageKey) {
+			String messageKey,
+			Throwable ex) {
 		return getModalControllerReturnValueError(
 				request,
 				url,
 				messageKey,
-				null);
+				null,
+				ex);
 	}
 	protected String getModalControllerReturnValueError(
 			HttpServletRequest request,
 			String url,
 			String messageKey,
-			Object[] messageArgs) {
+			Object[] messageArgs,
+			Throwable ex) {
 		if (messageKey != null) {
 			MissatgesHelper.error(
 					request, 
 					getMessage(
 							request, 
 							messageKey,
-							messageArgs));
+							messageArgs),
+					ex);
 		}
 		if (ModalHelper.isModal(request)) {
 			return modalUrlTancar();
@@ -226,7 +233,24 @@ public class BaseController implements MessageSourceAware {
 			return url;
 		}
 	}
-	
+
+	protected String getModalControllerReturnValueErrorMessageText(
+			HttpServletRequest request,
+			String url,
+			String message,
+			Throwable ex) {
+		if (message != null) {
+			MissatgesHelper.error(
+					request, 
+					message,
+					ex);
+		}
+		if (ModalHelper.isModal(request)) {
+			return modalUrlTancar();
+		} else {
+			return url;
+		}
+	}
 	
 	protected String getModalControllerReturnValueErrorMessageText(
 			HttpServletRequest request,
@@ -243,6 +267,7 @@ public class BaseController implements MessageSourceAware {
 			return url;
 		}
 	}
+	
 
 	protected void writeFileToResponse(
 			String fileName,

@@ -17,4 +17,7 @@ public interface SegonPlaService {
 	void actualitzarProcediments();
 
 	void consultaCanvisOrganigrama();
+	
+	void reintentarCanviEstatDistribucio();
+
 }
