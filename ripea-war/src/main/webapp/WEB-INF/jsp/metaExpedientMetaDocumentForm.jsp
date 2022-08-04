@@ -532,6 +532,7 @@ function removeLoading() {
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect name="pinbalServei" textKey="metadocument.form.camp.pinbal.servei" required="true" optionItems="${pinbalServeiEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
 				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" maxlength="256" disabled="${bloquejarCamps}" required="true"/>
+				<rip:inputSelect name="pinbalServeiDocsPermesos" textKey="metadocument.form.camp.pinbal.servei.docs.permesos" multiple="true" optionEnum="PinbalServeiDocPermesEnumDto"/>
 			</div>
 		</div>
 		<div id="modal-botons">

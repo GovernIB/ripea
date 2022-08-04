@@ -30,7 +30,9 @@ import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -56,7 +58,7 @@ public class PinbalHelper {
 	public String novaPeticioSvddgpciws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
-			InteressatPersonaFisicaEntity interessat,
+			InteressatEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment) throws PinbalException {
 		long t0 = System.currentTimeMillis();
@@ -79,7 +81,7 @@ public class PinbalHelper {
 	public String novaPeticioSvddgpviws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
-			InteressatPersonaFisicaEntity interessat,
+			InteressatEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment) throws PinbalException {
 		long t0 = System.currentTimeMillis();
@@ -102,7 +104,7 @@ public class PinbalHelper {
 	public String novaPeticioSvdccaacpasws01(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
-			InteressatPersonaFisicaEntity interessat,
+			InteressatEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment,
 			String comunitatAutonomaCodi,
@@ -160,7 +162,7 @@ public class PinbalHelper {
 			SolicitudBase solicitud,
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
-			InteressatPersonaFisicaEntity interessat,
+			InteressatEntity interessat,
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment) {
 		EntitatEntity entitat = metaDocument.getEntitat();
@@ -193,37 +195,50 @@ public class PinbalHelper {
 	}
 
 	private ScspTitular getTitularFromInteressat(
-			InteressatPersonaFisicaEntity interessat,
+			InteressatEntity interessat,
 			boolean ambNomSencer) {
 		ScspTitular titular = new ScspTitular();
-		switch (interessat.getDocumentTipus()) {
-		case DOCUMENT_IDENTIFICATIU_ESTRANGERS:
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.NIE);
-			break;
-		case NIF:
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.DNI);
-			break;
-		case PASSAPORT:
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.Pasaporte);
-			break;
-		default:
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.Otros);
-		}
+
 		titular.setDocumentacion(interessat.getDocumentNum());
-		titular.setNombre(interessat.getNom());
-		titular.setApellido1(interessat.getLlinatge1());
-		titular.setApellido2(interessat.getLlinatge2());
-		if (ambNomSencer) {
-			StringBuilder nomSencer = new StringBuilder(interessat.getNom());
-			if (interessat.getLlinatge1() != null) {
-				nomSencer.append(" ");
-				nomSencer.append(interessat.getLlinatge1().trim());
+		
+		if (interessat instanceof InteressatPersonaFisicaEntity) {
+			
+			switch (interessat.getDocumentTipus()) {
+			case DOCUMENT_IDENTIFICATIU_ESTRANGERS:
+				titular.setTipoDocumentacion(ScspTipoDocumentacion.NIE);
+				break;
+			case NIF:
+				titular.setTipoDocumentacion(ScspTipoDocumentacion.DNI);
+				break;
+			case PASSAPORT:
+				titular.setTipoDocumentacion(ScspTipoDocumentacion.Pasaporte);
+				break;
+			default:
+				titular.setTipoDocumentacion(ScspTipoDocumentacion.Otros);
 			}
-			if (interessat.getLlinatge2() != null) {
-				nomSencer.append(" ");
-				nomSencer.append(interessat.getLlinatge2().trim());
+			
+			InteressatPersonaFisicaEntity interessatPersonaFisica = (InteressatPersonaFisicaEntity) interessat;
+			titular.setNombre(interessatPersonaFisica.getNom());
+			titular.setApellido1(interessatPersonaFisica.getLlinatge1());
+			titular.setApellido2(interessatPersonaFisica.getLlinatge2());
+			if (ambNomSencer) {
+				StringBuilder nomSencer = new StringBuilder(interessatPersonaFisica.getNom());
+				if (interessatPersonaFisica.getLlinatge1() != null) {
+					nomSencer.append(" ");
+					nomSencer.append(interessatPersonaFisica.getLlinatge1().trim());
+				}
+				if (interessatPersonaFisica.getLlinatge2() != null) {
+					nomSencer.append(" ");
+					nomSencer.append(interessatPersonaFisica.getLlinatge2().trim());
+				}
+				titular.setNombreCompleto(nomSencer.toString());
 			}
-			titular.setNombreCompleto(nomSencer.toString());
+		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
+			InteressatPersonaJuridicaEntity interessatPersonaJuridica = (InteressatPersonaJuridicaEntity) interessat;
+			titular.setTipoDocumentacion(ScspTipoDocumentacion.CIF);
+			titular.setNombreCompleto(interessatPersonaJuridica.getRaoSocial());
+			titular.setDocumentacion(interessatPersonaJuridica.getDocumentNum());
+			
 		}
 		return titular;
 	}
