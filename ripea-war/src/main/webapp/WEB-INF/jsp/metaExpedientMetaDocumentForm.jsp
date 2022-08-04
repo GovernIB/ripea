@@ -353,11 +353,13 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				$('#pinbalServei').parent().parent().css('display', 'block');
 				$('#pinbalFinalitat').removeAttr('disabled');
 				$('#pinbalFinalitat').parent().parent().css('display', 'block');
+				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'block');
 			} else {
 				$('#pinbalServei').attr('disabled', 'disabled');
 				$('#pinbalServei').parent().parent().css('display', 'none');
 				$('#pinbalFinalitat').attr('disabled', 'disabled');
 				$('#pinbalFinalitat').parent().parent().css('display', 'none');
+				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'none');
 			}
 		});
 		$("#pinbalActiu").trigger('change');

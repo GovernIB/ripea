@@ -112,15 +112,15 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	
 	
 	@Column(name = "pinbal_servei_doc_permes_dni", nullable = false)
-	private boolean pinbalServeiDocPermesDni = true;
+	private boolean pinbalServeiDocPermesDni;
 	@Column(name = "pinbal_servei_doc_permes_nif", nullable = false)
-	private boolean pinbalServeiDocPermesNif = true;
+	private boolean pinbalServeiDocPermesNif;
 	@Column(name = "pinbal_servei_doc_permes_cif", nullable = false)
-	private boolean pinbalServeiDocPermesCif = true;
+	private boolean pinbalServeiDocPermesCif;
 	@Column(name = "pinbal_servei_doc_permes_nie", nullable = false)
-	private boolean pinbalServeiDocPermesNie = true;
+	private boolean pinbalServeiDocPermesNie;
 	@Column(name = "pinbal_servei_doc_permes_pas", nullable = false)
-	private boolean pinbalServeiDocPermesPas = true;
+	private boolean pinbalServeiDocPermesPas;
 	
 	
 	
@@ -286,11 +286,20 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.pinbalServei = pinbalServei;
 		this.pinbalFinalitat = pinbalFinalitat;
 		
-		this.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);
-		this.pinbalServeiDocPermesNif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF);
-		this.pinbalServeiDocPermesCif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF);
-		this.pinbalServeiDocPermesNie = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE);
-		this.pinbalServeiDocPermesPas = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT);
+		if (pinbalServeiDocsPermesos != null) {
+			this.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);
+			this.pinbalServeiDocPermesNif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF);
+			this.pinbalServeiDocPermesCif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF);
+			this.pinbalServeiDocPermesNie = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE);
+			this.pinbalServeiDocPermesPas = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT);
+		}	else {
+			this.pinbalServeiDocPermesDni = false;
+			this.pinbalServeiDocPermesNif = false;
+			this.pinbalServeiDocPermesCif = false;
+			this.pinbalServeiDocPermesNie = false;
+			this.pinbalServeiDocPermesPas = false;
+		}
+
 		
 	}
 
@@ -364,11 +373,20 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.pinbalActiu = pinbalActiu;
 			built.pinbalFinalitat = pinbalFinalitat;
 			
-			built.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);
-			built.pinbalServeiDocPermesNif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF);
-			built.pinbalServeiDocPermesCif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF);
-			built.pinbalServeiDocPermesNie = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE);
-			built.pinbalServeiDocPermesPas = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT);
+			if (pinbalServeiDocsPermesos != null) {
+				built.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);
+				built.pinbalServeiDocPermesNif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF);
+				built.pinbalServeiDocPermesCif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF);
+				built.pinbalServeiDocPermesNie = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE);
+				built.pinbalServeiDocPermesPas = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT);
+			} else {
+				built.pinbalServeiDocPermesDni = false;
+				built.pinbalServeiDocPermesNif = false;
+				built.pinbalServeiDocPermesCif = false;
+				built.pinbalServeiDocPermesNie = false;
+				built.pinbalServeiDocPermesPas = false;
+			}
+			
 		}
 		public Builder biometricaLectura(boolean biometricaLectura) {
 			built.biometricaLectura = biometricaLectura;
