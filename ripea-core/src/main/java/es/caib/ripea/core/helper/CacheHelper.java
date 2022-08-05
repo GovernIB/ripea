@@ -563,10 +563,21 @@ public class CacheHelper {
 		if (rolActual.equals("IPA_ADMIN")) {
 			return expedientPeticioRepository.countAnotacionsPendentsAdminEntitat(entitat);
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			List<String> organsCodisPermitted = organGestorRepository.findFillsCodis(entitat, Arrays.asList(organActualId));
-			OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organActualId);
-			organsCodisPermitted.add(organGestorEntity.getCodi());
-			return expedientPeticioRepository.countAnotacionsPendentsAdminOrgan(entitat, organsCodisPermitted);
+			
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organActualId);
+			List<OrganGestorEntity> organsPermesAdminOrgan = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
+			List<MetaExpedientEntity> procedimentsPermesAdminOrgan = new ArrayList<>();
+			procedimentsPermesAdminOrgan.addAll(organGestor.getMetaExpedients());
+			
+			for (OrganGestorEntity organGestorEntity : organsPermesAdminOrgan) {
+				procedimentsPermesAdminOrgan.addAll(organGestorEntity.getMetaExpedients());
+			}
+			
+			if (procedimentsPermesAdminOrgan.isEmpty()) {
+				procedimentsPermesAdminOrgan = null;
+			}
+			
+			return expedientPeticioRepository.countAnotacionsPendentsAdminOrgan(entitat, procedimentsPermesAdminOrgan);
 		} else {
 			List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitat.getId()); 
 			return expedientPeticioRepository.countAnotacionsPendentsUser(entitat,createWritePermIds);
