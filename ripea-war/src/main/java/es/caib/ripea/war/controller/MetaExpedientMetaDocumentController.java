@@ -20,6 +20,8 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -372,6 +374,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, true);
 			}
 		} catch (Exception ex) {
+			logger.error("Error al iniciar transacio", ex);
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 			transaccioResponse.setError(true);
 			transaccioResponse.setErrorDescripcio(ex.getMessage());
@@ -458,5 +461,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				EnumHelper.getOptionsForEnum(MetaDocumentPinbalServeiEnumDto.class, "pinbal.servei.enum."));
 
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientMetaDocumentController.class);
 
 }
