@@ -217,6 +217,7 @@ public class ConversioTipusHelper {
 						target.setArxiuPropagat(source.isArxiuPropagat());
 						target.setRepresentantArxiuPropagat(source.getRepresentant() != null ? source.getRepresentant().isArxiuPropagat() : true);
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
+						target.setEsRepresentant(source.isEsRepresentant());
 						return target;
 					}
 				});

@@ -9,9 +9,10 @@ import java.util.List;
 @Getter @Setter
 public class ProgresActualitzacioDto {
 
+	int fase = 0;
 	Integer progres = 0;
-	Integer numProcediments;
-	Integer numProcedimentsActualitzats = 0;
+	Integer numOperacions;
+	Integer numElementsActualitzats = 0;
 	List<ActualitzacioInfo> info = new ArrayList<>();
 	boolean finished = false;
 	
@@ -20,15 +21,15 @@ public class ProgresActualitzacioDto {
 	
 	public void addInfo(ActualitzacioInfo detall) {
 		info.add(detall);
-		incrementProcedimentsActualitzats();
+		incrementElementsActualitzats();
 	}
 	
-	public void incrementProcedimentsActualitzats() {
-		if (numProcediments == null) {
+	public void incrementElementsActualitzats() {
+		if (numOperacions == null) {
 			return;
 		}
-		this.numProcedimentsActualitzats++;
-		double auxprogres = (this.numProcedimentsActualitzats.doubleValue()  / this.numProcediments.doubleValue()) * 100;
+		this.numElementsActualitzats++;
+		double auxprogres = (this.numElementsActualitzats.doubleValue()  / this.numOperacions.doubleValue()) * 100;
 		this.progres = (int) auxprogres;
 	}
 

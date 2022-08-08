@@ -9,7 +9,8 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
-
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.OrganGestorCommand;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
@@ -48,6 +49,8 @@ public class OrganGestorController extends BaseUserOAdminController {
 	
     @Autowired
     private OrganGestorService organGestorService;
+	@Autowired
+	private MetaExpedientService metaExpedientService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -156,7 +159,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			organGestorService.syncDir3OrgansGestors(entitatActual.getId());
+			organGestorService.syncDir3OrgansGestors(entitatActual);
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar", e);
 			return getModalControllerReturnValueErrorMessageText(
@@ -169,6 +172,35 @@ public class OrganGestorController extends BaseUserOAdminController {
 				request,
 				"redirect:unitatOrganitzativa",
 				"unitat.controller.synchronize.ok");
+	}
+
+	@RequestMapping(value = "/update/auto/progres", method = RequestMethod.GET)
+	@ResponseBody
+	public ProgresActualitzacioDto getProgresActualitzacio(HttpServletRequest request) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		ProgresActualitzacioDto progresActualitzacio = organGestorService.getProgresActualitzacio(entitat.getCodi());
+
+
+		if (progresActualitzacio == null) {
+			logger.error("No s'ha trobat el progres actualització d'organs gestors per a l'entitat {}", entitat.getCodi());
+			return new ProgresActualitzacioDto();
+		}
+
+		if (progresActualitzacio.getFase() == 2) {
+			ProgresActualitzacioDto progresProc = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
+			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
+				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 24 / 100));
+				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
+				progresAcumulat.getInfo().addAll(progresProc.getInfo());
+				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
+				return progresAcumulat;
+			}
+		}
+
+		logger.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
+		return progresActualitzacio;
 	}
     
 

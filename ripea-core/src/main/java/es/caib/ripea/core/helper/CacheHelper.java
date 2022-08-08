@@ -61,7 +61,7 @@ public class CacheHelper {
 	private PermisosHelper permisosHelper;
 	@Resource
 	private PermisosEntitatHelper permisosEntitatHelper;
-	@Resource
+//	@Resource
 	private PluginHelper pluginHelper;
 	@Resource
 	private UsuariHelper usuariHelper;
@@ -85,6 +85,11 @@ public class CacheHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+
+	@Autowired
+	public void setPluginHelper(PluginHelper pluginHelper) {
+		this.pluginHelper = pluginHelper;
+	}
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {

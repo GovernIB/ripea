@@ -3,18 +3,17 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import lombok.Getter;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import lombok.Getter;
 
 /**
  * Classe del model de dades que representa una carpeta.
@@ -27,7 +26,7 @@ import lombok.Getter;
 @Getter
 public class CarpetaEntity extends ContingutEntity {
  
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_relacionat")
 	@ForeignKey(name = "ipa_carpeta_exprel_fk")
 	private ExpedientEntity expedientRelacionat;

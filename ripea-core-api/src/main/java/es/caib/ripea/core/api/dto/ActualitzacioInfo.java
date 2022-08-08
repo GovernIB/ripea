@@ -13,14 +13,28 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ActualitzacioInfo {
 
+    // Comú
+    boolean hasError;
+    boolean hasCanvis;
+    boolean hasInfo;
+
+    String errorText;
+    String infoTitol;
+    String infoText;
+
+    // Organ
+    boolean isOrgan;
+    boolean isNew;
+    String codiOrgan;
+    OrganEstatEnumDto estatAntic;
+    OrganEstatEnumDto estatNou;
+
+    // Procediments
     boolean exist;
     boolean nomModificat;
     boolean descripcioModificada;
     boolean comuModificat;
     boolean organModificat;
-    boolean hasError;
-    boolean hasCanvis;
-    boolean hasInfo;
 
     String codiSia;
     String nomAntic;
@@ -31,9 +45,6 @@ public class ActualitzacioInfo {
     boolean comuNou;
     String organAntic;
     String organNou;
-    String errorText;
-    String infoTitol;
-    String infoText;
 
     public void setNomNou(String nomNou) {
         this.nomNou = nomNou;

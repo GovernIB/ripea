@@ -77,9 +77,9 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @ManyToMany(mappedBy = "nous")
     private List<OrganGestorEntity> antics = new ArrayList<>();
 
-//    @Column(name = "tipus_transicio", length = 12)
-//    @Enumerated(EnumType.STRING)
-//    private TipusTransicioEnumDto tipusTransicio;
+    @Column(name = "tipus_transicio", length = 12)
+    @Enumerated(EnumType.STRING)
+    private TipusTransicioEnumDto tipusTransicio;
 
     
     @PreRemove

@@ -1,5 +1,6 @@
 package es.caib.ripea.core.api.service;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -7,6 +8,7 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -84,15 +86,18 @@ public interface OrganGestorService {
 	/**
 	 * Actualitza els organs gestors de la base de dades amb els de Dir3
 	 * 
-	 * @param entitatId Identificador de l'entitat actual
+	 * @param entitat Identificador de l'entitat actual
 	 * @return Indica si la sincronització ha tengut èxit
 	 * @throws Exception 
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception;
+	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception;
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
+
+	@PreAuthorize("hasRole('NOT_ADMIN')")
+	ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi);
 
 
 	/**
@@ -270,4 +275,8 @@ public interface OrganGestorService {
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(
 			Long entitatId);
 
+
+
+	// For testing:
+	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper);
 }

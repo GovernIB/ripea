@@ -36,6 +36,7 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private String tipusUnitatOrganica;
 	private String poder;
 	private String sigles;
+	@JsonProperty("superior")
 	private String codiUnitatSuperior;
 	private String codiUnitatArrel;
 	private Long nivellJerarquic;
@@ -43,6 +44,7 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private Date dataSupressioOficial;
 	private Date dataExtincioFuncional;
 	private Date dataAnulacio;
+	@JsonProperty("descripcionEstado")
 	private String estat; // V: Vigente, E: Extinguido, A: Anulado, T: Transitorio
 	private String codiPais;
 	private String codiComunitat;

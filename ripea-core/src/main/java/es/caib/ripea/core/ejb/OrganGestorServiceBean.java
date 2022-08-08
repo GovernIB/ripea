@@ -1,5 +1,6 @@
 package es.caib.ripea.core.ejb;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -7,6 +8,7 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,14 +82,19 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public boolean syncDir3OrgansGestors(Long entitatId) throws Exception {
-		return delegate.syncDir3OrgansGestors(entitatId);
+	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception {
+		return delegate.syncDir3OrgansGestors(entitat);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
 		return delegate.predictSyncDir3OrgansGestors(entitatId);
+	}
+
+	@Override
+	public ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi) {
+		return delegate.getProgresActualitzacio(entitatCodi);
 	}
 
 	@Override
@@ -220,6 +227,11 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	@Override
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
 		return delegate.findOrgansSuperiorByEntitat(entitatId);
+	}
+
+	@Override
+	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper) {
+		delegate.setServicesForSynctest(metaExpedientHelper, pluginHelper);
 	}
 
 }

@@ -42,6 +42,9 @@ public class AclObjectIdentityEntity extends AbstractPersistable<Long> {
 	@OneToMany(
 			mappedBy = "aclObjectIdentity", fetch = FetchType.EAGER)
 	private List<AclEntryEntity> entries;
+	@Builder.Default
+	@Column(name = "entries_inheriting", nullable = false)
+	private boolean entriesInheriting = true;
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

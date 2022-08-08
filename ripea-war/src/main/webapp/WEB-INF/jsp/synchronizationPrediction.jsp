@@ -15,11 +15,204 @@
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet" />
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet" />
 	<link href="<c:url value="/css/horizontal-tree.css"/>" rel="stylesheet" />
+    <link rel="stylesheet" href="<c:url value="/css/sync.css"/>">
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<rip:modalHead />
+	<script>
+		var itervalProgres;
+		var writtenBlocs = 0;
+		var title="<spring:message code="organgestor.actualitzacio.titol"/>";
+		var content="<spring:message code="organgestor.actualitzacio.cancelarActu"/>";
+		var acceptar="<spring:message code="comu.boto.acceptar"/>";
+		var cancelar="<spring:message code="comu.boto.cancelar"/>";
+		var lnouorgan="<spring:message code="organgestor.actualitzacio.nou"/>";
+		var lcodi="<spring:message code="organgestor.actualitzacio.codi"/>";
+		var lestat="<spring:message code="organgestor.actualitzacio.estat"/>";
+		var lnom="<spring:message code="metaexpedient.form.camp.nom"/>";
+		var ldesc="<spring:message code="metaexpedient.form.camp.descripcio"/>";
+		var lcomu="<spring:message code="metaexpedient.form.camp.comu"/>";
+		var lorgan="<spring:message code="metaexpedient.form.camp.organgestor"/>";
+		var sense="<spring:message code="metaexpedient.actualitzacio.sense.canvis"/>";
+		var lestats = [];
+		lestats["V"]="<spring:message code="organgestor.estat.enum.V"/>";
+		lestats["E"]="<spring:message code="organgestor.estat.enum.E"/>";
+		lestats["A"]="<spring:message code="organgestor.estat.enum.A"/>";
+		lestats["T"]="<spring:message code="organgestor.estat.enum.T"/>";
+
+		<c:if test="${not isUpdatingProcediments}">
+		var isUpdating = false;
+		$(document).ready(function() {
+			$('#formUpdateAuto').on("submit", function(){
+				console.log("submitting...");
+				$('.loading').fadeIn();
+				$('#actualitzacioInfo').fadeIn();
+				$('.confirmacio').fadeOut();
+				$('#autobtn', parent.document).prop('disabled', true);
+				$('#cancelbtn', parent.document).toggle(true);
+				$.post($(this).attr('action'));
+				isUpdating = true;
+				refreshProgres();
+				return false;
+			});
+			$('.close', parent.document).on('click',function(){
+				$.confirm({
+					title: title,
+					content: content,
+					buttons: {
+						confirm: {
+							text: acceptar,
+							action: function () {
+								window.top.location.reload();
+							}
+						},
+						cancel: {
+							text: cancelar,
+							action: function () {
+							}
+						}
+					}
+				});
+			});
+		});
+		</c:if>
+		function refreshProgres() {
+			console.log("refreshProgres");
+			itervalProgres =  setInterval(function(){ getProgres(); }, 250);
+		}
+
+		function getProgres() {
+			console.log("getProgres");
+			$('.close', parent.document).prop('disabled', true);
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value='/organgestor/update/auto/progres'/>",
+				success: function(data) {
+					if (data) {
+						console.log("Progres:", data);
+						writeInfo(data);
+						$('#cancelbtn', parent.document).toggle(true);
+						if (data.progres == 100) {
+							clearInterval(itervalProgres);
+							isUpdating = false;
+							$('#bar').css('width', '100%');
+							$('#bar').attr('aria-valuenow', 100);
+							$('#bar').html('100%');
+							$('.close', parent.document).prop('disabled', false);
+							$('.loading').hide();
+						} else {
+							if (data.progres > 0) {
+								$('.loading').hide();
+								$('.progress').show();
+								$('#bar').css('width', data.progres + '%');
+								$('#bar').attr('aria-valuenow', data.progres);
+								$('#bar').html(data.progres + '%');
+							}else if(data.progres == 0 && data.numElementsActualitzats == 0 ){
+								$('.close', parent.document).prop('disabled', false);
+								$('.loading').hide();
+							}
+						}
+					}
+				},
+				error: function() {
+					console.log("error obtenint progrés...");
+					clearInterval(itervalProgres);
+					$('.loading').hide();
+					$('.close', parent.document).prop('disabled', false);
+				}
+			});
+		}
+
+		function writeInfo(data) {
+			let info = data.info;
+			let index;
+
+			for (index = writtenBlocs; index < info.length; index++) {
+				// $("#bcursor").before("<p class='info-" + info[index].tipus + "'>" + info[index].text + "</p>");
+				let blocContent = '';
+				if (info[index].isOrgan) {
+					if (info[index].isNew) {
+						blocContent += '<h5>' + lnouorgan + ':</h5>';
+						blocContent = '<ul>';
+						// blocContent += '<li><strong>' + lcodi + ':</strong>' + info[index].codiOrgan +'</li>';
+						blocContent += '<li><strong>' + lnom + ':</strong>' + info[index].nomAntic +'</li>';
+						blocContent += '<li><strong>' + lestat + ':</strong>' + lestats[info[index].estatAntic] +'</li>';
+						blocContent += '</ul>';
+					} else {
+						blocContent = '<ul>';
+						// blocContent += '<li><strong>' + lcodi + ':</strong>' + info[index].codiOrgan +'</li>';
+						blocContent += '<li><strong>' + lnom + ':</strong>' + info[index].nomAntic + ' <span class="fa fa-long-arrow-right fa-2x"></span> ' + info[index].nomNou +'</li>';
+						blocContent += '<li><strong>' + lestat + ':</strong>' + lestats[info[index].estatAntic] + ' <span class="fa fa-long-arrow-right fa-2x"></span> ' + lestats[info[index].estatNou] +'</li>';
+						blocContent += '</ul>';
+					}
+				} else if (info[index].hasError) {
+					blocContent = info[index].errorText;
+				} else if (info[index].hasInfo) {
+					blocContent = info[index].infoText;
+				} else if (!info[index].hasCanvis) {
+					blocContent = sense;
+				} else {
+					blocContent = '<ul>';
+					if (info[index].nomModificat) {
+						blocContent += '<li><strong>' + lnom + ':</strong>' + info[index].nomAntic + ' <span class="fa fa-long-arrow-right fa-2x"></span> ' + info[index].nomNou +'</li>';
+					}
+					if (info[index].descripcioModificada) {
+						blocContent += '<li><strong>' + ldesc + ':</strong>' + info[index].descripcioAntiga + ' <span class="fa fa-long-arrow-right fa-2x"></span> ' + info[index].descripcioNova +'</li>';
+					}
+					if (info[index].comuModificat) {
+						blocContent += '<li><strong>' + lcomu + ':</strong> <span class="fa ' + (info[index].comuAntic ? 'fa-check' : 'fa-times') + '"></span> <span class="fa fa-long-arrow-right fa-2x"></span> <span class="fa ' + (info[index].comuNou? 'fa-check' : 'fa-times') +'"></span></li>';
+					}
+					if (info[index].organModificat) {
+						blocContent += '<li><strong>' + lorgan + ':</strong>' + info[index].organAntic + ' <span class="fa fa-long-arrow-right fa-2x"></span> ' + info[index].organNou +'</li>';
+					}
+					blocContent += '</ul>';
+				}
+				$("#bcursor").before(
+						'<div class="panel ' + (info[index].hasError ? 'panel-danger' : info[index].hasCanvis ? 'panel-info' : 'panel-default') + '">' +
+						'  <div class="panel-heading">' +
+						'    <h3 class="panel-title">' + (info[index].hasInfo ? info[index].infoTitol : info[index].isOrgan ? "Òrgan gestor: " + info[index].codiOrgan + ' - ' + info[index].nomAntic : 'Procediment: ' + info[index].codiSia + ' - ' + info[index].nomAntic) + '</h3>' +
+						'  </div>' +
+						'  <div class="panel-body">' + blocContent + '</div>' +
+						'</div>');
+			}
+			writtenBlocs = index;
+			if (data.error) {
+				$("#bcursor").before("<p class='info-ERROR'>" + data.errorMsg + "</p>");
+			}
+			//scroll to the bottom of "#actualitzacioInfo"
+			let scroll = writtenBlocs < info.length;
+			if (scroll) {
+				var infoDiv = document.getElementById("actualitzacioInfo");
+				infoDiv.scrollTop = infoDiv.scrollHeight;
+			}
+		}
+		function cancela() {
+			if (!isUpdating) {
+				window.top.location.reload();
+				return;
+			}
+			$.confirm({
+				title: title,
+				content: content,
+				buttons: {
+					confirm: {
+						text: acceptar,
+						action: function () {
+							window.top.location.reload();
+						}
+					},
+					cancel: {
+						text: cancelar,
+						action: function () {
+						}
+					}
+				}
+			});
+		}
+
+	</script>
 </head>
 <body>
 
@@ -251,6 +444,18 @@
 		</c:if>
 
 	</div>
+
+    <div class="loading">
+        <div class="loading-gif">
+            <span class="fa fa-circle-o-notch fa-2x fa-spin fa-fw"></span>
+        </div>
+    </div>
+    <div class="progress">
+        <div id="bar" class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
+    </div>
+    <div id="actualitzacioInfo" class="info">
+        <span id="bcursor" class="blinking-cursor">|</span>
+    </div>
 
 	<c:set var="formAction">
 		<rip:modalUrl value="/unitatOrganitzativa/saveSynchronize" />

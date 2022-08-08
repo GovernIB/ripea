@@ -3,8 +3,10 @@
  */
 package es.caib.ripea.core.helper;
 
+import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.entity.AclClassEntity;
 import es.caib.ripea.core.entity.AclEntryEntity;
 import es.caib.ripea.core.entity.AclObjectIdentityEntity;
@@ -15,6 +17,7 @@ import es.caib.ripea.core.repository.AclEntryRepository;
 import es.caib.ripea.core.repository.AclObjectIdentityRepository;
 import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -32,10 +35,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -752,78 +758,100 @@ public class PermisosHelper {
 			return rol;
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
     public void actualitzarPermisosOrgansObsolets(
+			List<UnitatOrganitzativa> unitatsWs,
 			List<OrganGestorEntity> organsDividits,
 			List<OrganGestorEntity> organsFusionats,
-			List<OrganGestorEntity> organsSubstituits) {
+			List<OrganGestorEntity> organsSubstituits,
+			ProgresActualitzacioDto progres) {
 
 		AclClassEntity classname = aclClassRepository.findByClassname("es.caib.ripea.core.entity.OrganGestorEntity");
 
-		for (OrganGestorEntity organDividit: organsDividits) {
-			for (OrganGestorEntity nou: organDividit.getNous()) {
-				duplicaPermisos(classname, organDividit, nou);
+		List<String> organsFusionatsProcessats = new ArrayList<>();
+
+		int nombreUnitatsTotal = unitatsWs.size();
+		int nombreUnitatsProcessades = 0;
+
+		for (UnitatOrganitzativa unitat: unitatsWs) {
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Sincronització de permisos").infoText("Traspassant permisos de l''òrgan gestor " + unitat.getCodi()).build());
+			progres.setProgres(51 + (nombreUnitatsProcessades++ * 24)/nombreUnitatsTotal);
+
+			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
+			if (organOrigen != null) {
+				for (OrganGestorEntity organDesti : organOrigen.getNous()) {
+					duplicaPermisos(classname, organOrigen, organDesti);
+				}
+				continue;
 			}
-		}
 
-		Set<OrganGestorEntity> organsFusio = new HashSet<>();
-		for (OrganGestorEntity organFusionat: organsFusionats) {
-			organsFusio.add(organFusionat.getNous().get(0));
-		}
-		for (OrganGestorEntity organFusio: organsFusio) {
-			duplicaPermisos(classname, organFusio);
-		}
+			organOrigen = getOrgan(organsFusionats, unitat.getCodi());
+			if (organOrigen != null && !organsFusionatsProcessats.contains(organOrigen.getCodi())) {
+				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
+				List<OrganGestorEntity> organsOrigen = organDesti.getAntics();
+				for(OrganGestorEntity origen: organsOrigen)
+					organsFusionatsProcessats.add(origen.getCodi());
+				duplicaPermisos(classname, organsOrigen, organDesti);
+				continue;
+			}
 
-		for (OrganGestorEntity organSubstituit: organsSubstituits) {
-			OrganGestorEntity organNou = organSubstituit.getNous().get(0);
-			duplicaPermisos(classname, organSubstituit, organNou);
+			organOrigen = getOrgan(organsSubstituits, unitat.getCodi());
+			if (organOrigen != null) {
+				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
+				duplicaPermisos(classname, organOrigen, organDesti);
+				continue;
+			}
 		}
     }
 
-	private void duplicaPermisos(AclClassEntity classname, OrganGestorEntity organFusio) {
-		Set<AclEntryEntity> permisosNous = new HashSet<>();
-		List<AclEntryEntity> permisosAntics = new ArrayList<>();
-		for (OrganGestorEntity antic: organFusio.getAntics()) {
-			AclObjectIdentityEntity objectIdentity = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, antic.getId());
-			if (objectIdentity != null) {
-				permisosAntics.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentity));
-			}
+	private OrganGestorEntity getOrgan(List<OrganGestorEntity> llista, String codi) {
+		for (OrganGestorEntity organ: llista) {
+			if (organ.getCodi().equals(codi))
+				return organ;
 		}
-		if (permisosAntics == null) {
-			return;
-		}
-		duplicaEntradesPermisos(classname, organFusio, permisosAntics.get(0).getAclObjectIdentity(), permisosAntics, permisosNous);
-		aclEntryRepository.save(permisosNous);
+		return null;
 	}
 
-	private void duplicaPermisos(AclClassEntity classname, OrganGestorEntity organAntic, OrganGestorEntity organNou) {
-		Set<AclEntryEntity> permisosNous = new HashSet<>();
-		List<AclEntryEntity> permisosAntics = new ArrayList<>();
-		AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organAntic.getId());
-		if (objectIdentityAntic == null) {
-			return;
-		}
-		permisosAntics.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
-		duplicaEntradesPermisos(classname, organNou, objectIdentityAntic, permisosAntics, permisosNous);
+	private void duplicaPermisos(AclClassEntity classname, OrganGestorEntity organOrigen, OrganGestorEntity organDesti) {
+		duplicaPermisos(classname, Arrays.asList(organOrigen), organDesti);
 	}
 
-	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclObjectIdentityEntity objectIdentityAntic, List<AclEntryEntity> permisosAntics, Set<AclEntryEntity> permisosNous) {
+	private void duplicaPermisos(AclClassEntity classname, List<OrganGestorEntity> organsOrigen, OrganGestorEntity organDesti) {
+		Set<AclEntryEntity> permisosDesti = new HashSet<>();
+		Set<AclEntryEntity> permisosOrigen = new HashSet<>();
+		AclSidEntity ownerSid = null;
+		for (OrganGestorEntity organOrigen: organsOrigen) {
+			AclObjectIdentityEntity objectIdentityAntic = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organOrigen.getId());
+			if (objectIdentityAntic == null)
+				continue;
+			if (ownerSid == null)
+				ownerSid = objectIdentityAntic.getOwnerSid();
+			permisosOrigen.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
+		}
+		duplicaEntradesPermisos(classname, organDesti, ownerSid, permisosOrigen, permisosDesti);
+		aclEntryRepository.save(permisosDesti);
+	}
+
+	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Set<AclEntryEntity> permisosOrigen, Set<AclEntryEntity> permisosDesti) {
 		AclObjectIdentityEntity objectIdentityNou = aclObjectIdentityRepository.findByClassnameAndObjectId(classname, organNou.getId());
 		if (objectIdentityNou == null) {
 			objectIdentityNou = AclObjectIdentityEntity.builder()
 					.classname(classname)
 					.objectId(organNou.getId())
-					.ownerSid(objectIdentityAntic.getOwnerSid())
+					.ownerSid(ownerSid)
 					.build();
+			aclObjectIdentityRepository.save(objectIdentityNou);
 		}
-		for (AclEntryEntity permisAntic : permisosAntics) {
+		for (AclEntryEntity permisAntic : permisosOrigen) {
 			AclEntryEntity aclEntry = AclEntryEntity.builder()
 					.aclObjectIdentity(objectIdentityNou)
 					.sid(permisAntic.getSid())
-					.order(permisosNous.size())
+					.order(permisosDesti.size())
 					.mask(permisAntic.getMask())
 					.granting(permisAntic.getGranting())
 					.build();
-			permisosNous.add(aclEntry);
+			permisosDesti.add(aclEntry);
 		}
 	}
 

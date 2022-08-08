@@ -41,6 +41,13 @@ public class AclEntryEntity extends AbstractPersistable<Long> {
 	private Integer mask;
 	@Column(name = "granting", nullable = false)
 	private Boolean granting;
+
+	@Builder.Default
+	@Column(name = "audit_success", nullable = false)
+	private boolean auditSuccess = false;
+	@Builder.Default
+	@Column(name = "audit_failure", nullable = false)
+	private boolean auditFailure = false;
 	
 	private static final long serialVersionUID = -2299453443943600172L;
 
