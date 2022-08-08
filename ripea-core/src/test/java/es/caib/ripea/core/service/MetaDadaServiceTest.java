@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,8 +23,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.MetaDadaService;
+import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests per al servei d'entitats.
@@ -35,6 +41,8 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 
 	@Autowired
 	private MetaDadaService metaDadaService;
+	@Autowired
+	private EntityManager entityManager;
 
 	private EntitatDto entitat;
 	protected OrganGestorDto organGestorDto;
@@ -289,8 +297,10 @@ public class MetaDadaServiceTest extends BaseServiceTest {
 									entitatCreada.getId(),
 									expedientCreat.getId(),
 									metaDadaCreate, "tothom", null);
+							fail("La metadada no s'hauria d'haver creat");
 						} catch (DataIntegrityViolationException ex) {
 							// Excepció esperada
+							entityManager.unwrap(Session.class).clear();
 						}
 					}
 				},

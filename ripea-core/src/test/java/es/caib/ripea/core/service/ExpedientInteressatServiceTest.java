@@ -3,21 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -33,6 +18,18 @@ import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests per al servei d'entitats.
@@ -82,7 +79,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 		representantPersonaFisicaDto = new InteressatPersonaFisicaDto();
 		representantPersonaFisicaDto.setAdresa("Test adresa 1 representant");
 		representantPersonaFisicaDto.setCodiPostal("07500");
-		representantPersonaFisicaDto.setDocumentNum("07450666T");
+		representantPersonaFisicaDto.setDocumentNum("58827570X");
 		representantPersonaFisicaDto.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
 		representantPersonaFisicaDto.setEmail("testRepresentant@mail.com");
 		representantPersonaFisicaDto.setEsRepresentant(true);
@@ -549,7 +546,7 @@ public class ExpedientInteressatServiceTest extends BaseExpedientServiceTest {
 			e.printStackTrace();
 			fail();
 		}
-		pluginHelper.setUnitatsOrganitzativesPlugin(mockUnitatsOrganitzatives);
+		pluginHelper.setUnitatsOrganitzativesPlugin(entitat.getCodi(), mockUnitatsOrganitzatives);
 	}
 
 }

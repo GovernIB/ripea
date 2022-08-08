@@ -3,18 +3,14 @@
  */
 package es.caib.ripea.core.service;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -23,27 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests per al servei de gestió de documents dels expedients.
@@ -340,7 +321,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 									Mockito.anyString(),
 									Mockito.anyString(),
 									Mockito.any(PortafirmesPrioritatEnum.class),
-									Mockito.any(Date.class),
+									Mockito.nullable(Date.class),
 									Mockito.nullable(List.class),
 									Mockito.nullable(String.class),
 									Mockito.nullable(List.class),
@@ -386,7 +367,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 			DocumentDto original,
 			DocumentDto perComprovar) {
 		assertEquals(original.getNom(), perComprovar.getNom());
-		assertEquals(original.getData(), perComprovar.getData());
+		assertTrue(Math.abs(original.getData().getTime() - perComprovar.getData().getTime()) < 1000);
+		assertEquals(DateUtils.round(original.getData(),Calendar.SECOND), DateUtils.round(perComprovar.getData(),Calendar.SECOND));
 		assertEquals(original.getTipus(), perComprovar.getTipus());
 		assertEquals(original.getDocumentTipus(), perComprovar.getDocumentTipus());
 		assertEquals(original.getNtiOrigen(), perComprovar.getNtiOrigen());

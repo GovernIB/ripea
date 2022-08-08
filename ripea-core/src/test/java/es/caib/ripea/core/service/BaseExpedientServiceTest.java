@@ -3,6 +3,32 @@
  */
 package es.caib.ripea.core.service;
 
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ConsultaFiltre;
+import es.caib.plugins.arxiu.api.ConsultaResultat;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
+import es.caib.plugins.arxiu.api.Expedient;
+import es.caib.plugins.arxiu.api.IArxiuPlugin;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import es.caib.ripea.plugin.usuari.DadesUsuari;
+import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -10,41 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-
-import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentContingut;
-import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.IArxiuPlugin;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
 
 /**
  * Classe que es pot utilitzar com a base dels tests que requereixen la creació
@@ -63,7 +54,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 	@Autowired
 	protected PluginHelper pluginHelper;
 
-	private EntitatDto entitat;
+	protected EntitatDto entitat;
 	private MetaDadaDto metaDada;
 	private MetaDocumentDto metaDocument;
 	private MetaExpedientDto metaExpedient;
@@ -171,6 +162,8 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		organGestorDto = new OrganGestorDto();
 		organGestorDto.setCodi("A000000000");
 		organGestorDto.setNom("Òrgan 0");
+
+		ConfigHelper.setEntitat(entitat);
 	}
 
 	protected void testAmbElementsIExpedient(
@@ -256,14 +249,25 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		carpetaArxiu.setIdentificador(UUID.randomUUID().toString());
 		carpetaArxiu.setNom("Carpeta arxiu");
 		carpetaArxiu.setVersio("1");
+		ConsultaResultat consultaResultat = new ConsultaResultat();
+		consultaResultat.setNumPagines(1);
+		consultaResultat.setNumRegistres(0);
+		consultaResultat.setNumRetornat(0);
+//		ContingutArxiu contingutArxiu = new ContingutArxiu(ContingutTipus.DOCUMENT);
+//		contingutArxiu.setNom(documentArxiu.getNom());
+//		contingutArxiu.setIdentificador(documentArxiu.getIdentificador());
+		List<ContingutArxiu> contingutsArxiu = new ArrayList<>();
+//		contingutsArxiu.add(contingutArxiu);
+		consultaResultat.setResultats(contingutsArxiu);
 		Mockito.when(arxiuPluginMock.expedientCrear(Mockito.any(Expedient.class))).thenReturn(expedientArxiu);
 		Mockito.when(arxiuPluginMock.expedientCrear(null)).thenThrow(NullPointerException.class);
 		Mockito.when(arxiuPluginMock.expedientDetalls(Mockito.anyString(), Mockito.nullable(String.class))).thenReturn(expedientArxiu);
+		Mockito.when(arxiuPluginMock.expedientConsulta(Mockito.<ConsultaFiltre>anyList(), Mockito.anyInt(), Mockito.anyInt())).thenReturn(consultaResultat);
 		Mockito.when(arxiuPluginMock.documentCrear(Mockito.any(Document.class), Mockito.anyString())).thenReturn(documentArxiu);
 		Mockito.when(arxiuPluginMock.documentCrear(null, null)).thenThrow(NullPointerException.class);
-		Mockito.when(arxiuPluginMock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.eq(true))).thenReturn(documentArxiuAmbContingut);
+		Mockito.when(arxiuPluginMock.documentDetalls(Mockito.anyString(), Mockito.nullable(String.class), Mockito.anyBoolean())).thenReturn(documentArxiuAmbContingut);
 		Mockito.when(arxiuPluginMock.carpetaCrear(Mockito.any(Carpeta.class), Mockito.anyString())).thenReturn(carpetaArxiu);
-		pluginHelper.setArxiuPlugin(arxiuPluginMock);
+		pluginHelper.setArxiuPlugin(entitat.getCodi(), arxiuPluginMock);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -289,12 +293,17 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		portafirmesDocument.setArxiuNom(pdfFirmat.getNom());
 		portafirmesDocument.setArxiuContingut(pdfFirmat.getContingut());
 		Mockito.when(portafirmesPluginMock.download(Mockito.anyString())).thenReturn(portafirmesDocument);
-		pluginHelper.setPortafirmesPlugin(portafirmesPluginMock);
+		Mockito.when(portafirmesPluginMock.recuperarBlocksFirmes(Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+		Mockito.when(portafirmesPluginMock.upload(Mockito.any(PortafirmesDocument.class), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(PortafirmesPrioritatEnum.class), Mockito.nullable(Date.class), Mockito.<PortafirmesFluxBloc>anyList(), Mockito.anyString(), Mockito.nullable(List.class), Mockito.anyBoolean(), Mockito.nullable(String.class))).thenReturn(String.valueOf(System.currentTimeMillis()));
+		pluginHelper.setPortafirmesPlugin(entitat.getCodi(), portafirmesPluginMock);
 	}
 
 	private void configureMockDadesUsuariPlugin() throws IOException, SistemaExternException {
 		dadesUsuariPluginMock = Mockito.mock(DadesUsuariPlugin.class);
 		//Mockito.when(portafirmesMock.download(Mockito.anyString())).thenReturn(portafirmesDocument);
+		DadesUsuari dadesUsuari = new DadesUsuari();
+//		dadesUsuari.setEmail("email@usuari.es");
+		Mockito.when(dadesUsuariPluginMock.findAmbCodi(Mockito.anyString())).thenReturn(dadesUsuari);
 		pluginHelper.setDadesUsuariPlugin(dadesUsuariPluginMock);
 	}
 

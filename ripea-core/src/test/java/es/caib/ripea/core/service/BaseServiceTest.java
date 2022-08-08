@@ -3,14 +3,21 @@
  */
 package es.caib.ripea.core.service;
 
-import static org.junit.Assert.fail;
-
-import java.util.*;
-
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.service.*;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.repository.config.ConfigRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import org.junit.AfterClass;
@@ -25,8 +32,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.repository.UsuariRepository;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.junit.Assert.fail;
 
 /**
  * Tests per al servei d'entitats.
@@ -188,11 +200,12 @@ public class BaseServiceTest {
 			fail("L'execució del test ha produït una excepció");
 		} finally {
 			Long metaExpedientId = null;
-			if (elementsCreats.size() > 1) {
+			if (elementsCreats.size() > 2) {
 				metaExpedientId = ((MetaExpedientDto)elementsCreats.get(2)).getId();
 			}
 			// TODO
 			Collections.reverse(elementsCreats);
+
 			for (Object element: elementsCreats) {
 				autenticarUsuari("admin");
 				logger.debug("Esborrant objecte de tipus " + element.getClass().getSimpleName() + "...");

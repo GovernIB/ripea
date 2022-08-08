@@ -3,14 +3,14 @@
  */
 package es.caib.ripea.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +19,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.MetaExpedientService;
+import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests per al servei d'entitats.
@@ -34,6 +37,8 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 
 	@Autowired
 	private MetaExpedientService metaExpedientService;
+	@Autowired
+	private EntityManager entityManager;
 
 	private EntitatDto entitat;
 	protected OrganGestorDto organGestorDto;
@@ -199,6 +204,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 									metaExpedientCreat.getId());
 							fail("El meta-expedient esborrat no s'hauria d'haver trobat");
 						} catch (NotFoundException expected) {
+							entityManager.unwrap(Session.class).clear();
 						}
 						elementsCreats.remove(metaExpedientCreat);
 					}
