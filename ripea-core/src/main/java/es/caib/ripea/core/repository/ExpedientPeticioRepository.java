@@ -49,7 +49,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity e " +
 			"where " +
 			"e.registre.entitat = :entitat " +
-			"and (:rolActual = 'IPA_ADMIN' or (:rolActual = 'IPA_ORGAN_ADMIN' and e.registre.destiCodi in (:organsCodisPermitted)) or e.metaExpedient.id in (:idMetaExpedientPermesos)) " +
+			"and (:rolActual = 'IPA_ADMIN' or (:rolActual = 'IPA_ORGAN_ADMIN' and e.metaExpedient in (:metaExpedientPermesAdminOrgan)) or (:rolActual = 'tothom' and e.metaExpedient.id in (:idMetaExpedientPermesos))) " +
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
 			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
@@ -66,7 +66,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("rolActual") String rolActual,
-			@Param("organsCodisPermitted") List<String> organsCodisPermitted,
+			@Param("metaExpedientPermesAdminOrgan") List<MetaExpedientEntity> metaExpedientPermesAdminOrgan,
 			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
@@ -117,11 +117,11 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity pet " +
 			"where " +
 			":entitatActual = pet.registre.entitat " +
-			"and (pet.registre.destiCodi in (:organsCodisPermitted)) " +
+			"and pet.metaExpedient in (:metaExpedientPermesAdminOrgan) " +
 			"and pet.estat='PENDENT' " )
 	long countAnotacionsPendentsAdminOrgan(
 			@Param("entitatActual") EntitatEntity entitatActual,
-			@Param("organsCodisPermitted") List<String> organsCodisPermitted);
+			@Param("metaExpedientPermesAdminOrgan") List<MetaExpedientEntity> metaExpedientPermesAdminOrgan);
 
 	@Query("FROM ExpedientPeticioEntity e WHERE e.pendentEnviarDistribucio = true AND e.reintentsEnviarDistribucio > 0")
 	List<ExpedientPeticioEntity> findPendentsCanviEstat();

@@ -71,13 +71,13 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 		return delegate.recuperarPlantillesDisponibles(filtrar);
 	}
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public String recuperarUrlEdicioPlantilla(String plantillaFluxId, String returnUrl) {
 		return delegate.recuperarUrlEdicioPlantilla(plantillaFluxId, returnUrl);
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public boolean esborrarPlantilla(String plantillaFluxId) {
 		return delegate.esborrarPlantilla(plantillaFluxId);
 	}

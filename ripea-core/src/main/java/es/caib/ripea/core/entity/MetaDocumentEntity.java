@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +29,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 
 /**
  * Classe del model de dades que representa un meta-document.
@@ -105,6 +109,20 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
 	@Column(name = "pinbal_finalitat", length = 512)
 	protected String pinbalFinalitat;
+	
+	
+	@Column(name = "pinbal_servei_doc_permes_dni", nullable = false)
+	private boolean pinbalServeiDocPermesDni;
+	@Column(name = "pinbal_servei_doc_permes_nif", nullable = false)
+	private boolean pinbalServeiDocPermesNif;
+	@Column(name = "pinbal_servei_doc_permes_cif", nullable = false)
+	private boolean pinbalServeiDocPermesCif;
+	@Column(name = "pinbal_servei_doc_permes_nie", nullable = false)
+	private boolean pinbalServeiDocPermesNie;
+	@Column(name = "pinbal_servei_doc_permes_pas", nullable = false)
+	private boolean pinbalServeiDocPermesPas;
+	
+	
 	
 	@Column(name = "per_defecte")
 	private boolean perDefecte;
@@ -194,6 +212,33 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public void setLeftPerCreacio(boolean leftPerCreacio) {
 		this.leftPerCreacio = leftPerCreacio;
 	}
+
+	
+	
+	public List<PinbalServeiDocPermesEnumDto> getPinbalServeiDocsPermesos() {
+		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesosEnumDto = new ArrayList<>();
+		
+		if (this.pinbalServeiDocPermesDni) {
+			pinbalServeiDocsPermesosEnumDto.add(PinbalServeiDocPermesEnumDto.DNI);
+		}
+		if (this.pinbalServeiDocPermesNif) {
+			pinbalServeiDocsPermesosEnumDto.add(PinbalServeiDocPermesEnumDto.NIF);
+		}
+		if (this.pinbalServeiDocPermesCif) {
+			pinbalServeiDocsPermesosEnumDto.add(PinbalServeiDocPermesEnumDto.CIF);
+		}
+		if (this.pinbalServeiDocPermesNie) {
+			pinbalServeiDocsPermesosEnumDto.add(PinbalServeiDocPermesEnumDto.NIE);
+		}
+		if (this.pinbalServeiDocPermesPas) {
+			pinbalServeiDocsPermesosEnumDto.add(PinbalServeiDocPermesEnumDto.PASSAPORT);
+		}
+		
+		return pinbalServeiDocsPermesosEnumDto;
+	}
+	
+	
+	
 	public void update(
 			String codi,
 			String nom,
@@ -215,7 +260,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			boolean pinbalActiu,
 			MetaDocumentPinbalServeiEnumDto pinbalServei,
-			String pinbalFinalitat) {
+			String pinbalFinalitat,
+			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
 		update(
 				codi,
 				nom,
@@ -239,6 +285,22 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.pinbalActiu = pinbalActiu;
 		this.pinbalServei = pinbalServei;
 		this.pinbalFinalitat = pinbalFinalitat;
+		
+		if (pinbalServeiDocsPermesos != null) {
+			this.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);
+			this.pinbalServeiDocPermesNif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF);
+			this.pinbalServeiDocPermesCif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF);
+			this.pinbalServeiDocPermesNie = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE);
+			this.pinbalServeiDocPermesPas = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT);
+		}	else {
+			this.pinbalServeiDocPermesDni = false;
+			this.pinbalServeiDocPermesNif = false;
+			this.pinbalServeiDocPermesCif = false;
+			this.pinbalServeiDocPermesNie = false;
+			this.pinbalServeiDocPermesPas = false;
+		}
+
+		
 	}
 
 	public void updatePlantilla(
@@ -264,7 +326,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			String ntiTipoDocumental,
 			boolean pinbalActiu,
-			String pinbalFinalitat) {
+			String pinbalFinalitat,
+			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
 		return new Builder(
 				entitat,
 				codi,
@@ -275,7 +338,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				ntiEstadoElaboracion,
 				ntiTipoDocumental,
 				pinbalActiu,
-				pinbalFinalitat);
+				pinbalFinalitat,
+				pinbalServeiDocsPermesos);
 	}
 	public static class Builder {
 		MetaDocumentEntity built;
@@ -289,7 +353,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 				String ntiTipoDocumental,
 				boolean pinbalActiu,
-				String pinbalFinalitat) {
+				String pinbalFinalitat,
+				List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;
@@ -307,6 +372,21 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.codiPropi = codi;
 			built.pinbalActiu = pinbalActiu;
 			built.pinbalFinalitat = pinbalFinalitat;
+			
+			if (pinbalServeiDocsPermesos != null) {
+				built.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);
+				built.pinbalServeiDocPermesNif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF);
+				built.pinbalServeiDocPermesCif = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF);
+				built.pinbalServeiDocPermesNie = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIE);
+				built.pinbalServeiDocPermesPas = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.PASSAPORT);
+			} else {
+				built.pinbalServeiDocPermesDni = false;
+				built.pinbalServeiDocPermesNif = false;
+				built.pinbalServeiDocPermesCif = false;
+				built.pinbalServeiDocPermesNie = false;
+				built.pinbalServeiDocPermesPas = false;
+			}
+			
 		}
 		public Builder biometricaLectura(boolean biometricaLectura) {
 			built.biometricaLectura = biometricaLectura;

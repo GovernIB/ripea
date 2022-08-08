@@ -91,7 +91,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la plantilla.
 	 * @return Informació bàsica del flux de firma.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public String recuperarUrlMostrarPlantilla(String plantillaFluxId);
 	
 	/**
@@ -101,7 +101,7 @@ public interface PortafirmesFluxService {
 	 * 				Id de la plantilla.
 	 * @return Informació bàsica del flux de firma.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public String recuperarUrlEdicioPlantilla(
 			String plantillaFluxId,
 			String returnUrl);

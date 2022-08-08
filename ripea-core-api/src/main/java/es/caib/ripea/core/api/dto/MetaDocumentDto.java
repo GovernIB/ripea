@@ -4,6 +4,7 @@
 package es.caib.ripea.core.api.dto;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -38,6 +39,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
+	private List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos;
 	private String pinbalFinalitat;
 	private boolean perDefecte;
 	private Long metaExpedientId;

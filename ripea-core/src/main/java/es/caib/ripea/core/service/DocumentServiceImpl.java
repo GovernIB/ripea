@@ -511,32 +511,32 @@ public class DocumentServiceImpl implements DocumentService {
 		InteressatEntity interessat = interessatRepository.findByExpedientAndId(expedient, consulta.getInteressatId());
 		if (interessat == null) {
 			throw new NotFoundException(consulta.getInteressatId(), InteressatEntity.class);
-		} else if (!(interessat instanceof InteressatPersonaFisicaEntity)) {
+		} else if (interessat instanceof InteressatAdministracioEntity) {
 			throw new ValidationException(
 					"<creacio>",
 					DocumentEntity.class,
-					"S'ha especificat un interessat que no és una persona física");
+					"S'ha especificat un interessat que no és una persona física o juridica");
 		}
 		String idPeticion;
 		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPCIWS02) {
 			idPeticion = pinbalHelper.novaPeticioSvddgpciws02(
 					expedient,
 					metaDocument,
-					(InteressatPersonaFisicaEntity)interessat,
+					interessat,
 					consulta.getFinalitat(),
 					consulta.getConsentiment());
 		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPVIWS02) {
 			idPeticion = pinbalHelper.novaPeticioSvddgpviws02(
 					expedient,
 					metaDocument,
-					(InteressatPersonaFisicaEntity)interessat,
+					interessat,
 					consulta.getFinalitat(),
 					consulta.getConsentiment());
 		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPASWS01) {
 			idPeticion = pinbalHelper.novaPeticioSvdccaacpasws01(
 					expedient,
 					metaDocument,
-					(InteressatPersonaFisicaEntity)interessat,
+					interessat,
 					consulta.getFinalitat(),
 					consulta.getConsentiment(),
 					consulta.getComunitatAutonomaCodi(),
@@ -550,17 +550,24 @@ public class DocumentServiceImpl implements DocumentService {
 		FitxerDto justificant = pinbalHelper.getJustificante(idPeticion);
 		DocumentDto document = new DocumentDto();
 		document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-		InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
-		StringBuilder nomSencer = new StringBuilder(interessatPf.getNom());
-		if (interessatPf.getLlinatge1() != null) {
-			nomSencer.append(" ");
-			nomSencer.append(interessatPf.getLlinatge1().trim());
+		
+		if (interessat instanceof InteressatPersonaFisicaEntity) {
+			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
+			StringBuilder nomSencer = new StringBuilder(interessatPf.getNom());
+			if (interessatPf.getLlinatge1() != null) {
+				nomSencer.append(" ");
+				nomSencer.append(interessatPf.getLlinatge1().trim());
+			}
+			if (interessatPf.getLlinatge2() != null) {
+				nomSencer.append(" ");
+				nomSencer.append(interessatPf.getLlinatge2().trim());
+			}
+			document.setNom(idPeticion + " - " + nomSencer.toString());
+		} else {
+			document.setNom(idPeticion + " - " + interessat.getIdentificador());
 		}
-		if (interessatPf.getLlinatge2() != null) {
-			nomSencer.append(" ");
-			nomSencer.append(interessatPf.getLlinatge2().trim());
-		}
-		document.setNom(idPeticion + " - " + nomSencer.toString());
+		
+		
 		document.setData(new Date());
 		document.setNtiOrgano(expedient.getNtiOrgano());
 		document.setNtiOrigen(NtiOrigenEnumDto.O1);

@@ -225,6 +225,6 @@ public interface EntitatService {
 	 * @param entitatDto
 	 *            Atribut entitatDto
 	 */
-	@PreAuthorize("hasRole('IPA_SUPER')")
+	@PreAuthorize("hasRole('tothom')")
 	public void setConfigEntitat(EntitatDto entitatDto);
 }

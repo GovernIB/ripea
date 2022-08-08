@@ -80,7 +80,8 @@ public class MetaDocumentHelper {
 				metaDocument.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isPinbalActiu(),
-				metaDocument.getPinbalFinalitat()).
+				metaDocument.getPinbalFinalitat(),
+				metaDocument.getPinbalServeiDocsPermesos()).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).

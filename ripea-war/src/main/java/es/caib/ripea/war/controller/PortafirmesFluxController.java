@@ -10,6 +10,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -67,6 +69,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 					urlReturn,
 					false);
 		} catch (Exception ex) {
+			logger.error("Error al iniciar transacio", ex);
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 			transaccioResponse.setError(true);
 			transaccioResponse.setErrorDescripcio(ex.getMessage());
@@ -180,5 +183,5 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
-
+	private static final Logger logger = LoggerFactory.getLogger(PortafirmesFluxController.class);
 }

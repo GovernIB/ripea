@@ -38,6 +38,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -128,17 +130,27 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
 		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitatId); 
-		List<String> organsCodisPermitted = null;
+		List<MetaExpedientEntity> procedimentsPermesAdminOrgan = null;
 		if (organActualId != null) {
-			organsCodisPermitted = organGestorRepository.findFillsCodis(entitat, Arrays.asList(organActualId));
-			OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organActualId);
-			organsCodisPermitted.add(organGestorEntity.getCodi());
+			
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organActualId);
+			List<OrganGestorEntity> organsPermesAdminOrgan = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
+			procedimentsPermesAdminOrgan = new ArrayList<>();
+			procedimentsPermesAdminOrgan.addAll(organGestor.getMetaExpedients());
+			
+			for (OrganGestorEntity organGestorEntity : organsPermesAdminOrgan) {
+				procedimentsPermesAdminOrgan.addAll(organGestorEntity.getMetaExpedients());
+			}
+			
+			if (procedimentsPermesAdminOrgan.isEmpty()) {
+				procedimentsPermesAdminOrgan = null;
+			}
 		}
 		
 		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
 				rolActual,
-				organsCodisPermitted,
+				procedimentsPermesAdminOrgan,
 				createWritePermIds ,
 				metaExpedient == null,
 				metaExpedient,

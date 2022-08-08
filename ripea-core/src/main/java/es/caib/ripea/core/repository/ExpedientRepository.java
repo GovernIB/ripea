@@ -104,7 +104,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
+			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and e.expedientEstat is null)) " +
 			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullSearch = true or lower(e.nom) like lower('%'||:search||'%') or lower(e.codi||'/'||e.sequencia||'/'||e.any) like lower('%'||:search||'%'))" +

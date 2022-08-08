@@ -28,9 +28,9 @@ public class MetaExpedientInterceptor extends HandlerInterceptorAdapter {
 				request, 
 				metaExpedientService);
 
-		if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
-			MetaExpedientHelper.setOrgansNoSincronitzats(request, metaExpedientService);
-		}
+//		if (RolHelper.isRolActualAdministrador(request) || RolHelper.isRolActualAdministradorOrgan(request)) {
+//			MetaExpedientHelper.setOrgansNoSincronitzats(request, metaExpedientService);
+//		}
 		return true;
 	}
 

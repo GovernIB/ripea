@@ -18,6 +18,8 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -208,6 +210,7 @@ public class MetaDocumentController extends BaseAdminController {
 				transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, true);
 			}
 		} catch (Exception ex) {
+			logger.error("Error al iniciar transacio", ex);
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
 			transaccioResponse.setError(true);
 			transaccioResponse.setErrorDescripcio(ex.getMessage());
@@ -280,5 +283,8 @@ public class MetaDocumentController extends BaseAdminController {
 				Boolean.parseBoolean(
 						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentController.class);
+
 
 }

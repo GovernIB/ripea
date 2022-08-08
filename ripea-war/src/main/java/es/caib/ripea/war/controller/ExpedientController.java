@@ -1083,9 +1083,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatsByMetaExpedient(
 				entitatActual.getId(),
 				metaExpedientId);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[0].name().toUpperCase(), Long.valueOf(0)));
+		
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
 		expedientEstatsOptions.addAll(estatsFromDatabase);
-		expedientEstatsOptions.add(new ExpedientEstatDto(ExpedientEstatEnumDto.values()[1].name().toUpperCase(), Long.valueOf(-1)));	
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
 		
 		logger.debug("findExpedientEstatByMetaExpedient time: " + (System.currentTimeMillis() - t0) + " ms");
 		return expedientEstatsOptions;
