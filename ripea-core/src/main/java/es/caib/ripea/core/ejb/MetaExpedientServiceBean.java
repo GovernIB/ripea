@@ -40,7 +40,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual,
-			boolean isCanviEstatDissenyAPendentByOrganAdmin, Long organId) {
+			MetaExpedientRevisioEstatEnumDto isCanviEstatDissenyAPendentByOrganAdmin, Long organId) {
 		return delegate.update(entitatId, metaExpedient, rolActual, isCanviEstatDissenyAPendentByOrganAdmin, organId);
 	}
 

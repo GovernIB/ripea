@@ -447,8 +447,7 @@ public class MetaExpedientHelper {
 
 			if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT) {
 				metaExpedientEntity.updateRevisioEstat(
-						MetaExpedientRevisioEstatEnumDto.PENDENT,
-						null);
+						MetaExpedientRevisioEstatEnumDto.PENDENT);
 				
 				emailHelper.canviEstatRevisioMetaExpedient(metaExpedientEntity, entitatId);
 			}
@@ -462,8 +461,7 @@ public class MetaExpedientHelper {
 
 		if (metaExpedientEntity.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.DISSENY) {
 			metaExpedientEntity.updateRevisioEstat(
-					MetaExpedientRevisioEstatEnumDto.DISSENY,
-					null);
+					MetaExpedientRevisioEstatEnumDto.DISSENY);
 			// No s'envia email mentre el meta-expedient està en DISSENY;
 			// s'enviarà quan el IPA_ORGAN_ADMIN canviï el seu estat a PENDENT
 		}
@@ -618,8 +616,7 @@ public class MetaExpedientHelper {
 		MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedientEntity.getRevisioEstat();
 		
 		metaExpedientEntity.updateRevisioEstat(
-				metaExpedient.getRevisioEstat(),
-				metaExpedient.getRevisioComentari());
+				metaExpedient.getRevisioEstat());
 
 		
 		if (estatAnterior == MetaExpedientRevisioEstatEnumDto.PENDENT && metaExpedient.getRevisioEstat() != MetaExpedientRevisioEstatEnumDto.PENDENT 

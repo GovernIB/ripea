@@ -44,7 +44,7 @@ public interface MetaExpedientService {
 	 * @param metaExpedient
 	 *            Informació del meta-expedient a modificar.
 	 * @param rolActual TODO
-	 * @param isCanviEstatDissenyAPendentOrganAdmin
+	 * @param estatAnterior
 	 * 			  Indica si la modificació del meta-expedient és un canvi d'estat 
 	 * 			  de disseny a pendent per part de l'admin d'òrgan.
 	 * @param organId TODO
@@ -56,7 +56,7 @@ public interface MetaExpedientService {
 	public MetaExpedientDto update(
 			Long entitatId,
 			MetaExpedientDto metaExpedient, String rolActual, 
-			boolean isCanviEstatDissenyAPendentOrganAdmin, Long organId) throws NotFoundException;
+			MetaExpedientRevisioEstatEnumDto estatAnterior, Long organId) throws NotFoundException;
 	
 	/**
 	 * Marca el meta-expedient especificat com a actiu/inactiu .

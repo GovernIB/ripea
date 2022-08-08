@@ -189,15 +189,21 @@
 	
 	<script>
 		$(document).ready(function(){
-
-			$('#revisioEstat').on('change', function() {
-				var estat = $(this).val();
-				if (estat=='REBUTJAT') {
-	            	$("label[for='revisioComentari']").append( " *" );
-				} else {
-					$("label[for='revisioComentari']").text( $("label[for='revisioComentari']").text().replace(' *', '') );
-				}
-			});
+			${isRolActualAdminOrgan}
+			<c:if test="${isRolActualAdminOrgan}">	
+				$('#revisioEstat').on('change', function() {
+					var revEst = $(this).val();
+					if (revEst == 'PENDENT' || revEst == 'DISSENY') {
+						$("#revisioEstat option[value='REVISAT']").remove();
+						$("#revisioEstat option[value='REBUTJAT']").remove();
+					} else if (revEst == 'REBUTJAT') {
+						$("#revisioEstat option[value='REVISAT']").remove();
+						$("#revisioEstat option[value='PENDENT']").remove();
+					}
+					
+				});
+				$("#revisioEstat").trigger('change');
+			</c:if>
 					
 		});
 	
@@ -295,7 +301,7 @@
 					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio"/>
 				</c:if>
 				<c:if test="${isRolAdminOrgan}">
-					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatPerAdminOrganEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${bloquejarCamps}"/>
+					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${bloquejarCamps}"/>
 				</c:if>
 				<c:if test="${isRolActualRevisor}">
 					<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${bloquejarCamps}"/>

@@ -151,7 +151,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else {
-			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
+			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
 			if (metaExpedient.isCrearReglaDistribucio()) {
 				metaExpedientDto.setCrearReglaResponse(metaExpedientHelper.crearReglaDistribucio(metaExpedientEntity.getId()));
 			}
@@ -161,7 +161,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional
 	@Override
-	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, boolean isCanviEstatDissenyAPendentByOrganAdmin, Long organId) {
+	public MetaExpedientDto update(Long entitatId, MetaExpedientDto metaExpedient, String rolActual, MetaExpedientRevisioEstatEnumDto estatAnterior, Long organId) {
 		logger.debug(
 				"Actualitzant meta-expedient existent (" + "entitatId=" + entitatId + ", " + "metaExpedient=" +
 						metaExpedient + ")");
@@ -196,9 +196,9 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 		
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
-			if (isCanviEstatDissenyAPendentByOrganAdmin)
+			if (estatAnterior == MetaExpedientRevisioEstatEnumDto.DISSENY && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT)
 				marcarPendentRevisio(entitatId,  metaExpedientEntity.getId(), organId);
-			else
+			else 
 				metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else if ("IPA_ADMIN".equals(rolActual)){
 			metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
@@ -258,7 +258,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if ("IPA_ORGAN_ADMIN".equals(rolActual)) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		} else {
-			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT, null);
+			metaExpedientEntity.updateRevisioEstat(MetaExpedientRevisioEstatEnumDto.REVISAT);
 		}
 
 		if (metaExpedient.getMetaDocuments() != null) {

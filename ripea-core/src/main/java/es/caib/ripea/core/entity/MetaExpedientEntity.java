@@ -93,7 +93,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	@Enumerated(EnumType.STRING)
 	private MetaExpedientRevisioEstatEnumDto revisioEstat;
 	@Column(name = "revisio_comentari", length = 1024)
-	private String revisioComentari;
+	private String revisioComentari; // TODO to delete in next version
 	
 	@OneToMany(
 			mappedBy = "metaExpedient",
@@ -157,10 +157,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     }
 	
 	public void updateRevisioEstat(
-			MetaExpedientRevisioEstatEnumDto revisioEstat,
-			String revisioComentari) {
+			MetaExpedientRevisioEstatEnumDto revisioEstat) {
         this.revisioEstat = revisioEstat;
-        this.revisioComentari = revisioComentari;
     }
 
 	public void updateSync(

@@ -3,13 +3,57 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
-import es.caib.ripea.core.api.dto.*;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -33,28 +77,6 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controlador per al manteniment de meta-expedients.
@@ -213,6 +235,8 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 		}
 		
+		model.addAttribute("isRolActualAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
+		
 		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
 		
 		fillFormModel(
@@ -249,17 +273,10 @@ public class MetaExpedientController extends BaseAdminController {
 		if (command.getId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), command.getId());
 
-			if (rolActual.equals("IPA_ORGAN_ADMIN") && metaExpedientService.isRevisioActiva()) {
-				MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, command.getId());
-				MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedient.getRevisioEstat();
-				boolean isCanviEstatDissenyAPendentByOrganAdmin = !dto.getRevisioEstat().equals(estatAnterior) 
-						&& estatAnterior.equals(MetaExpedientRevisioEstatEnumDto.DISSENY) 
-						&& dto.getRevisioEstat().equals(MetaExpedientRevisioEstatEnumDto.PENDENT);
-				metaExpedientService.update(entitatActual.getId(), dto, rolActual, isCanviEstatDissenyAPendentByOrganAdmin, organActual != null ? organActual.getId() : null);
-			} else {
-				metaExpedientService.update(entitatActual.getId(), dto, rolActual, false, organActual != null ? organActual.getId() : null);
-			}
-			
+			MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, command.getId());
+			MetaExpedientRevisioEstatEnumDto estatAnterior = metaExpedient.getRevisioEstat();
+			metaExpedientService.update(entitatActual.getId(), dto, rolActual, estatAnterior, organActual != null ? organActual.getId() : null);
+		
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
@@ -496,7 +513,6 @@ public class MetaExpedientController extends BaseAdminController {
 		} catch (Exception e) {
 			
 			logger.error("Error al importar procediment", e);
-			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:metaExpedient",
