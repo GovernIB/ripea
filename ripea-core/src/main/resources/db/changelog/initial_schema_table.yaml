@@ -123,40 +123,6 @@ databaseChangeLog:
             type: BIGINT
         tableName: ipa_contingut
 - changeSet:
-    id: init-4
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: ipa_cont_comment_pk
-            name: id
-            type: BIGINT
-        - column:
-            name: text
-            type: VARCHAR2(1024)
-        - column:
-            constraints:
-              nullable: false
-            name: contingut_id
-            type: BIGINT
-        - column:
-            name: createdby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: createddate
-            type: TIMESTAMP
-        - column:
-            name: lastmodifiedby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: lastmodifieddate
-            type: TIMESTAMP
-        tableName: ipa_cont_comment
-- changeSet:
     id: init-5
     author: limit (generated)
     changes:
@@ -1174,67 +1140,6 @@ databaseChangeLog:
             type: TIMESTAMP
         tableName: ipa_expedient_estat
 - changeSet:
-    id: init-19
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: ipa_expedient_filtre_pk
-            name: id
-            type: BIGINT
-        - column:
-            name: meta_expedient_id
-            type: BIGINT
-        - column:
-            name: nom
-            type: VARCHAR2(256)
-        - column:
-            name: data_creacio_inici
-            type: TIMESTAMP
-        - column:
-            name: data_creacio_fi
-            type: TIMESTAMP
-        - column:
-            name: numero
-            type: VARCHAR2(256)
-        - column:
-            name: estat
-            type: VARCHAR2(256)
-        - column:
-            name: data_tancat_inici
-            type: TIMESTAMP
-        - column:
-            name: data_tancat_fi
-            type: TIMESTAMP
-        - column:
-            name: meus_expedients
-            type: BOOLEAN
-        - column:
-            constraints:
-              nullable: false
-            name: filter_name
-            type: VARCHAR2(256)
-        - column:
-            name: last_used_date
-            type: TIMESTAMP
-        - column:
-            name: createdby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: createddate
-            type: TIMESTAMP
-        - column:
-            name: lastmodifiedby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: lastmodifieddate
-            type: TIMESTAMP
-        tableName: ipa_expedient_filtre
-- changeSet:
     id: init-20
     author: limit (generated)
     changes:
@@ -2015,9 +1920,6 @@ databaseChangeLog:
             name: global_expedient
             type: BOOLEAN
         - column:
-            name: global_multiplicitat
-            type: VARCHAR2(255)
-        - column:
             name: global_readonly
             type: BOOLEAN
         - column:
@@ -2171,53 +2073,6 @@ databaseChangeLog:
             name: grup_id
             type: BIGINT
         tableName: ipa_metaexpedient_grup
-- changeSet:
-    id: init-39
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: ipa_metaexp_metadoc_pk
-            name: id
-            type: BIGINT
-        - column:
-            name: multiplicitat
-            type: VARCHAR2(255)
-        - column:
-            constraints:
-              nullable: false
-            name: ordre
-            type: INTEGER
-        - column:
-            name: readonly
-            type: BOOLEAN
-        - column:
-            constraints:
-              nullable: false
-            name: metadocument_id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: metaexpedient_id
-            type: BIGINT
-        - column:
-            name: createdby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: createddate
-            type: TIMESTAMP
-        - column:
-            name: lastmodifiedby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: lastmodifieddate
-            type: TIMESTAMP
-        tableName: ipa_metaexpedient_metadocument
 - changeSet:
     id: init-40
     author: limit (generated)
@@ -2411,53 +2266,6 @@ databaseChangeLog:
             name: version
             type: BIGINT
         tableName: ipa_metanode
-- changeSet:
-    id: init-44
-    author: limit (generated)
-    changes:
-    - createTable:
-        columns:
-        - column:
-            constraints:
-              nullable: false
-              primaryKey: true
-              primaryKeyName: ipa_metanode_metadada_pk
-            name: id
-            type: BIGINT
-        - column:
-            name: multiplicitat
-            type: VARCHAR2(256)
-        - column:
-            constraints:
-              nullable: false
-            name: ordre
-            type: INTEGER
-        - column:
-            constraints:
-              nullable: false
-            name: metadada_id
-            type: BIGINT
-        - column:
-            constraints:
-              nullable: false
-            name: metanode_id
-            type: BIGINT
-        - column:
-            name: readonly
-            type: BOOLEAN
-        - column:
-            name: createdby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: createddate
-            type: TIMESTAMP
-        - column:
-            name: lastmodifiedby_codi
-            type: VARCHAR2(64)
-        - column:
-            name: lastmodifieddate
-            type: TIMESTAMP
-        tableName: ipa_metanode_metadada
 - changeSet:
     id: init-45
     author: limit (generated)

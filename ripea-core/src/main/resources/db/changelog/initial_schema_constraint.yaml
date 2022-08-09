@@ -20,56 +20,6 @@ databaseChangeLog:
         referencedColumnNames: codi
         referencedTableName: ipa_usuari
 - changeSet:
-    id: init-constraint-3
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: createdby_codi
-        baseTableName: ipa_cont_comment
-        constraintName: ipa_cont_com_createdby_fk
-        referencedColumnNames: codi
-        referencedTableName: ipa_usuari
-- changeSet:
-    id: init-constraint-4
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: lastmodifiedby_codi
-        baseTableName: ipa_cont_comment
-        constraintName: ipa_cont_com_lastmodby_fk
-        referencedColumnNames: codi
-        referencedTableName: ipa_usuari
-- changeSet:
-    id: init-constraint-5
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: contingut_id
-        baseTableName: ipa_cont_comment
-        constraintName: ipa_cont_com_contingut_fk
-        referencedColumnNames: id
-        referencedTableName: ipa_contingut
-- changeSet:
-    id: init-constraint-6
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: createdby_codi
-        baseTableName: ipa_metaexpedient_metadocument
-        constraintName: ipa_mexp_mdoc_createdby_fk
-        referencedColumnNames: codi
-        referencedTableName: ipa_usuari
-- changeSet:
-    id: init-constraint-7
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: lastmodifiedby_codi
-        baseTableName: ipa_metaexpedient_metadocument
-        constraintName: ipa_mexp_mdoc_lastmodby_fk
-        referencedColumnNames: codi
-        referencedTableName: ipa_usuari
-- changeSet:
     id: init-constraint-8
     author: limit (generated)
     changes:
@@ -480,16 +430,6 @@ databaseChangeLog:
         referencedColumnNames: id
         referencedTableName: ipa_metadada
 - changeSet:
-    id: init-constraint-50
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: metadada_id
-        baseTableName: ipa_metanode_metadada
-        constraintName: ipa_mnode_mdada_metadada_fk
-        referencedColumnNames: id
-        referencedTableName: ipa_metadada
-- changeSet:
     id: init-constraint-51
     author: limit (generated)
     changes:
@@ -527,16 +467,6 @@ databaseChangeLog:
         baseColumnNames: meta_expedient_id
         baseTableName: ipa_metadocument
         constraintName: ipa_metadoc_metaexp_fk
-        referencedColumnNames: id
-        referencedTableName: ipa_metaexpedient
-- changeSet:
-    id: init-constraint-55
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: metaexpedient_id
-        baseTableName: ipa_metaexpedient_metadocument
-        constraintName: ipa_metaexp_metadoc_metaexp_fk
         referencedColumnNames: id
         referencedTableName: ipa_metaexpedient
 - changeSet:
@@ -599,16 +529,6 @@ databaseChangeLog:
         constraintName: ipa_mexp_tasca_exp_est_fi_fk
         referencedColumnNames: id
         referencedTableName: ipa_expedient_estat
-- changeSet:
-    id: init-constraint-62
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: metanode_id
-        baseTableName: ipa_metanode_metadada
-        constraintName: ipa_mnode_mdada_metanode_fk
-        referencedColumnNames: id
-        referencedTableName: ipa_metanode
 - changeSet:
     id: init-constraint-63
     author: limit (generated)
@@ -950,16 +870,6 @@ databaseChangeLog:
         referencedColumnNames: codi
         referencedTableName: ipa_usuari
 - changeSet:
-    id: init-constraint-97
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: createdby_codi
-        baseTableName: ipa_metanode_metadada
-        constraintName: ipa_mnode_mdada_createdby_fk
-        referencedColumnNames: codi
-        referencedTableName: ipa_usuari
-- changeSet:
     id: init-constraint-98
     author: limit (generated)
     changes:
@@ -1097,16 +1007,6 @@ databaseChangeLog:
         baseColumnNames: lastmodifiedby_codi
         baseTableName: ipa_interessat
         constraintName: ipa_interessat_lastmodby_fk
-        referencedColumnNames: codi
-        referencedTableName: ipa_usuari
-- changeSet:
-    id: init-constraint-112
-    author: limit (generated)
-    changes:
-    - addForeignKeyConstraint:
-        baseColumnNames: lastmodifiedby_codi
-        baseTableName: ipa_metanode_metadada
-        constraintName: ipa_mnode_mdada_lastmodby_fk
         referencedColumnNames: codi
         referencedTableName: ipa_usuari
 - changeSet:
