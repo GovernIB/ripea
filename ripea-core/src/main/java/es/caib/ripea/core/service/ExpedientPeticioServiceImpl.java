@@ -462,7 +462,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					null, 
 					arxiuUuid, 
 					null, 
-					false, 
+					true, 
 					false);
 			DocumentDto document = expedientHelper.toDocumentDto(
 					documentDetalls, 
