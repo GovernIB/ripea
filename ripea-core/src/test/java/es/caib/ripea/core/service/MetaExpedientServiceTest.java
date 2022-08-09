@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
@@ -165,7 +166,10 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 						metaExpedientUpdate.setId(metaExpedientCreat.getId());
 						MetaExpedientDto modificat = metaExpedientService.update(
 								entitatCreada.getId(),
-								metaExpedientUpdate, null, false, null);
+								metaExpedientUpdate,
+								null,
+								MetaExpedientRevisioEstatEnumDto.DISSENY,
+								null);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(

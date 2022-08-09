@@ -55,8 +55,10 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public MetaExpedientDto update(
 			Long entitatId,
-			MetaExpedientDto metaExpedient, String rolActual, 
-			MetaExpedientRevisioEstatEnumDto estatAnterior, Long organId) throws NotFoundException;
+			MetaExpedientDto metaExpedient,
+			String rolActual,
+			MetaExpedientRevisioEstatEnumDto estatAnterior,
+			Long organId) throws NotFoundException;
 	
 	/**
 	 * Marca el meta-expedient especificat com a actiu/inactiu .
