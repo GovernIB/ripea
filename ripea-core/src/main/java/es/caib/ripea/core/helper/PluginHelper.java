@@ -2611,10 +2611,14 @@ public class PluginHelper {
 				if (provincia == null) {
 					throw new NotFoundException(interessatPerAdresa.getProvincia(), ProvinciaDto.class);
 				}
-				MunicipiDto municipi = dadesExternesHelper.getMunicipiAmbCodi(interessatPerAdresa.getProvincia(), interessatPerAdresa.getMunicipi());
+				MunicipiDto municipi = null;
+				if (interessatPerAdresa.getMunicipi() != null) {
+					municipi = dadesExternesHelper.getMunicipiAmbCodi(interessatPerAdresa.getProvincia(), interessatPerAdresa.getMunicipi());
+				}
 				if (municipi == null) {
 					throw new NotFoundException(interessatPerAdresa.getMunicipi(), MunicipiDto.class);
 				}
+
 				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
 				enviament.setEntregaPostalPaisCodi(pais.getAlfa2());
 				enviament.setEntregaPostalProvinciaCodi(provincia.getCodi());

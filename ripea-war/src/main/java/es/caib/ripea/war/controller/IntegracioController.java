@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.common.base.Strings;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.war.command.IntegracioFiltreCommand;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
