@@ -11,8 +11,6 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.*;
-import es.caib.ripea.core.repository.AvisRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -36,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,10 +50,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Autowired
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
 	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private AvisRepository avisRepository;
-	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
@@ -68,6 +63,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
@@ -205,14 +202,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 //	@Transactional
-	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto) throws Exception {
+	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto, Locale locale) throws Exception {
 	    EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false, false, false);
 		ConfigHelper.setEntitat(entitatDto);
+		MessageHelper.setCurrentLocale(locale);
 		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
-			throw new Exception("L'entitat actual no té cap codi DIR3 associat");
+			throw new Exception(msg("unitat.synchronize.error.dir3"));
 		}
 
-		// Comprova si hi ha una altre instància del procés en execució
+		// Comprova si hi ha una altra instància del procés en execució
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitat.getCodi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			logger.debug("[ORGANS GESTORS] Ja existeix un altre procés que està executant l'actualització");
@@ -224,55 +222,63 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		progresActualitzacio.put(entitat.getCodi(), progres);
 
 		progres.setNumOperacions(100);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Actualització d''òrgans gestors").infoText("Inici del procés de sincronització dels òrgans gestors").build());
+		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.actualitzar")).infoText(msg("unitat.synchronize.info.actualitzar.inici")).build());
 		progres.setProgres(1);
-
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Obtenció dels canvis de l''organigrama").infoText("Obtenció dels òrgans gestors que han estat modificats en el DIR3 des de la última sincronització").build());
-		List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-				entitat.getUnitatArrel(),
-				entitat.getDataActualitzacio(),
-				entitat.getDataSincronitzacio());
-		progres.setProgres(2);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Obtenció dels canvis de l''organigrama").infoText("Finalitzada la Obtenció dels òrgans gestors modificats en el DIR3." + (unitatsWs.isEmpty() ? " No s'han obtingut organs gestors amb canvis." : " Obtinguts " + unitatsWs.size() + " òrgans gestors amb canvis.")).build());
 
 		List<OrganGestorEntity> obsoleteUnitats = new ArrayList<>();
 		List<OrganGestorEntity> organsDividits = new ArrayList<>();
 		List<OrganGestorEntity> organsFusionats = new ArrayList<>();
 		List<OrganGestorEntity> organsSubstituits = new ArrayList<>();
 
-		// 2. Sincronitzar òrgans
-		progres.setFase(1);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Sincronització d''òrgans gestors").infoText("Inici del procés d''actualització dels òrgans gestors modificats en el DIR3 des de la última sincronització").build());
-		organGestorHelper.sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
-		progres.setProgres(27);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Sincronització d''òrgans gestors").infoText("Finalitzat el procés d''actualització dels òrgans gestors modificats en el DIR3 des de la última sincronització").build());
+		try {
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(msg("unitat.synchronize.info.organigrama.inici")).build());
+			List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+					entitat.getUnitatArrel(),
+					entitat.getDataActualitzacio(),
+					entitat.getDataSincronitzacio());
+			progres.setProgres(2);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(unitatsWs.isEmpty() ? msg("unitat.synchronize.info.organigrama.fi.buid") : msg("unitat.synchronize.info.organigrama.fi", unitatsWs.size())).build());
 
-		// Actualitzar procediments
-		progres.setFase(2);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Sincronització de procediments").infoText("Inici del procés d'actualització dels procediments").build());
-		metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), "ca");
-		progres.setProgres(51);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Sincronització de procediments").infoText("Finalitzat el procés d'actualització dels procediments").build());
+			// 2. Sincronitzar òrgans
+			progres.setFase(1);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
+			organGestorHelper.sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+			progres.setProgres(27);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.fi")).build());
 
-		// Actualitzar permisos
-		progres.setFase(3);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Actualització de permisos").infoText("Inici del procés d'actualització de permisos. Es copiaran els permisos dels òrgans que hagin quedat obsolets cap als òrgans que els substitueixen.").build());
-		permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
-		progres.setProgres(75);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Actualització de permisos").infoText("Finalitzat el procés d'actualització de permisos").build());
+			// Actualitzar procediments
+			progres.setFase(2);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.inici")).build());
+			metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), locale);
+			progres.setProgres(51);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
 
-		// Eliminar organs no vigents no utilitzats??
-		progres.setFase(4);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Eliminació d''òrgans obsolets").infoText("Inici del procés d'eliminació dels òrgans gestors obsolets. S'eliminaran únicamnent els que no hagin estat utilitzats.").build());
-		organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
-		progres.setProgres(99);
-		progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Eliminació d''òrgans obsolets").infoText("Finalitzat del procés d'eliminació dels òrgans gestors obsolets").build());
+			// Actualitzar permisos
+			progres.setFase(3);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
+			permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
+			progres.setProgres(75);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
 
-		cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
-		cacheHelper.evictAllOrganismesEntitatAmbPermis();
+			// Eliminar organs no vigents no utilitzats??
+			progres.setFase(4);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.inici")).build());
+			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
+			progres.setProgres(99);
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.fi")).build());
 
-		progres.setProgres(100);
-		progres.setFinished(true);
+			cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
+			cacheHelper.evictAllOrganismesEntitatAmbPermis();
+
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-success").infoTitol(msg("unitat.synchronize.titol.actualitzar")).infoText(msg("unitat.synchronize.info.actualitzar.fi")).build());
+		} catch (Exception ex) {
+			progres.addInfo(ActualitzacioInfo.builder().hasError(true).infoTitol(msg("unitat.synchronize.titol.error")).errorText("S'ha produit un error al realitzar la sincronització dels òrgans gestors: " + ex.getMessage()).build());
+			throw ex;
+		} finally {
+			progres.setProgres(100);
+			progres.setFinished(true);
+		}
+
 		return new ArrayList[]{(ArrayList) obsoleteUnitats, (ArrayList) organsDividits, (ArrayList) organsFusionats, (ArrayList) organsSubstituits};
 	}
 
@@ -301,7 +307,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Obtenir els òrgans vigents a la BBDD
 			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);
 			logger.debug("Consulta d'unitats vigents a DB");
-			for(OrganGestorEntity organVigent: organsVigents){
+			for (OrganGestorEntity organVigent : organsVigents) {
 				logger.debug(organVigent.toString());
 			}
 
@@ -318,7 +324,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				int transicionsVigents = 0;
 				if (!vigentObsolete.getLastHistoricosUnitats().isEmpty()) {
 					boolean extingit = true;
-					for (UnitatOrganitzativaDto hist: vigentObsolete.getLastHistoricosUnitats()) {
+					for (UnitatOrganitzativaDto hist : vigentObsolete.getLastHistoricosUnitats()) {
 						if (OrganEstatEnumDto.V.name().equals(hist.getEstat())) {
 							transicionsVigents++;
 						}
@@ -384,6 +390,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					.mergeMap(mergeMap)
 					.build();
 
+		} catch (SistemaExternException sex) {
+			throw sex;
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					IntegracioHelper.INTCODI_UNITATS,
@@ -1000,4 +1008,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		this.pluginHelper = (PluginHelper)pluginHelper;
 	}
 
+	private String msg(String codi) {
+		return messageHelper.getMessage(codi);
+	}
+	private String msg(String codi, Object... params) {
+		return messageHelper.getMessage(codi, params);
+	}
 }

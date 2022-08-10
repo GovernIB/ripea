@@ -13,6 +13,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Implementació de MetaExpedientService com a EJB que empra una clase
@@ -459,8 +460,8 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public void actualitzaProcediments(EntitatDto entitat, String lang) {
-		delegate.actualitzaProcediments(entitat, lang);
+	public void actualitzaProcediments(EntitatDto entitat, Locale locale) {
+		delegate.actualitzaProcediments(entitat, locale);
 	}
 
     @Override

@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Declaració dels mètodes per a la gestió de meta-expedients.
@@ -91,12 +92,12 @@ public interface OrganGestorService {
 	 * @throws Exception 
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception;
+	public Object[] syncDir3OrgansGestors(EntitatDto entitat, Locale locale) throws Exception;
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception;
 
-	@PreAuthorize("hasRole('NOT_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi);
 
 

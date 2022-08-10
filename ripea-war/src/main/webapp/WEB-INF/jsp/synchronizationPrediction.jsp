@@ -23,6 +23,7 @@
 	<rip:modalHead />
 	<script>
 		var itervalProgres;
+		var finished = false;
 		var writtenBlocs = 0;
 		var title="<spring:message code="organgestor.actualitzacio.titol"/>";
 		var content="<spring:message code="organgestor.actualitzacio.cancelarActu"/>";
@@ -45,15 +46,20 @@
 		<c:if test="${not isUpdatingProcediments}">
 		var isUpdating = false;
 		$(document).ready(function() {
-			$('#formUpdateAuto').on("submit", function(){
+			$('#formSync').on("submit", function(){
 				console.log("submitting...");
+				finished = false;
 				$('.loading').fadeIn();
+				let alt = $('body').height() - 60;
+				$('#actualitzacioInfo').css("height", alt + "px");
+				$('#actualitzacioInfo').css("max-height", alt + "px");
 				$('#actualitzacioInfo').fadeIn();
-				$('.confirmacio').fadeOut();
+				$('.prediccio').fadeOut();
 				$('#autobtn', parent.document).prop('disabled', true);
 				$('#cancelbtn', parent.document).toggle(true);
 				$.post($(this).attr('action'));
 				isUpdating = true;
+				$('.close', parent.document).on('click', dismissFunction);
 				refreshProgres();
 				return false;
 			});
@@ -80,7 +86,7 @@
 		</c:if>
 		function refreshProgres() {
 			console.log("refreshProgres");
-			itervalProgres =  setInterval(function(){ getProgres(); }, 250);
+			itervalProgres =  setInterval(function(){ getProgres(); }, 500);
 		}
 
 		function getProgres() {
@@ -92,26 +98,30 @@
 				success: function(data) {
 					if (data) {
 						console.log("Progres:", data);
-						writeInfo(data);
-						$('#cancelbtn', parent.document).toggle(true);
-						if (data.progres == 100) {
-							clearInterval(itervalProgres);
-							isUpdating = false;
-							$('#bar').css('width', '100%');
-							$('#bar').attr('aria-valuenow', 100);
-							$('#bar').html('100%');
-							$('.close', parent.document).prop('disabled', false);
-							$('.loading').hide();
-						} else {
-							if (data.progres > 0) {
-								$('.loading').hide();
-								$('.progress').show();
-								$('#bar').css('width', data.progres + '%');
-								$('#bar').attr('aria-valuenow', data.progres);
-								$('#bar').html(data.progres + '%');
-							}else if(data.progres == 0 && data.numElementsActualitzats == 0 ){
+						if (!finished) {
+							writeInfo(data);
+							$('#cancelbtn', parent.document).toggle(true);
+							if (data.finished) {
+								finished = true;
+								clearInterval(itervalProgres);
+								isUpdating = false;
+								$('#bar').css('width', '100%');
+								$('#bar').attr('aria-valuenow', 100);
+								$('#bar').html('100%');
 								$('.close', parent.document).prop('disabled', false);
 								$('.loading').hide();
+								$('.progress').show();
+							} else {
+								if (data.progres > 0) {
+									$('.loading').hide();
+									$('.progress').show();
+									$('#bar').css('width', data.progres + '%');
+									$('#bar').attr('aria-valuenow', data.progres);
+									$('#bar').html(data.progres + '%');
+								} else if (data.progres == 0 && data.numElementsActualitzats == 0) {
+									$('.close', parent.document).prop('disabled', false);
+									$('.loading').hide();
+								}
 							}
 						}
 					}
@@ -128,7 +138,8 @@
 		function writeInfo(data) {
 			let info = data.info;
 			let index;
-
+			console.log("Write info. Written bloks = " + writtenBlocs + ", info bloks = " + info.length);
+			let scroll = writtenBlocs < info.length;
 			for (index = writtenBlocs; index < info.length; index++) {
 				// $("#bcursor").before("<p class='info-" + info[index].tipus + "'>" + info[index].text + "</p>");
 				let blocContent = '';
@@ -170,9 +181,9 @@
 					blocContent += '</ul>';
 				}
 				$("#bcursor").before(
-						'<div class="panel ' + (info[index].hasError ? 'panel-danger' : info[index].hasCanvis ? 'panel-info' : 'panel-default') + '">' +
+						'<div class="panel ' + (info[index].infoClass ? info[index].infoClass : (info[index].hasError ? 'panel-danger' : info[index].hasCanvis ? 'panel-info' : 'panel-default')) + '">' +
 						'  <div class="panel-heading">' +
-						'    <h3 class="panel-title">' + (info[index].hasInfo ? info[index].infoTitol : info[index].isOrgan ? "Òrgan gestor: " + info[index].codiOrgan + ' - ' + info[index].nomAntic : 'Procediment: ' + info[index].codiSia + ' - ' + info[index].nomAntic) + '</h3>' +
+						'    <h3 class="panel-title">' + (info[index].infoTitol ? info[index].infoTitol : info[index].isOrgan ? "Òrgan gestor: " + info[index].codiOrgan + ' - ' + info[index].nomAntic : 'Procediment: ' + info[index].codiSia + ' - ' + info[index].nomAntic) + '</h3>' +
 						'  </div>' +
 						'  <div class="panel-body">' + blocContent + '</div>' +
 						'</div>');
@@ -182,13 +193,14 @@
 				$("#bcursor").before("<p class='info-ERROR'>" + data.errorMsg + "</p>");
 			}
 			//scroll to the bottom of "#actualitzacioInfo"
-			let scroll = writtenBlocs < info.length;
+			// let scroll = writtenBlocs < info.length;
+			console.log("Scroll: " + scroll);
 			if (scroll) {
 				var infoDiv = document.getElementById("actualitzacioInfo");
 				infoDiv.scrollTop = infoDiv.scrollHeight;
 			}
 		}
-		function cancela() {
+		function dismissFunction() {
 			if (!isUpdating) {
 				window.top.location.reload();
 				return;
@@ -216,7 +228,7 @@
 </head>
 <body>
 
-	<div class="panel-group">
+	<div class="panel-group prediccio">
 	
 		<!-- If this is first sincronization it shows all currently vigent unitats that will be created in db  -->
 		<c:if test="${isFirstSincronization}">
@@ -458,16 +470,16 @@
     </div>
 
 	<c:set var="formAction">
-		<rip:modalUrl value="/unitatOrganitzativa/saveSynchronize" />
+		<rip:modalUrl value="/organgestor/saveSynchronize" />
 	</c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" role="form">
+	<form:form id="formSync" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"
+			<button id="autobtn" type="submit" class="btn btn-success" data-noloading="true"
 				<c:if test="${isAllEmpty and !isFirstSincronization}"><c:out value="disabled='disabled'"/></c:if>>
 				<span class="fa fa-save"></span>
 				<spring:message code="unitat.list.boto.synchronize" />
 			</button>
-			<a href="<c:url value="/organgestor"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
+			<a id="cancelbtn" href="<c:url value="/organgestor"/>" class="btn btn-default" onclick="dismissFunction()" data-modal-cancel="false"><spring:message code="comu.boto.cancelar" /></a>
 		</div>
 	</form:form>
 

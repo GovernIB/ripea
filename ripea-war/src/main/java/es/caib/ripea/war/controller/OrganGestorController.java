@@ -159,13 +159,14 @@ public class OrganGestorController extends BaseUserOAdminController {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			organGestorService.syncDir3OrgansGestors(entitatActual);
+			organGestorService.syncDir3OrgansGestors(entitatActual, request.getLocale());
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar", e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../organgestor",
-					e.getMessage());
+					getMessage(request, "unitat.controller.syncronize.ko") + e.getMessage(),
+					e);
 		}
 
 		return getModalControllerReturnValueSuccess(

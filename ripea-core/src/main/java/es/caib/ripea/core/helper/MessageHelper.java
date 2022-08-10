@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.util.Locale;
-
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
 
 /**
  * Helper per a mostrar missatges multiidioma.
@@ -18,12 +18,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageHelper implements MessageSourceAware {
 
+	private static ThreadLocal<Locale> currentLocale = new ThreadLocal<>();
+
+	public static void setCurrentLocale(Locale locale) {
+		MessageHelper.currentLocale.set(locale);
+	}
+
+
 	private MessageSource messageSource;
+
 
 	public String getMessage(String[] keys, Object[] vars, Locale locale) {
 		String msg = "???" + (keys.length > 0 ? keys[keys.length-1] : "") + "???";
 		boolean found = false;
 		int i = 0;
+		if (locale == null) {
+			locale = MessageHelper.currentLocale.get();
+		}
 		while( ! found && i < keys.length) {		
 			try {
 				msg = messageSource.getMessage(
@@ -44,6 +55,9 @@ public class MessageHelper implements MessageSourceAware {
 		return msg;
 	}
 	public String getMessage(String key, Object[] vars, Locale locale) {
+		if (locale == null) {
+			locale = MessageHelper.currentLocale.get();
+		}
 		try {
 			return messageSource.getMessage(
 					key,

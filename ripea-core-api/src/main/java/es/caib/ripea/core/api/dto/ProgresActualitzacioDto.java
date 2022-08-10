@@ -18,10 +18,14 @@ public class ProgresActualitzacioDto {
 	
 	boolean error = false;
 	String errorMsg;
-	
+
 	public void addInfo(ActualitzacioInfo detall) {
+		addInfo(detall, false);
+	}
+	public void addInfo(ActualitzacioInfo detall, boolean incrementar) {
 		info.add(detall);
-		incrementElementsActualitzats();
+		if (incrementar)
+			incrementElementsActualitzats();
 	}
 	
 	public void incrementElementsActualitzats() {
@@ -30,7 +34,7 @@ public class ProgresActualitzacioDto {
 		}
 		this.numElementsActualitzats++;
 		double auxprogres = (this.numElementsActualitzats.doubleValue()  / this.numOperacions.doubleValue()) * 100;
-		this.progres = (int) auxprogres;
+		this.setProgres((int) auxprogres);
 	}
 
 }

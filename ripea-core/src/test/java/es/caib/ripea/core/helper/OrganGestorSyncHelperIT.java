@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/es/caib/ripea/core/application-context-sync-test.xml"})
@@ -105,7 +106,7 @@ public class OrganGestorSyncHelperIT {
         ObjectMapper mapper = new ObjectMapper();
 
         Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.anyString(), Mockito.nullable(Date.class), Mockito.nullable(Date.class))).thenReturn((List<UnitatOrganitzativa>) mapper.readValue(UNITATS_JSON, new TypeReference<List<UnitatOrganitzativa>>(){}));
-        Mockito.doNothing().when(metaExpedientHelper).actualitzarProcediments(Mockito.any(EntitatDto.class), Mockito.anyString());
+        Mockito.doNothing().when(metaExpedientHelper).actualitzarProcediments(Mockito.any(EntitatDto.class), Mockito.any(Locale.class));
         Mockito.when(pluginHelper.dadesUsuariFindAmbCodi(Mockito.anyString())).thenReturn(null);
 
     }
@@ -122,7 +123,7 @@ public class OrganGestorSyncHelperIT {
         EntitatDto entitatDto = new EntitatDto();
         entitatDto.setId(1L);
         entitatDto.setCodi("ENTITAT_TESTS");
-        List<OrganGestorEntity>[] result = (List<OrganGestorEntity>[])organGestorService.syncDir3OrgansGestors(entitatDto);
+        List<OrganGestorEntity>[] result = (List<OrganGestorEntity>[])organGestorService.syncDir3OrgansGestors(entitatDto, new Locale("ca"));
         Assert.assertNotNull(result);
         Assert.assertEquals(4, result.length);
 

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -1290,10 +1291,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Override
 	@Transactional
-	public void actualitzaProcediments(EntitatDto entitatDto, String lang) {
+	public void actualitzaProcediments(EntitatDto entitatDto, Locale locale) {
 
 		logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
-		metaExpedientHelper.actualitzarProcediments(entitatDto, lang);
+		MessageHelper.setCurrentLocale(locale);
+		metaExpedientHelper.actualitzarProcediments(entitatDto, locale);
 
 	}
 

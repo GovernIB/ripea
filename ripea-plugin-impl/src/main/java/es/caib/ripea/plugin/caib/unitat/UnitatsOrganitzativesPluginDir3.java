@@ -49,8 +49,8 @@ import java.util.logging.Logger;
  */
 public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperties implements UnitatsOrganitzativesPlugin {
 
-    private static final String SERVEI_ORGANIGRAMA = "/rest/organigrama/";
-    private static final String SERVEI_OBTENIR_UNITATS = "/ws/Dir3CaibObtenerUnidades";
+    private static final String SERVEI_ORGANIGRAMA = "rest/organigrama/";
+    private static final String SERVEI_OBTENIR_UNITATS = "ws/Dir3CaibObtenerUnidades";
 
 	public UnitatsOrganitzativesPluginDir3() {
 		super();

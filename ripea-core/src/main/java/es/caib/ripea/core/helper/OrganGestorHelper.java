@@ -59,6 +59,8 @@ public class OrganGestorHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private PluginHelper pluginHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
@@ -333,11 +335,11 @@ public class OrganGestorHelper {
 
 		// Històrics
 		nombreUnitatsProcessades = 0;
-		for (UnitatOrganitzativa unidadWS : unitatsWs) {
-			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unidadWS.getCodi());
-			sincronizarHistoricsUnitat(unitat, unidadWS, entitat);
+		for (UnitatOrganitzativa unitatWS : unitatsWs) {
+			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
+			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoText("Desats històrics de l''òrgan '" + unitat.getCodi() + " - " + unitat.getNom() + "'").build());
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.historic", unitatWS.getCodi())).infoText(msg("unitat.synchronize.info.historic", unitat.getCodi(), unitat.getNom())).build());
 		}
 		progres.setProgres(22);
 
@@ -346,28 +348,28 @@ public class OrganGestorHelper {
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
-			String infoText = "Calculant tipus de transició de l''òrgan '" + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom() + "': ";
+			String infoText = "";
 			if (obsoleteUnitat.getNous().size() > 1) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
 				organsDividits.add(obsoleteUnitat);
-				infoText += "DIVISIÓ (" + obsoleteUnitat.getCodi() + " --> [" + organsToCodiList(obsoleteUnitat.getNous()) + "])";
+				infoText = msg("unitat.synchronize.info.transicio.divisio", obsoleteUnitat.getCodi(), organsToCodiList(obsoleteUnitat.getNous()));
 			} else {
 				if (obsoleteUnitat.getNous().size() == 1) {
 					if (obsoleteUnitat.getNous().get(0).getAntics().size() > 1) {
 						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.FUSIO);
 						organsFusionats.add(obsoleteUnitat);
-						infoText += "FUSIÓ ([" + organsToCodiList(obsoleteUnitat.getNous().get(0).getAntics()) + "] --> " + obsoleteUnitat.getCodi() + ")";
+						infoText = msg("unitat.synchronize.info.transicio.fusio", organsToCodiList(obsoleteUnitat.getNous().get(0).getAntics()), obsoleteUnitat.getNous().get(0).getCodi());
 					} else if (obsoleteUnitat.getNous().get(0).getAntics().size() == 1) {
 						obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.SUBSTITUCIO);
 						organsSubstituits.add(obsoleteUnitat);
-						infoText += "SUBSTITUCIÓ (" + obsoleteUnitat.getCodi() + " --> " + obsoleteUnitat.getNous().get(0).getCodi() + ")";
+						infoText = msg("unitat.synchronize.info.transicio.substitucio", obsoleteUnitat.getCodi(), obsoleteUnitat.getNous().get(0).getCodi());
 					}
 				} else {
 					obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.EXTINCIO);
-					infoText += "EXTINCIÓ";
+					infoText = msg("unitat.synchronize.info.transicio.extincio");
 				}
 			}
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoText(infoText).build());
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.transicio", obsoleteUnitat.getCodi(), obsoleteUnitat.getNom())).infoText(infoText).build());
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
 
@@ -397,13 +399,13 @@ public class OrganGestorHelper {
 		return text;
 	}
 
-	private ActualitzacioInfo sincronizarUnitat(UnitatOrganitzativa unitatWS, EntitatEntity entitat,Map<String, List<String>> organsParesPendentsAssignar) {
+	private ActualitzacioInfo sincronizarUnitat(UnitatOrganitzativa unitatWS, EntitatEntity entitat, Map<String, List<String>> organsParesPendentsAssignar) {
 		ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder().isOrgan(true);
 		OrganGestorEntity unitat = null;
 		if (unitatWS != null) {
-			infoBuilder.infoTitol("Actualitzant unitat '" + unitatWS.getCodi() + "'");
+			infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi()));
 			// checks if unitat already exists in database
-			unitat = organGestorRepository.findByCodi(unitatWS.getCodi());
+			unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			// TODO: El pare potser encara no existeix. Per tant hem de comprovar si s'ha assignat, i si no, assignar-ho al crear el pare
 			OrganGestorEntity organPare = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior());
 			// if not it creates a new one
@@ -478,22 +480,29 @@ public class OrganGestorHelper {
 
 			Integer nombreProcediments = metaExpedientOrganGestorRepository.countByOrganGestor(organObsolet);
 			if (nombreProcediments > 0) {
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoText("No ha estat possible esborrar l''òrgan gestor '" + organObsolet.getCodi() + "' degut a que té " + nombreProcediments + " procediments.").build());
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.procediment.error", organObsolet.getCodi(), nombreProcediments)).build());
 				continue;
 			}
 			Integer nombreExpedients = expedientRepository.countByOrganGestor(organObsolet);
 			if (nombreExpedients > 0) {
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoText("No ha estat possible esborrar l''òrgan gestor '" + organObsolet.getCodi() + "' degut a que té " + nombreExpedients + " expedients.").build());
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.expedient.error", organObsolet.getCodi(), nombreExpedients)).build());
 				continue;
 			}
 			try {
 				permisosHelper.eliminarPermisosOrgan(organObsolet);
 				organGestorRepository.delete(organObsolet);
-				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoText("L''òrgan gestor '" + organObsolet.getCodi() + "' ha estat esborrat.").build());
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.eliminat", organObsolet.getCodi())).build());
 			} catch (Exception ex) {
 				logger.error("No ha estat possible esborrar l'òrgan gestor.", ex);
-				progres.addInfo(ActualitzacioInfo.builder().hasError(true).errorText("No ha estat possible esborrar l''òrgan gestor '" + organObsolet.getCodi() + "': " + ex.getMessage()).build());
+				progres.addInfo(ActualitzacioInfo.builder().hasError(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.error", organObsolet.getCodi(), ex.getMessage())).build());
 			}
 		}
+	}
+
+	private String msg(String codi) {
+		return messageHelper.getMessage(codi);
+	}
+	private String msg(String codi, Object... params) {
+		return messageHelper.getMessage(codi, params);
 	}
 }

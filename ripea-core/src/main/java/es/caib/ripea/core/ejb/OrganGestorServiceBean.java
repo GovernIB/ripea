@@ -18,6 +18,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Implementació de OrganGestorService com a EJB que empra una clase delegada
@@ -82,8 +83,8 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public Object[] syncDir3OrgansGestors(EntitatDto entitat) throws Exception {
-		return delegate.syncDir3OrgansGestors(entitat);
+	public Object[] syncDir3OrgansGestors(EntitatDto entitat, Locale locale) throws Exception {
+		return delegate.syncDir3OrgansGestors(entitat, locale);
 	}
 
 	@Override

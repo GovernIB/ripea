@@ -70,8 +70,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
             }
         };
         List<GrantedAuthority> rols = new ArrayList<>();
-        rols.add(new SimpleGrantedAuthority("NOT_SUPER"));
-        rols.add(new SimpleGrantedAuthority("NOT_ADMIN"));
+        rols.add(new SimpleGrantedAuthority("IPA_SUPER"));
+        rols.add(new SimpleGrantedAuthority("IPA_ADMIN"));
         rols.add(new SimpleGrantedAuthority("tothom"));
         Authentication authentication =  new UsernamePasswordAuthenticationToken(principal, "N/A", rols);
         SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -1,33 +1,30 @@
 package es.caib.ripea.core.service;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-
+import com.google.common.base.Strings;
+import es.caib.ripea.core.api.dto.config.ConfigDto;
+import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.exception.NotDefinedConfigException;
+import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.entity.config.ConfigGroupEntity;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.config.ConfigGroupRepository;
+import es.caib.ripea.core.repository.config.ConfigRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Strings;
-
-import es.caib.ripea.core.api.dto.config.ConfigDto;
-import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
-import es.caib.ripea.core.api.exception.NotDefinedConfigException;
-import es.caib.ripea.core.api.service.ConfigService;
-import es.caib.ripea.core.entity.config.ConfigEntity;
-import es.caib.ripea.core.entity.config.ConfigGroupEntity;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.repository.config.ConfigGroupRepository;
-import es.caib.ripea.core.repository.config.ConfigRepository;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
@@ -54,15 +51,6 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     @Transactional
     public ConfigDto updateProperty(ConfigDto property) {
-
-           /*
-
-            INSERT INTO NOT_CONFIG ("KEY", VALUE, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, ENTITAT_CODI)
-            SELECT "KEY", null, DESCRIPTION, GROUP_CODE, "POSITION", JBOSS_PROPERTY, TYPE_CODE, LASTMODIFIEDBY_CODI, LASTMODIFIEDDATE, 'CAIB'
-            FROM NOT_CONFIG nc
-            WHERE nc."KEY" = 'es.caib.notib.emprar.sir'
-
-            */
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);

@@ -18,6 +18,7 @@ import es.caib.ripea.core.repository.AclObjectIdentityRepository;
 import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 import org.springframework.security.acls.domain.GrantedAuthoritySid;
 import org.springframework.security.acls.domain.ObjectIdentityImpl;
@@ -72,6 +73,8 @@ public class PermisosHelper {
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
 	@Resource
 	private PluginHelper pluginHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -775,7 +778,7 @@ public class PermisosHelper {
 
 		for (UnitatOrganitzativa unitat: unitatsWs) {
 
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol("Sincronització de permisos").infoText("Traspassant permisos de l''òrgan gestor " + unitat.getCodi()).build());
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.permis")).infoText(msg("unitat.synchronize.info.permisos.traspas", unitat.getCodi())).build());
 			progres.setProgres(51 + (nombreUnitatsProcessades++ * 24)/nombreUnitatsTotal);
 
 			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
@@ -872,6 +875,13 @@ public class PermisosHelper {
 
 		public List<Serializable> getObjectIdentifiers(T object);
 
+	}
+
+	private String msg(String codi) {
+		return messageHelper.getMessage(codi);
+	}
+	private String msg(String codi, Object... params) {
+		return messageHelper.getMessage(codi, params);
 	}
 
 }

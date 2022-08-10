@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Declaració dels mètodes per a la gestió de meta-expedients.
@@ -502,7 +503,7 @@ public interface MetaExpedientService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param organId TODO
-	 * @param metaExpedient
+	 * @param id
 	 *            Informació del meta-expedient a marcar com a pendent.
 	 * @return El meta-expedient modificat.
 	 * @throws NotFoundException TODO
@@ -520,7 +521,7 @@ public interface MetaExpedientService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param organId
-	 * @param metaExpedient
+	 * @param id
 	 *            Informació del meta-expedient a marcar com a pendent.
 	 * @return El meta-expedient modificat.
 	 * @throws NotFoundException TODO
@@ -576,7 +577,7 @@ public interface MetaExpedientService {
 	ProgresActualitzacioDto getProgresActualitzacio(String codi);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	void actualitzaProcediments(EntitatDto entitat, String lang);
+	void actualitzaProcediments(EntitatDto entitat, Locale locale);
 
 	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 }

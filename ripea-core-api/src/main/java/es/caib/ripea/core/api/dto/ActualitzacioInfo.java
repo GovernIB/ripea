@@ -18,9 +18,10 @@ public class ActualitzacioInfo {
     boolean hasCanvis;
     boolean hasInfo;
 
-    String errorText;
+    String infoClass;
     String infoTitol;
     String infoText;
+    String errorText;
 
     // Organ
     boolean isOrgan;

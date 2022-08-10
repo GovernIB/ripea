@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
@@ -86,6 +87,8 @@ public class MetaExpedientHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired
+	private MessageHelper messageHelper;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
@@ -665,7 +668,7 @@ public class MetaExpedientHelper {
 	}
 
 	@Transactional
-	public void actualitzarProcediments(EntitatDto entitatDto, String lang) {
+	public void actualitzarProcediments(EntitatDto entitatDto, Locale locale) {
 		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getCodi());
 		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
 			logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
@@ -684,9 +687,7 @@ public class MetaExpedientHelper {
 			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 			progres.setNumOperacions(metaExpedients.size());
 
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
-					.infoTitol("es".equalsIgnoreCase(lang) ? "Inicio del proceso de actualitzaci&#243;n de procedimientos" : "Inici del proc&#233;s d&#39;actualitzaci&#243; de procediments")
-					.infoText("es".equalsIgnoreCase(lang) ? "Se actualizar&#225;n " + metaExpedients.size() + " procedimientos" : "S&#39;actualitzaran " + metaExpedients.size() + " procediments").build());
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.inici")).infoText(msg("procediment.synchronize.info.inici", metaExpedients.size())).build());
 
 			Integer organsNoSincronitzats = 0;
 			Integer modificats = 0;
@@ -708,16 +709,16 @@ public class MetaExpedientHelper {
 					infoBuilder.exist(procedimentGga != null);
 				} catch (SistemaExternException se) {
 					infoBuilder.hasError(true);
-					infoBuilder.errorText(("es".equalsIgnoreCase(lang) ? "Error al recuperar el procedimiento de Rolsac" : "Error al recuperar el procediment de Rolsac: ") + se.getMessage());
-					progres.addInfo(infoBuilder.build());
+					infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
+					progres.addInfo(infoBuilder.build(), true);
 					fallat++;
 					continue;
 				}
 
 				if (procedimentGga == null) {
 					infoBuilder.hasError(true);
-					infoBuilder.errorText("es".equalsIgnoreCase(lang) ? "No existe ning&#250;n procedimiento activo con el c&#243;digo SIA " + metaExpedient.getClassificacioSia() + " en Rolsac.": "No existeix cap procediment actiu amb el codi SIA " + metaExpedient.getClassificacioSia() + " a Rolsac.");
-					progres.addInfo(infoBuilder.build());
+					infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedient.getClassificacioSia()));
+					progres.addInfo(infoBuilder.build(), true);
 					fallat++;
 					continue;
 				}
@@ -729,7 +730,7 @@ public class MetaExpedientHelper {
 						.build();
 
 				if (!info.hasChange()) {
-					progres.addInfo(info);
+					progres.addInfo(info, true);
 					continue;
 				}
 
@@ -753,9 +754,7 @@ public class MetaExpedientHelper {
 						organsNoSincronitzats++;
 						organGestor = metaExpedient.getOrganGestor();
 						info.setHasError(true);
-						info.setErrorText("es".equalsIgnoreCase(lang) ?
-								"El &#243;rgano gestor no existe en RIPEA. Realice una sincronizaci&#243;n de &#243;rganos, y si a&#250;n no se encuentra el &#243;rgano, compruebe que est&#225; correctamente configurado en ROLSAC." :
-								"L&#39;&#242;rgan gestor no existeix a RIPEA. Realitzi una sincronitzaci&#243; d&#39;&#242;rgans, i si tot i aix&#237; encara no es troba l&#39;&#242;rgan, comprovi que est&#224; correctament configurat a ROLSAC.");
+						info.setErrorText(msg("procediment.synchronize.error.organ", procedimentGga.getUnitatOrganitzativaCodi()));
 						fallat++;
 
 						avisosProcedimentsOrgans.put(nom, new String[] {organGestor.getCodi() + " - " + organGestor.getNom(), procedimentGga.getUnitatOrganitzativaCodi()});
@@ -763,14 +762,12 @@ public class MetaExpedientHelper {
 				}
 
 				metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
-				progres.addInfo(info);
+				progres.addInfo(info, true);
 				modificats++;
 
 			}
 
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true)
-					.infoTitol("es".equalsIgnoreCase(lang) ? "Fin del proceso de actualitzaci&#243; de procedimientos" : "Fi del proc&#233;s d&#39;actualitzaci&#243; de procediments")
-					.infoText("es".equalsIgnoreCase(lang) ? "Se han modificado " + modificats + " procedimientos, y " + fallat + " han dado error" : "S&#39;han modificat " + modificats + " procediments, i " + fallat + " han donat error").build());
+			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.fi")).infoText(msg("procediment.synchronize.info.fi", modificats, fallat)).build());
 
 			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
 			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
@@ -826,7 +823,13 @@ public class MetaExpedientHelper {
 		}
 		return listLong;
 	}
-	
+
+	private String msg(String codi) {
+		return messageHelper.getMessage(codi);
+	}
+	private String msg(String codi, Object... params) {
+		return messageHelper.getMessage(codi, params);
+	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaExpedientHelper.class);
 
