@@ -886,9 +886,17 @@ public class ContingutHelper {
 					"Aquest contingut ja està esborrat");
 		}
 
-		// Marca el contingut i tots els seus fills com a esborrats
-		//  de forma recursiva
-		marcarEsborrat(contingut);
+		if ((conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || !conteDocumentsDefinitius(contingut)) {
+			// Marca el contingut i tots els seus fills com a esborrats
+			//  de forma recursiva
+			marcarEsborrat(contingut);
+		} else {
+			logger.error("Aquest contingut és definitiu o conté definitius i no es pot esborrar (contingutId=" + contingut.getId() + ")");
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					"Un contingut definitiu no es pot esborrar, verificau la propitat es.caib.ripea.document.esborrar.finals");
+		}
 
 		// Valida si conté documents definitius
 		if (!conteDocumentsDefinitius(contingut)) {
@@ -1574,6 +1582,10 @@ public class ContingutHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.ordenacio.contingut.habilitada");
 	}
 
+	private boolean isPermesEsborrarFinals() {
+		return configHelper.getAsBoolean("es.caib.ripea.document.esborrar.finals");
+	}
+	
 	private boolean isCertificacioAmbFirma(byte[] certificacioContingut) {
 		boolean hasFirma = false;
 		try {
