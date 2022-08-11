@@ -4108,11 +4108,11 @@ public class PluginHelper {
 		}
 		FirmaServidorPlugin plugin = firmaServidorPlugins.get(entitatCodi);
 //		loadPluginProperties("FIRMA_SERVIDOR");
-		if (plugin == null) {
+		if (plugin != null) {
 			return plugin;
 		}
 		String pluginClass = getPropertyPluginFirmaServidor();
-		if (pluginClass != null && pluginClass.length() > 0) {
+		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, "No està configurada la classe per al plugin de firma en servidor");
 		}
 		try {
