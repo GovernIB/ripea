@@ -29,6 +29,7 @@
 		var content="<spring:message code="organgestor.actualitzacio.cancelarActu"/>";
 		var acceptar="<spring:message code="comu.boto.acceptar"/>";
 		var cancelar="<spring:message code="comu.boto.cancelar"/>";
+		var tancar="<spring:message code="comu.boto.tancar"/>";
 		var lnouorgan="<spring:message code="organgestor.actualitzacio.nou"/>";
 		var lcodi="<spring:message code="organgestor.actualitzacio.codi"/>";
 		var lestat="<spring:message code="organgestor.actualitzacio.estat"/>";
@@ -57,6 +58,7 @@
 				$('.prediccio').fadeOut();
 				$('#autobtn', parent.document).prop('disabled', true);
 				$('#cancelbtn', parent.document).toggle(true);
+				$('#cancelbtn', parent.document).html(cancelar);
 				$.post($(this).attr('action'));
 				isUpdating = true;
 				$('.close', parent.document).on('click', dismissFunction);
@@ -111,6 +113,7 @@
 								$('.close', parent.document).prop('disabled', false);
 								$('.loading').hide();
 								$('.progress').show();
+								$('#cancelbtn', parent.document).html(tancar);
 							} else {
 								if (data.progres > 0) {
 									$('.loading').hide();
