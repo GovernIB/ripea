@@ -83,7 +83,7 @@
 		<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
-			<c:set var="isPermesEsborrarFinalsVar" value="${isPermesEsborrarFinals && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'DEFINITIU' || contingut.documentTipus == 'IMPORTAT')}"/>
+			<c:set var="isPermesEsborrarFinalsVar" value="${contingut.document && ((isPermesEsborrarFinals && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'DEFINITIU' || contingut.documentTipus == 'IMPORTAT')) || (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMA_PARCIAL'))}"/>
 			<c:choose>
 				<c:when test="${contingut.expedient && contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
