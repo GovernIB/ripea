@@ -141,6 +141,9 @@ public class ExpedientPeticioHelper {
 		if (entitat == null) {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
+		
+		System.out.println("crearRegistrePerPeticio before getBuilder, identificador: " + registreEntrada.getIdentificador());
+		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
 				registreEntrada.getData(),
@@ -181,6 +184,9 @@ public class ExpedientPeticioHelper {
 				build();
 		registreRepository.save(registreEntity);
 		expedientPeticioEntity.updateRegistre(registreEntity);
+		
+		System.out.println("crearRegistrePerPeticio before findByEntitatAndClassificacioSia, identificador: " + registreEntrada.getIdentificador());
+		
 		// set metaexpedient to which expedient will belong if peticion is accepted
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(
 				entitat,
@@ -207,12 +213,16 @@ public class ExpedientPeticioHelper {
 					ExpedientPeticioAccioEnumDto.CREAR);
 		}
 		expedientPeticioRepository.save(expedientPeticioEntity);
+		
+		System.out.println("crearRegistrePerPeticio before interessats, identificador: " + registreEntrada.getIdentificador());
+		
 		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
 					crearInteressatEntity(
 							interessat,
 							registreEntity));
 		}
+		System.out.println("crearRegistrePerPeticio before annexos, identificador: " + registreEntrada.getIdentificador());
 		for (Annex annex: registreEntrada.getAnnexos()) {
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
@@ -220,10 +230,13 @@ public class ExpedientPeticioHelper {
 							registreEntity));
 		}
 		
+		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
 		// change state of expedient peticion to pendent of acceptar or rebutjar
 		canviEstatExpedientPeticio(
 				expedientPeticioEntity.getId(),
 				ExpedientPeticioEstatEnumDto.PENDENT);
+		
+		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
 		
 	}
 

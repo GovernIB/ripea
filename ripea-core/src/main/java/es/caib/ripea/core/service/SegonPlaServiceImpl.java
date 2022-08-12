@@ -89,17 +89,22 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 */
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
-		logger.debug(
+		System.out.println(
 				"Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
 		// find peticions with no anotació associated and with no errors from previous invocation of this method
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(
 				ExpedientPeticioEstatEnumDto.CREAT);
 
+		if (peticions != null) {
+			System.out.println("Consultar i guardar anotacions size: " + peticions.size());
+		}
+		
 		if (peticions != null &&
 				!peticions.isEmpty()) {
 			for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
 
+				System.out.println("Consultar i guardar anotacio Id: " + expedientPeticioEntity.getId() + ", identificador: " + expedientPeticioEntity.getIdentificador() + ", clauAccess: " + expedientPeticioEntity.getClauAcces());
 				AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 				anotacioRegistreId.setIndetificador(
 						expedientPeticioEntity.getIdentificador());
@@ -112,15 +117,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					if(throwException)
 						throw new RuntimeException("EXCEPION BEFORE CONSULTING ANOTACIO!!!!!! ");
 					
-					
+					System.out.println("Consultar i guardar anotacio before consulta, identificador: " + expedientPeticioEntity.getIdentificador());
 					// obtain anotació from DISTRIBUCIO
 					AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioRestClient().consulta(
 							anotacioRegistreId);
 
+					System.out.println("Consultar i guardar anotacio before crearRegistrePerPeticio, identificador: " + expedientPeticioEntity.getIdentificador());
 					// create anotació in db and associate it with expedient peticion
 					expedientPeticioHelper.crearRegistrePerPeticio(
 							registre,
 							expedientPeticioEntity);
+					
+					System.out.println("Consultar i guardar anotacio before canviEstat, identificador: " + expedientPeticioEntity.getIdentificador());
 					
 					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
@@ -130,21 +138,23 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
 					if (entitatAnotacio != null)
 						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+					
+					System.out.println("Consultar i guardar anotacio finish segonpla, identificador: " + expedientPeticioEntity.getIdentificador());
 				} catch (Throwable e) {
+					
+					System.out.println("Error consultar i guardar anotació per petició: " +
+							expedientPeticioEntity.getIdentificador() + 
+							" RootCauseMessage: " + ExceptionUtils.getStackTrace(e));
+					
 					logger.error(
 							"Error consultar i guardar anotació per petició: " +
 									expedientPeticioEntity.getIdentificador() + 
 									" RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
-//					try {
-						boolean isRollbackException = true;
-						while (isRollbackException) {
-							if (e.getClass().toString().contains("RollbackException")) {
-								e = e.getCause();
-							} else {
-								isRollbackException = false;
-							}
-						}
+					
 
+					try {
+					
+					System.out.println("Consultar i guardar anotacio error before addExpedientPeticioConsultaError, identificador: " + expedientPeticioEntity.getIdentificador());
 						// add error to peticio, so it will not be processed anymore until it will be resent from DISTRIBUCIO 
 						expedientPeticioHelper.addExpedientPeticioConsultaError(
 								expedientPeticioEntity.getId(),
@@ -152,6 +162,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										ExceptionUtils.getStackTrace(e),
 										3600));
 						
+						
+						System.out.println("Consultar i guardar anotacio error before canviEstat: " + expedientPeticioEntity.getIdentificador());
 						// change state of anotació in DISTRIBUCIO to BACK_ERROR
 						DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 								anotacioRegistreId,
@@ -160,9 +172,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										ExceptionUtils.getStackTrace(e),
 										3600));
 						
-//					} catch (IOException e1) {
-//						logger.error(ExceptionUtils.getStackTrace(e1));
-//					}
+					} catch (Exception e1) {
+						System.out.println("Error canviEstat to ERROR: " +
+								expedientPeticioEntity.getIdentificador() + 
+								" RootCauseMessage: " + ExceptionUtils.getStackTrace(e1));
+						logger.error(ExceptionUtils.getStackTrace(e1));
+					}
 				}
 			}
 		}
