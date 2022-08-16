@@ -633,7 +633,9 @@ $(document).ready(function() {
 		getDetallsSignants($('#detallSignants'), contingutId, false);
 	});
 
-	<c:if test="${contingut.arxiuUuid == null}">
+	<c:set var="isCarpetaPendentArxiu" value="${(contingut.carpeta && !isCreacioCarpetesLogica && contingut.arxiuUuid == null)}"/>
+	
+	<c:if test="${isCarpetaPendentArxiu || (!contingut.carpeta && contingut.arxiuUuid == null)}">
 		var arxiu = '<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>';
 		$(".container-main .panel-heading h2").append(arxiu);
 	</c:if>

@@ -1259,7 +1259,7 @@ public class ContingutHelper {
 			throw new RuntimeException("Mock Excepcion al actualitzar contingut en arxiu");
 		}
 
-		boolean utilitzarCarpetes = fromAnotacio || !isCarpetaLogica();
+		boolean utilitzarCarpetes = fromAnotacio && !isCarpetaLogica();
 
 		String serieDocumental = null;
 		ExpedientEntity expedient = contingut.getExpedient();

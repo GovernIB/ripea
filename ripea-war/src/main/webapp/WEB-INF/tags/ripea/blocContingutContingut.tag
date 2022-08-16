@@ -25,6 +25,7 @@
 					<c:set var="firmat" value="true"/>
 					<c:set var="isPdf" value="true"/> 
 					<c:set var="isDocAdjuntPendentGuardarArxiu" value="false"/> 
+					<c:set var="isCarpetaPendentArxiu" value="${(fill.carpeta && !isCreacioCarpetesLogica && fill.arxiuUuid == null)}"/>
 					<script>
 						<c:if test="${fill.document}">
 							<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}">
@@ -89,7 +90,7 @@
 										<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
 									</c:if>
 									${fill.nom}
-									<c:if test="${fill.arxiuUuid == null}">
+									<c:if test="${isCarpetaPendentArxiu || (!fill.carpeta && fill.arxiuUuid == null)}">
 										<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
 									</c:if>
 								</p>
@@ -175,6 +176,7 @@
 					<c:set var="firmat" value="true"/>
 					<c:set var="isPdf" value="true"/> 
 					<c:set var="isDocAdjuntPendentGuardarArxiu" value="false"/> 
+					<c:set var="isCarpetaPendentArxiu" value="${(fill.carpeta && !isCreacioCarpetesLogica && fill.arxiuUuid == null)}"/>
 					<script>
 						<c:if test="${fill.document}">
 							<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}">
@@ -237,7 +239,7 @@
 								<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
 							</c:if>
 							&nbsp;${fill.nom}
-							<c:if test="${fill.arxiuUuid == null}">
+							<c:if test="${isCarpetaPendentArxiu || (!fill.carpeta && fill.arxiuUuid == null)}">
 								<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
 							</c:if>
 						</td>
