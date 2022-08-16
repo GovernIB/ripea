@@ -586,6 +586,7 @@ public class ConversioTipusHelper {
 						target.setTamany(source.getTamany());
 						target.setTipusMime(source.getTipusMime());
 						target.setTitol(source.getTitol());
+						target.setNom(source.getNom());
 						target.setUuid(source.getUuid());
 						target.setCreatedDate(source.getCreatedDate() != null ? source.getCreatedDate().toDate() : null);
 						target.setEstat(source.getEstat());
