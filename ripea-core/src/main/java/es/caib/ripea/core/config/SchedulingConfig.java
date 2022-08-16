@@ -1,13 +1,8 @@
 package es.caib.ripea.core.config;
 
-import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.api.service.SegonPlaService;
-import es.caib.ripea.core.helper.ConfigHelper;
-import lombok.SneakyThrows;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -19,8 +14,11 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.api.service.SegonPlaService;
+import es.caib.ripea.core.helper.ConfigHelper;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration

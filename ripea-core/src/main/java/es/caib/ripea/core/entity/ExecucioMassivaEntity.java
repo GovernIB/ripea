@@ -14,14 +14,16 @@ import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
@@ -74,10 +76,14 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			cascade = {CascadeType.ALL},
 			fetch = FetchType.EAGER)
 	private List<ExecucioMassivaContingutEntity> continguts = new ArrayList<ExecucioMassivaContingutEntity>();
-	@Column(name = "entitat_id")
-	private Long entitatId;
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "entitat_id")
+	private EntitatEntity entitat;
+	
 	@Column(name = "rol_actual")
 	private String rolActual;
+	
 
 	public ExecucioMassivaTipus getTipus() {
 		return tipus;
@@ -103,8 +109,9 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public List<ExecucioMassivaContingutEntity> getContinguts() {
 		return continguts;
 	}
-	public Long getEntitatId() {
-		return entitatId;
+
+	public EntitatEntity getEntitat() {
+		return entitat;
 	}
 	public String getPortafirmesResponsables() {
 		return portafirmesResponsables;
@@ -145,7 +152,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			String portafirmesTransaccioId,
 			Date dataCaducitat,
 			boolean enviarCorreu,
-			Long entitatId,
+			EntitatEntity entitat,
 			String rolActual) {
 		return new Builder(
 				tipus,
@@ -158,7 +165,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				portafirmesTransaccioId,
 				dataCaducitat,
 				enviarCorreu,
-				entitatId,
+				entitat,
 				rolActual);
 	}
 	public static class Builder {
@@ -173,7 +180,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				String portafirmesTransaccioId,
 				Date dataCaducitat,
 				boolean enviarCorreu,
-				Long entitatId,
+				EntitatEntity entitat,
 				String rolActual) {
 			built = new ExecucioMassivaEntity();
 			built.tipus = tipus;
@@ -186,7 +193,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			built.portafirmesTransaccioId = portafirmesTransaccioId;
 			built.dataCaducitat = dataCaducitat;
 			built.enviarCorreu = enviarCorreu;
-			built.entitatId = entitatId;
+			built.entitat = entitat;
 			built.rolActual = rolActual;
 		}
 		public ExecucioMassivaEntity build() {
