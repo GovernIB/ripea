@@ -66,8 +66,8 @@ public class ExpedientPeticioHelper {
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
 	@Transactional
-	public void crearExpedientsPeticions(List<AnotacioRegistreId> ids) {
-		for (AnotacioRegistreId anotacioRegistreId : ids) {
+	public void crearExpedientsPeticions(List<es.caib.distribucio.ws.backoffice.AnotacioRegistreId> ids) {
+		for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : ids) {
 			ExpedientPeticioEntity peticio = expedientPeticioRepository.findByIdentificador(anotacioRegistreId.getIndetificador());
 			// only create peticions that were not created before
 			// distribucio will be resending ids until ripea call Distribucio WS method canviEstat(BACK_REBUDA)
@@ -135,6 +135,13 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void setEstatCanviatDistribucioNewTransaction(Long expedientPeticioId, boolean canviat) {
+		
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		expedientPeticioEntity.setEstatCanviatDistribucio(canviat);
+	}
+	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
@@ -240,6 +247,7 @@ public class ExpedientPeticioHelper {
 		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
 		
 	}
+	
 	
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

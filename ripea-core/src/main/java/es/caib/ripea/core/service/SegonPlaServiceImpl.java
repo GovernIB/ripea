@@ -137,10 +137,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								anotacioRegistreId,
 								Estat.REBUDA,
 								"");
-						expedientPeticioEntity.setEstatCanviatDistribucio(true);
+						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), true);
 						
 					} catch (Exception e) {
-						expedientPeticioEntity.setEstatCanviatDistribucio(false);
+						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), false);
 					}
 					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
 					if (entitatAnotacio != null)
@@ -168,10 +168,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
 										3600));
-						expedientPeticioEntity.setEstatCanviatDistribucio(true);
+						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), true);
 						
 					} catch (Exception e1) {
-						expedientPeticioEntity.setEstatCanviatDistribucio(true);
+						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), false);
 						System.out.println("Error canviEstat to ERROR: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getStackTrace(e1));
 						logger.error(ExceptionUtils.getStackTrace(e1));
 					}
