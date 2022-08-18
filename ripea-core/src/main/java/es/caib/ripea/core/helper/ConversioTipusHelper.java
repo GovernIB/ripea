@@ -392,9 +392,9 @@ public class ConversioTipusHelper {
 						
 						ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio = null;
 						switch (source.getEstat()) {
-						case CREAT:
-							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.CONSULTA_ERROR;
-							break;
+//						case CREAT:
+//							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.CONSULTA_ERROR;
+//							break;
 						case PENDENT:
 							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.PENDENT;
 							break;
