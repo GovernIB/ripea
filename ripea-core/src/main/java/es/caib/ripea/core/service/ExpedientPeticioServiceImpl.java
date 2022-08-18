@@ -425,7 +425,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			expedientPeticioEntity.setEstatCanviatDistribucio(true);
 		} catch (Exception e) {
 			expedientPeticioEntity.setEstatCanviatDistribucio(false);
-			throw new RuntimeException(e);
 		}
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null)
