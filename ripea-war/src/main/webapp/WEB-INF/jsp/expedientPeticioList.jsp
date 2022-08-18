@@ -120,12 +120,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{:estatView}}
-						{{if pendentEnviarDistribucio}}
-							<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
-							class="fa fa-exclamation-triangle text-danger"></span>
-						{{/if}}
+						<c:if test="${isRolActualAdmin}">
+							{{if pendentEnviarDistribucio}}
+								<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
+								class="fa fa-exclamation-triangle text-danger"></span>
+							{{/if}}
+						</c:if>
 					</script>
-
 				</th>
 
 				<th data-col-name="expedientId" data-visible="false"></th>
@@ -142,9 +143,11 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
 								{{/if}}
-								{{if pendentEnviarDistribucio}}
-									<li><a href="<c:url value="/expedientPeticio/canviarEstat/{{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>
-								{{/if}}
+								<c:if test="${isRolActualAdmin}">
+									{{if pendentEnviarDistribucio}}
+										<li><a href="<c:url value="/expedientPeticio/canviarEstatDistribucio/{{:id}}"/>"><span class="fa fa-mail-forward"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>
+									{{/if}}
+								</c:if>
 							</ul>
 						</div>
 					</script>

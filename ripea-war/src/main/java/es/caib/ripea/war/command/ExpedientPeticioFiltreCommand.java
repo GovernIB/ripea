@@ -8,6 +8,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -28,7 +29,8 @@ public class ExpedientPeticioFiltreCommand {
 	private Date dataFinal;
 	private ExpedientPeticioEstatViewEnumDto estat;
 	private Long metaExpedientId;
-
+	
+	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
@@ -84,7 +86,12 @@ public class ExpedientPeticioFiltreCommand {
 	public void setDataFinal(Date dataFinal) {
 		this.dataFinal = dataFinal;
 	}
-	
+	public ExpedientPeticioEstatPendentDistribucioEnumDto getEstatPendentEnviarDistribucio() {
+		return estatPendentEnviarDistribucio;
+	}
+	public void setEstatPendentEnviarDistribucio(ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio) {
+		this.estatPendentEnviarDistribucio = estatPendentEnviarDistribucio;
+	}
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

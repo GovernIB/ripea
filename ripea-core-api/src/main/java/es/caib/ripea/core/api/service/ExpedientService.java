@@ -395,8 +395,6 @@ public interface ExpedientService {
 			Long metaDocumentId, 
 			String rolActual);
 
-	@PreAuthorize("hasRole('tothom')")
-	Exception retryNotificarDistribucio(Long expedientPeticioId);
 
 	@PreAuthorize("hasRole('tothom')")
 	boolean incorporar(Long entitatId,

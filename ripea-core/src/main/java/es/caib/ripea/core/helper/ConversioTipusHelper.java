@@ -387,7 +387,26 @@ public class ConversioTipusHelper {
 						target.setEstat(source.getEstat());
 						target.setIdentificador(source.getIdentificador());
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
-						target.setPendentEnviarDistribucio(source.isPendentEnviarDistribucio());
+						target.setPendentEnviarDistribucio(source.isPendentCanviEstatDistribucio());
+						target.setDataAlta(source.getDataAlta());
+						
+						ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio = null;
+						switch (source.getEstat()) {
+						case CREAT:
+							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.CONSULTA_ERROR;
+							break;
+						case PENDENT:
+							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.PENDENT;
+							break;
+						case PROCESSAT_PENDENT:
+						case PROCESSAT_NOTIFICAT:
+							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.ACCEPTAT;
+							break;
+						case REBUTJAT:
+							estatPendentEnviarDistribucio = ExpedientPeticioEstatPendentDistribucioEnumDto.REBUTJAT;
+							break;
+						}
+						target.setEstatPendentEnviarDistribucio(estatPendentEnviarDistribucio);
 						return target;
 					}
 				});
@@ -608,6 +627,10 @@ public class ConversioTipusHelper {
 						return target;
 					}
 				});
+		
+		
+		
+		
 		
 
 //		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)

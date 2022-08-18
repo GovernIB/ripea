@@ -3,16 +3,51 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.google.common.base.Strings;
+
 import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.RegistreJustificantDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
-import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
@@ -21,7 +56,17 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
-import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DistribucioHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -30,21 +75,6 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
@@ -85,10 +115,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private ConfigHelper configHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private DistribucioHelper distribucioHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
+	@Resource
+	private ExpedientPeticioHelper expedientPeticioHelper;
 
 	
 	@Transactional(readOnly = true)
@@ -394,7 +422,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId,
 					Estat.REBUTJADA,
 					observacions);
+			expedientPeticioEntity.setEstatCanviatDistribucio(true);
 		} catch (Exception e) {
+			expedientPeticioEntity.setEstatCanviatDistribucio(false);
 			throw new RuntimeException(e);
 		}
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
@@ -596,67 +626,76 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientPeticioPendentDist>  findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
+	public ResultDto<ExpedientPeticioListDto> findPendentsCanviEstatDistribucio(
+			Long entitatId,
+			ExpedientPeticioFiltreDto filtre,
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
+		
+		ResultDto<ExpedientPeticioListDto> result = new ResultDto<ExpedientPeticioListDto>();
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		boolean identNull = Strings.isNullOrEmpty(filtre.getIdentificador());
-		boolean nomNull = Strings.isNullOrEmpty(filtre.getNom());
-		boolean dataIniciNull = filtre.getDataInici() == null;
-		boolean dataFiNull = filtre.getDataFi() == null;
-		Page<ExpedientPeticioPendentDist> pagina = expedientPeticioRepository.findPendentsCanviEstat(entitat, identNull, filtre.getIdentificador(),
-				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi(), paginacioHelper.toSpringDataPageable(paginacioParams));
-		return paginacioHelper.toPaginaDto(pagina, ExpedientPeticioPendentDist.class);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true,
+				false);
+
+
+		
+		if (resultEnum == ResultEnumDto.PAGE) {
+
+			Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findPendentsCanviEstatDistribucio(
+					entitat,
+					Strings.isNullOrEmpty(filtre.getNumero()),
+					filtre.getNumero(),
+					filtre.getDataInicial() == null,
+					filtre.getDataInicial(),
+					filtre.getDataFinal() == null,
+					DateHelper.toDateFinalDia(filtre.getDataFinal()),
+					filtre.getEstatPendentEnviarDistribucio() == null,
+					filtre.getEstatPendentEnviarDistribucio() != null ? filtre.getEstatPendentEnviarDistribucio().toString() : null,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+
+			result.setPagina(
+					paginacioHelper.toPaginaDto(
+							pagina,
+							ExpedientPeticioListDto.class));
+			
+		} else if (resultEnum == ResultEnumDto.IDS) {
+			
+			List<Long> ids = expedientPeticioRepository.findIdsPendentsCanviEstatDistribucio(
+					entitat,
+					Strings.isNullOrEmpty(filtre.getNumero()),
+					filtre.getNumero(),
+					filtre.getDataInicial() == null,
+					filtre.getDataInicial(),
+					filtre.getDataFinal() == null,
+					DateHelper.toDateFinalDia(filtre.getDataFinal()));
+
+			result.setIds(ids);
+		}
+
+		return result;
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre) {
 
-		boolean identNull = Strings.isNullOrEmpty(filtre.getIdentificador());
-		boolean nomNull = Strings.isNullOrEmpty(filtre.getNom());
-		boolean dataIniciNull = filtre.getDataInici() == null;
-		boolean dataFiNull = filtre.getDataFi() == null;
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return expedientPeticioRepository.findIdsPendentsCanviEstat(entitat, identNull, filtre.getIdentificador(),
-				nomNull, filtre.getNom(), dataIniciNull, filtre.getDataInici(), dataFiNull, filtre.getDataFi());
-	}
+
 
 	@Transactional
 	@Override
-	public boolean canviarEstatAnotacionsDistribucio(List<Long> ids) {
+	public Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id) {
 
-		boolean ok = true;
-		for (Long id : ids) {
-			Throwable exception = canviarEstatAnotacioDistribucio(id);
-			if (exception != null) {
-				ok = false;
-			}
-		}
-		return ok;
-	}
-
-	@Transactional
-	@Override
-	public Throwable canviarEstatAnotacioDistribucio(Long id) {
-
-		ExpedientPeticioEntity pendent = expedientPeticioRepository.findOne(id);
-		Throwable exception = null;
-		AnotacioRegistreId anotacio = new AnotacioRegistreId();
-		anotacio.setIndetificador(pendent.getIdentificador());
-		anotacio.setClauAcces(pendent.getClauAcces());
-		try {
-			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
-			pendent.setPendentEnviarDistribucio(false);
-			expedientPeticioRepository.save(pendent);
-		} catch (Throwable ex) {
-			exception = ex;
-			log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
-			Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
-			reintents = reintents > 0 ? reintents : configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS);
-			pendent.setReintentsEnviarDistribucio(reintents);
-			expedientPeticioRepository.save(pendent);
-		}
-		return exception;
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true,
+				false);
+		
+		return expedientPeticioHelper.reintentarCanviEstatDistribucio(id);
 	}
 
 

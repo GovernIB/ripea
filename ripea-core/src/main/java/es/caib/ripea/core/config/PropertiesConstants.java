@@ -8,8 +8,6 @@ public class PropertiesConstants {
     // 2. Enviament de notificacions registrades a Notific@
     public static final String PROCESSAR_ANOTACIONS_PETICIONS_PENDENTS_RATE = "es.caib.ripea.tasca.consulta.anotacio.temps.espera.execucio";
 
-    public static final String REINTENTS_ANOTACIONS_PETICIONS_PENDENTS = "es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio";
-
     // 2.5
     public static final String REINTENTAR_CANVI_ESTAT_DISTRIBUCIO = "es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio";
 

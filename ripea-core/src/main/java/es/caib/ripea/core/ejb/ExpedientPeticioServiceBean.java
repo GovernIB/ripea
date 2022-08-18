@@ -3,16 +3,32 @@
  */
 package es.caib.ripea.core.ejb;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.ExpedientPeticioService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientSelectDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexDto;
+import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.ExpedientPeticioService;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -153,23 +169,24 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	}
 
 	@Override
-	public PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams) {
-		return delegate.findPendentsCanviEstatAnotacioDistribucio(entitatId, filtre, paginacioParams);
+	@RolesAllowed("IPA_ADMIN")
+	public ResultDto<ExpedientPeticioListDto> findPendentsCanviEstatDistribucio(
+			Long entitatId,
+			ExpedientPeticioFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			ResultEnumDto resultEnum) {
+		return delegate.findPendentsCanviEstatDistribucio(
+				entitatId,
+				filtre,
+				paginacioParams,
+				resultEnum);
 	}
 
-	@Override
-	public List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre) {
-		return delegate.findIdsPendentsCanviEstatAnotacioDistribucio(entitatId, filtre);
-	}
 
 	@Override
-	public boolean canviarEstatAnotacionsDistribucio(List<Long> ids) {
-		return delegate.canviarEstatAnotacionsDistribucio(ids);
-	}
-
-	@Override
-	public Throwable canviarEstatAnotacioDistribucio(Long id) {
-		return delegate.canviarEstatAnotacioDistribucio(id);
+	@RolesAllowed("IPA_ADMIN")
+	public Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id) {
+		return delegate.canviarEstatAnotacioDistribucio(entitatId, id);
 	}
 
 

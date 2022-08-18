@@ -114,8 +114,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Autowired
 	private GrupRepository grupRepository;
 	@Autowired
-	private DistribucioHelper distribucioHelper;
-	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
@@ -326,12 +324,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 		try {
 			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
 			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
+			expedientPeticioEntity.setEstatCanviatDistribucio(true);
 			// change state of expedient peticion to processat and notificat to DISTRIBUCIO
 			expedientPeticioHelper.canviEstatExpedientPeticioNewTransaction(
 					expedientPeticioEntity.getId(),
 					ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT);
 		} catch (Exception e) {
-			expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e));
+			expedientPeticioEntity.setEstatCanviatDistribucio(false);
+			expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e)); // this will be replaced by expedientPeticioEntity.setPendentCanviarEstatDistribucio(true, false);
 		}
 	}
 	
@@ -403,26 +403,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 
 	
-
-	@Transactional
-	@Override
-	public Exception retryNotificarDistribucio(Long expedientPeticioId) {
-		ExpedientPeticioEntity expedientPeticioEntity = new ExpedientPeticioEntity();
-		Exception exception = null;
-		try {
-			expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
-			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
-			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
-			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
-			// change state of registre in DISTRIBUCIO to BACK_PROCESSADA
-			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.PROCESSADA, "");
-			expedientPeticioEntity.updateNotificaDistError(null);
-		} catch (Exception e) {
-			expedientPeticioEntity.updateNotificaDistError(ExceptionUtils.getStackTrace(e));
-			exception = e;
-		}
-		return exception;
-	}
 
 	@Transactional
 	@Override

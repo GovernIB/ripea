@@ -28,7 +28,6 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
-import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
@@ -88,8 +87,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private InteressatRepository interessatRepository;
 	@Autowired
 	private ConfigHelper configHelper;
-	@Autowired
-	private DistribucioHelper distribucioHelper;
+
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 
@@ -139,10 +137,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								anotacioRegistreId,
 								Estat.REBUDA,
 								"");
+						expedientPeticioEntity.setEstatCanviatDistribucio(true);
+						
 					} catch (Exception e) {
-						expedientPeticioEntity.setPendentEnviarDistribucio(true);
-						expedientPeticioEntity.setReintentsEnviarDistribucio(configHelper.getAsInt(PropertiesConstants.REINTENTS_ANOTACIONS_PETICIONS_PENDENTS));
-						expedientPeticioRepository.save(expedientPeticioEntity);
+						expedientPeticioEntity.setEstatCanviatDistribucio(false);
 					}
 					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
 					if (entitatAnotacio != null)
@@ -170,8 +168,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 								StringUtils.abbreviate(
 										ExceptionUtils.getStackTrace(e),
 										3600));
-
+						expedientPeticioEntity.setEstatCanviatDistribucio(true);
+						
 					} catch (Exception e1) {
+						expedientPeticioEntity.setEstatCanviatDistribucio(true);
 						System.out.println("Error canviEstat to ERROR: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getStackTrace(e1));
 						logger.error(ExceptionUtils.getStackTrace(e1));
 					}
@@ -184,22 +184,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void reintentarCanviEstatDistribucio() {
 
-		List<ExpedientPeticioEntity> pendents = expedientPeticioRepository.findPendentsCanviEstat();
-		AnotacioRegistreId anotacio;
-		for (ExpedientPeticioEntity pendent : pendents) {
-			anotacio = new AnotacioRegistreId();
-			anotacio.setIndetificador(pendent.getIdentificador());
-			anotacio.setClauAcces(pendent.getClauAcces());
-			try {
-				DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, Estat.REBUDA, "");
-				pendent.setPendentEnviarDistribucio(false);
-				expedientPeticioRepository.save(pendent);
-			} catch (Throwable ex) {
-				log.error("No s'ha guardat la anotació pendent a Distribució amb id " + pendent.getId(), ex);
-				Integer reintents = pendent.getReintentsEnviarDistribucio() - 1;
-				pendent.setReintentsEnviarDistribucio(reintents);
-				expedientPeticioRepository.save(pendent);
-			}
+		List<Long> idsPendents = expedientPeticioRepository.findIdsPendentsCanviEstat(getMaxReintentsCanviEstatRebudaDistribucio());
+		for (Long idPendent : idsPendents) {
+			expedientPeticioHelper.reintentarCanviEstatDistribucio(idPendent);
 		}
 	}
 
@@ -348,7 +335,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		
 		for (ContingutEntity contingut : pendents) {
 			EntitatDto entitat = conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class);
-			ConfigHelper.setEntitat(entitat); // TODO: check if other scheduled tasks (methods called by SchedulingConfig or with @Scheduled annotation) need execution per entitat
+			ConfigHelper.setEntitat(entitat);
 
 			if (contingut instanceof ExpedientEntity) {
 				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
@@ -395,6 +382,13 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		String arxiuMaxReintentsInteressats = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats");
 		return arxiuMaxReintentsInteressats != null && !arxiuMaxReintentsInteressats.isEmpty() ? Integer.valueOf(arxiuMaxReintentsInteressats) : 0;
 	}
+	
+	private int getMaxReintentsCanviEstatRebudaDistribucio() {
+		String maxReintentsCanviEstatRebudaDistribucio = configHelper.getConfig("es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio");
+		return maxReintentsCanviEstatRebudaDistribucio != null && !maxReintentsCanviEstatRebudaDistribucio.isEmpty() ? Integer.valueOf(maxReintentsCanviEstatRebudaDistribucio) : 0;
+	}
+	
+	
 	
 
 	private static final Logger logger = LoggerFactory.getLogger(SegonPlaServiceImpl.class);

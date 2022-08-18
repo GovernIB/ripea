@@ -286,10 +286,6 @@ public class ExpedientServiceBean implements ExpedientService {
 				rolActual);		
 	}
 
-	@Override
-	public Exception retryNotificarDistribucio(Long expedientPeticioId) {
-		return delegate.retryNotificarDistribucio(expedientPeticioId);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
