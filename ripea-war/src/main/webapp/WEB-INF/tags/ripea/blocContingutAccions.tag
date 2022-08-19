@@ -32,7 +32,7 @@
 							<li class="hidden"><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 						</c:when>
 						<c:otherwise>
-							<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}, ${tascaId}', ${contingut.custodiat}"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+							<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${fn:escapeXml(contingut.nom)}, ${tascaId}', ${contingut.custodiat}"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 						</c:otherwise>
 					</c:choose>
 				</c:when>
@@ -42,7 +42,7 @@
 							<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 						</c:when>
 						<c:otherwise>
-							<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${contingut.nom}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+							<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${fn:escapeXml(contingut.nom)}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 						</c:otherwise>
 					</c:choose>							
 				</c:otherwise>
