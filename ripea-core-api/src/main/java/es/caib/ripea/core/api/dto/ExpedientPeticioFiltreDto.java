@@ -25,6 +25,8 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	private ExpedientPeticioEstatViewEnumDto estat;
 	private Long metaExpedientId;
 
+	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
+	
 	
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
@@ -102,6 +104,15 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	public void setDataFinal(Date dataFinal) {
 		this.dataFinal = dataFinal;
 	}
+
+	public ExpedientPeticioEstatPendentDistribucioEnumDto getEstatPendentEnviarDistribucio() {
+		return estatPendentEnviarDistribucio;
+	}
+
+	public void setEstatPendentEnviarDistribucio(ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio) {
+		this.estatPendentEnviarDistribucio = estatPendentEnviarDistribucio;
+	}
+
 
 	private static final long serialVersionUID = -139254994389509932L;
 

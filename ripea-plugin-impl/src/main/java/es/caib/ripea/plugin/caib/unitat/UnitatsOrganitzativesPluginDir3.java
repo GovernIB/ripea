@@ -136,7 +136,6 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     public UnitatOrganitzativa findAmbCodi(String codi) throws SistemaExternException {
 
         try {
-            UnitatOrganitzativa unitat = null;
             UnidadTF unidad = getObtenerUnidadesService().obtenerUnidad(codi, null, null);
             if (unidad == null || !"V".equalsIgnoreCase(unidad.getCodigoEstadoEntidad())) {
                 throw new SistemaExternException("La unitat organitzativa no està vigent (" + "codi=" + codi + ")");
@@ -332,7 +331,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     private String getServiceUrl() {
 
         String url = getProperty("plugin.unitats.organitzatives.dir3.service.url");
-        return url.endsWith("/") ? url : url + "/";
+        return url;
     }
 
     private String getServiceUsername() {

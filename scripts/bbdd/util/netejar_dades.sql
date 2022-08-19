@@ -23,12 +23,10 @@ delete from ipa_bustia;
 update ipa_contingut c set c.pare_id = null;
 delete from ipa_contingut;
 
-delete from ipa_metaexpedient_metadocument;
 delete from ipa_metaexp_seq;
 delete from ipa_metaexpedient_grup;
 delete from ipa_metaexpedient;
 delete from ipa_metadocument;
-delete from ipa_metanode_metadada;
 delete from ipa_metanode;
 delete from ipa_metadada;
 

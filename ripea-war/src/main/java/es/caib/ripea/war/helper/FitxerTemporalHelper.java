@@ -33,7 +33,14 @@ public class FitxerTemporalHelper {
 					command.getArxiu().getContentType(),
 					command.getArxiu().getBytes());
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_DOCUMENT, fitxer);
-		} 
+		} else if (command.getFitxerContingut() != null) {
+			// From scan
+			FitxerTemporalDto fitxer = new FitxerTemporalDto(
+					command.getFitxerNom(),
+					command.getFitxerContentType(),
+					command.getFitxerContingut());
+			request.getSession().setAttribute(SESSION_ATTRIBUTE_DOCUMENT, fitxer);
+		}
 		FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(SESSION_ATTRIBUTE_DOCUMENT);
 		if (fitxerTemp != null) {
 			command.setArxiuTemporal(fitxerTemp);

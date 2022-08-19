@@ -119,12 +119,13 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{:estatView}}
-						{{if pendentEnviarDistribucio}}
-							<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
-							class="fa fa-exclamation-triangle text-danger"></span>
-						{{/if}}
+						<c:if test="${isRolActualAdmin}">
+							{{if pendentEnviarDistribucio}}
+								<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
+								class="fa fa-exclamation-triangle text-danger"></span>
+							{{/if}}
+						</c:if>
 					</script>
-
 				</th>
 
 				<th data-col-name="expedientId" data-visible="false"></th>
@@ -134,16 +135,18 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/expedientPeticio/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
-								{{if estatView == 'PENDENT'}}
+								{{if estatView == 'PENDENT' && !pendentEnviarDistribucio}}
 									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
 									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
 								{{/if}}
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
 								{{/if}}
-								{{if pendentEnviarDistribucio}}
-									<li><a href="<c:url value="/expedientPeticio/canviarEstat/{{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>
-								{{/if}}
+								<c:if test="${isRolActualAdmin}">
+									{{if pendentEnviarDistribucio}}
+										<li><a href="<c:url value="/expedientPeticio/canviarEstatDistribucio/{{:id}}"/>"><span class="fa fa-mail-forward"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>
+									{{/if}}
+								</c:if>
 							</ul>
 						</div>
 					</script>

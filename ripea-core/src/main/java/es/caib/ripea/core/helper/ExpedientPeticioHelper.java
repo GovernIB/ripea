@@ -3,11 +3,21 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.util.Date;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.distribucio.rest.client.domini.Annex;
 import es.caib.distribucio.rest.client.domini.AnnexEstat;
 import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.domini.Interessat;
-import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
@@ -26,15 +36,6 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -65,8 +66,8 @@ public class ExpedientPeticioHelper {
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
 	@Transactional
-	public void crearExpedientsPeticions(List<AnotacioRegistreId> ids) {
-		for (AnotacioRegistreId anotacioRegistreId : ids) {
+	public void crearExpedientsPeticions(List<es.caib.distribucio.ws.backoffice.AnotacioRegistreId> ids) {
+		for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : ids) {
 			ExpedientPeticioEntity peticio = expedientPeticioRepository.findByIdentificador(anotacioRegistreId.getIndetificador());
 			// only create peticions that were not created before
 			// distribucio will be resending ids until ripea call Distribucio WS method canviEstat(BACK_REBUDA)
@@ -135,12 +136,22 @@ public class ExpedientPeticioHelper {
 	}
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void setEstatCanviatDistribucioNewTransaction(Long expedientPeticioId, boolean canviat) {
+		
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		expedientPeticioEntity.setEstatCanviatDistribucio(canviat);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
 				registreEntrada.getEntitatCodi());
 		if (entitat == null) {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
+		
+		System.out.println("crearRegistrePerPeticio before getBuilder, identificador: " + registreEntrada.getIdentificador());
+		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
 				registreEntrada.getData(),
@@ -181,6 +192,9 @@ public class ExpedientPeticioHelper {
 				build();
 		registreRepository.save(registreEntity);
 		expedientPeticioEntity.updateRegistre(registreEntity);
+		
+		System.out.println("crearRegistrePerPeticio before findByEntitatAndClassificacioSia, identificador: " + registreEntrada.getIdentificador());
+		
 		// set metaexpedient to which expedient will belong if peticion is accepted
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(
 				entitat,
@@ -207,12 +221,16 @@ public class ExpedientPeticioHelper {
 					ExpedientPeticioAccioEnumDto.CREAR);
 		}
 		expedientPeticioRepository.save(expedientPeticioEntity);
+		
+		System.out.println("crearRegistrePerPeticio before interessats, identificador: " + registreEntrada.getIdentificador());
+		
 		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
 					crearInteressatEntity(
 							interessat,
 							registreEntity));
 		}
+		System.out.println("crearRegistrePerPeticio before annexos, identificador: " + registreEntrada.getIdentificador());
 		for (Annex annex: registreEntrada.getAnnexos()) {
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
@@ -220,12 +238,59 @@ public class ExpedientPeticioHelper {
 							registreEntity));
 		}
 		
-		// change state of expedient peticion to pendent of acceptar or rebutjar
+		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
+		// change state of expedient peticio to pendent de processar
 		canviEstatExpedientPeticio(
 				expedientPeticioEntity.getId(),
 				ExpedientPeticioEstatEnumDto.PENDENT);
 		
+		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
+		
 	}
+	
+	
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Exception reintentarCanviEstatDistribucio(Long id) {
+
+		ExpedientPeticioEntity pendent = expedientPeticioRepository.findOne(id);
+		Exception exception = null;
+		AnotacioRegistreId anotacio = new AnotacioRegistreId();
+		anotacio.setIndetificador(pendent.getIdentificador());
+		anotacio.setClauAcces(pendent.getClauAcces());
+		try {
+			
+			es.caib.distribucio.rest.client.domini.Estat estat = null;
+			String observacions = "";
+			switch (pendent.getEstat()) {
+			case CREAT:
+				estat = es.caib.distribucio.rest.client.domini.Estat.ERROR;
+				observacions = pendent.getConsultaWsErrorDesc();
+				break;
+			case PENDENT:
+				estat = es.caib.distribucio.rest.client.domini.Estat.REBUDA;
+				break;
+			case PROCESSAT_PENDENT:
+			case PROCESSAT_NOTIFICAT:
+				estat = es.caib.distribucio.rest.client.domini.Estat.PROCESSADA;
+				break;
+			case REBUTJAT:
+				estat = es.caib.distribucio.rest.client.domini.Estat.REBUTJADA;
+				break;
+			}
+			
+			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, estat, observacions);
+			pendent.setEstatCanviatDistribucio(true);
+			
+		} catch (Exception ex) {
+			logger.error("Error al reintentar canvi estat a Distribució de anotacio amb id " + pendent.getId(), ex);
+			exception = ex;
+			pendent.setEstatCanviatDistribucio(false, true);
+		}
+		return exception;
+	}
+	
+	
 
 	private RegistreInteressatEntity crearInteressatEntity(
 			Interessat interessat,

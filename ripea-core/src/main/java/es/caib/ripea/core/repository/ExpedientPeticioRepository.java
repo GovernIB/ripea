@@ -6,8 +6,6 @@ package es.caib.ripea.core.repository;
 import java.util.Date;
 import java.util.List;
 
-
-import es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -123,41 +121,61 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("entitatActual") EntitatEntity entitatActual,
 			@Param("metaExpedientPermesAdminOrgan") List<MetaExpedientEntity> metaExpedientPermesAdminOrgan);
 
-	@Query("FROM ExpedientPeticioEntity e WHERE e.pendentEnviarDistribucio = true AND e.reintentsEnviarDistribucio > 0")
-	List<ExpedientPeticioEntity> findPendentsCanviEstat();
+	@Query("select " +
+			"	e.id " +
+			"from " +
+			"	ExpedientPeticioEntity e " +
+			"where " +
+			"e.pendentCanviEstatDistribucio = true " +
+			"and e.reintentsCanviEstatDistribucio < :reintents")
+	List<Long> findIdsPendentsCanviEstat(
+			@Param("reintents") int reintents);
 
-	@Query("SELECT new es.caib.ripea.core.api.dto.ExpedientPeticioPendentDist(ep.id, ep.identificador, ep.dataAlta, ep.expedient.nom, ep.expedient.id) " +
-			"FROM ExpedientPeticioEntity ep " +
-			"WHERE ep.pendentEnviarDistribucio = true AND ep.reintentsEnviarDistribucio > 0 AND ep.expedient.entitat = :entitat " +
-			"AND (:identificadorNull = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
-			"AND (:nomNull = true or lower(ep.expedient.nom) like lower('%' || :nom || '%')) " +
-			"AND (:dataIniciNull = true or ep.dataAlta >= :dataInici) " +
-			"AND (:dataFiNull = true or ep.dataAlta <= :dataFi)")
-	Page<ExpedientPeticioPendentDist> findPendentsCanviEstat(@Param("entitat") EntitatEntity entitat,
-															 @Param("identificadorNull") boolean identificadorNull,
-															 @Param("identificador") String identificador,
-															 @Param("nomNull") boolean nomNull,
-															 @Param("nom") String nom,
-															 @Param("dataIniciNull") boolean dataIniciNull,
-															 @Param("dataInici") Date dataInici,
-															 @Param("dataFiNull") boolean dataFiNull,
-															 @Param("dataFi") Date dataFi,
-															 Pageable pageable);
+	
+	@Query("from" +
+			"    ExpedientPeticioEntity ep " +
+			"where " +
+			"ep.pendentCanviEstatDistribucio = true " +
+			"and ep.registre.entitat = :entitat " +
+			"and (:esNullIdentificador = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
+			"and (:esNullDataInici = true or ep.dataAlta >= :dataInici) " +
+			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi) " +
+			"and (:esNullEstat = true or " +
+//			"							(:estat = 'CONSULTA_ERROR' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.CREAT) or " +
+			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
+			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
+			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " )
+	Page<ExpedientPeticioEntity> findPendentsCanviEstatDistribucio(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullIdentificador") boolean esNullIdentificador,
+			@Param("identificador") String identificador,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") String estat,			
+			Pageable pageable);
 
-	@Query("SELECT ep.id FROM ExpedientPeticioEntity ep " +
-			"WHERE ep.pendentEnviarDistribucio = true AND ep.reintentsEnviarDistribucio > 0 AND ep.expedient.entitat = :entitat " +
-			"AND (:identificadorNull = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
-			"AND (:nomNull = true or lower(ep.expedient.nom) like lower('%' || :nom || '%')) " +
-			"AND (:dataIniciNull = true or ep.dataAlta >= :dataInici) " +
-			"AND (:dataFiNull = true or ep.dataAlta <= :dataFi)")
-	List<Long> findIdsPendentsCanviEstat(@Param("entitat") EntitatEntity entitat,
-										 @Param("identificadorNull") boolean identificadorNull,
-										 @Param("identificador") String identificador,
-										 @Param("nomNull") boolean nomNull,
-										 @Param("nom") String nom,
-										 @Param("dataIniciNull") boolean dataIniciNull,
-										 @Param("dataInici") Date dataInici,
-										 @Param("dataFiNull") boolean dataFiNull,
-										 @Param("dataFi") Date dataFi);
+	
+	@Query(	"select " +
+			"    ep.id " +
+			"from " +
+			"    ExpedientPeticioEntity ep " +
+			"where " +
+			"ep.pendentCanviEstatDistribucio = true " +
+			"and ep.registre.entitat = :entitat " +
+			"and (:esNullIdentificador = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
+			"and (:esNullDataInici = true or ep.dataAlta >= :dataInici) " +
+			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi)")
+	List<Long> findIdsPendentsCanviEstatDistribucio(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullIdentificador") boolean esNullIdentificador,
+			@Param("identificador") String identificador,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi);
+
 
 }

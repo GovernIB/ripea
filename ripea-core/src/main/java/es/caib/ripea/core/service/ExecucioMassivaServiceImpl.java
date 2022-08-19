@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
@@ -32,6 +33,7 @@ import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity.ExecucioMassivaTipus;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -72,6 +74,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired
 	private EmailHelper emailHelper;
 
+
 	@Transactional
 	@Override
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException {
@@ -103,7 +106,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					dto.getPortafirmesTransaccioId(),
 					dto.getDataCaducitat(), 
 					dto.getEnviarCorreu(),
-					entitat.getId(),
+					entitat,
 					dto.getRolActual()).build();
 		}
 		
@@ -183,6 +186,10 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 
 			if (massives != null) {
 				for (ExecucioMassivaEntity execucioMassiva : massives) {
+					
+					EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
+					ConfigHelper.setEntitat(entitat);
+					
 					if (execucioMassiva.getContinguts() != null) {
 						for (ExecucioMassivaContingutEntity execucioMassivaEntity : execucioMassiva.getContinguts()) {
 							executarExecucioMassivaContingut(execucioMassivaEntity.getId());

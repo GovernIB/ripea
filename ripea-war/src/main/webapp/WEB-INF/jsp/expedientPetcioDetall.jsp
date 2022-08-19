@@ -280,14 +280,7 @@ tr.clicable {
 				<a href="#justificant" aria-controls="justificant" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.justificant"/></a>
 			</li>
 		</c:if>
-		<c:if test="${not empty peticio.notificaDistError}">
-			<li role="presentation">
-				<a href="#error" aria-controls="error" role="tab" data-toggle="tab">
-					<spring:message code="registre.detalls.pipella.error"/>
-					<span class="fa fa-warning text-danger"></span>				
-				</a>
-			</li>		
-		</c:if>
+
 
 	</ul>
 	<div class="tab-content">
@@ -1063,19 +1056,7 @@ tr.clicable {
 					</c:if>
 				</div>
 			</c:if>
-			<!------------------------------ TABPANEL ERROR ------------------------------------->
-			<div class="tab-pane" id="error" role="tabpanel">
-				<div>
-					<div class="alert well-sm alert-danger alert-dismissable" style="margin-bottom: 0px;">
-						<span class="fa fa-exclamation-triangle"></span>
-						<spring:message code="expedient.peticio.detalls.errorNotifacio" />
-						<a href="<c:url value="/expedientPeticio/${peticio.id}/reintentarNotificar"/>"
-							class="btn btn-xs btn-default pull-right"><span class="fa fa-refresh"></span>
-							<spring:message code="expedient.peticio.detalls.annex.accio.reintentar" /></a>
-					</div>
-					<pre style="height: 200px; background-color: white; margin-bottom: 0px;">${peticio.notificaDistError}</pre>
-				</div>
-			</div>
+
 	</div>
 	<div id="modal-botons" class="well">
 		<a href="<c:url value="/bustiaUser"/>" class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>

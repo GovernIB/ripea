@@ -81,14 +81,9 @@ public interface ExpedientPeticioService {
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	PaginaDto<ExpedientPeticioPendentDist> findPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre, PaginacioParamsDto paginacioParams);
+	ResultDto<ExpedientPeticioListDto> findPendentsCanviEstatDistribucio(Long entitatId, ExpedientPeticioFiltreDto filtre, PaginacioParamsDto paginacioParams, ResultEnumDto resultEnum);
+
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	List<Long> findIdsPendentsCanviEstatAnotacioDistribucio(Long entitatId, ContingutMassiuFiltreDto filtre);
-
-	@PreAuthorize("hasRole('tothom')")
-	boolean canviarEstatAnotacionsDistribucio(List<Long> ids);
-
-	@PreAuthorize("hasRole('tothom')")
-	Throwable canviarEstatAnotacioDistribucio(Long id);
+	Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id);
  }

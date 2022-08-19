@@ -29,6 +29,7 @@ public class ExpedientPeticioListDto {
 	private String notificaDistError;
 	private Long expedientId;
 	private boolean pendentEnviarDistribucio;
+	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 
 	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {

@@ -17,8 +17,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,6 +24,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Classe del model de dades que representa una petició de creació d’expedient
@@ -53,7 +53,7 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	
 	// these fields are filled if error occurs while getting anotacio from DISTRIBUCIO and saving it in DB
 	@Column(name = "consulta_ws_error")
-	private boolean consultaWsError = false;
+	private boolean consultaWsError = false; // this field can be removed because it is being substituted by pendentCanviEstatDistribucio
 	@Column(name = "consulta_ws_error_desc", length = 4000)
 	private String consultaWsErrorDesc;
 	@Column(name = "consulta_ws_error_date")
@@ -81,12 +81,33 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	@ForeignKey(name = "ipa_expedient_registre_fk")
 	private ExpedientEntity expedient;
 
-	@Column(name = "pendent_enviar_distribucio")
-	private boolean pendentEnviarDistribucio;
-	@Column(name = "reintents_enviar_distribucio")
-	private Integer reintentsEnviarDistribucio;
+	@Column(name = "pendent_canvi_estat_dis")
+	private boolean pendentCanviEstatDistribucio;
+	@Column(name = "reintents_canvi_estat_dis")
+	private int reintentsCanviEstatDistribucio;
 	
+	
+	public void setEstatCanviatDistribucio(boolean canviat) {
+		setEstatCanviatDistribucio(
+				canviat,
+				null);
+	}
+	
+	public void setEstatCanviatDistribucio(
+			boolean canviat,
+			Boolean incrementReintents) {
+		if (canviat) {
+			this.pendentCanviEstatDistribucio = false;
+			this.reintentsCanviEstatDistribucio = 0;
+		} else {
+			this.pendentCanviEstatDistribucio = true;
+			if (incrementReintents != null && incrementReintents) {
+				this.reintentsCanviEstatDistribucio++;
+			}
+		}
+	}
 
+	
 	public void updateNotificaDistError(String notificaDistError) {
 		this.notificaDistError = StringUtils.abbreviate(notificaDistError, 4000);
 	}
@@ -147,15 +168,25 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 		this.metaExpedient = metaExpedient;
 	}
 
-	public static Builder getBuilder(String identificador, String clauAcces, Date dataAlta, ExpedientPeticioEstatEnumDto estat) {
-		return new Builder(identificador, clauAcces, dataAlta, estat);
+	public static Builder getBuilder(
+			String identificador,
+			String clauAcces,
+			Date dataAlta,
+			ExpedientPeticioEstatEnumDto estat) {
+		return new Builder(
+				identificador,
+				clauAcces,
+				dataAlta,
+				estat);
 	}
 	
 	public static class Builder {
 		ExpedientPeticioEntity built;
-
-		Builder(String identificador, String clauAcces, Date dataAlta, ExpedientPeticioEstatEnumDto estat) {
-
+		Builder(
+				String identificador,
+				String clauAcces,
+				Date dataAlta,
+				ExpedientPeticioEstatEnumDto estat) {
 			built = new ExpedientPeticioEntity();
 			built.identificador = identificador;
 			built.clauAcces = clauAcces;

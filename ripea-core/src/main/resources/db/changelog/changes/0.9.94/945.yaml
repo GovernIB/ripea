@@ -161,11 +161,7 @@ databaseChangeLog:
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.pinbal.base.url';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.pinbal.user';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.pinbal.password';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.pinbal.codi.sia.peticions';
-                
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.distribucio.backofficeIntegracio.ws.url';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.distribucio.backofficeIntegracio.ws.username';
-                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.distribucio.backofficeIntegracio.ws.password';
+                UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.pinbal.codi.sia.peticions';      
                 
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.gesdoc.class';
                 UPDATE IPA_CONFIG SET CONFIGURABLE = ${booleanUnit} WHERE KEY LIKE 'es.caib.ripea.plugin.gesdoc.filesystem.base.dir';

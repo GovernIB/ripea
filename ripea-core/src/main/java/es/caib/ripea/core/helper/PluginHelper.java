@@ -2560,10 +2560,14 @@ public class PluginHelper {
 				if (provincia == null) {
 					throw new NotFoundException(interessatPerAdresa.getProvincia(), ProvinciaDto.class);
 				}
-				MunicipiDto municipi = dadesExternesHelper.getMunicipiAmbCodi(interessatPerAdresa.getProvincia(), interessatPerAdresa.getMunicipi());
+				MunicipiDto municipi = null;
+				if (interessatPerAdresa.getMunicipi() != null) {
+					municipi = dadesExternesHelper.getMunicipiAmbCodi(interessatPerAdresa.getProvincia(), interessatPerAdresa.getMunicipi());
+				}
 				if (municipi == null) {
 					throw new NotFoundException(interessatPerAdresa.getMunicipi(), MunicipiDto.class);
 				}
+
 				enviament.setEntregaPostalCodiPostal(interessatPerAdresa.getCodiPostal());
 				enviament.setEntregaPostalPaisCodi(pais.getAlfa2());
 				enviament.setEntregaPostalProvinciaCodi(provincia.getCodi());
@@ -4053,11 +4057,11 @@ public class PluginHelper {
 		}
 		FirmaServidorPlugin plugin = firmaServidorPlugins.get(entitatCodi);
 //		loadPluginProperties("FIRMA_SERVIDOR");
-		if (plugin == null) {
+		if (plugin != null) {
 			return plugin;
 		}
 		String pluginClass = getPropertyPluginFirmaServidor();
-		if (pluginClass != null && pluginClass.length() > 0) {
+		if (Strings.isNullOrEmpty(pluginClass)) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_FIRMASERV, "No està configurada la classe per al plugin de firma en servidor");
 		}
 		try {

@@ -76,7 +76,7 @@
                     </div>
                     <div class="col-sm-1">
                         <c:if test="${not config.jbossProperty}">
-                            <button class="btn btn-success"><i class="fa fa-save"></i></button>
+                            <button class="btn btn-success" style="padding: 4px 8px"><i class="fa fa-save"></i></button>
                         </c:if>
                         <c:if test="${config.configurable}">
                             <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>

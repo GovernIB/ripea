@@ -56,7 +56,7 @@
             $('#taulaDades').one('draw.dt', function () {
 
                 $('#seleccioAll').on('click', function() {
-                    $.get("anotacionsPendentsCanviEstat/select",
+                    $.get("expedientPeticioCanviEstatDistribucio/select",
                         function(data) {
                             $("#seleccioCount").html(data);
                             $('#taulaDades').webutilDatatable('refresh');
@@ -66,7 +66,7 @@
                 });
                 $('#seleccioNone').on('click', function() {
                     $.get(
-                        "anotacionsPendentsCanviEstat/deselect",
+                        "expedientPeticioCanviEstatDistribucio/deselect",
                         function(data) {
                             $("#seleccioCount").html(data);
                             $('#taulaDades').webutilDatatable('select-none');
@@ -100,20 +100,20 @@
 
 </head>
 <body>
-<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
+<form:form action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
     <div class="row">
         <div class="col-md-4">
-            <rip:inputText name="identificador" inline="true" placeholderKey="expedient.peticio.list.columna.numero"/>
-        </div>
-        <div class="col-md-4">
-            <rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
+            <rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.columna.numero"/>
         </div>
         <div class="col-md-2">
-            <rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+            <rip:inputDate name="dataInicial" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
         </div>
         <div class="col-md-2">
-            <rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+            <rip:inputDate name="dataFinal" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
         </div>
+		<div class="col-md-4">							
+			<rip:inputSelect name="estatPendentEnviarDistribucio" inline="true" optionEnum="ExpedientPeticioEstatPendentDistribucioEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
+		</div>	        
     </div>
     <div class="row">
         <div class="col-md-4 pull-right">
@@ -131,8 +131,8 @@
     <div class="btn-group pull-right">
         <a id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
         <a id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
-        <a class="btn btn-default" href="./anotacionsPendentsCanviEstat/canviarEstat" >
-            <span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.boto.canviEstat"/>
+        <a class="btn btn-default" href="./expedientPeticioCanviEstatDistribucio/canviarEstat" >
+            <span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.boto.actualitzarEstat"/>
         </a>
 
     </div>
@@ -140,28 +140,25 @@
 
 <table id="taulaDades"
        data-toggle="datatable"
-       data-url="<c:url value="/massiu/anotacionsPendentsCanviEstat/datatable"/>"
-       data-filter="#contingutMassiuFiltreCommand"
+       data-url="<c:url value="/massiu/expedientPeticioCanviEstatDistribucio/datatable"/>"
        class="table table-bordered table-striped"
-       data-default-order="1"
+       data-default-order="2"
        data-default-dir="desc"
        data-botons-template="#botonsTemplate"
        data-selection-enabled="true"
        style="width:100%">
     <thead>
-    <tr>
-        <th data-col-name="id" data-visible="false"></th>
-        <th data-col-name="identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
-        <th data-col-name="dataAlta" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data.alta"/></th>
-        <th data-col-name="expedientNom" data-visible="false"></th>
-        <th data-col-name="expedientId" data-visible="false"></th>
-        <th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
-            <spring:message code="accio.massiva.list.column.expedient"/>
-            <script id="cellPathTemplate" type="text/x-jsrender">
-                    <a href="../contingut/{{:expedientId}}"><span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span> {{:expedientNom}}</a>
-            </script>
-        </th>
-    </tr>
+		<tr>
+			<th data-col-name="id" data-visible="false"></th>
+			<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
+			<th data-col-name="dataAlta" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data.alta"/></th>
+			<th data-col-name="estatPendentEnviarDistribucio" data-orderable="false" data-template="#cellEstatTemplate">
+				<spring:message code="expedient.peticio.list.columna.estat"/>
+				<script id="cellEstatTemplate" type="text/x-jsrender">
+					{{:estatPendentEnviarDistribucio}}
+				</script>
+			</th>
+		</tr>
     </thead>
 </table>
 

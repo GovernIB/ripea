@@ -16,14 +16,6 @@ databaseChangeLog:
         constraintName: ipa_entitat_codi_uk
         tableName: ipa_entitat
 - changeSet:
-    id: init-index-6
-    author: limit (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: lastmodifiedby_codi, filter_name
-        constraintName: ipa_expedient_filtre_uk
-        tableName: ipa_expedient_filtre
-- changeSet:
     id: init-index-8
     author: limit (generated)
     changes:
@@ -72,14 +64,6 @@ databaseChangeLog:
         constraintName: ipa_metaexp_tasca_mult_uk
         tableName: ipa_metaexp_tasca
 - changeSet:
-    id: init-index-20
-    author: limit (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: metanode_id, metadada_id
-        constraintName: ipa_mnode_mdada_mnod_mdad_uk
-        tableName: ipa_metanode_metadada
-- changeSet:
     id: init-index-22
     author: limit (generated)
     changes:
@@ -87,14 +71,6 @@ databaseChangeLog:
         columnNames: codi, entitat_id
         constraintName: ipa_organ_gestor_uk
         tableName: ipa_organ_gestor
-- changeSet:
-    id: init-index-24
-    author: limit (generated)
-    changes:
-    - addUniqueConstraint:
-        columnNames: metaexpedient_id, metadocument_id
-        constraintName: ipa_metaexp_metadov_uk
-        tableName: ipa_metaexpedient_metadocument
 - changeSet:
     id: init-index-25
     author: limit (generated)
@@ -336,16 +312,6 @@ databaseChangeLog:
         indexName: ipa_dada_metadada_fk_i
         tableName: ipa_dada
 - changeSet:
-    id: init-index-49
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: metadada_id
-        indexName: ipa_mnode_mdada_metadada_fk_i
-        tableName: ipa_metanode_metadada
-- changeSet:
     id: init-index-50
     author: limit (generated)
     changes:
@@ -355,16 +321,6 @@ databaseChangeLog:
             name: meta_expedient_id
         indexName: ipa_metaexp_seq_metaexp_fk_i
         tableName: ipa_metaexp_seq
-- changeSet:
-    id: init-index-51
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: metanode_id
-        indexName: ipa_mnode_mdada_metanode_fk_i
-        tableName: ipa_metanode_metadada
 - changeSet:
     id: init-index-52
     author: limit (generated)
@@ -556,16 +512,6 @@ databaseChangeLog:
         indexName: ipa_interessat_createdby_fk_i
         tableName: ipa_interessat
 - changeSet:
-    id: init-index-70
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: createdby_codi
-        indexName: ipa_mnode_mdada_createdby_fk_i
-        tableName: ipa_metanode_metadada
-- changeSet:
     id: init-index-71
     author: limit (generated)
     changes:
@@ -695,16 +641,6 @@ databaseChangeLog:
             name: lastmodifiedby_codi
         indexName: ipa_nteressat_lastmodby_fk_i
         tableName: ipa_interessat
-- changeSet:
-    id: init-index-84
-    author: limit (generated)
-    changes:
-    - createIndex:
-        columns:
-        - column:
-            name: lastmodifiedby_codi
-        indexName: ipa_mnode_mdada_lastmodby_fk_i
-        tableName: ipa_metanode_metadada
 - changeSet:
     id: init-index-85
     author: limit (generated)

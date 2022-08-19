@@ -4,7 +4,6 @@
 package es.caib.ripea.core.helper;
 
 import es.caib.ripea.core.repository.AlertaRepository;
-import es.caib.ripea.core.repository.ContingutComentariRepository;
 import es.caib.ripea.core.repository.ContingutLogRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
@@ -40,8 +39,7 @@ public class ContingutsOrfesHelper {
 	private ContingutMovimentRepository contingutMovimentRepository;
 	@Autowired
 	private ContingutLogRepository contingutLogRepository;
-	@Autowired
-	private ContingutComentariRepository contingutComentariRepository;
+
 
 	// Mètodes per evitar errors al tenir continguts orfes en base de dades
 	// ////////////////////////////////////////////////////////////////////
@@ -68,7 +66,6 @@ public class ContingutsOrfesHelper {
 		alertaRepository.deleteAlertesFromContingutsOrfes(contingutId);
 		execucioMassivaContingutRepository.deleteExecucioMassivaFromContingutsOrfes(contingutId);
 		contingutMovimentRepository.deleteMovimentsFromContingutsOrfes(contingutId);
-//		contingutComentariRepository.deleteComentarisFromContingutsOrfes(contingutId);
 		contingutLogRepository.deleteLogsFromContingutsOrfes(contingutId);
 		contingutRepository.deleteContingutsOrfes(contingutId);
 	}
