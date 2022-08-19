@@ -156,7 +156,7 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed("tothom")
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,

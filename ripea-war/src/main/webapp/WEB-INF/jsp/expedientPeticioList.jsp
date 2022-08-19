@@ -120,12 +120,10 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{:estatView}}
-						<c:if test="${isRolActualAdmin}">
-							{{if pendentEnviarDistribucio}}
-								<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
-								class="fa fa-exclamation-triangle text-danger"></span>
-							{{/if}}
-						</c:if>
+						{{if pendentEnviarDistribucio}}
+							<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
+							class="fa fa-exclamation-triangle text-danger"></span>
+						{{/if}}
 					</script>
 				</th>
 

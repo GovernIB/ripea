@@ -95,7 +95,7 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	}
 
 	@Override
-	@RolesAllowed({"IPA_ADMIN", "IPA_SUPER"})
+	@RolesAllowed({"tothom"})
 	public List<MetaExpedientDto> findByEntitat(
 			Long entitatId) {
 		return delegate.findByEntitat(entitatId);
