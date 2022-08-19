@@ -17,6 +17,7 @@ public class Persona {
 	private String nom;
 	private String llinatge1;
 	private String llinatge2;
+	private String raoSocial;
 	private String nif;
 	private String telefon;
 	private String email;

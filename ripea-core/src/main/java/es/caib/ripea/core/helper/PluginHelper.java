@@ -3359,7 +3359,7 @@ public class PluginHelper {
 			persona.setInteressatTipus(InteressatTipusEnumDto.PERSONA_FISICA);
 		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
 			InteressatPersonaJuridicaEntity interessatPj = (InteressatPersonaJuridicaEntity)interessat;
-			persona.setNom(interessatPj.getRaoSocial());
+			persona.setRaoSocial(interessatPj.getRaoSocial());
 			persona.setInteressatTipus(InteressatTipusEnumDto.PERSONA_JURIDICA);
 		} else if (interessat instanceof InteressatAdministracioEntity) {
 			InteressatAdministracioEntity interessatA = (InteressatAdministracioEntity)interessat;

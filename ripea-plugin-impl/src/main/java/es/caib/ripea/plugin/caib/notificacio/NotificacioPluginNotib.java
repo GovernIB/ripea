@@ -357,6 +357,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			p.setNom(persona.getNom());
 			p.setLlinatge1(persona.getLlinatge1());
 			p.setLlinatge2(persona.getLlinatge2());
+			p.setRaoSocial(persona.getRaoSocial());
 			p.setTelefon(persona.getTelefon());
 			p.setEmail(persona.getEmail());
 			p.setInteressatTipus(toInteressatTipusEnumDto(persona.getInteressatTipus()));
