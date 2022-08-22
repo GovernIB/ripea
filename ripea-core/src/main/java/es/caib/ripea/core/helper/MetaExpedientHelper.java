@@ -3,32 +3,8 @@
  */
 package es.caib.ripea.core.helper;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
-import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
-import es.caib.ripea.core.repository.AvisRepository;
-import es.caib.ripea.core.repository.ExpedientEstatRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
-import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
-import es.caib.ripea.core.repository.MetaNodeRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
+import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -42,8 +18,60 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
-import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import es.caib.ripea.core.api.dto.ActualitzacioInfo;
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
+import es.caib.ripea.core.api.dto.ArbreNodeDto;
+import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.entity.AvisEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
+import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaExpedientSequenciaEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.PermisosHelper.ListObjectIdentifiersExtractor;
+import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
+import es.caib.ripea.core.repository.AvisRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientSequenciaRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.MetaNodeRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Utilitats comunes pels meta-expedients.
@@ -89,6 +117,8 @@ public class MetaExpedientHelper {
 	private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private MetaExpedientComentariRepository metaExpedientComentariRepository;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
@@ -787,6 +817,37 @@ public class MetaExpedientHelper {
 			throw e;
 		}
 	}
+	
+
+
+	public boolean publicarComentariPerMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			String text, 
+			String rolActual) {
+
+		EntitatEntity entitat = null;
+		if (rolActual.equals("IPA_REVISIO")) {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
+		} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, true);
+		}
+		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
+
+		//truncam a 1024 caracters
+		if (text.length() > 1024)
+			text = text.substring(0, 1024);
+		MetaExpedientComentariEntity comentari = MetaExpedientComentariEntity.getBuilder(
+				metaExpedient, 
+				text).build();
+		metaExpedientComentariRepository.save(comentari);
+		
+		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
+		
+		return true;
+	}
+	
 
 	private void actualitzaAvisosSyncProcediments(Map<String, String[]> avisosProcedimentsOrgans, Long entitatId) {
 		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitatId, PROCEDIMENT_ORGAN_NO_SYNC);

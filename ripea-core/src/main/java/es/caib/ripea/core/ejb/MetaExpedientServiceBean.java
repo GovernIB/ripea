@@ -316,10 +316,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"tothom"})
 	public MetaExpedientDto canviarEstatRevisioASellecionat(
 			Long entitatId,
-			MetaExpedientDto metaExpedient) {
+			MetaExpedientDto metaExpedient, 
+			String rolActual) {
 		return delegate.canviarEstatRevisioASellecionat(
 				entitatId, 
-				metaExpedient);
+				metaExpedient, 
+				rolActual);
 	}
 
 

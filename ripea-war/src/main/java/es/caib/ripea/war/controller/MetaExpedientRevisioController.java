@@ -134,6 +134,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaExpedientRevisioCommand command = MetaExpedientRevisioCommand.asCommand(metaExpedient);
+		command.setRevisioComentari(null);
 		model.addAttribute(command);
 		
 		if (RolHelper.isRolActualRevisor(request) && metaExpedientService.isRevisioActiva() && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT) {
@@ -155,12 +156,19 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaExpedientDto dto = command.asDto();
 		
+		if (command.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REBUTJAT && (command.getRevisioComentari() == null || command.getRevisioComentari().isEmpty())) {
+			bindingResult.rejectValue("revisioComentari", "NotNull");
+		}
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("modificar", true);
 			return "metaExpedientRevisioForm";
 		}
 
-		metaExpedientRevisioService.canviarEstatRevisioASellecionat(entitatActual.getId(), dto);
+		metaExpedientRevisioService.canviarEstatRevisioASellecionat(
+				entitatActual.getId(),
+				dto,
+				RolHelper.getRolActual(request));
+		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:metaExpedientRevisio",

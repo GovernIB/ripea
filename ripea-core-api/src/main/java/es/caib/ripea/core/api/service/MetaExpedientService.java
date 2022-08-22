@@ -465,7 +465,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto canviarEstatRevisioASellecionat(
 			Long entitatId,
-			MetaExpedientDto metaExpedient);
+			MetaExpedientDto metaExpedient, 
+			String rolActual);
 
 
 	@PreAuthorize("hasRole('tothom')")

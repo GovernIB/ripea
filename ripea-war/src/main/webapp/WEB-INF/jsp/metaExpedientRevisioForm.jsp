@@ -26,7 +26,14 @@
 	
 <script>
 	$(document).ready(function(){
-
+		$('#revisioEstat').on('change', function() {
+			var estat = $(this).val();
+			if (estat=='REBUTJAT') {
+            	$("label[for='revisioComentari']").append( " *" );
+			} else {
+				$("label[for='revisioComentari']").text( $("label[for='revisioComentari']").text().replace(' *', '') );
+			}
+		});
 	});
 </script>	
 	
@@ -37,7 +44,7 @@
 	
 		<form:hidden path="id"/>
 		<rip:inputSelect name="revisioEstat" optionEnum="MetaExpedientRevisioEstatEnumDto" textKey="metaexpedient.revisio.form.camp.estatRevisio" disabled="${!modificar}"/>
-		<div style="min-height: 150px;"></div>
+		<rip:inputTextarea name="revisioComentari" textKey="metaexpedient.revisio.form.camp.comentari" required="${metaExpedientRevisioCommand.revisioEstat=='REBUTJAT'}" disabled="${!modificar}"/>
 
 		<div id="modal-botons">
 			<c:if test="${modificar}"><button type="submit" class="btn btn-success" <span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>

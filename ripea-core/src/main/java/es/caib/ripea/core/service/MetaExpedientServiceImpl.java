@@ -3,22 +3,15 @@
  */
 package es.caib.ripea.core.service;
 
-//import com.codahale.metrics.Timer;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
-import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.PermissionDeniedException;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.helper.*;
-import es.caib.ripea.core.repository.*;
-import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
-import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
-import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +24,85 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+//import com.codahale.metrics.Timer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
+import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.entity.DominiEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.HistoricExpedientEntity;
+import es.caib.ripea.core.entity.HistoricInteressatEntity;
+import es.caib.ripea.core.entity.HistoricUsuariEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DominiHelper;
+import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientEstatHelper;
+import es.caib.ripea.core.helper.GrupHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaDadaHelper;
+import es.caib.ripea.core.helper.MetaDocumentHelper;
+import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.MetaNodeHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.DominiRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
+import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
+import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -209,9 +274,21 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public MetaExpedientDto canviarEstatRevisioASellecionat(Long entitatId, MetaExpedientDto metaExpedient) {
+	public MetaExpedientDto canviarEstatRevisioASellecionat(
+			Long entitatId,
+			MetaExpedientDto metaExpedient,
+			String rolActual) {
 		logger.debug("Canviant estat revicio meta-expedient (" + "entitatId=" + entitatId + ", " + "metaExpedient=" + metaExpedient + ")");
 
+		if (metaExpedient.getRevisioComentari() != null && !metaExpedient.getRevisioComentari().isEmpty()) {
+			metaExpedientHelper.publicarComentariPerMetaExpedient(
+					entitatId,
+					metaExpedient.getId(),
+					metaExpedient.getRevisioComentari(),
+					rolActual);
+		}
+
+		
 		return metaExpedientHelper.canviarEstatRevisioASellecionat(entitatId, metaExpedient);
 	}
 	
@@ -1063,29 +1140,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long metaExpedientId,
 			String text, 
 			String rolActual) {
-		logger.debug("Obtenint els comentaris pel contingut ("
+		logger.debug("Publicar comentari per metaexpedient ("
 				+ "entitatId=" + entitatId + ", "
-				+ "nodeId=" + metaExpedientId + ")");
-		EntitatEntity entitat = null;
-		if (rolActual.equals("IPA_REVISIO")) {
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-		} else {
-			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, true);
-		}
+				+ "text=" + text + ", "
+				+ "metaExpedientId=" + metaExpedientId + ")");
 		
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-
-		//truncam a 1024 caracters
-		if (text.length() > 1024)
-			text = text.substring(0, 1024);
-		MetaExpedientComentariEntity comentari = MetaExpedientComentariEntity.getBuilder(
-				metaExpedient, 
-				text).build();
-		metaExpedientComentariRepository.save(comentari);
-		
-		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
-		
-		return true;
+		return metaExpedientHelper.publicarComentariPerMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				text,
+				rolActual);
 	}
 	
 	
