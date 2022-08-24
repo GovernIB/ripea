@@ -139,6 +139,8 @@ UPDATE IPA_CONFIG SET CONFIGURABLE = true WHERE KEY LIKE 'es.caib.ripea.habilita
 UPDATE IPA_CONFIG SET CONFIGURABLE = true WHERE KEY LIKE 'es.caib.ripea.habilitar.tipusdocument';
 UPDATE IPA_CONFIG SET CONFIGURABLE = true WHERE KEY LIKE 'es.caib.ripea.procediment.gestio.permis.administrador.organ';
 
+-- Changeset db/changelog/changes/0.9.94/1018.yaml::1661173682991-1::limit
+update IPA_INTERESSAT set DOCUMENT_TIPUS = 'NIF' where DOCUMENT_TIPUS = 'CIF';
 -- Changeset db/changelog/changes/0.9.94/1019.yaml::1651146740000-1::limit
 UPDATE IPA_INTERESSAT SET INCAPACITAT = 0 WHERE INCAPACITAT = 1;
 
