@@ -13,11 +13,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
-/**
- * Command per al filtre d'expedients dels arxius.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+
 public class ExpedientPeticioFiltreCommand {
 
 	private String procediment;
@@ -31,6 +27,8 @@ public class ExpedientPeticioFiltreCommand {
 	private Long metaExpedientId;
 	
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
+	
+	private boolean nomesPendentEnviarDistribucio;
 
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
@@ -91,6 +89,12 @@ public class ExpedientPeticioFiltreCommand {
 	}
 	public void setEstatPendentEnviarDistribucio(ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio) {
 		this.estatPendentEnviarDistribucio = estatPendentEnviarDistribucio;
+	}
+	public boolean isNomesPendentEnviarDistribucio() {
+		return nomesPendentEnviarDistribucio;
+	}
+	public void setNomesPendentEnviarDistribucio(boolean nomesPendentEnviarDistribucio) {
+		this.nomesPendentEnviarDistribucio = nomesPendentEnviarDistribucio;
 	}
 	@Override
 	public String toString() {

@@ -135,8 +135,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	@Query("from" +
 			"    ExpedientPeticioEntity ep " +
 			"where " +
-			"ep.pendentCanviEstatDistribucio = true " +
-			"and ep.registre.entitat = :entitat " +
+			"ep.registre.entitat = :entitat " +
+			"and (:nomesPendentEnviarDistribucio = false or ep.pendentCanviEstatDistribucio = true) " +
 			"and (:esNullIdentificador = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
 			"and (:esNullDataInici = true or ep.dataAlta >= :dataInici) " +
 			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi) " +
@@ -154,7 +154,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			@Param("esNullEstat") boolean esNullEstat,
-			@Param("estat") String estat,			
+			@Param("estat") String estat,	
+			@Param("nomesPendentEnviarDistribucio") boolean nomesPendentEnviarDistribucio,
 			Pageable pageable);
 
 	
@@ -163,11 +164,16 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"from " +
 			"    ExpedientPeticioEntity ep " +
 			"where " +
-			"ep.pendentCanviEstatDistribucio = true " +
-			"and ep.registre.entitat = :entitat " +
+			"ep.registre.entitat = :entitat " +
+			"and (:nomesPendentEnviarDistribucio = false or ep.pendentCanviEstatDistribucio = true) " +
 			"and (:esNullIdentificador = true or lower(ep.identificador) like lower('%' || :identificador || '%')) " +
 			"and (:esNullDataInici = true or ep.dataAlta >= :dataInici) " +
-			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi)")
+			"and (:esNullDataFi = true or ep.dataAlta <= :dataFi) " +
+			"and (:esNullEstat = true or " +
+//			"							(:estat = 'CONSULTA_ERROR' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.CREAT) or " +
+			"							(:estat = 'PENDENT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
+			"							(:estat = 'ACCEPTAT' and (ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
+			" 							(:estat = 'REBUTJAT' and ep.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " )
 	List<Long> findIdsPendentsCanviEstatDistribucio(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullIdentificador") boolean esNullIdentificador,
@@ -175,7 +181,11 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") Date dataFi,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") String estat,	
+			@Param("nomesPendentEnviarDistribucio") boolean nomesPendentEnviarDistribucio);
+	
 
 
 }
