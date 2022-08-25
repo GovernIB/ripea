@@ -215,4 +215,7 @@ public interface AplicacioService {
 			String key,
 			boolean defaultValueIfNull);
 
+	@PreAuthorize("hasRole('tothom')")
+	public void evictRolsPerUsuari(String usuariCodi);
+
 }

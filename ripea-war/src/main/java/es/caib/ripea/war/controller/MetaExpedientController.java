@@ -1014,20 +1014,14 @@ public class MetaExpedientController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		
-		long t0 = System.currentTimeMillis();
 		if (text != null && !text.isEmpty()) {
 			metaExpedientService.publicarComentariPerMetaExpedient(entitatActual.getId(), metaExpedientId, text, RolHelper.getRolActual(request));
 		}
-		logger.info("publicarComentariPerMetaExpedient time: " + (System.currentTimeMillis() - t0) + " ms");
 			
-		
-		long t1 = System.currentTimeMillis();
 		List<MetaExpedientComentariDto> coms = metaExpedientService.findComentarisPerMetaExpedient(
 				entitatActual.getId(), 
 				metaExpedientId,
 				RolHelper.getRolActual(request));
-		logger.info("findComentarisPerMetaExpedient time: " + (System.currentTimeMillis() - t1) + " ms");
 		return coms;
 	}
 	

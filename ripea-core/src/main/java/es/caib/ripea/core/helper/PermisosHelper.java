@@ -56,6 +56,8 @@ public class PermisosHelper {
 	private AclObjectIdentityRepository aclObjectIdentityRepository;
 	@Resource
 	private PluginHelper pluginHelper;
+	@Resource
+	private CacheHelper cacheHelper;
 
 	public void assignarPermisUsuari(
 			String userName,
@@ -618,6 +620,7 @@ public class PermisosHelper {
 			acl.insertAce(acl.getEntries().size(), permission, sid, true);
 		}
 		aclService.updateAcl(acl);
+		cacheHelper.evictReadAclById(oid);
 	}
 
 	private void revocarPermisos(
@@ -642,6 +645,7 @@ public class PermisosHelper {
 			for (Integer index : indexosPerEsborrar)
 				acl.deleteAce(index);
 			aclService.updateAcl(acl);
+			cacheHelper.evictReadAclById(oid);
 		} catch (NotFoundException nfex) {
 			// Si no troba l'ACL no fa res
 		}
@@ -654,7 +658,7 @@ public class PermisosHelper {
 			String usuariCodi) {
 		List<Sid> sids = new ArrayList<Sid>();
 		sids.add(new PrincipalSid(usuariCodi));
-		List<String> rolsUsuariActual = pluginHelper.rolsUsuariFindAmbCodi(usuariCodi);
+		List<String> rolsUsuariActual = cacheHelper.findRolsAmbCodi(usuariCodi);
 		for (String rol : rolsUsuariActual) {
 			Sid sid = new GrantedAuthoritySid(getMapeigRol(rol));
 			sids.add(sid);
@@ -674,9 +678,9 @@ public class PermisosHelper {
 		boolean[] granted = new boolean[permissions.length];
 		for (int i = 0; i < permissions.length; i++)
 			granted[i] = false;
-		try {
 			ObjectIdentity oid = new ObjectIdentityImpl(clazz, objectIdentifier);
-			Acl acl = aclService.readAclById(oid);
+			Acl acl = cacheHelper.readAclById(oid);
+		if (acl != null) {
 			List<Permission> ps = new ArrayList<Permission>();
 			for (int i = 0; i < permissions.length; i++) {
 				try {
@@ -686,8 +690,9 @@ public class PermisosHelper {
 				} catch (NotFoundException ex) {
 				}
 			}
-		} catch (NotFoundException ex) {
 		}
+
+
 		return granted;
 	}
 

@@ -275,7 +275,7 @@ public class EmailHelper {
 				for (OrganGestorEntity organ : organs) {
 					boolean granted = permisosHelper.isGrantedAll(
 							organ.getId(),
-							EntitatEntity.class,
+							OrganGestorEntity.class,
 							new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU},
 							dadesUsuari.getCodi());
 					UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
@@ -293,7 +293,7 @@ public class EmailHelper {
 			for (DadesUsuari dadesUsuari : dadesUsuarisAdminOrgan) {
 				boolean granted = permisosHelper.isGrantedAll(
 						organGestor.getId(),
-						EntitatEntity.class,
+						OrganGestorEntity.class,
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						dadesUsuari.getCodi());
 				UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
@@ -308,7 +308,6 @@ public class EmailHelper {
 		}
 		
 		logger.info("comentari mail IPA_ORGAN_ADMIN time: " + (System.currentTimeMillis() - t2) + " ms");
-		long t22 = System.currentTimeMillis();
 		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
 		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
 		
@@ -322,7 +321,6 @@ public class EmailHelper {
 						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Comentari: " + comentari + "\n" +
 						"Usuari: " + usuariEntity.getNom();
-		logger.info("prepare mail IPA_ORGAN_ADMIN time: " + (System.currentTimeMillis() - t22) + " ms");
 		if (!emailsNoAgrupats.isEmpty()) {
 			
 			long t3 = System.currentTimeMillis();

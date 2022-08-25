@@ -1125,7 +1125,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + metaExpedientId + ")");
 		
-		long t0 = System.currentTimeMillis();
 		EntitatEntity entitat = null;
 		if (rolActual.equals("IPA_REVISIO")) {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
@@ -1142,8 +1141,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient, 
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
-		
-		logger.info("save comentari db time: " + (System.currentTimeMillis() - t0) + " ms");
 		
 		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
 		

@@ -20,6 +20,10 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -127,6 +131,8 @@ public class CacheHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private MutableAclService aclService;
 	
 	@Cacheable(value = "tasquesUsuari", key="#usuariCodi")
 	public long countTasquesPendents(String usuariCodi) {
@@ -594,6 +600,34 @@ public class CacheHelper {
 	@CacheEvict(value = "rolsDisponiblesEnAcls", allEntries = true)
 	public void evictRolsDisponiblesEnAcls() {
 	}
+	
+	
+	@Cacheable(value = "findRolsAmbCodi", key="#usuariCodi")
+	public List<String> findRolsAmbCodi(String usuariCodi) {
+		return pluginHelper.rolsUsuariFindAmbCodi(usuariCodi);
+	}
+
+	@CacheEvict(value = "findRolsAmbCodi", key="#usuariCodi")
+	public void evictFindRolsAmbCodi(String usuariCodi) {
+	}
+	
+	
+	@Cacheable(value = "readAclById", key="#oid")
+	public Acl readAclById(ObjectIdentity oid) {
+		Acl acl = null;
+		try {
+			acl = aclService.readAclById(oid);
+		} catch (NotFoundException e) {
+		}
+		return acl;
+	}
+
+	@CacheEvict(value = "readAclById", key="#oid")
+	public void evictReadAclById(ObjectIdentity oid) {
+	}
+	
+	
+	
 
 	@Cacheable(value = "anotacionsUsuari", key="{#entitat, #rolActual, #usuariCodi, #organActualId}")
 	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {

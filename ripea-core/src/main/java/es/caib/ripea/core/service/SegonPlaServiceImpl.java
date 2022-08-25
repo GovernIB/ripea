@@ -100,21 +100,21 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
 
-		System.out.println("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
+//		System.out.println("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 		logger.debug("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
 		// find peticions with no anotació associated and with no errors from previous invocation of this method
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto.CREAT);
 
 		if (peticions != null) {
-			System.out.println("Consultar i guardar anotacions size: " + peticions.size());
+//			System.out.println("Consultar i guardar anotacions size: " + peticions.size());
 		}
 
 		if (peticions != null && !peticions.isEmpty()) {
 
 			for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
 
-				System.out.println("Consultar i guardar anotacio Id: " + expedientPeticioEntity.getId() + ", identificador: " + expedientPeticioEntity.getIdentificador() + ", clauAccess: " + expedientPeticioEntity.getClauAcces());
+//				System.out.println("Consultar i guardar anotacio Id: " + expedientPeticioEntity.getId() + ", identificador: " + expedientPeticioEntity.getIdentificador() + ", clauAccess: " + expedientPeticioEntity.getClauAcces());
 
 				AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 				anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
@@ -129,7 +129,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 							registre,
 							expedientPeticioEntity);
 
-					System.out.println("Consultar i guardar anotacio before canviEstat, identificador: " + expedientPeticioEntity.getIdentificador());
+//					System.out.println("Consultar i guardar anotacio before canviEstat, identificador: " + expedientPeticioEntity.getIdentificador());
 
 					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 					try {
@@ -146,10 +146,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					if (entitatAnotacio != null)
 						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 
-					System.out.println("Consultar i guardar anotacio finish segonpla, identificador: " + expedientPeticioEntity.getIdentificador());
+//					System.out.println("Consultar i guardar anotacio finish segonpla, identificador: " + expedientPeticioEntity.getIdentificador());
 				} catch (Throwable e) {
 
-					System.out.println("Consultar i guardar anotacio error before addExpedientPeticioConsultaError, identificador: " + expedientPeticioEntity.getIdentificador());
+//					System.out.println("Consultar i guardar anotacio error before addExpedientPeticioConsultaError, identificador: " + expedientPeticioEntity.getIdentificador());
 					logger.error("Error consultar i guardar anotació per petició: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
 					
 					try {
@@ -160,7 +160,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										ExceptionUtils.getStackTrace(e),
 										3600));
 
-						System.out.println("Consultar i guardar anotacio error before canviEstat: " + expedientPeticioEntity.getIdentificador());
+//						System.out.println("Consultar i guardar anotacio error before canviEstat: " + expedientPeticioEntity.getIdentificador());
 						// change state of anotació in DISTRIBUCIO to BACK_ERROR
 						DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 								anotacioRegistreId,
@@ -172,7 +172,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 						
 					} catch (Exception e1) {
 						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), false);
-						System.out.println("Error canviEstat to ERROR: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getStackTrace(e1));
+//						System.out.println("Error canviEstat to ERROR: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getStackTrace(e1));
 						logger.error(ExceptionUtils.getStackTrace(e1));
 					}
 				}
