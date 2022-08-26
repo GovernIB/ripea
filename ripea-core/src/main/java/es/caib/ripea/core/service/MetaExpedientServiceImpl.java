@@ -1144,6 +1144,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				+ "entitatId=" + entitatId + ", "
 				+ "text=" + text + ", "
 				+ "metaExpedientId=" + metaExpedientId + ")");
+
+		
 		
 		return metaExpedientHelper.publicarComentariPerMetaExpedient(
 				entitatId,

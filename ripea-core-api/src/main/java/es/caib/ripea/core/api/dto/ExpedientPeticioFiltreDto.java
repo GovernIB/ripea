@@ -26,7 +26,7 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	private Long metaExpedientId;
 
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
-	
+	private boolean nomesPendentEnviarDistribucio;
 	
 	public Long getMetaExpedientId() {
 		return metaExpedientId;
@@ -111,6 +111,14 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 
 	public void setEstatPendentEnviarDistribucio(ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio) {
 		this.estatPendentEnviarDistribucio = estatPendentEnviarDistribucio;
+	}
+
+	public boolean isNomesPendentEnviarDistribucio() {
+		return nomesPendentEnviarDistribucio;
+	}
+
+	public void setNomesPendentEnviarDistribucio(boolean nomesPendentEnviarDistribucio) {
+		this.nomesPendentEnviarDistribucio = nomesPendentEnviarDistribucio;
 	}
 
 

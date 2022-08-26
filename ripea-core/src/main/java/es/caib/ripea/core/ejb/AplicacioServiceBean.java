@@ -211,4 +211,11 @@ public class AplicacioServiceBean implements AplicacioService {
 				defaultValueIfNull);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void evictRolsPerUsuari(String usuariCodi) {
+		delegate.evictRolsPerUsuari(usuariCodi);		
+	}
+
+
 }

@@ -275,6 +275,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Evict rols disponibles en ACLs");
 		cacheHelper.evictRolsDisponiblesEnAcls();
 	}
+	
+	@Override
+	public void evictRolsPerUsuari(String usuariCodi) {
+		logger.debug("Evict rols per usuari");
+		cacheHelper.evictFindRolsAmbCodi(usuariCodi);
+	}
 
 	@Override
 	public boolean isPluginArxiuActiu() {

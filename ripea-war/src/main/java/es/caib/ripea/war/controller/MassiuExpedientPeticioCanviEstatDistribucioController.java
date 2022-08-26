@@ -236,6 +236,7 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
         ExpedientPeticioFiltreCommand filtreCommand = (ExpedientPeticioFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
         if (filtreCommand == null) {
             filtreCommand = new ExpedientPeticioFiltreCommand();
+            filtreCommand.setNomesPendentEnviarDistribucio(true);
             RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
         }
         return filtreCommand;

@@ -1009,10 +1009,11 @@ public class MetaExpedientController extends BaseAdminController {
 			metaExpedientService.publicarComentariPerMetaExpedient(entitatActual.getId(), metaExpedientId, text, RolHelper.getRolActual(request));
 		}
 			
-		return metaExpedientService.findComentarisPerMetaExpedient(
+		List<MetaExpedientComentariDto> coms = metaExpedientService.findComentarisPerMetaExpedient(
 				entitatActual.getId(), 
 				metaExpedientId,
 				RolHelper.getRolActual(request));
+		return coms;
 	}
 	
 

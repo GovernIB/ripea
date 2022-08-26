@@ -72,7 +72,7 @@ public interface ExpedientPeticioService {
 			Long expedientId, 
 			Long expedientPeticioId);
 	
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('tothom')")
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(
 			Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,

@@ -76,6 +76,18 @@
                     return false;
                 });
             });
+
+        	$('#nomesPendentEnviarDistribucioBtn').click(function() {
+        		nomesAmbErrors = !$(this).hasClass('active');
+        		$('#nomesPendentEnviarDistribucio').val(nomesAmbErrors);
+        	});
+
+        	if ($('#nomesPendentEnviarDistribucio').val() == 'true') {
+        		$('#nomesPendentEnviarDistribucioBtn').addClass('active')
+			} else {
+				$('#nomesPendentEnviarDistribucioBtn').removeClass('active')
+			}
+            
         });
 
         function enableDisableSelection($this, tipus) {
@@ -111,9 +123,18 @@
         <div class="col-md-2">
             <rip:inputDate name="dataFinal" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
         </div>
-		<div class="col-md-4">							
-			<rip:inputSelect name="estatPendentEnviarDistribucio" inline="true" optionEnum="ExpedientPeticioEstatPendentDistribucioEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
-		</div>	        
+		<div class="col-md-3">
+			<div class="row">
+				<div class="col-md-10">
+					<rip:inputSelect name="estatPendentEnviarDistribucio" inline="true" optionEnum="ExpedientPeticioEstatPendentDistribucioEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
+				</div>
+				<div class="col-md-2" style="padding-left: 0;">
+					<button id="nomesPendentEnviarDistribucioBtn" style="width: 45px;" title="<spring:message code="expedient.peticio.list.placeholder.nomesAmbErrorsActualitzarDistribucio"/>" class="btn btn-default" data-toggle="button"><span class="fa fa-warning"></span></button>
+					<rip:inputHidden name="nomesPendentEnviarDistribucio"/>
+				</div>
+			</div>
+		</div>		
+		
     </div>
     <div class="row">
         <div class="col-md-4 pull-right">
@@ -142,7 +163,7 @@
        data-toggle="datatable"
        data-url="<c:url value="/massiu/expedientPeticioCanviEstatDistribucio/datatable"/>"
        class="table table-bordered table-striped"
-       data-default-order="2"
+       data-default-order="3"
        data-default-dir="desc"
        data-botons-template="#botonsTemplate"
        data-selection-enabled="true"
@@ -150,12 +171,17 @@
     <thead>
 		<tr>
 			<th data-col-name="id" data-visible="false"></th>
+			<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 			<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
 			<th data-col-name="dataAlta" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data.alta"/></th>
 			<th data-col-name="estatPendentEnviarDistribucio" data-orderable="false" data-template="#cellEstatTemplate">
 				<spring:message code="expedient.peticio.list.columna.estat"/>
 				<script id="cellEstatTemplate" type="text/x-jsrender">
 					{{:estatPendentEnviarDistribucio}}
+					{{if pendentEnviarDistribucio}}
+						<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
+						class="fa fa-exclamation-triangle text-danger"></span>
+					{{/if}}
 				</script>
 			</th>
 		</tr>

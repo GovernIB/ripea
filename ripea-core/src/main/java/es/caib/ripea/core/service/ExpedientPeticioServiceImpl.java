@@ -684,6 +684,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					DateHelper.toDateFinalDia(filtre.getDataFinal()),
 					filtre.getEstatPendentEnviarDistribucio() == null,
 					filtre.getEstatPendentEnviarDistribucio() != null ? filtre.getEstatPendentEnviarDistribucio().toString() : null,
+					filtre.isNomesPendentEnviarDistribucio(),
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 
 			result.setPagina(
@@ -700,7 +701,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					filtre.getDataInicial() == null,
 					filtre.getDataInicial(),
 					filtre.getDataFinal() == null,
-					DateHelper.toDateFinalDia(filtre.getDataFinal()));
+					DateHelper.toDateFinalDia(filtre.getDataFinal()),
+					filtre.getEstatPendentEnviarDistribucio() == null,
+					filtre.getEstatPendentEnviarDistribucio() != null ? filtre.getEstatPendentEnviarDistribucio().toString() : null,
+					filtre.isNomesPendentEnviarDistribucio());
 
 			result.setIds(ids);
 		}
