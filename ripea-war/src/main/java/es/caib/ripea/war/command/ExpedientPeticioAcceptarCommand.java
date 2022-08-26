@@ -18,7 +18,6 @@ import es.caib.ripea.war.validation.ExpedientODocumentNom;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@ExpedientODocumentNom(groups = {Create.class, Update.class})
 public class ExpedientPeticioAcceptarCommand {
 
 	private Long id;
