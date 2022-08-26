@@ -71,7 +71,8 @@
 		<thead>
 			<tr>
 				<th data-col-name="gestioDirect" data-visible="false"></th>
-				<th data-col-name="codi" data-template="#cellCodiTemplate">
+				
+				<th data-col-name="codi" data-template="#cellCodiTemplate" width="6%">
 					<spring:message code="organgestor.list.columna.codi"/>
 					<script id="cellCodiTemplate" type="text/x-jsrender">
 						{{:codi}}
@@ -80,10 +81,13 @@
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="nom" >
+				
+				
+				<th data-col-name="nom" width="40%">
 					<spring:message code="organgestor.list.columna.nom" />
 				</th>
-				<th data-col-name="pareCodiNom" data-orderable="false">
+				
+				<th data-col-name="pareCodiNom" data-orderable="false" width="40%">
 					<spring:message code="organgestor.list.columna.pare" />
 				</th>
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
