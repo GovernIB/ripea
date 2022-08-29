@@ -237,7 +237,7 @@ public class DocumentHelper {
 				document.getUbicacio(),
 				document.getData(),
 				documentEntity.getNtiOrgano(),
-				metaDocument.getNtiOrigen(),
+				document.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental(),
 				document.getNtiIdDocumentoOrigen(),

@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.FitxerTemporalDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.CreateFisic;
@@ -69,9 +70,9 @@ public class DocumentCommand extends ContenidorCommand {
 	private Date dataCaptura;
 	@NotEmpty(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	@Size(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class}, max=9)
-	private String ntiOrgano;
+	private String ntiOrgano;*/
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
-	private NtiOrigenEnumDto ntiOrigen;*/
+	private NtiOrigenEnumDto ntiOrigen;
 	@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	/*@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
@@ -296,6 +297,14 @@ public class DocumentCommand extends ContenidorCommand {
 	public void setUnselect(boolean unselect) {
 		this.unselect = unselect;
 	}
+
+	public NtiOrigenEnumDto getNtiOrigen() {
+		return ntiOrigen;
+	}
+	public void setNtiOrigen(NtiOrigenEnumDto ntiOrigen) {
+		this.ntiOrigen = ntiOrigen;
+	}
+
 
 	public interface CreateDigital {}
 	public interface UpdateDigital {}

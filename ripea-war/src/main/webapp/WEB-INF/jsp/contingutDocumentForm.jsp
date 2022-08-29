@@ -136,26 +136,16 @@ $(document).ready(function() {
 				$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-					$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-					if(!$('#ntiEstadoElaboracion').val()){
-						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-						$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
-					}
+					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
-					$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 				})
 			} else { // if modifying existing document 
 				if(confirm("<spring:message code="contingut.document.misatge.avis"/>")){
 					$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-						$('#ntiOrigen option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						if(!$('#ntiEstadoElaboracion').val()){
-							$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
-							$('#ntiEstadoElaboracion option[value='+ data.ntiOrigen +']').attr('selected','selected');
-						}
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
 						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
-						$('#ntiTipoDocumental option[value='+ data.ntiOrigen +']').attr('selected','selected');
 					})
 				}
 			}
@@ -174,6 +164,8 @@ $(document).ready(function() {
 			});
 		} else {
 			$('#info-plantilla-si').addClass('hidden');
+			$('#ntiOrigen').val('').trigger('change');
+			$('#ntiEstadoElaboracion').val('').trigger('change');
 		}
 	});
 	if ($('#id').val() == '') {
@@ -522,8 +514,9 @@ function removeLoading() {
 		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" maxlength="510"/>
 		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
 		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
+		<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionEnum="NtiOrigenEnumDto" required="true"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-		
+	
 		<div id="ntiIdDocumentoOrigenDiv">
 			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true"/>
 		</div>
