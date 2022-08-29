@@ -583,6 +583,7 @@ public class ConversioTipusHelper {
 						target.setPareCodi(source.getPare() != null ? source.getPare().getCodi() : null);
 						target.setPareNom(source.getPare() != null ? source.getPare().getNom() : null);
 						target.setGestioDirect(source.isGestioDirect());
+						target.setEstat(source.getEstat());
 						return target;
 					}
 				});

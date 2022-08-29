@@ -44,6 +44,9 @@
 			<div class="col-md-4">
 				<rip:inputSelect name="pareId" optionItems="${organsSuperior}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiINom" optionMinimumResultsForSearch="3" placeholderKey="organgestor.list.filtre.camp.pare" inline="true"/>
 			</div>	
+			<div class="col-md-2">
+				<rip:inputSelect name="estat"  optionEnum="OrganEstatEnumDto" placeholderKey="organgestor.list.filtre.camp.estat" emptyOption="true" inline="true"/>
+			</div>			
 
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
@@ -97,6 +100,10 @@
 				</th>
 				<th data-col-name="permisosCount" data-visible="false">
 					<spring:message code="organgestor.list.columna.nom"/>
+				</th>
+
+				<th data-col-name="estat" data-renderer="enum(OrganEstatEnumDto)">
+					<spring:message code="organgestor.list.columna.estat" />
 				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

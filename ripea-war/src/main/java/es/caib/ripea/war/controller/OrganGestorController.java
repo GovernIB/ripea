@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
@@ -300,6 +301,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new OrganGestorFiltreCommand();
+			filtreCommand.setEstat(OrganEstatEnumDto.V);
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

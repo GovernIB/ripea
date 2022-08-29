@@ -627,6 +627,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				filtre.getNom() != null ? filtre.getNom().trim() : "",
 				filtre.getPareId() == null,
 				filtre.getPareId(),
+				filtre.getEstat() == null,
+				filtre.getEstat(),
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		PaginaDto<OrganGestorDto> paginaOrgans = paginacioHelper.toPaginaDto(organs, OrganGestorDto.class);
 		for (OrganGestorDto organ : paginaOrgans.getContingut()) {

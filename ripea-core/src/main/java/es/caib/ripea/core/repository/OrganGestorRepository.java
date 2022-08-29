@@ -72,8 +72,9 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"where " +
 			"    (og.entitat = :entitat) " +
 			"and (:esNullCodi = true or lower(og.codi) like lower('%'||:codi||'%')) " +
-			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%'))" +
-			"and (:esNullOrganSuperior = true or og.pare.id = :organSuperiorId) ")
+			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullOrganSuperior = true or og.pare.id = :organSuperiorId) " + 
+			"and (:esNullEstat = true or og.estat = :estat) ")
 	public Page<OrganGestorEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullCodi") boolean esNullCodi,
@@ -82,6 +83,8 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("nom") String nom,
 			@Param("esNullOrganSuperior") boolean esNullOrganSuperior,
 			@Param("organSuperiorId") Long organSuperiorId,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") OrganEstatEnumDto estat,
 			Pageable paginacio);
 
 	@Query(	"select " +

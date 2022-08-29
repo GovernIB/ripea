@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class OrganGestorFiltreCommand {
 	private String codi;
 	private String nom;
 	private Long pareId;
+    private OrganEstatEnumDto estat;
 	
 	public void setCodi(String codi) {
 		this.codi = codi != null ? codi.trim() : null;
@@ -31,11 +33,14 @@ public class OrganGestorFiltreCommand {
 	public void setPareId(Long pareId) {
 		this.pareId = pareId;
 	}
-	
+	public void setEstat(OrganEstatEnumDto estat) {
+		this.estat = estat;
+	}
 	public OrganGestorFiltreDto asDto() {
 		return ConversioTipusHelper.convertir(
 				this,
 				OrganGestorFiltreDto.class);
 	}
+
 	
 }
