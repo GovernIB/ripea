@@ -86,7 +86,8 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 			</div>	
 			<div class="col-md-4">							
 				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
-			</div>					
+			</div>		
+						
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -113,7 +114,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<th data-col-name="registre.extracte"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiDescripcio"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
 				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
-
+				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="estatView" data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
@@ -125,7 +126,9 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 						{{/if}}
 					</script>
 				</th>
-
+				
+				<th data-col-name="interessatsResum" data-orderable="false"><spring:message code="expedient.peticio.list.columna.interessats"/></th>
+				
 				<th data-col-name="expedientId" data-visible="false"></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

@@ -76,7 +76,7 @@
 				<th data-col-name="estat" data-visible="false"></th>
 				<th data-col-name="tipusTransicio" data-visible="false"></th>
 				
-				<th data-col-name="codi" data-template="#cellCodiTemplate" width="6%">
+				<th data-col-name="codi" data-template="#cellCodiTemplate" width="7%">
 					<spring:message code="organgestor.list.columna.codi"/>
 					<script id="cellCodiTemplate" type="text/x-jsrender">
 						{{:codi}} 
