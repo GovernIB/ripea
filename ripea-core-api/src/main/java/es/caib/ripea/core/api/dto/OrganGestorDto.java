@@ -29,6 +29,7 @@ public class OrganGestorDto extends AuditoriaDto {
     private List<PermisDto> permisos;
     private boolean gestioDirect;
     private OrganEstatEnumDto estat;
+    private TipusTransicioEnumDto tipusTransicio;
     
     public int getPermisosCount() {
         if (permisos == null)

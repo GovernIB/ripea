@@ -63,7 +63,7 @@
 		data-toggle="datatable" 
 		data-url="<c:url value="organgestor/datatable"/>" 
 		data-search-enabled="false"
-		data-default-order="2" 
+		data-default-order="3" 
 		data-default-dir="asc" 
 		data-botons-template="#botonsTemplate"
 		class="table table-striped table-bordered" 
@@ -73,17 +73,26 @@
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="gestioDirect" data-visible="false"></th>
+				<th data-col-name="estat" data-visible="false"></th>
+				<th data-col-name="tipusTransicio" data-visible="false"></th>
 				
 				<th data-col-name="codi" data-template="#cellCodiTemplate" width="6%">
 					<spring:message code="organgestor.list.columna.codi"/>
 					<script id="cellCodiTemplate" type="text/x-jsrender">
-						{{:codi}}
-						{{if gestioDirect }}
-							<span class="fa fa-cog" title="<spring:message code="organgestor.list.gestionatRipea"/>"></span>
+						{{:codi}} 
+						{{if estat=='E'||estat=='A'||estat=='T'}}
+							{{if tipusTransicio == 'DIVISIO'}}
+								<span class="fa fa-warning text-danger pull-right" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet.tipusTransicio.DIVISIO"/>"></span>
+							{{else tipusTransicio == 'FUSIO'}}
+								<span class="fa fa-warning text-danger pull-right" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet.tipusTransicio.FUSIO"/>"></span>
+							{{else tipusTransicio == 'SUBSTITUCIO'}}
+								<span class="fa fa-warning text-danger pull-right" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet.tipusTransicio.SUBSTITUCIO"/>"></span>
+							{{else}}
+								<span class="fa fa-warning text-danger pull-right" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet"/>"></span>
+							{{/if}}
 						{{/if}}
 					</script>
-				</th>
+				</th>					
 				
 				
 				<th data-col-name="nom" width="40%">

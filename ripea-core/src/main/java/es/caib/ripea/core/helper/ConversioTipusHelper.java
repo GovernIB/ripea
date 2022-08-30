@@ -584,6 +584,7 @@ public class ConversioTipusHelper {
 						target.setPareNom(source.getPare() != null ? source.getPare().getNom() : null);
 						target.setGestioDirect(source.isGestioDirect());
 						target.setEstat(source.getEstat());
+						target.setTipusTransicio(source.getTipusTransicio());
 						return target;
 					}
 				});
