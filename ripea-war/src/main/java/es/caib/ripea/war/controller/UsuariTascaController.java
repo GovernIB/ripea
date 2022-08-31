@@ -14,6 +14,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.config.SchedulingConfig;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
@@ -27,6 +28,7 @@ import es.caib.ripea.war.helper.ArxiuTemporalHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
@@ -35,6 +37,8 @@ import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
@@ -63,6 +67,7 @@ import javax.validation.Valid;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -72,6 +77,7 @@ import java.util.Date;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/usuariTasca")
 public class UsuariTascaController extends BaseUserController {
@@ -426,17 +432,35 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long contingutId,
 			Model model) throws IOException {
 	
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		expedientTascaService.deleteTascaReversible(
-				entitatActual.getId(),
-				tascaId,
-				contingutId);
-		
-		return getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:/usuariTasca/" + tascaId + "/tramitar",
-				"contingut.controller.element.esborrat.ok");
+			expedientTascaService.deleteTascaReversible(
+					entitatActual.getId(),
+					tascaId,
+					contingutId);
+			
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:/usuariTasca/" + tascaId + "/tramitar",
+					"contingut.controller.element.esborrat.ok");
+		} catch (Exception e) {
+			log.error("Error al esborrar el contingut (id=" + contingutId + ")", e);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
+				
+			} else {
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../contingut/" + contingutId,
+						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage(), root);
+			}
+		}
+
 	}
 	
 	

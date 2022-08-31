@@ -1050,6 +1050,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					"redirect:../../contingut/" + expedientId,
 					"expedient.controller.tancar.ok");
 		} catch (Exception ex) {
+			
+			logger.error("Error al tancar expedient amb id=" + command.getId(), ex);
+			
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(
 					ex,
 					ExpedientTancarSenseDocumentsDefinitiusException.class)) {
@@ -1520,7 +1523,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				} catch (Exception e) {
 					errors++;
 					ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), contingutId, RolHelper.getRolActual(request));
-					logger.error("Error al esborrar el contingut", e);
+					logger.error("Error al esborrar el contingut multiple (id=" + contingutId + ")", e);
 					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 					if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
 						MissatgesHelper.error(

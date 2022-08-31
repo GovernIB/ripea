@@ -209,7 +209,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/tancar", method = RequestMethod.GET)
-	public String canviarEstatGet(
+	public String tancarMassiuGet(
 			HttpServletRequest request,
 			Model model) {
 		
@@ -235,7 +235,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/tancar", method = RequestMethod.POST)
-	public String canviarEstatPost(
+	public String tancarMassiuPost(
 			HttpServletRequest request,
 			@Valid ExpedientMassiuTancamentCommand command,
 			BindingResult bindingResult,
