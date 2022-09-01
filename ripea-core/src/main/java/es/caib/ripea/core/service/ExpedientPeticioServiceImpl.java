@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -75,24 +76,6 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -498,7 +481,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return arxiu;
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {
 		log.debug("Consultant el expedient peticio " +
@@ -508,7 +491,19 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		
-		expedientPeticioEntity.getRegistre().getAnnexos();
+		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
+			if (registreAnnex.getTamany() == 0) {
+				Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
+						null, 
+						registreAnnex.getUuid(), 
+						null, 
+						true, 
+						false);
+				
+				registreAnnex.updateTamany(documentDetalls.getContingut().getTamany());
+				
+			}
+		}
 
 		ExpedientPeticioDto expedientPeticioDto = conversioTipusHelper.convertir(expedientPeticioEntity,
 				ExpedientPeticioDto.class);

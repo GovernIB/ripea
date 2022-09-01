@@ -117,7 +117,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			 SicresTipoDocumento sicresTipoDocumento,
 			 String titol,
 			 RegistreEntity registre,
-			 NtiEstadoElaboracion ntiEstadoElaboracion) {
+			 NtiEstadoElaboracion ntiEstadoElaboracion, 
+			 long tamany) {
 		return new Builder(
 				 nom,
 				 ntiFechaCaptura,
@@ -126,7 +127,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 				 sicresTipoDocumento,
 				 titol,
 				 registre,
-				 ntiEstadoElaboracion);
+				 ntiEstadoElaboracion, 
+				 tamany);
 	}
 
 	/**
@@ -145,7 +147,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 				 SicresTipoDocumento sicresTipoDocumento,
 				 String titol,
 				 RegistreEntity registre,
-				 NtiEstadoElaboracion ntiEstadoElaboracion) {
+				 NtiEstadoElaboracion ntiEstadoElaboracion, 
+				 long tamany) {
 			built = new RegistreAnnexEntity();
 			built.nom = nom;
 			built.ntiFechaCaptura = ntiFechaCaptura;
@@ -157,6 +160,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.estat = RegistreAnnexEstatEnumDto.CREAT;
 			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
 			built.validacioCorrecte = true;
+			built.tamany = tamany;
 		}
 		
 		public Builder contingut(byte[] contingut) {

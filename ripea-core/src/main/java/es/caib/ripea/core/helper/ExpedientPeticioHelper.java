@@ -357,7 +357,8 @@ public class ExpedientPeticioHelper {
 				annex.getSicresTipoDocumento(),
 				annex.getTitol(),
 				registreEntity,
-				annex.getNtiEstadoElaboracion()).
+				annex.getNtiEstadoElaboracion(),
+				annex.getTamany()).
 				contingut(annex.getContingut()).
 				firmaContingut(annex.getFirmaContingut()).
 				ntiTipoDocumental(annex.getNtiTipoDocumental()).
