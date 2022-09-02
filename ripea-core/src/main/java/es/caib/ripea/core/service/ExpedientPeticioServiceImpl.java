@@ -14,6 +14,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -148,6 +149,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
+		ordenacioMap.put("registre.destiCodiINom", new String[] {"registre.destiCodi"});
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios;
 
 		// enum with states accesibles from filter in the view (without create state)
@@ -182,18 +184,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				createWritePermIds ,
 				metaExpedient == null,
 				metaExpedient,
-				filtre.getProcediment() == null ||
-						filtre.getProcediment().isEmpty(),
+				filtre.getProcediment() == null || filtre.getProcediment().isEmpty(),
 				filtre.getProcediment() != null ? filtre.getProcediment().trim() : "",
-				filtre.getNumero() == null ||
-						filtre.getNumero().isEmpty(),
+				StringUtils.isEmpty(filtre.getProcedimentCodi()),
+				filtre.getProcedimentCodi(),
+				filtre.getNumero() == null || filtre.getNumero().isEmpty(),
 				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
-				filtre.getExtracte() == null ||
-						filtre.getExtracte().isEmpty(),
+				filtre.getExtracte() == null || filtre.getExtracte().isEmpty(),
 				filtre.getExtracte() != null ? filtre.getExtracte().trim() : "",
-				filtre.getDestinacio() == null ||
-						filtre.getDestinacio().isEmpty(),
-				filtre.getDestinacio() != null ? filtre.getDestinacio().trim() : "",
+				filtre.getDestinacioCodi() == null || filtre.getDestinacioCodi().isEmpty(),
+				filtre.getDestinacioCodi() != null ? filtre.getDestinacioCodi().trim() : "",
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,

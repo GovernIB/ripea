@@ -213,6 +213,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 				metaExpedientFiltre,
 				true,
 				"",
+				true,
+				"",
 				filtre.getNumero() == null || filtre.getNumero().isEmpty(),
 				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
 				filtre.getExtracte() == null ||

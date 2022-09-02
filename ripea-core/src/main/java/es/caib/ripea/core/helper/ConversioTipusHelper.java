@@ -428,7 +428,9 @@ public class ConversioTipusHelper {
 							registre.setIdentificador(source.getRegistre().getIdentificador());
 							registre.setData(source.getRegistre().getData());
 							registre.setExtracte(source.getRegistre().getExtracte());
+							registre.setDestiCodi(source.getRegistre().getDestiCodi());
 							registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
+							registre.setProcedimentCodi(source.getRegistre().getProcedimentCodi());
 							registre.setOrigenRegistreNumero(source.getRegistre().getOrigenRegistreNumero());
 						}
 						target.setRegistre(registre);

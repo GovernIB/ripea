@@ -51,6 +51,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
 			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
+			"and (:esNullProcedimentCodi = true or lower(e.registre.procedimentCodi) like lower('%'||:procedimentCodi||'%')) " +
 			"and (:esNullExtracte = true or lower(e.registre.extracte) like lower('%'||:extracte||'%')) " +
 			"and (:esNullDestinacio = true or e.registre.destiCodi = :destinacio) " + 
 			"and (:esNullDataInicial = true or e.registre.data >= :dataInicial) " +
@@ -70,6 +71,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullProcediment") boolean esNullProcediment,
 			@Param("procediment") String procediment,
+			@Param("esNullProcedimentCodi") boolean esNullProcedimentCodi,
+			@Param("procedimentCodi") String procedimentCodi,
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullExtracte") boolean esNullExtracte,

@@ -50,17 +50,20 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaInicial"/>
 				<c:url value="/organgestorajax/organgestorcodi" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
-						name="destinacio"  
+						name="destinacioCodi"  
 						urlConsultaInicial="${urlConsultaInicial}"
 						urlConsultaLlistat="${urlConsultaLlistat}"
 						placeholderKey="expedient.peticio.list.placeholder.destinacio"
 						suggestValue="codi"
-						suggestText="nom"
+						suggestText="codiINom"
 						inline="true"/>	
 			</div>	
 		</div>
 		<div class="row">
 		<!--  optionMinimumResultsForSearch -->
+			<div class="col-md-4">
+				<rip:inputText name="procedimentCodi" inline="true" placeholderKey="expedient.peticio.list.placeholder.codiSia"/>
+			</div>			
 			<div class="col-md-4">					
 				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>
@@ -90,6 +93,7 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 						
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
+					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
 				</div>
@@ -112,7 +116,8 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 				<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
 				<th data-col-name="registre.extracte"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
-				<th data-col-name="registre.destiDescripcio"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
+				<th data-col-name="registre.destiCodiINom"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
+				<th data-col-name="registre.procedimentCodi"><spring:message code="expedient.peticio.list.columna.codiSia"/></th>
 				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
