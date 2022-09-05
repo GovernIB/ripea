@@ -115,10 +115,12 @@ public class ImportacioServiceImpl implements ImportacioService {
 		expedientsWithImportacio = new ArrayList<DocumentDto>();
 		outerloop: for (ContingutArxiu contingutArxiu : documentsTrobats) {
 			CarpetaEntity carpetaEntity = null;
-			Document documentArxiu = pluginHelper.importarDocument(
-					expedientSuperior.getArxiuUuid(),
-					contingutArxiu.getIdentificador(),
-					usingNumeroRegistre);
+			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
+					null,
+					contingutArxiu.getIdentificador(), 
+					null, 
+					true, 
+					false);
 			documents.add(documentArxiu);
 			documents = findAndCorrectDuplicates(
 					documents,
@@ -217,12 +219,20 @@ public class ImportacioServiceImpl implements ImportacioService {
 					fitxer.getContentType(),
 					null);
 		}
+		
 		// POSAR COM A CUSTODIAT O DEFINITIU
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
 			entity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		} else {
 			entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 		}
+
+		// MOU/COPIA EL DOCUMENT
+		documentArxiu = pluginHelper.importarDocument(
+				expedientSuperior.getArxiuUuid(),
+				documentArxiu.getIdentificador(),
+				usingNumeroRegistre);
+		
 		// ACTUALITZAR METADADES NTI DEL DOCUMENT CREAT
 		entity.updateArxiu(documentArxiu.getIdentificador());
 		entity.updateNtiIdentificador(documentArxiu.getMetadades().getIdentificador());
