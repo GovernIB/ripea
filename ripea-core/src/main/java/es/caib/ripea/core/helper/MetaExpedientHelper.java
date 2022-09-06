@@ -843,8 +843,6 @@ public class MetaExpedientHelper {
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
 		
-		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
-		
 		return true;
 	}
 	

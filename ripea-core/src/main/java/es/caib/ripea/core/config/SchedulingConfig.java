@@ -42,7 +42,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
     	taskRegistrar.setScheduler(taskScheduler);
 
-        // 1. Enviament d'execucions massives
+        // Enviament d'execucions massives
         ////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -75,7 +75,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
 
-        // 2. Consultar i guardar anotacions peticions pendents
+        // Consultar i guardar anotacions peticions pendents
         ///////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -108,7 +108,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
 
-        // 2.5 Reintentar canvi estat BACK_REBUDA a DISTRIBUCIO
+        // Reintentar canvi estat BACK_REBUDA a DISTRIBUCIO
         //////////////////////////////////////////////////////////////////
 
         taskRegistrar.addTriggerTask( new Runnable() {
@@ -141,7 +141,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 });
 
 
-        // 3. Buidar caches dominis
+        // Buidar caches dominis
         //////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -174,8 +174,36 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
 
+        
+        
+        
+        // Enviament de correus electrònics per comentaris als responsables dels procediments
+        /////////////////////////////////////////////////////////////////////////
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        segonPlaService.enviarEmailPerComentariMetaExpedient();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        CronTrigger trigger = null;
+						try {
+							trigger = new CronTrigger(configHelper.getConfig(PropertiesConstants.ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON));
+						} catch (Exception e) {
+                            log.error("Error getting next execution date for enviarEmailPerComentariMetaExpedient()", e);
+						}
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
+        
 
-        // 4. Enviament de correus electrònics pendents agrupats
+        // Enviament de correus electrònics pendents agrupats
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -201,7 +229,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         );
         
         
-        // 5. Guardar en arxiu continguts pendents
+        // Guardar en arxiu continguts pendents
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {
@@ -233,7 +261,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
                 }
         );
         
-        // 6. Guardar en arxiu interessats
+        // Guardar en arxiu interessats
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {

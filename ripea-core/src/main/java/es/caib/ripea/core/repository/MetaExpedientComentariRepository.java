@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,9 @@ public interface MetaExpedientComentariRepository extends JpaRepository<MetaExpe
 			+ "    comment.metaExpedient = :metaExpedient")
 	long countByMetaExpedient(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);	
+	
+	
+	public List<MetaExpedientComentariEntity> findByEmailEnviatFalseAndCreatedDateGreaterThan(Date createdDate);
 
 
 }

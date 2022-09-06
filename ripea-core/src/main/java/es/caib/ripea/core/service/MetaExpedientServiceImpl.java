@@ -1145,13 +1145,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				+ "text=" + text + ", "
 				+ "metaExpedientId=" + metaExpedientId + ")");
 
-		
-		
+
 		return metaExpedientHelper.publicarComentariPerMetaExpedient(
 				entitatId,
 				metaExpedientId,
 				text,
 				rolActual);
+
 	}
 	
 	

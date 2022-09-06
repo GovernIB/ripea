@@ -26,6 +26,9 @@ public class MetaExpedientComentariEntity extends RipeaAuditable<Long> {
 	protected MetaExpedientEntity metaExpedient;
 	@Column(name = "text", length = 1024)
 	protected String text;
+	
+	@Column(name = "email_enviat", nullable = false)
+	private boolean emailEnviat;
 
 	
 	public static Builder getBuilder(
@@ -43,20 +46,26 @@ public class MetaExpedientComentariEntity extends RipeaAuditable<Long> {
 			built = new MetaExpedientComentariEntity();
 			built.metaExpedient = metaExpedient;
 			built.text = text;
+			built.emailEnviat = false;
 		}
 		public MetaExpedientComentariEntity build() {
 			return built;
 		}
 	}
 	
-	public MetaExpedientEntity getExpedient() {
+	public MetaExpedientEntity getMetaExpedient() {
 		return metaExpedient;
 	}
 	public String getText() {
 		return text;
 	}
-
 	
+	public void updateEmailEnviat(boolean emailEnviat) {
+		this.emailEnviat = emailEnviat;
+	}
+
+
+
 	private static final long serialVersionUID = 1L;
 
 }

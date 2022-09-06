@@ -2427,10 +2427,10 @@ public class PluginHelper {
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
 
-			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
-			if (validationStatus.getStatus() != 1) {
-				throw new RuntimeException(validationStatus.getErrorMsg());
-			}
+//			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+//			if (validationStatus.getStatus() != 1) {
+//				throw new RuntimeException(validationStatus.getErrorMsg());
+//			}
 
 			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
 			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
