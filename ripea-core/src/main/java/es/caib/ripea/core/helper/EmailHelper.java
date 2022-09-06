@@ -321,7 +321,7 @@ public class EmailHelper {
 				"Informació del procediment:\n" +
 						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
 						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
-						"Comentari: " + comentari + "\n" +
+						"Comentari: \n\t" + comentari.replace("\n", "\n\t") + "\n" +
 						"Usuari: " + metaExpComnt.getCreatedBy().getNom();
 		if (!emailsNoAgrupats.isEmpty()) {
 			

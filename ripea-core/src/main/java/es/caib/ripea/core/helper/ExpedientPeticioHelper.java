@@ -150,7 +150,7 @@ public class ExpedientPeticioHelper {
 			throw new NotFoundException(entitat, EntitatEntity.class);
 		}
 		
-		System.out.println("crearRegistrePerPeticio before getBuilder, identificador: " + registreEntrada.getIdentificador());
+//		System.out.println("crearRegistrePerPeticio before getBuilder, identificador: " + registreEntrada.getIdentificador());
 		
 		RegistreEntity registreEntity = RegistreEntity.getBuilder(
 				registreEntrada.getAssumpteTipusCodi(),
@@ -193,7 +193,7 @@ public class ExpedientPeticioHelper {
 		registreRepository.save(registreEntity);
 		expedientPeticioEntity.updateRegistre(registreEntity);
 		
-		System.out.println("crearRegistrePerPeticio before findByEntitatAndClassificacioSia, identificador: " + registreEntrada.getIdentificador());
+//		System.out.println("crearRegistrePerPeticio before findByEntitatAndClassificacioSia, identificador: " + registreEntrada.getIdentificador());
 		
 		// set metaexpedient to which expedient will belong if peticion is accepted
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(
@@ -222,7 +222,7 @@ public class ExpedientPeticioHelper {
 		}
 		expedientPeticioRepository.save(expedientPeticioEntity);
 		
-		System.out.println("crearRegistrePerPeticio before interessats, identificador: " + registreEntrada.getIdentificador());
+//		System.out.println("crearRegistrePerPeticio before interessats, identificador: " + registreEntrada.getIdentificador());
 		
 		for (Interessat interessat: registreEntrada.getInteressats()) {
 			registreEntity.getInteressats().add(
@@ -230,7 +230,7 @@ public class ExpedientPeticioHelper {
 							interessat,
 							registreEntity));
 		}
-		System.out.println("crearRegistrePerPeticio before annexos, identificador: " + registreEntrada.getIdentificador());
+//		System.out.println("crearRegistrePerPeticio before annexos, identificador: " + registreEntrada.getIdentificador());
 		for (Annex annex: registreEntrada.getAnnexos()) {
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
@@ -238,13 +238,13 @@ public class ExpedientPeticioHelper {
 							registreEntity));
 		}
 		
-		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
+//		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
 		// change state of expedient peticio to pendent de processar
 		canviEstatExpedientPeticio(
 				expedientPeticioEntity.getId(),
 				ExpedientPeticioEstatEnumDto.PENDENT);
 		
-		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
+//		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
 		
 	}
 	
