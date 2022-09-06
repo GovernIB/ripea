@@ -66,4 +66,10 @@ public class SegonPlaServiceBean implements SegonPlaService {
 		delegate.reintentarCanviEstatDistribucio();
 	}
 
+	@Override
+	public void enviarEmailPerComentariMetaExpedient() {
+		delegate.enviarEmailPerComentariMetaExpedient();
+		
+	}
+
 }

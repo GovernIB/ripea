@@ -15,8 +15,9 @@ import org.springframework.mail.MailMessage;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
@@ -33,6 +34,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -227,13 +229,15 @@ public class EmailHelper {
 	}
 	
 	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void comentariMetaExpedient(
-			MetaExpedientEntity metaExpedientEntity, 
-			Long entitatId, 
-			String comentari) {
-		logger.debug("Enviant correu electrònic per nou comentari");
+			MetaExpedientComentariEntity metaExpComnt) {
 		
+		logger.debug("Enviant correu electrònic per nou comentari");
+		String comentari = metaExpComnt.getText();
+		MetaExpedientEntity metaExpedientEntity = metaExpComnt.getMetaExpedient();
 		long t0 = System.currentTimeMillis();
+		Long entitatId = metaExpedientEntity.getEntitat().getId();
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
@@ -311,8 +315,6 @@ public class EmailHelper {
 		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
 		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
 		
-		UsuariEntity usuariEntity = usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName());
-		
 		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Nou comentari per procediment";
 		String text = 
@@ -320,7 +322,7 @@ public class EmailHelper {
 						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
 						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Comentari: " + comentari + "\n" +
-						"Usuari: " + usuariEntity.getNom();
+						"Usuari: " + metaExpComnt.getCreatedBy().getNom();
 		if (!emailsNoAgrupats.isEmpty()) {
 			
 			long t3 = System.currentTimeMillis();
@@ -345,12 +347,13 @@ public class EmailHelper {
 						email,
 						subject,
 						text,
-						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
+						EventTipusEnumDto.PROCEDIMENT_COMENTARI)
 						.build();
 				emailPendentEnviarRepository.save(enitity);
 			}
 			logger.info("comentari mail sendAgrupats time: " + (System.currentTimeMillis() - t3) + " ms");
 		}
+		metaExpComnt.updateEmailEnviat(true);
 	}
 	
 	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(

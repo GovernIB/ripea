@@ -14,6 +14,9 @@ public class PropertiesConstants {
     // 3. Buidar cachés dominis
     public static final String BUIDAR_CACHES_DOMINIS_RATE = "es.caib.ripea.dominis.cache.execucio";
 
+    // Enviar emails comentaris metaexpedients
+    public static final String ENVIAR_EMAILS_PENDENTS_PROCEDIMENT_COMENTARI_CRON = "es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron";
+    
     // 4. Enviar emails pendents agrupats
     public static final String ENVIAR_EMAILS_PENDENTS_AGRUPATS_CRON = "es.caib.ripea.segonpla.email.enviament.agrupat.cron";
     

@@ -1142,8 +1142,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				text).build();
 		metaExpedientComentariRepository.save(comentari);
 		
-		emailHelper.comentariMetaExpedient(metaExpedient, entitatId, text);
-		
 		return true;
 	}
 	

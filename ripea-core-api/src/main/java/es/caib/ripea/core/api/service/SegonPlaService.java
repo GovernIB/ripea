@@ -16,4 +16,6 @@ public interface SegonPlaService {
 
 	void reintentarCanviEstatDistribucio();
 
+	void enviarEmailPerComentariMetaExpedient();
+
 }

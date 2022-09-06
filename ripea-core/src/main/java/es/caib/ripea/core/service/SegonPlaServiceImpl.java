@@ -4,6 +4,7 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,11 +36,13 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
@@ -50,6 +53,7 @@ import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -90,6 +94,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	
+	@Autowired
+	private EmailHelper emailHelper;
+	
+	@Autowired
+	private MetaExpedientComentariRepository metaExpedientComentariRepository;
 
 
 	private static final String PREFIX_RIPEA = "[RIPEA]";
@@ -212,6 +222,27 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	@Override
 	@Transactional
+	public void enviarEmailPerComentariMetaExpedient() {
+		logger.info("Execució tasca periòdica: Enviar email per comentari metaexpedient");
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		cal.add(Calendar.DATE, -7);
+		Date dateNowMinus7Days = cal.getTime();
+		List<MetaExpedientComentariEntity> metaExpComnts = metaExpedientComentariRepository.findByEmailEnviatFalseAndCreatedDateGreaterThan(dateNowMinus7Days);
+		
+		for (MetaExpedientComentariEntity metaExpComnt : metaExpComnts) {
+			try {
+				emailHelper.comentariMetaExpedient(metaExpComnt);
+			} catch (Exception e) {
+				logger.error("Error enviant l'email per comentari comentariId=" + metaExpComnt.getId() + ", metaexpedientId=" + metaExpComnt.getMetaExpedient().getId() + ": " + e.getMessage());
+			}
+		}
+	}
+	
+	
+	@Override
+	@Transactional
 	public void enviarEmailsPendentsAgrupats() {
 		logger.info("Execució tasca periòdica: Enviar correus pendents agrupats");
 
@@ -297,6 +328,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Canvi d'estat de documents enviat a ViaFirma";
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
 				header = "Canvi d'estat de revisio de procediments";
+			} else if(entry.getKey() == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
+				header = "Nous comentaris per procediments";
 			}
 			
 			text += header + "\n";
