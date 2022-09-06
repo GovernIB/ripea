@@ -147,3 +147,6 @@ UPDATE IPA_INTERESSAT SET INCAPACITAT = 0 WHERE INCAPACITAT = 1;
 -- Changeset db/changelog/changes/0.9.94/1111.yaml::1651146740001-1::limit
 INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.segonpla.max.reintents.anotacions.pendents.enviar.distribucio', 3, 'Nombre de reintents de canviar estat de anotacions a Distribució', 'SCHEDULLED', 0, 0, 'INT', 0);
 INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.segonpla.reintentar.anotacions.pendents.enviar.distribucio', 60000, 'Interval de temps (ms) en que executa la tasca periodica de reintentar canviar estat de anotacions a Distribució', 'SCHEDULLED', 0, 0, 'INT', 0);
+
+-- Changeset db/changelog/changes/0.9.94/1023.yaml::1662448389523-1::limit
+INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron', '0 0 * * * *', 'Expressió cron per indicar quan executar la tasca periodica per enviar els correus electronics avisant que s''ha afegit un comentari a procediment', 'SCHEDULLED', 8, 0, 'CRON', 0);

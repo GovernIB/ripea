@@ -10,3 +10,6 @@ ALTER TABLE ipa_expedient_peticio ADD reintents_canvi_estat_dis NUMBER(10, 0) DE
 
 -- Changeset db/changelog/changes/0.9.94/1119.yaml::1659009409606-1::limit
 ALTER TABLE ipa_hist_exp_interessat MODIFY interessat_doc_num NULL;
+
+-- Changeset db/changelog/changes/0.9.94/1023.yaml::1662448389523-1::limit
+ALTER TABLE ipa_metaexp_comment ADD email_enviat NUMBER(1) DEFAULT 1 NOT NULL;
