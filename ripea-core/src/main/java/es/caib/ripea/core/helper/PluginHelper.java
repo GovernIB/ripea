@@ -18,6 +18,7 @@ import java.util.Properties;
 import com.google.common.base.Strings;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import org.apache.commons.codec.binary.Base64;
+
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
 import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
@@ -25,7 +26,8 @@ import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
-import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
+//import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
+import org.fundaciobit.plugins.certificate.InformacioCertificat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
