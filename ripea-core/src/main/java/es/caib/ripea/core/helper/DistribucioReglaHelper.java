@@ -29,7 +29,7 @@ public class DistribucioReglaHelper  {
 					getServiceUrl(),
 					getServiceUsername(),
 					getServicePassword(),
-					false);
+					isAutenticacioBasic());
 
 			ClientResponse response = client.add(
 					entitat,
@@ -81,7 +81,10 @@ public class DistribucioReglaHelper  {
 		return configHelper.getConfig("es.caib.ripea.distribucio.regla.ws.codi.backoffice");
 	}
 	
-
+	private boolean isAutenticacioBasic() {
+		return configHelper.getAsBoolean("es.caib.ripea.distribucio.regla.autenticacio.basic");
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(DistribucioReglaHelper.class);
 
 }
