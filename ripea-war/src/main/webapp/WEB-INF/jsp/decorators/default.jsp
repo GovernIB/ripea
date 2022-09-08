@@ -280,7 +280,7 @@ body {
 					<span class="icon-bar"></span>
 				</button--%>
 				<div class="navbar-collapse collapse">
-				<div class="navbar-brand" style="margin-top: -20px">
+				<div class="navbar-brand" style="margin-top: -20px; padding: 0;">
 					<div id="govern-logo" class="pull-left">
 						<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
 						<c:choose>
