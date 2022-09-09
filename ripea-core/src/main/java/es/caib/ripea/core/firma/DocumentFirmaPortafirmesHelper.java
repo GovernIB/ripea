@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -43,6 +44,7 @@ import es.caib.ripea.core.entity.PortafirmesBlockEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
@@ -596,6 +598,10 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					"(portafirmesId=" + portafirmesId + ")",
 					DocumentPortafirmesEntity.class);
 		}
+		
+		EntitatDto entitat = conversioTipusHelper.convertir(documentPortafirmes.getDocument().getEntitat(), EntitatDto.class);
+		ConfigHelper.setEntitat(entitat);
+		
 		actualitzarBlocksPortafirmes(
 				callbackEstat, 
 				documentPortafirmes,

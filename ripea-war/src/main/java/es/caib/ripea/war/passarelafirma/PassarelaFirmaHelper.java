@@ -18,14 +18,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
-import org.fundaciobit.plugins.signatureweb.api.ISignatureWebPlugin;
 import org.fundaciobit.plugins.signature.api.ITimeStampGenerator;
 import org.fundaciobit.plugins.signature.api.PdfVisibleSignature;
 import org.fundaciobit.plugins.signature.api.PolicyInfoSignature;
 import org.fundaciobit.plugins.signature.api.SecureVerificationCodeStampInfo;
 import org.fundaciobit.plugins.signature.api.SignaturesTableHeader;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
-import org.fundaciobit.plugins.utils.PluginsManager;
+import org.fundaciobit.plugins.signatureweb.api.ISignatureWebPlugin;
+import org.fundaciobit.pluginsib.core.utils.PluginsManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,8 +76,7 @@ public class PassarelaFirmaHelper {
 				idiomaCodi,
 				filtreCertificats,
 				request.getUserPrincipal().getName(),
-				destinatariNif,
-				pis);
+				destinatariNif);
 		File filePerFirmar = getFitxerAFirmarPath(signaturaId);
 		FileUtils.writeByteArrayToFile(
 				filePerFirmar,
@@ -129,10 +128,11 @@ public class PassarelaFirmaHelper {
 				throw new Exception("No s'ha pogut instanciar el plugin amb id " + pluginDeFirma.getPluginId());
 			}
 			// 2.- Passa el filtre ...
-			if (signaturePlugin.filter(request, signaturesSet)) {
+			String filter = signaturePlugin.filter(request, signaturesSet, null);
+			if (filter == null) {
 				pluginsFiltered.add(pluginDeFirma);
 			} else {
-				log.debug("Exclos plugin [" + pluginDeFirma.getNom() + "]: NO PASSA FILTRE");
+				log.info("Exclos plugin [" + pluginDeFirma.getNom() + "]: NO PASSA FILTRE: " + filter);
 			}
 		}
 		return pluginsFiltered;
@@ -164,7 +164,8 @@ public class PassarelaFirmaHelper {
 								PassarelaFirmaHelper.CONTEXTWEB),
 						signaturesSetId,
 						-1),
-				signaturesSet);
+				signaturesSet,
+				null);
 		return pluginUrl;
 	}
 
