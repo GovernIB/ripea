@@ -75,6 +75,7 @@ import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -651,6 +652,18 @@ public class CacheHelper {
 	public void evictCountAnotacionsPendents(EntitatEntity entitat) {
 	}
 
+	
+	@Cacheable(value = "mostrarLogsIntegracio")
+	public boolean mostrarLogsIntegracio() {
+		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.integracio");
+		if (prop == null || prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,
 			MultiplicitatEnumDto multiplicitat) {
