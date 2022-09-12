@@ -150,3 +150,6 @@ INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PRO
 
 -- Changeset db/changelog/changes/0.9.94/1023.yaml::1662448389523-1::limit
 INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron', '0 0 * * * *', 'Expressió cron per indicar quan executar la tasca periodica per enviar els correus electronics avisant que s''ha afegit un comentari a procediment', 'SCHEDULLED', 8, 0, 'CRON', 0);
+
+-- Changeset db/changelog/changes/0.9.94/1140.yaml::1662715507467-1::limit
+UPDATE IPA_CONFIG_TYPE SET value = 'es.caib.ripea.plugin.caib.firmaservidor.FirmaSimpleServidorPluginPortafib,es.caib.ripea.plugin.caib.firmaservidor.FirmaServidorPluginMock' WHERE CODE = 'FIRMASERVIDOR_CLASS';

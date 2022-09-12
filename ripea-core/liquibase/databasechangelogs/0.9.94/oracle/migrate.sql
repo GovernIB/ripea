@@ -173,3 +173,5 @@ ALTER TABLE ipa_metaexp_comment ADD email_enviat NUMBER(1) DEFAULT 1 NOT NULL;
 
 INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.segonpla.email.enviament.procediment.comentari.cron', '0 0 * * * *', 'Expressió cron per indicar quan executar la tasca periodica per enviar els correus electronics avisant que s''ha afegit un comentari a procediment', 'SCHEDULLED', 8, 0, 'CRON', 0);
 
+-- Changeset db/changelog/changes/0.9.94/1140.yaml::1662715507467-1::limit
+UPDATE IPA_CONFIG_TYPE SET value = 'es.caib.ripea.plugin.caib.firmaservidor.FirmaSimpleServidorPluginPortafib,es.caib.ripea.plugin.caib.firmaservidor.FirmaServidorPluginMock' WHERE CODE = 'FIRMASERVIDOR_CLASS';
