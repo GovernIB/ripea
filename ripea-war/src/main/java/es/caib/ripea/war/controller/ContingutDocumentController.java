@@ -23,6 +23,7 @@ import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentGenericCommand;
 import es.caib.ripea.war.helper.*;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -350,11 +351,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					redirect,
 					"document.controller.guardar.arxiu.ok");
 		} else {
+			System.out.println("Error guardant document en arxiu" +  ExceptionUtils.getStackTrace(exception));
 			logger.error("Error guardant document en arxiu", exception);
 			
 			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
 			String msg = null;
-			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+			if (root instanceof ConnectException || (root.getMessage() != null && root.getMessage().contains("timed out"))) {
 				msg = getMessage(request,"error.arxiu.connectTimedOut");
 			} else {
 				msg = root.getMessage();

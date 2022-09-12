@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -552,7 +553,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		try {
 			return expedientPeticioService.getAnnexContent(annexId, true);
 		} catch (Exception ex) {
-			throw new Exception(ex.getMessage());
+			System.out.println("Errol al descarregarBase64:" +  ExceptionUtils.getStackTrace(ex));
+			logger.error("Errol al descarregarBase64", ex);
+			throw ex;
 		}
 	}
 	

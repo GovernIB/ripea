@@ -31,16 +31,32 @@
 			</exclusions>
 		</dependency>
 		<!-- PLUGINS PER A LA PASSAREL.LA DE FIRMA EN EL NAVEGADOR -->
+		    	
+		<dependency>
+			<groupId>org.fundaciobit.pluginsib.signatureweb</groupId>                    
+			<artifactId>pluginsib-signatureweb-api</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		 <dependency>
+			<groupId>org.fundaciobit.pluginsib.signatureweb</groupId>                    
+			<artifactId>pluginsib-signatureweb-portafib</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+	  <!--
 		<dependency>
 			<groupId>org.fundaciobit.plugins</groupId>
 			<artifactId>plugin-signatureweb-api</artifactId>
 			<version>2.0.0</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.fundaciobit.plugins</groupId>
 			<artifactId>plugin-signatureweb-portafib</artifactId>
 			<version>2.0.0</version>
 		</dependency>
+		-->
+
+		
 		<!--dependency>
 			<groupId>org.fundaciobit.plugins</groupId>
 			<artifactId>plugin-signatureweb-miniappletinclient</artifactId>
@@ -72,16 +88,7 @@
 			<version>${bouncycastle.version}</version>
 		</dependency-->
 		<!-- PLUGINS PER A LA PASSAREL.LA D'ESCANEIG DE DOCUMENTS -->
-		<dependency>
-			<groupId>org.fundaciobit.plugins</groupId>
-			<artifactId>plugin-scanweb-api</artifactId>
-			<version>2.0.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fundaciobit.plugins</groupId>
-			<artifactId>plugin-scanweb-dynamicwebtwain</artifactId>
-			<version>2.0.0</version>
-		</dependency>
+
 		<!--dependency>
 			<groupId>org.fundaciobit.plugins</groupId>
 			<artifactId>plugin-scanweb-iecisascanweb-plugin</artifactId>

@@ -27,21 +27,21 @@ public class FirmaServidorPluginTest {
 		PropertiesHelper.getProperties().load(ClassLoader.getSystemResourceAsStream("test.properties"));
 	}
 
-	@Test
-	public void signarDocumentPortafibCorrecte() throws Throwable {
-		String nom = "";
-		String motiu = "prova signatura";
-		byte[] contingut = this.obtenirContingutPerFirmar();
-		FirmaServidorPlugin signaturaPlugin = new FirmaServidorPluginPortafib();
-		try {
-			SignaturaResposta signatura = signaturaPlugin.firmar(nom, motiu, contingut, TipusFirma.PADES, "ca");
-			assertNotNull("La firma retornada no pot ser nul·la", signatura);
-		} catch (Exception ex) {
-			System.err.println("Excepció obtinguda signant: " + ex.getMessage());
-			ex.printStackTrace();
-			throw ex;
-		}
-	}
+//	@Test
+//	public void signarDocumentPortafibCorrecte() throws Throwable {
+//		String nom = "";
+//		String motiu = "prova signatura";
+//		byte[] contingut = this.obtenirContingutPerFirmar();
+//		FirmaServidorPlugin signaturaPlugin = new FirmaServidorPluginPortafib();
+//		try {
+//			SignaturaResposta signatura = signaturaPlugin.firmar(nom, motiu, contingut, TipusFirma.PADES, "ca");
+//			assertNotNull("La firma retornada no pot ser nul·la", signatura);
+//		} catch (Exception ex) {
+//			System.err.println("Excepció obtinguda signant: " + ex.getMessage());
+//			ex.printStackTrace();
+//			throw ex;
+//		}
+//	}
 
 	@Test
 	public void signarPluginMock() throws SistemaExternException {

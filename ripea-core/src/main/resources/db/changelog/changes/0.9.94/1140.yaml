@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1662715507467-1
+      author: limit
+      changes:
+        - sql:
+            sql: "
+            UPDATE IPA_CONFIG_TYPE SET value = 'es.caib.ripea.plugin.caib.firmaservidor.FirmaSimpleServidorPluginPortafib,es.caib.ripea.plugin.caib.firmaservidor.FirmaServidorPluginMock' WHERE CODE = 'FIRMASERVIDOR_CLASS';
+            "

@@ -39,7 +39,7 @@
 	</ul>
 	<br/>
 	<script id="rowhrefTemplate" type="text/x-jsrender">../nodeco/integracio/${codiActual}/{{:index}}</script>	
-	<table id="missatges-integracions" data-toggle="datatable" data-filter="#filtre" data-url="<c:url value="/integracio/datatable"/>" data-search-enabled="false" class="table table-striped table-bordered" style="width:100%"
+	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>" class="table table-striped table-bordered" style="width:100%"
 	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
 			<tr>
@@ -48,7 +48,7 @@
 				<th data-col-name="data" data-orderable="false" data-converter="datetime"><spring:message code="integracio.list.columna.data"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="integracio.list.columna.descripcio"/></th>
 				<th data-col-name="tipus" data-orderable="false"><spring:message code="integracio.list.columna.tipus"/></th>
-				<th data-col-name="codiEntitat" data-orderable="false"><spring:message code="integracio.list.codi.entitat"/></th>
+				<th data-col-name="entitatCodi" data-orderable="false"><spring:message code="integracio.list.codi.entitat"/></th>
 				<th data-col-name="tempsResposta" data-template="#cellTempsTemplate" data-orderable="false">
 					<spring:message code="integracio.list.columna.temps.resposta"/>
 					<script id="cellTempsTemplate" type="text/x-jsrender">{{:tempsResposta}} ms</script>

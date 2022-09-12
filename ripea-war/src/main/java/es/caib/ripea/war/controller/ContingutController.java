@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,10 +192,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		
 		
 		} catch (Exception e) {
+			System.out.println("Error al obtenir detalls del contingut" +  ExceptionUtils.getStackTrace(e));
 			logger.error("Error al obtenir detalls del contingut", e);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			if (ModalHelper.isModal(request)) {
-				if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+				if (root instanceof ConnectException || (root.getMessage() != null && root.getMessage().contains("timed out"))) {
 					return getModalControllerReturnValueErrorMessageText(
 							request,
 							"redirect:../../contingut/" + contingutId,
