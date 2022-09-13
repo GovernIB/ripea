@@ -173,8 +173,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			fillModelFileSubmit(command, model, request);
 			return "fileUploadResult";
 		}
-
-		if ((command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE02 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE03 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE04) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
+		String estatsElaboracioIdentificadorEniObligat = obtenirEstatsElaboracioIdentificadorEniObligat();
+		if ((estatsElaboracioIdentificadorEniObligat != null && !estatsElaboracioIdentificadorEniObligat.isEmpty() && command.getNtiEstadoElaboracion() != null && estatsElaboracioIdentificadorEniObligat.contains(command.getNtiEstadoElaboracion().name())) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
 			bindingResult.rejectValue("ntiIdDocumentoOrigen", "NotNull");
 		}
 		//Recuperar document escanejat
@@ -1072,6 +1072,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		        new StringArrayPropertyEditor(null)); 
 	}
 	
+	private String obtenirEstatsElaboracioIdentificadorEniObligat() {
+		return aplicacioService.propertyFindByNom("es.caib.ripea.estat.elaboracio.identificador.origen.obligat");
+	}
+	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {
 			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
@@ -1249,6 +1253,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				modificacioCustodiatsActiva);
 
 		model.addAttribute("contingutId", contingutId);
+		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

@@ -343,7 +343,9 @@ $(document).ready(function() {
 	});
 	
 	$('#ntiEstadoElaboracion').on('change', function() {
-		if ($(this).val() && ($(this).val()=='EE02' || $(this).val()=='EE03' ||  $(this).val()=='EE04')) {
+		var estatsElaboracioIdentificadorEniObligat = "${estatsElaboracioIdentificadorEniObligat}".replace(/\s/g, '').split(',');
+		var estatElaboracioSeleccionat = $(this).val();
+		if (estatElaboracioSeleccionat && (estatsElaboracioIdentificadorEniObligat.includes(estatElaboracioSeleccionat))) {
 			$('#ntiIdDocumentoOrigenDiv').show();
 		} else {
 			$('#ntiIdDocumentoOrigenDiv').hide();
