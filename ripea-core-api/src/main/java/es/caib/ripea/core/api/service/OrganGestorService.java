@@ -1,5 +1,6 @@
 package es.caib.ripea.core.api.service;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
@@ -280,4 +281,10 @@ public interface OrganGestorService {
 
 	// For testing:
 	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper);
+
+	
+	@PreAuthorize("hasRole('IPA_ADMIN')")
+	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
+			Long entitatId,
+			OrganGestorFiltreDto filtre);
 }

@@ -4,14 +4,15 @@
 package es.caib.ripea.core.repository;
 
 import java.util.List;
+import java.util.Set;
 
-import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -86,6 +87,33 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") OrganEstatEnumDto estat,
 			Pageable paginacio);
+	
+	
+
+	
+	
+	@Query(	"select " +
+			"    og.codi " + 
+			"from " +
+			"    OrganGestorEntity og " +
+			"where " +
+			"    (og.entitat = :entitat) " +
+			"and (:esNullCodi = true or lower(og.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullNom = true or lower(og.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullOrganSuperior = true or og.pare.id = :organSuperiorId) " + 
+			"and (:esNullEstat = true or og.estat = :estat) ")
+	public Set<String> findAmbFiltre(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullOrganSuperior") boolean esNullOrganSuperior,
+			@Param("organSuperiorId") Long organSuperiorId,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") OrganEstatEnumDto estat);
+	
+	
 
 	@Query(	"select " +
 			"    og " + 

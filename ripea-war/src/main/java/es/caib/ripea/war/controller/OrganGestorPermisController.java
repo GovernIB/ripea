@@ -3,6 +3,21 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
@@ -14,19 +29,6 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -131,10 +133,18 @@ public class OrganGestorPermisController extends BaseAdminController {
 				command.getOrganGestorId(),
 				PermisOrganGestorCommand.asDto(command),
 				entitat.getId());
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:permis",
-				"organgestor.controller.permis.modificat.ok");
+		if (command.getId() == null) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:permis",
+					"organgestor.controller.permis.creat.ok");
+		} else {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:permis",
+					"organgestor.controller.permis.modificat.ok");
+		}
+
 	}
 
 	@RequestMapping(value = "{permisId}/delete", method = RequestMethod.GET)

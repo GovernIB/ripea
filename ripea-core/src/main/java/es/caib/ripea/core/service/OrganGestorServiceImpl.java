@@ -1,21 +1,15 @@
 package es.caib.ripea.core.service;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.*;
-import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.unitat.NodeDir3;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.slf4j.Logger;
@@ -28,15 +22,48 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.ActualitzacioInfo;
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.ArbreNodeDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
+import es.caib.ripea.core.api.dto.PrediccioSincronitzacio;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.IntegracioHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.RolHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.unitat.NodeDir3;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
@@ -847,6 +874,88 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return hasPermisAdminComu;
 	}
 
+
+	@Transactional
+	@Override
+	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
+			Long entitatId,
+			OrganGestorFiltreDto filtre) {
+		
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				true,
+				false,
+				false,
+				false);
+		
+		List<OrganGestorEntity> organs = organGestorRepository.findByEntitat(entitat);
+
+		List<OrganGestorDto> organsDto = conversioTipusHelper.convertirList(
+				organs,
+				OrganGestorDto.class);
+
+		ArbreDto<OrganGestorDto> resposta = new ArbreDto<OrganGestorDto>(false);
+		// Cerca l'unitat organitzativa arrel
+		OrganGestorDto organGestorArrel = null;
+		for (OrganGestorDto organGestor : organsDto) {
+			if (entitat.getUnitatArrel().equalsIgnoreCase(organGestor.getCodi())) {
+				organGestorArrel = organGestor;
+				break;
+			}
+		}
+		if (organGestorArrel != null) {
+			// Omple l'arbre d'unitats organitzatives
+			resposta.setArrel(organGestorHelper.getNodeArbreUnitatsOrganitzatives(organGestorArrel, organsDto, null));
+			
+			Set<String> unitatCodiPermesos = organGestorRepository.findAmbFiltre(
+					entitat,
+					filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+					filtre.getCodi() != null ? filtre.getCodi().trim() : "",
+					filtre.getNom() == null || filtre.getNom().isEmpty(),
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					filtre.getPareId() == null,
+					filtre.getPareId(),
+					filtre.getEstat() == null,
+					filtre.getEstat());
+			
+			// Calcula els nodes a "salvar" afegint els nodes permesos
+			// i tots els seus pares.
+			List<ArbreNodeDto<OrganGestorDto>> nodes = resposta.toList();
+			Set<String> unitatCodiSalvats = new HashSet<String>();
+			for (ArbreNodeDto<OrganGestorDto> node: nodes) {
+				if (unitatCodiPermesos.contains(node.dades.getCodi())) {
+					unitatCodiSalvats.add(node.dades.getCodi());
+					ArbreNodeDto<OrganGestorDto> pare = node.getPare();
+					while (pare != null) {
+						unitatCodiSalvats.add(pare.dades.getCodi());
+						pare = pare.getPare();
+					}
+				}
+			}
+			// Esborra els nodes no "salvats"
+			for (ArbreNodeDto<OrganGestorDto> node: nodes) {
+				if (!unitatCodiSalvats.contains(node.dades.getCodi())) {
+					if (node.getPare() != null)
+						node.getPare().removeFill(node);
+					else
+						resposta.setArrel(null);
+				}
+					
+			}
+			
+			
+			return resposta;
+
+		} else {
+			return null;
+		}
+	}
+	
+	
+	
+	
 	private List<OrganGestorEntity> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,

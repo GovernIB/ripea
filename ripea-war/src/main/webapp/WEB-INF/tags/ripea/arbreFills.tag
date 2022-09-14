@@ -6,6 +6,8 @@
 <%@ attribute name="atributId" required="true"%>
 <%@ attribute name="atributNom" required="true"%>
 <%@ attribute name="seleccionatId"%>
+<%@ attribute name="fillsAtributInfoCondition"%>
+<%@ attribute name="fillsAtributInfoText"%>
 <%@ attribute name="fulles" type="java.lang.Object"%>
 <%@ attribute name="fullesAtributId"%>
 <%@ attribute name="fullesAtributNom"%>
@@ -17,8 +19,9 @@
 <ul>
 	<c:forEach var="fill" items="${fills}">
 		<li id="${fill.dades[atributId]}" data-jstree='{"icon":"fa fa-folder fa-lg"<c:if test="${not empty seleccionatId and fill.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
+			<c:if test="${!empty fillsAtributInfoCondition && fill.dades[fillsAtributInfoCondition]}">${fillsAtributInfoText}</c:if>		
 			${fill.dades[atributNom]}<c:if test="${not isOcultarCounts and fill.mostrarCount}"> <span class="badge">${fill.count}</span></c:if>
-			<rip:arbreFills pare="${fill}" fills="${fill.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"  fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" fullesAtributInfo="${fullesAtributInfo}" fullesAtributInfoText="${fullesAtributInfoText}" isOcultarCounts="${isOcultarCounts}"/>
+			<rip:arbreFills pare="${fill}" fills="${fill.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"  fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" fullesAtributInfo="${fullesAtributInfo}" fullesAtributInfoText="${fullesAtributInfoText}" isOcultarCounts="${isOcultarCounts}" fillsAtributInfoCondition="${fillsAtributInfoCondition}" fillsAtributInfoText="${fillsAtributInfoText}"/>
 		</li>
 	</c:forEach>
 	<c:forEach var="fulla" items="${fulles}">

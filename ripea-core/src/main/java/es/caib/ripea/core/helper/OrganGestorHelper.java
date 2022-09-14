@@ -1,8 +1,31 @@
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
+import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
 import es.caib.ripea.core.entity.AvisEntity;
@@ -20,25 +43,6 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class OrganGestorHelper {
@@ -278,6 +282,42 @@ public class OrganGestorHelper {
 		}
 		return pares;
 	}
+	
+	
+
+	/**
+	 * 
+	 * @param organGestor - in first call it is unitat arrel, later the children nodes
+	 * @param organGestors
+	 * @param pare - in first call it is null, later pare
+	 * @return
+	 */
+	public ArbreNodeDto<OrganGestorDto> getNodeArbreUnitatsOrganitzatives(
+			OrganGestorDto organGestor,
+			List<OrganGestorDto> organGestors,
+			ArbreNodeDto<OrganGestorDto> pare) {
+		
+		// creating current arbre node and filling it with pare arbre node and dades as current unitat
+		ArbreNodeDto<OrganGestorDto> currentArbreNode = new ArbreNodeDto<OrganGestorDto>(
+				pare,
+				organGestor);
+		String codiUnitat = (organGestor != null) ? organGestor.getCodi() : null;
+		
+		// for every child of current unitat call recursively getNodeArbreUnitatsOrganitzatives()
+		for (OrganGestorDto uo : organGestors) {
+			// searches for children of current unitat
+			if ((codiUnitat == null && uo.getPareCodi() == null) || (uo.getPareCodi() != null && uo.getPareCodi().equals(codiUnitat))) {
+				
+				currentArbreNode.addFill(
+						getNodeArbreUnitatsOrganitzatives(
+								uo,
+								organGestors,
+								currentArbreNode));
+			}
+		}
+		return currentArbreNode;
+	}
+	
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
 

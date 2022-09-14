@@ -42,10 +42,19 @@ public class OrganGestorDto extends AuditoriaDto {
     	return codi + " - " + nom;
     }
     
+    public String getNomICodi() {
+		return nom + " (" + codi + ")";
+    }
+    
     public String getPareCodiNom() {
     	if (pareCodi == null) 
     		return null;
     	return pareCodi + " - " + pareNom;
     }
+    
+	
+	public boolean isObsolet() {
+		return estat != OrganEstatEnumDto.V;
+	}
        
 }

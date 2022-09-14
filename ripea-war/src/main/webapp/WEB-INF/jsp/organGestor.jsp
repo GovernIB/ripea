@@ -18,12 +18,16 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	
 </head>
 <body>
 
 	<div class="text-right" data-toggle="botons-titol" data-btn-title-col-size="4">
 		<a id="organgestor-boto-nou" class="btn btn-default" data-toggle="modal" href="organgestor/sync/dir3">
 				<span class="fa fa-refresh"></span>&nbsp; <spring:message code="organgestor.list.boto.actualitzar"/>
+		</a>
+		<a id="organgestor-boto-organigrama" class="btn btn-primary" href="<c:url value="/organGestorOrganigrama"/>">
+			<spring:message code="organgestor.list.boto.canvi.vista"/>
 		</a>
 	</div>
 
@@ -57,6 +61,8 @@
 			</div>
 		</div>
 	</form:form>
+	
+	
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/organgestor/{{:id}}</script>
 	<table 
 		id="permisos" 

@@ -1,5 +1,6 @@
 package es.caib.ripea.core.ejb;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
@@ -229,10 +230,22 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	public List<OrganGestorDto> findOrgansSuperiorByEntitat(Long entitatId) {
 		return delegate.findOrgansSuperiorByEntitat(entitatId);
 	}
+	
+	@Override
+	@RolesAllowed("IPA_ADMIN")
+	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
+			Long entitatId,
+			OrganGestorFiltreDto filtre) {
+		return delegate.findOrgansArbreAmbFiltre(
+				entitatId,
+				filtre);
+	}
+
 
 	@Override
 	public void setServicesForSynctest(Object metaExpedientHelper, Object pluginHelper) {
 		delegate.setServicesForSynctest(metaExpedientHelper, pluginHelper);
 	}
+
 
 }

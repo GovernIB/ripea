@@ -29,7 +29,6 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
-import lombok.NonNull;
 
 /**
  * Controlador per a la consulta d'accions de les integracions.
@@ -50,16 +49,31 @@ public class IntegracioController extends BaseUserController {
 	public String get(HttpServletRequest request, Model model) {
 		return getAmbCodi(request, null, model);
 	}
-
-	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
+	
+	@RequestMapping(method = RequestMethod.POST)
 	public String post(
 			HttpServletRequest request,
-			@PathVariable @NonNull String codi,
 			IntegracioFiltreCommand command,
 			@RequestParam(value = "accio", required = false) String accio,
 			Model model) {
 
-		
+		return postAmbCodi(
+				request,
+				null,
+				command,
+				accio,
+				model);
+	}
+	
+
+	@RequestMapping(value="/{codi}", method = RequestMethod.POST)
+	public String postAmbCodi(
+			HttpServletRequest request,
+			@PathVariable String codi,
+			IntegracioFiltreCommand command,
+			@RequestParam(value = "accio", required = false) String accio,
+			Model model) {
+
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
@@ -71,8 +85,9 @@ public class IntegracioController extends BaseUserController {
 					command);
 		}
 		
-		return "redirect:/integracio/{codi}";
+		return codi != null ? "redirect:/integracio/{codi}" : "redirect:/integracio";
 	}
+
 	
 	@RequestMapping(value = "/{codi}", method = RequestMethod.GET)
 	public String getAmbCodi(HttpServletRequest request, @PathVariable String codi, Model model) {

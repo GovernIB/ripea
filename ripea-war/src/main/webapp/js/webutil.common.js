@@ -356,6 +356,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	$.fn.webutilBotonsTitol = function() {
 		var $heading = $('.panel-heading h2', $(this).closest('.panel'))
 		if ($heading) {
+			$heading = $heading.first();
 			$heading.wrap( "<div class='row'></div>");
 			
 			$(this).insertAfter($heading);
