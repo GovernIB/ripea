@@ -1076,6 +1076,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return aplicacioService.propertyFindByNom("es.caib.ripea.estat.elaboracio.identificador.origen.obligat");
 	}
 	
+	private String isMascaraPermesa() {
+		return aplicacioService.propertyFindByNom("es.caib.ripea.identificador.origen.mascara");
+	}
+	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {
 			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
@@ -1254,6 +1258,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 		model.addAttribute("contingutId", contingutId);
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
+		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

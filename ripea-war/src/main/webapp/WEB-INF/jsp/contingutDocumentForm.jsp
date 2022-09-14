@@ -33,6 +33,7 @@
 	<script src="<c:url value="/webjars/eonasdan-bootstrap-datetimepicker/4.7.14/build//js/bootstrap-datetimepicker.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
+	<script src="<c:url value="/js/jquery.maskedinput.min.js"/>"></script>
 	<rip:modalHead/>
 <style type="text/css">
 
@@ -116,6 +117,11 @@ function mostrarFrima(fileName) {
 }
 
 $(document).ready(function() {
+	if (${isMascaraPermesa}) {
+		$("#ntiIdDocumentoOrigen").mask("**_*********_9999_******************************",{ 
+			placeholder:"_"
+		});
+	}
 	let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
 	let rootIframe = window.frameElement;
@@ -520,7 +526,7 @@ function removeLoading() {
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 	
 		<div id="ntiIdDocumentoOrigenDiv">
-			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true"/>
+			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true" comment="contingut.document.form.camp.id.doc.origen.comtentari"/>
 		</div>
 <%--		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">--%>
 		<c:if test="${!isImportatNoBorrador && isPermesModificarCustodiatsVar}">

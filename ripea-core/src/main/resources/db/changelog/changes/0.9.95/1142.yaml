@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1663146757135-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.identificador.origen.mascara
+              - column:
+                  name: value
+                  value: true
+              - column:
+                  name: description
+                  value: Aplicar màscara al camp "Identificador del document origen"
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 23
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1
