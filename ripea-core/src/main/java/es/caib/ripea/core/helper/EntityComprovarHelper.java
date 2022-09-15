@@ -306,6 +306,20 @@ public class EntityComprovarHelper {
 		}
 		return metaNode;
 	}
+	
+	
+
+	
+	public MetaExpedientEntity comprovarMetaExpedient(Long entitatId, Long metaExpedientId) {
+		EntitatEntity entitat = comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				false,
+				false);
+		return comprovarMetaExpedient(entitat, metaExpedientId);
+	}
 
 	public MetaExpedientEntity comprovarMetaExpedient(EntitatEntity entitat, Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
@@ -395,6 +409,22 @@ public class EntityComprovarHelper {
 					metaExpedient.getOrganGestor().getId());
 		}
 		return metaExpedient;
+	}
+	
+	public MetaDocumentEntity comprovarMetaDocument(
+			Long entitatId,
+			Long metaDocumentId) {
+		EntitatEntity entitat = comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				false,
+				false);
+
+		return comprovarMetaDocument(
+				entitat,
+				metaDocumentId);
 	}
 
 	public MetaDocumentEntity comprovarMetaDocument(EntitatEntity entitat, Long metaDocumentId) {

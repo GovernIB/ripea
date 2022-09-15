@@ -437,6 +437,16 @@ public class DocumentServiceBean implements DocumentService {
 				contingut,
 				contentType);
 	}
+	
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public long countByMetaDocument(
+			Long entitatId,
+			Long metaDocumentId) {
+		return delegate.countByMetaDocument(
+				entitatId,
+				metaDocumentId);
+	}
 
 
 }

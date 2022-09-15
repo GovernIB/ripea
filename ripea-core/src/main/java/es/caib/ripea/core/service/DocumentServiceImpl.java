@@ -1425,6 +1425,22 @@ public class DocumentServiceImpl implements DocumentService {
 		documentHelper.actualitzarEstat(document, nouEstat);
 	}
 	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public long countByMetaDocument(
+			Long entitatId,
+			Long metaDocumentId) {
+		
+		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
+				entitatId,
+				metaDocumentId);
+		
+		List<DocumentEntity> documents = documentRepository.findByMetaNode(entity);
+		return documents != null ? documents.size() : 0;
+	}
+	
+	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto)contingutHelper.toContingutDto(

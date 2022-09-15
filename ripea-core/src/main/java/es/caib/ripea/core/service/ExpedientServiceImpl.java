@@ -2035,6 +2035,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 		CarpetaEntity expedientFillImportedEntity = carpetaRepository.findOne(expedientFillImported.getId());
 		expedientFillImportedEntity.updateExpedientRelacionat(expedientFill);
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public long countByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitatId,
+				metaExpedientId);
+		
+		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);
+		return expedients != null ? expedients.size() : 0;
+	}
+	
 
 	@Override
 	public boolean esborrarExpedientFill(Long entitatId, Long expedientPareId, Long expedientId, String rolActual)

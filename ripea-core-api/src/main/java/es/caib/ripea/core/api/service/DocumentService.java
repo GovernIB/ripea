@@ -687,6 +687,11 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType);
 
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	public long countByMetaDocument(
+			Long entitatId,
+			Long metaDocumentId);
+
 	
 
 }

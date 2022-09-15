@@ -546,6 +546,11 @@ public interface ExpedientService {
 			String rolActual) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
-	Exception retryMoverAnnexArxiu(Long registreAnnexId);
+	public Exception retryMoverAnnexArxiu(Long registreAnnexId);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
+	public long countByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId);
 
 }

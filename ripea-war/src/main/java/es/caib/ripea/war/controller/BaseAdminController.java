@@ -46,7 +46,7 @@ public class BaseAdminController extends BaseController {
 		return entitat;
 	}
 
-	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(
+	public EntitatDto getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(
 			HttpServletRequest request) {
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		if (entitat == null) {

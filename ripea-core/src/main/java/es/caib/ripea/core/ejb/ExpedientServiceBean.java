@@ -440,4 +440,14 @@ public class ExpedientServiceBean implements ExpedientService {
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
 		return delegate.retryMoverAnnexArxiu(registreAnnexId);
 	}
+	
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
+	public long countByMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegate.countByMetaExpedient(
+				entitatId,
+				metaExpedientId);
+	}
 }

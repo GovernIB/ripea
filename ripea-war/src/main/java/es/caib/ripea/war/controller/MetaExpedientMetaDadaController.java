@@ -3,26 +3,16 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.DominiDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.ResultatConsultaDto;
-import es.caib.ripea.core.api.dto.ResultatDominiDto;
-import es.caib.ripea.core.api.exception.DominiException;
-import es.caib.ripea.core.api.service.DominiService;
-import es.caib.ripea.core.api.service.MetaDadaService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.MetaDadaCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +30,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
+import es.caib.ripea.core.api.dto.ResultatDominiDto;
+import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.api.service.DominiService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDadaService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.MetaDadaCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de les meta-dades dels meta-expedients.
@@ -64,13 +67,15 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private DominiService dominiService;
+	@Autowired
+	private ExpedientService expedientService;
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
@@ -106,7 +111,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
@@ -131,7 +136,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaNodeId,
 			@PathVariable Long metaDadaId,
 			@PathVariable int posicio) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		metaDadaService.moveTo(
 				entitatActual.getId(),
 				metaNodeId,
@@ -156,12 +161,12 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		Long entitatActualId = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request).getId();
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDadaDto metaDada = null;
 		if (metaDadaId != null)
 			metaDada = metaDadaService.findById(
-					entitatActual.getId(),
+					entitatActualId,
 					metaExpedientId,
 					metaDadaId);
 		MetaDadaCommand command = null;
@@ -172,10 +177,11 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		} else {
 			command = new MetaDadaCommand();
 		}
-		command.setEntitatId(entitatActual.getId());
+		command.setEntitatId(entitatActualId);
 		command.setMetaNodeId(metaExpedientId);
 		model.addAttribute(command);
 		
+		model.addAttribute("existContingut",  expedientService.countByMetaExpedient(entitatActualId, metaExpedientId) != 0);
 		if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
 			if (RolHelper.isRolActualAdministradorOrgan(request)  && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.REVISAT){
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.adminOrgan.bloquejada.alerta"));
@@ -195,7 +201,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@Valid MetaDadaCommand command,
 			BindingResult bindingResult,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
@@ -240,7 +246,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
@@ -266,7 +272,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
@@ -293,7 +299,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			@PathVariable Long metaDadaId) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
@@ -336,7 +342,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	public List<DominiDto> getDominis(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrPermisAdminEntitatOrganOrRevisor(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
