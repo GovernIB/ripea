@@ -83,6 +83,9 @@ databaseChangeLog:
                   type: ${tipus}
                   defaultValue: 0
         - sql:
+            dbms: oracle
+            sql: "GRANT SELECT, UPDATE, INSERT, DELETE ON  ipa_processos_inicials TO www_ripea;"                  
+        - sql:
             sql: "
                 INSERT INTO IPA_PROCESSOS_INICIALS (codi, init, id) VALUES ('PROPIETATS_CONFIG_ENTITATS', 1, 2);
             
