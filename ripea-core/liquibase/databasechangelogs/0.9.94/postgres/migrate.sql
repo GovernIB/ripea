@@ -152,6 +152,13 @@ UPDATE IPA_CONFIG SET CONFIGURABLE = true WHERE KEY LIKE 'es.caib.ripea.habilita
 UPDATE IPA_CONFIG SET CONFIGURABLE = true WHERE KEY LIKE 'es.caib.ripea.habilitar.tipusdocument';
 UPDATE IPA_CONFIG SET CONFIGURABLE = true WHERE KEY LIKE 'es.caib.ripea.procediment.gestio.permis.administrador.organ';
 
+INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.path', null, 'Path del magatzem de claus amb el certificat per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE', 8, 1, 'TEXT', 1);
+INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.type', null, 'Tipus de magatzem de claus per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE', 9, 1, 'TEXT', 1);
+INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.password', null, 'Password del magatzem de claus per l''autenticació a Afirm@', 'VALIDATE_SIGNATURE', 10, 1, 'PASSWORD', 1);
+INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.cert.alias', null, 'Alies del certificat a emprar del magatzem de claus per l''autenticació a Afirm@','VALIDATE_SIGNATURE', 11, 1, 'TEXT', 1);
+INSERT INTO IPA_CONFIG (KEY, VALUE, DESCRIPTION, GROUP_CODE, POSITION, JBOSS_PROPERTY, TYPE_CODE, CONFIGURABLE) VALUES ('es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.cert.password', null, 'Password del certificat del magatzem de claus per l''autenticació a Afirm@','VALIDATE_SIGNATURE', 12, 1, 'PASSWORD', 1);
+
+
 -- Changeset db/changelog/changes/0.9.94/1018.yaml::1661173682991-1::limit
 update IPA_INTERESSAT set DOCUMENT_TIPUS = 'NIF' where DOCUMENT_TIPUS = 'CIF';
 

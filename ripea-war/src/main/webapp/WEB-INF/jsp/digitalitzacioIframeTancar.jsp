@@ -32,6 +32,8 @@ if (rootIframe) {
 	} else {
 		$(window.parent.document).find('.start-scan-btn').show();
 	}
+
+	 $('.crearDocumentBtnSubmit', parent.parent.document).prop('disabled', false);
 	
 	//Adjust modal width/height
 	adjustModalPerFlux();

@@ -313,6 +313,7 @@ $(document).ready(function() {
 					webutilModalAdjustHeight();
 					$body = $("body");
 					$body.addClass("loading");
+
 				}
 			},
 			error: function(err) {
@@ -333,6 +334,9 @@ $(document).ready(function() {
 				$('.scan-result').html('');
 				$('.start-scan-btn').show();
 				localStorage.removeItem('transaccioId');
+
+				$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+				$('.start-scan-btn').click();
 			},
 			error: function(err) {
 				console.log("Error tancant la transacció");
@@ -347,7 +351,17 @@ $(document).ready(function() {
 	});
 
 	$('#escaneigTab').on('click', function(){
-		$('.start-scan-btn').click();
+		if (!$("#escaneig").find(".scan-cancel-btn").length) {
+			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+		}
+		if (!$("#escaneig").find("iframe").length && !$("#escaneig").find(".scan-cancel-btn").length) {
+		    $('.start-scan-btn').click();
+		}
+	});
+	
+	$('#fitxerTab').on('click', function(){
+		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
+
 	});
 	
 	$('#ntiEstadoElaboracion').on('change', function() {
@@ -530,7 +544,7 @@ function removeLoading() {
 <%--		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">--%>
 		<c:if test="${!isImportatNoBorrador && isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
-				<li role="presentation" class="active"><a href="#fitxer" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
+				<li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
 				<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
 			</ul>
 			<br/>

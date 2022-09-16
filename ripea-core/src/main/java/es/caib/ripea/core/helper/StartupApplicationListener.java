@@ -41,12 +41,13 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
         log.info("Executant processos inicials. Counter: " + counter++);
         addCustomAuthentication();
         try {
+        	
             List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
             for (ProcesosInicialsEntity proces : processos) {
                 log.info("Executant procés inicial: {}",  proces.getCodi());
                 switch (proces.getCodi()) {
                     case PROPIETATS_CONFIG_ENTITATS:
-                        configService.crearPropietatsConfigPerEntitats();
+//                        configService.crearPropietatsConfigPerEntitats(); it must be executed on every startup because it must create configuration per entititats for properties added in the future
                         break;
                     default:
                         log.error("Procés inicial no definit");
@@ -54,6 +55,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                 }
                 processosInicialsRepository.updateInit(proces.getId(), false);
             }
+            configService.crearPropietatsConfigPerEntitats();
             configService.actualitzarPropietatsJBossBdd();
         } catch (Exception ex) {
             log.error("Errror executant els processos inicials", ex);
