@@ -504,7 +504,7 @@ function removeLoading() {
 		</c:otherwise>
 	</c:choose>
 	
-	<c:if test="${documentCommand.estat!='REDACCIO'}">
+	<c:if test="${!empty documentCommand.id && documentCommand.estat!='REDACCIO'}">
 		<div class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span>&nbsp; <spring:message code="contingut.document.form.arxiu.definitiu.avis"/></div>
 	</c:if>
 	
