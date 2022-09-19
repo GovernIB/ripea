@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
@@ -87,6 +88,7 @@ public class DocumentCommand extends ContenidorCommand {
 	private boolean onlyFileSubmit = false;
 	private boolean unselect = false;
 	
+	private DocumentEstatEnumDto estat;
 
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
@@ -319,6 +321,12 @@ public class DocumentCommand extends ContenidorCommand {
 		ESCANER
 	}
 	
+	public DocumentEstatEnumDto getEstat() {
+		return estat;
+	}
+	public void setEstat(DocumentEstatEnumDto estat) {
+		this.estat = estat;
+	}
 	private static Date convertToDate(LocalDateTime dateToConvert) throws ParseException {
 		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dateToConvert.toString("dd/MM/yyyy HH:mm:ss"));
 	}
