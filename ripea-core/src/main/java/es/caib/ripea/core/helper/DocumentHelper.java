@@ -299,12 +299,17 @@ public class DocumentHelper {
 				true,
 				true);
 		DocumentDto dto = toDocumentDto(documentEntity);
-		contingutHelper.arxiuPropagarModificacio(
-				documentEntity,
-				fitxer,
-				document.isAmbFirma(),
-				document.isFirmaSeparada(),
-				firmes, false);
+		
+		if (document.getEstat() == DocumentEstatEnumDto.REDACCIO) {
+			contingutHelper.arxiuPropagarModificacio(
+					documentEntity,
+					fitxer,
+					document.isAmbFirma(),
+					document.isFirmaSeparada(),
+					firmes, 
+					false);
+		}
+
 		return dto;
 	}
 	
