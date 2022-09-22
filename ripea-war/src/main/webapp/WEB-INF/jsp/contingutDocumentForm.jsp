@@ -560,6 +560,9 @@ function removeLoading() {
 					<div id="arxiuInput">
 						<div id="inputDoc">
 							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+							<c:if test="${!empty documentCommand.id && !documentCommand.validacioCorrecte}">
+								<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioError}</span></div>
+							</c:if>
 						</div>
 						<div id="inputAmbFirma" class="hidden">
 							<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>

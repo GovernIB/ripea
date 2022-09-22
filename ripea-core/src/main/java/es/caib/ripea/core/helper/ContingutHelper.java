@@ -364,6 +364,7 @@ public class ContingutHelper {
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			dto.setValidacioCorrecte(document.isValidacioCorrecte());
 			dto.setValidacioError(document.getValidacioError());
+			dto.setEstat(document.getEstat());
 			resposta = dto;
 
 			logger.trace("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");

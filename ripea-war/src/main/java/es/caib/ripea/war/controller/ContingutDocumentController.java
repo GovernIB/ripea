@@ -126,6 +126,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		DocumentCommand command = null;
 		if (document != null) {
 			command = DocumentCommand.asCommand(document);
+			command.setEntitatId(entitatActual.getId());
+			command.setPareId(pareId);
+			command.setOrigen(DocumentFisicOrigenEnum.DISC);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 			omplirModelFormulariAmbDocument(
 					request,
 					command,
@@ -138,6 +142,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			LocalDateTime ara = new LocalDateTime();
 			command.setDataTime(ara);
 
+			command.setEntitatId(entitatActual.getId());
+			command.setPareId(pareId);
+			command.setOrigen(DocumentFisicOrigenEnum.DISC);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 			omplirModelFormulari(
 					request,
 					command,
@@ -145,10 +153,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					model);
 		}
-		command.setEntitatId(entitatActual.getId());
-		command.setPareId(pareId);
-		command.setOrigen(DocumentFisicOrigenEnum.DISC);
-		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+
 		model.addAttribute(command);
 		model.addAttribute("contingutId", pareId);
 		model.addAttribute("documentId", documentId);
@@ -1188,6 +1193,17 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("nomDocument", document.getFitxerNom());
 		}
 		model.addAttribute("documentEstat", document.getEstat());
+		
+		if (document.getNtiTipoFirma() != null) {
+			command.setAmbFirma(true);
+			if (document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF02 && document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF04) {
+				command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+			} else {
+				command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+			}
+		}
+		
+		
 		omplirModelFormulari(request, command, commandGeneric, contingutId, model);
 	}
 	
