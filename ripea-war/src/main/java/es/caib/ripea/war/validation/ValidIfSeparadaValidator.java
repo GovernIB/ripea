@@ -8,6 +8,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.support.RequestContext;
 
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.war.command.DocumentCommand;
@@ -39,7 +40,7 @@ public class ValidIfSeparadaValidator implements ConstraintValidator<ValidIfSepa
 				valid = (command.getFirma() != null && !command.getFirma().isEmpty()) || request.getSession().getAttribute(SESSION_ATTRIBUTE_FRIMA) != null;
 				if (!valid) {
 					context.buildConstraintViolationWithTemplate(
-							MessageHelper.getInstance().getMessage("FirmaNoBuida"))
+							MessageHelper.getInstance().getMessage("FirmaNoBuida", null, new RequestContext(request).getLocale()))
 					.addNode("firma")
 					.addConstraintViolation();
 				}
