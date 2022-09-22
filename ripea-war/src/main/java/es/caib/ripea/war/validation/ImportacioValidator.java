@@ -7,8 +7,12 @@ package es.caib.ripea.war.validation;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.servlet.support.RequestContext;
 
 import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
@@ -22,6 +26,9 @@ import es.caib.ripea.war.helper.MessageHelper;
  */
 public class ImportacioValidator implements ConstraintValidator<Importacio, ImportacioCommand> {
 	
+	@Autowired
+	private HttpServletRequest request;
+	
 	@Override
 	public void initialize(final Importacio constraintAnnotation) {
 	}
@@ -34,13 +41,13 @@ public class ImportacioValidator implements ConstraintValidator<Importacio, Impo
 			String numeroRegistre = command.getNumeroRegistre();
 			String dataRegistre = command.getDataPresentacio();
 			if (numeroRegistre == null || dataRegistre.isEmpty()) {
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, new RequestContext(request).getLocale()))
 				.addNode("numeroRegistre")
 				.addConstraintViolation();
 				valid = false;
 			}
 			if (dataRegistre == null || dataRegistre.isEmpty()) {
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, new RequestContext(request).getLocale()))
 				.addNode("dataPresentacio")
 				.addConstraintViolation();
 				valid = false;
@@ -48,20 +55,20 @@ public class ImportacioValidator implements ConstraintValidator<Importacio, Impo
 		} else {
 			String codiEni = command.getCodiEni();
 			if (codiEni == null || codiEni.isEmpty()) {
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, new RequestContext(request).getLocale()))
 				.addNode("codiEni")
 				.addConstraintViolation();
 				valid = false;
 			}
 			if (codiEni != null && !isValid(codiEni)) {
-				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("contingut.importacio.form.camp.eni.notvalid"))
+				context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("contingut.importacio.form.camp.eni.notvalid", null, new RequestContext(request).getLocale()))
 				.addNode("codiEni")
 				.addConstraintViolation();
 				valid = false;
 			}
 		}
 		if (command.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA) && command.getCarpetaNom().isEmpty()) {
-			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty"))
+			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, new RequestContext(request).getLocale()))
 			.addNode("carpetaNom")
 			.addConstraintViolation();
 			valid = false;
