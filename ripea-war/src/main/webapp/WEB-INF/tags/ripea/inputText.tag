@@ -2,6 +2,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
+<%@ attribute name="id" required="false" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
 <%@ attribute name="text" required="false" rtexprvalue="true"%>
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
@@ -21,6 +22,7 @@
 <%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
 
 <c:set var="campPath" value="${name}"/>
+<c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}"> *</c:if></c:set>
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
@@ -40,12 +42,12 @@
 			<c:choose>
 				<c:when test="${tooltip && not button}">
 					<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" maxlength="${maxlength}"/>
+					<form:input path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" maxlength="${maxlength}"/>
 				</c:when>
 				<c:when test="${button && not tooltip}">
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
+					<form:input path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
 					<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
 					</div>
 				</c:when>
@@ -53,12 +55,12 @@
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
 						<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
-						<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
+						<form:input path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
 						<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<form:input path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}"  readonly="${myReadonly}" />
+					<form:input path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}"  readonly="${myReadonly}" />
 				</c:otherwise>
 			</c:choose>
 			
@@ -68,7 +70,7 @@
 	</c:when>
 	<c:otherwise>
 		<label class="sr-only" for="${campPath}">${campLabelText}</label>
-   		<form:input path="${campPath}" cssClass="form-control" id="${campPath}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
+   		<form:input path="${campPath}" cssClass="form-control" id="${campId}" placeholder="${campPlaceholder}" disabled="${disabled}" readonly="${myReadonly}"/>
 		<c:if test="${button}">
 			<button class="btn btn-outline-secondary" type="button">Button</button>
 		</c:if>

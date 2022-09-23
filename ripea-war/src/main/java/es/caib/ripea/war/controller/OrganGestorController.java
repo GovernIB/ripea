@@ -235,6 +235,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 			HttpServletRequest request,
 			@Valid OrganGestorCommand command,
 			BindingResult bindingResult,
+			@RequestParam(value = "redirectAOrganigrama", required = false) Boolean redirectAOrganigrama,
 			Model model) throws JsonMappingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
@@ -246,7 +247,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 			organGestorService.update(entitatActual.getId(), OrganGestorCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:organGestor",
+					redirectAOrganigrama != null && redirectAOrganigrama == true ? "redirect:organGestorOrganigrama" : "redirect:organgestor",
 					"organgestor.controller.modificat.ok");
 		} else {
 			organGestorService.create(entitatActual.getId(), OrganGestorCommand.asDto(command));
@@ -258,7 +259,10 @@ public class OrganGestorController extends BaseUserOAdminController {
 	}
 
 	@RequestMapping(value = "/{organGestorId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable Long organGestorId) {
+	public String delete(
+			HttpServletRequest request, 
+			@PathVariable Long organGestorId,
+			@RequestParam(value = "redirectAOrganigrama", required = false) Boolean redirectAOrganigrama) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			organGestorService.delete(
@@ -266,7 +270,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 					organGestorId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
-					"redirect:../../organGestor",
+					redirectAOrganigrama != null && redirectAOrganigrama == true ? "redirect:../../organGestorOrganigrama" : "redirect:../../organgestor",
 					"organgestor.controller.esborrat.ok");
 		} catch (Exception ex) {
 			logger.error("Error al esborrar organ gestor");

@@ -134,6 +134,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				entitat(entitat).
 				pare(organPareEntity).
 				gestioDirect(true).
+				estat(OrganEstatEnumDto.V).
 				build();
 		
 		OrganGestorEntity organGestorEntity = organGestorRepository.save(entity);
