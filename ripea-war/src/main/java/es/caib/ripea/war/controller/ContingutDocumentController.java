@@ -1085,6 +1085,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return aplicacioService.propertyFindByNom("es.caib.ripea.identificador.origen.mascara");
 	}
 	
+	private Boolean isPropagarModificacioDefinitiusActiva() {
+		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.propagar.modificacio.arxiu");
+	}
+	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {
 			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
@@ -1193,7 +1197,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("nomDocument", document.getFitxerNom());
 		}
 		model.addAttribute("documentEstat", document.getEstat());
-		
+		model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
 		if (document.getNtiTipoFirma() != null) {
 			command.setAmbFirma(true);
 			if (document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF02 && document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF04) {

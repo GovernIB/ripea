@@ -504,7 +504,7 @@ function removeLoading() {
 		</c:otherwise>
 	</c:choose>
 	
-	<c:if test="${!empty documentCommand.id && documentCommand.estat!='REDACCIO'}">
+	<c:if test="${!empty documentCommand.id && documentCommand.estat!='REDACCIO' && !isPermesPropagarModificacioDefinitius}">
 		<div class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span>&nbsp; <spring:message code="contingut.document.form.arxiu.definitiu.avis"/></div>
 	</c:if>
 	
@@ -539,7 +539,7 @@ function removeLoading() {
 		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters" maxlength="250"/>
 		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" maxlength="510"/>
 		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
-		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>
+		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${!isPermesPropagarModificacioDefinitius}"/>
 		<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionEnum="NtiOrigenEnumDto" required="true"/>
 		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 	

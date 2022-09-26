@@ -300,7 +300,7 @@ public class DocumentHelper {
 				true);
 		DocumentDto dto = toDocumentDto(documentEntity);
 		
-		if (document.getEstat() == DocumentEstatEnumDto.REDACCIO) {
+		if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || isPropagarModificacioDefinitiusActiva()) {
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
@@ -962,6 +962,9 @@ public class DocumentHelper {
 	}
 	public boolean isPropagarConversioDefinitiuActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+	}
+	public boolean isPropagarModificacioDefinitiusActiva() {
+		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 
