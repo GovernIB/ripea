@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.config.PropertiesConstants;
+import es.caib.ripea.core.config.SchedulingConfig;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
@@ -106,6 +107,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private EmailHelper emailHelper;
 	@Autowired
 	private MetaExpedientComentariRepository metaExpedientComentariRepository;
+	@Autowired
+	private SchedulingConfig schedulingConfig;
 
 
 	private static final String PREFIX_RIPEA = "[RIPEA]";
@@ -116,21 +119,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
 
-//		System.out.println("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
-		logger.debug("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
+
 
 		// find peticions with no anotació associated and with no errors from previous invocation of this method
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto.CREAT);
 
-		if (peticions != null) {
-//			System.out.println("Consultar i guardar anotacions size: " + peticions.size());
-		}
 
 		if (peticions != null && !peticions.isEmpty()) {
-
 			for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
-
-//				System.out.println("Consultar i guardar anotacio Id: " + expedientPeticioEntity.getId() + ", identificador: " + expedientPeticioEntity.getIdentificador() + ", clauAccess: " + expedientPeticioEntity.getClauAcces());
 
 				AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 				anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
@@ -144,8 +142,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					expedientPeticioHelper.crearRegistrePerPeticio(
 							registre,
 							expedientPeticioEntity);
-
-//					System.out.println("Consultar i guardar anotacio before canviEstat, identificador: " + expedientPeticioEntity.getIdentificador());
 
 					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 					try {
@@ -162,10 +158,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					if (entitatAnotacio != null)
 						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 
-//					System.out.println("Consultar i guardar anotacio finish segonpla, identificador: " + expedientPeticioEntity.getIdentificador());
 				} catch (Throwable e) {
 
-//					System.out.println("Consultar i guardar anotacio error before addExpedientPeticioConsultaError, identificador: " + expedientPeticioEntity.getIdentificador());
 					logger.error("Error consultar i guardar anotació per petició: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
 					
 					try {
@@ -176,7 +170,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 										ExceptionUtils.getStackTrace(e),
 										3600));
 
-//						System.out.println("Consultar i guardar anotacio error before canviEstat: " + expedientPeticioEntity.getIdentificador());
 						// change state of anotació in DISTRIBUCIO to BACK_ERROR
 						DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 								anotacioRegistreId,
@@ -188,7 +181,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 						
 					} catch (Exception e1) {
 						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), false);
-//						System.out.println("Error canviEstat to ERROR: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getStackTrace(e1));
 						logger.error(ExceptionUtils.getStackTrace(e1));
 					}
 				}
@@ -208,7 +200,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 
 	@Override
 	public void buidarCacheDominis() {
-		logger.debug("Execució tasca periòdica: Buidar cachés dominis");
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Buidar cachés dominis");
 		try {
 			//Consulta
 			cacheHelper.evictFindDominisByConsutla();
@@ -229,7 +222,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void enviarEmailPerComentariMetaExpedient() {
-		logger.info("Execució tasca periòdica: Enviar email per comentari metaexpedient");
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Enviar email per comentari metaexpedient");
 
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(new Date());
@@ -250,7 +244,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void enviarEmailsPendentsAgrupats() {
-		logger.info("Execució tasca periòdica: Enviar correus pendents agrupats");
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Enviar correus pendents agrupats");
 
 		List<EmailPendentEnviarEntity> emailPendentsList = emailPendentEnviarRepository.findByOrderByDestinatariAscEventTipusEnumAsc();
 		
@@ -273,7 +269,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				enviarEmailsPendentsAgrupats(
 						email, 
 						emailPendentsList);
-				logger.debug("Enviat l'email d'avis de " + emailPendentsList.size() + " moviments agrupats al destinatari " + email);
+				if (cacheHelper.mostrarLogsSegonPla())
+					logger.info("Enviat l'email d'avis de " + emailPendentsList.size() + " moviments agrupats al destinatari " + email);
 				
 			} catch (Exception e) {
 				logger.error("Error enviant l'email d'avis de " + emailPendentsList.size() + " moviments agrupats al destinatari " + email + ": " + e.getMessage());
@@ -363,7 +360,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void guardarExpedientsDocumentsArxiu() {
 		
-		logger.debug("Execució tasca periòdica: Guardar expedients i documents en arxiu");
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
 		
 		int arxiuMaxReintentsExpedients = getArxiuMaxReintentsExpedients();
 		int arxiuMaxReintentsDocuments = getArxiuMaxReintentsDocuments();
@@ -393,8 +391,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void guardarInteressatsArxiu() {
-		
-		logger.debug("Execució tasca periòdica: Guardar interessats en arxiu");
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.debug("Execució tasca periòdica: Guardar interessats en arxiu");
 		
 		List<InteressatEntity> pendents = interessatRepository.findInteressatsPendentsArxiu(getArxiuMaxReintentsInteressats());
 
@@ -412,7 +410,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
     public void actualitzarProcediments() {
 
-		logger.debug("Execució tasca periòdica: Actualitzar procedimetns");
+    	if (cacheHelper.mostrarLogsSegonPla())
+    		logger.info("Execució tasca periòdica: Actualitzar procedimetns");
 
 		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)	// Tasca en segon pla no configurada
 			return;
@@ -425,7 +424,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void consultaCanvisOrganigrama() {
-		logger.debug("Execució tasca periòdica: Actualitzar procedimetns");
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Actualitzar procedimetns");
 
 		if (configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA) == null)	// Tasca en segon pla no configurada
 			return;
@@ -435,6 +436,13 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		}
 	}
 
+	
+	@Override
+	public void restartSchedulledTasks() {
+		schedulingConfig.restartSchedulledTasks();
+	}
+	
+	
 	private int getArxiuMaxReintentsExpedients() {
 		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
 		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;

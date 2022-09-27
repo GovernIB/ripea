@@ -353,7 +353,8 @@ public class PluginHelper {
 				accioParams,
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
 				System.currentTimeMillis() - t0,
-				errorMissatge);
+				errorMissatge,
+				null);
 		throw new SistemaExternException(
 				IntegracioHelper.INTCODI_UNITATS,
 				errorMissatge);
@@ -385,7 +386,7 @@ public class PluginHelper {
 				return resposta;
 			} else {
 				String errorMissatge = "No s'ha trobat la unitat organitzativa arrel (codi=" + pareCodi + ")";
-				integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorMissatge);
+				integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorMissatge, null);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 		} catch (Exception ex) {

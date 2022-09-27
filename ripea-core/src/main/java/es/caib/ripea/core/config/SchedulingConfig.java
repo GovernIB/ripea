@@ -37,10 +37,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
 
     private static final long DEFAULT_INITIAL_DELAY_MS = 30000L;
+    private ScheduledTaskRegistrar taskRegistrar;
+    
+    public void restartSchedulledTasks() {
+        if (taskRegistrar != null) {
+            taskRegistrar.destroy();
+            taskRegistrar.afterPropertiesSet();
+        }
 
+    }
+    
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
     	taskRegistrar.setScheduler(taskScheduler);
+    	this.taskRegistrar = taskRegistrar;
 
         // Enviament d'execucions massives
         ////////////////////////////////////////////////////////////////

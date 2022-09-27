@@ -6,6 +6,7 @@ package es.caib.ripea.plugin.caib.usuari;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -20,17 +21,26 @@ import javax.naming.ldap.LdapContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 import es.caib.ripea.plugin.usuari.DadesUsuariPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
 
 /**
- * Implementació del plugin de consulta de dades d'usuaris emprant JDBC.
+ * Implementació del plugin de consulta de dades d'usuaris emprant LDAP.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
+public class DadesUsuariPluginLdap extends RipeaAbstractPluginProperties implements DadesUsuariPlugin {
+
+	
+	public DadesUsuariPluginLdap() {
+		super();
+	}
+
+	public DadesUsuariPluginLdap(String propertyKeyBase, Properties properties) {
+		super(propertyKeyBase, properties);
+	}
 
 	@Override
 	public List<String> findRolsAmbCodi(String usuariCodi) throws SistemaExternException {
@@ -249,38 +259,38 @@ public class DadesUsuariPluginLdap implements DadesUsuariPlugin {
 	}
 
 	private String getLdapServerUrl() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.server.url");
+		return getProperty("plugin.dades.usuari.ldap.server.url");
 	}
 	private String getLdapPrincipal() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.principal");
+		return getProperty("plugin.dades.usuari.ldap.principal");
 	}
 	private String getLdapCredentials() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.credentials");
+		return getProperty("plugin.dades.usuari.ldap.credentials");
 	}
 	private String getLdapSearchBase() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.search.base");
+		return getProperty("plugin.dades.usuari.ldap.search.base");
 	}
 	private String getLdapAtributs() {
 		// Exemple: cn,givenName,sn,mail,departmentNumber,memberOf
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.atributs");
+		return getProperty("plugin.dades.usuari.ldap.atributs");
 	}
 	private String getLdapFiltreCodi() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(cn=XXX))
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.codi");
+		return getProperty("plugin.dades.usuari.ldap.filtre.codi");
 	}
 	private String getLdapFiltre() {
 		// Exemple: (&(displayName=inetOrgPersonCAIB)(cn=XXX))
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre");
+		return getProperty("plugin.dades.usuari.ldap.filtre");
 	}
 	private String getLdapFiltreGrup() {
 		// Exemple: (&(objectClass=inetOrgPersonCAIB)(memberOf=cn=XXX,dc=caib,dc=es))
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.filtre.grup");
+		return getProperty("plugin.dades.usuari.ldap.filtre.grup");
 	}
 	private String getLdapExcloureGrup() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.excloure.grup");
+		return getProperty("plugin.dades.usuari.ldap.excloure.grup");
 	}
 	private String getLdapExcloureMembre() {
-		return PropertiesHelper.getProperties().getProperty("es.caib.ripea.plugin.dades.usuari.ldap.excloure.membre");
+		return getProperty("plugin.dades.usuari.ldap.excloure.membre");
 	}
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DadesUsuariPluginLdap.class);

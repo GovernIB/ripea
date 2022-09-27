@@ -3,11 +3,8 @@ package es.caib.ripea.core.firma;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 //import org.ghost4j.document.Document;
 //import org.ghost4j.document.PDFDocument;
@@ -25,7 +22,6 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 
 @Component
@@ -41,25 +37,19 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	
 	public ArxiuFirmaDto firmar(DocumentEntity document, FitxerDto fitxer, String motiu) {
 
-		TipusFirma tipusFirma = TipusFirma.CADES;
-		if ("pdf".equals(fitxer.getExtensio())) {
-			tipusFirma = TipusFirma.PADES;
-		}
+
 		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
-//		arxiuFirma.setFitxerNom("firma.cades");
 		arxiuFirma.setFitxerNom(firma.getNom());
 		arxiuFirma.setContingut(firma.getContingut());
 		arxiuFirma.setTipusMime(firma.getMime());
-//		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
 		arxiuFirma.setTipus(pluginHelper.toArxiuFirmaTipus(firma.getTipusFirmaEni()));
-//		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
 		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 		arxiuFirma.setPerfil(perfil);
 		if (document.getArxiuUuid() != null) {
 			pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
 		} else {
-			guardarDocumentFirmatArxiu(document, fitxer, Arrays.asList(arxiuFirma), tipusFirma);
+			guardarDocumentFirmatArxiu(document, fitxer, Arrays.asList(arxiuFirma));
 		}
 
 		logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
@@ -70,20 +60,17 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	public void guardarDocumentFirmatArxiu(
 			DocumentEntity documentEntity,
 			FitxerDto fitxer,
-			List<ArxiuFirmaDto> firmes,
-			TipusFirma tipusFirma) {
+			List<ArxiuFirmaDto> firmes) {
 	
 		fitxer.setNom(documentEntity.getFitxerNom());
 		fitxer.setContentType(documentEntity.getFitxerContentType());
-		if (tipusFirma == TipusFirma.PADES) {
-			fitxer.setContingut(firmes.get(0).getContingut());
-		}
+		fitxer.setContingut(firmes.get(0).getContingut());
 
 		contingutHelper.arxiuPropagarModificacio(
 				documentEntity,
 				fitxer,
 				true,
-				tipusFirma != TipusFirma.PADES,
+				false,
 				firmes,
 				false);
 			

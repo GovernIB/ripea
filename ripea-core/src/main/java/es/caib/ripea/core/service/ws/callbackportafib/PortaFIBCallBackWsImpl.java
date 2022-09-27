@@ -88,7 +88,8 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					0,
-					errorDescripcio);
+					errorDescripcio,
+					null);
 			throw new CallBackException(errorDescripcio, new CallBackFault());
 		}
 		if (estatEnum != null) {

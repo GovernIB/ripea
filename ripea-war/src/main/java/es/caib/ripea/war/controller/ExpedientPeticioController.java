@@ -354,8 +354,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	}
 	
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
-	public String acceptarPost(HttpServletRequest request, @Valid ExpedientPeticioAcceptarCommand command, @PathVariable Long expedientPeticioId,
-							   BindingResult bindingResult, Model model) {
+	public String acceptarPost(
+			HttpServletRequest request,
+			@Valid ExpedientPeticioAcceptarCommand command,
+			@PathVariable Long expedientPeticioId,
+			BindingResult bindingResult,
+			Model model) {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		for (int i = 0; i < command.getAnnexos().size(); i++) {

@@ -89,10 +89,7 @@ public class IntegracioHelper {
 
 	public List<IntegracioAccioDto> findAccionsByIntegracioCodi(String integracioCodi, IntegracioFiltreDto filtre) {
 		synchronized(lock){
-			if (cacheHelper.mostrarLogsIntegracio()) {
-				System.out.println("Find accions by integracioCodi= " + integracioCodi + ", filtre=" + filtre);
-				log.info("Find accions by integracioCodi= " + integracioCodi + ", filtre=" + filtre);
-			}
+
 			List<IntegracioAccioDto> listaAccions = getLlistaAccions(integracioCodi);
 			int index = 0;
 			LinkedList<IntegracioAccioDto> accionsFiltered = new LinkedList<>();
@@ -128,25 +125,7 @@ public class IntegracioHelper {
 		accio.setEstat(IntegracioAccioEstatEnumDto.OK);
 		addAccio(integracioCodi, accio);
 	}
-	public void addAccioError(
-			String integracioCodi,
-			String descripcio,
-			Map<String, String> parametres,
-			IntegracioAccioTipusEnumDto tipus,
-			long tempsResposta,
-			String errorDescripcio) {
 
-		IntegracioAccioDto accio = new IntegracioAccioDto();
-		accio.setIntegracio(novaIntegracio(integracioCodi));
-		accio.setData(new Date());
-		accio.setDescripcio(descripcio);
-		accio.setParametres(parametres);
-		accio.setTipus(tipus);
-		accio.setTempsResposta(tempsResposta);
-		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
-		accio.setErrorDescripcio(errorDescripcio);
-		addAccio(integracioCodi, accio);
-	}
 	public void addAccioError(
 			String integracioCodi,
 			String descripcio,
@@ -165,8 +144,11 @@ public class IntegracioHelper {
 		accio.setTempsResposta(tempsResposta);
 		accio.setEstat(IntegracioAccioEstatEnumDto.ERROR);
 		accio.setErrorDescripcio(errorDescripcio);
-		accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
-		accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
+		if (throwable != null) {
+			accio.setExcepcioMessage(ExceptionUtils.getMessage(throwable));
+			accio.setExcepcioStacktrace(ExceptionUtils.getStackTrace(throwable));
+		}
+
 		addAccio(integracioCodi, accio);
 	}
 
@@ -204,10 +186,10 @@ public class IntegracioHelper {
 
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio) {
 		synchronized(lock){
-			if (cacheHelper.mostrarLogsIntegracio()) {
-				System.out.println("Add accio integracioCodi= " + integracioCodi + ", accio=" + accio);
-				log.info("Add accio integracioCodi= " + integracioCodi + ", accio=" + accio);
-			}
+			
+			if (cacheHelper.mostrarLogsIntegracio()) 
+				log.info("Nova integracio en monitor: integracioCodi= " + integracioCodi + ", accio=" + accio);
+			
 			afegirParametreUsuari(accio);
 			String entitatCodi = configHelper.getEntitatActualCodi();
 			accio.setEntitatCodi(entitatCodi);

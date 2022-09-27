@@ -104,16 +104,25 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 		<form:hidden path="agafarExpedient"/>
 		<form:hidden path="newExpedientTitol"/>
 		
-
-		<c:forEach items="${expedientPeticioAcceptarCommand.annexos}" varStatus="vs">
-			<div class="well"> 
-				<form:hidden path="annexos[${vs.index}].id" />
-				
-				<rip:inputText name="annexos[${vs.index}].titolINom" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
-				<rip:inputSelect name="annexos[${vs.index}].metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
-			</div>
-		</c:forEach>
-	
+		<c:choose>
+			<c:when test="${!empty expedientPeticioAcceptarCommand.annexos}">
+				<c:forEach items="${expedientPeticioAcceptarCommand.annexos}" varStatus="vs">
+					<div class="well"> 
+						<form:hidden path="annexos[${vs.index}].id" />
+						<rip:inputText name="annexos[${vs.index}].titolINom" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
+						<rip:inputSelect name="annexos[${vs.index}].metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
+					</div>
+				</c:forEach>
+			</c:when>
+			<c:otherwise>
+				<div class="well"> 
+					<spring:message code="registre.annex.buit"/>
+				</div>
+				<div style="min-height: 50px;"></div>
+			</c:otherwise>
+		</c:choose>
+		
+		
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" /></button>
 			<a href="<c:url value="/expedientPeticio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
