@@ -48,9 +48,9 @@ public class RegistreAnnexDto {
 	private String error;
 	private Long expedientPeticioId;
 
-	private boolean validacioCorrecte;
-	private String validacioError;
-	private ArxiuEstatEnumDto annexEstat;
+	private boolean validacioFirmaCorrecte;
+	private String validacioFirmaErrorMsg;
+	private ArxiuEstatEnumDto annexArxiuEstat;
 	
 
 	public boolean isAmbFirma() {

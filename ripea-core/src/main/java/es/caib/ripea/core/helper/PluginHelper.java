@@ -135,7 +135,6 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
@@ -2826,7 +2825,7 @@ public class PluginHelper {
 		}
 	}
 
-	public SignaturaResposta firmaServidorFirmar(DocumentEntity document, FitxerDto fitxer, TipusFirma tipusFirma, String motiu, String idioma) {
+	public SignaturaResposta firmaServidorFirmar(DocumentEntity document, FitxerDto fitxer, String motiu, String idioma) {
 
 		String accioDescripcio = "Firma en servidor d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -2834,7 +2833,7 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), tipusFirma, idioma);
+			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_FIRMASERV, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0);
 			return resposta;
 		} catch (Exception ex) {

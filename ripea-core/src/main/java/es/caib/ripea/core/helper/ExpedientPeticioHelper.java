@@ -368,9 +368,9 @@ public class ExpedientPeticioHelper {
 				tipusMime(annex.getTipusMime()).
 				uuid(annex.getUuid()).
 				firmaNom(annex.getFirmaNom()).
-				validacioCorrecte(annex.isDocumentValid()).
-				validacioError(annex.getDocumentError()).
-				annexEstat(getAnnexEstat(annex.getEstat())).
+				validacioFirmaCorrecte(annex.isDocumentValid()).
+				validacioFirmaErrorMsg(annex.getDocumentError()).
+				annexArxiuEstat(getAnnexEstat(annex.getEstat())).
 				build();
 		if (annex.getFirmaTipus() != null) {
 			annexEntity.updateFirmaTipus(annex.getFirmaTipus());

@@ -126,34 +126,34 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		DocumentCommand command = null;
 		if (document != null) {
 			command = DocumentCommand.asCommand(document);
-			command.setEntitatId(entitatActual.getId());
-			command.setPareId(pareId);
-			command.setOrigen(DocumentFisicOrigenEnum.DISC);
+			
+			if(document.getFitxerNom() != null) {
+				model.addAttribute("nomDocument", document.getFitxerNom());
+			}
+			model.addAttribute("documentEstat", document.getEstat());
 			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			omplirModelFormulariAmbDocument(
-					request,
-					command,
-					null,
-					documentId,
-					model,
-					document);
+			if (!document.isValidacioFirmaCorrecte()) {
+				command.setAmbFirma(true);
+			}
+			model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
+			omplirModelFormulari(request, command, documentId, model);
+			
 		} else {
 			command = new DocumentCommand();
 			LocalDateTime ara = new LocalDateTime();
 			command.setDataTime(ara);
-
-			command.setEntitatId(entitatActual.getId());
-			command.setPareId(pareId);
-			command.setOrigen(DocumentFisicOrigenEnum.DISC);
 			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 			omplirModelFormulari(
 					request,
 					command,
-					null,
 					pareId,
 					model);
 		}
 
+		command.setEntitatId(entitatActual.getId());
+		command.setPareId(pareId);
+		command.setOrigen(DocumentFisicOrigenEnum.DISC);
+		
 		model.addAttribute(command);
 		model.addAttribute("contingutId", pareId);
 		model.addAttribute("documentId", documentId);
@@ -195,7 +195,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			omplirModelFormulari(
 					request,
 					command,
-					null,
 					pareId,
 					model);
 			return "contingutDocumentForm";
@@ -212,7 +211,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			omplirModelFormulari(
 					request,
 					command,
-					null,
 					pareId,
 					model);
 			return "contingutDocumentForm";
@@ -228,7 +226,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					omplirModelFormulari(
 							request,
 							command,
-							null,
 							pareId,
 							model);
 					return "contingutDocumentForm";
@@ -274,7 +271,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			omplirModelFormulari(
 					request,
 					command,
-					null,
 					contingutId,
 					model);
 			return "contingutDocumentForm";
@@ -292,7 +288,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			omplirModelFormulari(
 					request,
 					command,
-					null,
 					contingutId,
 					model);
 			return "contingutDocumentForm";
@@ -420,7 +415,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				omplirModelFormulari(
 						request,
 						command,
-						null,
 						contingutId,
 						model);
 				model.addAttribute("contingutId", contingutId);
@@ -452,7 +446,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			omplirModelFormulari(
 					request,
 					command,
-					null,
 					contingutId,
 					model);
 			model.addAttribute("contingutId", contingutId);
@@ -1186,39 +1179,15 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 
-	private void omplirModelFormulariAmbDocument(
-			HttpServletRequest request,
-			DocumentCommand command,
-			DocumentGenericCommand commandGeneric,
-			Long contingutId,
-			Model model,
-			DocumentDto document) throws ClassNotFoundException, IOException {
-		if(document.getFitxerNom() != null) {
-			model.addAttribute("nomDocument", document.getFitxerNom());
-		}
-		model.addAttribute("documentEstat", document.getEstat());
-		model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
-		if (document.getNtiTipoFirma() != null) {
-			command.setAmbFirma(true);
-			if (document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF02 && document.getNtiTipoFirma() != DocumentNtiTipoFirmaEnumDto.TF04) {
-				command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			} else {
-				command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
-			}
-		}
-		
-		
-		omplirModelFormulari(request, command, commandGeneric, contingutId, model);
-	}
+
 	
 	private void omplirModelFormulari(
 			HttpServletRequest request,
 			DocumentCommand command,
-			DocumentGenericCommand commandGeneric,
 			Long contingutId,
 			Model model) throws ClassNotFoundException, IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (commandGeneric == null ? command.getId() == null: commandGeneric.getId() == null) {
+		if (command.getId() == null) {
 			model.addAttribute(
 					"metaDocuments",
 					metaDocumentService.findActiusPerCreacio(
@@ -1231,7 +1200,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					"metaDocuments",
 					metaDocumentService.findActiusPerModificacio(
 							entitatActual.getId(),
-							commandGeneric == null ? command.getId() : commandGeneric.getId()));
+							command.getId()));
 		}
 		model.addAttribute(
 				"digitalOrigenOptions",
@@ -1243,7 +1212,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				EnumHelper.getOptionsForEnum(
 						DocumentTipusFirmaEnumDto.class,
 						"document.tipus.firma.enum."));
-		String tempId = commandGeneric == null ? command.getEscanejatTempId() : commandGeneric.getEscanejatTempId();
+		String tempId = command.getEscanejatTempId();
 		if (tempId != null) {
 			model.addAttribute(
 					"escanejat",

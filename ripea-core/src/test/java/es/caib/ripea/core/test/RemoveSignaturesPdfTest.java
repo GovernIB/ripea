@@ -11,7 +11,6 @@ import org.junit.Test;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.caib.firmaservidor.FirmaSimpleServidorPluginPortafib;
-import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 
 
@@ -34,7 +33,7 @@ public class RemoveSignaturesPdfTest {
 		byte[] fileContent = null;
 		
 
-		fileContent = removeSignatures(false);
+		fileContent = removeSignatures(true);
 		
 		fileContent = signInServidor(true, fileContent);
 		
@@ -44,7 +43,7 @@ public class RemoveSignaturesPdfTest {
 	
 	public byte[] removeSignatures(boolean writeInDisk) throws Throwable{
 		DocumentFirmaServidorFirma documentFirmaServidorFirma = new DocumentFirmaServidorFirma();
-		byte[] fileWithRemovedSignatures = documentFirmaServidorFirma.removeSignaturesPdfUsingPdfReader(obtenirContingut(null), "application/pdf");
+		byte[] fileWithRemovedSignatures = documentFirmaServidorFirma.removeSignaturesPdfUsingPdfWriterCopyPdf(obtenirContingut(null), "application/pdf");
 		if (writeInDisk) {
 			Path path = Paths.get(System.getProperty("user.home") + "\\Desktop\\signature_removed" + FILE_NUMBER + ".pdf");
 			Files.write(path, fileWithRemovedSignatures);
@@ -58,7 +57,7 @@ public class RemoveSignaturesPdfTest {
 		}
 
 		FirmaSimpleServidorPluginPortafib firmaSimpleServidorPluginPortafib = new FirmaSimpleServidorPluginPortafib("es.caib.ripea.", PropertiesHelper.getProperties());
-		SignaturaResposta signaturaResposta = firmaSimpleServidorPluginPortafib.firmar("name.pdf", "123", content, TipusFirma.PADES, "ca");
+		SignaturaResposta signaturaResposta = firmaSimpleServidorPluginPortafib.firmar("name.pdf", "123", content, "ca");
 		byte[] fileSigned = signaturaResposta.getContingut();
 		if (writeInDisk) {
 			Path path1 = Paths.get(System.getProperty("user.home") + "\\Desktop\\signedAfterSignatureRemoved" + FILE_NUMBER + ".pdf");

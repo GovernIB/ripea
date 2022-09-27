@@ -90,8 +90,8 @@ public class DocumentCommand extends ContenidorCommand {
 	
 	private DocumentEstatEnumDto estat;
 	
-	private boolean validacioCorrecte;
-	private String validacioError;
+	private boolean validacioFirmaCorrecte;
+	private String validacioFirmaErrorMsg;
 
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
@@ -333,17 +333,18 @@ public class DocumentCommand extends ContenidorCommand {
 	private static Date convertToDate(LocalDateTime dateToConvert) throws ParseException {
 		return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(dateToConvert.toString("dd/MM/yyyy HH:mm:ss"));
 	}
-	public boolean isValidacioCorrecte() {
-		return validacioCorrecte;
+	public boolean isValidacioFirmaCorrecte() {
+		return validacioFirmaCorrecte;
 	}
-	public void setValidacioCorrecte(boolean validacioCorrecte) {
-		this.validacioCorrecte = validacioCorrecte;
+	public void setValidacioFirmaCorrecte(boolean validacioFirmaCorrecte) {
+		this.validacioFirmaCorrecte = validacioFirmaCorrecte;
 	}
-	public String getValidacioError() {
-		return validacioError;
+	public String getValidacioFirmaErrorMsg() {
+		return validacioFirmaErrorMsg;
 	}
-	public void setValidacioError(String validacioError) {
-		this.validacioError = validacioError;
+	public void setValidacioFirmaErrorMsg(String validacioFirmaErrorMsg) {
+		this.validacioFirmaErrorMsg = validacioFirmaErrorMsg;
 	}
+
 	
 }

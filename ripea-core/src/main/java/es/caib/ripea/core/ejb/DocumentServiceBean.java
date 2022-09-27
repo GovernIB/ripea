@@ -448,5 +448,15 @@ public class DocumentServiceBean implements DocumentService {
 				metaDocumentId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+			Long entitatId,
+			Long expedientId) {
+		return delegate.findDocumentsNoFirmatsOAmbFirmaInvalida(
+				entitatId,
+				expedientId);
+	}
+
 
 }

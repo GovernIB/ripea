@@ -692,6 +692,11 @@ public interface DocumentService {
 			Long entitatId,
 			Long metaDocumentId);
 
+	@PreAuthorize("hasRole('tothom')")
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+			Long entitatId,
+			Long expedientId);
+
 	
 
 }

@@ -538,9 +538,9 @@ public class ExpedientHelper {
 					documentDto.getUbicacio(),
 					documentDto.getNtiIdDocumentoOrigen(),
 					null,
-					registreAnnexEntity.isValidacioCorrecte(),
-					registreAnnexEntity.getValidacioError(),
-					registreAnnexEntity.getAnnexEstat());
+					registreAnnexEntity.isValidacioFirmaCorrecte(),
+					registreAnnexEntity.getValidacioFirmaErrorMsg(),
+					registreAnnexEntity.getAnnexArxiuEstat());
 			FitxerDto fitxer = new FitxerDto();
 			fitxer.setNom(documentDto.getFitxerNom());
 			fitxer.setContentType(documentDto.getFitxerContentType());
@@ -553,15 +553,14 @@ public class ExpedientHelper {
 			} else {
 				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
 			}
-			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexEstat()) || registreAnnexEntity.getAnnexEstat() == null) {
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
 				if (registreAnnexEntity.getFirmaTipus() != null) {
 					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-					docEntity.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));
 				} else {
 					docEntity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 				}
 			}
-			
+			docEntity.setNtiTipoFirma(documentDto.getNtiTipoFirma());
 			registreAnnexEntity.updateDocument(docEntity);
 			contingutLogHelper.logCreacio(docEntity, true, true);
 		}
@@ -1344,9 +1343,10 @@ public class ExpedientHelper {
 		String codiDir3 = entitatRepository.findByUnitatArrel(
 				registreAnnexEntity.getRegistre().getEntitatCodi()).getUnitatArrel();
 		document.setNtiOrgano(codiDir3);
-		document.setValidacioCorrecte(registreAnnexEntity.isValidacioCorrecte());
-		document.setValidacioError(registreAnnexEntity.getValidacioError());
-		document.setAnnexEstat(registreAnnexEntity.getAnnexEstat());
+		document.setValidacioFirmaCorrecte(registreAnnexEntity.isValidacioFirmaCorrecte());
+		document.setValidacioFirmaErrorMsg(registreAnnexEntity.getValidacioFirmaErrorMsg());
+		document.setAnnexArxiuEstat(registreAnnexEntity.getAnnexArxiuEstat());
+		document.setNtiTipoFirma(toNtiTipoFirma(registreAnnexEntity.getFirmaTipus()));
 		return document;
 	}
 	
@@ -1903,35 +1903,38 @@ public class ExpedientHelper {
 	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(es.caib.distribucio.rest.client.domini.FirmaTipus firmaTipus) {
 		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto = null;
 		
-		switch (firmaTipus) {
-		case CSV:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF01;
-			break;
-		case XADES_DET:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF02;
-			break;
-		case XADES_ENV:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF03;
-			break;
-		case CADES_DET:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF04;
-			break;
-		case CADES_ATT:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF05;
-			break;
-		case PADES:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF06;
-			break;
-		case SMIME:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF07;
-			break;
-		case ODT:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF08;
-			break;
-		case OOXML:
-			documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF09;
-			break;
+		if (firmaTipus != null) {
+			switch (firmaTipus) {
+			case CSV:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF01;
+				break;
+			case XADES_DET:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF02;
+				break;
+			case XADES_ENV:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF03;
+				break;
+			case CADES_DET:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF04;
+				break;
+			case CADES_ATT:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF05;
+				break;
+			case PADES:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF06;
+				break;
+			case SMIME:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF07;
+				break;
+			case ODT:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF08;
+				break;
+			case OOXML:
+				documentNtiTipoFirmaEnumDto = DocumentNtiTipoFirmaEnumDto.TF09;
+				break;
+			}
 		}
+
 		return documentNtiTipoFirmaEnumDto;
 	}
 //	public void comprovarSiExpedientAmbMateixNom(

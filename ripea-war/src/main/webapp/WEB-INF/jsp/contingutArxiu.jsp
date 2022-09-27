@@ -14,7 +14,7 @@
 	<c:if test="${documentInvalid}">
 		<div class="alert alert-danger alert-dismissible">
 			<button type="button" class="close close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>
-			<spring:message code="contingut.icona.estat.invalid.origen.form" arguments="${contingut.validacioError}"/>
+			<spring:message code="contingut.icona.estat.invalid.origen.form" arguments="${contingut.validacioFirmaErrorMsg}"/>
 		</div>
 	</c:if>
 	<c:choose>

@@ -1,12 +1,12 @@
 package es.caib.ripea.core.firma;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //import org.ghost4j.document.Document;
@@ -15,20 +15,14 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.PdfCopy;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfSmartCopy;
-import com.itextpdf.text.pdf.PdfStamper;
-import com.itextpdf.text.pdf.PdfWriter;
 
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
@@ -41,6 +35,9 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	private PluginHelper pluginHelper;
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private ContingutHelper contingutHelper;
+	
 	
 	public ArxiuFirmaDto firmar(DocumentEntity document, FitxerDto fitxer, String motiu) {
 
@@ -48,7 +45,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		if ("pdf".equals(fitxer.getExtensio())) {
 			tipusFirma = TipusFirma.PADES;
 		}
-		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, tipusFirma, motiu, "ca");
+		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 //		arxiuFirma.setFitxerNom("firma.cades");
 		arxiuFirma.setFitxerNom(firma.getNom());
@@ -59,10 +56,55 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 //		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
 		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 		arxiuFirma.setPerfil(perfil);
-		pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
+		if (document.getArxiuUuid() != null) {
+			pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
+		} else {
+			guardarDocumentFirmatArxiu(document, fitxer, Arrays.asList(arxiuFirma), tipusFirma);
+		}
+
 		logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 		return arxiuFirma;
 	}
+	
+	
+	public void guardarDocumentFirmatArxiu(
+			DocumentEntity documentEntity,
+			FitxerDto fitxer,
+			List<ArxiuFirmaDto> firmes,
+			TipusFirma tipusFirma) {
+	
+		fitxer.setNom(documentEntity.getFitxerNom());
+		fitxer.setContentType(documentEntity.getFitxerContentType());
+		if (tipusFirma == TipusFirma.PADES) {
+			fitxer.setContingut(firmes.get(0).getContingut());
+		}
+
+		contingutHelper.arxiuPropagarModificacio(
+				documentEntity,
+				fitxer,
+				true,
+				tipusFirma != TipusFirma.PADES,
+				firmes,
+				false);
+			
+		if (documentEntity.getGesDocAdjuntId() != null) {
+			pluginHelper.gestioDocumentalDelete(documentEntity.getGesDocAdjuntId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+			documentEntity.setGesDocAdjuntId(null);
+		}
+		if (documentEntity.getGesDocAdjuntFirmaId() != null) {
+			pluginHelper.gestioDocumentalDelete(documentEntity.getGesDocAdjuntFirmaId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+			documentEntity.setGesDocAdjuntFirmaId(null);
+		}
+
+	}
+	
+	
+	
+	
+	
+	
 
 	/**
 	 * Registra el log al document i al expedient on està el document.
@@ -84,93 +126,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	}
 	
 	
-	
-	public byte[] removeSignaturesPdfUsingPdfReader(
-			byte[] contingut,
-			String contentType) {
-		if (contentType.equals("application/pdf")) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-			try {
-				PdfReader reader = new PdfReader(contingut);
-				AcroFields acroFields = reader.getAcroFields();
-				ArrayList<String> signatureNames = acroFields.getSignatureNames();
-				if (!signatureNames.isEmpty()) {
-					PdfStamper stamper = null;
-					try {
-						stamper = new PdfStamper(
-								reader,
-								baos);
-						for (String name : signatureNames) {
-							AcroFields.Item signature = (AcroFields.Item) stamper.getAcroFields().getFieldItem(name);
-							for (int i = 0; i < signature.size(); ++i) {
-								signature.getWidget(i).clear();
-								signature.getMerged(i).clear();
-								signature.getValue(i).clear();
-							}
-							
-							PdfDictionary dictionary = stamper.getAcroFields().getSignatureDictionary(name);
-							if(dictionary!=null){
-							   dictionary.clear();
-							}
-						}
-
-
-						
-					} finally {
-						if (stamper != null) {
-							stamper.close();
-						}
-					}
-				}
-				return baos.toByteArray();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-		} else {
-			throw new RuntimeException("Only removing signatures of pdf supported");
-		}
-
-	}
-	
-	/**
-	 * The copy still has signatures somewhere because on firma en servidor it gives 
-	 * es.caib.ripea.plugin.SistemaExternException: Error durant la realitzaciˇ de les firmes: La firma no Ús v?lida. Raˇ: El certificado firmante se encuentra caducado (urn:afirma:dss:1.0:profile:XSS:resultminor:SignerCertificate:Expired)
-	 *  org.fundaciobit.genapp.common.i18n.I18NException: genapp.comodi
-       at es.caib.portafib.logic.ValidacioCompletaFirmaLogicaEJB.internalValidateCompletaFirma(ValidacioCompletaFirmaLogicaEJB.java:153)
-	 */
-	public byte[] removeSignaturesPdfUsingPdfReaderCopyPdf(
-			byte[] contingut,
-			String contentType) {
-		if (contentType.equals("application/pdf")) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-			try {
-				PdfReader reader = new PdfReader(contingut);
-				
-				com.itextpdf.text.Document document = new com.itextpdf.text.Document();
-			    PdfCopy copy = new PdfSmartCopy(document, baos);
-			    document.open();
-			    for(int page = 1; page <= reader.getNumberOfPages(); page++) {
-			        PdfImportedPage importedPage = copy.getImportedPage(reader, page);
-			        copy.addPage(importedPage);
-			    }
-			    document.close();
-			    reader.close();
-				
-				
-				return baos.toByteArray();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-
-		} else {
-			throw new RuntimeException("Only removing signatures of pdf supported");
-		}
-
-	}
-	
 	public byte[] removeSignaturesPdfUsingPdfWriterCopyPdf(
 			byte[] contingut,
 			String contentType) {
@@ -178,53 +134,33 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			try {
-				
-				com.itextpdf.text.Document document = new com.itextpdf.text.Document();
-	            @SuppressWarnings("unused")
-	            PdfWriter pdfWriter = PdfWriter.getInstance(document, baos);
-	            document.open();
-	             
-
-				
 				PdfReader reader = new PdfReader(contingut);
+				ByteArrayInputStream bais = null;
 
-			    
-//			    PdfDocument pdfDoc = new PdfDocument(pdfWriter);
-//			    PdfDocument srcDoc = new PdfDocument(reader);
-//			    srcDoc.copyPagesTo(1, srcDoc.getNumberOfPages(), pdfDoc);
-//			    
-//			    
-//	            PdfWriter writer = new PdfWriter(f1);
-//	            writer.SetSmartMode(true);
-//	            PdfDocument pdfDoc = new PdfDocument(writer);
-//	            pdfDoc.InitializeOutlines();
-//	            ByteArrayOutputStream baos;
-//	            PdfReader reader;
-//	            PdfDocument pdfInnerDoc;
-//
-//	            BufferedStream br = new BufferedStream(myStream1);
-//	            // String line = br.readLine();
-//	            // loop over readers
-//	            // create a PDF in memory
-//	            baos = new ByteArrayOutputStream();
-//	            reader = new PdfReader(f2);
-//	            pdfInnerDoc = new PdfDocument(reader, new PdfWriter(baos));
-//	            // form = PdfAcroForm.getAcroForm(pdfInnerDoc, true);
-//	            //fill and flatten form...
-//	            //add the PDF using copyPagesTo
-//	            pdfInnerDoc = new PdfDocument(new PdfReader(myStream1));
-//	            pdfInnerDoc.CopyPagesTo(1, pdfInnerDoc.GetNumberOfPages(), pdfDoc, new PdfPageFormCopier());
-//
-//	            byte[] arrb = baos.ToArray();
-//	            pdfInnerDoc.Close();
-//	            DownloadPDF(arrb, "MergedPdf")
-			    
-			    
-			    
-			    document.close();
-			    reader.close();
-				
-				
+				com.lowagie.text.Document document = new com.lowagie.text.Document();
+
+				bais = new ByteArrayInputStream(contingut);
+				baos = new ByteArrayOutputStream();
+
+				com.lowagie.text.pdf.PdfReader inputPDF = new com.lowagie.text.pdf.PdfReader(bais);
+
+				// create a writer for the outputstream
+				com.lowagie.text.pdf.PdfWriter writer = com.lowagie.text.pdf.PdfWriter.getInstance(document, baos);
+
+				document.open();
+				com.lowagie.text.pdf.PdfContentByte cb = writer.getDirectContent();
+
+				com.lowagie.text.pdf.PdfImportedPage page;
+
+				for (int pageC = 1; pageC <= reader.getNumberOfPages(); pageC++) {
+					document.newPage();
+					page = writer.getImportedPage(inputPDF, pageC);
+					cb.addTemplate(page, 0, 0);
+				}
+
+				document.close();
+				reader.close();
+
 				return baos.toByteArray();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -236,12 +172,11 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 
 	}
 	
-	
 
 	
 	
 	
-//	
+	
 //	public byte[] removeSignaturesPdfUsingGhost4J(
 //			byte[] contingut,
 //			String contentType) {
@@ -254,6 +189,8 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 //			    document.load(new ByteArrayInputStream(contingut));
 //			 
 //			 
+//			    // gives org.ghost4j.document.DocumentException: Documents of class org.ghost4j.document.PDFDocument are not supported by the component 
+//			    // at org.ghost4j.AbstractComponent.assertDocumentSupported(AbstractComponent.java:58)
 ////			    //create converter
 ////			    PDFConverter converter = new PDFConverter();
 ////			    //set options
@@ -276,7 +213,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 //		        Document result = modifier.modify(document, parameters);
 //		 
 //		        // write resulting document to file
-//		        result.write(new File("merged.ps"));
+//		        result.write(baos);
 //			    
 //			    return baos.toByteArray();
 //			    

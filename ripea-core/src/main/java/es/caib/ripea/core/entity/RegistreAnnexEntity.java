@@ -90,12 +90,12 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	private String error;
 
 	@Column(name = "val_ok")
-	private boolean validacioCorrecte;
+	private boolean validacioFirmaCorrecte;
 	@Column(name = "val_error")
-	private String validacioError;
+	private String validacioFirmaErrorMsg;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "annex_estat")
-	private ArxiuEstatEnumDto annexEstat;
+	private ArxiuEstatEnumDto annexArxiuEstat;
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "registre_id")
@@ -159,7 +159,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.registre = registre;
 			built.estat = RegistreAnnexEstatEnumDto.CREAT;
 			built.ntiEstadoElaboracion = ntiEstadoElaboracion;
-			built.validacioCorrecte = true;
+			built.validacioFirmaCorrecte = true;
 			built.tamany = tamany;
 		}
 		
@@ -199,16 +199,16 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 			built.firmaNom = firmaNom;
 			return this;
 		}
-		public Builder validacioCorrecte(Boolean validacioCorrecte) {
-			built.validacioCorrecte = validacioCorrecte != null ? validacioCorrecte : true;
+		public Builder validacioFirmaCorrecte(Boolean validacioFirmaCorrecte) {
+			built.validacioFirmaCorrecte = validacioFirmaCorrecte != null ? validacioFirmaCorrecte : true;
 			return this;
 		}
-		public Builder validacioError(String validacioError) {
-			built.validacioError = validacioError;
+		public Builder validacioFirmaErrorMsg(String validacioFirmaErrorMsg) {
+			built.validacioFirmaErrorMsg = validacioFirmaErrorMsg;
 			return this;
 		}
-		public Builder annexEstat(ArxiuEstatEnumDto annexEstat) {
-			built.annexEstat = annexEstat;
+		public Builder annexArxiuEstat(ArxiuEstatEnumDto annexArxiuEstat) {
+			built.annexArxiuEstat = annexArxiuEstat;
 			return this;
 		}
 		public RegistreAnnexEntity build() {
@@ -279,8 +279,8 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	public void updateDocument(DocumentEntity document) {
 		this.document = document;
 	}
-	public void updateAnnexEstat(ArxiuEstatEnumDto annexEstat) {
-		this.annexEstat = annexEstat;
+	public void updateAnnexArxiuEstat(ArxiuEstatEnumDto annexArxiuEstat) {
+		this.annexArxiuEstat = annexArxiuEstat;
 	}
 	
 	

@@ -222,6 +222,7 @@ public class ContingutHelper {
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
 
+			dto.setConteDocuments(documentRepository.findByExpedientAndEsborrat(expedient, 0).size() > 0);
 			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
 
 			if (!onlyForList) {
@@ -346,6 +347,7 @@ public class ContingutHelper {
 			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
 
 			dto.setDocFromAnnex(document.isDocFromAnnex()); 
+			dto.setEstat(document.getEstat());
 			
 			if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
 				RegistreAnnexEntity annex = document.getAnnexos().get(0);
@@ -362,8 +364,8 @@ public class ContingutHelper {
 			dto.setMetaNode(metaNode);
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
-			dto.setValidacioCorrecte(document.isValidacioCorrecte());
-			dto.setValidacioError(document.getValidacioError());
+			dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
+			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
 			resposta = dto;
 
