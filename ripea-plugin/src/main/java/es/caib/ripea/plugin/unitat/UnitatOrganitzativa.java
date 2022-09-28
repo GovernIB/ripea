@@ -61,6 +61,21 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private List<UnitatOrganitzativa> lastHistoricosUnitats;
 
 
+	public UnitatOrganitzativa(
+			String codi,
+			String denominacio,
+			String codiUnitatSuperior,
+			String codiUnitatArrel,
+			String estat,
+			List<String> historicosUO) {
+		this.codi = codi;
+		this.denominacio = denominacio;
+		this.codiUnitatSuperior = codiUnitatSuperior;
+		this.codiUnitatArrel = codiUnitatArrel;
+		this.estat = estat;
+		this.historicosUO = historicosUO;
+	}
+	
 	@Override
 	public int compareTo(UnitatOrganitzativa o) {
 		return denominacio.compareToIgnoreCase(o.getDenominacio());
