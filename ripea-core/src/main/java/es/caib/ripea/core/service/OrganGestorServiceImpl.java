@@ -20,6 +20,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
@@ -229,7 +230,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	@Override
-//	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto, Locale locale) throws Exception {
 	    EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false, false, false);
 		ConfigHelper.setEntitat(entitatDto);
@@ -267,7 +268,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			progres.setProgres(2);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(unitatsWs.isEmpty() ? msg("unitat.synchronize.info.organigrama.fi.buid") : msg("unitat.synchronize.info.organigrama.fi", unitatsWs.size())).build());
 
-			// 2. Sincronitzar òrgans
+			// Sincronitzar òrgans
 			progres.setFase(1);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
 			organGestorHelper.sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);

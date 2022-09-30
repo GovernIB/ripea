@@ -769,7 +769,6 @@ public class PermisosHelper {
 			return rol;
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
     public void actualitzarPermisosOrgansObsolets(
 			List<UnitatOrganitzativa> unitatsWs,
 			List<OrganGestorEntity> organsDividits,
@@ -840,8 +839,9 @@ public class PermisosHelper {
 				ownerSid = objectIdentityAntic.getOwnerSid();
 			permisosOrigen.addAll(aclEntryRepository.findByAclObjectIdentity(objectIdentityAntic));
 		}
-		duplicaEntradesPermisos(classname, organDesti, ownerSid, permisosOrigen, permisosDesti);
-		aclEntryRepository.save(permisosDesti);
+		if (!permisosOrigen.isEmpty()) {
+			duplicaEntradesPermisos(classname, organDesti, ownerSid, permisosOrigen, permisosDesti);
+		}
 	}
 
 	private void duplicaEntradesPermisos(AclClassEntity classname, OrganGestorEntity organNou, AclSidEntity ownerSid, Set<AclEntryEntity> permisosOrigen, Set<AclEntryEntity> permisosDesti) {
@@ -864,6 +864,7 @@ public class PermisosHelper {
 					.build();
 			permisosDesti.add(aclEntry);
 		}
+		aclEntryRepository.save(permisosDesti);
 	}
 
 	public void eliminarPermisosOrgan(OrganGestorEntity organGestor) {

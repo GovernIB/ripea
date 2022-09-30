@@ -83,11 +83,11 @@ public class ProcedimentPluginMock extends RipeaAbstractPluginProperties impleme
 	
 	private String getCodiAfterTransformation(String codiDir3) {
 		if (codiDir3.equals(UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_SPLIT)) {
-			codiDir3 = UnitatsOrganitzativesPluginMock.CODI_UNITAT_SPLIT1;
+			codiDir3 = UnitatsOrganitzativesPluginMock.CODI_UNITAT_SPLITTED1;
 		} else if (codiDir3.equals(UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_MERGE1) || (codiDir3.equals(UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_MERGE2))) {
-			codiDir3 = UnitatsOrganitzativesPluginMock.CODI_UNITAT_MERGE;
+			codiDir3 = UnitatsOrganitzativesPluginMock.CODI_UNITAT_MERGED;
 		} else if (codiDir3.equals(UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_SUBSTITUTE)) {
-			codiDir3 = UnitatsOrganitzativesPluginMock.CODI_UNITAT_SUNSTITUTE;
+			codiDir3 = UnitatsOrganitzativesPluginMock.CODI_UNITAT_SUBSTITUTED;
 		}
 		return codiDir3;
 	}

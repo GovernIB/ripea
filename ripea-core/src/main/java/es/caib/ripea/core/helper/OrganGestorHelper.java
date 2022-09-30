@@ -350,7 +350,6 @@ public class OrganGestorHelper {
 
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void sincronitzarOrgans(Long entitatId,
 								   List<UnitatOrganitzativa> unitatsWs,
 								   List<OrganGestorEntity> obsoleteUnitats,
@@ -507,9 +506,8 @@ public class OrganGestorHelper {
 
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void deleteExtingitsNoUtilitzats(List<OrganGestorEntity> obsoleteUnitats, ProgresActualitzacioDto progres) {
 		// Eliminar organs no vigents no utilitzats??
+	public void deleteExtingitsNoUtilitzats(List<OrganGestorEntity> obsoleteUnitats, ProgresActualitzacioDto progres) {
 		int nombreUnitatsTotal = obsoleteUnitats.size();
 		int nombreUnitatsProcessades = 0;
 
