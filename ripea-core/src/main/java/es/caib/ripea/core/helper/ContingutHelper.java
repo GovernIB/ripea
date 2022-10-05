@@ -225,6 +225,8 @@ public class ContingutHelper {
 			dto.setConteDocuments(documentRepository.findByExpedientAndEsborrat(expedient, 0).size() > 0);
 			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
 
+			dto.setConteDocumentsEnProcessDeFirma(documentRepository.findEnProccessDeFirma(expedient).size() > 0);			
+
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());
 				dto.setTancatMotiu(expedient.getTancatMotiu());
