@@ -331,33 +331,35 @@ public class PluginHelper {
 			integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-
-		if (unitatsOrganitzatives != null && !unitatsOrganitzatives.isEmpty()) {
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_UNITATS,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			return unitatsOrganitzatives;
+		
+		
+		if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
+			try {
+				getUnitatsOrganitzativesPlugin().findAmbCodi(pareCodi);
+			} catch (Exception e) {
+				String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_UNITATS,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorMissatge,
+						null);
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_UNITATS,
+						errorMissatge);
+			}
 		}
-
-		String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
-		try {
-			UnitatOrganitzativa unitatArrel = getUnitatsOrganitzativesPlugin().findAmbCodi(pareCodi);
-			errorMissatge = "No s'han trobat canvis realitzats posteriorment a la última sincronització.";
-		} catch (Exception e) {}
-		integracioHelper.addAccioError(
+		
+		integracioHelper.addAccioOk(
 				IntegracioHelper.INTCODI_UNITATS,
 				accioDescripcio,
 				accioParams,
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				System.currentTimeMillis() - t0,
-				errorMissatge,
-				null);
-		throw new SistemaExternException(
-				IntegracioHelper.INTCODI_UNITATS,
-				errorMissatge);
+				System.currentTimeMillis() - t0);
+		return unitatsOrganitzatives;
+
 
 	}
 	

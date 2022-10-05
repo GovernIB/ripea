@@ -713,7 +713,7 @@ public class MetaExpedientHelper {
 
 		try {
 
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatDto.getId());
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false, false);
 			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 			progres.setNumOperacions(metaExpedients.size());
 
@@ -733,11 +733,15 @@ public class MetaExpedientHelper {
 
 				ProcedimentDto procedimentGga = null;
 				try {
+					logger.info("Procediment DB: " + metaExpedient);
 					procedimentGga = pluginHelper.procedimentFindByCodiSia(
 							entitat.getUnitatArrel(),
 							metaExpedient.getClassificacioSia());
 					infoBuilder.exist(procedimentGga != null);
+					
+					logger.info(" Procediment WS: " + procedimentGga);
 				} catch (SistemaExternException se) {
+					logger.error("Error Procediment WS: " + metaExpedient, se);
 					infoBuilder.hasError(true);
 					infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
 					progres.addInfo(infoBuilder.build(), true);
@@ -753,11 +757,11 @@ public class MetaExpedientHelper {
 					continue;
 				}
 
-				ActualitzacioInfo info = infoBuilder.nomNou(procedimentGga.getNom())
-						.descripcioNova(procedimentGga.getResum())
-						.comuNou(procedimentGga.isComu())
-						.organNou(procedimentGga.getUnitatOrganitzativaCodi())
-						.build();
+				ActualitzacioInfo info = infoBuilder.build();
+				info.setNomNou(procedimentGga.getNom());
+				info.setDescripcioNova(procedimentGga.getResum());
+				info.setComuNou(procedimentGga.isComu());
+				info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
 
 				if (!info.hasChange()) {
 					progres.addInfo(info, true);
@@ -792,6 +796,7 @@ public class MetaExpedientHelper {
 				}
 
 				metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
+				metaExpedientRepository.flush();
 				progres.addInfo(info, true);
 				modificats++;
 

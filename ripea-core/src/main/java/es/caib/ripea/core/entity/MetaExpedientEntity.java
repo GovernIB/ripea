@@ -6,6 +6,8 @@ package es.caib.ripea.core.entity;
 import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
+import lombok.ToString;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -24,6 +26,7 @@ import java.util.Set;
         @UniqueConstraint(name = "ipa_metaexp_entitat_codi_uk", columnNames = { "entitat_id", "codi" }) })
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@ToString
 public class MetaExpedientEntity extends MetaNodeEntity {
 
     @Column(name = "clasif_sia", length = 30, nullable = false)

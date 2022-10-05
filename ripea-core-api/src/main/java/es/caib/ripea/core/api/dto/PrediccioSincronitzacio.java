@@ -25,5 +25,5 @@ public class PrediccioSincronitzacio {
     List<UnitatOrganitzativaDto> unitatsNew = new ArrayList<>();
     List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
     boolean isFirstSincronization;
-
+    boolean noCanvis;
 }

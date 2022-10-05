@@ -14,6 +14,7 @@ import java.util.Properties;
 
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.caib.procediment.ProcedimentPluginMock;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
@@ -40,15 +41,18 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	
 	//CUMULATIVE CHANGES
 	public static final String CODI_UNITAT_TO_CUMULATIVE_CHANGES = "A00000006";
-	public static final String CODI_UNITAT_CUMULATIVE_CHANGES1 = "A99999905";
+	public static final String CODI_UNITAT_CUMULATIVE_CHANGES1 = "A00000007";
 	public static final String CODI_UNITAT_CUMULATIVE_CHANGES2 = "A99999906";
 	
 	//PROPS CHANGED
-	public static final String CODI_UNITAT_PROPS_CHANGED = "A00000007";
+	public static final String CODI_UNITAT_PROPS_CHANGED = "A00000008";
 
 	//NEW
 	public static final String CODI_UNITAT_NEW1 = "A99999907";
 	public static final String CODI_UNITAT_NEW2 = "A99999908";
+	
+	//EXTINCT
+	public static final String CODI_UNITAT_EXTINCT = "A00000009";
 
 	//script to clear entitat
 //	delete from ipa_metaexpedient where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000');
@@ -77,6 +81,9 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, name(CODI_UNITAT_TO_SUBSTITUTE), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, name(CODI_UNITAT_TO_CUMULATIVE_CHANGES), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_EXTINCT, name(CODI_UNITAT_EXTINCT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			
+			ProcedimentPluginMock.secondSyncronization = false;
 
 		} else {
 			
@@ -106,6 +113,12 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_NEW1, name(CODI_UNITAT_NEW1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_NEW2, name(CODI_UNITAT_NEW2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			
+			//EXTINCT
+			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_EXTINCT, name(CODI_UNITAT_EXTINCT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", null));
+			
+			
+			ProcedimentPluginMock.secondSyncronization = true;
+
 			
 		}
 
@@ -117,7 +130,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	@Override
 	public UnitatOrganitzativa findAmbCodi(
 			String codi) throws SistemaExternException {
-		throw new RuntimeException("Method not supported");
+		return UnitatOrganitzativa.builder().codi(codi).build();
 	}
 
 	@Override
@@ -187,7 +200,11 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			additonal = "to cumulative changes";
 		} else if (name.equals(CODI_UNITAT_PROPS_CHANGED)) {
 			additonal = "props changed";
-		} 
+		} else if (name.equals(CODI_UNITAT_EXTINCT)) {
+			additonal = "to extinct";
+		} else if (name.equals(CODI_UNITAT_NEW1) || name.equals(CODI_UNITAT_NEW1)) {
+			additonal = "new";
+		}  
 		if (!additonal.isEmpty()) {
 			additonal = " (" + additonal + ")";
 		}

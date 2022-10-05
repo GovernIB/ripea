@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -128,7 +129,14 @@ public class OrganGestorController extends BaseUserOAdminController {
 		}
 		try {
 
-			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
+			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(
+					entitat.getId());
+			if (prediccio.isNoCanvis()) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:../organgestor",
+						"unitat.controller.synchronize.no.changes");
+			}
 
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
 //			model.addAttribute("unitatsVigentsFirstSincro", unitatsVigentsFirstSincro);
@@ -142,7 +150,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 //			organGestorService.syncDir3OrgansGestors(entitat.getId());
 			
 		} catch (Exception e) {
-			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
+ 			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../organgestor",
@@ -160,7 +168,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			organGestorService.syncDir3OrgansGestors(entitatActual, request.getLocale());
+			organGestorService.syncDir3OrgansGestors(entitatActual, new RequestContext(request).getLocale());
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar", e);
 			return getModalControllerReturnValueErrorMessageText(

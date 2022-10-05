@@ -17,10 +17,12 @@ public class ProcedimentPluginMock extends RipeaAbstractPluginProperties impleme
 
 	public static int callMethodCounter = 0;
 	
-	public static List<String> organsCodis = Arrays.asList(UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_SPLIT, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_MERGE1, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_MERGE2, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_SUBSTITUTE);
+	public static List<String> organsCodis = Arrays.asList(UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_SPLIT, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_MERGE1, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_MERGE2, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_SUBSTITUTE, UnitatsOrganitzativesPluginMock.CODI_UNITAT_TO_CUMULATIVE_CHANGES, UnitatsOrganitzativesPluginMock.CODI_UNITAT_PROPS_CHANGED, UnitatsOrganitzativesPluginMock.CODI_UNITAT_EXTINCT);
 	
 	public Map<String, String> usedCodisSias = new HashMap<String, String>();
-	public static boolean mockStateAfterRolsacSyncronization = false;
+	public static boolean mockSecondSyncronizationInRolsac = true;
+	
+	public static boolean secondSyncronization = false;
 	
 	public static String forceReturnedCodiDir3 = null;//forceReturnedCodiDir3="A00000111";
 	
@@ -52,9 +54,13 @@ public class ProcedimentPluginMock extends RipeaAbstractPluginProperties impleme
 		if (forceReturnedCodiDir3 != null) {
 			return forceReturnedCodiDir3;
 		} else {
-			
-			if (!mockStateAfterRolsacSyncronization) {//mockStateAfterRolsacSyncronization=true;
-			
+			if (mockSecondSyncronizationInRolsac && secondSyncronization) {//mockSecondSyncronizationInRolsac=false;
+				if (usedCodisSias.containsKey(codiSia)) {
+					return getCodiAfterTransformation(usedCodisSias.get(codiSia));
+				} else {
+					throw new RuntimeException("Can't mock synchronization in rolsac. Codi SIA doesn't exist in memory.");
+				}
+			} else {
 				if (usedCodisSias.containsKey(codiSia)) {
 					return usedCodisSias.get(codiSia);
 				} else {
@@ -70,12 +76,6 @@ public class ProcedimentPluginMock extends RipeaAbstractPluginProperties impleme
 					} else {
 						return null;
 					}
-				}
-			} else {
-				if (usedCodisSias.containsKey(codiSia)) {
-					return getCodiAfterTransformation(usedCodisSias.get(codiSia));
-				} else {
-					throw new RuntimeException("Can't mock rolsac synchronization. Codi SIA doesn't exist in memory.");
 				}
 			}
 		}

@@ -332,6 +332,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					entitat.getUnitatArrel(),
 					entitat.getDataActualitzacio(),
 					entitat.getDataSincronitzacio());
+			
+			if (unitatsWS == null || unitatsWS.isEmpty()) {
+				return PrediccioSincronitzacio.builder()
+						.noCanvis(true)
+						.build();
+			}
 
 			// Obtenir els òrgans vigents a la BBDD
 			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);

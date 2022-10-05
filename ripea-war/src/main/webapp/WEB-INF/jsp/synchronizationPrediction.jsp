@@ -146,7 +146,7 @@
 			for (index = writtenBlocs; index < info.length; index++) {
 				// $("#bcursor").before("<p class='info-" + info[index].tipus + "'>" + info[index].text + "</p>");
 				let blocContent = '';
-				if (info[index].isOrgan) {
+				if (info[index].organ) {
 					if (info[index].isNew) {
 						blocContent += '<h5>' + lnouorgan + ':</h5>';
 						blocContent = '<ul>';

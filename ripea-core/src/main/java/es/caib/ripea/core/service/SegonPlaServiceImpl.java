@@ -417,7 +417,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			return;
 		List<EntitatDto> entitats = conversioTipusHelper.convertirList(entitatRepository.findAll(), EntitatDto.class);
 		for(EntitatDto entitat: entitats) {
-			metaExpedientHelper.actualitzarProcediments(entitat, new Locale("ca"));
+			try {
+				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+				metaExpedientHelper.actualitzarProcediments(entitat, new Locale("ca"));
+			} catch (Exception e) {
+				logger.error("Error al actualitzar procediments en segon pla", e);
+			}
 		}
     }
 
@@ -432,6 +437,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			return;
 		List<EntitatEntity> entitats = entitatRepository.findAll();
 		for(EntitatEntity entitat: entitats) {
+			ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
 			organGestorHelper.consultaCanvisOrganigrama(entitat);
 		}
 	}

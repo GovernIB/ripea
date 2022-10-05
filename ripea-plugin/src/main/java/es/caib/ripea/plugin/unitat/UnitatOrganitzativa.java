@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.List;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
+@ToString
 public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrganitzativa> {
 
 	@JsonProperty("codigo")

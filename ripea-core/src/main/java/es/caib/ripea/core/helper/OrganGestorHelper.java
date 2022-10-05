@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
@@ -41,6 +39,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
@@ -51,6 +50,8 @@ public class OrganGestorHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired
+	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private ExpedientOrganPareRepository expedientOrganPareRepository;
 	@Autowired
@@ -321,31 +322,35 @@ public class OrganGestorHelper {
 
 	public void consultaCanvisOrganigrama(EntitatEntity entitat) {
 
-		Date ara = new Date();
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(ara);
-		calendar.add(Calendar.YEAR, 1);
+		try {
+			Date ara = new Date();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(ara);
+			calendar.add(Calendar.YEAR, 1);
 
-		List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
-				entitat.getUnitatArrel(),
-				entitat.getDataActualitzacio(),
-				entitat.getDataSincronitzacio());
+			List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(
+					entitat.getUnitatArrel(),
+					entitat.getDataActualitzacio(),
+					entitat.getDataSincronitzacio());
 
-		List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
-		if (avisosSinc != null && !avisosSinc.isEmpty()) {
-			avisRepository.delete(avisosSinc);
-		}
+			List<AvisEntity> avisosSinc = avisRepository.findByEntitatIdAndAssumpte(entitat.getId(), ORGAN_NO_SYNC);
+			if (avisosSinc != null && !avisosSinc.isEmpty()) {
+				avisRepository.delete(avisosSinc);
+			}
 
-		if (unitatsWs != null && !unitatsWs.isEmpty()) {
-			AvisEntity avis = AvisEntity.getBuilder(
-					ORGAN_NO_SYNC,
-					"Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.",
-					ara,
-					calendar.getTime(),
-					AvisNivellEnumDto.ERROR,
-					true,
-					entitat.getId()).build();
-			avisRepository.save(avis);
+			if (unitatsWs != null && !unitatsWs.isEmpty()) {
+				AvisEntity avis = AvisEntity.getBuilder(
+						ORGAN_NO_SYNC,
+						"Realitzi el procés de sincronització d'òrgans gestors per a disposar dels òrgans gestors actuals.",
+						ara,
+						calendar.getTime(),
+						AvisNivellEnumDto.ERROR,
+						true,
+						entitat.getId()).build();
+				avisRepository.save(avis);
+			}
+		} catch (Exception e) {
+			logger.error("Error al consultar canvis organigrama en segon pla", e);
 		}
 
 	}
@@ -449,6 +454,7 @@ public class OrganGestorHelper {
 			OrganGestorEntity organPare = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior());
 			// if not it creates a new one
 			if (unitat == null) {
+				logger.info("Unitat WS:" + unitatWS + "\n Unitat DB no existe");
 				infoBuilder.isNew(true).codiOrgan(unitatWS.getCodi()).nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
 				// Venen les unitats ordenades, primer el pare i després els fills?
 				unitat = OrganGestorEntity.getBuilder(unitatWS.getCodi())
@@ -469,6 +475,7 @@ public class OrganGestorHelper {
 					}
 				}
 			} else {
+				logger.info("Unitat WS:" + unitatWS + "\n Unitat DB: " + unitat);
 				infoBuilder.isNew(false).codiOrgan(unitatWS.getCodi())
 						.nomAntic(unitat.getNom()).estatAntic(unitat.getEstat())
 						.nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
@@ -514,9 +521,14 @@ public class OrganGestorHelper {
 		Iterator<OrganGestorEntity> it = obsoleteUnitats.iterator();
 		while (it.hasNext()) {
 			OrganGestorEntity organObsolet = it.next();
+			
+			if (organObsolet.getAntics() != null && !organObsolet.getAntics().isEmpty()) {
+				continue;
+			}
+			
 			progres.setProgres(75 + (nombreUnitatsProcessades++ * 24)/nombreUnitatsTotal);
 
-			Integer nombreProcediments = metaExpedientOrganGestorRepository.countByOrganGestor(organObsolet);
+			Integer nombreProcediments = metaExpedientOrganGestorRepository.countByOrganGestor(organObsolet) + metaExpedientRepository.countByOrganGestor(organObsolet);
 			if (nombreProcediments > 0) {
 				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.procediment.error", organObsolet.getCodi(), nombreProcediments)).build());
 				continue;
@@ -527,11 +539,13 @@ public class OrganGestorHelper {
 				continue;
 			}
 			try {
+				logger.info("Eliminant organ: " + organObsolet);
 				permisosHelper.eliminarPermisosOrgan(organObsolet);
 				organGestorRepository.delete(organObsolet);
+				organGestorRepository.flush();
 				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.eliminat", organObsolet.getCodi())).build());
 			} catch (Exception ex) {
-				logger.error("No ha estat possible esborrar l'òrgan gestor.", ex);
+				logger.error("No ha estat possible esborrar l'òrgan gestor: " + organObsolet, ex);
 				progres.addInfo(ActualitzacioInfo.builder().hasError(true).infoTitol(msg("unitat.synchronize.titol.obsolet", organObsolet.getCodi(), organObsolet.getNom())).infoText(msg("unitat.synchronize.info.obsolets.error", organObsolet.getCodi(), ex.getMessage())).build());
 			}
 		}
