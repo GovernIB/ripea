@@ -1863,6 +1863,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getMetaExpedientDominiValor() != null ? filtre.getMetaExpedientDominiValor().trim() : "",
 						esNullRolsCurrentUser,
 						rolsCurrentUser,
+						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 						pageable);
 				logger.trace("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
 				long t11 = System.currentTimeMillis();

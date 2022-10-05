@@ -120,7 +120,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
-			"and (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser)))) "
+			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) "
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -169,6 +169,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
+			@Param("isAdmin") boolean isAdmin,
 			Pageable pageable);
 
 	@Query(	"select " +

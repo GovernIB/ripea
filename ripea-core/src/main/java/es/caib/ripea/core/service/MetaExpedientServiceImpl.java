@@ -916,27 +916,29 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<GrupDto> findGrupsAmbMetaExpedient(Long entitatId, Long metaExpedientId) {
+	public List<GrupDto> findGrupsAmbMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual) {
 		logger.debug("Consulta de grups per metaexpedient (" + "metaExpedientId=" + metaExpedientId + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		List<GrupEntity> grups = metaExpedientRepository.findOne(metaExpedientId).getGrups();
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<Sid> sids = new ArrayList<Sid>();
-		sids.add(new PrincipalSid(auth.getName()));
-		for (GrantedAuthority ga : auth.getAuthorities()) {
-			sids.add(new GrantedAuthoritySid(ga.getAuthority()));
-		}
-		Iterator<GrupEntity> it = grups.iterator();
-		while (it.hasNext()) {
-			GrupEntity grupEntity = it.next();
-			boolean isGranted = false;
-			for (Sid sid : sids) {
-				if (sid.equals(new GrantedAuthoritySid(grupEntity.getRol()))) {
-					isGranted = true;
-				}
+		if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN")) {
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			List<Sid> sids = new ArrayList<Sid>();
+			sids.add(new PrincipalSid(auth.getName()));
+			for (GrantedAuthority ga : auth.getAuthorities()) {
+				sids.add(new GrantedAuthoritySid(ga.getAuthority()));
 			}
-			if (!isGranted) {
-				it.remove();
+			Iterator<GrupEntity> it = grups.iterator();
+			while (it.hasNext()) {
+				GrupEntity grupEntity = it.next();
+				boolean isGranted = false;
+				for (Sid sid : sids) {
+					if (sid.equals(new GrantedAuthoritySid(grupEntity.getRol()))) {
+						isGranted = true;
+					}
+				}
+				if (!isGranted) {
+					it.remove();
+				}
 			}
 		}
 		return conversioTipusHelper.convertirList(grups, GrupDto.class);

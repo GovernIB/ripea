@@ -263,10 +263,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"tothom"})
 	public List<GrupDto> findGrupsAmbMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId) {
+			Long metaExpedientId, 
+			String rolActual) {
 		return delegate.findGrupsAmbMetaExpedient(
 				entitatId, 
-				metaExpedientId);
+				metaExpedientId, 
+				rolActual);
 	}
 
 	@Override

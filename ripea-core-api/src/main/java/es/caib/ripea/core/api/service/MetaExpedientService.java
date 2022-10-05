@@ -438,7 +438,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<GrupDto> findGrupsAmbMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId);
+			Long metaExpedientId, 
+			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(

@@ -426,6 +426,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -444,7 +446,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		
 		List<MetaExpedientDto> metaExpedients = null;
-		MetaExpedientDto metaExpedient = null;
 		if (expedientId != null) {
 			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request));
 		} else {
@@ -456,7 +457,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (metaExpedients != null && !metaExpedients.isEmpty()) {
 			grups = metaExpedientService.findGrupsAmbMetaExpedient(
 					entitatActual.getId(),
-					expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId());
+					expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId(), 
+					rolActual);
 			command.setGestioAmbGrupsActiva(expedientId != null ? expedient.getMetaExpedient().isGestioAmbGrupsActiva() : metaExpedients.get(0).isGestioAmbGrupsActiva());
 		}
 		model.addAttribute(
@@ -629,10 +631,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public List<GrupDto> grups(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaExpedientService.findGrupsAmbMetaExpedient(
 				entitatActual.getId(),
-				metaExpedientId);
+				metaExpedientId, 
+				rolActual);
 	}
 
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
