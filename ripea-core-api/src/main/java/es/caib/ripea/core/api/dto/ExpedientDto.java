@@ -67,6 +67,8 @@ public class ExpedientDto extends NodeDto {
 	private Long organGestorId;
 	private String organGestorText;
 
+	private boolean hasNoFirmatsOAmbFirmaInvalida;
+	
 	public MetaExpedientDto getMetaExpedient() {
 		return (MetaExpedientDto)getMetaNode();
 	}

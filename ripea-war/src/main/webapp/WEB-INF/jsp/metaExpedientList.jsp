@@ -143,7 +143,7 @@
 		data-search-enabled="false">
 		<thead>
 			<tr>
-				<th data-col-name="codi" width="1%"></th>
+				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
 				<th data-col-name="classificacioSia" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
 				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
