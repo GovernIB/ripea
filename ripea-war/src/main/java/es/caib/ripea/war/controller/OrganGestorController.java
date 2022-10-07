@@ -197,17 +197,17 @@ public class OrganGestorController extends BaseUserOAdminController {
 			return new ProgresActualitzacioDto();
 		}
 
-		if (progresActualitzacio.getFase() == 2) {
-			ProgresActualitzacioDto progresProc = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
-			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
-				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
-				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 24 / 100));
-				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
-				progresAcumulat.getInfo().addAll(progresProc.getInfo());
-				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
-				return progresAcumulat;
-			}
-		}
+//		if (progresActualitzacio.getFase() == 2) {
+//			ProgresActualitzacioDto progresProc = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
+//			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
+//				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+//				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 24 / 100));
+//				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
+//				progresAcumulat.getInfo().addAll(progresProc.getInfo());
+//				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
+//				return progresAcumulat;
+//			}
+//		}
 
 		logger.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
 		return progresActualitzacio;

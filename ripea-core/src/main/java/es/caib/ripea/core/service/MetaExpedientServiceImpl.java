@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
 import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -172,7 +173,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private EmailHelper emailHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
-	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
+//	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
 
 	@Transactional
 	@Override
@@ -547,6 +548,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			resposta.setNumComentaris(metaExpedient.getComentaris().size());
+			
+			if (metaExpedient.getOrganGestor() != null) {
+				resposta.setOrganEstat(metaExpedient.getOrganGestor().getEstat());
+				resposta.setOrganTipusTransicio(metaExpedient.getOrganGestor().getTipusTransicio());
+				resposta.setOrgansNous(conversioTipusHelper.convertirList(metaExpedient.getOrganGestor().getNous(), OrganGestorDto.class));  
+			}
 		}
 		return resposta;
 	}
@@ -575,6 +582,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
 			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
+			
+			if (metaExpedient.getOrganGestor() != null) {
+				resposta.setOrganEstat(metaExpedient.getOrganGestor().getEstat());
+				resposta.setOrganTipusTransicio(metaExpedient.getOrganGestor().getTipusTransicio());
+				resposta.setOrgansNous(conversioTipusHelper.convertirList(metaExpedient.getOrganGestor().getNous(), OrganGestorDto.class));  
+			}
 		}
 		return resposta;
 	}
@@ -739,6 +752,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 					metaExpedientTascaRepository.countByMetaExpedient(metaExpedientEntity));
 			metaExpedient.setGrupsCount(metaExpedientEntity.getGrups().size());
 			metaExpedient.setNumComentaris(metaExpedientEntity.getComentaris().size());
+			if (metaExpedientEntity.getOrganGestor() != null) {
+				metaExpedient.setOrganEstat(metaExpedientEntity.getOrganGestor().getEstat());
+				metaExpedient.setOrganTipusTransicio(metaExpedientEntity.getOrganGestor().getTipusTransicio());
+			}
+			
 		}
 		return resposta;
 	}
@@ -1347,15 +1365,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return progres;
 	}
 
-	@Override
-	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
-		Integer organsNoSincronitzats = metaExpedientsAmbOrganNoSincronitzat.get(entitatId);
-		if (organsNoSincronitzats == null) {
-			organsNoSincronitzats = metaExpedientRepository.countByEntitatIdAndOrganNoSincronitzatTrue(entitatId);
-			metaExpedientsAmbOrganNoSincronitzat.put(entitatId, organsNoSincronitzats);
-		}
-		return organsNoSincronitzats;
-	}
+//	@Override
+//	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
+//		Integer organsNoSincronitzats = metaExpedientsAmbOrganNoSincronitzat.get(entitatId);
+//		if (organsNoSincronitzats == null) {
+//			organsNoSincronitzats = metaExpedientRepository.countByEntitatIdAndOrganNoSincronitzatTrue(entitatId);
+//			metaExpedientsAmbOrganNoSincronitzat.put(entitatId, organsNoSincronitzats);
+//		}
+//		return organsNoSincronitzats;
+//	}
 
 	@Override
 	@Transactional
@@ -1363,7 +1381,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 		MessageHelper.setCurrentLocale(locale);
-		metaExpedientHelper.actualitzarProcediments(entitatDto, locale);
+		metaExpedientHelper.actualitzarProcediments(entitatDto, locale, null);
 
 	}
 

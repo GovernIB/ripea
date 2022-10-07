@@ -278,14 +278,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Actualitzar procediments
 			progres.setFase(2);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.inici")).build());
-			metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), locale);
+			metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), locale, progres);
 			progres.setProgres(51);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
 
 			// Actualitzar permisos
 			progres.setFase(3);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
-			permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
+			permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
 			progres.setProgres(75);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
 

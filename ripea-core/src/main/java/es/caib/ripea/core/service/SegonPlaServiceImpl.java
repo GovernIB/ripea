@@ -419,7 +419,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		for(EntitatDto entitat: entitats) {
 			try {
 				ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
-				metaExpedientHelper.actualitzarProcediments(entitat, new Locale("ca"));
+				metaExpedientHelper.actualitzarProcediments(entitat, new Locale("ca"), null);
 			} catch (Exception e) {
 				logger.error("Error al actualitzar procediments en segon pla", e);
 			}

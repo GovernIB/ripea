@@ -468,9 +468,9 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		delegate.actualitzaProcediments(entitat, locale);
 	}
 
-    @Override
-    public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
-        return delegate.getMetaExpedientsAmbOrganNoSincronitzat(entitatId);
-    }
+//    @Override
+//    public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
+//        return delegate.getMetaExpedientsAmbOrganNoSincronitzat(entitatId);
+//    }
 
 }

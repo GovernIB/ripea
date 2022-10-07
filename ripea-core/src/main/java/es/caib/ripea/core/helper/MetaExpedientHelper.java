@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
-import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
+//import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
 import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
 
 import java.io.PrintWriter;
@@ -698,19 +698,23 @@ public class MetaExpedientHelper {
 	}
 
 	@Transactional
-	public void actualitzarProcediments(EntitatDto entitatDto, Locale locale) {
-		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getCodi());
-		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-			logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
-			return;
+	public void actualitzarProcediments(EntitatDto entitatDto, Locale locale, ProgresActualitzacioDto progresActualitzacioDto) {
+		ProgresActualitzacioDto progres = null;
+		if (progresActualitzacioDto != null) {
+			progres = progresActualitzacioDto;
+		} else {
+			progres = progresActualitzacio.get(entitatDto.getCodi());
+			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+				return;
+			}
+			// inicialitza el seguiment del prgrés d'actualització
+			progres = new ProgresActualitzacioDto();
+			progresActualitzacio.put(entitatDto.getCodi(), progres);
 		}
 
-		// inicialitza el seguiment del prgrés d'actualització
-		progres = new ProgresActualitzacioDto();
-		progresActualitzacio.put(entitatDto.getCodi(), progres);
-
+		
 		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-
 		try {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false, false);
@@ -804,10 +808,10 @@ public class MetaExpedientHelper {
 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.fi")).infoText(msg("procediment.synchronize.info.fi", modificats, fallat)).build());
 
-			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
-			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+			progres.setProgres(100);
+			progres.setFinished(true);
 
-			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
+//			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
 
 			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
 

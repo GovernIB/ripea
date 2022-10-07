@@ -383,7 +383,9 @@ public class OrganGestorHelper {
 			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.historic", unitatWS.getCodi())).infoText(msg("unitat.synchronize.info.historic", unitat.getCodi(), unitat.getNom())).build());
+			if (unitatWS.getHistoricosUO()!=null && !unitatWS.getHistoricosUO().isEmpty()) {
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.historic", unitatWS.getCodi())).infoText(msg("unitat.synchronize.info.historic", unitat.getCodi(), unitat.getNom())).build());
+			}
 		}
 		progres.setProgres(22);
 
@@ -447,7 +449,6 @@ public class OrganGestorHelper {
 		ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder().isOrgan(true);
 		OrganGestorEntity unitat = null;
 		if (unitatWS != null) {
-			infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi()));
 			// checks if unitat already exists in database
 			unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			// TODO: El pare potser encara no existeix. Per tant hem de comprovar si s'ha assignat, i si no, assignar-ho al crear el pare
@@ -455,7 +456,7 @@ public class OrganGestorHelper {
 			// if not it creates a new one
 			if (unitat == null) {
 				logger.info("Unitat WS:" + unitatWS + "\n Unitat DB no existe");
-				infoBuilder.isNew(true).codiOrgan(unitatWS.getCodi()).nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
+				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ.crear", unitatWS.getCodi())).isIsNew(true).codiOrgan(unitatWS.getCodi()).nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
 				// Venen les unitats ordenades, primer el pare i després els fills?
 				unitat = OrganGestorEntity.getBuilder(unitatWS.getCodi())
 						.entitat(entitat)
@@ -476,7 +477,7 @@ public class OrganGestorHelper {
 				}
 			} else {
 				logger.info("Unitat WS:" + unitatWS + "\n Unitat DB: " + unitat);
-				infoBuilder.isNew(false).codiOrgan(unitatWS.getCodi())
+				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi())).isIsNew(false).codiOrgan(unitatWS.getCodi())
 						.nomAntic(unitat.getNom()).estatAntic(unitat.getEstat())
 						.nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
 				unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), organPare);

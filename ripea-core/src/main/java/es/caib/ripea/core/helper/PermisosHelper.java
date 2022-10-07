@@ -46,7 +46,6 @@ import es.caib.ripea.core.repository.AclEntryRepository;
 import es.caib.ripea.core.repository.AclObjectIdentityRepository;
 import es.caib.ripea.core.repository.AclSidRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
 /**
  * Helper per a la gestió de permisos dins les ACLs.
@@ -767,7 +766,7 @@ public class PermisosHelper {
 	}
 
     public void actualitzarPermisosOrgansObsolets(
-			List<UnitatOrganitzativa> unitatsWs,
+    		List<OrganGestorEntity> obsoleteUnitats,
 			List<OrganGestorEntity> organsDividits,
 			List<OrganGestorEntity> organsFusionats,
 			List<OrganGestorEntity> organsSubstituits,
@@ -775,12 +774,17 @@ public class PermisosHelper {
 
 		List<String> organsFusionatsProcessats = new ArrayList<>();
 
-		int nombreUnitatsTotal = unitatsWs.size();
+		int nombreUnitatsTotal = obsoleteUnitats.size();
 		int nombreUnitatsProcessades = 0;
 
-		for (UnitatOrganitzativa unitat: unitatsWs) {
+		for (OrganGestorEntity unitat: obsoleteUnitats) {
 
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.permis")).infoText(msg("unitat.synchronize.info.permisos.traspas", unitat.getCodi())).build());
+			if (hasAnyPermissions(unitat)) {
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.permis")).infoText(msg("unitat.synchronize.info.permisos.traspas", unitat.getCodi())).build());
+			} 
+//			else {
+//				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.permis")).infoText(msg("unitat.synchronize.info.permisos.no", unitat.getCodi())).build());
+//			}
 			progres.setProgres(51 + (nombreUnitatsProcessades++ * 24)/nombreUnitatsTotal);
 
 			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
@@ -818,6 +822,21 @@ public class PermisosHelper {
 				return organ;
 		}
 		return null;
+	}
+	
+	
+	private boolean hasAnyPermissions(OrganGestorEntity organOrigen) {
+		Acl acl = null;
+		try {
+			ObjectIdentity oid = new ObjectIdentityImpl(OrganGestorEntity.class, organOrigen.getId());
+			acl = aclService.readAclById(oid);
+		} catch (NotFoundException nfex) {
+		}
+		if (acl != null && acl.getEntries() != null && !acl.getEntries().isEmpty()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 

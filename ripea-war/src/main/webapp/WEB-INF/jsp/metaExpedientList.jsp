@@ -151,7 +151,19 @@
 					<spring:message code="metaexpedient.list.columna.organGestor"/>
 					<script id="cellSyncTemplate" type="text/x-jsrender">
 						{{:organGestor?.codiINom}}
-						{{if organNoSincronitzat}}<span class="fa fa-warning text-danger" title="<spring:message code='metaexpedient.actualitzacio.organ.no.sync'/>"></span>{{/if}}
+						{{if organNoSincronitzat}}
+							<span class="fa fa-warning text-danger" title="<spring:message code='metaexpedient.actualitzacio.organ.no.sync'/>"></span>
+						{{else organEstat=='E'||organEstat=='A'||organEstat=='T'}}
+							{{if organTipusTransicio == 'DIVISIO'}}
+								<span class="fa fa-warning text-danger" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet.tipusTransicio.DIVISIO"/>"></span>
+							{{else organTipusTransicio == 'FUSIO'}}
+								<span class="fa fa-warning text-danger" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet.tipusTransicio.FUSIO"/>"></span>
+							{{else organTipusTransicio == 'SUBSTITUCIO'}}
+								<span class="fa fa-warning text-danger" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet.tipusTransicio.SUBSTITUCIO"/>"></span>
+							{{else}}
+								<span class="fa fa-warning text-danger" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet"/>"></span>
+							{{/if}}
+						{{/if}}
 					</script>
 				</th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">
@@ -202,6 +214,8 @@
 				<th data-col-name="grupsCount" data-visible="false"></th>
 				<th data-col-name="crearReglaDistribucio" data-visible="false"></th>
 				<th data-col-name="organNoSincronitzat" data-visible="false"></th>
+				<th data-col-name="organEstat" data-visible="false"></th>
+				<th data-col-name="organTipusTransicio" data-visible="false"></th>
 				
 				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
