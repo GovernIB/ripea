@@ -181,6 +181,7 @@ databaseChangeLog:
         tableName: ipa_cont_log
 - changeSet:
     id: init-6
+    author: limit (generated)
     changes:
     - createTable:
         columns:
