@@ -92,6 +92,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		boolean usingNumeroRegistre = params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE);
 		boolean crearNovaCarpeta = params.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA);
 		String numeroRegistre = params.getNumeroRegistre();
+		CarpetaEntity carpetaEntity = null;
 		ContingutEntity pareActual = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -113,8 +114,17 @@ public class ImportacioServiceImpl implements ImportacioService {
 		int idx = 1;
 		List<Document> documents = new ArrayList<Document>();
 		expedientsWithImportacio = new ArrayList<DocumentDto>();
+		
+		// CREAR NOVA CARPETA SI ÉS EL CAS ON IMPORTAR DOCUMENT
+		if (crearNovaCarpeta) {
+			CarpetaDto carpeta = carpetaService.create(
+					entitatId,
+					expedientSuperior.getId(),
+					params.getCarpetaNom());
+			carpetaEntity = carpetaRepository.findOne(carpeta.getId());
+		}
+		
 		outerloop: for (ContingutArxiu contingutArxiu : documentsTrobats) {
-			CarpetaEntity carpetaEntity = null;
 			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
 					null,
 					contingutArxiu.getIdentificador(), 
@@ -138,14 +148,6 @@ public class ImportacioServiceImpl implements ImportacioService {
 					documentsRepetits++;
 				}
 				continue outerloop;
-			}
-			// CREAR NOVA CARPETA SI ÉS EL CAS ON IMPORTAR DOCUMENT
-			if (crearNovaCarpeta) {
-				CarpetaDto carpeta = carpetaService.create(
-						entitatId,
-						expedientSuperior.getId(),
-						params.getCarpetaNom());
-				carpetaEntity = carpetaRepository.findOne(carpeta.getId());
 			}
 			String nomDocument = (tituloDoc != null && usingNumeroRegistre) ? (tituloDoc + " - " + numeroRegistre.replace('/', '_')) : documentArxiu.getNom();
 			contingutHelper.comprovarNomValid(
@@ -184,7 +186,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		return documentsArxiu;
 	}
 	
-	private DocumentEntity crearDocumentActualitzarMetadades(
+	private void crearDocumentActualitzarMetadades(
 			String nomDocument,
 			Document documentArxiu,
 			ContingutEntity contenidor,
@@ -251,7 +253,6 @@ public class ImportacioServiceImpl implements ImportacioService {
 				entity,
 				true,
 				true);
-		return entity;
 	}
 	
 	private static final String ENI_DOCUMENT_PREFIX = "http://administracionelectronica.gob.es/ENI/XSD/v";
