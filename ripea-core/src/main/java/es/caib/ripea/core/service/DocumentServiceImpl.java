@@ -328,6 +328,26 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 		return dtos;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+			Long entitatId,
+			Long expedientId) {
+		
+		List<DocumentEntity> documents = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
+				entitatId,
+				expedientId);
+		
+		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
+		for (DocumentEntity document: documents) {
+			dtos.add(
+					(DocumentDto)contingutHelper.toContingutDto(document));
+		}
+		
+		return dtos;
+	}
 
 	@Transactional(readOnly = true)
 	@Override

@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 import com.sun.jersey.core.util.Base64;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
@@ -256,21 +257,25 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es pot actualitzar el contingut d'un document importat o definitiu");
 		}
-		if (document.getFitxerContingut() != null) {
-			fitxer = new FitxerDto();
-			fitxer.setNom(document.getFitxerNom());
-			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(document.getFitxerContingut());
-		} else if (documentEntity.getArxiuUuid() != null) {
-			fitxer = new FitxerDto();
-			fitxer.setContentType(documentEntity.getFitxerContentType());
-			fitxer.setNom(documentEntity.getFitxerNom());
-			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+		Document arxiuDocument = null;
+		if (documentEntity.getArxiuUuid() != null) {
+			arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 					documentEntity,
 					null,
 					null,
 					true,
 					false);
+		}
+		
+		if (document.getFitxerContingut() != null) {
+			fitxer = new FitxerDto();
+			fitxer.setNom(document.getFitxerNom());
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setContingut(document.getFitxerContingut());
+		} else if (arxiuDocument != null) {
+			fitxer = new FitxerDto();
+			fitxer.setContentType(documentEntity.getFitxerContentType());
+			fitxer.setNom(documentEntity.getFitxerNom());
 			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 		}
 		if (document.getFitxerContingut() != null) {
@@ -285,8 +290,8 @@ public class DocumentHelper {
 			}
 			// Al modificar el document, eliminam l'alerta de document invàlid,
 			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
-			if (!documentEntity.isValidacioCorrecte()) {
-				documentEntity.setValidacioCorrecte(true);
+			if (!documentEntity.isValidacioFirmaCorrecte()) {
+				documentEntity.setValidacioFirmaCorrecte(true);
 //				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 			}
 		}
@@ -299,8 +304,9 @@ public class DocumentHelper {
 				true,
 				true);
 		DocumentDto dto = toDocumentDto(documentEntity);
-		
-		if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || isPropagarModificacioDefinitiusActiva()) {
+
+		if (arxiuDocument == null || arxiuDocument.getEstat() == DocumentEstat.ESBORRANY || isPropagarModificacioDefinitiusActiva()) {
+
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
@@ -439,9 +445,9 @@ public class DocumentHelper {
 			String ubicacio,
 			String ntiIdDocumentoOrigen,
 			String pinbalIdpeticion,
-			boolean validacioCorrecte,
-			String validacioError,
-			ArxiuEstatEnumDto annexEstat) {
+			boolean validacioFirmaCorrecte,
+			String validacioFirmaErrorMsg,
+			ArxiuEstatEnumDto annexArxiuEstat) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
 				DocumentEstatEnumDto.REDACCIO,
@@ -461,9 +467,9 @@ public class DocumentHelper {
 				expedient).
 				ubicacio(ubicacio).
 				pinbalIdpeticion(pinbalIdpeticion).
-				validacioCorrecte(validacioCorrecte).
-				validacioError(validacioError).
-				annexEstat(annexEstat).
+				validacioFirmaCorrecte(validacioFirmaCorrecte).
+				validacioFirmaErrorMsg(validacioFirmaErrorMsg).
+				annexArxiuEstat(annexArxiuEstat).
 				build();
 		DocumentEntity documentCreat = documentRepository.save(documentCrear);
 		calcularIdentificadorDocument(
@@ -672,6 +678,34 @@ public class DocumentHelper {
 		}
 		return fitxer;
 	}
+	
+	
+	public List<DocumentEntity> findDocumentsNoFirmatsOAmbFirmaInvalida(
+			Long entitatId,
+			Long expedientId) {
+		logger.debug("Obtenint els documents no firmats o amb firma invalida (" +
+				"entitatId=" + entitatId + ", " +
+				"expedientId=" + expedientId + ")");
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				false, 
+				false, 
+				null);
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		List<DocumentEntity> documentsChosen = new ArrayList<DocumentEntity>();
+		for (DocumentEntity document: documents) {
+			if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || document.getArxiuUuid() == null) {
+				documentsChosen.add(document);
+			}
+		}
+		return documentsChosen;
+	}
+	
 
 	@SuppressWarnings("incomplete-switch")
 	public byte[] getContingutFromArxiuDocument(Document arxiuDocument) {

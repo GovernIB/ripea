@@ -214,6 +214,32 @@
 </head>
 <body>
 
+
+	<c:if test="${metaExpedientDto!=null && metaExpedientDto.organsNous != null && !empty metaExpedientDto.organsNous}">
+
+		<div class="panel panel-danger">
+			<div class="panel-heading">
+				<span class="fa fa-warning text-danger"></span>
+				<spring:message code="metaexpedient.form.organ.obsolet"/> 
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<label class="col-xs-4 text-right"><spring:message
+							code="metaexpedient.form.organ.nou" /></label>
+					<div class="col-xs-8">
+						<ul style="padding-left: 17px;">
+							<c:forEach items="${metaExpedientDto.organsNous}"
+								var="newUnitat" varStatus="loop">
+								<li>${newUnitat.nom} (${newUnitat.codi})</li>
+							</c:forEach>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>
+
+
 	<div id="loading" style="display: none;"><div style="text-align: center; padding-bottom: 100px; color: #666666; margin-top: 100px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
 	<c:set var="formAction"><rip:modalUrl value="/metaExpedient"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="metaExpedientCommand">

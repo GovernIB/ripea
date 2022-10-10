@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
-import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
+//import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
 import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
 
 import java.io.PrintWriter;
@@ -698,22 +698,26 @@ public class MetaExpedientHelper {
 	}
 
 	@Transactional
-	public void actualitzarProcediments(EntitatDto entitatDto, Locale locale) {
-		ProgresActualitzacioDto progres = progresActualitzacio.get(entitatDto.getCodi());
-		if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
-			logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
-			return;
+	public void actualitzarProcediments(EntitatDto entitatDto, Locale locale, ProgresActualitzacioDto progresActualitzacioDto) {
+		ProgresActualitzacioDto progres = null;
+		if (progresActualitzacioDto != null) {
+			progres = progresActualitzacioDto;
+		} else {
+			progres = progresActualitzacio.get(entitatDto.getCodi());
+			if (progres != null && (progres.getProgres() > 0 && progres.getProgres() < 100) && !progres.isError()) {
+				logger.debug("[PROCEDIMENTS] Ja existeix un altre procés que està executant l'actualització");
+				return;
+			}
+			// inicialitza el seguiment del prgrés d'actualització
+			progres = new ProgresActualitzacioDto();
+			progresActualitzacio.put(entitatDto.getCodi(), progres);
 		}
 
-		// inicialitza el seguiment del prgrés d'actualització
-		progres = new ProgresActualitzacioDto();
-		progresActualitzacio.put(entitatDto.getCodi(), progres);
-
+		
 		Map<String, String[]> avisosProcedimentsOrgans = new HashMap<>();
-
 		try {
 
-			EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatDto.getId());
+			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false, false);
 			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 			progres.setNumOperacions(metaExpedients.size());
 
@@ -733,11 +737,15 @@ public class MetaExpedientHelper {
 
 				ProcedimentDto procedimentGga = null;
 				try {
+					logger.info("Procediment DB: " + metaExpedient);
 					procedimentGga = pluginHelper.procedimentFindByCodiSia(
 							entitat.getUnitatArrel(),
 							metaExpedient.getClassificacioSia());
 					infoBuilder.exist(procedimentGga != null);
+					
+					logger.info(" Procediment WS: " + procedimentGga);
 				} catch (SistemaExternException se) {
+					logger.error("Error Procediment WS: " + metaExpedient, se);
 					infoBuilder.hasError(true);
 					infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
 					progres.addInfo(infoBuilder.build(), true);
@@ -753,11 +761,11 @@ public class MetaExpedientHelper {
 					continue;
 				}
 
-				ActualitzacioInfo info = infoBuilder.nomNou(procedimentGga.getNom())
-						.descripcioNova(procedimentGga.getResum())
-						.comuNou(procedimentGga.isComu())
-						.organNou(procedimentGga.getUnitatOrganitzativaCodi())
-						.build();
+				ActualitzacioInfo info = infoBuilder.build();
+				info.setNomNou(procedimentGga.getNom());
+				info.setDescripcioNova(procedimentGga.getResum());
+				info.setComuNou(procedimentGga.isComu());
+				info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
 
 				if (!info.hasChange()) {
 					progres.addInfo(info, true);
@@ -792,6 +800,7 @@ public class MetaExpedientHelper {
 				}
 
 				metaExpedient.updateSync(nom, descripcio, organGestor, organNoSincronitzat);
+				metaExpedientRepository.flush();
 				progres.addInfo(info, true);
 				modificats++;
 
@@ -799,10 +808,10 @@ public class MetaExpedientHelper {
 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.fi")).infoText(msg("procediment.synchronize.info.fi", modificats, fallat)).build());
 
-			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
-			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+			progres.setProgres(100);
+			progres.setFinished(true);
 
-			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
+//			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
 
 			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
 

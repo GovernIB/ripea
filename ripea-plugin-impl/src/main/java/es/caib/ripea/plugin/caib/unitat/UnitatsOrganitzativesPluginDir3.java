@@ -331,6 +331,9 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
     private String getServiceUrl() {
 
         String url = getProperty("plugin.unitats.organitzatives.dir3.service.url");
+		if (!url.endsWith("/")) {
+			url = url + "/";
+		}
         return url;
     }
 

@@ -13,7 +13,6 @@ public interface FirmaServidorPlugin {
 			String nom,
 			String motiu,
 			byte[] contingut,
-			TipusFirma tipusFirma,
 			String idioma) throws SistemaExternException;
 
 	public static enum TipusFirma {

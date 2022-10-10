@@ -101,6 +101,20 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			int esborrat);
 	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"    c.expedient = :expedient " +
+			"and c.esborrat = 0 " +
+			"and (c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
+			"	or c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
+			"	or c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)")
+	List<DocumentEntity> findEnProccessDeFirma(
+			@Param("expedient") ExpedientEntity expedient);
+	
+	
 	@Query(	"select case when (count(c) > 0) then true else false end " +
 			"from " +
 			"    DocumentEntity c " +

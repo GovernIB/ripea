@@ -45,6 +45,10 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
 	private CrearReglaResponseDto crearReglaResponse;
 
     private boolean organNoSincronitzat;
+    
+    private OrganEstatEnumDto organEstat;
+    private TipusTransicioEnumDto organTipusTransicio;
+    private List<OrganGestorDto> organsNous;
 	
     public String getCodiSiaINom() {
     	return classificacioSia + " - " + nom;

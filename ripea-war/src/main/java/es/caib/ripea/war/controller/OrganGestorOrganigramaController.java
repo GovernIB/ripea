@@ -15,15 +15,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.command.OrganGestorCommand;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -69,6 +72,23 @@ public class OrganGestorOrganigramaController extends BaseUserOAdminController {
 	}
     
     
+	
+	
+	@RequestMapping(value = "/{organGestorId}", method = RequestMethod.GET)
+	@ResponseBody
+	public OrganGestorDto organGet(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		OrganGestorDto organ = null;
+		if (organGestorId != null)
+			organ = organGestorService.findById(entitatActual.getId(), organGestorId);
+
+		return organ;
+	}
+	
+	
     
 	private OrganGestorFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -108,6 +128,11 @@ public class OrganGestorOrganigramaController extends BaseUserOAdminController {
 		model.addAttribute(
 				"arbreOrgans",
 				arbreOrgans);
+		
+		
+		OrganGestorCommand organGestorCommand = new OrganGestorCommand();
+		model.addAttribute(organGestorCommand);
+		
 	
 	}
 	

@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -216,6 +217,8 @@ public class MetaExpedientController extends BaseAdminController {
 		model.addAttribute("isRolActualAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
 		
 		model.addAttribute("isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
+		
+		model.addAttribute("metaExpedientDto", metaExpedient);
 		
 		fillFormModel(
 				request,
@@ -1082,7 +1085,7 @@ public class MetaExpedientController extends BaseAdminController {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		try {
-			metaExpedientService.actualitzaProcediments(entitat, request.getLocale());
+			metaExpedientService.actualitzaProcediments(entitat, new RequestContext(request).getLocale());
 		} catch (Exception e) {
 			logger.error("Error inesperat al actualitzar els procediments", e);
 			model.addAttribute("errors", e.getMessage());

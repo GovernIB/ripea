@@ -106,7 +106,7 @@ public class OrganGestorSyncHelperIT {
         ObjectMapper mapper = new ObjectMapper();
 
         Mockito.when(pluginHelper.unitatsOrganitzativesFindByPare(Mockito.anyString(), Mockito.nullable(Date.class), Mockito.nullable(Date.class))).thenReturn((List<UnitatOrganitzativa>) mapper.readValue(UNITATS_JSON, new TypeReference<List<UnitatOrganitzativa>>(){}));
-        Mockito.doNothing().when(metaExpedientHelper).actualitzarProcediments(Mockito.any(EntitatDto.class), Mockito.any(Locale.class));
+        Mockito.doNothing().when(metaExpedientHelper).actualitzarProcediments(Mockito.any(EntitatDto.class), Mockito.any(Locale.class), null);
         Mockito.when(pluginHelper.dadesUsuariFindAmbCodi(Mockito.anyString())).thenReturn(null);
 
     }

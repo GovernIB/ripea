@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -128,7 +129,14 @@ public class OrganGestorController extends BaseUserOAdminController {
 		}
 		try {
 
-			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(entitat.getId());
+			PrediccioSincronitzacio prediccio = organGestorService.predictSyncDir3OrgansGestors(
+					entitat.getId());
+			if (prediccio.isNoCanvis()) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:../organgestor",
+						"unitat.controller.synchronize.no.changes");
+			}
 
 			model.addAttribute("isFirstSincronization", prediccio.isFirstSincronization());
 //			model.addAttribute("unitatsVigentsFirstSincro", unitatsVigentsFirstSincro);
@@ -142,7 +150,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 //			organGestorService.syncDir3OrgansGestors(entitat.getId());
 			
 		} catch (Exception e) {
-			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
+ 			logger.error("Error al obtenir la predicció de la sincronitzacio", e);
 			return getModalControllerReturnValueErrorMessageText(
 					request,
 					"redirect:../../organgestor",
@@ -160,7 +168,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			organGestorService.syncDir3OrgansGestors(entitatActual, request.getLocale());
+			organGestorService.syncDir3OrgansGestors(entitatActual, new RequestContext(request).getLocale());
 		} catch (Exception e) {
 			logger.error("Error al syncronitzar", e);
 			return getModalControllerReturnValueErrorMessageText(
@@ -189,17 +197,17 @@ public class OrganGestorController extends BaseUserOAdminController {
 			return new ProgresActualitzacioDto();
 		}
 
-		if (progresActualitzacio.getFase() == 2) {
-			ProgresActualitzacioDto progresProc = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
-			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
-				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
-				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 24 / 100));
-				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
-				progresAcumulat.getInfo().addAll(progresProc.getInfo());
-				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
-				return progresAcumulat;
-			}
-		}
+//		if (progresActualitzacio.getFase() == 2) {
+//			ProgresActualitzacioDto progresProc = metaExpedientService.getProgresActualitzacio(entitat.getCodi());
+//			if (progresProc != null && progresProc.getInfo() != null && ! progresProc.getInfo().isEmpty()) {
+//				ProgresActualitzacioDto progresAcumulat = new ProgresActualitzacioDto();
+//				progresAcumulat.setProgres(27 + (progresProc.getProgres() * 24 / 100));
+//				progresAcumulat.getInfo().addAll(progresActualitzacio.getInfo());
+//				progresAcumulat.getInfo().addAll(progresProc.getInfo());
+//				logger.info("Progres actualització organs gestors fase 2: {}",  progresAcumulat.getProgres());
+//				return progresAcumulat;
+//			}
+//		}
 
 		logger.info("Progres actualització organs gestors fase {}: {}",progresActualitzacio.getFase(), progresActualitzacio.getProgres());
 		return progresActualitzacio;
@@ -235,6 +243,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 			HttpServletRequest request,
 			@Valid OrganGestorCommand command,
 			BindingResult bindingResult,
+			@RequestParam(value = "redirectAOrganigrama", required = false) Boolean redirectAOrganigrama,
 			Model model) throws JsonMappingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
@@ -246,7 +255,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 			organGestorService.update(entitatActual.getId(), OrganGestorCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:organGestor",
+					redirectAOrganigrama != null && redirectAOrganigrama == true ? "redirect:organGestorOrganigrama" : "redirect:organgestor",
 					"organgestor.controller.modificat.ok");
 		} else {
 			organGestorService.create(entitatActual.getId(), OrganGestorCommand.asDto(command));
@@ -258,7 +267,10 @@ public class OrganGestorController extends BaseUserOAdminController {
 	}
 
 	@RequestMapping(value = "/{organGestorId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable Long organGestorId) {
+	public String delete(
+			HttpServletRequest request, 
+			@PathVariable Long organGestorId,
+			@RequestParam(value = "redirectAOrganigrama", required = false) Boolean redirectAOrganigrama) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			organGestorService.delete(
@@ -266,7 +278,7 @@ public class OrganGestorController extends BaseUserOAdminController {
 					organGestorId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
-					"redirect:../../organGestor",
+					redirectAOrganigrama != null && redirectAOrganigrama == true ? "redirect:../../organGestorOrganigrama" : "redirect:../../organgestor",
 					"organgestor.controller.esborrat.ok");
 		} catch (Exception ex) {
 			logger.error("Error al esborrar organ gestor");

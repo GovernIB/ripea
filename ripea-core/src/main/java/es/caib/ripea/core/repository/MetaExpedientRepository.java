@@ -283,4 +283,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("isAdmin") boolean isAdmin);
 
     Integer countByEntitatIdAndOrganNoSincronitzatTrue(Long entitatId);
+    
+    
+	@Query(	"select count(me.id) from MetaExpedientEntity me where me.organGestor = :organGestor")
+	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 }

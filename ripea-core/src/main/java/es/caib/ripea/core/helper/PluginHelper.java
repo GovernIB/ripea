@@ -135,7 +135,6 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioPlugin;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
-import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin.TipusFirma;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
@@ -332,32 +331,35 @@ public class PluginHelper {
 			integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorDescripcio, ex);
 		}
-
-		if (unitatsOrganitzatives != null && !unitatsOrganitzatives.isEmpty()) {
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_UNITATS,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-			return unitatsOrganitzatives;
+		
+		
+		if (unitatsOrganitzatives == null || unitatsOrganitzatives.isEmpty()) {
+			try {
+				getUnitatsOrganitzativesPlugin().findAmbCodi(pareCodi);
+			} catch (Exception e) {
+				String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
+				integracioHelper.addAccioError(
+						IntegracioHelper.INTCODI_UNITATS,
+						accioDescripcio,
+						accioParams,
+						IntegracioAccioTipusEnumDto.ENVIAMENT,
+						System.currentTimeMillis() - t0,
+						errorMissatge,
+						null);
+				throw new SistemaExternException(
+						IntegracioHelper.INTCODI_UNITATS,
+						errorMissatge);
+			}
 		}
-
-		String errorMissatge = "No s'ha trobat la unitat organitzativa llistat (codi=" + pareCodi + ")";
-		try {
-			UnitatOrganitzativa unitatArrel = getUnitatsOrganitzativesPlugin().findAmbCodi(pareCodi);
-			errorMissatge = "No s'han trobat canvis realitzats posteriorment a la última sincronització.";
-		} catch (Exception e) {}
-		integracioHelper.addAccioError(
+		
+		integracioHelper.addAccioOk(
 				IntegracioHelper.INTCODI_UNITATS,
 				accioDescripcio,
 				accioParams,
 				IntegracioAccioTipusEnumDto.ENVIAMENT,
-				System.currentTimeMillis() - t0,
-				errorMissatge);
-		throw new SistemaExternException(
-				IntegracioHelper.INTCODI_UNITATS,
-				errorMissatge);
+				System.currentTimeMillis() - t0);
+		return unitatsOrganitzatives;
+
 
 	}
 	
@@ -386,7 +388,7 @@ public class PluginHelper {
 				return resposta;
 			} else {
 				String errorMissatge = "No s'ha trobat la unitat organitzativa arrel (codi=" + pareCodi + ")";
-				integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorMissatge);
+				integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorMissatge, null);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 			}
 		} catch (Exception ex) {
@@ -2826,7 +2828,7 @@ public class PluginHelper {
 		}
 	}
 
-	public SignaturaResposta firmaServidorFirmar(DocumentEntity document, FitxerDto fitxer, TipusFirma tipusFirma, String motiu, String idioma) {
+	public SignaturaResposta firmaServidorFirmar(DocumentEntity document, FitxerDto fitxer, String motiu, String idioma) {
 
 		String accioDescripcio = "Firma en servidor d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -2834,7 +2836,7 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), tipusFirma, idioma);
+			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_FIRMASERV, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0);
 			return resposta;
 		} catch (Exception ex) {

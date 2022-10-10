@@ -70,9 +70,9 @@ public class DocumentDto extends NodeDto {
 	private boolean pendentMoverArxiu;
 	private Long annexId;
 
-	private boolean validacioCorrecte;
-	private String validacioError;
-	private ArxiuEstatEnumDto annexEstat; // Estat a l'arxiu en l'origen
+	private boolean validacioFirmaCorrecte;
+	private String validacioFirmaErrorMsg;
+	private ArxiuEstatEnumDto annexArxiuEstat; // Estat a l'arxiu en l'origen
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {

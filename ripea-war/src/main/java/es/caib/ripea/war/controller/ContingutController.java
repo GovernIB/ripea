@@ -702,7 +702,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					null);
 			model.addAttribute("contingut", contingut);
 			if (contingut instanceof DocumentDto) {
-				model.addAttribute("documentInvalid", !((DocumentDto) contingut).isValidacioCorrecte());
+				model.addAttribute("documentInvalid", !((DocumentDto) contingut).isValidacioFirmaCorrecte());
 			}
 			if (contingut.isReplicatDinsArxiu()) {
 				model.addAttribute(

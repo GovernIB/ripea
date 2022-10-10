@@ -100,6 +100,14 @@
 			<version>4.2.2.GA</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!--
+	<dependency>
+		<groupId>org.ghost4j</groupId>
+		<artifactId>ghost4j</artifactId>
+		<version>1.0.0</version>
+	</dependency>		-->
+		
 		<dependency>
 			<groupId>es.caib.portafib</groupId>
 			<artifactId>portafib-ws-callback-api</artifactId>

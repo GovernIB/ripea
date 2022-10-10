@@ -120,7 +120,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
-			"and (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser)))) "
+			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) "
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -169,6 +169,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
+			@Param("isAdmin") boolean isAdmin,
 			Pageable pageable);
 
 	@Query(	"select " +
@@ -409,6 +410,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
 			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
+			"and (select count(document) from DocumentEntity document where " + // no documents en process de firma
+			"	document.expedient = e " +
+			"	and (document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT " +
+			"		or document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA " +
+			"		or document.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)) = 0 " +   
 			"and (select count(document) from DocumentEntity document where document.expedient = e and document.esborrat = 0) > 0 " +   // at least one document no esborrat
 			"and (select " +																										// all dades obligatoris created
 			"	     	count(metaDada) " +

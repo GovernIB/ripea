@@ -2,6 +2,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ attribute name="name" required="true" rtexprvalue="true"%>
+<%@ attribute name="id" required="false" rtexprvalue="true"%>
 <%@ attribute name="required" required="false" rtexprvalue="true"%>
 <%@ attribute name="text" required="false" rtexprvalue="true"%>
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
@@ -23,6 +24,7 @@
 
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
 <c:set var="campPath" value="${name}"/>
+<c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="minimumInputLength"><c:choose><c:when test="${not empty minimumInputLength}">${minimumInputLength}</c:when><c:otherwise>${3}</c:otherwise></c:choose></c:set>
 <c:set var="suggestValue"><c:choose><c:when test="${not empty suggestValue}">${suggestValue}</c:when><c:otherwise>id</c:otherwise></c:choose></c:set>
@@ -53,7 +55,7 @@
 				<c:when test="${not empty icon}">
 					<div class="input-group select2-bootstrap-append">
 						<form:select path="${campPath}" cssClass="form-control"
-							id="${campPath}" disabled="${disabled}" style="width:100%"
+							id="${campId}" disabled="${disabled}" style="width:100%"
 							data-toggle="suggest" data-netejar="${netejar}"
 							data-placeholder="${placeholderText}"
 							data-minimum-input-length="${minimumInputLength}"
@@ -72,7 +74,7 @@
 				</c:when>
 				<c:otherwise>
 					<form:select path="${campPath}" cssClass="form-control"
-							id="${campPath}" disabled="${disabled}" style="width:100%"
+							id="${campId}" disabled="${disabled}" style="width:100%"
 							data-toggle="suggest" data-netejar="${netejar}"
 							data-placeholder="${placeholderText}"
 							data-minimum-input-length="${minimumInputLength}"
@@ -92,7 +94,7 @@
 		</div>
 	</c:when>
 	<c:otherwise>
-		<form:select path="${campPath}" cssClass="form-control" id="${campPath}"
+		<form:select path="${campPath}" cssClass="form-control" id="${campId}"
 			disabled="${disabled}" style="width:100%" data-toggle="suggest"
 			data-netejar="${netejar}" data-placeholder="${placeholderText}"
 			data-minimum-input-length="${minimumInputLength}"

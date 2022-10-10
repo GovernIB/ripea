@@ -45,9 +45,9 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 	}
 	
 	@Override
-	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, TipusFirma tipusFirma, String idioma) throws SistemaExternException {
+	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, String idioma) throws SistemaExternException {
 
-		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).tipusFirma(tipusFirma).mime(TipusMime.PDF).contingut(contingut).build());
+		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).mime(TipusMime.PDF).contingut(contingut).build());
 	}
 
 	public SignaturaResposta signar(SignaturaConsulta consulta) {

@@ -41,6 +41,7 @@ public class ExpedientDto extends NodeDto {
 	private String numero;
 	private boolean conteDocuments;
 	private boolean conteDocumentsFirmats;
+	private boolean conteDocumentsEnProcessDeFirma;
 	private long numComentaris;
 	private ExpedientEstatDto expedientEstat;
 	private Long expedientEstatId;
@@ -66,6 +67,8 @@ public class ExpedientDto extends NodeDto {
 	private Long organGestorId;
 	private String organGestorText;
 
+	private boolean hasNoFirmatsOAmbFirmaInvalida;
+	
 	public MetaExpedientDto getMetaExpedient() {
 		return (MetaExpedientDto)getMetaNode();
 	}

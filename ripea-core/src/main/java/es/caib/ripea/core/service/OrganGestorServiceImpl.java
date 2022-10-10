@@ -20,6 +20,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
@@ -134,6 +135,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				entitat(entitat).
 				pare(organPareEntity).
 				gestioDirect(true).
+				estat(OrganEstatEnumDto.V).
 				build();
 		
 		OrganGestorEntity organGestorEntity = organGestorRepository.save(entity);
@@ -228,7 +230,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	}
 
 	@Override
-//	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto, Locale locale) throws Exception {
 	    EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false, false, false);
 		ConfigHelper.setEntitat(entitatDto);
@@ -266,7 +268,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			progres.setProgres(2);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(unitatsWs.isEmpty() ? msg("unitat.synchronize.info.organigrama.fi.buid") : msg("unitat.synchronize.info.organigrama.fi", unitatsWs.size())).build());
 
-			// 2. Sincronitzar òrgans
+			// Sincronitzar òrgans
 			progres.setFase(1);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
 			organGestorHelper.sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
@@ -276,14 +278,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// Actualitzar procediments
 			progres.setFase(2);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.inici")).build());
-			metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), locale);
+			metaExpedientHelper.actualitzarProcediments(conversioTipusHelper.convertir(entitat, EntitatDto.class), locale, progres);
 			progres.setProgres(51);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
 
 			// Actualitzar permisos
 			progres.setFase(3);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
-			permisosHelper.actualitzarPermisosOrgansObsolets(unitatsWs, organsDividits, organsFusionats, organsSubstituits, progres);
+			permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
 			progres.setProgres(75);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
 
@@ -330,6 +332,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					entitat.getUnitatArrel(),
 					entitat.getDataActualitzacio(),
 					entitat.getDataSincronitzacio());
+			
+			if (unitatsWS == null || unitatsWS.isEmpty()) {
+				return PrediccioSincronitzacio.builder()
+						.noCanvis(true)
+						.build();
+			}
 
 			// Obtenir els òrgans vigents a la BBDD
 			List<OrganGestorEntity> organsVigents = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);

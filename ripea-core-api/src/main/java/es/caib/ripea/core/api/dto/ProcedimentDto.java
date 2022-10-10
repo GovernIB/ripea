@@ -1,8 +1,10 @@
 package es.caib.ripea.core.api.dto;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class ProcedimentDto {
 	private String codi;
 	private String nom;

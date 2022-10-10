@@ -132,4 +132,8 @@
 			id="avisService"
 			jndi-name="ripea/AvisServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.AvisService"/>
+	<jee:local-slsb
+			id="segonPlaService"
+			jndi-name="ripea/SegonPlaServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.SegonPlaService"/>
 </beans>

@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,6 +25,7 @@ import java.util.List;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
+@ToString
 public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrganitzativa> {
 
 	@JsonProperty("codigo")
@@ -61,6 +63,21 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private List<UnitatOrganitzativa> lastHistoricosUnitats;
 
 
+	public UnitatOrganitzativa(
+			String codi,
+			String denominacio,
+			String codiUnitatSuperior,
+			String codiUnitatArrel,
+			String estat,
+			List<String> historicosUO) {
+		this.codi = codi;
+		this.denominacio = denominacio;
+		this.codiUnitatSuperior = codiUnitatSuperior;
+		this.codiUnitatArrel = codiUnitatArrel;
+		this.estat = estat;
+		this.historicosUO = historicosUO;
+	}
+	
 	@Override
 	public int compareTo(UnitatOrganitzativa o) {
 		return denominacio.compareToIgnoreCase(o.getDenominacio());

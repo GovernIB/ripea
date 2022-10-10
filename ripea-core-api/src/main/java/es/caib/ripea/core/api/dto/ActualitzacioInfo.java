@@ -25,7 +25,7 @@ public class ActualitzacioInfo {
 
     // Organ
     boolean isOrgan;
-    boolean isNew;
+    boolean isIsNew;
     String codiOrgan;
     OrganEstatEnumDto estatAntic;
     OrganEstatEnumDto estatNou;

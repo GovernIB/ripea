@@ -197,6 +197,7 @@ $(document).ready(function() {
 		<rip:inputText name="codi" textKey="metadada.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
 		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto" disabled="${bloquejarCamps || (metaDadaCommand.id!=null && existContingut)}"/>
+		<form:hidden path="tipus" id="tipushidden"/>
 		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto" disabled="${bloquejarCamps}"/>
 		
 		

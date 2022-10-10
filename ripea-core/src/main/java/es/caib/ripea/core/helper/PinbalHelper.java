@@ -153,7 +153,8 @@ public class PinbalHelper {
 					accioParams,
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
-					errorDescripcio);
+					errorDescripcio,
+					null);
 			throw new PinbalException(ex);
 		}
 	}
@@ -267,7 +268,8 @@ public class PinbalHelper {
 					getAccioParams(solicitud, serveiScsp),
 					IntegracioAccioTipusEnumDto.ENVIAMENT,
 					System.currentTimeMillis() - t0,
-					errorDescripcio);
+					errorDescripcio,
+					null);
 			throw new PinbalException(errorDescripcio);
 		}
 	}

@@ -3,7 +3,55 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.*;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.WebUtils;
+
+import es.caib.ripea.core.api.dto.CodiValorDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientComentariDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -30,38 +78,6 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.util.WebUtils;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Controlador per al llistat d'expedients dels usuaris.
@@ -410,6 +426,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientDto expedient = null;
 		if (expedientId != null) {
@@ -428,7 +446,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		
 		List<MetaExpedientDto> metaExpedients = null;
-		MetaExpedientDto metaExpedient = null;
 		if (expedientId != null) {
 			metaExpedients = metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), RolHelper.getRolActual(request));
 		} else {
@@ -440,7 +457,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (metaExpedients != null && !metaExpedients.isEmpty()) {
 			grups = metaExpedientService.findGrupsAmbMetaExpedient(
 					entitatActual.getId(),
-					expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId());
+					expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId(), 
+					rolActual);
 			command.setGestioAmbGrupsActiva(expedientId != null ? expedient.getMetaExpedient().isGestioAmbGrupsActiva() : metaExpedients.get(0).isGestioAmbGrupsActiva());
 		}
 		model.addAttribute(
@@ -613,10 +631,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public List<GrupDto> grups(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return metaExpedientService.findGrupsAmbMetaExpedient(
 				entitatActual.getId(),
-				metaExpedientId);
+				metaExpedientId, 
+				rolActual);
 	}
 
 	@RequestMapping(value = "/metaExpedient/{metaExpedientId}/gestioAmbGrupsActiva", method = RequestMethod.GET)
@@ -1675,13 +1696,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				true,
 				false, null, null);
 		model.addAttribute("expedient", expedient);
-		if (expedient.isHasEsborranys()) {
-			List<DocumentDto> esborranys = documentService.findAmbExpedientIEstat(
-					entitatActual.getId(),
-					expedientId,
-					DocumentEstatEnumDto.REDACCIO);
-			model.addAttribute("esborranys", esborranys);
-		}
+		List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalida(
+				entitatActual.getId(),
+				expedientId);
+		model.addAttribute("esborranys", esborranys);
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientController.class);

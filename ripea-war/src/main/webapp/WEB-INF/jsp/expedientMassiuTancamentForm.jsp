@@ -34,7 +34,7 @@
 
 		<c:forEach items="${expedients}" varStatus="vs" var="expedient">
 			<form:hidden path="expedientsTancar[${vs.index}].id" value="${expedient.id}"/>
-			<c:if test="${expedient.hasEsborranys}">
+			<c:if test="${expedient.hasNoFirmatsOAmbFirmaInvalida}">
 				
 					<table class="table table-bordered">
 						<thead>

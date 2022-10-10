@@ -159,6 +159,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("existContingut",  documentService.countByMetaDocument(entitatActual.getId(), metaDocumentId) != 0);
 			return "metaDadaForm";
 		}
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);

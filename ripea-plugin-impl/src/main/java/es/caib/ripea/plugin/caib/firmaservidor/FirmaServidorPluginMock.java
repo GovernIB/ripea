@@ -33,7 +33,6 @@ public class FirmaServidorPluginMock extends RipeaAbstractPluginProperties imple
 			String nom,
 			String motiu,
 			byte[] contingut,
-			TipusFirma tipusFirma,
 			String idioma) throws SistemaExternException {
 		if (motiu != null && "e".equals(motiu)) {
 			// Cas per provocar una excepció

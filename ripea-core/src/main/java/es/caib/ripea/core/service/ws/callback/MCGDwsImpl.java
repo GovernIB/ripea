@@ -77,7 +77,8 @@ public class MCGDwsImpl implements MCGDws {
 					accioParams,
 					IntegracioAccioTipusEnumDto.RECEPCIO,
 					0,
-					errorDescripcio);
+					errorDescripcio,
+					null);
 			callbackResponse.setReturn(-1);
 		}
 		if (estatEnum != null) {

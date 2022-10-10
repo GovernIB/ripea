@@ -661,5 +661,3 @@ databaseChangeLog:
             name: lastmodifiedby_codi
         indexName: ipa_metaexp_seq_lastmodby_fk_i
         tableName: ipa_metaexp_seq
-- changeSet:
-    id: init-index-87

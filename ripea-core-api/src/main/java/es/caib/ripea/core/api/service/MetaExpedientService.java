@@ -438,7 +438,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<GrupDto> findGrupsAmbMetaExpedient(
 			Long entitatId,
-			Long metaExpedientId);
+			Long metaExpedientId, 
+			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientDto> findActiusAmbOrganGestorPermisLectura(
@@ -580,5 +581,5 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	void actualitzaProcediments(EntitatDto entitat, Locale locale);
 
-	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
+//	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 }

@@ -680,7 +680,17 @@ public class CacheHelper {
 	@Cacheable(value = "mostrarLogsIntegracio")
 	public boolean mostrarLogsIntegracio() {
 		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.integracio");
-		if (prop == null || prop.equals("true")) {
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@Cacheable(value = "mostrarLogsSegonPla")
+	public boolean mostrarLogsSegonPla() {
+		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.segonpla");
+		if (prop != null && prop.equals("true")) {
 			return true;
 		} else {
 			return false;

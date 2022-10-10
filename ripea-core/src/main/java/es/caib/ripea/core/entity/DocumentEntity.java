@@ -104,12 +104,12 @@ public class DocumentEntity extends NodeEntity {
 	private String pinbalIdpeticion;
 
 	@Column(name = "val_ok")
-	private boolean validacioCorrecte;
+	private boolean validacioFirmaCorrecte;
 	@Column(name = "val_error")
-	private String validacioError;
+	private String validacioFirmaErrorMsg;
 	@Enumerated(EnumType.STRING)
 	@Column(name = "annex_estat")
-	private ArxiuEstatEnumDto annexEstat;
+	private ArxiuEstatEnumDto annexArxiuEstat;
 	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
@@ -247,8 +247,8 @@ public class DocumentEntity extends NodeEntity {
 	public void updateEstat(
 			DocumentEstatEnumDto estat) {
 		this.estat = estat;
-		if (!validacioCorrecte && !DocumentEstatEnumDto.REDACCIO.equals(estat)) {
-			this.validacioCorrecte = true;
+		if (!validacioFirmaCorrecte && !DocumentEstatEnumDto.REDACCIO.equals(estat)) {
+			this.validacioFirmaCorrecte = true;
 		}
 	}
 	public void updateInformacioCustodia(
@@ -381,7 +381,7 @@ public class DocumentEntity extends NodeEntity {
 			built.expedient = expedient;
 			built.tipus = ContingutTipusEnumDto.DOCUMENT;
 			built.versioCount = 0;
-			built.validacioCorrecte = true;
+			built.validacioFirmaCorrecte = true;
 		}
 		public Builder ubicacio(String ubicacio) {
 			built.ubicacio = ubicacio;
@@ -404,16 +404,16 @@ public class DocumentEntity extends NodeEntity {
 			built.pinbalIdpeticion = pinbalIdpeticion;
 			return this;
 		}
-		public Builder validacioCorrecte(Boolean validacioCorrecte) {
-			built.validacioCorrecte = validacioCorrecte != null ? validacioCorrecte : true;
+		public Builder validacioFirmaCorrecte(Boolean validacioFirmaCorrecte) {
+			built.validacioFirmaCorrecte = validacioFirmaCorrecte != null ? validacioFirmaCorrecte : true;
 			return this;
 		}
-		public Builder validacioError(String validacioError) {
-			built.validacioError = validacioError;
+		public Builder validacioFirmaErrorMsg(String validacioFirmaErrorMsg) {
+			built.validacioFirmaErrorMsg = validacioFirmaErrorMsg;
 			return this;
 		}
-		public Builder annexEstat(ArxiuEstatEnumDto annexEstat) {
-			built.annexEstat = annexEstat;
+		public Builder annexArxiuEstat(ArxiuEstatEnumDto annexArxiuEstat) {
+			built.annexArxiuEstat = annexArxiuEstat;
 			return this;
 		}
 		public DocumentEntity build() {

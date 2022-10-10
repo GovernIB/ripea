@@ -45,13 +45,13 @@ public class MetaExpedientHelper {
 
 	}
 
-	public static void setOrgansNoSincronitzats(HttpServletRequest request, MetaExpedientService metaExpedientService) {
-		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
-		if (entitatActual != null && metaExpedientService != null)
-			request.getSession().setAttribute(
-					MetaExpedientHelper.SESSION_ATTRIBUTE_ORGANS_NO_SYNC,
-					metaExpedientService.getMetaExpedientsAmbOrganNoSincronitzat(entitatActual.getId()));
-	}
+//	public static void setOrgansNoSincronitzats(HttpServletRequest request, MetaExpedientService metaExpedientService) {
+//		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
+//		if (entitatActual != null && metaExpedientService != null)
+//			request.getSession().setAttribute(
+//					MetaExpedientHelper.SESSION_ATTRIBUTE_ORGANS_NO_SYNC,
+//					metaExpedientService.getMetaExpedientsAmbOrganNoSincronitzat(entitatActual.getId()));
+//	}
 
 	public static Integer getOrgansNoSincronitzats(HttpServletRequest request) {
 		Integer organsNoSincronitzats = (Integer) request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGANS_NO_SYNC);

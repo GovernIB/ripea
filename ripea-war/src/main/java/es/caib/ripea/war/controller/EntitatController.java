@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.EntitatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
 
 /**
  * Controlador per al manteniment d'entitats.
@@ -172,10 +173,24 @@ public class EntitatController extends BaseUserController {
 	}
 
 	@RequestMapping(value = "/{entitatId}/delete", method = RequestMethod.GET)
-	public String delete(HttpServletRequest request, @PathVariable Long entitatId) {
+	public String delete(
+			HttpServletRequest request,
+			@PathVariable Long entitatId) {
 
-		entitatService.delete(entitatId);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "entitat.controller.esborrada.ok");
+		try {
+			entitatService.delete(entitatId);
+			return getAjaxControllerReturnValueSuccess(request,
+					"redirect:../../entitat",
+					"entitat.controller.esborrada.ok");
+			
+		} catch (Exception e) {
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../esborrat",
+					"entitat.controller.esborrada.error",
+					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() },
+					e);
+		}
 	}
 
 }

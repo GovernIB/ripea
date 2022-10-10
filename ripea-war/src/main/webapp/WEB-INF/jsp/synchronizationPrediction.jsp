@@ -91,6 +91,13 @@
 			itervalProgres =  setInterval(function(){ getProgres(); }, 500);
 		}
 
+
+
+
+
+
+
+		
 		function getProgres() {
 			console.log("getProgres");
 			$('.close', parent.document).prop('disabled', true);
@@ -146,13 +153,13 @@
 			for (index = writtenBlocs; index < info.length; index++) {
 				// $("#bcursor").before("<p class='info-" + info[index].tipus + "'>" + info[index].text + "</p>");
 				let blocContent = '';
-				if (info[index].isOrgan) {
+				if (info[index].organ) {
 					if (info[index].isNew) {
 						blocContent += '<h5>' + lnouorgan + ':</h5>';
 						blocContent = '<ul>';
 						// blocContent += '<li><strong>' + lcodi + ':</strong>' + info[index].codiOrgan +'</li>';
-						blocContent += '<li><strong>' + lnom + ':</strong>' + info[index].nomAntic +'</li>';
-						blocContent += '<li><strong>' + lestat + ':</strong>' + lestats[info[index].estatAntic] +'</li>';
+						blocContent += '<li><strong>' + lnom + ':</strong>' + info[index].nomNou +'</li>';
+						blocContent += '<li><strong>' + lestat + ':</strong>' + lestats[info[index].estatNou] +'</li>';
 						blocContent += '</ul>';
 					} else {
 						blocContent = '<ul>';

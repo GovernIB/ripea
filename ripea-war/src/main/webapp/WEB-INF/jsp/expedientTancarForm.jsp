@@ -34,7 +34,7 @@
 	</div>
 	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientTancarCommand">
 		<form:hidden path="id"/>
-		<c:if test="${expedient.hasEsborranys}">
+		<c:if test="${!empty esborranys}">
 			<div class="alert well-sm alert-info">
 				<span class="fa fa-info-circle"></span>
 				<spring:message code="contingut.expedient.tancar.esborranys.info"/>
@@ -56,7 +56,7 @@
 						<td>${esborrany.metaNode.nom}</td>
 						<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${esborrany.createdBy.nom}</td>
-						<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" disabled="${esborrany.fitxerExtension == 'zip'}"/></td>
+						<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" disabled="${esborrany.fitxerExtension != 'pdf'}"/></td>
 					</tr>
 				</c:forEach>
 			</tbody>

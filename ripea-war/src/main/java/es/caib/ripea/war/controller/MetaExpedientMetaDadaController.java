@@ -207,6 +207,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("existContingut",  expedientService.countByMetaExpedient(entitatActual.getId(), metaExpedientId) != 0);
 			return "metaDadaForm";
 		}
 
