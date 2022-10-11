@@ -36,6 +36,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"    RegistreAnnexEntity a left join a.registre.expedientPeticions ep " +
 			"where " +
 			"    a.registre.entitat = :entitat " +
+			"and ep.expedient.metaExpedient in :metaExpedientsPermesos " +
 			"and ep.expedient is not null " +
 			"and ep.expedient.esborrat = 0 " +
 			"and (a.document is null) " +
@@ -46,6 +47,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) ")
 	public Page<RegistreAnnexEntity> findPendentsProcesar(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullNumero") boolean esNullNumero,
@@ -67,6 +69,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"    RegistreAnnexEntity a left join a.registre.expedientPeticions ep " +
 			"where " +
 			"    a.registre.entitat = :entitat " +
+			"and ep.expedient.metaExpedient in :metaExpedientsPermesos " +
 			"and ep.expedient is not null " +
 			"and ep.expedient.esborrat = 0 " +
 			"and (a.document is null) " +
@@ -77,6 +80,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) ")
 	public List<Long> findIdsPendentsProcesar(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullNumero") boolean esNullNumero,

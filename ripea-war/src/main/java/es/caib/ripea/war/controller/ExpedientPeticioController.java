@@ -99,8 +99,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute(getFiltreCommand(request));
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(entitatActual.getId(), null, rolActual, false, null);
-		model.addAttribute("metaExpedients", metaExpedientsPermisLectura);
+		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
+		List<MetaExpedientDto> metaExpedientsPermesos = expedientPeticioService.findMetaExpedientsPermesosPerAnotacions(
+				entitatActual.getId(),
+				organActualId,
+				rolActual);
+		model.addAttribute("metaExpedients", metaExpedientsPermesos);
 		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN"));
 		return "expedientPeticioList";
 	}

@@ -73,6 +73,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -101,7 +102,8 @@ public class CacheHelper {
 	private MetaDadaRepository metaDadaRepository;
 	@Resource
 	private MetaDocumentRepository metaDocumentRepository;
-
+	@Resource
+	private MetaExpedientRepository metaExpedientRepository;
 	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
@@ -134,6 +136,8 @@ public class CacheHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
+	@Resource
+	private ExpedientPeticioHelper expedientPeticioHelper;
 
 
 	@Autowired
@@ -647,28 +651,10 @@ public class CacheHelper {
 	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {
 		logger.debug("Consulta anotacions pendents de processar");
 		
-		if (rolActual.equals("IPA_ADMIN")) {
-			return expedientPeticioRepository.countAnotacionsPendentsAdminEntitat(entitat);
-		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			
-			OrganGestorEntity organGestor = organGestorRepository.findOne(organActualId);
-			List<OrganGestorEntity> organsPermesAdminOrgan = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
-			List<MetaExpedientEntity> procedimentsPermesAdminOrgan = new ArrayList<>();
-			procedimentsPermesAdminOrgan.addAll(organGestor.getMetaExpedients());
-			
-			for (OrganGestorEntity organGestorEntity : organsPermesAdminOrgan) {
-				procedimentsPermesAdminOrgan.addAll(organGestorEntity.getMetaExpedients());
-			}
-			
-			if (procedimentsPermesAdminOrgan.isEmpty()) {
-				procedimentsPermesAdminOrgan = null;
-			}
-			
-			return expedientPeticioRepository.countAnotacionsPendentsAdminOrgan(entitat, procedimentsPermesAdminOrgan);
-		} else {
-			List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitat.getId()); 
-			return expedientPeticioRepository.countAnotacionsPendentsUser(entitat,createWritePermIds);
-		}
+		List<MetaExpedientEntity> metaExpedientsPermesos = expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(entitat, organActualId, rolActual);
+
+		return expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(entitat, metaExpedientsPermesos);
+		
 	}
 	
 	

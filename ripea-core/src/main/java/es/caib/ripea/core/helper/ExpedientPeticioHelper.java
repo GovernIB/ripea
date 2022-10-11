@@ -61,6 +61,8 @@ public class ExpedientPeticioHelper {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 	
 	/*
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
@@ -291,6 +293,19 @@ public class ExpedientPeticioHelper {
 	}
 	
 	
+	
+	public List<MetaExpedientEntity> findMetaExpedientsPermesosPerAnotacions(EntitatEntity entitat, Long organActualId, String rolActual) {
+		List<MetaExpedientEntity> metaExpedientsPermesos = null;
+		if (rolActual.equals("IPA_ADMIN")) {
+			metaExpedientsPermesos = metaExpedientRepository.findByEntitat(entitat);
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientsPermesos = metaExpedientHelper.findByOrganAmbFills(entitat, organActualId);
+		} else if (rolActual.equals("tothom")) {
+			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId()); 
+		}
+		
+		return metaExpedientsPermesos;
+	}
 
 	private RegistreInteressatEntity crearInteressatEntity(
 			Interessat interessat,

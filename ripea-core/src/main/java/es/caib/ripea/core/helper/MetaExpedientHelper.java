@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -595,6 +596,26 @@ public class MetaExpedientHelper {
 	}
 	
 	
+
+	public List<MetaExpedientEntity> findByOrganAmbFills(EntitatEntity entitat, Long organId) {
+		List<MetaExpedientEntity> procedimentsOrgan = null;
+		if (organId != null) {
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
+			List<OrganGestorEntity> organGestorAmbFills = organGestorRepository.findFills(entitat, Arrays.asList(organId));
+			
+			procedimentsOrgan = new ArrayList<>();
+			procedimentsOrgan.addAll(organGestor.getMetaExpedients());
+			
+			for (OrganGestorEntity organGestorEntity : organGestorAmbFills) {
+				procedimentsOrgan.addAll(organGestorEntity.getMetaExpedients());
+			}
+			
+			if (procedimentsOrgan.isEmpty()) {
+				procedimentsOrgan = null;
+			}
+		}
+		return procedimentsOrgan;
+	}
 	
 	public List<Long> getIdsCreateWritePermesos(Long entitatId) {
 		
@@ -621,6 +642,41 @@ public class MetaExpedientHelper {
 					false));
 
 		List<Long> createWritePermIds = new ArrayList<>(); 
+		createWritePermIds.addAll(createPermIds);
+		createWritePermIds.addAll(writePermIds);
+		createWritePermIds = new ArrayList<>(new HashSet<>(createWritePermIds));
+		if (createWritePermIds.isEmpty()) {
+			createWritePermIds = null;
+		}
+		
+		return createWritePermIds;
+		
+	}
+	
+	
+	public List<MetaExpedientEntity> getCreateWritePermesos(Long entitatId) {
+
+		List<MetaExpedientEntity> createPermIds = findAmbPermis(
+				entitatId,
+				ExtendedPermission.CREATE,
+				true,
+				null,
+				false,
+				false,
+				null,
+				false);
+
+		List<MetaExpedientEntity> writePermIds = findAmbPermis(
+				entitatId,
+				ExtendedPermission.WRITE,
+				true,
+				null,
+				false,
+				false,
+				null,
+				false);
+
+		List<MetaExpedientEntity> createWritePermIds = new ArrayList<>(); 
 		createWritePermIds.addAll(createPermIds);
 		createWritePermIds.addAll(writePermIds);
 		createWritePermIds = new ArrayList<>(new HashSet<>(createWritePermIds));

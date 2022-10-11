@@ -2,6 +2,7 @@ package es.caib.ripea.core.api.service;
 
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
@@ -77,7 +78,9 @@ public interface ExpedientPeticioService {
 			Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			ResultEnumDto resultEnum) throws NotFoundException;
+			ResultEnumDto resultEnum, 
+			String rolActual, 
+			Long organActualId) throws NotFoundException;
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
@@ -86,4 +89,10 @@ public interface ExpedientPeticioService {
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaExpedientDto> findMetaExpedientsPermesosPerAnotacions(
+			Long entitatId,
+			Long organActualId,
+			String rolActual);
  }
