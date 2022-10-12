@@ -801,7 +801,7 @@ public class MetaExpedientHelper {
 					
 					logger.info(" Procediment WS: " + procedimentGga);
 				} catch (SistemaExternException se) {
-					logger.error("Error Procediment WS: " + metaExpedient, se);
+					logger.error("Error Procediment WS id="+ metaExpedient.getId(), se);
 					infoBuilder.hasError(true);
 					infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
 					progres.addInfo(infoBuilder.build(), true);
@@ -828,20 +828,15 @@ public class MetaExpedientHelper {
 					continue;
 				}
 
-				String nom = metaExpedient.getNom();
-				String descripcio = metaExpedient.getDescripcio();
-				OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
-				boolean organNoSincronitzat = false;
 
-				if (!procedimentGga.getNom().equals(metaExpedient.getNom())) {
-					nom = procedimentGga.getNom();
-				}
-				if (!procedimentGga.getResum().equals(metaExpedient.getDescripcio())) {
-					descripcio = procedimentGga.getResum();
-				}
-				if (procedimentGga.isComu() != metaExpedient.isComu() && procedimentGga.isComu()) {
+				String nom = procedimentGga.getNom();
+				String descripcio = procedimentGga.getResum();
+				OrganGestorEntity organGestor;
+				boolean organNoSincronitzat = false;
+				
+				if (procedimentGga.isComu()) {
 					organGestor = null;
-				} else if (!procedimentGga.getUnitatOrganitzativaCodi().equals(metaExpedient.getOrganGestor().getCodi())) {
+				} else {
 					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
 					if (organGestor == null) {
 						organNoSincronitzat = true;
@@ -872,13 +867,14 @@ public class MetaExpedientHelper {
 			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
 
 		} catch (Exception e) {
+			logger.error("Error al syncronitzar procediemnts", e);
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			progresActualitzacio.get(entitatDto.getCodi()).setError(true);
-			progresActualitzacio.get(entitatDto.getCodi()).setErrorMsg(sw.toString());
-			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
-			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+			progresActualitzacioDto.setError(true);
+			progresActualitzacioDto.setErrorMsg(sw.toString());
+			progresActualitzacioDto.setProgres(100);
+			progresActualitzacioDto.setFinished(true);
 			throw e;
 		}
 	}

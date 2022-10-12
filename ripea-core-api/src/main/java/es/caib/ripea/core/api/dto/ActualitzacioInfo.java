@@ -1,5 +1,7 @@
 package es.caib.ripea.core.api.dto;
 
+import java.util.Objects;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,14 +51,14 @@ public class ActualitzacioInfo {
 
     public void setNomNou(String nomNou) {
         this.nomNou = nomNou;
-        this.nomModificat = !this.nomAntic.equals(nomNou);
+        this.nomModificat = !Objects.equals(this.nomAntic, nomNou);
         if (this.nomModificat)
             this.hasCanvis = true;
     }
 
     public void setDescripcioNova(String descripcioNova) {
         this.descripcioNova = descripcioNova;
-        this.descripcioModificada = !this.descripcioAntiga.equals(descripcioNova);
+        this.descripcioModificada = !Objects.equals(this.descripcioAntiga, descripcioNova);
         if (this.descripcioModificada)
             this.hasCanvis = true;
     }
@@ -70,7 +72,7 @@ public class ActualitzacioInfo {
 
     public void setOrganNou(String organNou) {
         this.organNou = organNou;
-        this.organModificat = !this.organAntic.equals(organNou);
+        this.organModificat = !Objects.equals(this.organAntic, organNou);
         if (this.organModificat)
             this.hasCanvis = true;
     }

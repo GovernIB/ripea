@@ -144,3 +144,6 @@ databaseChangeLog:
         - sql:
             dbms: oracle
             sql: grant select, update, insert, delete on ipa_og_sinc_rel to www_ripea;
+        - sql:
+            sql: update ipa_metaexp_seq set valor = 0 where valor is null;
+                 alter table ipa_metaexp_seq modify ( valor not null);        

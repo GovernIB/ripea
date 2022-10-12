@@ -303,7 +303,9 @@ public class ExpedientPeticioHelper {
 		} else if (rolActual.equals("tothom")) {
 			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId()); 
 		}
-		
+		if (metaExpedientsPermesos != null && metaExpedientsPermesos.isEmpty()) {
+			metaExpedientsPermesos = null;
+		}
 		return metaExpedientsPermesos;
 	}
 

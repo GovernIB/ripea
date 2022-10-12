@@ -455,7 +455,7 @@ public class OrganGestorHelper {
 			OrganGestorEntity organPare = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodiUnitatSuperior());
 			// if not it creates a new one
 			if (unitat == null) {
-				logger.info("Unitat WS:" + unitatWS + "\n Unitat DB no existe");
+				logger.info("Unitat WS:" + unitatWS + "\n\t Unitat DB no existe");
 				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ.crear", unitatWS.getCodi())).isIsNew(true).codiOrgan(unitatWS.getCodi()).nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
 				// Venen les unitats ordenades, primer el pare i després els fills?
 				unitat = OrganGestorEntity.getBuilder(unitatWS.getCodi())
@@ -476,7 +476,7 @@ public class OrganGestorHelper {
 					}
 				}
 			} else {
-				logger.info("Unitat WS:" + unitatWS + "\n Unitat DB: " + unitat);
+				logger.info("Unitat WS:" + unitatWS + "\n\t Unitat DB: " + unitat);
 				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi())).isIsNew(false).codiOrgan(unitatWS.getCodi())
 						.nomAntic(unitat.getNom()).estatAntic(unitat.getEstat())
 						.nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
