@@ -463,6 +463,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								false, 
 								null, 
 								null, 
+								null,
 								null);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(

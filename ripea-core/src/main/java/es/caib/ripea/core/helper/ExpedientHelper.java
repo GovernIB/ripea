@@ -643,13 +643,15 @@ public class ExpedientHelper {
 	 * 
 	 * @param arxiuUuid
 	 * @param expedientPeticioId
+	 * @param justificantIdMetaDoc 
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public DocumentEntity crearDocFromUuid(
 			Long expedientId, 
 			String arxiuUuid, 
-			Long expedientPeticioId) {
+			Long expedientPeticioId,
+			Long justificantIdMetaDoc) {
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
@@ -698,7 +700,8 @@ public class ExpedientHelper {
 				null,
 				DocumentEntity.class);
 //		Recuperar tipus document per defecte
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
+//		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientEntity.getMetaExpedient());
+		MetaDocumentEntity metaDocument = justificantIdMetaDoc != null ? metaDocumentRepository.findOne(justificantIdMetaDoc) : null;
 		
 		DocumentEntity docEntity = documentHelper.crearDocumentDB(
 				documentDto.getDocumentTipus(),

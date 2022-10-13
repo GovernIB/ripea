@@ -494,6 +494,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					false,
 					command.getGrupId(), 
 					RolHelper.getRolActual(request), 
+					null,
 					null);
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());

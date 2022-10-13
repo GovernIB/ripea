@@ -59,6 +59,7 @@ import es.caib.ripea.war.command.ExpedientPeticioAcceptarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
 import es.caib.ripea.war.command.RegistreAnnexCommand;
+import es.caib.ripea.war.command.RegistreJustificantCommand;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -234,7 +235,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		model.addAttribute("isErrorDocuments", isErrorDocuments);
 		model.addAttribute("peticio", expedientPeticioDto);
-		model.addAttribute("isIncorporacioJustificantActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.incorporar.justificant")));
+		model.addAttribute("isIncorporacioJustificantActiva", isIncorporacioJustificantActiva());
 		return "expedientPetcioDetall";
 	}
 
@@ -325,8 +326,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		} else {
 			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), command.getExpedientId(), null, false);
 		}
+		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
 		model.addAttribute("metaDocuments", metaDocumentsQueQuedenPerCreacio);
-		command.setAnnexos(ConversioTipusHelper.convertirList(expedientPeticioService.findOne(expedientPeticioId).getRegistre().getAnnexos(), RegistreAnnexCommand.class));
+		command.setAnnexos(ConversioTipusHelper.convertirList(registre.getAnnexos(), RegistreAnnexCommand.class));
+		if (isIncorporacioJustificantActiva()) {
+			command.setJustificant(ConversioTipusHelper.convertir(registre.getJustificant(), RegistreJustificantCommand.class));
+		}
 		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), command.getMetaExpedientId());
 		if (metaDocPerDefecte == null) {
 			return "expedientPeticioAcceptMetaDocs";
@@ -372,6 +377,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				bindingResult.rejectValue("annexos[" + i + "].metaDocumentId", "NotNull");
 			}
 		}
+		
+		RegistreJustificantCommand justificant = command.getJustificant();
+		if (isIncorporacioJustificantActiva() && justificant.getMetaDocumentId() == null) {
+			bindingResult.rejectValue("justificant.metaDocumentId", "NotNull");
+		}
+		
 		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = new ArrayList<>();
 		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), null, command.getMetaExpedientId(), false);
@@ -386,6 +397,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		for (RegistreAnnexCommand registreAnnex : command.getAnnexos()) {
 			anexosIdsMetaDocsIdsMap.put(registreAnnex.getId(), registreAnnex.getMetaDocumentId());
 		}
+		Long justificantIdMetaDoc = justificant.getMetaDocumentId();
 		boolean processatOk = true;
 		boolean expCreatArxiuOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
@@ -406,7 +418,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						command.isAssociarInteressats(),
 						null, 
 						RolHelper.getRolActual(request), 
-						anexosIdsMetaDocsIdsMap);
+						anexosIdsMetaDocsIdsMap,
+						justificantIdMetaDoc);
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				
@@ -420,6 +433,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							command.isAssociarInteressats(), 
 							RolHelper.getRolActual(request), 
 							anexosIdsMetaDocsIdsMap, 
+							justificantIdMetaDoc,
 							command.isAgafarExpedient());
 					
 				logger.info("Expedient incorporat per anotacio: " + processatOk);
@@ -700,6 +714,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientPeticioAcceptarCommand", command);
 	}
 
+	private boolean isIncorporacioJustificantActiva() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.incorporar.justificant"));
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioController.class);
 
 }

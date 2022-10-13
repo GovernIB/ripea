@@ -213,7 +213,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			boolean associarInteressats,
 			Long grupId, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc) {
 
 		logger.info(
 				"Creant nou expedient Service(" +
@@ -291,7 +292,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						expedientHelper.crearDocFromUuid(
 								expedient.getId(),
 								arxiuUuid,
-								expedientPeticioEntity.getId());
+								expedientPeticioEntity.getId(),
+								justificantIdMetaDoc);
 					} catch (Exception e) {
 						processatOk = false;
 						logger.error("Error crear doc from uuid", e);
@@ -337,6 +339,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			boolean associarInteressats,
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc,
 			boolean agafarExpedient) {
 		logger.info("Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
@@ -373,7 +376,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.crearDocFromUuid(
 						expedientId,
 						arxiuUuid, 
-						expedientPeticioId);
+						expedientPeticioId,
+						justificantIdMetaDoc);
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
