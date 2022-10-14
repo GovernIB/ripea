@@ -295,11 +295,21 @@ public class DocumentEntity extends NodeEntity {
 	}
 
 	public boolean isErrorEnviamentPortafirmes() {
-		if (enviaments != null && !enviaments.isEmpty() && enviaments.iterator() instanceof DocumentPortafirmesEntity) {
-			DocumentPortafirmesEntity lastEnviament = (DocumentPortafirmesEntity) enviaments.iterator().next();
-			return lastEnviament.isError();
+		DocumentPortafirmesEntity docPortLast = null;
+		if (enviaments != null) {
+			while (enviaments.iterator().hasNext()) {
+				DocumentEnviamentEntity docEnv = enviaments.iterator().next();
+				if (docEnv instanceof DocumentPortafirmesEntity) {
+					docPortLast = (DocumentPortafirmesEntity) docEnv;
+					break;
+				}
+			}
 		}
-		return false;
+		if (docPortLast != null && docPortLast.isError()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public boolean isDocFromAnnex() {

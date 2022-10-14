@@ -901,6 +901,16 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"Un contingut definitiu no es pot esborrar, verificau la propitat es.caib.ripea.document.esborrar.finals");
 		}
+		
+		// Cancel·lar enviament si el document conté enviaments pendents
+		if (contingut instanceof DocumentEntity) {
+			DocumentEntity document = (DocumentEntity)contingut;
+			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+				firmaPortafirmesHelper.portafirmesCancelar(
+						entitatId,
+						document, rolActual);
+			}
+		}
 
 		// Valida si conté documents definitius
 		if (!conteDocumentsDefinitius(contingut)) {
@@ -918,17 +928,8 @@ public class ContingutHelper {
 				// Elimina contingut a l'arxiu
 				arxiuPropagarEliminacio(contingut);
 			}
+		}
 
-		}
-		// Cancel·lar enviament si el document conté enviaments pendents
-		if (contingut instanceof DocumentEntity) {
-			DocumentEntity document = (DocumentEntity)contingut;
-			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
-				firmaPortafirmesHelper.portafirmesCancelar(
-						entitatId,
-						document, rolActual);
-			}
-		}
 		return dto;
 	}
 
