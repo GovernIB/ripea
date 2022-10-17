@@ -108,22 +108,25 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			Model model) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		
-		 List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = metaDocumentService.findById(entitatActual.getId(), metaDocumentId).getPinbalServeiDocsPermesos();
-		
-		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
+
+		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = metaDocumentService.findById(
 				entitatActual.getId(),
+				metaDocumentId).
+				getPinbalServeiDocsPermesos();
+
+		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(entitatActual.getId(),
 				pareId,
 				false);
-		Iterator<InteressatDto> itin = interessats.iterator();
-		while (itin.hasNext()) {
-			InteressatDto interessat = itin.next();
-			if (!isInteressatDocumentOk(interessat, pinbalServeiDocsPermesos)) {
-				itin.remove();
-			} 
-		};
-		
+
+		if (pinbalServeiDocsPermesos != null && !pinbalServeiDocsPermesos.isEmpty()) {
+			Iterator<InteressatDto> itin = interessats.iterator();
+			while (itin.hasNext()) {
+				InteressatDto interessat = itin.next();
+				if (!isInteressatDocumentOk(interessat, pinbalServeiDocsPermesos)) {
+					itin.remove();
+				} 
+			};
+		}
 		return interessats;
 	}
 	
@@ -154,7 +157,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 				return false;
 
 		} else if (interessat.getTipus()==InteressatTipusEnumDto.PERSONA_JURIDICA) {
-			if (pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF)) {
+			if (pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.NIF) || pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF)) {
 				return true;
 			} else {
 				return false;
