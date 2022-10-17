@@ -683,6 +683,16 @@ public class CacheHelper {
 		}
 	}
 	
+	@Cacheable(value = "mostrarLogsRendiment")
+	public boolean mostrarLogsRendiment() {
+		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.rendiment");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,

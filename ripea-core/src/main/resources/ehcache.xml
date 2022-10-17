@@ -35,5 +35,6 @@
 	<cache name="findOrganismesEntitatAmbPermis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="mostrarLogsIntegracio" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="mostrarLogsSegonPla" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
+	<cache name="mostrarLogsRendiment" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	
 </ehcache>
