@@ -225,7 +225,10 @@ public class ContingutHelper {
 			dto.setConteDocuments(documentRepository.findByExpedientAndEsborrat(expedient, 0).size() > 0);
 			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
 
-			dto.setConteDocumentsEnProcessDeFirma(documentRepository.findEnProccessDeFirma(expedient).size() > 0);			
+			dto.setConteDocumentsEnProcessDeFirma(documentRepository.findEnProccessDeFirma(expedient).size() > 0);	
+			
+			dto.setConteDocumentsPendentsReintentsArxiu(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments()).size() > 0);
+		
 
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());
@@ -1775,6 +1778,11 @@ public class ContingutHelper {
 
 	}
 
+	
+	private int getArxiuMaxReintentsDocuments() {
+		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
+		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
+	}
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 
 }

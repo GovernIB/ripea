@@ -934,72 +934,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.alliberar(expedient);
 	}
 
-	@Transactional
 	@Override
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
-		logger.debug(
-				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false,
-				false, 
-				checkPerMassiuAdmin, null);
-		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
-			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
-		}
-		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
-		}
-		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
-		if (!documentRepository.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
-			throw new ExpedientTancarSenseDocumentsDefinitiusException();
-		}
-		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
-		expedient.updateExpedientEstat(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-		if (pluginHelper.isArxiuPluginActiu()) {
-			List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+			expedientHelper.tancar(
 					entitatId,
-					id);
-			// Firmam els documents seleccionats
-			if (hiHaEsborranysPerFirmar) {
-				for (Long documentPerFirmar : documentsPerFirmar) {
-					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
-					if (document != null) {
-						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null) {
-							//remove invalid signature
-							fitxer.setContingut(documentFirmaServidorFirma.removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
-						}
-						documentFirmaServidorFirma.firmar(document, fitxer, motiu);
-						//pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
-					} else {
-						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
-					}
-				}
-			}
-			// Eliminam de l'expedient els esborranys que no s'han firmat
-			for (DocumentEntity esborrany : esborranys) {
-				boolean trobat = false;
-				if (documentsPerFirmar != null) {
-					for (Long documentPerFirmarId : documentsPerFirmar) {
-						if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
-							trobat = true;
-							break;
-						}
-					}
-				}
-				if (!trobat) {
-					documentRepository.delete(esborrany);
-				}
-			}
-			pluginHelper.arxiuExpedientTancar(expedient);
+					id,
+					motiu,
+					documentsPerFirmar,
+					checkPerMassiuAdmin);
 		}
 	}
+	
 
 	@Transactional
 	@Override
