@@ -821,8 +821,12 @@ public class MetaExpedientHelper {
 				info.setNomNou(procedimentGga.getNom());
 				info.setDescripcioNova(procedimentGga.getResum());
 				info.setComuNou(procedimentGga.isComu());
-				info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
-
+				if (!procedimentGga.isComu()) {
+					info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
+				} else {
+					info.setOrganNou(null);
+				}
+				
 				if (!info.hasChange()) {
 					progres.addInfo(info, true);
 					continue;
