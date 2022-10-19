@@ -110,6 +110,17 @@
 	<script>
 		var requestLocale = '${requestLocale}';
 		var contextAddress = '${pageContext.request.contextPath}';
+
+		
+		$(document).ready(function() {
+			$('button[value="filtrar"]').click(function() {
+				$('table').dataTable().api().state.clear();
+			});
+			$('button[value="netejar"]').click(function() {
+				$('table').dataTable().api().state.clear();
+			});
+		});
+		
 	</script>
 	<decorator:head />
 <style>

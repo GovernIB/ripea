@@ -25,6 +25,7 @@ public class ExpedientPeticioListDto {
 	private RegistreDto registre;
 	private Long metaExpedientId;
 	private String metaExpedientNom;
+	private String procedimentCodi;
 	private ExpedientPeticioAccioEnumDto accio;
 	private String notificaDistError;
 	private Long expedientId;
@@ -32,6 +33,10 @@ public class ExpedientPeticioListDto {
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	private String interessatsResum;
 
+    public String getProcedimentCodiSiaINom() {
+    	return procedimentCodi + " - " + metaExpedientNom;
+    }
+	
 	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {
 		ExpedientPeticioEstatViewEnumDto estatView = null;

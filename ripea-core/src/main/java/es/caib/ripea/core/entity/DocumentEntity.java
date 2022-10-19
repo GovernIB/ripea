@@ -3,6 +3,31 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -12,13 +37,6 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Classe del model de dades que representa un document.
@@ -297,8 +315,9 @@ public class DocumentEntity extends NodeEntity {
 	public boolean isErrorEnviamentPortafirmes() {
 		DocumentPortafirmesEntity docPortLast = null;
 		if (enviaments != null) {
-			while (enviaments.iterator().hasNext()) {
-				DocumentEnviamentEntity docEnv = enviaments.iterator().next();
+			Iterator<DocumentEnviamentEntity> iter = enviaments.iterator();
+			while (iter.hasNext()) {
+				DocumentEnviamentEntity docEnv = iter.next();
 				if (docEnv instanceof DocumentPortafirmesEntity) {
 					docPortLast = (DocumentPortafirmesEntity) docEnv;
 					break;
