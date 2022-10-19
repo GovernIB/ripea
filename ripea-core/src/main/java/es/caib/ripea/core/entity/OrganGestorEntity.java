@@ -167,6 +167,11 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 		this.pare = pare;
 		this.gestioDirect = gestioDirect;
 	}
+	
+	public void updateEstat(
+			OrganEstatEnumDto estat) {
+		this.estat = estat;
+	}
 
     public void update(
             String nom,

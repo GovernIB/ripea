@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
+import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
@@ -377,9 +378,12 @@ public class OrganGestorHelper {
 		}
 		progres.setProgres(12);
 
+		List<String> unitatsWsCodis = new  ArrayList<String>();
+		
 		// Històrics
 		nombreUnitatsProcessades = 0;
 		for (UnitatOrganitzativa unitatWS : unitatsWs) {
+			unitatsWsCodis.add(unitatWS.getCodi());
 			OrganGestorEntity unitat = organGestorRepository.findByEntitatAndCodi(entitat, unitatWS.getCodi());
 			sincronizarHistoricsUnitat(unitat, unitatWS, entitat);
 			progres.setProgres(12 + (nombreUnitatsProcessades++ * 10 / nombreUnitatsTotal));
@@ -391,6 +395,7 @@ public class OrganGestorHelper {
 
 		// Definint tipus de transició
 		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+		
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
@@ -426,8 +431,18 @@ public class OrganGestorHelper {
 		progres.setProgres(27);
 
 		Date ara = new Date();
+		
 		// Si és la primera sincronització
 		if (entitat.getDataSincronitzacio() == null) {
+			
+			List<OrganGestorEntity> organs =  organGestorRepository.findByEntitat(entitat);
+			
+			for (OrganGestorEntity organ : organs) {
+				if (!unitatsWsCodis.contains(organ.getCodi())) {
+					logger.info("Primera sync. Organ WS no exisiteix en DB : " + organ.getCodi());
+					organ.updateEstat(OrganEstatEnumDto.E);
+				}
+			}
 			entitat.setDataSincronitzacio(ara);
 		}
 		entitat.setDataActualitzacio(ara);
