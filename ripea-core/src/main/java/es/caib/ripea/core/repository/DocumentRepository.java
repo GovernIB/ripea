@@ -122,6 +122,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"    d.expedient = :expedient " +
 			"and d.esborrat = 0 " +
+			"and d.arxiuUuid = null " +
 			"and d.arxiuReintents < :arxiuMaxReintentsDocuments")
 	List<DocumentEntity> findDocumentsPendentsReintentsArxiu(
 			@Param("expedient") ExpedientEntity expedient,
