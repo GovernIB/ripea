@@ -33,6 +33,7 @@ public class ExpedientPeticioAcceptarCommand {
 	private Long organGestorId;
     private List<RegistreAnnexCommand> annexos = new ArrayList<>();
 	
+    private RegistreJustificantCommand justificant;
 	
 
 	public ExpedientPeticioAccioEnumDto getAccio() {
@@ -94,6 +95,12 @@ public class ExpedientPeticioAcceptarCommand {
 	}
 	public void setAgafarExpedient(boolean agafarExpedient) {
 		this.agafarExpedient = agafarExpedient;
+	}
+	public RegistreJustificantCommand getJustificant() {
+		return justificant;
+	}
+	public void setJustificant(RegistreJustificantCommand justificant) {
+		this.justificant = justificant;
 	}
 	@Override
 	public String toString() {

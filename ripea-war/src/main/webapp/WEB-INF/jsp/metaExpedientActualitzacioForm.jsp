@@ -33,7 +33,7 @@
 					$('.loading').fadeIn();
 					$('#actualitzacioInfo').fadeIn();
 					$('.confirmacio').fadeOut();
-					$('#autobtn', parent.document).prop('disabled', true);
+					$('.autobtn', parent.document).prop('disabled', true);
 					$('#cancelbtn', parent.document).toggle(true);
 					$.post($(this).attr('action'));
 					isUpdating = true;
@@ -205,9 +205,8 @@
 				<span id="bcursor" class="blinking-cursor">|</span>
 			</div>
 			<div id="modal-botons" class="well">
-				<button id="autobtn"
-						type="submit"
-						class="btn btn-success"
+				<button type="submit"
+						class="btn btn-success autobtn"
 						data-noloading="true">
 					<span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.actualitzar"/>
 				</button>

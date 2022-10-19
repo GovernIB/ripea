@@ -3,23 +3,15 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.ResultEnumDto;
-import es.caib.ripea.core.api.service.ExpedientPeticioService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.MassiuAnnexProcesarFiltreCommand;
-import es.caib.ripea.war.command.RegistreAnnexCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +26,23 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.war.command.MassiuAnnexProcesarFiltreCommand;
+import es.caib.ripea.war.command.RegistreAnnexCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 
 @Controller
@@ -57,8 +59,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	private ExpedientService expedientService;
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
+
 	
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -73,14 +74,16 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 						getSessionAttributeSelecio(request)));
 		model.addAttribute(
 				filtreCommand);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByEntitat(
-				entitatActual.getId());
+		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
+		List<MetaExpedientDto> metaExpedientsPermesos = expedientPeticioService.findMetaExpedientsPermesosPerAnotacions(
+				entitatActual.getId(),
+				organActualId,
+				rolActual);
 		model.addAttribute(
 				"metaExpedients",
-				metaExpedients);
-		
+				metaExpedientsPermesos);
 		
 		return "massiuAnnexProcesarList";
 	}
@@ -121,6 +124,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MassiuAnnexProcesarFiltreCommand massiuAnnexProcesarCommand = getFiltreCommand(request);
 
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
 		
 		try {
 			return DatatablesHelper.getDatatableResponse(
@@ -129,7 +134,9 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 								entitatActual.getId(), 
 								MassiuAnnexProcesarFiltreCommand.asDto(massiuAnnexProcesarCommand), 
 								DatatablesHelper.getPaginacioDtoFromRequest(request),
-								ResultEnumDto.PAGE).getPagina(),
+								ResultEnumDto.PAGE, 
+								rolActual, 
+								organActualId).getPagina(),
 					 "id",
 					 getSessionAttributeSelecio(request));
 		} catch (Exception e) {
@@ -145,6 +152,10 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	public int select(
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		
+		
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
 		
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -169,7 +180,9 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 								entitatActual.getId(), 
 								MassiuAnnexProcesarFiltreCommand.asDto(filtreCommand), 
 								null,
-								ResultEnumDto.IDS).getIds());
+								ResultEnumDto.IDS, 
+								rolActual, 
+								organActualId).getIds());
 		}
 		return seleccio.size();
 	}

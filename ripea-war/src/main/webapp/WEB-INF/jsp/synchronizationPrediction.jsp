@@ -56,7 +56,7 @@
 				$('#actualitzacioInfo').css("max-height", alt + "px");
 				$('#actualitzacioInfo').fadeIn();
 				$('.prediccio').fadeOut();
-				$('#autobtn', parent.document).prop('disabled', true);
+				$('.autobtn', parent.document).prop('disabled', true);
 				$('#cancelbtn', parent.document).toggle(true);
 				$('#cancelbtn', parent.document).html(cancelar);
 				$.post($(this).attr('action'));
@@ -484,7 +484,7 @@
 	</c:set>
 	<form:form id="formSync" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 		<div id="modal-botons">
-			<button id="autobtn" type="submit" class="btn btn-success" data-noloading="true"
+			<button type="submit" class="btn btn-success autobtn" data-noloading="true"
 				<c:if test="${isAllEmpty and !isFirstSincronization}"><c:out value="disabled='disabled'"/></c:if>>
 				<span class="fa fa-save"></span>
 				<spring:message code="unitat.list.boto.synchronize" />

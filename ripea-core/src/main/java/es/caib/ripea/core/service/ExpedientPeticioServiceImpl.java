@@ -3,8 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -55,7 +53,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.helper.CacheHelper;
@@ -159,29 +156,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-		List<Long> createWritePermIds = metaExpedientHelper.getIdsCreateWritePermesos(entitatId); 
-		List<MetaExpedientEntity> procedimentsPermesAdminOrgan = null;
-		if (organActualId != null) {
-			
-			OrganGestorEntity organGestor = organGestorRepository.findOne(organActualId);
-			List<OrganGestorEntity> organsPermesAdminOrgan = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
-			procedimentsPermesAdminOrgan = new ArrayList<>();
-			procedimentsPermesAdminOrgan.addAll(organGestor.getMetaExpedients());
-			
-			for (OrganGestorEntity organGestorEntity : organsPermesAdminOrgan) {
-				procedimentsPermesAdminOrgan.addAll(organGestorEntity.getMetaExpedients());
-			}
-			
-			if (procedimentsPermesAdminOrgan.isEmpty()) {
-				procedimentsPermesAdminOrgan = null;
-			}
-		}
+
+		List<MetaExpedientEntity> metaExpedientsPermesos = expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(entitat, organActualId, rolActual);
 		
 		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
-				rolActual,
-				procedimentsPermesAdminOrgan,
-				createWritePermIds ,
+				metaExpedientsPermesos,
 				metaExpedient == null,
 				metaExpedient,
 				filtre.getProcediment() == null || filtre.getProcediment().isEmpty(),
@@ -585,7 +565,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			ResultEnumDto resultEnum) {
+			ResultEnumDto resultEnum, 
+			String rolActual, 
+			Long organActualId) {
 		
 		ResultDto<RegistreAnnexDto> result = new ResultDto<RegistreAnnexDto>();
 		
@@ -608,9 +590,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		
+		List<MetaExpedientEntity> metaExpedientsPermesos = expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(entitat, organActualId, rolActual);
+		
 		if (resultEnum == ResultEnumDto.PAGE) {
 			Page<RegistreAnnexEntity> pagina = registreAnnexRepository.findPendentsProcesar(
 					entitat,
+					metaExpedientsPermesos,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					filtre.getNumero() == null,
@@ -631,6 +616,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			
 			List<Long> documentsIds = registreAnnexRepository.findIdsPendentsProcesar(
 					entitat,
+					metaExpedientsPermesos,
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					filtre.getNumero() == null,
@@ -725,5 +711,27 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return expedientPeticioHelper.reintentarCanviEstatDistribucio(id);
 	}
 
+	@Transactional
+	@Override
+	public List<MetaExpedientDto> findMetaExpedientsPermesosPerAnotacions(
+			Long entitatId,
+			Long organActualId,
+			String rolActual) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true,
+				false);
+
+		return conversioTipusHelper.convertirList(
+				expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(
+						entitat,
+						organActualId,
+						rolActual),
+				MetaExpedientDto.class);
+	}
 
 }

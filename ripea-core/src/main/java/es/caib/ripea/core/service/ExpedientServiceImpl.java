@@ -213,7 +213,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			boolean associarInteressats,
 			Long grupId, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc) {
 
 		logger.info(
 				"Creant nou expedient Service(" +
@@ -291,7 +292,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						expedientHelper.crearDocFromUuid(
 								expedient.getId(),
 								arxiuUuid,
-								expedientPeticioEntity.getId());
+								expedientPeticioEntity.getId(),
+								justificantIdMetaDoc);
 					} catch (Exception e) {
 						processatOk = false;
 						logger.error("Error crear doc from uuid", e);
@@ -337,6 +339,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			boolean associarInteressats,
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc,
 			boolean agafarExpedient) {
 		logger.info("Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
@@ -373,7 +376,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientHelper.crearDocFromUuid(
 						expedientId,
 						arxiuUuid, 
-						expedientPeticioId);
+						expedientPeticioId,
+						justificantIdMetaDoc);
 			} catch (Exception e) {
 				logger.error(ExceptionUtils.getStackTrace(e));
 			}
@@ -930,72 +934,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 		expedientHelper.alliberar(expedient);
 	}
 
-	@Transactional
 	@Override
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
-		logger.debug(
-				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false,
-				false, 
-				checkPerMassiuAdmin, null);
-		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
-			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
-		}
-		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
-		}
-		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
-		if (!documentRepository.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
-			throw new ExpedientTancarSenseDocumentsDefinitiusException();
-		}
-		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
-		expedient.updateExpedientEstat(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-		if (pluginHelper.isArxiuPluginActiu()) {
-			List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+			expedientHelper.tancar(
 					entitatId,
-					id);
-			// Firmam els documents seleccionats
-			if (hiHaEsborranysPerFirmar) {
-				for (Long documentPerFirmar : documentsPerFirmar) {
-					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
-					if (document != null) {
-						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null) {
-							//remove invalid signature
-							fitxer.setContingut(documentFirmaServidorFirma.removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
-						}
-						documentFirmaServidorFirma.firmar(document, fitxer, motiu);
-						//pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
-					} else {
-						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
-					}
-				}
-			}
-			// Eliminam de l'expedient els esborranys que no s'han firmat
-			for (DocumentEntity esborrany : esborranys) {
-				boolean trobat = false;
-				if (documentsPerFirmar != null) {
-					for (Long documentPerFirmarId : documentsPerFirmar) {
-						if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
-							trobat = true;
-							break;
-						}
-					}
-				}
-				if (!trobat) {
-					documentRepository.delete(esborrany);
-				}
-			}
-			pluginHelper.arxiuExpedientTancar(expedient);
+					id,
+					motiu,
+					documentsPerFirmar,
+					checkPerMassiuAdmin);
 		}
 	}
+	
 
 	@Transactional
 	@Override
@@ -1646,7 +1596,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		
 		long t1 = System.currentTimeMillis();
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		logger.trace("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
+    	if (cacheHelper.mostrarLogsRendiment())
+    		logger.info("comprovarEntitat time:  " + (System.currentTimeMillis() - t1) + " ms");
 		MetaExpedientEntity metaExpedientFiltre = null;
 		List<Long> metaExpedientIdDomini = null;
 		
@@ -1662,7 +1613,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false, 
 					rolActual, null);
 		}
-		logger.trace("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		long t3 = System.currentTimeMillis();
 		OrganGestorEntity organGestorFiltre = null;
@@ -1677,7 +1629,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						filtre.getOrganGestorId());
 			}
 		}
-		logger.trace("comprovarOrgan time:  " + (System.currentTimeMillis() - t3) + " ms");
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("comprovarOrgan time:  " + (System.currentTimeMillis() - t3) + " ms");
 		/*/ Els meta-expedients permesos son els que tenen assignat permís de lectura directament
 		// i també els que pertanyen a un òrgan sobre el que es te assignat permís de lectura.
 		List<MetaExpedientEntity> metaExpedientsPermesos;
@@ -1710,7 +1663,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					agafatPer = usuariHelper.getUsuariByCodi(filtre.getAgafatPer());
 				} 
 			}
-			logger.trace("getUsuariAgafat time:  " + (System.currentTimeMillis() - t4) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("getUsuariAgafat time:  " + (System.currentTimeMillis() - t4) + " ms");
 			
 			long t5 = System.currentTimeMillis();
 			// estats
@@ -1725,7 +1679,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					chosenEstat = expedientEstatRepository.findOne(estatId);
 				}
 			}
-			logger.trace("getEstat time:  " + (System.currentTimeMillis() - t5) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("getEstat time:  " + (System.currentTimeMillis() - t5) + " ms");
 			
 			long t6 = System.currentTimeMillis();
 			// relacionar expedient view
@@ -1750,8 +1705,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			} else {
 				esNullExpedientsToBeExcluded = true;
 				expedientsToBeExluded = null; // repository does not accept empty list but it accepts null value
-			}			
-			logger.trace("expedientsToBeExluded time:  " + (System.currentTimeMillis() - t6) + " ms");
+			}	
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("expedientsToBeExluded time:  " + (System.currentTimeMillis() - t6) + " ms");
 			long t7 = System.currentTimeMillis();
 			boolean esNullRolsCurrentUser = false;
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1774,7 +1730,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						MetaNodeEntity.class,
 						ExtendedPermission.READ));
 			}
-			logger.trace("metaExpedientIdPermesos (" + (metaExpedientIdPermesos != null ? metaExpedientIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("metaExpedientIdPermesos (" + (metaExpedientIdPermesos != null ? metaExpedientIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
 			
 			// Cercam els òrgans amb permisos assignats directament
 			long t8 = System.currentTimeMillis();
@@ -1788,14 +1745,16 @@ public class ExpedientServiceImpl implements ExpedientService {
 						OrganGestorEntity.class,
 						ExtendedPermission.READ));
 			}
-			logger.trace("organIdPermesos (" + (organIdPermesos != null ? organIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("organIdPermesos (" + (organIdPermesos != null ? organIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
 			
 			// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 			long t9 = System.currentTimeMillis();
 			List<Long> metaExpedientOrganIdPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
 					MetaExpedientOrganGestorEntity.class,
 					ExtendedPermission.READ));
-			logger.trace("metaExpedientOrganIdPermesos (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("metaExpedientOrganIdPermesos (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
 			
 			// Cercam els òrgans amb permisos per procediemnts comuns
 			long t91 = System.currentTimeMillis();
@@ -1804,12 +1763,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExtendedPermission.COMU,
 					ExtendedPermission.READ));
 			List<Long> procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
-			logger.trace("organProcedimentsComunsIdsPermesos (" + (organProcedimentsComunsIdsPermesos != null ? organProcedimentsComunsIdsPermesos.size() : "0") + " " + (procedimentsComunsIds != null ? procedimentsComunsIds.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("organProcedimentsComunsIdsPermesos (" + (organProcedimentsComunsIdsPermesos != null ? organProcedimentsComunsIdsPermesos.size() : "0") + " " + (procedimentsComunsIds != null ? procedimentsComunsIds.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
 			
 			// Cercam metaExpedients amb una meta-dada del domini del filtre
 			long t92 = System.currentTimeMillis();
 			metaExpedientIdDomini = expedientHelper.getMetaExpedientIdDomini(filtre.getMetaExpedientDominiCodi());
-			logger.trace("metaExpedientIdDomini (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t92) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("metaExpedientIdDomini (" + (metaExpedientOrganIdPermesos != null ? metaExpedientOrganIdPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t92) + " ms");
 			
 			if (resultEnum == ResultEnumDto.PAGE) {
 				
@@ -1865,7 +1826,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						rolsCurrentUser,
 						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 						pageable);
-				logger.trace("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
 				long t11 = System.currentTimeMillis();
 				PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
 						paginaExpedients,
@@ -1882,8 +1844,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedient.setAlerta(enAlerta);
 				}
 				result.setPagina(paginaDto);
-				logger.trace("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");			
-				logger.trace("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+				if (cacheHelper.mostrarLogsRendiment())	
+					logger.info("toPaginaDto time:  " + (System.currentTimeMillis() - t11) + " ms");
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("findAmbFiltrePaginat (" + (paginaDto != null ? paginaDto.getTamany() + "/" + paginaDto.getElementsTotal() : "0")  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 
 			} else {
 				
@@ -1933,8 +1897,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 						esNullRolsCurrentUser,
 						rolsCurrentUser);
 				result.setIds(expedientsIds);
-				
-				logger.trace("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");
 			}
 			
 			

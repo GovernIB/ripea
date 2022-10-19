@@ -46,7 +46,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			boolean associarInteressats,
 			Long grupId, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -60,7 +61,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				associarInteressats,
 				grupId, 
 				rolActual, 
-				anexosIdsMetaDocsIdsMap);
+				anexosIdsMetaDocsIdsMap,
+				justificantIdMetaDoc);
 	}
 	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
 			Long entitatId,
@@ -295,14 +297,18 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient) {
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc,
+			boolean agafarExpedient) {
 		return delegate.incorporar(
 				entitatId, 
 				expedientId, 
 				expedientPeticioId,  
 				associarInteressats, 
 				rolActual, 
-				anexosIdsMetaDocsIdsMap, agafarExpedient);
+				anexosIdsMetaDocsIdsMap,
+				justificantIdMetaDoc,
+				agafarExpedient);
 		
 	}
 

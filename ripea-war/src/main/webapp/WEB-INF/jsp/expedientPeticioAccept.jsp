@@ -171,9 +171,11 @@ $(document).ready(function(){
 		webutilModalAdjustHeight();
 	});
 
-	$('#btnSave').on('click', function() {
-
-		var showConfirm = false;
+	$("button#btnSave").submit(function (e) {
+	    e.preventDefault();
+	    $("button#btnSave").attr("disabled", true);
+	    
+	    var showConfirm = false;
 		var expedientId = $('#expedientId').val();
 		if (expedientId) {
 			var associarInteressats = $('#associarInteressats').is(":checked");
@@ -196,13 +198,6 @@ $(document).ready(function(){
 		} else {
 			$('#expedientPeticioAcceptarForm').submit();
 		}
-
-	});
-
-	$("button#btnSave").submit(function (e) {
-	    e.preventDefault();
-	    $("button#btnSave").attr("disabled", true);
-	    return true;
 	});		
 			
 });

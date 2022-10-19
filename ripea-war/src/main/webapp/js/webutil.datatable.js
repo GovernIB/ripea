@@ -176,6 +176,8 @@
 						if (!targetBotons.data('botons-creats')) {
 							targetBotons.html($.render.templateNew());
 							targetBotons.data('botons-creats', 'true');
+							if ($.fn.webutilModalEval)
+								$(this).closest('.dataTables_wrapper').webutilModalEval();
 						}
 					}
 					$('div.dataTables_length', $(this).closest('.dataTables_wrapper')).each(function() {

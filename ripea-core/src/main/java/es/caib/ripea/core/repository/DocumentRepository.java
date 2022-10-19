@@ -115,6 +115,20 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("expedient") ExpedientEntity expedient);
 	
 	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.expedient = :expedient " +
+			"and d.esborrat = 0 " +
+			"and d.arxiuUuid = null " +
+			"and d.arxiuReintents < :arxiuMaxReintentsDocuments")
+	List<DocumentEntity> findDocumentsPendentsReintentsArxiu(
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("arxiuMaxReintentsDocuments") int arxiuMaxReintentsDocuments);
+	
+	
 	@Query(	"select case when (count(c) > 0) then true else false end " +
 			"from " +
 			"    DocumentEntity c " +
@@ -124,6 +138,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and c.esborrat = 0 " +
 			"and c.estat = 0) ")
 	Boolean hasFillsEsborranys(@Param("expedient") ExpedientEntity expedient);
+	
 	
 	@Query(	"select case when (count(c) = 0) then true else false end " +
 			"from " +

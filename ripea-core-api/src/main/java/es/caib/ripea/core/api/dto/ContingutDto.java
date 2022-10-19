@@ -40,6 +40,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 	private boolean admin;
 	
 	private boolean conteDocumentsDefinitius;
+	private boolean conteDocumentsPendentsReintentsArxiu;
 
 	protected int ordre;
 	

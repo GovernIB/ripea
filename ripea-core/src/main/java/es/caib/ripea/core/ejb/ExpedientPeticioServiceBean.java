@@ -160,12 +160,16 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	public ResultDto<RegistreAnnexDto> findAnnexosPendentsProcesarMassiu(Long entitatId,
 			MassiuAnnexProcesarFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			ResultEnumDto resultEnum) throws NotFoundException {
+			ResultEnumDto resultEnum, 
+			String rolActual, 
+			Long organActualId) throws NotFoundException {
 		return delegate.findAnnexosPendentsProcesarMassiu(
 				entitatId,
 				filtre,
 				paginacioParams,
-				resultEnum);
+				resultEnum, 
+				rolActual, 
+				organActualId);
 	}
 
 	@Override
@@ -187,6 +191,19 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	@RolesAllowed("IPA_ADMIN")
 	public Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id) {
 		return delegate.canviarEstatAnotacioDistribucio(entitatId, id);
+	}
+
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaExpedientDto> findMetaExpedientsPermesosPerAnotacions(
+			Long entitatId,
+			Long organActualId,
+			String rolActual) {
+		return delegate.findMetaExpedientsPermesosPerAnotacions(
+				entitatId,
+				organActualId,
+				rolActual);
 	}
 
 

@@ -100,7 +100,7 @@ public class DocumentHelper {
 				new Date(),
 				document.getData(), //data captura
 				expedient.getNtiOrgano(),
-				metaDocument.getNtiOrigen(),
+				document.getNtiOrigen(),
 				document.getNtiEstadoElaboracion(),
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument,

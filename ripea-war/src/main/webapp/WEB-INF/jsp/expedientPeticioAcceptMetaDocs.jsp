@@ -122,7 +122,14 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 			</c:otherwise>
 		</c:choose>
 		
-		
+		<c:if test="${!empty expedientPeticioAcceptarCommand.justificant}">
+			<c:set var="justificant" value="${expedientPeticioAcceptarCommand.justificant}"></c:set>
+			<div class="well"> 
+				<form:hidden path="justificant.id" />
+				<rip:inputText name="justificant.titolINom" textKey="expedient.peticio.form.acceptar.camp.justificnat.nom" required="true" readonly = "true"/>
+				<rip:inputSelect name="justificant.metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
+			</div>
+		</c:if>
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" /></button>
 			<a href="<c:url value="/expedientPeticio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>

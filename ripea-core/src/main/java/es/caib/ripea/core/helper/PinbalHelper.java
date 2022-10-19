@@ -5,9 +5,10 @@ package es.caib.ripea.core.helper;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.Solicit
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -36,6 +38,7 @@ import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Mètodes comuns per a gestionar les alertes.
@@ -184,7 +187,7 @@ public class PinbalHelper {
 		}
 		solicitud.setIdExpediente(expedientHelper.calcularNumero(expedient));
 		solicitud.setFuncionario(getFuncionariActual());
-		solicitud.setTitular(getTitularFromInteressat(interessat, false));
+		solicitud.setTitular(getTitularFromInteressat(interessat, false, metaDocument.getPinbalServeiDocsPermesos()));
 	}
 
 	private ScspFuncionario getFuncionariActual() {
@@ -197,7 +200,8 @@ public class PinbalHelper {
 
 	private ScspTitular getTitularFromInteressat(
 			InteressatEntity interessat,
-			boolean ambNomSencer) {
+			boolean ambNomSencer,
+			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
 		ScspTitular titular = new ScspTitular();
 
 		titular.setDocumentacion(interessat.getDocumentNum());
@@ -209,7 +213,11 @@ public class PinbalHelper {
 				titular.setTipoDocumentacion(ScspTipoDocumentacion.NIE);
 				break;
 			case NIF:
-				titular.setTipoDocumentacion(ScspTipoDocumentacion.DNI);
+				if (CollectionUtils.isEmpty(pinbalServeiDocsPermesos) || pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI)) {
+					titular.setTipoDocumentacion(ScspTipoDocumentacion.DNI);
+				} else {
+					titular.setTipoDocumentacion(ScspTipoDocumentacion.NIF);
+				}
 				break;
 			case PASSAPORT:
 				titular.setTipoDocumentacion(ScspTipoDocumentacion.Pasaporte);
@@ -236,7 +244,12 @@ public class PinbalHelper {
 			}
 		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
 			InteressatPersonaJuridicaEntity interessatPersonaJuridica = (InteressatPersonaJuridicaEntity) interessat;
-			titular.setTipoDocumentacion(ScspTipoDocumentacion.CIF);
+			
+			if (CollectionUtils.isEmpty(pinbalServeiDocsPermesos) || pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.CIF)) {
+				titular.setTipoDocumentacion(ScspTipoDocumentacion.CIF);
+			} else {
+				titular.setTipoDocumentacion(ScspTipoDocumentacion.NIF);
+			}
 			titular.setNombreCompleto(interessatPersonaJuridica.getRaoSocial());
 			titular.setDocumentacion(interessatPersonaJuridica.getDocumentNum());
 			

@@ -203,7 +203,8 @@ public class ContingutHelper {
 				dto.setUsuariActualDelete(true);
 			} catch (PermissionDeniedException ex) {
 			}
-			logger.trace("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
 
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
@@ -222,10 +223,7 @@ public class ContingutHelper {
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
 
-			dto.setConteDocuments(documentRepository.findByExpedientAndEsborrat(expedient, 0).size() > 0);
 			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
-
-			dto.setConteDocumentsEnProcessDeFirma(documentRepository.findEnProccessDeFirma(expedient).size() > 0);			
 
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());
@@ -244,7 +242,9 @@ public class ContingutHelper {
 				dto.setSistraClau(expedient.getSistraClau());
 				dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions( ).isEmpty() ? true : false);
 
-
+				dto.setConteDocuments(documentRepository.findByExpedientAndEsborrat(expedient, 0).size() > 0);
+				dto.setConteDocumentsEnProcessDeFirma(documentRepository.findEnProccessDeFirma(expedient).size() > 0);	
+				dto.setConteDocumentsPendentsReintentsArxiu(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments()).size() > 0);
 
 				dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
 				dto.setConteDocumentsFirmats(
@@ -271,8 +271,8 @@ public class ContingutHelper {
 						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
 			}
 
-
-			logger.trace("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
 
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
@@ -371,7 +371,8 @@ public class ContingutHelper {
 			dto.setEstat(document.getEstat());
 			resposta = dto;
 
-			logger.trace("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
 			CarpetaDto dto = new CarpetaDto();
@@ -560,8 +561,8 @@ public class ContingutHelper {
 			}
 		}
 
-
-		logger.trace("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
 
@@ -901,6 +902,16 @@ public class ContingutHelper {
 					ContingutEntity.class,
 					"Un contingut definitiu no es pot esborrar, verificau la propitat es.caib.ripea.document.esborrar.finals");
 		}
+		
+		// Cancel·lar enviament si el document conté enviaments pendents
+		if (contingut instanceof DocumentEntity) {
+			DocumentEntity document = (DocumentEntity)contingut;
+			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+				firmaPortafirmesHelper.portafirmesCancelar(
+						entitatId,
+						document, rolActual);
+			}
+		}
 
 		// Valida si conté documents definitius
 		if (!conteDocumentsDefinitius(contingut)) {
@@ -918,17 +929,8 @@ public class ContingutHelper {
 				// Elimina contingut a l'arxiu
 				arxiuPropagarEliminacio(contingut);
 			}
+		}
 
-		}
-		// Cancel·lar enviament si el document conté enviaments pendents
-		if (contingut instanceof DocumentEntity) {
-			DocumentEntity document = (DocumentEntity)contingut;
-			if (document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
-				firmaPortafirmesHelper.portafirmesCancelar(
-						entitatId,
-						document, rolActual);
-			}
-		}
 		return dto;
 	}
 
@@ -1774,6 +1776,11 @@ public class ContingutHelper {
 
 	}
 
+	
+	private int getArxiuMaxReintentsDocuments() {
+		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
+		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
+	}
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 
 }

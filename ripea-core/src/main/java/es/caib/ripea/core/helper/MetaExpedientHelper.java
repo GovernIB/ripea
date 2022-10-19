@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -595,6 +596,26 @@ public class MetaExpedientHelper {
 	}
 	
 	
+
+	public List<MetaExpedientEntity> findByOrganAmbFills(EntitatEntity entitat, Long organId) {
+		List<MetaExpedientEntity> procedimentsOrgan = null;
+		if (organId != null) {
+			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
+			List<OrganGestorEntity> organGestorAmbFills = organGestorRepository.findFills(entitat, Arrays.asList(organId));
+			
+			procedimentsOrgan = new ArrayList<>();
+			procedimentsOrgan.addAll(organGestor.getMetaExpedients());
+			
+			for (OrganGestorEntity organGestorEntity : organGestorAmbFills) {
+				procedimentsOrgan.addAll(organGestorEntity.getMetaExpedients());
+			}
+			
+			if (procedimentsOrgan.isEmpty()) {
+				procedimentsOrgan = null;
+			}
+		}
+		return procedimentsOrgan;
+	}
 	
 	public List<Long> getIdsCreateWritePermesos(Long entitatId) {
 		
@@ -621,6 +642,41 @@ public class MetaExpedientHelper {
 					false));
 
 		List<Long> createWritePermIds = new ArrayList<>(); 
+		createWritePermIds.addAll(createPermIds);
+		createWritePermIds.addAll(writePermIds);
+		createWritePermIds = new ArrayList<>(new HashSet<>(createWritePermIds));
+		if (createWritePermIds.isEmpty()) {
+			createWritePermIds = null;
+		}
+		
+		return createWritePermIds;
+		
+	}
+	
+	
+	public List<MetaExpedientEntity> getCreateWritePermesos(Long entitatId) {
+
+		List<MetaExpedientEntity> createPermIds = findAmbPermis(
+				entitatId,
+				ExtendedPermission.CREATE,
+				true,
+				null,
+				false,
+				false,
+				null,
+				false);
+
+		List<MetaExpedientEntity> writePermIds = findAmbPermis(
+				entitatId,
+				ExtendedPermission.WRITE,
+				true,
+				null,
+				false,
+				false,
+				null,
+				false);
+
+		List<MetaExpedientEntity> createWritePermIds = new ArrayList<>(); 
 		createWritePermIds.addAll(createPermIds);
 		createWritePermIds.addAll(writePermIds);
 		createWritePermIds = new ArrayList<>(new HashSet<>(createWritePermIds));
@@ -745,7 +801,7 @@ public class MetaExpedientHelper {
 					
 					logger.info(" Procediment WS: " + procedimentGga);
 				} catch (SistemaExternException se) {
-					logger.error("Error Procediment WS: " + metaExpedient, se);
+					logger.error("Error Procediment WS id="+ metaExpedient.getId(), se);
 					infoBuilder.hasError(true);
 					infoBuilder.errorText(msg("procediment.synchronize.error.rolsac", se.getMessage()));
 					progres.addInfo(infoBuilder.build(), true);
@@ -765,27 +821,26 @@ public class MetaExpedientHelper {
 				info.setNomNou(procedimentGga.getNom());
 				info.setDescripcioNova(procedimentGga.getResum());
 				info.setComuNou(procedimentGga.isComu());
-				info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
-
+				if (!procedimentGga.isComu()) {
+					info.setOrganNou(procedimentGga.getUnitatOrganitzativaCodi());
+				} else {
+					info.setOrganNou(null);
+				}
+				
 				if (!info.hasChange()) {
 					progres.addInfo(info, true);
 					continue;
 				}
 
-				String nom = metaExpedient.getNom();
-				String descripcio = metaExpedient.getDescripcio();
-				OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
-				boolean organNoSincronitzat = false;
 
-				if (!procedimentGga.getNom().equals(metaExpedient.getNom())) {
-					nom = procedimentGga.getNom();
-				}
-				if (!procedimentGga.getResum().equals(metaExpedient.getDescripcio())) {
-					descripcio = procedimentGga.getResum();
-				}
-				if (procedimentGga.isComu() != metaExpedient.isComu() && procedimentGga.isComu()) {
+				String nom = procedimentGga.getNom();
+				String descripcio = procedimentGga.getResum();
+				OrganGestorEntity organGestor;
+				boolean organNoSincronitzat = false;
+				
+				if (procedimentGga.isComu()) {
 					organGestor = null;
-				} else if (!procedimentGga.getUnitatOrganitzativaCodi().equals(metaExpedient.getOrganGestor().getCodi())) {
+				} else {
 					organGestor = organGestorRepository.findByEntitatAndCodi(entitat, procedimentGga.getUnitatOrganitzativaCodi());
 					if (organGestor == null) {
 						organNoSincronitzat = true;
@@ -816,13 +871,14 @@ public class MetaExpedientHelper {
 			actualitzaAvisosSyncProcediments(avisosProcedimentsOrgans, entitatDto.getId());
 
 		} catch (Exception e) {
+			logger.error("Error al syncronitzar procediemnts", e);
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			e.printStackTrace(pw);
-			progresActualitzacio.get(entitatDto.getCodi()).setError(true);
-			progresActualitzacio.get(entitatDto.getCodi()).setErrorMsg(sw.toString());
-			progresActualitzacio.get(entitatDto.getCodi()).setProgres(100);
-			progresActualitzacio.get(entitatDto.getCodi()).setFinished(true);
+			progresActualitzacioDto.setError(true);
+			progresActualitzacioDto.setErrorMsg(sw.toString());
+			progresActualitzacioDto.setProgres(100);
+			progresActualitzacioDto.setFinished(true);
 			throw e;
 		}
 	}

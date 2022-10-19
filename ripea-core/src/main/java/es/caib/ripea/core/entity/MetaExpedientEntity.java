@@ -26,7 +26,6 @@ import java.util.Set;
         @UniqueConstraint(name = "ipa_metaexp_entitat_codi_uk", columnNames = { "entitat_id", "codi" }) })
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@ToString
 public class MetaExpedientEntity extends MetaNodeEntity {
 
     @Column(name = "clasif_sia", length = 30, nullable = false)
@@ -267,6 +266,19 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 		} else if (!getId().equals(other.getId()))
 			return false;
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		return "MetaExpedientEntity: [" +
+				"id: " + this.getId() + ", " +
+				"codi: " + this.codi + ", " +
+				"nom: " + this.nom + ", " +
+				"descripcio: " + this.descripcio + ", " +
+				"codiSia: " + this.classificacioSia + ", " +
+				"organGestor: " + (this.organGestor != null ? organGestor.getCodi() : "null") + ", " +
+				"actiu: " + this.actiu + ", " +
+				"entitat: " + (this.entitat != null ? this.entitat.getCodi() : "NULL") + "]";
 	}
 	
 

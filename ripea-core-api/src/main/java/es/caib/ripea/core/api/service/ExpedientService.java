@@ -43,6 +43,7 @@ public interface ExpedientService {
 	 *            Nom de l'expedient que es vol crear.
 	 * @param rolActual TODO
 	 * @param anexosIdsMetaDocsIdsMap
+	 * @param justificantIdMetaDoc
 	 * @return L'expedient creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -63,7 +64,8 @@ public interface ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId, String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap) throws NotFoundException, ValidationException;
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un expedient.
@@ -402,7 +404,9 @@ public interface ExpedientService {
 			Long expedientPeticioId,
 			boolean associarInteressats, 
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap, boolean agafarExpedient);
+			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long justificantIdMetaDoc,
+			boolean agafarExpedient);
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.

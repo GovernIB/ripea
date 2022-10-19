@@ -455,6 +455,11 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientActualitzar(ExpedientEntity expedient) {
+		
+		boolean throwExcepcion = false;
+		if (throwExcepcion) { // throwExcepcion = true;
+			throw new RuntimeException("Mock Error al accedir arxiu");
+		}
 
 		String accioDescripcio = "Actualització de les dades d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();

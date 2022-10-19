@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 10.10.22 11:07
+-- Ran at: 12.10.22 09:14
 -- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.4.3
 -- *********************************************************************
@@ -40,6 +40,10 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.organs.consulta.canvis', NULL, 'Cron per a la consulta de canvis a l''organigrama', 'SCHEDULLED', '7', '0', 'TEXT', '0');
 
 grant select, update, insert, delete on ipa_og_sinc_rel to www_ripea;
+
+update ipa_metaexp_seq set valor = 0 where valor is null;
+
+alter table ipa_metaexp_seq modify ( valor not null);
 
 -- Changeset db/changelog/changes/0.9.95/1067.yaml::1659525430753-1::limit
 ALTER TABLE ipa_metadocument ADD pinbal_servei_doc_permes_dni NUMBER(1) DEFAULT 1 NOT NULL;
