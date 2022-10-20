@@ -397,7 +397,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		for (RegistreAnnexCommand registreAnnex : command.getAnnexos()) {
 			anexosIdsMetaDocsIdsMap.put(registreAnnex.getId(), registreAnnex.getMetaDocumentId());
 		}
-		Long justificantIdMetaDoc = justificant.getMetaDocumentId();
+		Long justificantIdMetaDoc = justificant != null ? justificant.getMetaDocumentId() : null;
 		boolean processatOk = true;
 		boolean expCreatArxiuOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
