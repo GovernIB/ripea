@@ -55,9 +55,7 @@ public class ConfigServiceImpl implements ConfigService {
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
         pluginHelper.reloadProperties(configEntity.getGroupCode());
-        if (property.getKey().endsWith(".class")){
-            pluginHelper.resetPlugins();
-        }
+        pluginHelper.resetPlugins();
        // cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
