@@ -448,7 +448,15 @@
 				}
 				if(plugin.settings.saveState){
 					dataTableOptions = $.extend({
-						stateSave: true
+						stateSave: true,
+						stateSaveCallback: function(settings, data) {
+							sessionStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+						}
+					}, dataTableOptions);
+					dataTableOptions = $.extend({
+						stateLoadCallback: function(settings) {
+							return JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
+						}
 					}, dataTableOptions);
 				}
 			} else {

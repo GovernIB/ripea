@@ -233,6 +233,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto, Locale locale) throws Exception {
 	    EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, true, false, false, false);
+	    boolean primeraSync = entitat.getDataSincronitzacio() == null;
+	    
 		ConfigHelper.setEntitat(entitatDto);
 		MessageHelper.setCurrentLocale(locale);
 		if (entitat.getUnitatArrel() == null || entitat.getUnitatArrel().isEmpty()) {
@@ -282,19 +284,22 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			progres.setProgres(51);
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.procediments")).infoText(msg("unitat.synchronize.info.procediments.fi")).build());
 
-			// Actualitzar permisos
-			progres.setFase(3);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
-			permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
-			progres.setProgres(75);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
+			if (!primeraSync) {
+				// Actualitzar permisos
+				progres.setFase(3);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.inici")).build());
+				permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
+				progres.setProgres(75);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
 
-			// Eliminar organs no vigents no utilitzats??
-			progres.setFase(4);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.inici")).build());
-			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
-			progres.setProgres(99);
-			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.fi")).build());
+			}
+
+//			// Eliminar organs no vigents no utilitzats??
+//			progres.setFase(4);
+//			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.inici")).build());
+//			organGestorHelper.deleteExtingitsNoUtilitzats(obsoleteUnitats, progres);
+//			progres.setProgres(99);
+//			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.obsolets")).infoText(msg("unitat.synchronize.info.obsolets.fi")).build());
 
 			cacheHelper.evictUnitatsOrganitzativesPerEntitat(entitat.getCodi());
 			cacheHelper.evictAllOrganismesEntitatAmbPermis();

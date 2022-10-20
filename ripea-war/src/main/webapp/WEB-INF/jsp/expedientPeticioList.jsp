@@ -33,6 +33,11 @@ table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
 table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr.selectable > :first-child {
 	cursor: pointer;
 }
+
+table.dataTable td {
+	word-wrap: break-word; max-width: 1px;
+}
+
 </style>
 
 </head>
@@ -112,10 +117,9 @@ table.dataTable thead > tr.selectable > :first-child, table.dataTable tbody > tr
 			<tr>
 				<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
-				<th data-col-name="registre.extracte"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
+				<th data-col-name="registre.extracte" width="15%"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiCodiINom"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
-				<th data-col-name="registre.procedimentCodi"><spring:message code="expedient.peticio.list.columna.codiSia"/></th>
-				<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
+				<th data-col-name="procedimentCodiSiaINom" data-orderable="false"><spring:message code="expedient.peticio.list.columna.metaExpedientNom"/></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="estatView" data-orderable="false" data-template="#cellEstatTemplate">

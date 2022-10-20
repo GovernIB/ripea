@@ -436,6 +436,7 @@ public class ConversioTipusHelper {
 						target.setRegistre(registre);
 						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
 						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setProcedimentCodi(source.getMetaExpedient() != null ? source.getMetaExpedient().getClassificacioSia() : null);
 						target.setEstat(source.getEstat());
 						target.setIdentificador(source.getIdentificador());
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
