@@ -396,8 +396,8 @@
 
 							<div class=horizontal-left>
 								<div id="wrapper">
-									<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigent.codi} - ${unitatVigent.denominacio}">
-										${unitatVigent.codi} - ${unitatVigent.denominacio}
+									<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigent.codi} - ${unitatVigent.oldDenominacio}">
+										${unitatVigent.codi} - ${unitatVigent.oldDenominacio}
 									</span>
 									<div class="branch lv1">
 										<div class="entry sole">

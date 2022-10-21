@@ -526,9 +526,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		// converting from UnitatOrganitzativa to UnitatOrganitzativaDto
 		List<UnitatOrganitzativaDto> unitatsVigentsWithChangedAttributesDto = new ArrayList<>();
 		for(UnitatOrganitzativa vigent : unitatsVigentsWithChangedAttributes){
-			unitatsVigentsWithChangedAttributesDto.add(conversioTipusHelper.convertir(
+			UnitatOrganitzativaDto unitatOrganitzativaDto = conversioTipusHelper.convertir(
 					vigent,
-					UnitatOrganitzativaDto.class));
+					UnitatOrganitzativaDto.class);
+			OrganGestorEntity org = organGestorRepository.findByCodi(unitatOrganitzativaDto.getCodi());
+			unitatOrganitzativaDto.setOldDenominacio(org.getNom());
+			unitatsVigentsWithChangedAttributesDto.add(unitatOrganitzativaDto);
+			
+			
 		}
 		return unitatsVigentsWithChangedAttributesDto;
 	}
