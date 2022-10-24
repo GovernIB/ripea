@@ -20,6 +20,7 @@ public class UnitatOrganitzativaDto implements Serializable {
 
 	private String codi;
 	private String denominacio;
+	private String oldDenominacio;
 	private String nifCif;
 	private String codiUnitatSuperior;
 	private String codiUnitatArrel;
