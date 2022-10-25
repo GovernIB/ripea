@@ -41,7 +41,7 @@ pageContext.setAttribute(
 <script>
 var metaExpedientOrgan = {};
 <c:forEach var="metaExpedient" items="${metaExpedients}">
-<c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${metaExpedient.organGestor.nom}'};</c:if>
+<c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${fn:escapeXml(metaExpedient.organGestor.nom)}'};</c:if>
 </c:forEach>
 
 
