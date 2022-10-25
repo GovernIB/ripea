@@ -6,6 +6,8 @@ package es.caib.ripea.core.entity;
 import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import lombok.Getter;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -180,7 +182,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			OrganGestorEntity organGestor,
 			boolean organNoSincronitzat) {
 		this.nom = nom;
-		this.descripcio = truncateToFitUtf8ByteLength(descripcio, 4000);
+		this.descripcio = StringUtils.abbreviate(descripcio, 1000);
 		this.organGestor = organGestor;
 		this.organNoSincronitzat = organNoSincronitzat;
 	}
@@ -230,7 +232,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built = new MetaExpedientEntity();
             built.codi = codi;
             built.nom = nom;
-            built.descripcio = truncateToFitUtf8ByteLength(descripcio, 4000);
+            built.descripcio = StringUtils.abbreviate(descripcio, 1000);
             built.serieDocumental = serieDocumental;
             built.classificacioSia = classificacioSia;
             built.entitat = entitat;
