@@ -3,8 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import es.caib.ripea.core.audit.RipeaAuditable;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,11 +22,13 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.audit.RipeaAuditable;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CodingErrorAction;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa un meta-node.
@@ -42,7 +45,7 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 	protected String codi;
 	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;
-	@Column(name = "descripcio", length = 1024)
+	@Column(name = "descripcio", length = 4000)
 	protected String descripcio;
 	@Column(name = "tipus", nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -97,8 +100,29 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 			String descripcio) {
 		this.codi = codi;
 		this.nom = nom;
-		this.descripcio = descripcio;
+		this.descripcio = truncateToFitUtf8ByteLength(descripcio, 4000);
 	}
+
+	public static String truncateToFitUtf8ByteLength(String s, int maxBytes) {
+		if (s == null) {
+			return null;
+		}
+		Charset charset = Charset.forName("UTF-8");
+		CharsetDecoder decoder = charset.newDecoder();
+		byte[] sba = s.getBytes(charset);
+		if (sba.length <= maxBytes) {
+			return s;
+		}
+		// Ensure truncation by having byte buffer = maxBytes
+		ByteBuffer bb = ByteBuffer.wrap(sba, 0, maxBytes);
+		CharBuffer cb = CharBuffer.allocate(maxBytes);
+		// Ignore an incomplete character
+		decoder.onMalformedInput(CodingErrorAction.IGNORE);
+		decoder.decode(bb, cb, true);
+		decoder.flush(cb);
+		return new String(cb.array(), 0, cb.position());
+	}
+
 	public void updateActiu(
 			boolean actiu) {
 		this.actiu = actiu;
