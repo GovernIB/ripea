@@ -170,7 +170,7 @@ public class IndexHelper {
 			localDest.setLocalDestination("expedient_" + expedient.getId());
 			titolParagraph.add(localDest);
 			titolParagraph.setAlignment(Element.ALIGN_CENTER);
-			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacioSia() + "] (" + expedientHelper.calcularNumero(expedient) + ")";
+			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacioSia() + "] (" + expedient.getNumero() + ")";
 			Paragraph subTitolParagraph = new Paragraph(subtitol, frutiger9TitolBold);
 			subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
 			subTitolParagraph.add(Chunk.NEWLINE);

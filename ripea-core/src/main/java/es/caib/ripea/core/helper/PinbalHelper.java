@@ -185,7 +185,7 @@ public class PinbalHelper {
 			solicitud.setConsentimiento(ScspConsentimiento.Si);
 			break;
 		}
-		solicitud.setIdExpediente(expedientHelper.calcularNumero(expedient));
+		solicitud.setIdExpediente(expedient.getNumero());
 		solicitud.setFuncionario(getFuncionariActual());
 		solicitud.setTitular(getTitularFromInteressat(interessat, false, metaDocument.getPinbalServeiDocsPermesos()));
 	}

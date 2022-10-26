@@ -157,7 +157,7 @@ public class ContingutHelper {
 			ExpedientDto dto = new ExpedientDto();
 
 			dto.setEstat(expedient.getEstat());
-			dto.setNumero(expedientHelper.calcularNumero(expedient));
+			dto.setNumero(expedient.getNumero());
 			dto.setAgafatPer(
 					conversioTipusHelper.convertir(
 							expedient.getAgafatPer(),
@@ -1122,6 +1122,9 @@ public class ContingutHelper {
 			}
 		}
 		ExpedientEntity expedientCreat = expedientRepository.save(expedientCrear);
+		
+		// Calcula número del nou expedient
+		expedientCreat.updateNumero(expedientHelper.calcularNumero(expedientCreat));
 		// Calcula l'identificador del nou expedient
 		calcularIdentificadorExpedient(
 				expedientCreat,

@@ -452,7 +452,7 @@ public class EmailHelper {
 				"Informació del document:\n" +
 						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 						"\tExpedient nom: " + expedient.getNom() + "\n" +
-						"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 						"\tDocument nom: " + document.getNom() + "\n" +
 						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
@@ -524,7 +524,7 @@ public class EmailHelper {
 				"Informació del document:\n" +
 						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 						"\tExpedient nom: " + expedient.getNom() + "\n" +
-						"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 						"\tDocument nom: " + document.getNom() + "\n" +
 						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
@@ -594,7 +594,7 @@ public class EmailHelper {
 				"Informació del document:\n" +
 				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
-				"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
 				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
@@ -664,7 +664,7 @@ public class EmailHelper {
 				"Informació del document:\n" +
 				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
-				"\tExpedient núm.: " + expedientHelper.calcularNumero(expedient) + "\n" +
+				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
 				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +

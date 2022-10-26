@@ -693,13 +693,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			Long expedientId,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) {
 		logger.trace(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, "tothom", ResultEnumDto.PAGE).getPagina();
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, rolActual, ResultEnumDto.PAGE).getPagina();
 	}
 
 	@Transactional
@@ -741,7 +742,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				ExpedientDto expedient = new ExpedientDto();
 				expedient.setId(exp.getId());
 				expedient.setNom(exp.getNom());
-				expedient.setNumero(expedientHelper.calcularNumero(exp));
+				expedient.setNumero(exp.getNumero());
 				expedient.setAgafatPer(
 						conversioTipusHelper.convertir(
 								exp.getAgafatPer(),
@@ -756,7 +757,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					ExpedientDto expedient = new ExpedientDto();
 					expedient.setId(exp.getId());
 					expedient.setNom(exp.getNom());
-					expedient.setNumero(expedientHelper.calcularNumero(exp));
+					expedient.setNumero(exp.getNumero());
 					expedient.setAgafatPer(
 							conversioTipusHelper.convertir(
 									exp.getAgafatPer(),
@@ -1269,7 +1270,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientDto expedientDto = new ExpedientDto();
 			expedientDto.setId(expedientEntity.getId());
 			expedientDto.setNom(expedientEntity.getNom());
-			expedientDto.setNumero(expedientHelper.calcularNumero(expedientEntity));
+			expedientDto.setNumero(expedientEntity.getNumero());
 			expedientsDto.add(expedientDto);
 		}
 		return expedientsDto;
@@ -1348,7 +1349,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		int dadesIndex = 0;
 		for (ExpedientEntity expedient : expedients) {
 			String[] fila = new String[numColumnes];
-			fila[0] = expedientHelper.calcularNumero(expedient);
+			fila[0] = expedient.getNumero();
 			fila[1] = expedient.getNom();
 			if (expedient.getExpedientEstat() != null && expedient.getEstat() != ExpedientEstatEnumDto.TANCAT) {
 				fila[2] = expedient.getExpedientEstat().getNom();
@@ -1812,8 +1813,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 						chosenEstat,
 						agafatPer == null,
 						agafatPer,
-						filtre.getSearch() == null,
-						filtre.getSearch() != null ? filtre.getSearch().trim() : "",
 						filtre.getTipusId() == null,
 						filtre.getTipusId(),
 						esNullExpedientsToBeExcluded,
@@ -1860,10 +1859,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 						organIdPermesos == null || organIdPermesos.isEmpty() ? null : organIdPermesos,
 						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty(),
 						metaExpedientOrganIdPermesos == null || metaExpedientOrganIdPermesos.isEmpty() ? null : metaExpedientOrganIdPermesos,
+						organProcedimentsComunsIdsPermesos == null || organProcedimentsComunsIdsPermesos.isEmpty(),
+						organProcedimentsComunsIdsPermesos == null || organProcedimentsComunsIdsPermesos.isEmpty() ? null : organProcedimentsComunsIdsPermesos,	
+						!procedimentsComunsIds.isEmpty() ? procedimentsComunsIds : null,
 						metaExpedientFiltre == null,
 						metaExpedientFiltre,
 						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty(),
-						metaExpedientIdDomini == null || metaExpedientIdDomini.isEmpty() ? null : metaExpedientIdDomini,
+						!metaExpedientIdDomini.isEmpty() ? metaExpedientIdDomini : null,
 						organGestorFiltre == null,
 						organGestorFiltre,
 						filtre.getNumero() == null || "".equals(filtre.getNumero().trim()),
@@ -1884,18 +1886,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 						chosenEstat,
 						agafatPer == null,
 						agafatPer,
-						filtre.getSearch() == null,
-						filtre.getSearch() != null ? filtre.getSearch().trim() : "",
 						filtre.getTipusId() == null,
 						filtre.getTipusId(),
-						true,
-						null,
+						esNullExpedientsToBeExcluded,
+						expedientsToBeExluded,
 						filtre.getInteressat() == null || filtre.getInteressat().isEmpty(),
 						filtre.getInteressat() != null ? filtre.getInteressat().trim() : "",
 						filtre.getMetaExpedientDominiValor() == null || filtre.getMetaExpedientDominiValor().isEmpty(),
 						filtre.getMetaExpedientDominiValor() != null ? filtre.getMetaExpedientDominiValor().trim() : "",
 						esNullRolsCurrentUser,
-						rolsCurrentUser);
+						rolsCurrentUser,
+						rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));				
+
 				result.setIds(expedientsIds);
 				if (cacheHelper.mostrarLogsRendiment())
 					logger.info("findAmbFiltrePaginat ids (size: " + expedientsIds.size()  +") time:  " + (System.currentTimeMillis() - t0) + " ms");

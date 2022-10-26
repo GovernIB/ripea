@@ -1287,7 +1287,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(), 
 						ExpedientFiltreCommand.asDto(filtreCommand), 
 						expedientId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
+						DatatablesHelper.getPaginacioDtoFromRequest(request), 
+						RolHelper.getRolActual(request)));		
 	}
 
 	@RequestMapping(value = "/{expedientId}/relacio/{relacionatId}/delete", method = RequestMethod.GET)

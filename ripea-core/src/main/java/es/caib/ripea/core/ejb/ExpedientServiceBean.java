@@ -232,12 +232,14 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			Long expedientId,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) {
 		return delegate.findAmbFiltreNoRelacionat(
 				entitatId,
 				filtre,
 				expedientId,
-				paginacioParams);
+				paginacioParams, 
+				rolActual);
 	}
 
 	@Override

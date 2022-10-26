@@ -97,8 +97,10 @@ $(document).ready(function() {
 			//if selected
 			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
 	    		notificacionsSeleccionades.push(notificacio);
-	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
-	    			noNif = true;
+	    		if (notificacio.titular.personaFisica) {
+		    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+		    			noNif = true;
+					}
 				}
 			}
 	    });
@@ -185,10 +187,12 @@ function getNotificacionsSenseNif() {
 	var notificacionsSenseNif = [];
 	
 	$(notificacions).each(function(index, notificacio) {
-		//if selected
-		if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
-    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
-    			notificacionsSenseNif.push(notificacio);
+		if (notificacio.titular.personaFisica) {
+			//if selected
+			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
+	    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+	    			notificacionsSenseNif.push(notificacio);
+				}
 			}
 		}
     });

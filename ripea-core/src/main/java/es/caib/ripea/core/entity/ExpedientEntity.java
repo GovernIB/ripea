@@ -60,6 +60,8 @@ public class ExpedientEntity extends NodeEntity {
 	protected long sequencia;
 	@Column(name = "codi", nullable = false)
 	protected String codi;
+	@Column(name = "numero", length = 64, nullable = false)
+	protected String numero;
 	@Column(name = "nti_version", length = 5, nullable = false)
 	protected String ntiVersion;
 	@Column(name = "nti_identif", length = 52, nullable = false)
@@ -266,7 +268,9 @@ public class ExpedientEntity extends NodeEntity {
 	public OrganGestorEntity getOrganGestor() {
 		return organGestor;
 	}
-
+	public String getNumero() {
+		return numero;
+	}
 	public void update(
 			String nom) {
 		this.nom = nom;
@@ -363,7 +367,10 @@ public class ExpedientEntity extends NodeEntity {
 	public void removeOrganGestorPares() {
 		this.organGestorPares.clear();
 	}
-
+	
+	public void updateNumero(String numero) {
+		this.numero = numero;
+	}
 	public static Builder getBuilder(
 			String nom,
 			MetaExpedientEntity metaExpedient,

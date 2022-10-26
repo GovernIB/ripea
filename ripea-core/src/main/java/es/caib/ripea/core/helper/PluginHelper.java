@@ -2636,7 +2636,7 @@ public class PluginHelper {
 				notificacio.setDocumentArxiuUuid(documentEntity.getArxiuUuid());
 			}
 			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
-			notificacio.setNumExpedient(expedientHelper.calcularNumero(expedientEntity));
+			notificacio.setNumExpedient(expedientEntity.getNumero());
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
 
@@ -2886,7 +2886,7 @@ public class PluginHelper {
 			parametresViaFirma.setLecturaObligatoria(documentViaFirmaEntity.isLecturaObligatoria());
 			parametresViaFirma.setTitol(documentViaFirmaEntity.getTitol());
 			parametresViaFirma.setViaFirmaDispositiu(viaFirmaDispositiu);
-			parametresViaFirma.setExpedientCodi(expedientHelper.calcularNumero(document.getExpedientPare()));
+			parametresViaFirma.setExpedientCodi(document.getExpedientPare().getNumero());
 			parametresViaFirma.setSignantNif(documentViaFirmaEntity.getSignantNif());
 			parametresViaFirma.setSignantNom(documentViaFirmaEntity.getSignantNom());
 			parametresViaFirma.setObservaciones(documentViaFirmaEntity.getObservacions());

@@ -1,10 +1,9 @@
 package es.caib.ripea.core.helper;
 
-import es.caib.ripea.core.api.service.ConfigService;
-import es.caib.ripea.core.entity.ProcesosInicialsEntity;
-import es.caib.ripea.core.repository.ProcessosInicialsRepository;
-import lombok.Synchronized;
-import lombok.extern.slf4j.Slf4j;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -14,11 +13,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.core.entity.ProcesosInicialsEntity;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.ProcessosInicialsRepository;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -26,37 +27,47 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     @Autowired
     private ConfigService configService;
-
+	@Autowired
+	private ExpedientHelper expedientHelper;
+	@Autowired
+	private ExpedientRepository expedientRepository;
     @Autowired
     private ProcessosInicialsRepository processosInicialsRepository;
+    @Autowired
+    private ApplicationHelper applicationHelper;
 
     public static int counter = 0;
 
     private Authentication auth;
 
     @Synchronized
-    @Transactional
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
 
         log.info("Executant processos inicials. Counter: " + counter++);
         addCustomAuthentication();
         try {
-        	
+        	// ========================================================= EXECUTE PROCESS ONLY ONCE =================================================
             List<ProcesosInicialsEntity> processos = processosInicialsRepository.findProcesosInicialsEntityByInitTrue();
             for (ProcesosInicialsEntity proces : processos) {
                 log.info("Executant procés inicial: {}",  proces.getCodi());
                 switch (proces.getCodi()) {
                     case PROPIETATS_CONFIG_ENTITATS:
-//                        configService.crearPropietatsConfigPerEntitats(); it must be executed on every startup because it must create configuration per entititats for properties added in the future
+//                        configService.crearPropietatsConfigPerEntitats(); it must be executed on every startup because it must create configuration per entitats for properties added in the future
                         break;
+                    case GENERAR_EXPEDIENT_NUMERO:
+                    	generateNumeroAllExpedients();
+                      break;                        
                     default:
                         log.error("Procés inicial no definit");
                         break;
                 }
-                processosInicialsRepository.updateInit(proces.getId(), false);
+                applicationHelper.setProcessAsProcessed(proces.getId());
             }
+            
+            // ===================================================== EXECUTE PROCESS ON EVERY STARTUP OF APPLICATION ==================================
             configService.crearPropietatsConfigPerEntitats();
             configService.actualitzarPropietatsJBossBdd();
+            
         } catch (Exception ex) {
             log.error("Errror executant els processos inicials", ex);
         }
@@ -81,5 +92,27 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
     private void restoreAuthentication() {
         SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+    
+    
+    private void generateNumeroAllExpedients(){
+    	
+		List<Long> ids = expedientRepository.findAllIdsNumeroNotNull();
+		if (ids != null) {
+			int i = 0;
+			int size = ids.size();
+			for (Long id : ids) {
+				try {
+					expedientHelper.generateNumeroExpedient(id);
+					i++;
+					if (i % 100 == 0) {
+						log.info("Generant números per expedients: " + i + "/" + size + "...");
+					}
+				} catch (Exception e) {
+					log.error("Error al generar numero expedient: " + id);
+				}
+				
+			}
+		}
     }
 }
