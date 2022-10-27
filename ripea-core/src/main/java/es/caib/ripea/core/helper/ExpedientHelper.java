@@ -1093,6 +1093,14 @@ public class ExpedientHelper {
 		}
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void generateNumeroExpedient(Long id) {
+		ExpedientEntity expedientEntity = expedientRepository.findOne(id);
+		String numero = calcularNumero(expedientEntity);
+		expedientEntity.updateNumero(numero);
+	}
+	
+
 	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
 		return (ExpedientDto)contingutHelper.toContingutDto(
 				expedient,
@@ -1109,7 +1117,7 @@ public class ExpedientHelper {
 	public ExpedientDto toExpedientDto(ExpedientEntity entity) {
 		ExpedientDto dto = new ExpedientDto();
 
-		dto.setNumero(calcularNumero(entity));
+		dto.setNumero(entity.getNumero());
 		dto.setNom(entity.getNom());
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, entity.getId()) > 0);
 		dto.setValid(cacheHelper.findErrorsValidacioPerNode(entity).isEmpty());

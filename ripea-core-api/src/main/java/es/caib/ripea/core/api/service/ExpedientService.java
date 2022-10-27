@@ -372,7 +372,8 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
 			Long entitatId, ExpedientFiltreDto filtre, Long expedientId,
-			PaginacioParamsDto paginacioParams);
+			PaginacioParamsDto paginacioParams, 
+			String rolActual);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	List<CodiValorDto> findByEntitat(Long entitatId);

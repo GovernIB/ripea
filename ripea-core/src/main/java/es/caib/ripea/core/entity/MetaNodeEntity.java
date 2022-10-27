@@ -22,6 +22,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -42,7 +43,7 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 	protected String codi;
 	@Column(name = "nom", length = 256, nullable = false)
 	protected String nom;
-	@Column(name = "descripcio", length = 1024)
+	@Column(name = "descripcio", length = 4000)
 	protected String descripcio;
 	@Column(name = "tipus", nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -97,8 +98,29 @@ public abstract class MetaNodeEntity extends RipeaAuditable<Long> {
 			String descripcio) {
 		this.codi = codi;
 		this.nom = nom;
-		this.descripcio = descripcio;
+		this.descripcio = StringUtils.abbreviate(descripcio, 1000);
 	}
+
+//	public static String truncateToFitUtf8ByteLength(String s, int maxBytes) {
+//		if (s == null) {
+//			return null;
+//		}
+//		Charset charset = Charset.forName("UTF-8");
+//		CharsetDecoder decoder = charset.newDecoder();
+//		byte[] sba = s.getBytes(charset);
+//		if (sba.length <= maxBytes) {
+//			return s;
+//		}
+//		// Ensure truncation by having byte buffer = maxBytes
+//		ByteBuffer bb = ByteBuffer.wrap(sba, 0, maxBytes);
+//		CharBuffer cb = CharBuffer.allocate(maxBytes);
+//		// Ignore an incomplete character
+//		decoder.onMalformedInput(CodingErrorAction.IGNORE);
+//		decoder.decode(bb, cb, true);
+//		decoder.flush(cb);
+//		return new String(cb.array(), 0, cb.position());
+//	}
+
 	public void updateActiu(
 			boolean actiu) {
 		this.actiu = actiu;

@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 12.10.22 09:17
+-- Ran at: 26.10.22 15:26
 -- Against: null@offline:postgresql?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.4.3
 -- *********************************************************************
@@ -53,6 +53,11 @@ ALTER TABLE ipa_metadocument ADD pinbal_servei_doc_permes_cif BOOLEAN DEFAULT TR
 ALTER TABLE ipa_metadocument ADD pinbal_servei_doc_permes_nie BOOLEAN DEFAULT TRUE NOT NULL;
 
 ALTER TABLE ipa_metadocument ADD pinbal_servei_doc_permes_pas BOOLEAN DEFAULT TRUE NOT NULL;
+
+-- Changeset db/changelog/changes/0.9.95/1082.yaml::1666773113019-1::limit
+ALTER TABLE ipa_expedient ADD numero VARCHAR(64);
+
+INSERT INTO IPA_PROCESSOS_INICIALS (codi, init, id) VALUES ('GENERAR_EXPEDIENT_NUMERO', 1, 3);
 
 -- Changeset db/changelog/changes/0.9.95/1123.yaml::1660219576096-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.document.esborrar.finals', 'true', 'Permetre esborrar documents CUSTODIATS, FIRMATS, DEFINITIUS I IMPORTATS', 'CONTINGUT', '21', '0', 'BOOL', '1');

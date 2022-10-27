@@ -563,7 +563,7 @@ public class ConversioTipusHelper {
 						SeguimentArxiuPendentsDto target = new SeguimentArxiuPendentsDto();
 						target.setId(source.getId());
 						target.setElementNom(source.getNom());
-						target.setExpedientNumeroNom(source.getNom() + " (" + expedientHelper.calcularNumero(source) + ")");
+						target.setExpedientNumeroNom(source.getNom() + " (" + source.getNumero() + ")");
 						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						return target;
@@ -578,7 +578,7 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setExpedientId(source.getExpedient().getId());
 						target.setElementNom(source.getNom());
-						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + expedientHelper.calcularNumero(source.getExpedient()) + ")");
+						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
 						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
@@ -602,7 +602,7 @@ public class ConversioTipusHelper {
 						} else if (source instanceof  InteressatPersonaJuridicaEntity) {
 							target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
 						} 
-						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + expedientHelper.calcularNumero(source.getExpedient()) + ")");
+						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
 						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
@@ -691,7 +691,7 @@ public class ConversioTipusHelper {
 						ExpedientEntity expedient = source.getRegistre().getExpedientPeticions().get(0).getExpedient();
 						if (expedient != null) {
 							target.setExpedientId(expedient.getId());
-							target.setExpedientNumeroNom(expedientHelper.calcularNumero(expedient) + " - " + expedient.getNom());
+							target.setExpedientNumeroNom(expedient.getNumero() + " - " + expedient.getNom());
 							target.setExpedientCreatedDate(expedient.getCreatedDate().toDate());
 						}
 						target.setDocumentId(source.getDocument() != null ? source.getDocument().getId() : null);

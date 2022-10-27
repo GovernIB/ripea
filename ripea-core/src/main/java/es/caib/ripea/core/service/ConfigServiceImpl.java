@@ -151,6 +151,7 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
+    @Transactional
     public void actualitzarPropietatsJBossBdd() {
 
         List<ConfigEntity> configs = configRepository.findJBossConfigurables();

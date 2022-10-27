@@ -12,6 +12,11 @@ update ipa_metaexp_seq set valor = 0 where valor is null;
 
 alter table ipa_metaexp_seq modify ( valor not null);
 
+-- Changeset db/changelog/changes/0.9.95/1082.yaml::1666773113019-1::limit
+ALTER TABLE ipa_expedient ADD numero VARCHAR2(64 CHAR);
+
+INSERT INTO IPA_PROCESSOS_INICIALS (codi, init, id) VALUES ('GENERAR_EXPEDIENT_NUMERO', 1, 3);
+
 -- Changeset db/changelog/changes/0.9.95/1123.yaml::1660219576096-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.document.esborrar.finals', 'true', 'Permetre esborrar documents CUSTODIATS, FIRMATS, DEFINITIUS I IMPORTATS', 'CONTINGUT', '21', '0', 'BOOL', '1');
 

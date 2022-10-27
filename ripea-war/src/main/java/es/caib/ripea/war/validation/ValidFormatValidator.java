@@ -67,11 +67,14 @@ public class ValidFormatValidator implements ConstraintValidator<ValidFormat, Do
 			if (command.getInteressatsIds() != null) {
 				boolean val = true;
 				for (Long id : command.getInteressatsIds()) {
+					
 					InteressatDto interessatDto = expedientInteressatService.findById(id, false);
-					if (interessatDto.getRepresentant() == null && interessatDto.getDocumentTipus() != InteressatDocumentTipusEnumDto.NIF && interessatDto.getDocumentTipus() != InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && (interessatDto.getEmail() == null || interessatDto.getEmail().isEmpty())) {
-						val = false;
-					} else if (interessatDto.getRepresentant() != null && interessatDto.getRepresentant().getDocumentTipus() != InteressatDocumentTipusEnumDto.NIF && interessatDto.getRepresentant().getDocumentTipus() != InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && (interessatDto.getRepresentant().getEmail() == null || interessatDto.getRepresentant().getEmail().isEmpty())) {
-						val = false;
+					if (interessatDto.isPersonaFisica()) {
+						if (interessatDto.getRepresentant() == null && interessatDto.getDocumentTipus() != InteressatDocumentTipusEnumDto.NIF && interessatDto.getDocumentTipus() != InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && (interessatDto.getEmail() == null || interessatDto.getEmail().isEmpty())) {
+							val = false;
+						} else if (interessatDto.getRepresentant() != null && interessatDto.getRepresentant().getDocumentTipus() != InteressatDocumentTipusEnumDto.NIF && interessatDto.getRepresentant().getDocumentTipus() != InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS && (interessatDto.getRepresentant().getEmail() == null || interessatDto.getRepresentant().getEmail().isEmpty())) {
+							val = false;
+						}
 					}
 				}
 				if (!val) {
