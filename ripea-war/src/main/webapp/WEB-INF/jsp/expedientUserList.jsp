@@ -156,7 +156,7 @@ $(document).ready(function() {
 	var metaExpedientId = "";
 	var counter = 0;
 	$('#metaExpedientId').on('change', function() {
-		metaExpedientId = $(this).val() ? $(this).val() : '${expedientFiltreCommand.metaExpedientId}';
+		metaExpedientId = $(this).val();
 		if (counter != 0) {
 			
 			if (metaExpedientId) {
@@ -172,6 +172,8 @@ $(document).ready(function() {
 				.fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");
 				});
+			} else {
+				setObertTancat();
 			}
 		}
 		counter++;
@@ -249,7 +251,7 @@ $(document).ready(function() {
 	$('#organGestorId').on('change', function() {
 		var organGestorId = $(this).val();
 		findActiusPerLectura(organGestorId);
-		
+
 		/*$('#metaExpedientId').val('').trigger('change')
 
 		if (organGestorId) {
@@ -296,12 +298,13 @@ function findActiusPerLectura(organId) {
                 console.info(procedimentsComuns);
                 console.info(procedimentsOrgan);
 
-
+				var previousProcedimentStillSelected = false;
                 if (procedimentsComuns.length > 0) {
                     selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.comuns'/>'>");
                     $.each(procedimentsComuns, function(index, val) {
         				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
         					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        					previousProcedimentStillSelected = true;
         				} else {
         					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacioSia + ")</option>");
         				}
@@ -313,19 +316,42 @@ function findActiusPerLectura(organId) {
                     $.each(procedimentsOrgan, function(index, val) {
         				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
         					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        					previousProcedimentStillSelected = true;
         				} else {
         					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacioSia + ")</option>");
         				}
                     });
                     selProcediments.append("</optgroup>");
                 }
-    			
-    		}
+
+
+                if (previousValue && !previousProcedimentStillSelected) {
+                	setObertTancat();
+				}
+    		} else {
+    			setObertTancat();
+        	}
         }
 	});
 	var select2Options = {theme: 'bootstrap', width: '100%', minimumInputLength: 0, allowClear: true, language: "${requestLocale}"}
 	selProcediments.select2(select2Options);
 }
+
+
+	function setObertTancat() {
+		$.get("<c:url value="/expedient/estatValues/"/>"+0)
+		.done(function(data) {
+			$('#expedientEstatId').select2('val', '', true);
+			$('#expedientEstatId option[value!=""]').remove();
+			for (var i = 0; i < data.length; i++) {
+				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+			}
+		})
+		.fail(function() {
+			alert("<spring:message code="error.jquery.ajax"/>");
+		});
+	}
+
 
 function checkLoadingFinished() {
 	var cookieName = "contentLoaded";

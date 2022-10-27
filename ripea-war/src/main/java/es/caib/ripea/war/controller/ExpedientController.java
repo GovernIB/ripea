@@ -210,6 +210,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_SELECCIO);
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_METAEXP_ID);
 		} else {
 			if (!bindingResult.hasErrors()) {
 				RequestSessionHelper.actualitzarObjecteSessio(
@@ -1101,18 +1104,25 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
 			Model model) {
-		
 		long t0 = System.currentTimeMillis();
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
-		List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatsByMetaExpedient(
-				entitatActual.getId(),
-				metaExpedientId);
-		
-		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
-		expedientEstatsOptions.addAll(estatsFromDatabase);
-		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
-		
+		if (metaExpedientId == 0) { //TODO change 0 to null and @RequesParam
+			expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
+			expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
+		} else {
+			
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+			List<ExpedientEstatDto> estatsFromDatabase = expedientEstatService.findExpedientEstatsByMetaExpedient(
+					entitatActual.getId(),
+					metaExpedientId);
+			
+			expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
+			expedientEstatsOptions.addAll(estatsFromDatabase);
+			expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[1].name()), Long.valueOf(-1)));
+			
+		}
+
 		logger.debug("findExpedientEstatByMetaExpedient time: " + (System.currentTimeMillis() - t0) + " ms");
 		return expedientEstatsOptions;
 	}
