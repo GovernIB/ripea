@@ -1640,20 +1640,27 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
 			
-			Date now = new Date();
-			Calendar c = Calendar.getInstance(); 
-			c.setTime(now); 
-			c.add(Calendar.MONTH, -3);
-	        c.set(Calendar.HOUR, 0);
-	        c.set(Calendar.MINUTE, 0);
-	        c.set(Calendar.SECOND, 0);
-			filtreCommand.setDataCreacioInici(c.getTime());
+			if (isFiltreDataCreacioActiu()) {
+				Date now = new Date();
+				Calendar c = Calendar.getInstance(); 
+				c.setTime(now); 
+				c.add(Calendar.MONTH, -3);
+		        c.set(Calendar.HOUR, 0);
+		        c.set(Calendar.MINUTE, 0);
+		        c.set(Calendar.SECOND, 0);
+				filtreCommand.setDataCreacioInici(c.getTime());
+			}
 			filtreCommand.setExpedientEstatId(Long.valueOf(0));
+			
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
 
 		return filtreCommand;
+	}
+	
+	private boolean isFiltreDataCreacioActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.filtre.data.creacio.actiu"));
 	}
 
 	private ExpedientFiltreCommand getRelacionarFiltreCommand(
