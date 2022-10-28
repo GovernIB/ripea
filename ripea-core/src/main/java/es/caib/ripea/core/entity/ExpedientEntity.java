@@ -177,6 +177,15 @@ public class ExpedientEntity extends NodeEntity {
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<ExpedientOrganPareEntity> organGestorPares = new ArrayList<ExpedientOrganPareEntity>();
+	
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+	  name = "ipa_expedient_organpare", 
+	  joinColumns = @JoinColumn(name = "expedient_id"), 
+	  inverseJoinColumns = @JoinColumn(name = "meta_expedient_organ_id"))
+	Set<MetaExpedientOrganGestorEntity> metaexpedientOrganGestorPares;
+	
 
 	public GrupEntity getGrup() {
 		return grup;

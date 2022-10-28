@@ -6,8 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="seguiment.arxiu.pendents.list.titol"/></title>
-	
+	<title><spring:message code="accio.massiva.titol"/>: <spring:message code="decorator.menu.pendents.arxiu"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -196,7 +195,7 @@ $(document).ready(function() {
 					<a id="expSeleccioAll" title="<spring:message code="seguiment.list.expedients.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 					<a id="expSeleccioNone" title="<spring:message code="seguiment.list.expedients.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 					<a id="expReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/expedients/reintentar'/>" >
-						<span id="expSeleccioCount" class="badge">${fn:length(expSeleccio)}</span> <spring:message code="seguiment.list.expedients.boto.reintentar"/>
+						<span id="expSeleccioCount" class="badge">${fn:length(expSeleccio)}</span> <spring:message code="accio.massiva.boto.custodiar"/>
 					</a>
 				</div>
 			</script>
@@ -264,7 +263,7 @@ $(document).ready(function() {
 					<a id="docSeleccioAll" title="<spring:message code="seguiment.list.documents.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 					<a id="docSeleccioNone" title="<spring:message code="seguiment.list.documents.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 					<a id="docReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/documents/reintentar'/>" >
-						<span id="docSeleccioCount" class="badge">${fn:length(docSeleccio)}</span> <spring:message code="seguiment.list.documents.boto.reintentar"/>
+						<span id="docSeleccioCount" class="badge">${fn:length(docSeleccio)}</span> <spring:message code="accio.massiva.boto.custodiar"/>
 					</a>
 				</div>
 			</script>
@@ -353,7 +352,7 @@ $(document).ready(function() {
 					<a id="intSeleccioAll" title="<spring:message code="seguiment.list.interessats.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 					<a id="intSeleccioNone" title="<spring:message code="seguiment.list.interessats.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 					<a id="intReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/interessats/reintentar'/>" >
-						<span id="intSeleccioCount" class="badge">${fn:length(intSeleccio)}</span> <spring:message code="seguiment.list.interessats.boto.reintentar"/>
+						<span id="intSeleccioCount" class="badge">${fn:length(intSeleccio)}</span> <spring:message code="accio.massiva.boto.custodiar"/>
 					</a>
 				</div>
 			</script>

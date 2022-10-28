@@ -20,6 +20,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -239,9 +240,11 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"from " +
 			"    InteressatEntity i " +
 			"where " +
-			"    i.expedient.entitat = :entitat " +
-			"and i.arxiuPropagat = false " +
+			"	 i.arxiuPropagat = false " +
 			"and i.expedient.esborrat = 0 " +
+			"and i.expedient.entitat = :entitat " +
+			"and (i.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:nomesAgafats = false or i.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true " +
 			"			or (lower(i.documentNum||' '||i.nom||' '||i.llinatge1||' '||i.llinatge2) like lower('%'||:nom||'%')" +
 			"				or lower(i.raoSocial) like lower('%'||:nom||'%')" +
@@ -250,6 +253,9 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) ")
 	public Page<InteressatEntity> findArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("nomesAgafats") boolean nomesAgafats,
+			@Param("usuariActual") String usuariActual,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullExpedient") boolean esNullExpedient,
@@ -257,29 +263,37 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			Pageable pageable);
-
+	
+	
 	@Query(	"select " +
 			"    i.id " +
 			"from " +
 			"    InteressatEntity i " +
 			"where " +
-			"    i.expedient.entitat = :entitat " +
-			"and i.arxiuPropagat = false " +
+			"	 i.arxiuPropagat = false " +
 			"and i.expedient.esborrat = 0 " +
+			"and i.expedient.entitat = :entitat " +
+			"and (i.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:nomesAgafats = false or i.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true " +
 			"			or (lower(i.documentNum||' '||i.nom||' '||i.llinatge1||' '||i.llinatge2) like lower('%'||:nom||'%')" +
 			"				or lower(i.raoSocial) like lower('%'||:nom||'%')" +
-			"				or lower(i.organNom) like lower('%'||:nom||'%'))) " +
+			"				or lower(i.organNom) like lower('%'||:nom||'%'))) " + 
 			"and (:esNullExpedient = true or i.expedient = :expedient) " +
 			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) ")
-	public List<Long> findArxiuPendents(
+	public List<Long> findIdsArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("nomesAgafats") boolean nomesAgafats,
+			@Param("usuariActual") String usuariActual,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullExpedient") boolean esNullExpedient,
-			@Param("expedient") ExpedientEntity expedient,
+			@Param("expedient") ExpedientEntity expedient,			
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+
+
 	
 	
 }

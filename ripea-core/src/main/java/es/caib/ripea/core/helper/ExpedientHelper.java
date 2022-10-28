@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -66,6 +67,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -84,6 +86,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -101,6 +104,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -173,6 +177,11 @@ public class ExpedientHelper {
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private MetaExpedientRepository metaExpedientRepository;
+	
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
@@ -1297,6 +1306,70 @@ public class ExpedientHelper {
 		return resultat;
 	}
 	
+	
+	
+	public PermisosPerExpedientsDto findPermisosPerExpedients(
+			Long entitatId,
+			String rolActual) {
+		PermisosPerExpedientsDto permisosPerExpedientsDto = new PermisosPerExpedientsDto();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+
+		long t7 = System.currentTimeMillis();
+		List<Long> idsMetaExpedientsPermesos = null;
+		if (rolActual.equals("IPA_ADMIN")) {
+			idsMetaExpedientsPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);
+		} else {
+			// Cercam els metaExpedients amb permisos assignats directament
+			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					MetaNodeEntity.class,
+					ExtendedPermission.READ));
+		}
+		permisosPerExpedientsDto.setIdsMetaExpedientsPermesos(idsMetaExpedientsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsMetaExpedientsPermesos (" + (idsMetaExpedientsPermesos != null ? idsMetaExpedientsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
+		
+		// Cercam els òrgans amb permisos assignats directament
+		long t8 = System.currentTimeMillis();
+		List<Long> idsOrgansPermesos;
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			idsOrgansPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					OrganGestorEntity.class,
+					ExtendedPermission.ADMINISTRATION));
+		} else {
+			idsOrgansPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					OrganGestorEntity.class,
+					ExtendedPermission.READ));
+		}
+		permisosPerExpedientsDto.setIdsOrgansPermesos(idsOrgansPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsOrgansPermesos (" + (idsOrgansPermesos != null ? idsOrgansPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
+		
+		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+		long t9 = System.currentTimeMillis();
+		List<Long> idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				MetaExpedientOrganGestorEntity.class,
+				ExtendedPermission.READ));
+		permisosPerExpedientsDto.setIdsMetaExpedientOrganPairsPermesos(idsMetaExpedientOrganPairsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsMetaExpedientOrganPairsPermesos (" + (idsMetaExpedientOrganPairsPermesos != null ? idsMetaExpedientOrganPairsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
+		
+		// Cercam els òrgans amb permisos per procediemnts comuns
+		long t91 = System.currentTimeMillis();
+		List<Long> idsOrgansAmbProcedimentsComunsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
+				OrganGestorEntity.class,
+				ExtendedPermission.COMU,
+				ExtendedPermission.READ));
+		permisosPerExpedientsDto.setIdsOrgansAmbProcedimentsComunsPermesos(idsOrgansAmbProcedimentsComunsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + " " + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
+		
+		
+		List<Long> procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+		permisosPerExpedientsDto.setIdsProcedimentsComuns(procedimentsComunsIds);
+		return permisosPerExpedientsDto;
+		
+	}
+	
 	private BigDecimal crearFilesCarpetaActual(
 			BigDecimal num, 
 			BigDecimal sum, 
@@ -2101,6 +2174,14 @@ public class ExpedientHelper {
 //					"Ja existeix un altre expedient amb el mateix tipus i nom");
 //		}
 //	}
+	
+	private List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 

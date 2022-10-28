@@ -83,18 +83,16 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    distinct e " +
 			"from " +
 			"    ExpedientEntity e " +
-			"    left join e.organGestorPares eogp " +
-			"    left join eogp.metaExpedientOrganGestor eogpmeog " +
-			"    left join eogp.metaExpedientOrganGestor.organGestor eogpmeogog " +
+			"    left join e.metaexpedientOrganGestorPares meogp " +
 			"where " +
 			"    e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
 			"and (" +
-			"     (:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
-			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
-			"     or (:esNullOrganIdPermesos = false and eogpmeogog.id in (:organIdPermesos)) " +
-			"     or (:esNullMetaExpedientOrganIdPermesos = false and eogpmeog.id in (:metaExpedientOrganIdPermesos)) " +
-			"     or (:esNullOrganProcedimentsComunsIdsPermesos = false and eogpmeogog.id in (:organProcedimentsComunsIdsPermesos) and e.metaExpedient.id in (:procedimentsComunsIds))) " +
+			"     (:esNullIdsMetaExpedientsPermesos = false and e.metaExpedient.id in (:idsMetaExpedientsPermesos)) " +
+			"     or (:esNullIdsOrgansPermesos = false and meogp.organGestor.id in (:idsOrgansPermesos)) " +
+			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
+		//TODO if organ is in :idsOrgansAmbProcedimentsComunsPermesos it is also already in :idsOrgansPermesos as well so check :idsOrgansAmbProcedimentsComunsPermesos doesn't do anything, probably :idsOrgansPermesos check should be only allowed for procediments no comuns
 			"and (:esNullMetaNode = true or e.metaNode = :metaNode) " +
 			"and (:esNullMetaExpedientIdDomini = true or e.metaExpedient.id in (:metaExpedientIdDomini)) " +
 			"and (:esNullOrganGestor = true or e.organGestor = :organGestor) " +
@@ -123,15 +121,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
-			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
-			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos, 
-			@Param("organIdPermesos") List<Long> organIdPermesos,
-			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
-			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
-			@Param("esNullOrganProcedimentsComunsIdsPermesos") boolean esNullOrganProcedimentsComunsIdsPermesos, 
-			@Param("organProcedimentsComunsIdsPermesos") List<Long> organProcedimentsComunsIdsPermesos,
-			@Param("procedimentsComunsIds") List<Long> procedimentsComunsIds,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("idsMetaExpedientsPermesos") List<Long> idsMetaExpedientsPermesos,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos, 
+			@Param("idsOrgansPermesos") List<Long> idsOrgansPermesos,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos, 
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
 			@Param("esNullMetaNode") boolean esNullMetaNode,
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("esNullMetaExpedientIdDomini") boolean esNullMetaExpedientIdDomini,
@@ -499,41 +497,118 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	
 	
 	
+//	@Query(	"select " +
+//			"    distinct e " +
+//			"from " +
+//			"    ExpedientEntity e " +
+//			"    join MetaExpedientOrganGestorEntity mo on e.organGestor = mo.organGestor and e.metaExpedient = mo.metaExpedient " +
+//			"where " +
+//			"    e.esborrat = 0 " +
+//			"and ((:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
+//			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
+//			"     or (:esNullMetaExpedientOrganIdPermesos = false and mo in (:metaExpedientOrganIdPermesos)))"
+//			)
+//	Page<ExpedientEntity> findExpedientsPermittedOneWay(
+//			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
+//			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
+//			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos, 
+//			@Param("organIdPermesos") List<Long> organIdPermesos,
+//			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
+//			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
+//			Pageable pageable);
+//	
+
+
+	
+
+	
+	
+	@Query(	"select " +
+			"    distinct e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"    left join e.metaexpedientOrganGestorPares meogp " +
+			"where " +
+			"	 e.arxiuUuid = null " +
+			"and e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and (" +
+			"     (:esNullIdsMetaExpedientsPermesos = false and e.metaExpedient.id in (:idsMetaExpedientsPermesos)) " +
+			"     or (:esNullIdsOrgansPermesos = false and meogp.organGestor.id in (:idsOrgansPermesos)) " +
+			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
+		//TODO if organ is in :idsOrgansAmbProcedimentsComunsPermesos it is also already in :idsOrgansPermesos as well so check :idsOrgansAmbProcedimentsComunsPermesos doesn't do anything, probably :idsOrgansPermesos check should be only allowed for procediments no comuns
+			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +			
+			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
+	public Page<ExpedientEntity> findArxiuPendents(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("idsMetaExpedientsPermesos") List<Long> idsMetaExpedientsPermesos,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos, 
+			@Param("idsOrgansPermesos") List<Long> idsOrgansPermesos,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos, 
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
+			@Param("nomesAgafats") boolean nomesAgafats,
+			@Param("usuariActual") String usuariActual,
+			@Param("esNullNom") boolean esNullNom,
+			@Param("nom") String nom,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			Pageable pageable);
+	
+	
 	
 	@Query(	"select " +
 			"    e " +
 			"from " +
 			"    ExpedientEntity e " +
 			"where " +
-			"    e.entitat = :entitat " +
-			"and e.arxiuUuid = null " +
+			"	 e.arxiuUuid = null " +
 			"and e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +			
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
 	public Page<ExpedientEntity> findArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("nomesAgafats") boolean nomesAgafats,
+			@Param("usuariActual") String usuariActual,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
-			Pageable pageable);
-
+			Pageable pageable);	
+	
+	
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
 			"    ExpedientEntity e " +
 			"where " +
-			"    e.entitat = :entitat " +
-			"and e.arxiuUuid = null " +
+			"	 e.arxiuUuid = null " +
 			"and e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and (e.metaNode in (:metaExpedientsPermesos)) " +
+			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +			
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
-	public List<Long> findArxiuPendents(
+	public List<Long> findIdsArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
+			@Param("nomesAgafats") boolean nomesAgafats,
+			@Param("usuariActual") String usuariActual,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);	
+
+
 
 	@Query(	"select " +
 			"    e " +
