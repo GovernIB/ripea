@@ -48,17 +48,20 @@
 				</c:otherwise>
 			</c:choose>	
 		</c:if>
-		<c:if test="${contingut.arxiuUuid==null}">
-			<c:choose>
-				<c:when test="${contingut.document}">
-					<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
-					<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-				</c:when>
-				<c:when test="${contingut.expedient}">
-					<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-				</c:when>
-			</c:choose>
-		</c:if>
+		
+		
+		<c:choose>
+			<c:when test="${contingut.document && contingut.arxiuUuid==null}">
+				<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
+				<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+			</c:when>
+			<c:when test="${contingut.document && contingut.gesDocFirmatId != null}">
+				<li><a href="<c:url value="/document/${contingut.id}/portafirmes/reintentarGuardarArxiu"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+			</c:when>			
+			<c:when test="${contingut.expedient && contingut.arxiuUuid==null}">
+				<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+			</c:when>
+		</c:choose>
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
 			<c:choose>
 				<c:when test="${contingut.carpeta}">

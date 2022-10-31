@@ -107,17 +107,18 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "descripcio", length = 512)
 	protected String descripcio;
 
-	//document signed by portafib that haven't been saved in arxiu 
+	// document signed in portafirmes that arrived in callback and was not saved in arxiu 
 	@Column(name = "ges_doc_firmat_id", length = 256)
 	private String gesDocFirmatId;
 	@Column(name = "nom_fitxer_firmat", length = 512)
 	private String nomFitxerFirmat;
 	
-	// document adjunt when creating document that haven't been saved in arxiu
+	//document uploaded manually in ripea that was not saved in arxiu
 	@Column(name = "ges_doc_adjunt_id", length = 256)
 	private String gesDocAdjuntId;
 	@Column(name = "ges_doc_adjunt_firma_id", length = 256)
 	private String gesDocAdjuntFirmaId;
+	
 	@Column(name = "pinbal_idpeticion", length = 64)
 	private String pinbalIdpeticion;
 

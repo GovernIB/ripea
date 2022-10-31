@@ -470,9 +470,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	 left join d.annexos a " + 
 			"where " +
 			"	 c1.esborrat = 0 " +
-			"and (c1.arxiuUuid = null " + //documents uploaded manually in ripea not saved in arxiu
-			"	  or a.error is not null " + //documents from distribucio not moved in arxiu to ripea expedient
-			"	  or (d.id in " + // documents signed in portafirmes that arrived in callback not saved in arxiu 
+			"and (c1.arxiuUuid = null " + //documents uploaded manually in ripea that were not saved in arxiu
+			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
+			"	  or (d.id in " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 
 			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
 			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
 			"				and docPortafirmes.estat = 'ENVIAT' " +
