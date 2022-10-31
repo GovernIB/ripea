@@ -210,6 +210,7 @@ $(document).ready(function() {
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
 				data-selection-enabled="true"
+				data-save-state="true"
 				style="width:100%">
 				<thead> 
 					<tr>
@@ -278,6 +279,7 @@ $(document).ready(function() {
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
 				data-selection-enabled="true"
+				data-save-state="true"
 				style="width:100%">
 				<thead> 
 					<tr>
@@ -367,6 +369,7 @@ $(document).ready(function() {
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
 				data-selection-enabled="true"
+				data-save-state="true"
 				style="width:100%">
 				<thead> 
 					<tr>
