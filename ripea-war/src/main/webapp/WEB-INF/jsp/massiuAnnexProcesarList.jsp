@@ -135,7 +135,7 @@ function enableDisableSelection($this, tipus) {
 			</div>
 			
 			<div class="col-md-4">					
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>		
 						
 			
