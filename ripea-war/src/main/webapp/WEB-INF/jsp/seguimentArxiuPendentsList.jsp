@@ -214,7 +214,11 @@ $(document).ready(function() {
 				style="width:100%">
 				<thead> 
 					<tr>
-						<th data-col-name="expedientNumeroNom"><spring:message code="seguiment.list.columna.expedient"/></th>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink1" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+							<script id="cellExpedientLink1" type="text/x-jsrender">
+								<a href="<c:url value="/contingut/{{:id}}"/>">{{:expedientNumeroNom}}</a>	
+							</script>
+						</th>
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsExpedientsTemplate" width="10%">
@@ -286,10 +290,10 @@ $(document).ready(function() {
 						<th data-col-name="expedientId" data-visible="false"></th>
 						<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.document"/></th>
-						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
-						<script id="cellExpedientLink" type="text/x-jsrender">
-							<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
-						</script>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink2" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+							<script id="cellExpedientLink2" type="text/x-jsrender">
+								<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
+							</script>
 						</th>
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
@@ -376,7 +380,11 @@ $(document).ready(function() {
 						<th data-col-name="expedientId" data-visible="false"></th>
 						<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.interessat"/></th>
-						<th data-col-name="expedientNumeroNom"><spring:message code="seguiment.list.columna.expedient"/></th>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink3" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+							<script id="cellExpedientLink3" type="text/x-jsrender">
+								<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
+							</script>
+						</th>						
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatsTemplate" width="10%">
