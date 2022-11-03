@@ -745,6 +745,7 @@ public class ContingutServiceImpl implements ContingutService {
 //				}
 //			}
 //		}
+		Long t0 = System.currentTimeMillis();
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -758,6 +759,7 @@ public class ContingutServiceImpl implements ContingutService {
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
+		logger.trace("findAmbIdUser toContingutDto time:  " + (System.currentTimeMillis() - t0) + " ms");
 		return dto;
 	}
 

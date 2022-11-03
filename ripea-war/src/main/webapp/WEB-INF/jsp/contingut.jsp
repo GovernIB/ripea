@@ -582,6 +582,14 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 
 let pageSizeDominis = 20;
 $(document).ready(function() {
+
+	$('.nav-tabs a[href$="#interessats"]').on('click', function() {
+		$('#taulaInteressats').webutilDatatable();
+	});
+	
+	$('.nav-tabs a[href$="#notificacions"]').on('click', function() {
+		$('#taulaNotificacions').webutilDatatable();
+	});
 	
 	if (/#contingut/.test(window.location.href)) {
 		$('.nav-tabs a[href$="#contingut"]').trigger('click');	
@@ -2632,7 +2640,6 @@ $.views.helpers(myHelpers);
 						<div class="tab-pane" id="interessats">
 							<table 
 								id="taulaInteressats" 
-								data-toggle="datatable" 
 								data-url="<c:url value="/contingut/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/datatable"/>" 
 								data-paging-enabled="false"
 								data-botons-template="#taulaInteressatsNouBoton" 
@@ -2715,7 +2722,6 @@ $.views.helpers(myHelpers);
 						<div class="tab-pane" id="notificacions">
 							<table
 								id="taulaNotificacions"
-								data-toggle="datatable"
 								data-url="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/enviament/NOTIFICACIO/datatable"/>"
 								data-paging-enabled="false"
 								data-agrupar="5"
