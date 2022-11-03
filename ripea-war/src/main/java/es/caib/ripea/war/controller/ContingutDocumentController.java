@@ -156,7 +156,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		model.addAttribute(command);
 		model.addAttribute("contingutId", pareId);
-		model.addAttribute("documentId", documentId);
+		model.addAttribute("documentId", documentId);		
 		return "contingutDocumentForm";
 	}
 	@RequestMapping(value = "/{pareId}/document/docNew", method = RequestMethod.POST)
@@ -1091,6 +1091,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.propagar.modificacio.arxiu");
 	}
 	
+	private Boolean isDeteccioFirmaAutomaticaActiva() {
+		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.deteccio.firma.automatica");
+	}
+	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {
 			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
@@ -1256,6 +1260,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("contingutId", contingutId);
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
+		model.addAttribute("isDeteccioFirmaAutomaticaActiva", isDeteccioFirmaAutomaticaActiva());
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

@@ -292,7 +292,7 @@ public class DocumentHelper {
 			fitxer.setNom(documentEntity.getFitxerNom());
 			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 		}
-		if (document.getFitxerContingut() != null) {
+		if (document.getFitxerContingut() != null || arxiuDocument != null) {
 			actualitzarFitxerDocument(
 					documentEntity,
 					fitxer);
