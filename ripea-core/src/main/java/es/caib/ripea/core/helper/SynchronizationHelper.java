@@ -10,10 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SynchronizationHelper {
 
-	public static Map<Long, Object> locksMoureDocumentArxiu = new ConcurrentHashMap<>();
-	public static Map<Long, Object> locksGuardarExpedientArxiu = new ConcurrentHashMap<>();
-	public static Map<Long, Object> locksGuardarDocumentArxiu = new ConcurrentHashMap<>();
-
+	public static Map<Long, Object> locksExpedients = new ConcurrentHashMap<>();  // think if shoudn't be replaced by JPA @Lock(LockModeType.PESSIMISTIC_READ)
 	
 	
 	

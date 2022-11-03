@@ -332,9 +332,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
 		Exception exception = null;
 		if (document.getArxiuUuid() == null) {
-			exception = documentService.guardarDocumentArxiu(documentId);
+			
+			try {
+				exception = documentService.guardarDocumentArxiu(documentId);
+			} catch (Exception e) {
+				exception = e;
+			}
 		} else if (document.isPendentMoverArxiu()) {
-			exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+			try {
+				exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+			} catch (Exception e) {
+				exception = e;
+			}
 		}
 		
 		

@@ -34,7 +34,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Persistable;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -480,7 +479,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	public Exception retryMoverAnnexArxiu(Long registreAnnexId) {
 		
-		synchronized (SynchronizationHelper.get0To99Lock(registreAnnexId, SynchronizationHelper.locksMoureDocumentArxiu)) {
+		Long expedientId = registreAnnexRepository.findExpedientId(registreAnnexId);
+		
+		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 			return expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
 		}
 	}
@@ -938,7 +939,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Override
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
-		synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+		synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksExpedients)) {
 			expedientHelper.tancar(
 					entitatId,
 					id,
@@ -976,7 +977,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public Exception guardarExpedientArxiu(
 			Long expId) {
 		
-		synchronized (SynchronizationHelper.get0To99Lock(expId, SynchronizationHelper.locksGuardarExpedientArxiu)) {
+		synchronized (SynchronizationHelper.get0To99Lock(expId, SynchronizationHelper.locksExpedients)) {
 			return expedientHelper.guardarExpedientArxiu(expId);
 		}
 	}

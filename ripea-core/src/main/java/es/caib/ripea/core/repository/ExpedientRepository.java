@@ -7,9 +7,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.LockModeType;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -663,4 +666,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 
 	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
+
+	
+	@Lock(LockModeType.PESSIMISTIC_READ)
+	@Query(	"select " +
+			"    e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"where " +
+			"    e.id = :id")
+	public ExpedientEntity findWithLock(@Param("id") Long id);
+	
 }

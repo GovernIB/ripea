@@ -295,7 +295,10 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception guardarDocumentArxiu(
 			Long docId) {
-		synchronized (SynchronizationHelper.get0To99Lock(docId, SynchronizationHelper.locksGuardarDocumentArxiu)) {
+		
+		Long expedientId = documentRepository.findExpedientId(docId);
+		
+		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 			return documentHelper.guardarDocumentArxiu(docId);
 		}
 	}

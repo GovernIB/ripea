@@ -3,31 +3,6 @@
  */
 package es.caib.ripea.core.helper;
 
-import com.sun.jersey.core.util.Base64;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
-import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.NodeEntity;
-import es.caib.ripea.core.repository.DocumentRepository;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -37,6 +12,43 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.sun.jersey.core.util.Base64;
+
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.repository.DocumentRepository;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -62,6 +74,8 @@ public class DocumentHelper {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
@@ -836,6 +850,12 @@ public class DocumentHelper {
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);
 		if (documentEntity.getExpedientPare().getArxiuUuid() != null) {
+			
+			if (documentEntity.getArxiuUuid() != null) { // concurrency check
+				throw new RuntimeException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+			}
+			expedientHelper.concurrencyCheckExpedientJaTancat(documentEntity.getExpedient());
+			
 			try {
 				FitxerDto fitxer = new FitxerDto();
 				fitxer.setNom(documentEntity.getFitxerNom());

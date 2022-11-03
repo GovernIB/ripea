@@ -40,6 +40,15 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	int countByExpedientAndEstat(
 			ExpedientEntity expedient,
 			DocumentEstatEnumDto estat);
+	
+	@Query(	"select " +
+			"    d.expedient.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.id = :documentId ")
+	Long findExpedientId(
+			@Param("documentId") Long documentId);
 
 
 	@Query(	" SELECT " +

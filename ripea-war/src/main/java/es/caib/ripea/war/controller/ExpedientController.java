@@ -597,7 +597,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@RequestParam(value = "origin") String origin,
 			Model model)  {
 
-		Exception exception = expedientService.guardarExpedientArxiu(expedientId);
+		
+		Exception exception = null;
+		try {
+			exception = expedientService.guardarExpedientArxiu(expedientId);
+		} catch (Exception e) {
+			exception = e;
+		}
 		
 		String redirect = null;
 		if (origin.equals("expDetail")) {

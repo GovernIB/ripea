@@ -994,7 +994,7 @@ public class ExpedientHelper {
 	}
 	
 	
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
 		logger.debug(
 				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
@@ -1008,9 +1008,7 @@ public class ExpedientHelper {
 				false, 
 				checkPerMassiuAdmin, null);
 		
-		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) { // concurrency
-			throw new RuntimeException("L'expedient ja se ha tancat");
-		}
+		concurrencyCheckExpedientJaTancat(expedient);
 		
 		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
@@ -1180,6 +1178,11 @@ public class ExpedientHelper {
 		Exception exception = null;
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
+		
+		if (expedient.getArxiuUuid() != null) { // concurrency check
+			throw new RuntimeException("L'expedient ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+		}
+		concurrencyCheckExpedientJaTancat(expedient);
 		
 		try {
 			contingutHelper.arxiuPropagarModificacio(
@@ -2064,6 +2067,13 @@ public class ExpedientHelper {
 			carpetaId = carpetaDto.getId();
 		}
 		return carpetaId;
+	}
+	
+	
+	public void concurrencyCheckExpedientJaTancat(ExpedientEntity expedient) {
+		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) { 
+			throw new RuntimeException("L'expedient ja se ha tancat per otra persona. No és possible fer cap canvi");
+		}
 	}
 	
 	

@@ -47,6 +47,8 @@ public class ExpedientInteressatHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 	
 	@Transactional
 	public InteressatDto create(
@@ -514,6 +516,8 @@ public class ExpedientInteressatHelper {
 		
 		Exception exception = null;
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
+		
+		expedientHelper.concurrencyCheckExpedientJaTancat(expedient);
 			
 		if (expedient.getArxiuUuid() != null) {
 			try {
