@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -31,10 +32,13 @@ import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentOrigenEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -82,7 +86,6 @@ public class DocumentHelper {
 			ContingutEntity pare,
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
-			List<ArxiuFirmaDto> firmes,
 			boolean returnDetail) {
 		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
@@ -124,28 +127,19 @@ public class DocumentHelper {
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen(),
 				document.getPinbalIdpeticion());
+		
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(document.getFitxerNom());
 		fitxer.setContentType(document.getFitxerContentType());
 		fitxer.setContingut(document.getFitxerContingut());
-		List<ArxiuFirmaDto> firmesValidacio = null;
-		if (document.getFitxerContingut() != null) {
-			actualitzarFitxerDocument(
-					entity,
-					fitxer);
-			if (document.isAmbFirma() && firmes == null) {
-				firmesValidacio = validaFirmaDocument(
-						entity, 
-						fitxer,
-						document.getFirmaContingut());
-			}
-		}
+		actualitzarFitxerDocument(
+				entity,
+				fitxer);
+
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
 				true);
-		logger.debug("[CERT] Fitxer nom: " + fitxer.getNom());
-		
 		
 		String gestioDocumentalAdjuntId = document.getGesDocAdjuntId();
 		if (document.getFitxerContingut() != null) {
@@ -167,13 +161,29 @@ public class DocumentHelper {
 		
 		try {
 			if (entity.getExpedient().getArxiuUuid() != null) {
+				
+				List<ArxiuFirmaDto> firmes = null;
+				if (isDocumentFromPinbal(entity)) {
+					ArxiuFirmaDto firma = new ArxiuFirmaDto();
+					firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
+					firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+					firmes = Arrays.asList(firma);
+					
+				} else if (document.isAmbFirma()) {
+					firmes = validaFirmaDocument(
+							entity, 
+							fitxer,
+							document.getFirmaContingut(), 
+							false, 
+							true);
+				}
+
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
 						document.isAmbFirma(),
 						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmesValidacio, 
-						false);
+						firmes != null ? firmes : firmes);
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -204,6 +214,31 @@ public class DocumentHelper {
 			dto.setId(entity.getId());
 		return dto;
 	}
+	
+	
+	public static boolean isDocumentFromRipea(DocumentEntity document) {
+		return getDocumentOrigen(document) == DocumentOrigenEnumDto.RIPEA;
+	}
+	
+	public static boolean isDocumentFromDistribucio(DocumentEntity document) {
+		return getDocumentOrigen(document) == DocumentOrigenEnumDto.DISTRIBUCIO;
+	}
+	
+	public static boolean isDocumentFromPinbal(DocumentEntity document) {
+		return getDocumentOrigen(document) == DocumentOrigenEnumDto.PINBAL;
+	}
+	
+	
+	public static DocumentOrigenEnumDto getDocumentOrigen(DocumentEntity document) {
+		if (document.getPinbalIdpeticion() != null) {
+			return DocumentOrigenEnumDto.PINBAL;
+		} else if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
+			return DocumentOrigenEnumDto.DISTRIBUCIO;
+		} else {
+			return DocumentOrigenEnumDto.RIPEA;
+		}
+	}
+	
 	
 	public DocumentDto updateDocument(
 			Long entitatId,
@@ -300,7 +335,9 @@ public class DocumentHelper {
 				firmes = validaFirmaDocument(
 						documentEntity, 
 						fitxer,
-						document.getFirmaContingut());
+						document.getFirmaContingut(), 
+						false, 
+						true);
 			}
 			// Al modificar el document, eliminam l'alerta de document invàlid,
 			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
@@ -326,8 +363,7 @@ public class DocumentHelper {
 					fitxer,
 					document.isAmbFirma(),
 					document.isFirmaSeparada(),
-					firmes, 
-					false);
+					firmes);
 		}
 
 		return dto;
@@ -413,8 +449,7 @@ public class DocumentHelper {
 					fitxer,
 					false, //##no validar firma en actualitzar tipus document
 					false,
-					firmes, 
-					false);
+					firmes);
 			return true;
 		} else {
 			return true;
@@ -512,8 +547,7 @@ public class DocumentHelper {
 					fitxer,
 					false,
 					false,
-					null,
-					false);
+					null);
 		}
 		contingutLogHelper.log(
 				document,
@@ -849,7 +883,7 @@ public class DocumentHelper {
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);
-		if (documentEntity.getExpedientPare().getArxiuUuid() != null) {
+		if (documentEntity.getExpedient().getArxiuUuid() != null) {
 			
 			if (documentEntity.getArxiuUuid() != null) { // concurrency check
 				throw new RuntimeException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
@@ -882,19 +916,17 @@ public class DocumentHelper {
 					firmes = validaFirmaDocument(
 							documentEntity,
 							fitxer,
-							firmaSeparada);
+							firmaSeparada, 
+							false, 
+							true);
 				}
 			
-				if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
-					documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
-		
-		
 					contingutHelper.arxiuPropagarModificacio(
 							documentEntity,
 							fitxer,
 							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
 							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes, false);
+							firmes);
 				
 					if (documentEntity.getGesDocAdjuntId() != null ) {
 						pluginHelper.gestioDocumentalDelete(
@@ -934,14 +966,19 @@ public class DocumentHelper {
 	public List<ArxiuFirmaDto> validaFirmaDocument(
 			DocumentEntity document,
 			FitxerDto fitxer,
-			byte[] contingutFirma) {
+			byte[] contingutFirma, 
+			boolean updateEstat, 
+			boolean throwExceptionIfNotValid) {
 		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
 				+ "documentID=" + document.getId() + ")");
 		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
 				fitxer.getContingut(), 
 				(contingutFirma != null && contingutFirma.length > 0) ? contingutFirma : null,
-				fitxer.getContentType());
-		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+				fitxer.getContentType(), 
+				throwExceptionIfNotValid);
+		if (updateEstat) {
+			document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		}
 		contingutLogHelper.log(
 				document,
 				LogTipusEnumDto.DOC_FIRMAT,

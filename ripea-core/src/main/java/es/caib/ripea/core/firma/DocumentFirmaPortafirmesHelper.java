@@ -41,6 +41,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
@@ -310,7 +311,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	}
 
 	/**
-	 * Process document received in callback from portafirmes
+	 * Processes document received in callback from portafirmes
 	 */
 	public Exception portafirmesProcessar(
 			DocumentPortafirmesEntity documentPortafirmes) {
@@ -327,59 +328,50 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				portafirmesDocument = getDocumentFirmatPortafirmes(documentPortafirmes);
 				
 				try {
-					if (portafirmesDocument.isCustodiat()) {
-						// Si el document ja ha estat custodiat pel portafirmes
-						// actualitza la informació de custòdia.
-						document.updateInformacioCustodia(
-								new Date(),
-								portafirmesDocument.getCustodiaId(),
-								portafirmesDocument.getCustodiaUrl());
-						documentPortafirmes.updateProcessat(
-								true,
-								new Date());
-					} else {
-						// Si el document no ha estat custodiat pel portafirmes
-						// actualitza la informació de firma a l'arxiu.
-						if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
-							
-							FitxerAmbFirmaArxiuDto fitxerAmbFirma = getFitxerAmbFirma(portafirmesDocument, document);
-							
-							String gestioDocumentalId = document.getGesDocFirmatId();
-							if (gestioDocumentalId == null ) {
-								gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
-										new ByteArrayInputStream(portafirmesDocument.getArxiuContingut()));
-								document.setGesDocFirmatId(gestioDocumentalId);
-								document.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
-							}
-							
-							// ============================== SAVE IN ARXIU ==========================
-							String custodiaDocumentId = null;
-							if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
-								custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
-										document,
-										fitxerAmbFirma.getFitxer());
-							} else {
-								custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaCades(
-										document, 
-										fitxerAmbFirma.getFitxer(), 
-										Arrays.asList(fitxerAmbFirma.getArxiuFirma()));
-							}
-							
-							String gestioDocumentalDeleteId = document.getGesDocFirmatId();
-							if (gestioDocumentalDeleteId != null ) {
-								pluginHelper.gestioDocumentalDelete(
-										gestioDocumentalDeleteId,
-										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB);
-								document.setGesDocFirmatId(null);
-							}
-							
-							actualitzarInfoDocumentPortafirmesGuardatArxiu(
-									documentPortafirmes,
-									documentEstatAnterior,
-									custodiaDocumentId);
+
+					// Si el document no ha estat custodiat pel portafirmes
+					// actualitza la informació de firma a l'arxiu.
+					if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
+						
+						FitxerAmbFirmaArxiuDto fitxerAmbFirma = getFitxerAmbFirma(portafirmesDocument, document);
+						
+						String gestioDocumentalId = document.getGesDocFirmatId();
+						if (gestioDocumentalId == null ) {
+							gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+									PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+									new ByteArrayInputStream(portafirmesDocument.getArxiuContingut()));
+							document.setGesDocFirmatId(gestioDocumentalId);
+							document.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
 						}
+						
+						// ============================== SAVE IN ARXIU ==========================
+
+						if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
+							pluginHelper.arxiuDocumentGuardarFirmaPades(
+									document,
+									fitxerAmbFirma.getFitxer());
+						} else {
+							pluginHelper.arxiuDocumentActualitzar(
+									document,
+									fitxerAmbFirma.getFitxer(),
+									true,
+									true,
+									Arrays.asList(fitxerAmbFirma.getArxiuFirma()));
+						}
+						
+						String gestioDocumentalDeleteId = document.getGesDocFirmatId();
+						if (gestioDocumentalDeleteId != null ) {
+							pluginHelper.gestioDocumentalDelete(
+									gestioDocumentalDeleteId,
+									PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB);
+							document.setGesDocFirmatId(null);
+						}
+						
+						actualitzarInfoDocumentPortafirmesGuardatArxiu(
+								documentPortafirmes,
+								documentEstatAnterior);
 					}
+					
 
 				} catch (Exception ex) {
 					logger.error("Error al custodiar document de portafirmes (" +
@@ -418,29 +410,22 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	
 	private void actualitzarInfoDocumentPortafirmesGuardatArxiu(
 			DocumentPortafirmesEntity documentPortafirmes,
-			DocumentEstatEnumDto documentEstatAnterior,
-			String custodiaDocumentId) {
+			DocumentEstatEnumDto documentEstatAnterior) {
 		DocumentEntity document = documentPortafirmes.getDocument();
 		documentPortafirmes.updateProcessat(
 				true,
 				new Date());
-		document.updateInformacioCustodia(
-				new Date(),
-				custodiaDocumentId,
-				document.getCustodiaCsv());
-		
 		
 		documentHelper.actualitzarVersionsDocument(document);
 		actualitzarInformacioFirma(document);
 		contingutLogHelper.log(
 				documentPortafirmes.getDocument(),
 				LogTipusEnumDto.ARXIU_CUSTODIAT,
-				custodiaDocumentId,
+				document.getArxiuUuid(),
 				null,
 				false,
 				false);
 		logExpedient(documentPortafirmes, LogTipusEnumDto.ARXIU_CUSTODIAT);
-		
 		
 		DocumentEstatEnumDto documentEstatNou = document.getEstat();
 		if ((documentEstatAnterior != documentEstatNou)) {

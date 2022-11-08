@@ -107,6 +107,14 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "descripcio", length = 512)
 	protected String descripcio;
 
+	
+	//Tipus de document firmat:
+		//Document firmat putjat manualment
+		//Document firmat des dels navegador
+		//Document firmat que es rep des del portafirmes callback
+		//Document que vene d'una anotació de registre
+		//Document generat de les resposta de PINBAL
+	
 	// document signed in portafirmes that arrived in callback and was not saved in arxiu 
 	@Column(name = "ges_doc_firmat_id", length = 256)
 	private String gesDocFirmatId;
@@ -164,6 +172,14 @@ public class DocumentEntity extends NodeEntity {
 		return pare.getId();
 	}
 	
+	
+    /**
+
+     * @deprecated
+     * Document entity has field expedient
+     * <p> Use {@link #getExpedient()} instead.
+     */
+    @Deprecated
 	public ExpedientEntity getExpedientPare() {
 		ContingutEntity contingutPare = this.pare;
 		while(contingutPare != null && !(contingutPare instanceof ExpedientEntity)) {
@@ -204,7 +220,7 @@ public class DocumentEntity extends NodeEntity {
 			MetaDocumentEntity metaDocument) {
 		this.metaNode = metaDocument;
 	}
-
+	
 	public void update(
 			MetaDocumentEntity metaDocument,
 			String nom,

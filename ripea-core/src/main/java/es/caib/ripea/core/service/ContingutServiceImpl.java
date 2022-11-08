@@ -364,12 +364,21 @@ public class ContingutServiceImpl implements ContingutService {
 					fitxer = contingutHelper.fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
 				}
 			}
-			contingutHelper.arxiuPropagarModificacio(
-					contingut,
-					fitxer,
-					false,
-					false,
-					null, false);
+			if (contingut instanceof ExpedientEntity) {
+				contingutHelper.arxiuPropagarModificacio((ExpedientEntity) contingut);
+			} else if (contingut instanceof DocumentEntity) {
+				contingutHelper.arxiuPropagarModificacio(
+						(DocumentEntity) contingut,
+						fitxer,
+						false,
+						false,
+						null);
+			} else if (contingut instanceof CarpetaEntity) {
+				contingutHelper.arxiuPropagarModificacio(
+						(CarpetaEntity) contingut,
+						false);
+			}
+
 			if (fitxer != null) {
 				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}

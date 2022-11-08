@@ -369,6 +369,7 @@ public class ContingutHelper {
 			dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
+			
 			resposta = dto;
 
 			if (cacheHelper.mostrarLogsRendiment())
@@ -1254,72 +1255,65 @@ public class ContingutHelper {
 					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public void arxiuPropagarModificacio(
+			ExpedientEntity expedient) {
+
+		if (pluginHelper.isArxiuPluginActiu()) {
+			pluginHelper.arxiuExpedientActualitzar(expedient);
+		}
+	}
+	
+	public void arxiuPropagarModificacio(
+			CarpetaEntity carpeta,
+			boolean fromAnotacio) {
+
+		boolean utilitzarCarpetesEnArxiu = fromAnotacio && !isCarpetaLogica();
+		
+		if (pluginHelper.isArxiuPluginActiu() && utilitzarCarpetesEnArxiu) {
+				pluginHelper.arxiuCarpetaActualitzar( 
+						carpeta,
+						carpeta.getPare());
+		}
+	}
+	
+	
+	
 
 	public void arxiuPropagarModificacio(
-			ContingutEntity contingut,
+			DocumentEntity document,
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes,
-			boolean fromAnotacio) {
-
-		boolean throwExcepcion = false;//throwExcepcion = true;
-		if (throwExcepcion) {
-			throw new RuntimeException("Mock Excepcion al actualitzar contingut en arxiu");
-		}
-
-		boolean utilitzarCarpetes = fromAnotacio && !isCarpetaLogica();
-
-		String serieDocumental = null;
-		ExpedientEntity expedient = contingut.getExpedient();
-		if (expedient != null) {
-			serieDocumental = expedient.getMetaExpedient().getSerieDocumental();
-		}
+			List<ArxiuFirmaDto> firmes) {
 		if (pluginHelper.isArxiuPluginActiu()) {
-			//##################### EXPEDIENT #####################
-			if (contingut instanceof ExpedientEntity) {
-				pluginHelper.arxiuExpedientActualitzar((ExpedientEntity)contingut);
-			//##################### DOCUMENT #####################
-			} else if (contingut instanceof DocumentEntity) {
-				//No actualizar dins SGD si és un document importat de Regweb
-				String custodiaDocumentId = null;
-				DocumentEntity document = (DocumentEntity) contingut;
-				custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
-						(DocumentEntity) contingut,
-						utilitzarCarpetes ? contingut.getPare() : contingut.getExpedientPare(),
-						serieDocumental,
-						fitxer,
-						documentAmbFirma,
-						firmaSeparada,
-						firmes);
-				documentHelper.actualitzarVersionsDocument((DocumentEntity) contingut);
-				if (firmes != null) {
-					// Custodia el document firmat
-					((DocumentEntity) contingut).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-					((DocumentEntity) contingut).updateInformacioCustodia(
-							new Date(),
-							custodiaDocumentId != null ? custodiaDocumentId : document.getArxiuUuid(),
-							((DocumentEntity) contingut).getCustodiaCsv());
-					// Registra al log la custòdia de la firma del document
-					contingutLogHelper.log((
-							(DocumentEntity) contingut),
-							LogTipusEnumDto.ARXIU_CUSTODIAT,
-							custodiaDocumentId != null ? custodiaDocumentId : document.getArxiuUuid(),
-							null,
-							false,
-							false);
-				}
-			//##################### CARPETA #####################
-			} else if (contingut instanceof CarpetaEntity) {
-				if (utilitzarCarpetes) {
-					pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
-							contingut.getPare());
-				}
-			} else {
-				throw new ValidationException(
-						contingut.getId(),
-						ContingutEntity.class,
-						"El contingut que es vol propagar a l'arxiu no és del tipus expedient, document o carpeta");
+			
+			pluginHelper.arxiuDocumentActualitzar(
+					(DocumentEntity) document,
+					fitxer,
+					documentAmbFirma,
+					firmaSeparada,
+					firmes);
+			documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
+			if (firmes != null) {
+				// Custodia el document firmat
+				((DocumentEntity) document).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+
+				// Registra al log la custòdia de la firma del document
+				contingutLogHelper.log((
+						(DocumentEntity) document),
+						LogTipusEnumDto.ARXIU_CUSTODIAT,
+						document.getArxiuUuid(),
+						null,
+						false,
+						false);
 			}
 		}
 	}

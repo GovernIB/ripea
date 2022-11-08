@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -47,7 +48,14 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 		arxiuFirma.setPerfil(perfil);
 		if (document.getArxiuUuid() != null) {
-			pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
+			pluginHelper.arxiuDocumentActualitzar(
+					document,
+					fitxer,
+					true,
+					true,
+					Arrays.asList(arxiuFirma));
+			
+			
 		} else {
 			guardarDocumentFirmatArxiu(document, fitxer, Arrays.asList(arxiuFirma));
 		}
@@ -71,8 +79,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				fitxer,
 				true,
 				false,
-				firmes,
-				false);
+				firmes);
 			
 		if (documentEntity.getGesDocAdjuntId() != null) {
 			pluginHelper.gestioDocumentalDelete(documentEntity.getGesDocAdjuntId(),

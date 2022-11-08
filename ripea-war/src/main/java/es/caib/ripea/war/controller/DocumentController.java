@@ -551,7 +551,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		
 		String forsarTancamentModal = aplicacioService.propertyFindByNom("plugin.passarelafirma.forsar.tancament.modal");
 		if (ignorarModal) {
-			return "redirect:/contingut/" + documentId;
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
 		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
 			String propertyValue = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga");
 			boolean usingNewVersion = propertyValue == null || !propertyValue.equals("true");

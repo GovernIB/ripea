@@ -470,7 +470,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				pare,
 				expedient,
 				metaDocument,
-				null,
 				true);
 	}
 

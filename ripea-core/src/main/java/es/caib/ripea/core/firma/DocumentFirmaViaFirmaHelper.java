@@ -18,6 +18,7 @@ import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -117,19 +118,17 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 					documentViaFirma.updateProcessat(
 								true,
 								new Date());
-					String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
+					
+					pluginHelper.arxiuDocumentGuardarFirmaPades(
 							document,
 							fitxer);
-					document.updateInformacioCustodia(
-							new Date(),
-							custodiaDocumentId,
-							document.getCustodiaCsv());
+
 					documentHelper.actualitzarVersionsDocument(document);
 					actualitzarInformacioFirma(document);
 					contingutLogHelper.log(
 							documentViaFirma.getDocument(),
 							LogTipusEnumDto.ARXIU_CUSTODIAT,
-							custodiaDocumentId,
+							document.getArxiuUuid(),
 							null,
 							false,
 							false);

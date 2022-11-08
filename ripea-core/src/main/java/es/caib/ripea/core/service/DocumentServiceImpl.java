@@ -41,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -143,7 +142,6 @@ public class DocumentServiceImpl implements DocumentService {
 				pare,
 				expedient,
 				metaDocument,
-				null,
 				true);
 	}
 
@@ -436,7 +434,8 @@ public class DocumentServiceImpl implements DocumentService {
 				List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
 						documentHelper.getContingutFromArxiuDocument(arxiuDocument),
 						documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
-						null);
+						null, 
+						false);
 				return arxiuFirmes.get(0).getDetalls();
 			}
 		}
@@ -602,15 +601,12 @@ public class DocumentServiceImpl implements DocumentService {
 		document.setAmbFirma(true);
 		document.setFirmaSeparada(false);
 		document.setPinbalIdpeticion(idPeticion);
-		ArxiuFirmaDto firma = new ArxiuFirmaDto();
-		firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
-		firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+
 		documentHelper.crearDocument(
 				document,
 				pare,
 				expedient,
 				metaDocument,
-				Arrays.asList(firma),
 				true);
 	}
 

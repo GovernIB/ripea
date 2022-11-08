@@ -119,10 +119,6 @@ public class CarpetaHelper {
 		} else {
 			contingutHelper.arxiuPropagarModificacio(
 					carpetaEntity,
-					null,
-					false,
-					false,
-					null, 
 					fromAnotacio);
 		}
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);

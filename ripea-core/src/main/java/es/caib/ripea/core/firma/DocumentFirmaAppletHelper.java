@@ -1,6 +1,23 @@
 package es.caib.ripea.core.firma;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.security.MessageDigest;
+import java.util.Arrays;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.sun.jersey.core.util.Base64;
+
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -10,21 +27,6 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import lombok.Getter;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Date;
 
 @Component
 public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
@@ -55,12 +57,13 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 		fitxer.setContingut(arxiuContingut);
 		fitxer.setContentType("application/pdf");
 		document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(document, fitxer);
-		document.updateInformacioCustodia(new Date(), custodiaDocumentId, document.getCustodiaCsv());
+		
+		
+		pluginHelper.arxiuDocumentGuardarFirmaPades(document, fitxer);
 		documentHelper.actualitzarVersionsDocument(document);
 
 		// Registra al log la custòdia de la firma del document
-		logAll(document, LogTipusEnumDto.ARXIU_CUSTODIAT, custodiaDocumentId, null);
+		logAll(document, LogTipusEnumDto.ARXIU_CUSTODIAT, document.getArxiuUuid(), null);
 	}
 
 	public SecretKeySpec buildKey(String message) throws Exception {

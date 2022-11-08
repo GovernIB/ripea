@@ -508,7 +508,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		expedientHelper.updateNomExpedient(expedient, nom);
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
+		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
 	}
 
@@ -537,7 +537,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			expedient.setGrup(grupRepository.findOne(grupId));
 		}
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient, null, false, false, null, false);
+		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
 	}
 

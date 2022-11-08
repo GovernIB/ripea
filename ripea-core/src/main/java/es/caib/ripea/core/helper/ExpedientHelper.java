@@ -188,10 +188,6 @@ public class ExpedientHelper {
 	
 	
 
-	/**
-	 * 
-	 * This method is synchronized to avoid possibility of getting and using same sequence by concurrent threads, to avoid creating expedients with the same name by concurrent threads, to avoid creating expedients from the same annotation by concurrent threads
-	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long create(
 			Long entitatId,
@@ -375,12 +371,7 @@ public class ExpedientHelper {
 		try {
 			// create expedient in arxiu
 			contingutHelper.arxiuPropagarModificacio(
-					expedient,
-					null,
-					false,
-					false,
-					null,
-					false);
+					expedient);
 
 			for (InteressatEntity interessat : expedient.getInteressats()) {
 				interessat.updateArxiuIntent(true);
@@ -618,7 +609,7 @@ public class ExpedientHelper {
 			if (documentDto.getFitxerContingut() != null) {
 				documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
 				if (documentDto.isAmbFirma()) {
-					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 				}
 			} else {
 				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
@@ -797,7 +788,7 @@ public class ExpedientHelper {
 		if (documentDto.getFitxerContingut() != null) {
 			documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
 			if (documentDto.isAmbFirma()) {
-				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 			}
 		} else {
 			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
@@ -1185,12 +1176,7 @@ public class ExpedientHelper {
 		concurrencyCheckExpedientJaTancat(expedient);
 		
 		try {
-			contingutHelper.arxiuPropagarModificacio(
-					expedient,
-					null,
-					false,
-					false,
-					null, false);
+			contingutHelper.arxiuPropagarModificacio(expedient);
 			
 			for (InteressatEntity interessat : expedient.getInteressats()) {
 				interessat.updateArxiuIntent(true);

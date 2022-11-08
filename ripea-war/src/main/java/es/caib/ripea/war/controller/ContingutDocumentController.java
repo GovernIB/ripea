@@ -109,7 +109,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Model model) throws ClassNotFoundException, IOException {
 		return get(request, pareId, null, model);
 	}
-	@RequestMapping(value = "/{pareId}/document/{documentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/modificar/{documentId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long pareId,

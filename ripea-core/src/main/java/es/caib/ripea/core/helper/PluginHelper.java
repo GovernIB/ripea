@@ -61,11 +61,12 @@ import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
-import es.caib.ripea.core.api.dto.ArxiuAccioEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuOperacioEnumDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
@@ -78,6 +79,7 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
+import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
@@ -456,9 +458,9 @@ public class PluginHelper {
 
 	public void arxiuExpedientActualitzar(ExpedientEntity expedient) {
 		
-		boolean throwExcepcion = false;
-		if (throwExcepcion) { // throwExcepcion = true;
-			throw new RuntimeException("Mock Error al accedir arxiu");
+		boolean throwExceptionExpedientArxiu = false;
+		if (throwExceptionExpedientArxiu) { // throwExceptionExpedientArxiu = true;
+			throw new RuntimeException("Mock excepcion al actualitzar expedient al arxiu");
 		}
 
 		String accioDescripcio = "Actualització de les dades d'un expedient";
@@ -758,91 +760,187 @@ public class PluginHelper {
 		}
 	}
 	
-	public String arxiuDocumentActualitzar(DocumentEntity document, ContingutEntity contingutPare, String serieDocumental, FitxerDto fitxer, boolean documentAmbFirma,
-										   boolean firmaSeparada, List<ArxiuFirmaDto> firmes) {
-
-		String accioDescripcio = "Actualització de les dades d'un document";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("id", document.getId().toString());
-		accioParams.put("títol", document.getNom());
-		accioParams.put("contingutPareId", contingutPare.getId().toString());
-		accioParams.put("contingutPareNom", contingutPare.getNom());
-		accioParams.put("serieDocumental", serieDocumental);
+	public void arxiuDocumentActualitzar(
+			DocumentEntity document,
+			FitxerDto fitxer,
+			boolean documentAmbFirma,
+			boolean firmaSeparada,
+			List<ArxiuFirmaDto> firmes) {
+		ContingutArxiu documentArxiuCreatOModificat;
+		
 		long t0 = System.currentTimeMillis();
-		boolean throwExcepcion = false;
-		if (throwExcepcion) { // throwExcepcion = true;
-			throw new RuntimeException("Mock Error al accedir arxiu");
+		
+		boolean throwExceptionDocumentArxiu = false;
+		if (throwExceptionDocumentArxiu) { // throwExceptionDocumentArxiu = true;
+			throw new RuntimeException("Mock excepcion al actualitzar document al arxiu");
 		}
+
+		
+		ExpedientEntity expedientSuperior = document.getExpedient();
+		String serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
+		boolean utilitzarCarpetesEnArxiu = !isCarpetaLogica();
+		ContingutEntity contingutPare = utilitzarCarpetesEnArxiu ? document.getPare() : document.getExpedient();
+		
+		
+		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+				document,
+				contingutPare,
+				serieDocumental);
+
+
 		try {
 			if (document.getArxiuUuid() == null) {
-				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
-						toArxiuDocument(
-								null,
-								contingutPare.getArxiuUuid(),
-								document.getNom(),
-								document.getDescripcio(),
-								document.getMetaDocument().getNom(),
-								DocumentTipusEnumDto.IMPORTAT.equals(document.getDocumentTipus()),
-								fitxer,
-								documentAmbFirma,
-								firmaSeparada,
-								firmes,
-								null,
-								document.getNtiOrigen(),
-								Arrays.asList(document.getNtiOrgano()),
-								document.getDataCaptura(),
-								document.getNtiEstadoElaboracion(),
-								document.getNtiTipoDocumental(),
-								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, 
-								null, 
-								document.getNtiIdDocumentoOrigen()),
+				// ===============  CREAR DOCUMENT EN ARXIU ===================
+				Document documentArxiu = toArxiuDocument(
+						document,
+						contingutPare,
+						serieDocumental,
+						fitxer,
+						documentAmbFirma,
+						firmaSeparada,
+						firmes,
+						ArxiuOperacioEnumDto.CREACIO);
+				
+				documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
+						documentArxiu,
 						contingutPare.getArxiuUuid());
-				if (getArxiuPlugin().suportaMetadadesNti()) {
-					Document documentDetalls = getArxiuPlugin().documentDetalls(documentCreat.getIdentificador(), null, false);
-					propagarMetadadesDocument(documentDetalls, document);
-				}
-				document.updateArxiu(documentCreat.getIdentificador());
+				document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
+
 			} else {
-				boolean propagarConversioDefinitiu = getPropertyPropagarConversioDefinitiuActiu() && document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU);
-				getArxiuPlugin().documentModificar(
-						toArxiuDocument(
-								document.getArxiuUuid(),
-								contingutPare.getArxiuUuid(),
-								document.getNom(),
-								document.getDescripcio(),
-								document.getMetaDocument().getNom(),
-								document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
-								fitxer,
-								documentAmbFirma,
-								firmaSeparada,
-								firmes,
-								null,
-								document.getNtiOrigen(),
-								Arrays.asList(document.getNtiOrgano()),
-								document.getDataCaptura(),
-								document.getNtiEstadoElaboracion(),
-								document.getNtiTipoDocumental(),
-								((firmes != null || propagarConversioDefinitiu) ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, 
-								null, 
-								document.getNtiIdDocumentoOrigen()));
-				document.updateArxiu(null);
+				Document documentArxiuDetalls = getArxiuPlugin().documentDetalls(document.getArxiuUuid(), null, false);
+				if (DocumentEstat.ESBORRANY.equals(documentArxiuDetalls.getEstat())) {
+					// ===============  MODIFICAR DOCUMENT EN ARXIU ===================
+					Document documentArxiu = toArxiuDocument(
+							document,
+							contingutPare,
+							serieDocumental,
+							fitxer,
+							documentAmbFirma,
+							firmaSeparada,
+							firmes,
+							ArxiuOperacioEnumDto.MODIFICACIO);
+					
+					documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
+					document.updateArxiu(null);
+				} else {
+
+					Document documentArxiu = toArxiuDocument(
+							document,
+							contingutPare,
+							serieDocumental,
+							fitxer,
+							documentAmbFirma,
+							firmaSeparada,
+							firmes,
+							ArxiuOperacioEnumDto.CREACIO);
+					
+					documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
+							documentArxiu,
+							contingutPare.getArxiuUuid());
+					document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
+				}
+				
 			}
-			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
-			return document.getId().toString();
+			if (getArxiuPlugin().suportaMetadadesNti()) {
+				Document documentDetalls = getArxiuPlugin().documentDetalls(documentArxiuCreatOModificat.getIdentificador(), null, false);
+				propagarMetadadesDocument(documentDetalls, document);
+			}
+			
+			
+			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, integracioAccio.getDescripcio(), integracioAccio.getParametres(), IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
 			if (ex.getClass() == SistemaExternException.class) {
 				throw ex;
 			} else {
 				String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
-				integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
+				integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, integracioAccio.getDescripcio(), integracioAccio.getParametres(), IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 			}
 		}
 	}
+	
+	
+	
+	
+	private void setContingutIFirmes(
+			Document documentArxiu,
+			FitxerDto fitxer,
+			boolean documentAmbFirma,
+			boolean firmaSeparada,
+			List<ArxiuFirmaDto> firmes,
+			ArxiuOperacioEnumDto arxiuAccio) {
+
+		DocumentContingut contingut = null;
+		if (!documentAmbFirma) {
+			// Sense firma
+			contingut = new DocumentContingut();
+			contingut.setArxiuNom(fitxer.getNom());
+			contingut.setContingut(fitxer.getContingut());
+			contingut.setTipusMime(fitxer.getContentType());
+			documentArxiu.setContingut(contingut);
+		} else if (!firmaSeparada && firmes != null && !firmes.isEmpty()) {
+			// Firma attached
+			Firma firma = new Firma();
+			ArxiuFirmaDto primeraFirma = firmes.get(0);
+			firma.setFitxerNom(fitxer.getNom());
+			firma.setContingut(fitxer.getContingut());
+			firma.setTipusMime(fitxer.getContentType());
+			setFirmaTipusPerfil(firma, primeraFirma);
+			firma.setCsvRegulacio(primeraFirma.getCsvRegulacio());
+			documentArxiu.setFirmes(Arrays.asList(firma));
+		} else if (firmes != null) {
+			// Firma detached
+			documentArxiu.setFirmes(new ArrayList<Firma>());
+			for (ArxiuFirmaDto firmaDto: firmes) {
+				Firma firma = new Firma();
+				firma.setFitxerNom(firmaDto.getFitxerNom());
+				firma.setContingut(firmaDto.getContingut());
+				firma.setTipusMime(firmaDto.getTipusMime());
+				setFirmaTipusPerfil(firma, firmaDto);
+				firma.setCsvRegulacio(firmaDto.getCsvRegulacio());
+				documentArxiu.getFirmes().add(firma);
+			}
+			
+			if (arxiuAccio != null && arxiuAccio == ArxiuOperacioEnumDto.MODIFICACIO && getArxiuPlugin() instanceof ArxiuPluginCaib) {
+				contingut = null;
+			} else {
+				contingut = new DocumentContingut();
+				contingut.setArxiuNom(fitxer.getNom());
+				contingut.setContingut(fitxer.getContingut());
+				contingut.setTipusMime(fitxer.getContentType());
+			}
+			
+			documentArxiu.setContingut(contingut);
+		}
+	}
+	
+	
+	
+	
+	private IntegracioAccioDto getIntegracioAccio(
+			DocumentEntity document,
+			ContingutEntity contingutPare,
+			String serieDocumental) {
+		IntegracioAccioDto integracioAccioDto = new IntegracioAccioDto();
+		String accioDescripcio = "Actualització de les dades d'un document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", document.getId().toString());
+		accioParams.put("títol", document.getNom());
+		if (contingutPare!=null) {
+			accioParams.put("contingutPareId", contingutPare.getId().toString());
+			accioParams.put("contingutPareNom", contingutPare.getNom());
+		}
+		if (serieDocumental!=null) {
+			accioParams.put("serieDocumental", serieDocumental);
+		}
+
+		integracioAccioDto.setDescripcio(accioDescripcio);
+		integracioAccioDto.setParametres(accioParams);
+		
+		return integracioAccioDto;
+	}
+	
+
 
 	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid) {
 
@@ -1079,123 +1177,39 @@ public class PluginHelper {
 		}
 	}
 
-	public String arxiuDocumentGuardarFirmaPades(DocumentEntity document, FitxerDto fitxerPdfFirmat) {
+	
 
-		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
-		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
-		String accioDescripcio = "Guardar PDF firmat amb PAdES com a document definitiu";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("id", document.getId().toString());
-		accioParams.put("títol", document.getNom());
-		accioParams.put("fitxerPdfFirmatNom", fitxerPdfFirmat.getNom());
-		accioParams.put("fitxerPdfFirmatTamany", new Long(fitxerPdfFirmat.getTamany()).toString());
-		accioParams.put("fitxerPdfFirmatContentType", fitxerPdfFirmat.getContentType());
-		long t0 = System.currentTimeMillis();
-		String serieDocumental = null;
-		ExpedientEntity expedientSuperior = document.getExpedient();
-		if (expedientSuperior != null) {
-			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
+	
+	public void arxiuDocumentGuardarFirmaPades(
+			DocumentEntity document,
+			FitxerDto fitxerPdfFirmat) {
+		
+		FitxerDto fitxer = new FitxerDto();
+		fitxer.setNom(fitxerPdfFirmat.getNom());
+		fitxer.setNomFitxerFirmat(fitxerPdfFirmat.getNomFitxerFirmat());
+		fitxer.setContingut(fitxerPdfFirmat.getContingut());
+		fitxer.setContentType("application/pdf");
+		List<ArxiuFirmaDto> firmes = null;
+		if (getPropertyArxiuFirmaDetallsActiu()) {
+			firmes = validaSignaturaObtenirFirmes(fitxerPdfFirmat.getContingut(), null, fitxer.getContentType(), true);
+		} else {
+			ArxiuFirmaDto firma = new ArxiuFirmaDto();
+			firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
+			firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+			firmes = Arrays.asList(firma);
 		}
-		try {
-			FitxerDto fitxerAmbFirma = new FitxerDto();
-			fitxerAmbFirma.setNom(fitxerPdfFirmat.getNom());
-			fitxerAmbFirma.setNomFitxerFirmat(fitxerPdfFirmat.getNomFitxerFirmat());
-			fitxerAmbFirma.setContingut(fitxerPdfFirmat.getContingut());
-			fitxerAmbFirma.setContentType("application/pdf");
-			List<ArxiuFirmaDto> firmes = null;
-			if (getPropertyArxiuFirmaDetallsActiu()) {
-				firmes = validaSignaturaObtenirFirmes(fitxerPdfFirmat.getContingut(), null, fitxerAmbFirma.getContentType());
-			} else {
-				ArxiuFirmaDto firma = new ArxiuFirmaDto();
-				firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
-				firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
-				firmes = Arrays.asList(firma);
-			}
-			
-			boolean throwException = false; // throwException = true;
-			if (throwException) {
-				throw new RuntimeException("Mock Exception al custodiar document de portafirmes");
-			}
-			
-			// Consulta l'arxiu, si ja està definitiu no intentar guardar sobre el mateix
-			Document documentArxiu = getArxiuPlugin().documentDetalls(document.getArxiuUuid(), null, false);
-			
-			// El document ja està firmat a l'Arxiu, es guarda amb un nou uuid
-			if (DocumentEstat.DEFINITIU.equals(documentArxiu.getEstat())) {
-				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
-						toArxiuDocument(
-								null,
-								document.getExpedientPare().getArxiuUuid(),
-								document.getNom(),
-								document.getDescripcio(),
-								document.getMetaDocument().getNom(),
-								false,
-								fitxerAmbFirma,
-								true,
-								false,
-								firmes,
-								null,
-								document.getNtiOrigen(),
-								Arrays.asList(document.getNtiOrgano()),
-								document.getDataCaptura(),
-								document.getNtiEstadoElaboracion(),
-								document.getNtiTipoDocumental(),
-								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, 
-								null, 
-								document.getNtiIdDocumentoOrigen()),
-						document.getExpedientPare().getArxiuUuid());
-				if (getArxiuPlugin().suportaMetadadesNti()) {
-					Document documentDetalls = getArxiuPlugin().documentDetalls(documentCreat.getIdentificador(), null, false);
-					propagarMetadadesDocument(documentDetalls, document);
-				}
-				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
-					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-				}
-				document.updateArxiu(documentCreat.getIdentificador());
-				return document.getId().toString();
+		
+		arxiuDocumentActualitzar(
+				document,
+				fitxer,
+				true,
+				false,
+				firmes);
+		
+		if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
+			document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+		}
 
-			} else {
-				
-				ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(
-						toArxiuDocument(
-								document.getArxiuUuid(),
-								document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
-								document.getNom(),
-								document.getDescripcio(),
-								document.getMetaDocument().getNom(),
-								document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
-								fitxerAmbFirma,
-								true,
-								false,
-								firmes,
-								null,
-								document.getNtiOrigen(),
-								Arrays.asList(document.getNtiOrgano()),
-								document.getDataCaptura(),
-								document.getNtiEstadoElaboracion(),
-								document.getNtiTipoDocumental(),
-								document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ? DocumentEstat.ESBORRANY : DocumentEstat.DEFINITIU, //si firma parcial --> pendent Portafirmes
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental, 
-								null, 
-								document.getNtiIdDocumentoOrigen()));
-				integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
-				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
-					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-				}
-				if (getArxiuPlugin().suportaMetadadesNti()) {
-					Document documentDetalls = getArxiuPlugin().documentDetalls(documentModificat.getIdentificador(), null, false);
-					propagarMetadadesDocument(documentDetalls, document);
-				}
-				return document.getId().toString();
-			}
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
-		}
 	}
 	
 	public List<TipusDocumentalDto> documentTipusAddicionals() {
@@ -1222,57 +1236,7 @@ public class PluginHelper {
 		}
 	}
 
-	public String arxiuDocumentGuardarFirmaCades(DocumentEntity document, FitxerDto fitxer, List<ArxiuFirmaDto> firmes) {
 
-		// El paràmetre custodiaTipus es reb sempre com a paràmetre però només te
-		// sentit quan s'empra el plugin d'arxiu que accedeix a valcert.
-		String accioDescripcio = "Guardar document firmat com a document definitiu";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("id", document.getId().toString());
-		accioParams.put("títol", document.getNom());
-		long t0 = System.currentTimeMillis();
-		String serieDocumental = null;
-		ExpedientEntity expedientSuperior = document.getExpedient();
-		if (expedientSuperior != null) {
-			serieDocumental = expedientSuperior.getMetaExpedient().getSerieDocumental();
-		}
-		try {
-			Document documentArxiu = toArxiuDocument(
-					document.getArxiuUuid(),
-					document.getPare().getArxiuUuid() != null ? document.getPare().getArxiuUuid() : document.getExpedient().getArxiuUuid(),
-					document.getNom(),
-					document.getDescripcio(),
-					document.getMetaDocument().getNom(),
-					document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? true : false,
-					fitxer,
-					true,
-					true,
-					firmes,
-					null,
-					document.getNtiOrigen(),
-					Arrays.asList(document.getNtiOrgano()),
-					document.getDataCaptura(),
-					document.getNtiEstadoElaboracion(),
-					document.getNtiTipoDocumental(),
-					DocumentEstat.DEFINITIU,
-					DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-					serieDocumental, 
-					ArxiuAccioEnumDto.MODIFICACIO, 
-					document.getNtiIdDocumentoOrigen());
-			ContingutArxiu documentModificat = getArxiuPlugin().documentModificar(documentArxiu);
-			document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-			if (getArxiuPlugin().suportaMetadadesNti()) {
-				Document documentDetalls = getArxiuPlugin().documentDetalls(documentModificat.getIdentificador(), null, false);
-				propagarMetadadesDocument(documentDetalls, document);
-			}
-			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
-			return document.getId().toString();
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
-		}
-	}
 
 	public void arxiuDocumentCopiar(DocumentEntity document, String arxiuUuidDesti) {
 
@@ -2500,7 +2464,7 @@ public class PluginHelper {
 	
 	
 
-	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(byte[] documentContingut, byte[] firmaContingut, String firmaContentType) {
+	public List<ArxiuFirmaDto> validaSignaturaObtenirFirmes(byte[] documentContingut, byte[] firmaContingut, String firmaContentType, boolean throwExceptionIfNotValid) {
 
 		String accioDescripcio = "Obtenir informació de document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -3041,88 +3005,50 @@ public class PluginHelper {
 		carpeta.setNom(nom);
 		return carpeta;
 	}
+	
+	private Document toArxiuDocument(
+			DocumentEntity documentEntity,
+			ContingutEntity contingutPare,
+			String serieDocumental,
+			FitxerDto fitxer,
+			boolean documentAmbFirma,
+			boolean firmaSeparada,
+			List<ArxiuFirmaDto> firmes, 
+			ArxiuOperacioEnumDto arxiuOperacio) {
+		
+		Document documentArxiu = new Document();
 
-	private Document toArxiuDocument(String documentUuid, String expedientUuid, String nom, String descripcio, String tipusDocumentNom, boolean documentImportat,
-									 FitxerDto fitxer, boolean documentAmbFirma, boolean firmaSeparada, List<ArxiuFirmaDto> firmes, String ntiIdentificador,
-									 NtiOrigenEnumDto ntiOrigen, List<String> ntiOrgans, Date ntiDataCaptura, DocumentNtiEstadoElaboracionEnumDto ntiEstatElaboracio,
-									 String ntiTipusDocumental, DocumentEstat estat, boolean enPaper, String serieDocumental, ArxiuAccioEnumDto arxiuAccio, String ntiIdDocumentoOrigen) {
+		String documentNomInArxiu = documentEntity.getNom();
+		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus())) {
+			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), contingutPare.getArxiuUuid());
+		}
+		documentArxiu.setNom(documentNomInArxiu);
+		documentArxiu.setDescripcio(documentEntity.getDescripcio());
+		documentArxiu.setIdentificador(arxiuOperacio == ArxiuOperacioEnumDto.MODIFICACIO ? documentEntity.getArxiuUuid() : null);
 
-		Document document = new Document();
-		String fitxerExtensio = null;
-		String documentNomInArxiu = nom;
-		if (!documentImportat) {
-			documentNomInArxiu = documentNomInArxiu(nom, expedientUuid);
+
+		if (fitxer != null && !DocumentTipusEnumDto.FISIC.equals(documentEntity.getDocumentTipus())) {
+			setContingutIFirmes(
+					documentArxiu,
+					fitxer,
+					documentAmbFirma,
+					firmaSeparada,
+					firmes,
+					arxiuOperacio);
 		}
-		document.setNom(documentNomInArxiu);
-		document.setDescripcio(descripcio);
-		document.setIdentificador(documentUuid);
-		DocumentMetadades metadades = new DocumentMetadades();
-		if (fitxer != null && fitxer.getNomFitxerFirmat() != null) {
-			fitxerExtensio = fitxer.getExtensioFitxerFirmat();
-		} else if (fitxer != null && fitxer.getNom() != null) {
-			fitxerExtensio = fitxer.getExtensio();
-		}
-		setMetadades(ntiOrigen, ntiIdentificador, ntiDataCaptura, ntiEstatElaboracio, ntiTipusDocumental, fitxerExtensio, ntiOrgans, serieDocumental, metadades, ntiIdDocumentoOrigen);
-		document.setMetadades(metadades);
-		document.setEstat(estat);
-		DocumentContingut contingut = null;
-		if (fitxer != null && !enPaper) {
-			if (!documentAmbFirma) {
-				// Sense firma
-				contingut = new DocumentContingut();
-				contingut.setArxiuNom(fitxer.getNom());
-				contingut.setContingut(fitxer.getContingut());
-				contingut.setTipusMime(fitxer.getContentType());
-				document.setContingut(contingut);
-			} else if (!firmaSeparada && firmes != null && !firmes.isEmpty()) {
-				// Firma attached
-				Firma firma = new Firma();
-				ArxiuFirmaDto primeraFirma = firmes.get(0);
-				firma.setFitxerNom(fitxer.getNom());
-				firma.setContingut(fitxer.getContingut());
-				firma.setTipusMime(fitxer.getContentType());
-				setFirmaTipusPerfil(firma, primeraFirma);
-				firma.setCsvRegulacio(primeraFirma.getCsvRegulacio());
-				document.setFirmes(Arrays.asList(firma));
-			} else if (firmes != null) {
-				// Firma detached
-				document.setFirmes(new ArrayList<Firma>());
-				for (ArxiuFirmaDto firmaDto: firmes) {
-					Firma firma = new Firma();
-					firma.setFitxerNom(firmaDto.getFitxerNom());
-					firma.setContingut(firmaDto.getContingut());
-					firma.setTipusMime(firmaDto.getTipusMime());
-					setFirmaTipusPerfil(firma, firmaDto);
-					firma.setCsvRegulacio(firmaDto.getCsvRegulacio());
-					document.getFirmes().add(firma);
-				}
-				
-				if (arxiuAccio != null && arxiuAccio == ArxiuAccioEnumDto.MODIFICACIO && getArxiuPlugin() instanceof ArxiuPluginCaib) {
-					contingut = null;
-				} else {
-					contingut = new DocumentContingut();
-					contingut.setArxiuNom(fitxer.getNom());
-					contingut.setContingut(fitxer.getContingut());
-					contingut.setTipusMime(fitxer.getContentType());
-				}
-				
-				document.setContingut(contingut);
-			}
-			
-			Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
-			
-			if (getPropertyArxiuMetadadesAddicionalsActiu()) {
-				metadadesAddicionals.put("tipusDocumentNom", tipusDocumentNom);
-				metadadesAddicionals.put("isImportacio", documentImportat);
-				if (firmes != null && ! firmes.isEmpty()) {
-					metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
-				}
-			}
-			metadadesAddicionals.put("eni:descripcion", descripcio);
-			metadades.setMetadadesAddicionals(metadadesAddicionals);
-		}
-		return document;
+		
+		
+		documentArxiu.setMetadades(
+				getMetadades(
+						serieDocumental,
+						fitxer,
+						documentEntity, 
+						firmes));
+		
+		return documentArxiu;
+
 	}
+	
 
 	private void setFirmaTipusPerfil(Firma firma, ArxiuFirmaDto arxiuFirmaDto) {
 
@@ -3211,32 +3137,66 @@ public class PluginHelper {
 		}
 	}
 
-	private void setMetadades(
-			NtiOrigenEnumDto ntiOrigen,
-			String ntiIdentificador,
-			Date ntiDataCaptura,
-			DocumentNtiEstadoElaboracionEnumDto ntiEstatElaboracio,
-			String ntiTipusDocumental,
-			String fitxerExtensio,
-			List<String> ntiOrgans,
+	private DocumentMetadades getMetadades(
 			String serieDocumental,
-			DocumentMetadades metadades, 
-			String ntiIdDocumentoOrigen){
+			FitxerDto fitxer,
+			DocumentEntity documentEntity, 
+			List<ArxiuFirmaDto> firmes){
 
-		metadades.setIdentificador(ntiIdentificador);
+		
+		DocumentMetadades metadades = new DocumentMetadades();
+		
+		// ============= METADADES ===============
+		metadades.setOrigen(getOrigen(documentEntity.getNtiOrigen()));
+		metadades.setDataCaptura(documentEntity.getDataCaptura());
+		metadades.setEstatElaboracio(getDocumentEstatElaboracio(documentEntity.getNtiEstadoElaboracion()));
+		metadades.setIdentificadorOrigen(documentEntity.getNtiIdDocumentoOrigen());
+		setTipusDocumental(metadades, documentEntity.getNtiTipoDocumental());
+		setExtensioFormat(metadades, fitxer);
+		metadades.setOrgans(Arrays.asList(documentEntity.getNtiOrgano()));
+		metadades.setSerieDocumental(serieDocumental);
+		
+		
+		// ========== METADADES ADDICIONALS ============
+		Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
+		if (getPropertyArxiuMetadadesAddicionalsActiu()) {
+			metadadesAddicionals.put("tipusDocumentNom", documentEntity.getMetaDocument().getNom());
+			metadadesAddicionals.put("isImportacio", DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()));
+			if (firmes != null && ! firmes.isEmpty()) {
+				metadadesAddicionals.put("detallsFirma", firmes.get(0).getDetalls());
+			}
+		}
+		metadadesAddicionals.put("eni:descripcion", documentEntity.getDescripcio());
+		metadades.setMetadadesAddicionals(metadadesAddicionals);
+		
+		return metadades;
+	}
+
+	private void setExtensioFormat(DocumentMetadades metadades, FitxerDto fitxer) {
+		DocumentExtensio extensio = getDocumentExtensio(fitxer);
+		metadades.setExtensio(extensio);
+		metadades.setFormat(getDocumentFormat(extensio));
+	}
+	
+	private ContingutOrigen getOrigen(NtiOrigenEnumDto ntiOrigen) {
+		ContingutOrigen origen = null;
 		if (ntiOrigen != null) {
 			switch (ntiOrigen) {
 			case O0:
-				metadades.setOrigen(ContingutOrigen.CIUTADA);
+				origen = ContingutOrigen.CIUTADA;
 				break;
 			case O1:
-				metadades.setOrigen(ContingutOrigen.ADMINISTRACIO);
+				origen = ContingutOrigen.ADMINISTRACIO;
 				break;
 			}
 		}
-		metadades.setDataCaptura(ntiDataCaptura);
+		return origen;
+	}
+	
+	
+	private DocumentEstatElaboracio getDocumentEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 		DocumentEstatElaboracio estatElaboracio = null;
-		switch (ntiEstatElaboracio) {
+		switch (ntiEstadoElaboracion) {
 		case EE01:
 			estatElaboracio = DocumentEstatElaboracio.ORIGINAL;
 			break;
@@ -3253,15 +3213,14 @@ public class PluginHelper {
 			estatElaboracio = DocumentEstatElaboracio.ALTRES;
 			break;
 		}
-		metadades.setEstatElaboracio(estatElaboracio);
 		
-		if (ntiIdDocumentoOrigen != null && !ntiIdDocumentoOrigen.isEmpty()) {
-			metadades.setIdentificadorOrigen(ntiIdDocumentoOrigen);
-		}
-		
+		return estatElaboracio;
+	}
+	
+	private void setTipusDocumental(DocumentMetadades metadades, String ntiTipoDocumental) {
 		DocumentTipus tipusDocumental = null;
 		String tipusDocumentalAddicional = null;
-		switch (ntiTipusDocumental) {
+		switch (ntiTipoDocumental) {
 		case "TD01":
 			tipusDocumental = DocumentTipus.RESOLUCIO;
 			break;
@@ -3326,18 +3285,37 @@ public class PluginHelper {
 			tipusDocumental = DocumentTipus.ALTRES;
 			break;
 		default:
-			tipusDocumentalAddicional = ntiTipusDocumental;
+			tipusDocumentalAddicional = ntiTipoDocumental;
 		}
 		metadades.setTipusDocumental(tipusDocumental);
 		metadades.setTipusDocumentalAddicional(tipusDocumentalAddicional);
+		
+	}
+	
+	
+	private DocumentExtensio getDocumentExtensio(FitxerDto fitxer) {
 		DocumentExtensio extensio = null;
+		
+		String fitxerExtensio = null;
+		if (fitxer != null && fitxer.getNomFitxerFirmat() != null) {
+			fitxerExtensio = fitxer.getExtensioFitxerFirmat();
+		} else if (fitxer != null && fitxer.getNom() != null) {
+			fitxerExtensio = fitxer.getExtensio();
+		}
+		
 		if (fitxerExtensio != null) {
 			String extensioAmbPunt = (fitxerExtensio.startsWith(".")) ? fitxerExtensio.toLowerCase(): "." + fitxerExtensio.toLowerCase();
 			extensio = DocumentExtensio.toEnum(extensioAmbPunt);
 		}
+		
+		return extensio;
+	}
+	
+	
+	private DocumentFormat getDocumentFormat(DocumentExtensio extensio) {
+		
+		DocumentFormat format = null;
 		if (extensio != null) {
-			metadades.setExtensio(extensio);
-			DocumentFormat format = null;
 			switch (extensio) {
 			case AVI:
 				format = DocumentFormat.AVI;
@@ -3442,12 +3420,11 @@ public class PluginHelper {
 				format = DocumentFormat.XML;
 				break;
 			}
-			metadades.setFormat(format);
 		}
-		metadades.setOrgans(ntiOrgans);
-		metadades.setSerieDocumental(serieDocumental);
+		return format;
 	}
-
+	
+	
 	private DocumentExtensio getArxiuFormatExtensio(String extensio) {
 		String extensioAmbPunt = (extensio.startsWith(".")) ? extensio.toLowerCase() : "." + extensio.toLowerCase();
 		return DocumentExtensio.toEnum(extensioAmbPunt);
@@ -4370,6 +4347,12 @@ public class PluginHelper {
 	public boolean getPropertyPropagarConversioDefinitiuActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
 	}
+	
+	public boolean isCarpetaLogica() {
+		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
+	}
+	
+	
 	public void setArxiuPlugin(String entitatCodi, IArxiuPlugin arxiuPlugin) {
 		arxiuPlugins.put(entitatCodi, arxiuPlugin);
 	}
