@@ -1794,8 +1794,8 @@ function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 	
     // Mostrar contingut capçalera visor
     resumViewer.find('*').not('#container').remove();
-    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px;">\
-									<table style="width: 453px;">\
+    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px; display: flex; flex-wrap: wrap;">\
+									<table style="width: 453px; flex-basis: calc(100%/3); margin-bottom: 10px;">\
 										<tbody id="detallSignantsPreview">\
 										</tbody>\
 									</table>\
