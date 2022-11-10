@@ -504,7 +504,7 @@ function removeLoading() {
 		</c:otherwise>
 	</c:choose>
 	
-	<c:if test="${!empty documentCommand.id && documentCommand.estat!='REDACCIO' && !isPermesPropagarModificacioDefinitius}">
+	<c:if test="${!empty documentCommand.id && documentCommand.arxiuEstatDefinitu && !isPermesPropagarModificacioDefinitius}">
 		<div class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span>&nbsp; <spring:message code="contingut.document.form.arxiu.definitiu.avis"/></div>
 	</c:if>
 	
@@ -547,7 +547,7 @@ function removeLoading() {
 			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true" comment="contingut.document.form.camp.id.doc.origen.comtentari"/>
 		</div>
 <%--		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">--%>
-		<c:if test="${!isImportatNoBorrador && isPermesModificarCustodiatsVar}">
+		<c:if test="${!documentCommand.arxiuEstatDefinitu || isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
 				<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>

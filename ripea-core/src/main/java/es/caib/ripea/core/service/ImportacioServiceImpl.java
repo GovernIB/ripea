@@ -19,6 +19,7 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -228,6 +229,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		} else {
 			entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 		}
+		entity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 
 		// MOU/COPIA EL DOCUMENT
 		documentArxiu = pluginHelper.importarDocument(

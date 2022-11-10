@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
@@ -351,12 +352,14 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 									document,
 									fitxerAmbFirma.getFitxer());
 						} else {
+							ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 							pluginHelper.arxiuDocumentActualitzar(
 									document,
 									fitxerAmbFirma.getFitxer(),
 									true,
 									true,
-									Arrays.asList(fitxerAmbFirma.getArxiuFirma()));
+									Arrays.asList(fitxerAmbFirma.getArxiuFirma()), 
+									arxiuEstat);
 						}
 						
 						String gestioDocumentalDeleteId = document.getGesDocFirmatId();

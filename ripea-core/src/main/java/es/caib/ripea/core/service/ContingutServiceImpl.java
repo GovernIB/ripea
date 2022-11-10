@@ -367,12 +367,14 @@ public class ContingutServiceImpl implements ContingutService {
 			if (contingut instanceof ExpedientEntity) {
 				contingutHelper.arxiuPropagarModificacio((ExpedientEntity) contingut);
 			} else if (contingut instanceof DocumentEntity) {
+				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 				contingutHelper.arxiuPropagarModificacio(
 						(DocumentEntity) contingut,
 						fitxer,
 						false,
 						false,
-						null);
+						null, 
+						arxiuEstat);
 			} else if (contingut instanceof CarpetaEntity) {
 				contingutHelper.arxiuPropagarModificacio(
 						(CarpetaEntity) contingut,

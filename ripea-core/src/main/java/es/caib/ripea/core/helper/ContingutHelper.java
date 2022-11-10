@@ -369,6 +369,7 @@ public class ContingutHelper {
 			dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
+			dto.setArxiuEstat(document.getArxiuEstat());
 			
 			resposta = dto;
 
@@ -1292,7 +1293,8 @@ public class ContingutHelper {
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes) {
+			List<ArxiuFirmaDto> firmes, 
+			ArxiuEstatEnumDto arxiuEstat) {
 		if (pluginHelper.isArxiuPluginActiu()) {
 			
 			pluginHelper.arxiuDocumentActualitzar(
@@ -1300,7 +1302,8 @@ public class ContingutHelper {
 					fitxer,
 					documentAmbFirma,
 					firmaSeparada,
-					firmes);
+					firmes, 
+					arxiuEstat);
 			documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
 			if (firmes != null) {
 				// Custodia el document firmat

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.itextpdf.text.pdf.PdfReader;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -48,12 +49,15 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 		arxiuFirma.setPerfil(perfil);
 		if (document.getArxiuUuid() != null) {
+			
+			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
 			pluginHelper.arxiuDocumentActualitzar(
 					document,
 					fitxer,
 					true,
 					true,
-					Arrays.asList(arxiuFirma));
+					Arrays.asList(arxiuFirma), 
+					arxiuEstat);
 			
 			
 		} else {
@@ -74,12 +78,14 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		fitxer.setContentType(documentEntity.getFitxerContentType());
 		fitxer.setContingut(firmes.get(0).getContingut());
 
+		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 		contingutHelper.arxiuPropagarModificacio(
 				documentEntity,
 				fitxer,
 				true,
 				false,
-				firmes);
+				firmes, 
+				arxiuEstat);
 			
 		if (documentEntity.getGesDocAdjuntId() != null) {
 			pluginHelper.gestioDocumentalDelete(documentEntity.getGesDocAdjuntId(),

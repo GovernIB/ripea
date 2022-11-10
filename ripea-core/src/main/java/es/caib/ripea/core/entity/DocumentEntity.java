@@ -139,6 +139,11 @@ public class DocumentEntity extends NodeEntity {
 	private ArxiuEstatEnumDto annexArxiuEstat;
 	
 	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "arxiu_estat", length = 16)
+	private ArxiuEstatEnumDto arxiuEstat;
+	
+	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
 	@OrderBy("createdDate DESC")
 	protected Set<DocumentEnviamentEntity> enviaments;
@@ -221,6 +226,10 @@ public class DocumentEntity extends NodeEntity {
 		this.metaNode = metaDocument;
 	}
 	
+	public void updateArxiuEstat(ArxiuEstatEnumDto arxiuEstat) {
+		this.arxiuEstat = arxiuEstat;
+	}
+
 	public void update(
 			MetaDocumentEntity metaDocument,
 			String nom,
@@ -329,6 +338,10 @@ public class DocumentEntity extends NodeEntity {
 		return "";
 	}
 
+	public boolean isArxiuEstatDefinitu() {
+		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
+	}
+	
 	public boolean isErrorEnviamentPortafirmes() {
 		DocumentPortafirmesEntity docPortLast = null;
 		if (enviaments != null) {

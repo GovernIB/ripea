@@ -1,0 +1,25 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1667905124779-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: arxiu_estat
+            type: varchar(16 ${varcharunit})
+        tableName: ipa_document
+    - sql:
+        sql:  
+            update ipa_document set arxiu_estat = 'ESBORRANY' where estat not in (3, 5) and id in (select id from ipa_contingut where arxiu_uuid is not null);
+            update ipa_document set arxiu_estat = 'DEFINITIU' where estat in (3, 5) and id in (select id from ipa_contingut where arxiu_uuid is not null);
+            update ipa_document set arxiu_estat = null where id in (select document_id from ipa_registre_annex where error is not null);
+       

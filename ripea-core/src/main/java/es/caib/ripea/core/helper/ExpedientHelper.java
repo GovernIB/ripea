@@ -658,6 +658,12 @@ public class ExpedientHelper {
 				docEntity.updateArxiu(uuidDesti);
 			}
 			
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
+				docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+			} else {
+				docEntity.updateArxiuEstat(ArxiuEstatEnumDto.ESBORRANY);
+			}
+			
 			registreAnnexEntity.updateError(null);
 			
 		} catch (Exception e) {
@@ -801,6 +807,7 @@ public class ExpedientHelper {
 		// ##########################################
 		// put arxiu uuid of annex
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
+		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
 		if (isCarpetaActive) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);

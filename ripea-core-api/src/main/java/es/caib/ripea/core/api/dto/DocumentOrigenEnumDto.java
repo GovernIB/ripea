@@ -22,6 +22,7 @@ public enum DocumentOrigenEnumDto {
 	/**
 	 * Document generat de les resposta de PINBAL
 	 */
-	PINBAL
+	PINBAL,
+	ANOTHER // TODO should be change for specific other cases
 
 }

@@ -37,6 +37,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentOrigenEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
@@ -177,13 +178,14 @@ public class DocumentHelper {
 							false, 
 							true);
 				}
-
+				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
 						document.isAmbFirma(),
 						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmes);
+						firmes != null ? firmes : firmes, 
+						arxiuEstat);
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -234,6 +236,8 @@ public class DocumentHelper {
 			return DocumentOrigenEnumDto.PINBAL;
 		} else if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
 			return DocumentOrigenEnumDto.DISTRIBUCIO;
+		} else if (document.getDocumentTipus() == DocumentTipusEnumDto.IMPORTAT){
+			return DocumentOrigenEnumDto.ANOTHER;
 		} else {
 			return DocumentOrigenEnumDto.RIPEA;
 		}
@@ -261,15 +265,11 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
-		if (!isModificacioCustodiatsActiva() && (
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) && !documentEntity.isDocFromAnnex()) {
+		if (!isModificacioCustodiatsActiva() && documentEntity.isArxiuEstatDefinitu()) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
-					"No es poden actualitzar les metadades d'un document definitiu");
+					"No es poden actualitzar un document definitiu");
 		}
 		contingutHelper.comprovarNomValid(
 				documentEntity.getPare(),
@@ -295,17 +295,7 @@ public class DocumentHelper {
 				document.getNtiCsv(),
 				document.getNtiCsvRegulacion());
 		FitxerDto fitxer = null;
-		if (document.getFitxerContingut() != null && (
-				(document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) && !documentEntity.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
-			throw new ValidationException(
-					documentEntity.getId(),
-					DocumentEntity.class,
-					"No es pot actualitzar el contingut d'un document importat o definitiu");
-		}
+
 		Document arxiuDocument = null;
 		if (documentEntity.getArxiuUuid() != null) {
 			arxiuDocument = pluginHelper.arxiuDocumentConsultar(
@@ -316,29 +306,102 @@ public class DocumentHelper {
 					false);
 		}
 		
-		if (document.getFitxerContingut() != null) {
-			fitxer = new FitxerDto();
-			fitxer.setNom(document.getFitxerNom());
-			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(document.getFitxerContingut());
-		} else if (arxiuDocument != null) {
-			fitxer = new FitxerDto();
-			fitxer.setContentType(documentEntity.getFitxerContentType());
-			fitxer.setNom(documentEntity.getFitxerNom());
-			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+		
+		DocumentFirmaEnumDto documentFirmaEnum;
+		if (!document.isAmbFirma()) {
+			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_SIN_FIRMA;
+		} else if (!document.isFirmaSeparada()) {
+			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED;
+		} else {
+			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED;
 		}
-		if (document.getFitxerContingut() != null || arxiuDocument != null) {
-			actualitzarFitxerDocument(
-					documentEntity,
-					fitxer);
-			if (document.isAmbFirma()) {
-				firmes = validaFirmaDocument(
-						documentEntity, 
-						fitxer,
-						document.getFirmaContingut(), 
-						false, 
-						true);
+		
+		boolean newFitxer = document.getFitxerContingut() != null;
+		boolean newFirma = document.getFirmaContingut() != null;
+		
+		
+		if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_SIN_FIRMA) {
+			
+			if (newFitxer) {
+				fitxer = new FitxerDto();
+				fitxer.setNom(document.getFitxerNom());
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setContingut(document.getFitxerContingut());
+				actualitzarFitxerDocument(
+						documentEntity,
+						fitxer);
+			} else {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(documentEntity.getFitxerContentType());
+				fitxer.setNom(documentEntity.getFitxerNom());
+				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 			}
+			documentEntity.updateEstat(DocumentEstatEnumDto.REDACCIO);
+			
+			
+		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED) {
+			
+			if (newFitxer) {
+				fitxer = new FitxerDto();
+				fitxer.setNom(document.getFitxerNom());
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setContingut(document.getFitxerContingut());
+				actualitzarFitxerDocument(
+						documentEntity,
+						fitxer);
+			} else {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(documentEntity.getFitxerContentType());
+				fitxer.setNom(documentEntity.getFitxerNom());
+				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			}
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					null, 
+					false, 
+					true);
+			
+			// Al modificar el document, eliminam l'alerta de document invàlid,
+			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
+			if (!documentEntity.isValidacioFirmaCorrecte()) {
+				documentEntity.setValidacioFirmaCorrecte(true);
+//				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+			}
+			
+		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED) {
+			
+			if (newFitxer) {
+				fitxer = new FitxerDto();
+				fitxer.setNom(document.getFitxerNom());
+				fitxer.setContentType(document.getFitxerContentType());
+				fitxer.setContingut(document.getFitxerContingut());
+				actualitzarFitxerDocument(
+						documentEntity,
+						fitxer);
+			} else {
+				fitxer = new FitxerDto();
+				fitxer.setContentType(documentEntity.getFitxerContentType());
+				fitxer.setNom(documentEntity.getFitxerNom());
+				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+			}
+			
+			byte[]  firmaContingut;
+			if (newFirma) {
+				firmaContingut = document.getFirmaContingut();
+			} else {
+				firmaContingut = getFirmaDetachedFromArxiuDocument(arxiuDocument);
+			}
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					firmaContingut, 
+					false, 
+					true);
+			
+			
 			// Al modificar el document, eliminam l'alerta de document invàlid,
 			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
 			if (!documentEntity.isValidacioFirmaCorrecte()) {
@@ -346,6 +409,7 @@ public class DocumentHelper {
 //				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 			}
 		}
+		
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -358,12 +422,14 @@ public class DocumentHelper {
 
 		if (arxiuDocument == null || arxiuDocument.getEstat() == DocumentEstat.ESBORRANY || isPropagarModificacioDefinitiusActiva()) {
 
+			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
 					document.isAmbFirma(),
 					document.isFirmaSeparada(),
-					firmes);
+					firmes, 
+					arxiuEstat);
 		}
 
 		return dto;
@@ -444,12 +510,14 @@ public class DocumentHelper {
 			//		}
 				}
 			}
+			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
 					false, //##no validar firma en actualitzar tipus document
 					false,
-					firmes);
+					firmes, 
+					arxiuEstat);
 			return true;
 		} else {
 			return true;
@@ -535,6 +603,10 @@ public class DocumentHelper {
 		if ((document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) || document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) || document.getEstat().equals(DocumentEstatEnumDto.ADJUNT_FIRMAT)) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
+		if (nouEstat.equals(DocumentEstatEnumDto.DEFINITIU)) {
+			document.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+		}
+		
 		if (isPropagarConversioDefinitiuActiu() && nouEstat.equals(DocumentEstatEnumDto.DEFINITIU)) {
 			FitxerDto fitxer = null;
 			if (document.getArxiuUuid() != null) {
@@ -542,12 +614,14 @@ public class DocumentHelper {
 				fitxer.setContentType(document.getFitxerContentType());
 				fitxer.setNom(document.getFitxerNom());
 			}
+			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
 			contingutHelper.arxiuPropagarModificacio(
 					document,
 					fitxer,
 					false,
 					false,
-					null);
+					null, 
+					arxiuEstat);
 		}
 		contingutLogHelper.log(
 				document,
@@ -557,6 +631,47 @@ public class DocumentHelper {
 				false,
 				false);
 	}
+	
+	public void actualitzarEstatADefinititu(DocumentEntity documentEntity) {
+		
+
+		FitxerDto fitxer = null;
+		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					documentEntity,
+					null,
+					null,
+					true,
+					false);
+
+	
+//		fitxer = new FitxerDto();
+//		fitxer.setContentType(documentEntity.getFitxerContentType());
+//		fitxer.setNom(documentEntity.getFitxerNom());
+//
+//		 List<ArxiuFirmaDto> firmes = new ArrayList<>();
+//		 
+//		 for ( Firma firma : arxiuDocument.getFirmes()) {
+//			 ArxiuFirmaDto arxiuFirmaDto = new ArxiuFirmaDto();
+//			 arxiuFirmaDto.setContingut(firma.getContingut());
+//			 arxiuFirmaDto.setTipusMime(firma.getTipusMime());
+//			 arxiuFirmaDto.set
+//			
+//		}
+//
+//		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
+//		contingutHelper.arxiuPropagarModificacio(
+//				documentEntity,
+//				fitxer,
+//				true,
+//				document.isFirmaSeparada(),
+//				firmes,
+//				arxiuEstat);
+//		}
+
+		
+	}
+	
+	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto)contingutHelper.toContingutDto(
@@ -569,7 +684,7 @@ public class DocumentHelper {
 				true,
 				false, null, false, null);
 	}
-		
+
 
 
 	public void actualitzarVersionsDocument(
@@ -921,12 +1036,14 @@ public class DocumentHelper {
 							true);
 				}
 			
+					ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 					contingutHelper.arxiuPropagarModificacio(
 							documentEntity,
 							fitxer,
 							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
 							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes);
+							firmes, 
+							arxiuEstat);
 				
 					if (documentEntity.getGesDocAdjuntId() != null ) {
 						pluginHelper.gestioDocumentalDelete(

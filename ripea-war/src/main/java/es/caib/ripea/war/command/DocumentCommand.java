@@ -16,6 +16,7 @@ import org.joda.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
@@ -93,6 +94,12 @@ public class DocumentCommand extends ContenidorCommand {
 	private boolean validacioFirmaCorrecte;
 	private String validacioFirmaErrorMsg;
 
+	private ArxiuEstatEnumDto arxiuEstat;
+	
+	public boolean isArxiuEstatDefinitu() {
+		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
+	}
+	
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
 	}
@@ -344,6 +351,12 @@ public class DocumentCommand extends ContenidorCommand {
 	}
 	public void setValidacioFirmaErrorMsg(String validacioFirmaErrorMsg) {
 		this.validacioFirmaErrorMsg = validacioFirmaErrorMsg;
+	}
+	public ArxiuEstatEnumDto getArxiuEstat() {
+		return arxiuEstat;
+	}
+	public void setArxiuEstat(ArxiuEstatEnumDto arxiuEstat) {
+		this.arxiuEstat = arxiuEstat;
 	}
 
 	

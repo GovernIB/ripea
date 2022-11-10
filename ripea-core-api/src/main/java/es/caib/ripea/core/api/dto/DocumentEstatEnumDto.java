@@ -18,4 +18,11 @@ public enum DocumentEstatEnumDto {
 	DEFINITIU,
 	FIRMA_PARCIAL,
 	ADJUNT_FIRMAT
+	
+	
+	// TODO it would be clearer to have only 3 states:
+	// 1. SIN_FIRMA - equivalent to current state REDACCIO
+	// 2. FIRMA_EN_PROGRESS - equivalent to current states: FIRMA_PENDENT, FIRMA_PENDENT_VIAFIRMA, FIRMA_PARCIAL
+	// 3. FIRMAT - equivalent to current states: FIRMAT, ADJUNT_FIRMAT, CUSTODIAT, DEFINITIU
+	// Information about if it is saved in arxiu, and what is the state of document in arxiu is in field arxiuEstat
 }

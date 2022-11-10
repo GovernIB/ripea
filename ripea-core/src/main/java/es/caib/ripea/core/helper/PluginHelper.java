@@ -765,7 +765,8 @@ public class PluginHelper {
 			FitxerDto fitxer,
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes) {
+			List<ArxiuFirmaDto> firmes, 
+			ArxiuEstatEnumDto arxiuEstat) {
 		ContingutArxiu documentArxiuCreatOModificat;
 		
 		long t0 = System.currentTimeMillis();
@@ -799,46 +800,32 @@ public class PluginHelper {
 						documentAmbFirma,
 						firmaSeparada,
 						firmes,
-						ArxiuOperacioEnumDto.CREACIO);
+						ArxiuOperacioEnumDto.CREACIO, 
+						arxiuEstat);
 				
 				documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
 						documentArxiu,
 						contingutPare.getArxiuUuid());
 				document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
+				document.updateArxiuEstat(arxiuEstat);
 
 			} else {
-				Document documentArxiuDetalls = getArxiuPlugin().documentDetalls(document.getArxiuUuid(), null, false);
-				if (DocumentEstat.ESBORRANY.equals(documentArxiuDetalls.getEstat())) {
-					// ===============  MODIFICAR DOCUMENT EN ARXIU ===================
-					Document documentArxiu = toArxiuDocument(
-							document,
-							contingutPare,
-							serieDocumental,
-							fitxer,
-							documentAmbFirma,
-							firmaSeparada,
-							firmes,
-							ArxiuOperacioEnumDto.MODIFICACIO);
-					
-					documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
-					document.updateArxiu(null);
-				} else {
+				// ===============  MODIFICAR DOCUMENT EN ARXIU ===================
+				Document documentArxiu = toArxiuDocument(
+						document,
+						contingutPare,
+						serieDocumental,
+						fitxer,
+						documentAmbFirma,
+						firmaSeparada,
+						firmes,
+						ArxiuOperacioEnumDto.MODIFICACIO, 
+						arxiuEstat);
+				
+				documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
+				document.updateArxiu(null);
+				document.updateArxiuEstat(arxiuEstat);
 
-					Document documentArxiu = toArxiuDocument(
-							document,
-							contingutPare,
-							serieDocumental,
-							fitxer,
-							documentAmbFirma,
-							firmaSeparada,
-							firmes,
-							ArxiuOperacioEnumDto.CREACIO);
-					
-					documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
-							documentArxiu,
-							contingutPare.getArxiuUuid());
-					document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
-				}
 				
 			}
 			if (getArxiuPlugin().suportaMetadadesNti()) {
@@ -856,6 +843,19 @@ public class PluginHelper {
 				integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, integracioAccio.getDescripcio(), integracioAccio.getParametres(), IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
 				throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 			}
+		}
+	}
+	
+	public void arxiuDocumentSetDefinitiu(  // doesn work, changes firma in arxiu to csv
+			DocumentEntity document) {
+		try {
+			Document documentArxiu = new Document();
+			documentArxiu.setIdentificador(document.getArxiuUuid());
+			documentArxiu.setEstat(DocumentEstat.DEFINITIU);
+			getArxiuPlugin().documentModificar(documentArxiu);
+			document.updateArxiu(null);
+			document.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+		} catch (Exception ex) {
 		}
 	}
 	
@@ -1199,12 +1199,15 @@ public class PluginHelper {
 			firmes = Arrays.asList(firma);
 		}
 		
+		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+		
 		arxiuDocumentActualitzar(
 				document,
 				fitxer,
 				true,
 				false,
-				firmes);
+				firmes, 
+				arxiuEstat);
 		
 		if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
 			document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
@@ -2498,10 +2501,10 @@ public class PluginHelper {
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);
 
-//			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
-//			if (validationStatus.getStatus() != 1) {
-//				throw new RuntimeException(validationStatus.getErrorMsg());
-//			}
+			ValidationStatus validationStatus = validateSignatureResponse.getValidationStatus();
+			if (validationStatus.getStatus() != 1 && throwExceptionIfNotValid) {
+				throw new RuntimeException(validationStatus.getErrorMsg());
+			}
 
 			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
 			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
@@ -3005,6 +3008,7 @@ public class PluginHelper {
 		carpeta.setNom(nom);
 		return carpeta;
 	}
+
 	
 	private Document toArxiuDocument(
 			DocumentEntity documentEntity,
@@ -3014,7 +3018,8 @@ public class PluginHelper {
 			boolean documentAmbFirma,
 			boolean firmaSeparada,
 			List<ArxiuFirmaDto> firmes, 
-			ArxiuOperacioEnumDto arxiuOperacio) {
+			ArxiuOperacioEnumDto arxiuOperacio, 
+			ArxiuEstatEnumDto arxiuEstat) {
 		
 		Document documentArxiu = new Document();
 
@@ -3025,8 +3030,8 @@ public class PluginHelper {
 		documentArxiu.setNom(documentNomInArxiu);
 		documentArxiu.setDescripcio(documentEntity.getDescripcio());
 		documentArxiu.setIdentificador(arxiuOperacio == ArxiuOperacioEnumDto.MODIFICACIO ? documentEntity.getArxiuUuid() : null);
-
-
+		documentArxiu.setEstat(DocumentEstat.valueOf(arxiuEstat.toString()));
+	
 		if (fitxer != null && !DocumentTipusEnumDto.FISIC.equals(documentEntity.getDocumentTipus())) {
 			setContingutIFirmes(
 					documentArxiu,
@@ -3048,6 +3053,7 @@ public class PluginHelper {
 		return documentArxiu;
 
 	}
+	
 	
 
 	private void setFirmaTipusPerfil(Firma firma, ArxiuFirmaDto arxiuFirmaDto) {

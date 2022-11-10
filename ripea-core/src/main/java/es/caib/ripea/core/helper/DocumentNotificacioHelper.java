@@ -167,6 +167,8 @@ public class DocumentNotificacioHelper {
 			cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 			logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
+			
+			documentHelper.actualitzarEstatADefinititu(documentEntity);
 		}
 	}
 	
