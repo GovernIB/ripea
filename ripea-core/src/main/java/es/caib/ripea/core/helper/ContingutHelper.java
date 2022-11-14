@@ -146,6 +146,11 @@ public class ContingutHelper {
 			Long organActualId, 
 			boolean onlyFirstDescendant, int level) {
 		level++;
+		
+		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("toContingutDto start (" + contingut.getId() + ", "+ tipus + ", level="+level +") ");
+    	
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
@@ -315,7 +320,7 @@ public class ContingutHelper {
 				}
 			}
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto1 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t10) + " ms");
+				logger.info("toDocumentDto 1/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t10) + " ms");
 			long t20 = System.currentTimeMillis();
 			dto.setNtiVersion(document.getNtiVersion());
 			dto.setNtiIdentificador(document.getNtiIdentificador());
@@ -370,7 +375,7 @@ public class ContingutHelper {
 					MetaDocumentDto.class);
 			dto.setMetaNode(metaNode);
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto2 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t20) + " ms");
+				logger.info("toDocumentDto 2/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t20) + " ms");
 
 			long t3 = System.currentTimeMillis();
 			dto.setValid(
@@ -380,7 +385,7 @@ public class ContingutHelper {
 			dto.setEstat(document.getEstat());
 			resposta = dto;
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
+				logger.info("toDocumentDto 3/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
 
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("toDocumentDto time (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
@@ -437,7 +442,8 @@ public class ContingutHelper {
 			}
 
 			if (contingut.getExpedient() != null) {
-				long t2 = System.currentTimeMillis();
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("setExpedientPare recursive");
 				resposta.setExpedientPare(
 						(ExpedientDto)toContingutDto(
 								contingut.getExpedient(),
@@ -449,8 +455,7 @@ public class ContingutHelper {
 								false,
 								false,
 								rolActual, onlyForList, organActualId, onlyFirstDescendant, level));
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("setExpedientPare time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+
 			}
 			resposta.setEntitat(
 					conversioTipusHelper.convertir(
@@ -555,6 +560,10 @@ public class ContingutHelper {
 					fillPath = new ArrayList<ContingutDto>();
 					if (resposta.getPath() != null)
 						fillPath.addAll(resposta.getPath());
+					
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("fillPath recursive");
+					
 					fillPath.add(toContingutDto(
 							contingut,
 							ambPermisos,
@@ -567,6 +576,8 @@ public class ContingutHelper {
 				}
 				for (ContingutEntity fill: fills) {
 					if (fill.getEsborrat() == 0) {
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("fillDto recursive");
 						ContingutDto fillDto = toContingutDto(
 								fill,
 								ambPermisos,
@@ -602,7 +613,6 @@ public class ContingutHelper {
 					logger.info("ambDades time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 		}
-		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("toContingutDto time (" + contingut.getId() + ", "+ tipus + ", level="+level +"): " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
@@ -1480,6 +1490,8 @@ public class ContingutHelper {
 				if (!expedientArrelTrobat && contingutPath instanceof ExpedientEntity)
 					expedientArrelTrobat = true;
 				if (expedientArrelTrobat) {
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("pathAdd recursive");
 					pathDto.add(
 						toContingutDto(
 								contingutPath,
