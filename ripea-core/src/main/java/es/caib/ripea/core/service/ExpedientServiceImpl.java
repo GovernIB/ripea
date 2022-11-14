@@ -60,14 +60,12 @@ import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
-import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -1052,7 +1050,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0);
 							return dto;
 						}
 					});
@@ -1301,8 +1299,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 		});
 		List<ExpedientDto> relacionatsDto = new ArrayList<ExpedientDto>();
-		for (ExpedientEntity e : relacionats)
-			relacionatsDto.add(expedientHelper.toExpedientDto(e, false, null, false));
+		for (ExpedientEntity e : relacionats) {
+			ExpedientDto exp = new ExpedientDto();
+			exp.setId(e.getId());
+			exp.setEsborrat(e.getEsborrat());
+			exp.setNom(e.getNom());
+			exp.setAny(e.getAny());
+			exp.setSequencia(e.getSequencia());
+			relacionatsDto.add(exp);
+		}
 		return relacionatsDto;
 	}
 

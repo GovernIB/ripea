@@ -217,5 +217,10 @@ public class AplicacioServiceBean implements AplicacioService {
 		delegate.evictRolsPerUsuari(usuariCodi);		
 	}
 
+	@Override
+	public boolean mostrarLogsRendiment() {
+		return delegate.mostrarLogsRendiment();
+	}
+
 
 }

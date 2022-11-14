@@ -349,4 +349,10 @@ public class ContingutServiceBean implements ContingutService {
         return delegate.arreglaDocumentsSenseContingut();
     }
 
+	@Override
+	public boolean isExpedient(
+			Long contingutId) {
+		return delegate.isExpedient(contingutId);
+	}
+
 }

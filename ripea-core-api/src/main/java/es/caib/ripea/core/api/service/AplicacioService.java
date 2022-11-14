@@ -218,4 +218,6 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public void evictRolsPerUsuari(String usuariCodi);
 
+	public boolean mostrarLogsRendiment();
+
 }

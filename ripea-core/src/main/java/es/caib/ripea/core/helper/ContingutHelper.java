@@ -130,7 +130,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0);
 	}
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
@@ -143,7 +143,9 @@ public class ContingutHelper {
 			boolean ambVersions,
 			String rolActual,
 			boolean onlyForList,
-			Long organActualId) {
+			Long organActualId, 
+			boolean onlyFirstDescendant, int level) {
+		level++;
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
@@ -272,14 +274,14 @@ public class ContingutHelper {
 			}
 
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
+				logger.info("toExpedientDto time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
 
 			long t2 = System.currentTimeMillis();
-
+			long t10 = System.currentTimeMillis();
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
 			dto.setDescripcio(document.getDescripcio());
@@ -312,6 +314,9 @@ public class ContingutHelper {
 					dto.setVersions(versions);
 				}
 			}
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto1 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t10) + " ms");
+			long t20 = System.currentTimeMillis();
 			dto.setNtiVersion(document.getNtiVersion());
 			dto.setNtiIdentificador(document.getNtiIdentificador());
 			dto.setNtiOrgano(document.getNtiOrgano());
@@ -364,17 +369,25 @@ public class ContingutHelper {
 					document.getMetaNode(),
 					MetaDocumentDto.class);
 			dto.setMetaNode(metaNode);
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto2 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t20) + " ms");
+
+			long t3 = System.currentTimeMillis();
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
 			resposta = dto;
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
 
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
+				logger.info("toDocumentDto time (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
+			
+			long t2 = System.currentTimeMillis();
 			CarpetaDto dto = new CarpetaDto();
 			CarpetaEntity carpeta = (CarpetaEntity)deproxied;
 			if (carpeta.getExpedientRelacionat() != null)
@@ -387,16 +400,20 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, true, null));
+								false, null, true, null, onlyFirstDescendant, level));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
 			resposta = dto;
+			
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toCarpetaDto time (" + carpeta.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		}
 
-		long t3 = System.currentTimeMillis();
+		
 		// ##################### CONTINGUT ##################################
-
+		long t3 = System.currentTimeMillis();
+		
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
@@ -420,6 +437,7 @@ public class ContingutHelper {
 			}
 
 			if (contingut.getExpedient() != null) {
+				long t2 = System.currentTimeMillis();
 				resposta.setExpedientPare(
 						(ExpedientDto)toContingutDto(
 								contingut.getExpedient(),
@@ -430,7 +448,9 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								rolActual, onlyForList, organActualId));
+								rolActual, onlyForList, organActualId, onlyFirstDescendant, level));
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("setExpedientPare time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 			resposta.setEntitat(
 					conversioTipusHelper.convertir(
@@ -447,12 +467,22 @@ public class ContingutHelper {
 			}
 
 			if (ambPermisos && metaNode != null) {
+				long t2 = System.currentTimeMillis();
 				// Omple els permisos
 				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambPermisosmetaNode time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				
 			}
 
 			if (ambPermisos) {
+				
+				long t2 = System.currentTimeMillis();
 				resposta.setAdmin(checkIfUserIsAdminOfContingut(contingut.getId(), rolActual));
+				
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambPermisos time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				
 			}
 
 			// Omple la informació d'auditoria
@@ -468,14 +498,20 @@ public class ContingutHelper {
 
 
 			if (ambPath) {
+				long t2 = System.currentTimeMillis();
 				// Calcula el path
 				List<ContingutDto> path = getPathContingutComDto(
 						contingut,
 						ambPermisos,
 						pathNomesFinsExpedientArrel);
 				resposta.setPath(path);
+				
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambPath time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 			if (ambFills) {
+				
+				long t2 = System.currentTimeMillis();
 				// Cerca els nodes fills
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				List<ContingutDto> contenidorDtos = new ArrayList<ContingutDto>();
@@ -527,28 +563,32 @@ public class ContingutHelper {
 							false,
 							false,
 							false,
-							false, rolActual, onlyForList, organActualId));
+							false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level));
 				}
 				for (ContingutEntity fill: fills) {
 					if (fill.getEsborrat() == 0) {
 						ContingutDto fillDto = toContingutDto(
 								fill,
 								ambPermisos,
-								true,
+								onlyFirstDescendant ? false : true,
 								false,
 								false,
 								false,
 								false,
-								false, rolActual, onlyForList, organActualId);
+								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level);
 						// Configura el pare de cada fill
 						fillDto.setPath(fillPath);
 						contenidorDtos.add(fillDto);
 					}
 				}
 				resposta.setFills(contenidorDtos);
+				
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambFills time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 
 			if (ambDades && contingut instanceof NodeEntity) {
+				long t2 = System.currentTimeMillis();
 				NodeEntity node = (NodeEntity)contingut;
 				List<DadaEntity> dades = dadaRepository.findByNode(node);
 				((NodeDto)resposta).setDades(
@@ -558,11 +598,13 @@ public class ContingutHelper {
 				for (int i = 0; i < dades.size(); i++) {
 					((NodeDto)resposta).getDades().get(i).setValor(dades.get(i).getValor());
 				}
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambDades time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 		}
-
+		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
 		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
+			logger.info("toContingutDto time (" + contingut.getId() + ", "+ tipus + ", level="+level +"): " + (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
 
@@ -881,7 +923,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1447,7 +1489,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, false, null));
+								false, null, false, null, false, 0));
 				}
 			}
 		}
