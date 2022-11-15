@@ -58,7 +58,9 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private Long tipusVia;
 	private String nomVia;
 	private String numVia;
-
+	@JsonProperty("tieneOficinaSir")
+	private Boolean ambOficinaSir;
+	
 	protected List<String> historicosUO;
 	private List<UnitatOrganitzativa> lastHistoricosUnitats;
 

@@ -32,7 +32,7 @@ public class DocumentNotificacionsCommand {
 	private Long id;
 	@NotNull(groups = {Create.class})
 	private Long documentId;
-	@NotNull
+	@NotNull(groups = {Create.class, Update.class})
 	private DocumentNotificacioTipusEnumDto tipus;
 	private DocumentEnviamentEstatEnumDto estat;
 	@NotEmpty(groups = {Create.class, Update.class})

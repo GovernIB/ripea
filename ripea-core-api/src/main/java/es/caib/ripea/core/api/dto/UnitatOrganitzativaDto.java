@@ -44,7 +44,8 @@ public class UnitatOrganitzativaDto implements Serializable {
 
 	private List<UnitatOrganitzativaDto> lastHistoricosUnitats;
 
-
+	private Boolean ambOficinaSir;
+	
 	public String getNom() {
 		return this.denominacio + " (" + this.codi + ")";
 	}

@@ -78,9 +78,6 @@ $(document).ready(function() {
 		window.parent.addLoading(idModal);
 	});
 	
-	$('#tipus').val("NOTIFICACIO");
-	$('#tipus').trigger('change');
-
 	//select and checkbox elements dont have readonly attribute that allows elements to be greyed out but submitted
 	//in order to send disabled values in POST we need to enable them on submit
 	$('#notificacioForm').on('submit', function () {
@@ -93,17 +90,33 @@ $(document).ready(function() {
 		var notificacions = eval(${notificacions});
 		var notificacionsSeleccionades = [];
 		var noNif = false;
+		var administracioSir = false;
 		$(notificacions).each(function(index, notificacio) {
 			//if selected
 			if (interessatsSelected != null && notificacio.titular != null && interessatsSelected.includes(notificacio.titular.id.toString())) {
 	    		notificacionsSeleccionades.push(notificacio);
-	    		if (notificacio.titular.personaFisica) {
-		    		if ((notificacio.destinatari == null && notificacio.titular.documentTipus!='NIF' && notificacio.titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (notificacio.destinatari != null && notificacio.destinatari.documentTipus!='NIF' && notificacio.destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
+	    		var titular = notificacio.titular;
+	    		var destinatari = notificacio.destinatari;
+	    		if (titular.personaFisica) {
+		    		if ((destinatari == null && titular.documentTipus!='NIF' && titular.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')|| (destinatari != null && destinatari.documentTipus!='NIF' && destinatari.documentTipus!='DOCUMENT_IDENTIFICATIU_ESTRANGERS')) {
 		    			noNif = true;
 					}
 				}
+	    		
+				if (titular.administracio && titular.ambOficinaSir) {
+					administracioSir = true;
+				}
 			}
 	    });
+		
+		if (administracioSir) {
+			$("#alertComunicacioSir").show();
+			$('#tipus').val("COMUNICACIO");
+			$('#tipus').trigger('change');
+		} else {
+			$("#alertComunicacioSir").hide();
+		}
+		
 		if (noNif) {
 			$("#alertNoNif").show();
 		} else {
@@ -544,10 +557,11 @@ function destinitarisNoResults() {
 	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacionsCommand" role="form">
 		<rip:inputHidden name="id"/>
 		<rip:inputHidden name="documentId"/>
+		<div id="alertComunicacioSir" style="display: none;" class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span> <spring:message code="notificacio.form.camp.comunicacio.sir.alert"/></div>
 		<!---  TIPUS (NOTIFICACIO / COMUNICACIO) ---->
 		<c:choose>
 			<c:when test="${empty documentNotificacionsCommand.id}">
-				<rip:inputSelect labelSize="2" name="tipus" textKey="notificacio.form.camp.tipus" optionItems="${notificacioTipusEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
+				<rip:inputSelect labelSize="2" name="tipus" textKey="notificacio.form.camp.tipus" optionItems="${notificacioTipusEnumOptions}" emptyOption="true" emptyOptionTextKey="comu.boto.cap" optionValueAttribute="value" optionTextKeyAttribute="text" required="true"/>
 			</c:when>
 			<c:otherwise>
 				<rip:inputHidden name="tipus"/>

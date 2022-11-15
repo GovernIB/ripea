@@ -162,7 +162,8 @@ public class ExpedientInteressatHelper {
 					null,
 					interessatAdministracioDto.getEntregaDeh(),
 					interessatAdministracioDto.getEntregaDehObligat(),
-					interessatAdministracioDto.getIncapacitat()).build();
+					interessatAdministracioDto.getIncapacitat(),
+					interessatAdministracioDto.getAmbOficinaSir()).build();
 		}
 		
 		boolean throwException = false;//throwException = true
@@ -410,7 +411,8 @@ public class ExpedientInteressatHelper {
 					interessatAdministracioDto.getPreferenciaIdioma(),
 					interessatAdministracioDto.getEntregaDeh(),
 					interessatAdministracioDto.getEntregaDehObligat(),
-					interessatAdministracioDto.getIncapacitat());
+					interessatAdministracioDto.getIncapacitat(),
+					interessatAdministracioDto.getAmbOficinaSir());
 		}
 		interessatEntity = interessatRepository.save(interessatEntity);
 		// Registra al log la modificació de l'interessat

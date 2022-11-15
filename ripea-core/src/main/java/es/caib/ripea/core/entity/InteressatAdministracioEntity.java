@@ -30,6 +30,9 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	@Column(name = "organ_nom", length = 80)
 	protected String organNom;
 	
+	@Column(name = "amb_oficina_sir")
+	protected Boolean ambOficinaSir;
+	
 	public String getOrganCodi() {
 		return organCodi;
 	}
@@ -41,6 +44,12 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	}
 	public void setOrganNom(String organNom) {
 		this.organNom = organNom;
+	}
+	public Boolean getAmbOficinaSir() {
+		return ambOficinaSir;
+	}
+	public void setAmbOficinaSir(Boolean ambOficinaSir) {
+		this.ambOficinaSir = ambOficinaSir;
 	}
 	
 	@Override
@@ -64,7 +73,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			InteressatIdiomaEnumDto preferenciaIdioma,
 			Boolean entregaDeh,
 			Boolean entregaDehObligat,
-			Boolean incapacitat) {
+			Boolean incapacitat,
+			Boolean ambOficinaSir) {
 		this.organCodi = organCodi;
 		this.organNom = organNom;
 		this.documentTipus = documentTipus;
@@ -81,6 +91,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		this.entregaDeh = entregaDeh;
 		this.entregaDehObligat = entregaDehObligat;
 		this.incapacitat = incapacitat;
+		this.ambOficinaSir = ambOficinaSir;
 	}
 
 	/**
@@ -120,7 +131,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			InteressatEntity representant,
 			Boolean entregaDeh,
 			Boolean entregaDehObligat,
-			Boolean incapacitat) {
+			Boolean incapacitat,
+			Boolean ambOficinaSir) {
 		return new Builder(
 				organCodi,
 				organNom,
@@ -139,7 +151,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				representant,
 				entregaDeh,
 				entregaDehObligat,
-				incapacitat);
+				incapacitat,
+				ambOficinaSir);
 	}
 
 	/**
@@ -167,7 +180,8 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				InteressatEntity representant,
 				Boolean entregaDeh,
 				Boolean entregaDehObligat,
-				Boolean incapacitat) {
+				Boolean incapacitat,
+				Boolean ambOficinaSir) {
 			built = new InteressatAdministracioEntity();
 			built.organCodi = organCodi;
 			built.organNom = organNom;
@@ -189,6 +203,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			built.entregaDeh = entregaDeh;
 			built.entregaDehObligat = entregaDehObligat;
 			built.incapacitat = incapacitat;
+			built.ambOficinaSir = ambOficinaSir;
 		}
 		public InteressatAdministracioEntity build() {
 			return built;
