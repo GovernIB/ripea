@@ -129,7 +129,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 	}
 
 	@Transactional
@@ -224,7 +224,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -344,7 +344,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -472,7 +472,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -575,7 +575,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -681,7 +681,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 		return dto;
 	}
 
@@ -756,7 +756,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false, null, true, 0);
+				rolActual, false, null, true, 0, null, null, true);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -804,7 +804,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null, false, null, false, 0);
+				true, null, false, null, false, 0, null, null, true);
 	}
 
 	@Transactional(readOnly = true)
@@ -1088,7 +1088,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null, false, null, false, 0);
+								false, null, false, null, false, 0, null, null, true);
 					}
 				});
 	}
@@ -1149,7 +1149,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null, false, null, false, 0);
+								false, null, false, null, false, 0, null, null, true);
 					}
 				});
 	}
@@ -1622,7 +1622,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null, false, 0);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});
@@ -1776,7 +1776,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null, false, 0);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});

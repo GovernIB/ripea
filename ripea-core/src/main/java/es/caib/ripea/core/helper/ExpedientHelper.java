@@ -980,7 +980,7 @@ public class ExpedientHelper {
 				false,
 				false,
 				rolActual,
-				onlyForList, null, false, 0);
+				onlyForList, null, false, 0, null, null, true);
 		return expedientDto;
 	}
 	
@@ -1110,7 +1110,7 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 	}
 
 

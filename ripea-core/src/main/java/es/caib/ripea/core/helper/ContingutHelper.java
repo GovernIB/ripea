@@ -130,7 +130,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 	}
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
@@ -144,12 +144,8 @@ public class ContingutHelper {
 			String rolActual,
 			boolean onlyForList,
 			Long organActualId, 
-			boolean onlyFirstDescendant, int level) {
+			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare) {
 		level++;
-		
-		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toContingutDto start (" + contingut.getId() + ", "+ tipus + ", level="+level +") ");
     	
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
@@ -157,7 +153,8 @@ public class ContingutHelper {
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		// ##################### EXPEDIENT ##################################
 		if (deproxied instanceof ExpedientEntity) {
-
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toExpedientDto start (" + contingut.getId() + ", level=" + level + ") ");
 			long t1 = System.currentTimeMillis();
 
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
@@ -279,12 +276,13 @@ public class ContingutHelper {
 			}
 
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+				logger.info("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
-
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto start (" + contingut.getId() + ", level=" + level + ") ");
 			long t2 = System.currentTimeMillis();
 			long t10 = System.currentTimeMillis();
 			DocumentEntity document = (DocumentEntity)deproxied;
@@ -388,9 +386,11 @@ public class ContingutHelper {
 				logger.info("toDocumentDto 3/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
 
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto time (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				logger.info("toDocumentDto end (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toCarpetaDto start (" + contingut.getId() + ", level=" + level + ") ");
 			
 			long t2 = System.currentTimeMillis();
 			CarpetaDto dto = new CarpetaDto();
@@ -405,29 +405,36 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, true, null, onlyFirstDescendant, level));
+								false, null, true, null, onlyFirstDescendant, level, null, null, ambExpedientPare));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
 			resposta = dto;
 			
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toCarpetaDto time (" + carpeta.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				logger.info("toCarpetaDto end (" + carpeta.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		}
 
 		
 		// ##################### CONTINGUT ##################################
 		long t3 = System.currentTimeMillis();
 		
+		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("toContingutDto[" + tipus + "] start (" + contingut.getId() + ", level=" + level + ") ");
+		
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setCreatedDate(contingut.getCreatedDate().toDate());
 
+		long t22 = System.currentTimeMillis();
 		resposta.setAlerta(
 				alertaRepository.countByLlegidaAndContingutId(
 				false,
 				contingut.getId()) > 0);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("setAlerta time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t22) + " ms");
 
 		if (!onlyForList) {
 
@@ -441,22 +448,6 @@ public class ContingutHelper {
 				resposta.setHasFills(false);
 			}
 
-			if (contingut.getExpedient() != null) {
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("setExpedientPare recursive");
-				resposta.setExpedientPare(
-						(ExpedientDto)toContingutDto(
-								contingut.getExpedient(),
-								ambPermisos,
-								false,
-								false,
-								true,
-								false,
-								false,
-								false,
-								rolActual, onlyForList, organActualId, onlyFirstDescendant, level));
-
-			}
 			resposta.setEntitat(
 					conversioTipusHelper.convertir(
 							contingut.getEntitat(),
@@ -502,28 +493,98 @@ public class ContingutHelper {
 			resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
 
 
-			if (ambPath) {
+			if (ambDades && contingut instanceof NodeEntity) {
 				long t2 = System.currentTimeMillis();
-				// Calcula el path
-				List<ContingutDto> path = getPathContingutComDto(
-						contingut,
-						ambPermisos,
-						pathNomesFinsExpedientArrel);
-				resposta.setPath(path);
-				
+				NodeEntity node = (NodeEntity)contingut;
+				List<DadaEntity> dades = dadaRepository.findByNode(node);
+				((NodeDto)resposta).setDades(
+						conversioTipusHelper.convertirList(
+								dades,
+								DadaDto.class));
+				for (int i = 0; i < dades.size(); i++) {
+					((NodeDto)resposta).getDades().get(i).setValor(dades.get(i).getValor());
+				}
 				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambPath time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+					logger.info("ambDades time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
+			
+			
+			
+			ExpedientDto expedientCalculat = null;
+			if (ambExpedientPare) {
+				if (contingut instanceof ExpedientEntity) { //if is expedient
+					expedientCalculat = (ExpedientDto) resposta;
+				} else {
+					if (expedientDto != null) { //if is called recursively from pare that already calculated expedient
+						expedientCalculat = expedientDto;
+					} else { //if is not called recursively from pare that already calculated expedient, calculate expedient now
+						long t2 = System.currentTimeMillis();
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("expedientPare (recursive) start (" + contingut.getId() + ") " );
+	
+						expedientCalculat = (ExpedientDto) toContingutDto(
+								contingut.getExpedient(),
+								ambPermisos,
+								false,
+								false,
+								true,
+								false,
+								false,
+								false,
+								rolActual,
+								onlyForList,
+								organActualId,
+								onlyFirstDescendant,
+								level,
+								null,
+								null, 
+								ambExpedientPare);
+						logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+					}
+					resposta.setExpedientPare(expedientCalculat);
+				}
+			}
+			
+			List<ContingutDto> pathCalculatPerFills = null;
+			List<ContingutDto> pathCalculatPerThisContingut = null;
+			if (ambPath) {
+				if (contingut instanceof ExpedientEntity) { //if is expedient
+					pathCalculatPerThisContingut = null;
+				} else {
+					if (pathDto != null) { //if is called recursively from pare that already calculated path
+						pathCalculatPerThisContingut = pathDto;
+					} else { //if is not called recursively from pare that already calculated path, calculate path now
+						long t2 = System.currentTimeMillis();
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("ambPath (recursive) start (" + contingut.getId() + ") " );
+						pathCalculatPerThisContingut = getPathContingutComDto(
+								contingut,
+								ambPermisos,
+								pathNomesFinsExpedientArrel, level);
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("ambPath (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+						
+					}
+				}
+				resposta.setPath(pathCalculatPerThisContingut);
+			
+			
+				pathCalculatPerFills = new ArrayList<>();
+				if (pathCalculatPerThisContingut != null) {
+					pathCalculatPerFills.addAll(pathCalculatPerThisContingut);
+				}
+				pathCalculatPerFills.add(resposta);
+
+			}
+			
 			if (ambFills) {
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambFills (recursive) start (" + contingut.getId() + ")");
 				
 				long t2 = System.currentTimeMillis();
 				// Cerca els nodes fills
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				List<ContingutDto> contenidorDtos = new ArrayList<ContingutDto>();
-//				List<ContingutEntity> fills = contingutRepository.findByPareAndEsborrat(
-//						contingut,
-//						0,
-//						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+
 				List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
 				List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
 						contingut,
@@ -555,66 +616,34 @@ public class ContingutHelper {
 						}
 					}
 				}
-				List<ContingutDto> fillPath = null;
-				if (ambPath) {
-					fillPath = new ArrayList<ContingutDto>();
-					if (resposta.getPath() != null)
-						fillPath.addAll(resposta.getPath());
-					
-					if (cacheHelper.mostrarLogsRendiment())
-						logger.info("fillPath recursive");
-					
-					fillPath.add(toContingutDto(
-							contingut,
-							ambPermisos,
-							false,
-							false,
-							false,
-							false,
-							false,
-							false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level));
-				}
+				
+				List<ContingutDto> fillsDtos = new ArrayList<ContingutDto>();
 				for (ContingutEntity fill: fills) {
 					if (fill.getEsborrat() == 0) {
-						if (cacheHelper.mostrarLogsRendiment())
-							logger.info("fillDto recursive");
 						ContingutDto fillDto = toContingutDto(
 								fill,
 								ambPermisos,
 								onlyFirstDescendant ? false : true,
 								false,
 								false,
+								ambPath,
 								false,
-								false,
-								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level);
+								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare);
 						// Configura el pare de cada fill
-						fillDto.setPath(fillPath);
-						contenidorDtos.add(fillDto);
+						fillsDtos.add(fillDto);
 					}
 				}
-				resposta.setFills(contenidorDtos);
+
+				resposta.setFills(fillsDtos);
 				
 				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambFills time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+					logger.info("ambFills (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 
-			if (ambDades && contingut instanceof NodeEntity) {
-				long t2 = System.currentTimeMillis();
-				NodeEntity node = (NodeEntity)contingut;
-				List<DadaEntity> dades = dadaRepository.findByNode(node);
-				((NodeDto)resposta).setDades(
-						conversioTipusHelper.convertirList(
-								dades,
-								DadaDto.class));
-				for (int i = 0; i < dades.size(); i++) {
-					((NodeDto)resposta).getDades().get(i).setValor(dades.get(i).getValor());
-				}
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambDades time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-			}
+
 		}
 		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toContingutDto time (" + contingut.getId() + ", "+ tipus + ", level="+level +"): " + (System.currentTimeMillis() - t3) + " ms");
+			logger.info("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + level + "): "+ (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
 
@@ -933,7 +962,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0);
+				false, null, false, null, false, 0, null, null, true);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1480,7 +1509,7 @@ public class ContingutHelper {
 	public List<ContingutDto> getPathContingutComDto(
 			ContingutEntity contingut,
 			boolean ambPermisos,
-			boolean nomesFinsExpedientArrel) {
+			boolean nomesFinsExpedientArrel, int level) {
 		List<ContingutEntity> path = getPathContingut(contingut);
 		List<ContingutDto> pathDto = null;
 		if (path != null) {
@@ -1490,8 +1519,6 @@ public class ContingutHelper {
 				if (!expedientArrelTrobat && contingutPath instanceof ExpedientEntity)
 					expedientArrelTrobat = true;
 				if (expedientArrelTrobat) {
-					if (cacheHelper.mostrarLogsRendiment())
-						logger.info("pathAdd recursive");
 					pathDto.add(
 						toContingutDto(
 								contingutPath,
@@ -1501,7 +1528,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, false, null, false, 0));
+								false, null, false, null, false, level, null, null, false));
 				}
 			}
 		}

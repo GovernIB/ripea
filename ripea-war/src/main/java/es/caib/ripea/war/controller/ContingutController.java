@@ -199,7 +199,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	    		logger.info("metaDocumentsPerCreacio time (" + contingutId + "):  " + (System.currentTimeMillis() - t11) + " ms");
 			
 	    	if (aplicacioService.mostrarLogsRendiment())
-	    		logger.info("contingutGet time (" + contingutId + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	    		logger.info("contingutGet end (" + contingutId + "):  " + (System.currentTimeMillis() - t1) + " ms");
 			
 			return "contingut";
 		
