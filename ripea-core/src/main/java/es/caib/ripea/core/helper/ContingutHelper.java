@@ -419,15 +419,22 @@ public class ContingutHelper {
 		// ##################### CONTINGUT ##################################
 		long t3 = System.currentTimeMillis();
 		
+		long t234 = System.currentTimeMillis();
 		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("propertiesContingut1 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t234) + " ms");
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("toContingutDto[" + tipus + "] start (" + contingut.getId() + ", level=" + level + ") ");
 		
+		long t23 = System.currentTimeMillis();
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setCreatedDate(contingut.getCreatedDate().toDate());
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("propertiesContingut2 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t23) + " ms");
 
+		
 		long t22 = System.currentTimeMillis();
 		resposta.setAlerta(
 				alertaRepository.countByLlegidaAndContingutId(
@@ -438,6 +445,8 @@ public class ContingutHelper {
 
 		if (!onlyForList) {
 
+			long t2341 = System.currentTimeMillis();
+
 			resposta.setEsborrat(contingut.getEsborrat());
 			resposta.setEsborratData(contingut.getEsborratData());
 			resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
@@ -447,12 +456,19 @@ public class ContingutHelper {
 			} else {
 				resposta.setHasFills(false);
 			}
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("propertiesContingut3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2341) + " ms");
 
+			long t2342 = System.currentTimeMillis();
 			resposta.setEntitat(
 					conversioTipusHelper.convertir(
 							contingut.getEntitat(),
 								EntitatDto.class));
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("propertiesContingut4 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2342) + " ms");
+			
 			if (contingut.getDarrerMoviment() != null) {
+				long t1 = System.currentTimeMillis();
 				ContingutMovimentEntity darrerMoviment = contingut.getDarrerMoviment();
 				resposta.setDarrerMovimentUsuari(
 						conversioTipusHelper.convertir(
@@ -460,6 +476,8 @@ public class ContingutHelper {
 								UsuariDto.class));
 				resposta.setDarrerMovimentData(darrerMoviment.getCreatedDate().toDate());
 				resposta.setDarrerMovimentComentari(darrerMoviment.getComentari());
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("propertiesContingut5 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 			}
 
 			if (ambPermisos && metaNode != null) {
@@ -481,6 +499,7 @@ public class ContingutHelper {
 				
 			}
 
+			long t1 = System.currentTimeMillis();
 			// Omple la informació d'auditoria
 			resposta.setCreatedBy(
 					conversioTipusHelper.convertir(
@@ -491,7 +510,9 @@ public class ContingutHelper {
 							contingut.getLastModifiedBy(),
 							UsuariDto.class));
 			resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
-
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("propertiesContingut6 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+			
 
 			if (ambDades && contingut instanceof NodeEntity) {
 				long t2 = System.currentTimeMillis();

@@ -125,6 +125,12 @@ $(document).ready(function() {
 			$("body").addClass("loading");
 			checkLoadingFinished();
 	    });
+
+
+		$('#agafar_lnk').on('click', function() {
+			$("body").addClass("loading");
+		});
+		    
 	});
 	if (mostrarMeusExpedients) {
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(false);
@@ -655,10 +661,10 @@ function hexToRgb(hex) {
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
+								<li><a id="agafar_lnk" href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
 								{{if usuariActualWrite || '${rolActual}' == 'IPA_ADMIN' || '${rolActual}' == 'IPA_ORGAN_ADMIN'}}
 									{{if !agafat}}
-										<li><a href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+										<li><a  href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 									{{else}}
 										{{if agafatPer.codi != '${pageContext.request.userPrincipal.name}'}}
 											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>

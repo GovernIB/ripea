@@ -218,6 +218,7 @@
 									return false;
 								} else if (event.which == 1) {
 									if (!plugin.settings.rowhrefToggle) {
+										$("body").addClass("loading");
 										window.location.href = $(this).data('href');
 										return false;
 									} else {
