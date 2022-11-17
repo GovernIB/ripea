@@ -111,6 +111,9 @@
 		var requestLocale = '${requestLocale}';
 		var contextAddress = '${pageContext.request.contextPath}';
 
+		$(window).bind("pageshow", function(event) {
+		    $('body').removeClass('loading');
+		});
 		
 		$(document).ready(function() {
 			$('button[value="filtrar"]').click(function() {
