@@ -39,6 +39,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentOrigenEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -133,7 +134,7 @@ public class DocumentHelper {
 		fitxer.setNom(document.getFitxerNom());
 		fitxer.setContentType(document.getFitxerContentType());
 		fitxer.setContingut(document.getFitxerContingut());
-		actualitzarFitxerDocument(
+		actualitzarFitxerDB(
 				entity,
 				fitxer);
 
@@ -322,39 +323,22 @@ public class DocumentHelper {
 		
 		if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_SIN_FIRMA) {
 			
-			if (newFitxer) {
-				fitxer = new FitxerDto();
-				fitxer.setNom(document.getFitxerNom());
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setContingut(document.getFitxerContingut());
-				actualitzarFitxerDocument(
-						documentEntity,
-						fitxer);
-			} else {
-				fitxer = new FitxerDto();
-				fitxer.setContentType(documentEntity.getFitxerContentType());
-				fitxer.setNom(documentEntity.getFitxerNom());
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			}
+			fitxer = fitxer(
+					newFitxer,
+					documentEntity,
+					document,
+					arxiuDocument);
+	
 			documentEntity.updateEstat(DocumentEstatEnumDto.REDACCIO);
 			
 			
 		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED) {
 			
-			if (newFitxer) {
-				fitxer = new FitxerDto();
-				fitxer.setNom(document.getFitxerNom());
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setContingut(document.getFitxerContingut());
-				actualitzarFitxerDocument(
-						documentEntity,
-						fitxer);
-			} else {
-				fitxer = new FitxerDto();
-				fitxer.setContentType(documentEntity.getFitxerContentType());
-				fitxer.setNom(documentEntity.getFitxerNom());
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			}
+			fitxer = fitxer(
+					newFitxer,
+					documentEntity,
+					document,
+					arxiuDocument);
 			
 			firmes = validaFirmaDocument(
 					documentEntity, 
@@ -372,20 +356,11 @@ public class DocumentHelper {
 			
 		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED) {
 			
-			if (newFitxer) {
-				fitxer = new FitxerDto();
-				fitxer.setNom(document.getFitxerNom());
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setContingut(document.getFitxerContingut());
-				actualitzarFitxerDocument(
-						documentEntity,
-						fitxer);
-			} else {
-				fitxer = new FitxerDto();
-				fitxer.setContentType(documentEntity.getFitxerContentType());
-				fitxer.setNom(documentEntity.getFitxerNom());
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			}
+			fitxer = fitxer(
+					newFitxer,
+					documentEntity,
+					document,
+					arxiuDocument);
 			
 			byte[]  firmaContingut;
 			if (newFirma) {
@@ -434,6 +409,59 @@ public class DocumentHelper {
 
 		return dto;
 	}
+	
+	private FitxerDto fitxer(
+			boolean newFitxer,
+			DocumentEntity documentEntity,
+			DocumentDto document,
+			Document arxiuDocument) {
+		FitxerDto fitxer = null;
+		if (newFitxer) {
+			fitxer = getFitxerNew(
+					documentEntity,
+					document);
+		} else {
+			fitxer = getFitxerExisting(
+					documentEntity,
+					arxiuDocument);
+
+		}
+		return fitxer;
+	}
+	
+	private FitxerDto getFitxerNew(
+			DocumentEntity documentEntity,
+			DocumentDto document) {
+		FitxerDto fitxer = null;
+		fitxer = new FitxerDto(
+				document.getFitxerNom(),
+				document.getFitxerContentType(),
+				document.getFitxerContingut());
+
+		actualitzarFitxerDB(
+				documentEntity,
+				fitxer);
+
+		return fitxer;
+	}
+	
+	private FitxerDto getFitxerExisting(
+			DocumentEntity documentEntity,
+			Document arxiuDocument) {
+		FitxerDto fitxer = null;
+
+		fitxer = new FitxerDto(
+				documentEntity.getFitxerNom(),
+				documentEntity.getFitxerContentType(),
+				getContingutFromArxiuDocument(arxiuDocument));
+		
+		return fitxer;
+	}
+	
+	
+	
+	
+	
 	
 	public boolean updateTipusDocumentDocument(
 			Long entitatId,
@@ -635,39 +663,65 @@ public class DocumentHelper {
 	public void actualitzarEstatADefinititu(DocumentEntity documentEntity) {
 		
 
-		FitxerDto fitxer = null;
 		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+				documentEntity,
+				null,
+				null,
+				true,
+				false);
+		
+		DocumentFirmaEnumDto documentFirmaEnum;
+		if (documentEntity.getNtiTipoFirma() == null) {
+			throw new RuntimeException("No es pot marcar el document com a definitiu si no està firmat");
+		} else if (documentEntity.getNtiTipoFirma() == DocumentNtiTipoFirmaEnumDto.TF04) {
+			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED;
+		} else {
+			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED;
+		}
+		
+		FitxerDto fitxer = null;
+		List<ArxiuFirmaDto> firmes = null;
+		
+		if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED) {
+			
+			fitxer = getFitxerExisting(
 					documentEntity,
-					null,
-					null,
-					true,
-					false);
+					arxiuDocument);
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					null, 
+					false, 
+					true);
+			
+			
+		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED) {
+			
+			fitxer = getFitxerExisting(
+					documentEntity,
+					arxiuDocument);
+			
+			byte[]  firmaContingut = getFirmaDetachedFromArxiuDocument(arxiuDocument);
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					firmaContingut, 
+					false, 
+					true);
+			
 
+		}
+
+		contingutHelper.arxiuPropagarModificacio(
+				documentEntity,
+				fitxer,
+				true,
+				documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED,
+				firmes, 
+				ArxiuEstatEnumDto.DEFINITIU);
 	
-//		fitxer = new FitxerDto();
-//		fitxer.setContentType(documentEntity.getFitxerContentType());
-//		fitxer.setNom(documentEntity.getFitxerNom());
-//
-//		 List<ArxiuFirmaDto> firmes = new ArrayList<>();
-//		 
-//		 for ( Firma firma : arxiuDocument.getFirmes()) {
-//			 ArxiuFirmaDto arxiuFirmaDto = new ArxiuFirmaDto();
-//			 arxiuFirmaDto.setContingut(firma.getContingut());
-//			 arxiuFirmaDto.setTipusMime(firma.getTipusMime());
-//			 arxiuFirmaDto.set
-//			
-//		}
-//
-//		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
-//		contingutHelper.arxiuPropagarModificacio(
-//				documentEntity,
-//				fitxer,
-//				true,
-//				document.isFirmaSeparada(),
-//				firmes,
-//				arxiuEstat);
-//		}
-
 		
 	}
 	
@@ -721,7 +775,7 @@ public class DocumentHelper {
 	// FITXER DEL DOCUMENT - ARXIU
 	////
 	
-	public void actualitzarFitxerDocument(
+	public void actualitzarFitxerDB(
 			DocumentEntity document,
 			FitxerDto fitxer) {
 		if (pluginHelper.isArxiuPluginActiu()) {

@@ -607,7 +607,7 @@ public class ExpedientHelper {
 			fitxer.setContentType(documentDto.getFitxerContentType());
 			fitxer.setContingut(documentDto.getFitxerContingut());
 			if (documentDto.getFitxerContingut() != null) {
-				documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
+				documentHelper.actualitzarFitxerDB(docEntity, fitxer);
 				if (documentDto.isAmbFirma()) {
 					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 				}
@@ -792,7 +792,7 @@ public class ExpedientHelper {
 		fitxer.setContentType(documentDto.getFitxerContentType());
 		fitxer.setContingut(documentDto.getFitxerContingut());
 		if (documentDto.getFitxerContingut() != null) {
-			documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
+			documentHelper.actualitzarFitxerDB(docEntity, fitxer);
 			if (documentDto.isAmbFirma()) {
 				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 			}
@@ -1014,10 +1014,7 @@ public class ExpedientHelper {
 		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
 		}
-		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
-		if (!documentRepository.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
-			throw new ExpedientTancarSenseDocumentsDefinitiusException();
-		}
+
 		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
 		expedient.updateExpedientEstat(null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
@@ -1025,8 +1022,10 @@ public class ExpedientHelper {
 			List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
 					entitatId,
 					id);
+			
 			// Firmam els documents seleccionats
-			if (hiHaEsborranysPerFirmar) {
+			boolean hiHaDocumentsPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
+			if (hiHaDocumentsPerFirmar) {
 				for (Long documentPerFirmar : documentsPerFirmar) {
 					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
 					if (document != null) {
@@ -1057,6 +1056,17 @@ public class ExpedientHelper {
 					documentRepository.delete(esborrany);
 				}
 			}
+			
+			
+			// Marquem esborannys firmats com a definitius
+			List<DocumentEntity> esborranysArxiu = documentRepository.findByExpedientAndEsborratAndArxiuEstat(
+					expedient,
+					ArxiuEstatEnumDto.ESBORRANY);
+			for (DocumentEntity documentEntity : esborranysArxiu) {
+				documentHelper.actualitzarEstatADefinititu(documentEntity);
+			}
+			
+			
 			pluginHelper.arxiuExpedientTancar(expedient);
 		}
 	}

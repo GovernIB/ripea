@@ -1307,7 +1307,9 @@ public class ContingutHelper {
 			documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
 			if (firmes != null) {
 				// Custodia el document firmat
-				((DocumentEntity) document).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
+					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				}
 
 				// Registra al log la custòdia de la firma del document
 				contingutLogHelper.log((

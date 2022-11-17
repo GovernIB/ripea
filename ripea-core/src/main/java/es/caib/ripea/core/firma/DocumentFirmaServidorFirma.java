@@ -51,14 +51,13 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		if (document.getArxiuUuid() != null) {
 			
 			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
-			pluginHelper.arxiuDocumentActualitzar(
+			contingutHelper.arxiuPropagarModificacio(
 					document,
 					fitxer,
 					true,
 					true,
 					Arrays.asList(arxiuFirma), 
 					arxiuEstat);
-			
 			
 		} else {
 			guardarDocumentFirmatArxiu(document, fitxer, Arrays.asList(arxiuFirma));
@@ -78,7 +77,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		fitxer.setContentType(documentEntity.getFitxerContentType());
 		fitxer.setContingut(firmes.get(0).getContingut());
 
-		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
 		contingutHelper.arxiuPropagarModificacio(
 				documentEntity,
 				fitxer,

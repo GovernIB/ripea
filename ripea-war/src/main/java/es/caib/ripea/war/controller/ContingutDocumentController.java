@@ -131,10 +131,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				model.addAttribute("nomDocument", document.getFitxerNom());
 			}
 			model.addAttribute("documentEstat", document.getEstat());
-			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			if (!document.isValidacioFirmaCorrecte()) {
-				command.setAmbFirma(true);
-			}
+			
+			setTipusFirma(command, document);
+			
 			model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
 			omplirModelFormulari(request, command, documentId, model);
 			
@@ -159,6 +158,20 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("documentId", documentId);		
 		return "contingutDocumentForm";
 	}
+	
+	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
+		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+		if (document.getNtiTipoFirma() != null) {
+			command.setAmbFirma(true);
+			if (document.getNtiTipoFirma()==DocumentNtiTipoFirmaEnumDto.TF04) {
+				command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+			} 
+		} else {
+			command.setAmbFirma(false);
+		}
+	}
+	
+	
 	@RequestMapping(value = "/{pareId}/document/docNew", method = RequestMethod.POST)
 	public String postNew(
 			HttpServletRequest request,

@@ -42,12 +42,12 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
@@ -92,6 +92,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	private PortafirmesBlockInfoRepository portafirmesBlockInfoRepository;
 	@Autowired
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired
+	private ContingutHelper contingutHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -353,7 +355,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 									fitxerAmbFirma.getFitxer());
 						} else {
 							ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-							pluginHelper.arxiuDocumentActualitzar(
+							
+							contingutHelper.arxiuPropagarModificacio(
 									document,
 									fitxerAmbFirma.getFitxer(),
 									true,

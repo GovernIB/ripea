@@ -480,6 +480,7 @@ $(document).ready(function() {
 	    } else if($('#ambFirma').prop('checked') && $('#tipusFirma2').is(":checked")){
 	        $('#tipusFirma1').parent().hide();
 	        $('#tipusFirma2').parent().show();
+	        $('input[type=radio][name=tipusFirma]').val('SEPARAT');
 	    }
 	</c:if>
 	
@@ -572,7 +573,7 @@ function removeLoading() {
 								<div id="input-firma" class="hidden">
 									<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 									<div id="input-firma-arxiu" class="hidden">
-										<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+										<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}" fileName="${documentCommand.tipusFirma=='SEPARAT' ? 'firma_separada' : ''}"/>
 									</div>
 								</div>
 							</div>

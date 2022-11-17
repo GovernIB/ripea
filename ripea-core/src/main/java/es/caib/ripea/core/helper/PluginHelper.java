@@ -220,7 +220,8 @@ public class PluginHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
-	
+	@Autowired
+	private ContingutHelper contingutHelper;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -1200,8 +1201,8 @@ public class PluginHelper {
 		}
 		
 		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-		
-		arxiuDocumentActualitzar(
+	
+		contingutHelper.arxiuPropagarModificacio(
 				document,
 				fitxer,
 				true,
@@ -1209,10 +1210,6 @@ public class PluginHelper {
 				firmes, 
 				arxiuEstat);
 		
-		if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
-			document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-		}
-
 	}
 	
 	public List<TipusDocumentalDto> documentTipusAddicionals() {
