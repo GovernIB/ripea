@@ -283,12 +283,6 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public boolean isPluginArxiuActiu() {
-		logger.debug("Consulta si el plugin d'arxiu està actiu");
-		return pluginHelper.isArxiuPluginActiu();
-	}
-
-	@Override
 	public String propertyBaseUrl() {
 		logger.debug("Consulta de la propietat base URL");
 		return configHelper.getConfig("es.caib.ripea.base.url");

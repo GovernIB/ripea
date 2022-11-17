@@ -966,9 +966,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
 		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
-		if (pluginHelper.isArxiuPluginActiu()) {
-			pluginHelper.arxiuExpedientReobrir(expedient);
-		}
+		pluginHelper.arxiuExpedientReobrir(expedient);
 	}
 
 	
@@ -1175,7 +1173,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false);
 		boolean isPropagarRelacioActiva = isProgaparRelacioActiva();
-		if (pluginHelper.isArxiuPluginActiu() && isPropagarRelacioActiva) {
+		if (isPropagarRelacioActiva) {
 			pluginHelper.arxiuExpedientEnllacar(
 					expedient, 
 					toRelate);
@@ -1239,7 +1237,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false);
 		}
 		boolean isPropagarRelacioActiva = isProgaparRelacioActiva();
-		if (pluginHelper.isArxiuPluginActiu() && isPropagarRelacioActiva) {
+		if (isPropagarRelacioActiva) {
 			try {
 				//provar desenllaçar fill del pare des del pare
 				pluginHelper.arxiuExpedientDesenllacar(

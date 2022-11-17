@@ -385,9 +385,7 @@
 					</c:otherwise>
 				</c:choose>	
 			</c:if>
-			<c:if test="${pluginArxiuActiu}"> 
-				<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
-			</c:if>
+			<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 			<c:if test="${contingut.document && contingut.fitxerExtension!='zip'}">
 				<c:choose>
 					<c:when test="${contingut.document && contingut.estat != 'CUSTODIAT' || contingut.expedient && !contingut.conteDocumentsFirmats}">

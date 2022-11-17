@@ -882,9 +882,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"interessat.tipus.enum."));
-		model.addAttribute(
-				"pluginArxiuActiu",
-				aplicacioService.isPluginArxiuActiu());
+
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
 		
 		Set<Long> seleccio = new HashSet<Long>();

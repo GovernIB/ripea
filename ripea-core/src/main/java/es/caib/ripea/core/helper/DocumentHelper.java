@@ -778,17 +778,10 @@ public class DocumentHelper {
 	public void actualitzarFitxerDB(
 			DocumentEntity document,
 			FitxerDto fitxer) {
-		if (pluginHelper.isArxiuPluginActiu()) {
-			document.updateFitxer(
-					fitxer.getNom(),
-					fitxer.getContentType(),
-					null);
-		} else {
-			document.updateFitxer(
-					fitxer.getNom(),
-					fitxer.getContentType(),
-					fitxer.getContingut());
-		}
+		document.updateFitxer(
+				fitxer.getNom(),
+				fitxer.getContentType(),
+				null);
 	}
 
 	public FitxerDto getFitxerAssociat(
@@ -796,40 +789,34 @@ public class DocumentHelper {
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
+			
+			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
 				
-				if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
-					
-					ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-					pluginHelper.gestioDocumentalGet(
-							document.getGesDocFirmatId(),
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
-							streamAnnex);
-					fitxer = new FitxerDto();
-					fitxer.setContingut(streamAnnex.toByteArray());
-					fitxer.setNom(document.getNomFitxerFirmat());
-					fitxer.setContentType(document.getFitxerContentType());
-				} else {
-					
-                    String fitxerNom = document.getFitxerNom();
-                    String fitxerFirmatNom = document.getNomFitxerFirmat();
-					fitxer = new FitxerDto();
-	                fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
-	                fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
-					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-							document,
-							null,
-							versio,
-							true,
-							false);
-					fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-				}
-
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						document.getGesDocFirmatId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+						streamAnnex);
+				fitxer = new FitxerDto();
+				fitxer.setContingut(streamAnnex.toByteArray());
+				fitxer.setNom(document.getNomFitxerFirmat());
+				fitxer.setContentType(document.getFitxerContentType());
 			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_ARXIU,
-						"S'està intentant obtenir l'arxiu associat a un document pujat a l'arxiu i el plugin d'arxiu no està activat");
+				
+                String fitxerNom = document.getFitxerNom();
+                String fitxerFirmatNom = document.getNomFitxerFirmat();
+				fitxer = new FitxerDto();
+                fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
+                fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
+				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+						document,
+						null,
+						versio,
+						true,
+						false);
+				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 			}
+
 		} else {
 			fitxer = new FitxerDto();
 
@@ -859,22 +846,17 @@ public class DocumentHelper {
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
-				fitxer = new FitxerDto();
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setNom(document.getFitxerNom());
-				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-						document,
-						null,
-						versio,
-						true,
-						false);
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_ARXIU,
-						"S'està intentant obtenir l'arxiu associat a un document pujat a l'arxiu i el plugin d'arxiu no està activat");
-			}
+			fitxer = new FitxerDto();
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setNom(document.getFitxerNom());
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					document,
+					null,
+					versio,
+					true,
+					false);
+			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+
 		} else {
 			fitxer = new FitxerDto();
 			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {

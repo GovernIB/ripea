@@ -724,9 +724,7 @@ public class UsuariTascaController extends BaseUserController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"interessat.tipus.enum."));
-		model.addAttribute(
-				"pluginArxiuActiu",
-				aplicacioService.isPluginArxiuActiu());
+
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
 	}
 	

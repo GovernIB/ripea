@@ -2197,7 +2197,7 @@ $.views.helpers(myHelpers);
 							<a href="#versions" data-toggle="tab"><spring:message code="contingut.tab.versions"/>&nbsp;<span class="badge" id="versions-count">${fn:length(contingut.versions)}</span></a>
 						</li>
 					</c:if>
-					<c:if test="${contingut.document && pluginArxiuActiu}">
+					<c:if test="${contingut.document}">
 						<div class="dropdown" style="float: right;" id="documentDropdownAccions">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">

@@ -299,7 +299,7 @@ public class ContingutHelper {
 			dto.setDataCaptura(document.getDataCaptura());
 			dto.setVersioDarrera(document.getVersioDarrera());
 			dto.setVersioCount(document.getVersioCount());
-			if (ambVersions && pluginHelper.isArxiuPluginActiu() && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == 0) {
+			if (ambVersions && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == 0) {
 				List<ContingutArxiu> arxiuVersions = pluginHelper.arxiuDocumentObtenirVersions(document);
 				if (arxiuVersions != null) {
 					List<DocumentVersioDto> versions = new ArrayList<DocumentVersioDto>();
@@ -1267,9 +1267,7 @@ public class ContingutHelper {
 	public void arxiuPropagarModificacio(
 			ExpedientEntity expedient) {
 
-		if (pluginHelper.isArxiuPluginActiu()) {
-			pluginHelper.arxiuExpedientActualitzar(expedient);
-		}
+		pluginHelper.arxiuExpedientActualitzar(expedient);
 	}
 	
 	public void arxiuPropagarModificacio(
@@ -1278,7 +1276,7 @@ public class ContingutHelper {
 
 		boolean utilitzarCarpetesEnArxiu = fromAnotacio && !isCarpetaLogica();
 		
-		if (pluginHelper.isArxiuPluginActiu() && utilitzarCarpetesEnArxiu) {
+		if (utilitzarCarpetesEnArxiu) {
 				pluginHelper.arxiuCarpetaActualitzar( 
 						carpeta,
 						carpeta.getPare());
@@ -1295,61 +1293,53 @@ public class ContingutHelper {
 			boolean firmaSeparada,
 			List<ArxiuFirmaDto> firmes, 
 			ArxiuEstatEnumDto arxiuEstat) {
-		if (pluginHelper.isArxiuPluginActiu()) {
 			
-			pluginHelper.arxiuDocumentActualitzar(
-					(DocumentEntity) document,
-					fitxer,
-					documentAmbFirma,
-					firmaSeparada,
-					firmes, 
-					arxiuEstat);
-			documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
-			if (firmes != null) {
-				// Custodia el document firmat
-				if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
-					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-				}
-
-				// Registra al log la custòdia de la firma del document
-				contingutLogHelper.log((
-						(DocumentEntity) document),
-						LogTipusEnumDto.ARXIU_CUSTODIAT,
-						document.getArxiuUuid(),
-						null,
-						false,
-						false);
+		pluginHelper.arxiuDocumentActualitzar(
+				(DocumentEntity) document,
+				fitxer,
+				documentAmbFirma,
+				firmaSeparada,
+				firmes, 
+				arxiuEstat);
+		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
+		if (firmes != null) {
+			// Custodia el document firmat
+			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
+				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
+
+			// Registra al log la custòdia de la firma del document
+			contingutLogHelper.log((
+					(DocumentEntity) document),
+					LogTipusEnumDto.ARXIU_CUSTODIAT,
+					document.getArxiuUuid(),
+					null,
+					false,
+					false);
 		}
 	}
 
 	public void arxiuPropagarEliminacio(ContingutEntity contingut) {
 		if (contingut.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
-				if (contingut instanceof ExpedientEntity) {
-					pluginHelper.arxiuExpedientEsborrar(
-							(ExpedientEntity)contingut);
-				} else if (contingut instanceof DocumentEntity) {
-					DocumentTipusEnumDto documentTipus = ((DocumentEntity)contingut).getDocumentTipus();
-					if (!documentTipus.equals(DocumentTipusEnumDto.IMPORTAT)) {
-						pluginHelper.arxiuDocumentEsborrar(
-								(DocumentEntity)contingut);
-					}
-				} else if (contingut instanceof CarpetaEntity) {
-					pluginHelper.arxiuCarpetaEsborrar(
-							(CarpetaEntity)contingut);
-				} else {
-					throw new ValidationException(
-							contingut.getId(),
-							ContingutEntity.class,
-							"El contingut que es vol esborrar de l'arxiu no és del tipus expedient, document o carpeta");
+			if (contingut instanceof ExpedientEntity) {
+				pluginHelper.arxiuExpedientEsborrar(
+						(ExpedientEntity)contingut);
+			} else if (contingut instanceof DocumentEntity) {
+				DocumentTipusEnumDto documentTipus = ((DocumentEntity)contingut).getDocumentTipus();
+				if (!documentTipus.equals(DocumentTipusEnumDto.IMPORTAT)) {
+					pluginHelper.arxiuDocumentEsborrar(
+							(DocumentEntity)contingut);
 				}
+			} else if (contingut instanceof CarpetaEntity) {
+				pluginHelper.arxiuCarpetaEsborrar(
+						(CarpetaEntity)contingut);
 			} else {
 				throw new ValidationException(
 						contingut.getId(),
 						ContingutEntity.class,
-						"S'ha d'esborrar un contingut de l'arxiu però el plugin no està habilitat");
+						"El contingut que es vol esborrar de l'arxiu no és del tipus expedient, document o carpeta");
 			}
+
 		//Carpeta lògica
 		} else if (contingut.getArxiuUuid() == null && contingut instanceof CarpetaEntity) {
 			for (ContingutEntity fill : contingut.getFills()) {

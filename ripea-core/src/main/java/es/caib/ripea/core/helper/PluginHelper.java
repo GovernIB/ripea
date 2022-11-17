@@ -453,9 +453,6 @@ public class PluginHelper {
 	public boolean arxiuSuportaVersionsDocuments() {
 		return getArxiuPlugin().suportaVersionatDocument();
 	}
-	public boolean arxiuSuportaMetadades() {
-		return getArxiuPlugin().suportaMetadadesNti();
-	}
 
 	public void arxiuExpedientActualitzar(ExpedientEntity expedient) {
 		
@@ -555,10 +552,8 @@ public class PluginHelper {
 										expedient.getEstat(),
 										interessats,
 										metaExpedient.getSerieDocumental()));
-						if (getArxiuPlugin().suportaMetadadesNti()) {
-							Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(expedientCreat.getIdentificador(), null);
-							propagarMetadadesExpedient(expedientDetalls, expedient);
-						}
+						Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(expedientCreat.getIdentificador(), null);
+						propagarMetadadesExpedient(expedientDetalls, expedient);
 						expedient.updateArxiu(expedientCreat.getIdentificador());
 					} catch (Exception e) {
 						if (e.getMessage().contains("Duplicate child name not allowed")) {
@@ -829,11 +824,9 @@ public class PluginHelper {
 
 				
 			}
-			if (getArxiuPlugin().suportaMetadadesNti()) {
-				Document documentDetalls = getArxiuPlugin().documentDetalls(documentArxiuCreatOModificat.getIdentificador(), null, false);
-				propagarMetadadesDocument(documentDetalls, document);
-			}
-			
+			Document documentDetalls = getArxiuPlugin().documentDetalls(documentArxiuCreatOModificat.getIdentificador(), null, false);
+			propagarMetadadesDocument(documentDetalls, document);
+		
 			
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, integracioAccio.getDescripcio(), integracioAccio.getParametres(), IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
@@ -963,75 +956,6 @@ public class PluginHelper {
 		return nomPerComprovar;
 	}
 
-	/*public void arxiuFirmaActualitzar(
-			DocumentEntity document,
-			FitxerDto fitxer,
-			ContingutEntity contingutPare,
-			String serieDocumental,
-			List<ArxiuFirmaDto> firmes,
-			boolean ambFirmaSeparada) {
-		String accioDescripcio = "Actualització de les dades de la firma seprada";
-		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("id", document.getId().toString());
-		accioParams.put("títol", document.getNom());
-		accioParams.put("contingutPareId", contingutPare.getId().toString());
-		accioParams.put("contingutPareNom", contingutPare.getNom());
-		accioParams.put("serieDocumental", serieDocumental);
-		long t0 = System.currentTimeMillis();
-		try {
-			if (document.getArxiuUuid() == null) {
-				ContingutArxiu documentCreat = getArxiuPlugin().documentCrear(
-						toArxiuDocument(
-								null,
-								document.getNom(),
-								fitxer,
-								null,
-								firmes,
-								null,
-								document.getNtiOrigen(),
-								Arrays.asList(document.getNtiOrgano()),
-								document.getDataCaptura(),
-								document.getNtiEstadoElaboracion(),
-								document.getNtiTipoDocumental(),
-								(firmes != null ? DocumentEstat.DEFINITIU : DocumentEstat.ESBORRANY),
-								DocumentTipusEnumDto.FISIC.equals(document.getDocumentTipus()),
-								serieDocumental),
-						contingutPare.getArxiuUuid());
-				if (getArxiuPlugin().suportaMetadadesNti()) {
-					Document documentDetalls = getArxiuPlugin().documentDetalls(
-							documentCreat.getIdentificador(),
-							null,
-							false);
-					propagarMetadadesDocument(
-							documentDetalls,
-							document);
-				}
-				document.updateArxiu(
-						documentCreat.getIdentificador());
-			}
-
-			integracioHelper.addAccioOk(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
-			integracioHelper.addAccioError(
-					IntegracioHelper.INTCODI_ARXIU,
-					accioDescripcio,
-					accioParams,
-					IntegracioAccioTipusEnumDto.ENVIAMENT,
-					System.currentTimeMillis() - t0,
-					errorDescripcio,
-					ex);
-			throw new SistemaExternException(
-					IntegracioHelper.INTCODI_ARXIU,
-					errorDescripcio,
-					ex);
-		}
-	}*/
 
 	public Document arxiuDocumentConsultar(ContingutEntity contingut, String nodeId, String versio, boolean ambContingut) {
 		return arxiuDocumentConsultar(contingut, nodeId, versio, ambContingut, false);

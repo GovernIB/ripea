@@ -424,20 +424,18 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
-				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-						document,
-						null,
-						versio,
-						true,
-						false);
-				List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
-						documentHelper.getContingutFromArxiuDocument(arxiuDocument),
-						documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
-						null, 
-						false);
-				return arxiuFirmes.get(0).getDetalls();
-			}
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					document,
+					null,
+					versio,
+					true,
+					false);
+			List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
+					documentHelper.getContingutFromArxiuDocument(arxiuDocument),
+					documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
+					null, 
+					false);
+			return arxiuFirmes.get(0).getDetalls();
 		}
 		return null;
 	}
