@@ -132,6 +132,7 @@ public class ContingutHelper {
 				false,
 				false, null, false, null, false, 0, null, null, true);
 	}
+	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
 			boolean ambPermisos,
@@ -145,6 +146,41 @@ public class ContingutHelper {
 			boolean onlyForList,
 			Long organActualId, 
 			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare) {
+		
+		return toContingutDto(
+				contingut,
+				ambPermisos,
+				ambFills,
+				filtrarFillsSegonsPermisRead,
+				ambDades,
+				ambPath,
+				pathNomesFinsExpedientArrel,
+				ambVersions,
+				rolActual,
+				onlyForList,
+				organActualId,
+				onlyFirstDescendant,
+				level,
+				expedientDto,
+				pathDto,
+				ambExpedientPare,
+				true);
+	}
+	
+	
+	public ContingutDto toContingutDto(
+			ContingutEntity contingut,
+			boolean ambPermisos,
+			boolean ambFills,
+			boolean filtrarFillsSegonsPermisRead,
+			boolean ambDades,
+			boolean ambPath,
+			boolean pathNomesFinsExpedientArrel,
+			boolean ambVersions,
+			String rolActual,
+			boolean onlyForList,
+			Long organActualId, 
+			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare, boolean ambEntitat) {
 		level++;
     	
 		ContingutDto resposta = null;
@@ -405,7 +441,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, true, null, onlyFirstDescendant, level, null, null, ambExpedientPare));
+								false, null, true, null, onlyFirstDescendant, level, null, null, ambExpedientPare, ambEntitat));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
@@ -459,13 +495,17 @@ public class ContingutHelper {
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("propertiesContingut3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2341) + " ms");
 
-			long t2342 = System.currentTimeMillis();
-			resposta.setEntitat(
-					conversioTipusHelper.convertir(
-							contingut.getEntitat(),
-								EntitatDto.class));
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("propertiesContingut4 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2342) + " ms");
+			
+			if (ambEntitat) {
+				long t2342 = System.currentTimeMillis();
+				resposta.setEntitat(
+						conversioTipusHelper.convertir(
+								contingut.getEntitat(),
+									EntitatDto.class));
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("propertiesContingut4 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2342) + " ms");
+			}
+
 			
 			if (contingut.getDarrerMoviment() != null) {
 				long t1 = System.currentTimeMillis();
@@ -559,8 +599,10 @@ public class ContingutHelper {
 								level,
 								null,
 								null, 
-								ambExpedientPare);
-						logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+								ambExpedientPare, 
+								ambEntitat);
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 					}
 					resposta.setExpedientPare(expedientCalculat);
 				}
@@ -649,7 +691,7 @@ public class ContingutHelper {
 								false,
 								ambPath,
 								false,
-								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare);
+								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare, ambEntitat);
 						// Configura el pare de cada fill
 						fillsDtos.add(fillDto);
 					}
@@ -1549,7 +1591,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, false, null, false, level, null, null, false));
+								false, null, false, null, false, level, null, null, false, false));
 				}
 			}
 		}

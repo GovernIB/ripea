@@ -555,4 +555,14 @@ public interface ContingutService {
 
 	public boolean isExpedient(
 			Long contingutId);
+
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos,
+			String rolActual,
+			Long organActualId,
+			boolean ambEntitat);
 }

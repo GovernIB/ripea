@@ -133,8 +133,10 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId,
 					true,
 					true, 
+					true,
 					RolHelper.getRolActual(request), 
-					EntitatHelper.getOrganGestorActualId(request));
+					EntitatHelper.getOrganGestorActualId(request),
+					false);
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,

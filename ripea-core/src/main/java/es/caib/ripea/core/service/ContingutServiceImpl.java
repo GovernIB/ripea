@@ -701,7 +701,9 @@ public class ContingutServiceImpl implements ContingutService {
 				true, 
 				rolActual, null);
 	}
-
+	
+	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -712,6 +714,31 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambPermisos, 
 			String rolActual, 
 			Long organActualId) {
+		
+		return findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				ambPermisos,
+				rolActual,
+				organActualId,
+				true);
+
+	}
+	
+
+	@Transactional(readOnly = true)
+	@Override
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos, 
+			String rolActual, 
+			Long organActualId,
+			boolean ambEntitat) {
 		
 		long t2 = System.currentTimeMillis();
 		logger.debug("Obtenint contingut amb id per usuari ("
@@ -756,7 +783,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false, null, true, 0, null, null, true);
+				rolActual, false, null, true, 0, null, null, true, ambEntitat);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
