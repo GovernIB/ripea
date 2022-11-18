@@ -129,7 +129,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
 
 	@Transactional
@@ -224,7 +224,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -344,7 +344,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -483,7 +483,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -586,7 +586,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -692,7 +692,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		return dto;
 	}
 
@@ -712,7 +712,9 @@ public class ContingutServiceImpl implements ContingutService {
 				true, 
 				rolActual, null);
 	}
-
+	
+	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -723,6 +725,33 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambPermisos, 
 			String rolActual, 
 			Long organActualId) {
+		
+		return findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				ambPermisos,
+				rolActual,
+				organActualId,
+				true);
+
+	}
+	
+
+	@Transactional(readOnly = true)
+	@Override
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos, 
+			String rolActual, 
+			Long organActualId,
+			boolean ambEntitat) {
+		
+		long t2 = System.currentTimeMillis();
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
@@ -766,13 +795,27 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false, null);
+				rolActual, false, null, true, 0, null, null, true, ambEntitat);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
-		logger.trace("findAmbIdUser toContingutDto time:  " + (System.currentTimeMillis() - t0) + " ms");
+
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("findAmbIdUser time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		return dto;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public boolean isExpedient(
+			Long contingutId) {
+
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+
+		return contingut instanceof ExpedientEntity;
+	}
+
 
 	@Transactional(readOnly = true)
 	@Override
@@ -800,7 +843,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null, false, null);
+				true, null, false, null, false, 0, null, null, true);
 	}
 
 	@Transactional(readOnly = true)
@@ -1084,7 +1127,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null, false, null);
+								false, null, false, null, false, 0, null, null, true);
 					}
 				});
 	}
@@ -1145,7 +1188,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null, false, null);
+								false, null, false, null, false, 0, null, null, true);
 					}
 				});
 	}
@@ -1618,7 +1661,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});
@@ -1772,7 +1815,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});

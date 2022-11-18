@@ -349,4 +349,31 @@ public class ContingutServiceBean implements ContingutService {
         return delegate.arreglaDocumentsSenseContingut();
     }
 
+	@Override
+	public boolean isExpedient(
+			Long contingutId) {
+		return delegate.isExpedient(contingutId);
+	}
+
+	@Override
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos,
+			String rolActual,
+			Long organActualId,
+			boolean ambEntitat) {
+		return delegate.findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				ambPermisos,
+				rolActual,
+				organActualId,
+				ambEntitat);
+	}
+
 }

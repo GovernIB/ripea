@@ -1052,7 +1052,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});
@@ -1301,8 +1301,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 		});
 		List<ExpedientDto> relacionatsDto = new ArrayList<ExpedientDto>();
-		for (ExpedientEntity e : relacionats)
-			relacionatsDto.add(expedientHelper.toExpedientDto(e, false, null, false));
+		for (ExpedientEntity e : relacionats) {
+			ExpedientDto exp = new ExpedientDto();
+			exp.setId(e.getId());
+			exp.setEsborrat(e.getEsborrat());
+			exp.setNom(e.getNom());
+			exp.setAny(e.getAny());
+			exp.setSequencia(e.getSequencia());
+			relacionatsDto.add(exp);
+		}
 		return relacionatsDto;
 	}
 
