@@ -354,27 +354,56 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 
-		if (!conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
+		if (!contingutHelper.conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
 
 			// Propaga l'acció a l'arxiu
 			FitxerDto fitxer = null;
-			if (contingut instanceof DocumentEntity) {
-				DocumentEntity document = (DocumentEntity)contingut;
-				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-					fitxer = contingutHelper.fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
-				}
-			}
+
 			if (contingut instanceof ExpedientEntity) {
 				contingutHelper.arxiuPropagarModificacio((ExpedientEntity) contingut);
 			} else if (contingut instanceof DocumentEntity) {
-				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-				contingutHelper.arxiuPropagarModificacio(
-						(DocumentEntity) contingut,
-						fitxer,
-						false,
-						false,
-						null, 
-						arxiuEstat);
+				
+				DocumentEntity document = (DocumentEntity)contingut;
+				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
+
+					DocumentFirmaTipusEnumDto documentFirmaTipus = documentHelper.getDocumentFirmaTipus(document.getNtiTipoFirma());
+					List<ArxiuFirmaDto> firmes = null;
+					
+					if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+						
+						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								null, 
+								false, 
+								true);
+						
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						
+						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
+						byte[] firmaContingut = contingutHelper.firmaSeparadaEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								firmaContingut, 
+								false, 
+								true);
+						
+					} 
+					
+					ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+					contingutHelper.arxiuPropagarModificacio(
+							(DocumentEntity) contingut,
+							fitxer,
+							documentFirmaTipus,
+							firmes,
+							arxiuEstat);
+				}
+				
+
 			} else if (contingut instanceof CarpetaEntity) {
 				contingutHelper.arxiuPropagarModificacio(
 						(CarpetaEntity) contingut,
@@ -2121,21 +2150,6 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 	}
 
-	private boolean conteDocumentsDefinitius(ContingutEntity contingut) {
-		boolean conteDefinitius = false;
-		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
-			for (ContingutEntity contingutFill: contingut.getFills()) {
-				conteDefinitius = conteDocumentsDefinitius(contingutFill);
-				if (conteDefinitius)
-					break;
-			}
-		} else if (deproxied instanceof DocumentEntity) {
-			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat());
-		}
-		return conteDefinitius;
-	}
 
 
 	// Mètodes per evitar errors al tenir continguts orfes en base de dades

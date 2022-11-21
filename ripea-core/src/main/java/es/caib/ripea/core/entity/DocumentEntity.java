@@ -122,8 +122,10 @@ public class DocumentEntity extends NodeEntity {
 	private String nomFitxerFirmat;
 	
 	//document uploaded manually in ripea that was not saved in arxiu
+	// document sense firma o amb firma adjunt
 	@Column(name = "ges_doc_adjunt_id", length = 256)
 	private String gesDocAdjuntId;
+	// firma separada
 	@Column(name = "ges_doc_adjunt_firma_id", length = 256)
 	private String gesDocAdjuntFirmaId;
 	
@@ -181,7 +183,7 @@ public class DocumentEntity extends NodeEntity {
     /**
 
      * @deprecated
-     * Document entity has field expedient
+     * DocumentEntity already has field expedient, there is no need to calculate it
      * <p> Use {@link #getExpedient()} instead.
      */
     @Deprecated

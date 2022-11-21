@@ -4,7 +4,6 @@ package es.caib.ripea.core.firma;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
-import java.util.List;
 
 //import org.ghost4j.document.Document;
 //import org.ghost4j.document.PDFDocument;
@@ -17,10 +16,10 @@ import com.itextpdf.text.pdf.PdfReader;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.PluginHelper;
@@ -39,8 +38,12 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	
 	public ArxiuFirmaDto firmar(DocumentEntity document, FitxerDto fitxer, String motiu) {
 
-
-		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(document, fitxer, motiu, "ca");
+		SignaturaResposta firma = pluginHelper.firmaServidorFirmar(
+				document,
+				fitxer,
+				motiu,
+				"ca");
+		
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 		arxiuFirma.setFitxerNom(firma.getNom());
 		arxiuFirma.setContingut(firma.getContingut());
@@ -48,59 +51,61 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		arxiuFirma.setTipus(pluginHelper.toArxiuFirmaTipus(firma.getTipusFirmaEni()));
 		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 		arxiuFirma.setPerfil(perfil);
-		if (document.getArxiuUuid() != null) {
+		
+		
+		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus = getDocumentFirmaTipus(firma);
+		
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+//			FitxerDto fitxerNou = new FitxerDto(
+//					firma.getNom(),
+//					firma.getMime(),
+//					firma.getContingut());
+
+			contingutHelper.arxiuPropagarModificacio(
+					document,
+					null,
+					documentFirmaTipus,
+					Arrays.asList(arxiuFirma),
+					arxiuEstat);
 			
-			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
+		} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA){ 
 			contingutHelper.arxiuPropagarModificacio(
 					document,
 					fitxer,
-					true,
-					true,
-					Arrays.asList(arxiuFirma), 
+					documentFirmaTipus,
+					Arrays.asList(arxiuFirma),
 					arxiuEstat);
-			
-		} else {
-			guardarDocumentFirmatArxiu(document, fitxer, Arrays.asList(arxiuFirma));
 		}
+
+		
+		if (document.getGesDocAdjuntId() != null) {
+			pluginHelper.gestioDocumentalDelete(document.getGesDocAdjuntId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+			document.setGesDocAdjuntId(null);
+		}
+		if (document.getGesDocAdjuntFirmaId() != null) {
+			pluginHelper.gestioDocumentalDelete(document.getGesDocAdjuntFirmaId(),
+					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+			document.setGesDocAdjuntFirmaId(null);
+		}
+
 
 		logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 		return arxiuFirma;
 	}
 	
 	
-	public void guardarDocumentFirmatArxiu(
-			DocumentEntity documentEntity,
-			FitxerDto fitxer,
-			List<ArxiuFirmaDto> firmes) {
-	
-		fitxer.setNom(documentEntity.getFitxerNom());
-		fitxer.setContentType(documentEntity.getFitxerContentType());
-		fitxer.setContingut(firmes.get(0).getContingut());
-
-		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
-		contingutHelper.arxiuPropagarModificacio(
-				documentEntity,
-				fitxer,
-				true,
-				false,
-				firmes, 
-				arxiuEstat);
-			
-		if (documentEntity.getGesDocAdjuntId() != null) {
-			pluginHelper.gestioDocumentalDelete(documentEntity.getGesDocAdjuntId(),
-					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-			documentEntity.setGesDocAdjuntId(null);
+	private DocumentFirmaTipusEnumDto getDocumentFirmaTipus(SignaturaResposta firma){
+		DocumentFirmaTipusEnumDto documentFirmaTipus = null;
+		if (firma.getTipusFirmaEni().equals("TF04")) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
 		}
-		if (documentEntity.getGesDocAdjuntFirmaId() != null) {
-			pluginHelper.gestioDocumentalDelete(documentEntity.getGesDocAdjuntFirmaId(),
-					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-			documentEntity.setGesDocAdjuntFirmaId(null);
-		}
-
+		return documentFirmaTipus;
 	}
-	
-	
-	
 	
 	
 	

@@ -1068,6 +1068,7 @@ public class ContingutHelper {
 				DocumentEntity document = (DocumentEntity)contingut;
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) && document.getGesDocAdjuntId() == null) {
 					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
+					fitxerDocumentEsborratGuardarFirmaEnTmp((DocumentEntity)contingut);
 				}
 				// Elimina contingut a l'arxiu
 				arxiuPropagarEliminacio(contingut);
@@ -1080,7 +1081,7 @@ public class ContingutHelper {
 		return dto;
 	}
 
-	private boolean conteDocumentsDefinitius(ContingutEntity contingut) {
+	public boolean conteDocumentsDefinitius(ContingutEntity contingut) {
 		boolean conteDefinitius = false;
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
@@ -1091,7 +1092,7 @@ public class ContingutHelper {
 			}
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat()) && !DocumentEstatEnumDto.FIRMA_PARCIAL.equals(document.getEstat());
+			conteDefinitius = document.isArxiuEstatDefinitu();
 		}
 		return conteDefinitius;
 	}
@@ -1106,6 +1107,29 @@ public class ContingutHelper {
 				null);
 		outContent.write(fitxer.getContingut());
 		outContent.close();
+	}
+	
+	private void fitxerDocumentEsborratGuardarFirmaEnTmp(
+			DocumentEntity document) throws IOException {
+		
+		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+				document,
+				null,
+				null,
+				true,
+				false);
+	
+		byte[]  firmaContingut =  documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument);
+		
+		if (firmaContingut != null) {
+			File fContent = new File(getBaseDirFirma() + "/" + document.getId());
+			fContent.getParentFile().mkdirs();
+			FileOutputStream outContent = new FileOutputStream(fContent);
+			
+			outContent.write(firmaContingut);
+			outContent.close();
+		}
+
 	}
 
 
@@ -1433,21 +1457,19 @@ public class ContingutHelper {
 	public void arxiuPropagarModificacio(
 			DocumentEntity document,
 			FitxerDto fitxer,
-			boolean documentAmbFirma,
-			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus,
+			List<ArxiuFirmaDto> firmes,
 			ArxiuEstatEnumDto arxiuEstat) {
 			
 		pluginHelper.arxiuDocumentActualitzar(
 				(DocumentEntity) document,
 				fitxer,
-				documentAmbFirma,
-				firmaSeparada,
-				firmes, 
+				documentFirmaTipus,
+				firmes,
 				arxiuEstat);
 		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
 		if (firmes != null) {
-			// Custodia el document firmat
+			
 			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
 				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
@@ -1694,6 +1716,28 @@ public class ContingutHelper {
 			return null;
 		}
 	}
+	
+	
+	public byte[] firmaSeparadaEsborratLlegir(
+			DocumentEntity document)  {
+		File fContent = new File(getBaseDirFirma() + "/" + document.getId());
+		fContent.getParentFile().mkdirs();
+		if (fContent.exists()) {
+			byte fileContent[] = null;
+			try {
+				FileInputStream inContent = new FileInputStream(fContent);
+				fileContent = new byte[(int)fContent.length()];
+				inContent.read(fileContent);
+				inContent.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			return fileContent;
+		} else {
+			return null;
+		}
+	}
 
 	public void fitxerDocumentEsborratEsborrar(
 			DocumentEntity document) {
@@ -1714,6 +1758,10 @@ public class ContingutHelper {
 
 	public String getBaseDir() {
 		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
+	}
+	
+	public String getBaseDirFirma() {
+		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-firma-tmp";
 	}
 
 	public boolean isCarpetaLogica() {

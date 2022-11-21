@@ -30,10 +30,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.tool.xml.Experimental;
 
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ConsultaFiltre;
@@ -72,6 +74,7 @@ import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
@@ -759,9 +762,8 @@ public class PluginHelper {
 	public void arxiuDocumentActualitzar(
 			DocumentEntity document,
 			FitxerDto fitxer,
-			boolean documentAmbFirma,
-			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus, 
+			List<ArxiuFirmaDto> firmes,	
 			ArxiuEstatEnumDto arxiuEstat) {
 		ContingutArxiu documentArxiuCreatOModificat;
 		
@@ -793,10 +795,9 @@ public class PluginHelper {
 						contingutPare,
 						serieDocumental,
 						fitxer,
-						documentAmbFirma,
-						firmaSeparada,
+						documentFirmaTipus,
 						firmes,
-						ArxiuOperacioEnumDto.CREACIO, 
+						ArxiuOperacioEnumDto.CREACIO,
 						arxiuEstat);
 				
 				documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
@@ -812,10 +813,9 @@ public class PluginHelper {
 						contingutPare,
 						serieDocumental,
 						fitxer,
-						documentAmbFirma,
-						firmaSeparada,
+						documentFirmaTipus,
 						firmes,
-						ArxiuOperacioEnumDto.MODIFICACIO, 
+						ArxiuOperacioEnumDto.MODIFICACIO,
 						arxiuEstat);
 				
 				documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
@@ -840,7 +840,12 @@ public class PluginHelper {
 		}
 	}
 	
-	public void arxiuDocumentSetDefinitiu(  // doesn work, changes firma in arxiu to csv
+	/**
+	 * 
+	 * doesn't work correctly with ArxiuPluginCaib, changes firma type in arxiu to CSV
+	 */
+	@Experimental
+	public void arxiuDocumentSetDefinitiu(  
 			DocumentEntity document) {
 		try {
 			Document documentArxiu = new Document();
@@ -859,31 +864,32 @@ public class PluginHelper {
 	private void setContingutIFirmes(
 			Document documentArxiu,
 			FitxerDto fitxer,
-			boolean documentAmbFirma,
-			boolean firmaSeparada,
+			DocumentFirmaTipusEnumDto documentFirmaTipus,
 			List<ArxiuFirmaDto> firmes,
 			ArxiuOperacioEnumDto arxiuAccio) {
 
 		DocumentContingut contingut = null;
-		if (!documentAmbFirma) {
-			// Sense firma
+		
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 			contingut = new DocumentContingut();
 			contingut.setArxiuNom(fitxer.getNom());
 			contingut.setContingut(fitxer.getContingut());
 			contingut.setTipusMime(fitxer.getContentType());
 			documentArxiu.setContingut(contingut);
-		} else if (!firmaSeparada && firmes != null && !firmes.isEmpty()) {
-			// Firma attached
+			
+		} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			if (fitxer == null) fitxer = new FitxerDto();
 			Firma firma = new Firma();
 			ArxiuFirmaDto primeraFirma = firmes.get(0);
-			firma.setFitxerNom(fitxer.getNom());
-			firma.setContingut(fitxer.getContingut());
-			firma.setTipusMime(fitxer.getContentType());
+			firma.setFitxerNom(!StringUtils.isEmpty(primeraFirma.getFitxerNom()) ? primeraFirma.getFitxerNom() : fitxer.getNom());
+			firma.setContingut(primeraFirma.getContingut() != null ?  primeraFirma.getContingut() : fitxer.getContingut());
+			firma.setTipusMime(!StringUtils.isEmpty(primeraFirma.getTipusMime()) ?  primeraFirma.getTipusMime() : fitxer.getContentType());
 			setFirmaTipusPerfil(firma, primeraFirma);
 			firma.setCsvRegulacio(primeraFirma.getCsvRegulacio());
 			documentArxiu.setFirmes(Arrays.asList(firma));
-		} else if (firmes != null) {
-			// Firma detached
+			
+		} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+			
 			documentArxiu.setFirmes(new ArrayList<Firma>());
 			for (ArxiuFirmaDto firmaDto: firmes) {
 				Firma firma = new Firma();
@@ -894,15 +900,11 @@ public class PluginHelper {
 				firma.setCsvRegulacio(firmaDto.getCsvRegulacio());
 				documentArxiu.getFirmes().add(firma);
 			}
-			
-			if (arxiuAccio != null && arxiuAccio == ArxiuOperacioEnumDto.MODIFICACIO && getArxiuPlugin() instanceof ArxiuPluginCaib) {
-				contingut = null;
-			} else {
-				contingut = new DocumentContingut();
-				contingut.setArxiuNom(fitxer.getNom());
-				contingut.setContingut(fitxer.getContingut());
-				contingut.setTipusMime(fitxer.getContentType());
-			}
+	
+			contingut = new DocumentContingut();
+			contingut.setArxiuNom(fitxer.getNom());
+			contingut.setContingut(fitxer.getContingut());
+			contingut.setTipusMime(fitxer.getContentType());
 			
 			documentArxiu.setContingut(contingut);
 		}
@@ -1104,37 +1106,7 @@ public class PluginHelper {
 
 	
 
-	
-	public void arxiuDocumentGuardarFirmaPades(
-			DocumentEntity document,
-			FitxerDto fitxerPdfFirmat) {
-		
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(fitxerPdfFirmat.getNom());
-		fitxer.setNomFitxerFirmat(fitxerPdfFirmat.getNomFitxerFirmat());
-		fitxer.setContingut(fitxerPdfFirmat.getContingut());
-		fitxer.setContentType("application/pdf");
-		List<ArxiuFirmaDto> firmes = null;
-		if (getPropertyArxiuFirmaDetallsActiu()) {
-			firmes = validaSignaturaObtenirFirmes(fitxerPdfFirmat.getContingut(), null, fitxer.getContentType(), true);
-		} else {
-			ArxiuFirmaDto firma = new ArxiuFirmaDto();
-			firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
-			firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
-			firmes = Arrays.asList(firma);
-		}
-		
-		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-	
-		contingutHelper.arxiuPropagarModificacio(
-				document,
-				fitxer,
-				true,
-				false,
-				firmes, 
-				arxiuEstat);
-		
-	}
+
 	
 	public List<TipusDocumentalDto> documentTipusAddicionals() {
 
@@ -2936,9 +2908,8 @@ public class PluginHelper {
 			ContingutEntity contingutPare,
 			String serieDocumental,
 			FitxerDto fitxer,
-			boolean documentAmbFirma,
-			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus,
+			List<ArxiuFirmaDto> firmes,
 			ArxiuOperacioEnumDto arxiuOperacio, 
 			ArxiuEstatEnumDto arxiuEstat) {
 		
@@ -2953,12 +2924,11 @@ public class PluginHelper {
 		documentArxiu.setIdentificador(arxiuOperacio == ArxiuOperacioEnumDto.MODIFICACIO ? documentEntity.getArxiuUuid() : null);
 		documentArxiu.setEstat(DocumentEstat.valueOf(arxiuEstat.toString()));
 	
-		if (fitxer != null && !DocumentTipusEnumDto.FISIC.equals(documentEntity.getDocumentTipus())) {
+		if (!DocumentTipusEnumDto.FISIC.equals(documentEntity.getDocumentTipus())) {
 			setContingutIFirmes(
 					documentArxiu,
 					fitxer,
-					documentAmbFirma,
-					firmaSeparada,
+					documentFirmaTipus,
 					firmes,
 					arxiuOperacio);
 		}
@@ -4251,7 +4221,7 @@ public class PluginHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.arxiu.metadades.addicionals.actiu");
 	}
 	
-	private boolean getPropertyArxiuFirmaDetallsActiu() {
+	public boolean getPropertyArxiuFirmaDetallsActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.arxiu.firma.detalls.actiu");
 	}
 

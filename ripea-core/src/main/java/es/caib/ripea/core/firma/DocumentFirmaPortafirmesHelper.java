@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -336,7 +337,6 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					// actualitza la informació de firma a l'arxiu.
 					if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
 						
-						FitxerAmbFirmaArxiuDto fitxerAmbFirma = getFitxerAmbFirma(portafirmesDocument, document);
 						
 						String gestioDocumentalId = document.getGesDocFirmatId();
 						if (gestioDocumentalId == null ) {
@@ -348,20 +348,54 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						}
 						
 						// ============================== SAVE IN ARXIU ==========================
-
+						ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+						
 						if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
-							pluginHelper.arxiuDocumentGuardarFirmaPades(
-									document,
-									fitxerAmbFirma.getFitxer());
-						} else {
-							ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+							
+							List<ArxiuFirmaDto> firmes = null;
+							if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
+								firmes = pluginHelper.validaSignaturaObtenirFirmes(portafirmesDocument.getArxiuContingut(), null, "application/pdf", true);
+							} else {
+								ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(portafirmesDocument.getArxiuNom(), portafirmesDocument.getArxiuContingut());
+								firmes = Arrays.asList(firma);
+							}
 							
 							contingutHelper.arxiuPropagarModificacio(
 									document,
-									fitxerAmbFirma.getFitxer(),
-									true,
-									true,
-									Arrays.asList(fitxerAmbFirma.getArxiuFirma()), 
+									null,
+									DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+									firmes,
+									arxiuEstat);
+
+
+						} else {
+							FitxerDto fitxer = documentHelper.getFitxerAssociatFirmat(
+									document, 
+									null);
+							
+							ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
+							arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
+							arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
+							arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
+							arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+							arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+							List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+							for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
+								ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+								detall.setData(firmant.getData());
+								detall.setEmissorCertificat(firmant.getEmissorCertificat());
+								detall.setResponsableNif(firmant.getResponsableNif());
+								detall.setResponsableNom(firmant.getResponsableNom());
+								detalls.add(detall);
+							}
+							arxiuFirma.setDetalls(detalls);
+							arxiuFirma.setAutofirma(true);
+							
+							contingutHelper.arxiuPropagarModificacio(
+									document,
+									fitxer,
+									DocumentFirmaTipusEnumDto.FIRMA_SEPARADA,
+									Arrays.asList(arxiuFirma),
 									arxiuEstat);
 						}
 						
@@ -489,35 +523,30 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	private FitxerAmbFirmaArxiuDto getFitxerAmbFirma(PortafirmesDocument portafirmesDocument, DocumentEntity document) {
 		FitxerAmbFirmaArxiuDto fitxerAmbFirmaArxiuDto = new FitxerAmbFirmaArxiuDto();
 		FitxerDto fitxer = new FitxerDto();
+		
 		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 		
-		if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
-			fitxer.setNom(document.getFitxerNom());
-			fitxer.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
-			fitxer.setContingut(portafirmesDocument.getArxiuContingut());
-			fitxer.setContentType("application/pdf");
-		} else {
-			fitxer = documentHelper.getFitxerAssociatFirmat(
-					document, 
-					null);
-			arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
-			arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
-			arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
-			arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
-			arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
-			
-			List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
-			for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
-				ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
-				detall.setData(firmant.getData());
-				detall.setEmissorCertificat(firmant.getEmissorCertificat());
-				detall.setResponsableNif(firmant.getResponsableNif());
-				detall.setResponsableNom(firmant.getResponsableNom());
-				detalls.add(detall);
-			}
-			arxiuFirma.setDetalls(detalls);
-			arxiuFirma.setAutofirma(true);
+		fitxer = documentHelper.getFitxerAssociatFirmat(
+				document, 
+				null);
+		arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
+		arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
+		arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
+		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+		
+		List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+		for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
+			ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+			detall.setData(firmant.getData());
+			detall.setEmissorCertificat(firmant.getEmissorCertificat());
+			detall.setResponsableNif(firmant.getResponsableNif());
+			detall.setResponsableNom(firmant.getResponsableNom());
+			detalls.add(detall);
 		}
+		arxiuFirma.setDetalls(detalls);
+		arxiuFirma.setAutofirma(true);
+		
 		
 		fitxerAmbFirmaArxiuDto.setFitxer(fitxer);
 		fitxerAmbFirmaArxiuDto.setArxiuFirma(arxiuFirma);

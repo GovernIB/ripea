@@ -37,7 +37,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentOrigenEnumDto;
@@ -166,9 +166,7 @@ public class DocumentHelper {
 				
 				List<ArxiuFirmaDto> firmes = null;
 				if (isDocumentFromPinbal(entity)) {
-					ArxiuFirmaDto firma = new ArxiuFirmaDto();
-					firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
-					firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+					ArxiuFirmaDto firma = getArxiuFirmaPades(null, null);
 					firmes = Arrays.asList(firma);
 					
 				} else if (document.isAmbFirma()) {
@@ -179,13 +177,25 @@ public class DocumentHelper {
 							false, 
 							true);
 				}
+				
+				
+				
+				DocumentFirmaTipusEnumDto documentFirmaTipus;
+				if (!document.isAmbFirma()) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+				} else if (!document.isFirmaSeparada()) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+				} else {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+				}
+				
 				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+				
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
-						document.isAmbFirma(),
-						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmes, 
+						documentFirmaTipus,
+						firmes,
 						arxiuEstat);
 				
 				if (gestioDocumentalAdjuntId != null ) {
@@ -216,6 +226,19 @@ public class DocumentHelper {
 		else
 			dto.setId(entity.getId());
 		return dto;
+	}
+	
+	
+	public ArxiuFirmaDto getArxiuFirmaPades(String nom, byte[] contingut){
+		ArxiuFirmaDto firma = new ArxiuFirmaDto();
+		
+		firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
+		firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+		firma.setTipusMime("application/pdf");
+		
+		firma.setFitxerNom(nom);
+		firma.setContingut(contingut);
+		return firma;
 	}
 	
 	
@@ -308,20 +331,20 @@ public class DocumentHelper {
 		}
 		
 		
-		DocumentFirmaEnumDto documentFirmaEnum;
+		DocumentFirmaTipusEnumDto documentFirmaTipus;
 		if (!document.isAmbFirma()) {
-			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_SIN_FIRMA;
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
 		} else if (!document.isFirmaSeparada()) {
-			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED;
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
 		} else {
-			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED;
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
 		}
 		
 		boolean newFitxer = document.getFitxerContingut() != null;
 		boolean newFirma = document.getFirmaContingut() != null;
 		
 		
-		if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_SIN_FIRMA) {
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 			
 			fitxer = fitxer(
 					newFitxer,
@@ -331,8 +354,7 @@ public class DocumentHelper {
 	
 			documentEntity.updateEstat(DocumentEstatEnumDto.REDACCIO);
 			
-			
-		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED) {
+		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
 			
 			fitxer = fitxer(
 					newFitxer,
@@ -347,14 +369,7 @@ public class DocumentHelper {
 					false, 
 					true);
 			
-			// Al modificar el document, eliminam l'alerta de document invàlid,
-			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
-			if (!documentEntity.isValidacioFirmaCorrecte()) {
-				documentEntity.setValidacioFirmaCorrecte(true);
-//				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-			}
-			
-		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED) {
+		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			
 			fitxer = fitxer(
 					newFitxer,
@@ -376,13 +391,14 @@ public class DocumentHelper {
 					false, 
 					true);
 			
-			
-			// Al modificar el document, eliminam l'alerta de document invàlid,
-			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
-			if (!documentEntity.isValidacioFirmaCorrecte()) {
-				documentEntity.setValidacioFirmaCorrecte(true);
-//				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-			}
+		}
+		
+		
+		// Al modificar el document, eliminam l'alerta de document invàlid,
+		// i el passam de importat a digital, ja que no és el mateix document que haviem importat
+		if (!documentEntity.isValidacioFirmaCorrecte()) {
+			documentEntity.setValidacioFirmaCorrecte(true);
+//			documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
 		}
 		
 		// Registra al log la modificació del document
@@ -401,9 +417,8 @@ public class DocumentHelper {
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
-					document.isAmbFirma(),
-					document.isFirmaSeparada(),
-					firmes, 
+					documentFirmaTipus,
+					firmes,
 					arxiuEstat);
 		}
 
@@ -542,9 +557,8 @@ public class DocumentHelper {
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
-					false, //##no validar firma en actualitzar tipus document
-					false,
-					firmes, 
+					DocumentFirmaTipusEnumDto.SENSE_FIRMA, //##no validar firma en actualitzar tipus document
+					firmes,
 					arxiuEstat);
 			return true;
 		} else {
@@ -646,9 +660,8 @@ public class DocumentHelper {
 			contingutHelper.arxiuPropagarModificacio(
 					document,
 					fitxer,
-					false,
-					false,
-					null, 
+					DocumentFirmaTipusEnumDto.SENSE_FIRMA,
+					null,
 					arxiuEstat);
 		}
 		contingutLogHelper.log(
@@ -670,19 +683,12 @@ public class DocumentHelper {
 				true,
 				false);
 		
-		DocumentFirmaEnumDto documentFirmaEnum;
-		if (documentEntity.getNtiTipoFirma() == null) {
-			throw new RuntimeException("No es pot marcar el document com a definitiu si no està firmat");
-		} else if (documentEntity.getNtiTipoFirma() == DocumentNtiTipoFirmaEnumDto.TF04) {
-			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED;
-		} else {
-			documentFirmaEnum = DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED;
-		}
+		DocumentFirmaTipusEnumDto documentFirmaTipus = getDocumentFirmaTipus(documentEntity.getNtiTipoFirma());
 		
 		FitxerDto fitxer = null;
 		List<ArxiuFirmaDto> firmes = null;
 		
-		if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_ATTACHED) {
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
 			
 			fitxer = getFitxerExisting(
 					documentEntity,
@@ -696,7 +702,7 @@ public class DocumentHelper {
 					true);
 			
 			
-		} else  if (documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED) {
+		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			
 			fitxer = getFitxerExisting(
 					documentEntity,
@@ -717,14 +723,26 @@ public class DocumentHelper {
 		contingutHelper.arxiuPropagarModificacio(
 				documentEntity,
 				fitxer,
-				true,
-				documentFirmaEnum == DocumentFirmaEnumDto.DOCUMENT_AMB_FIRMA_DETACHED,
-				firmes, 
+				documentFirmaTipus,
+				firmes,
 				ArxiuEstatEnumDto.DEFINITIU);
 	
 		
 	}
 	
+	
+	public DocumentFirmaTipusEnumDto getDocumentFirmaTipus(DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto) {
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus = null;
+		if (documentNtiTipoFirmaEnumDto == null) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (documentNtiTipoFirmaEnumDto == DocumentNtiTipoFirmaEnumDto.TF04) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		}
+		return documentFirmaTipus;
+	}
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
@@ -1071,28 +1089,37 @@ public class DocumentHelper {
 							false, 
 							true);
 				}
-			
-					ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-					contingutHelper.arxiuPropagarModificacio(
-							documentEntity,
-							fitxer,
-							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
-							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes, 
-							arxiuEstat);
 				
-					if (documentEntity.getGesDocAdjuntId() != null ) {
-						pluginHelper.gestioDocumentalDelete(
-								documentEntity.getGesDocAdjuntId(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-						documentEntity.setGesDocAdjuntId(null);
-					}
-					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
-						pluginHelper.gestioDocumentalDelete(
-								documentEntity.getGesDocAdjuntFirmaId(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-						documentEntity.setGesDocAdjuntFirmaId(null);
-					}
+				DocumentFirmaTipusEnumDto documentFirmaTipus;
+				if (documentEntity.getEstat() != DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+				} else if (documentEntity.getGesDocAdjuntFirmaId() == null) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+				} else {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+				}
+				
+		
+				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+				contingutHelper.arxiuPropagarModificacio(
+						documentEntity,
+						fitxer,
+						documentFirmaTipus,
+						firmes,
+						arxiuEstat);
+			
+				if (documentEntity.getGesDocAdjuntId() != null ) {
+					pluginHelper.gestioDocumentalDelete(
+							documentEntity.getGesDocAdjuntId(),
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					documentEntity.setGesDocAdjuntId(null);
+				}
+				if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+					pluginHelper.gestioDocumentalDelete(
+							documentEntity.getGesDocAdjuntFirmaId(),
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					documentEntity.setGesDocAdjuntFirmaId(null);
+				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar en arxiu document adjunt  (" +
 						"id=" + documentEntity.getId() + ")",

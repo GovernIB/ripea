@@ -11,7 +11,7 @@ package es.caib.ripea.core.api.dto;
  */
 public enum DocumentTipusEnumDto {
 	DIGITAL,
-	FISIC,
+	FISIC, //TODO check if FISIC is used
 	VIRTUAL,
 	IMPORTAT
 }
