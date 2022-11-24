@@ -5,5 +5,6 @@ import java.io.Serializable;
 public enum ProcessosInicialsEnum implements Serializable {
 
     PROPIETATS_CONFIG_ENTITATS,
-    GENERAR_EXPEDIENT_NUMERO;
+    GENERAR_EXPEDIENT_NUMERO,
+    GENERAR_MISSING_HISTORICS;
 }

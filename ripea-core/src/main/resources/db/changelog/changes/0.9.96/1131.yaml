@@ -1,0 +1,17 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1669215787742-1
+    author: limit
+    changes:
+    - sql:
+        sql: "INSERT INTO IPA_PROCESSOS_INICIALS (codi, init, id) VALUES ('GENERAR_MISSING_HISTORICS', 1, 4);"
+                
+

@@ -334,8 +334,7 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		
 		Collection<HistoricExpedientEntity> historics = historicHelper.calcularHistoricExpedient(
-				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
-				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
+				new Date(),
 				HistoricTipusEnumDto.DIARI);
 
 		List<HistoricExpedientEntity> resultat = new ArrayList<HistoricExpedientEntity>();
@@ -372,8 +371,7 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		
 		Collection<HistoricExpedientEntity> historics = historicHelper.calcularHistoricExpedient(
-				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
-				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
+				new Date(),
 				HistoricTipusEnumDto.DIARI);
 		Map<OrganGestorDto, HistoricExpedientDto> results = new HashMap<>();
 		for (Long organId : organGestors) {
@@ -462,8 +460,7 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		
 		Collection<HistoricUsuariEntity> historics = historicHelper.calcularHistoricUsuari(
-				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
-				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
+				new Date(),
 				HistoricTipusEnumDto.DIARI);
 
 		List<HistoricUsuariEntity> resultat = new ArrayList<HistoricUsuariEntity>();
@@ -495,8 +492,7 @@ public class HistoricServiceImpl implements HistoricService {
 		}
 		
 		Collection<HistoricInteressatEntity> historics = historicHelper.calcularHistoricInteressat(
-				(new LocalDate()).toDateTimeAtStartOfDay().toDate(),
-				(new LocalDate()).toDateTimeAtCurrentTime().toDate(),
+				new Date(),
 				HistoricTipusEnumDto.DIARI);
 
 		List<HistoricInteressatEntity> resultat = new ArrayList<HistoricInteressatEntity>();
