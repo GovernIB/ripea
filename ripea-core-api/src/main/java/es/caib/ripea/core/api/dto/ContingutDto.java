@@ -10,6 +10,9 @@ import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +23,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@JsonIdentityInfo(generator=JSOGGenerator.class)
 public abstract class ContingutDto extends AuditoriaDto {
 
 	protected Long id;
@@ -143,8 +147,10 @@ public abstract class ContingutDto extends AuditoriaDto {
 	
 	public void getFillsFlat(ContingutDto contenidor, List<ContingutDto> fillsFlat) {
 		if (contenidor instanceof CarpetaDto) {
-			for (ContingutDto fill : contenidor.getFills()) {
-				getFillsFlat(fill, fillsFlat);
+			if (contenidor.getFills() != null) {
+				for (ContingutDto fill : contenidor.getFills()) {
+					getFillsFlat(fill, fillsFlat);
+				}
 			}
 		} else {
 			fillsFlat.add(contenidor);

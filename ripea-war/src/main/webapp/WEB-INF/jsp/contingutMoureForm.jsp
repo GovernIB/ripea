@@ -10,6 +10,7 @@
 <head>
 	<title>${titol}</title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/js/JSOG.js"/>"></script>
 	<rip:modalHead/>
 </head>
 <body>

@@ -125,9 +125,7 @@ function refrescarOne(campPath, contenidorId, prevContenidorId) {
 			var ocultarCarpetes = <c:choose><c:when test="${ocultarCarpetes}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 
-			
- 			
-
+			data = JSOG.decode(data);
 // 			$("#file-chooser-input").html('');
 			$('#${campPath}').nextAll('.panel').remove();
 			
@@ -231,6 +229,7 @@ function loadFileChooser(campPath, contenidorId) {
 // 		$("#file-chooser-input").html('');
 		$('#${campPath}').nextAll('.panel').remove();
 
+		dataTable = JSOG.decode(dataTable);
 		$.each(dataTable, function( key, data ) {
 
 			// SETTING PATH IN THE PANEL HEADER

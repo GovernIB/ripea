@@ -9,6 +9,7 @@
 <html>
 <head>
 	<title>${titol}</title>
+	<script src="<c:url value="/js/JSOG.js"/>"></script>
 	<rip:modalHead/>
 </head>
 <body>
