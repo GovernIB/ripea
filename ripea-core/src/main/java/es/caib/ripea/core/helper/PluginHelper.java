@@ -3118,7 +3118,7 @@ public class PluginHelper {
 		Document documentArxiu = new Document();
 
 		String documentNomInArxiu = documentEntity.getNom();
-		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus())) {
+		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
 			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), contingutPare.getArxiuUuid());
 		}
 		documentArxiu.setNom(documentNomInArxiu);
@@ -4014,6 +4014,9 @@ public class PluginHelper {
 	}
 	public boolean getPropertyPropagarConversioDefinitiuActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+	}
+	private boolean isComprovacioNomsDesactivada() {
+		return configHelper.getAsBoolean("es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu");
 	}
 	
 	public boolean isCarpetaLogica() {
