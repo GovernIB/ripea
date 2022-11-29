@@ -29,6 +29,7 @@ public class IntegracioAccioDto implements Serializable {
 	private Map<String, String> parametres;
 	private IntegracioDto integracio;
 	private IntegracioAccioTipusEnumDto tipus;
+	private long tempsInici;
 	private long tempsResposta;
 	private IntegracioAccioEstatEnumDto estat;
 	private EntitatDto entitat;
@@ -44,6 +45,20 @@ public class IntegracioAccioDto implements Serializable {
 		} else {
 			return parametres.size();
 		}
+	}
+
+	public IntegracioAccioDto(){
+		super();
+	}
+
+	public IntegracioAccioDto(
+			String descripcio,
+			Map<String, String> parametres,
+			long tempsInici) {
+		super();
+		this.descripcio = descripcio;
+		this.parametres = parametres;
+		this.tempsInici = tempsInici;
 	}
 
 

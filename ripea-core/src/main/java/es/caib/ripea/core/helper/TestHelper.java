@@ -87,7 +87,7 @@ public class TestHelper {
 				metaDocumentEntity,
 				expedientEntity,
 				new EntitatEntity(),
-				expedientEntity).
+				expedientEntity, null).
 				build();
 		
 		
@@ -158,7 +158,7 @@ public class TestHelper {
 				metaDocumentEntity,
 				expedientEntity,
 				new EntitatEntity(),
-				expedientEntity).
+				expedientEntity, null).
 				build();
 		
 		

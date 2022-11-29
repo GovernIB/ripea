@@ -418,6 +418,7 @@ public class ContingutHelper {
 			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
 			dto.setArxiuEstat(document.getArxiuEstat());
+			dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
 			
 			resposta = dto;
 			if (cacheHelper.mostrarLogsRendiment())
@@ -1460,7 +1461,7 @@ public class ContingutHelper {
 			DocumentFirmaTipusEnumDto documentFirmaTipus,
 			List<ArxiuFirmaDto> firmes,
 			ArxiuEstatEnumDto arxiuEstat) {
-			
+		
 		pluginHelper.arxiuDocumentActualitzar(
 				(DocumentEntity) document,
 				fitxer,
@@ -1468,7 +1469,8 @@ public class ContingutHelper {
 				firmes,
 				arxiuEstat);
 		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
-		if (firmes != null) {
+		
+		if (arxiuEstat == ArxiuEstatEnumDto.DEFINITIU) {
 			
 			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
 				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);

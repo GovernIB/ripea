@@ -33,5 +33,13 @@ public class ArxiuFirmaDto {
 		}
 		return null;
 	}
+	
+	
+	public FitxerDto getFitxer() {
+		return new FitxerDto(
+				fitxerNom,
+				tipusMime,
+				contingut);
+	}
 
 }

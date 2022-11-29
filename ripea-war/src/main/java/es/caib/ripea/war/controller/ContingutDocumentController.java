@@ -159,16 +159,20 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return "contingutDocumentForm";
 	}
 	
+	
 	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
-		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-		if (document.getNtiTipoFirma() != null) {
-			command.setAmbFirma(true);
-			if (document.getNtiTipoFirma()==DocumentNtiTipoFirmaEnumDto.TF04) {
-				command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
-			} 
-		} else {
+		
+		if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 			command.setAmbFirma(false);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+		} else if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			command.setAmbFirma(true);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+		} else if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+			command.setAmbFirma(true);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
 		}
+
 	}
 	
 	

@@ -14,12 +14,9 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -66,7 +63,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			documentViaFirma.updateEnviat(
 					new Date(),
 					messageCode);
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		} catch (Exception ex) {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			if (rootCause == null) rootCause = ex;
@@ -93,7 +90,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 			if (documentViaFirma.isFirmaParcial())
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PARCIAL);
 			else
@@ -107,7 +104,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 						documentViaFirma);
 			} catch (Exception ex) {
 				logger.error("Error al descarregar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
-				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
 				documentViaFirma.updateProcessatError(
@@ -133,27 +130,21 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 						firmes = Arrays.asList(firma);
 					}
 					
-					ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+					document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+					
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 					contingutHelper.arxiuPropagarModificacio(
 							document,
-							null,
-							DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+							firmes.get(0).getFitxer(),
+							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
 							firmes,
 							arxiuEstat);
-					
 
-					actualitzarInformacioFirma(document);
-					contingutLogHelper.log(
-							documentViaFirma.getDocument(),
-							LogTipusEnumDto.ARXIU_CUSTODIAT,
-							document.getArxiuUuid(),
-							null,
-							false,
-							false);
+
 				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar document de Viafirma (id=" + documentViaFirma.getId() + ")", ex);
-				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 				document.updateEstat(DocumentEstatEnumDto.FIRMA_PENDENT_VIAFIRMA);
 				Throwable rootCause = ExceptionUtils.getRootCause(ex);
 				if (rootCause == null) rootCause = ex;
@@ -164,7 +155,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		} 
 		if (ViaFirmaCallbackEstatEnumDto.WAITING_CHECK.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 				contingutLogHelper.log(
 						documentViaFirma.getDocument(),
 						LogTipusEnumDto.VFIRMA_WAITING_CHECK,
@@ -181,7 +172,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 		
 		if (ViaFirmaCallbackEstatEnumDto.REJECTED.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -201,7 +192,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.ERROR.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(
@@ -221,7 +212,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 			}
 		} else if (ViaFirmaCallbackEstatEnumDto.EXPIRED.equals(callbackEstat)) {
 			try {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 				documentViaFirma.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentViaFirma.updateProcessat(

@@ -76,6 +76,8 @@ public class DocumentDto extends NodeDto {
 	
 	private ArxiuEstatEnumDto arxiuEstat;
 	
+	private DocumentFirmaTipusEnumDto documentFirmaTipus;
+	
 	public boolean isArxiuEstatDefinitu() {
 		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
 	}

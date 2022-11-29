@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
 
@@ -48,14 +49,15 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		arxiuFirma.setFitxerNom(firma.getNom());
 		arxiuFirma.setContingut(firma.getContingut());
 		arxiuFirma.setTipusMime(firma.getMime());
-		arxiuFirma.setTipus(pluginHelper.toArxiuFirmaTipus(firma.getTipusFirmaEni()));
-		ArxiuFirmaPerfilEnumDto perfil = pluginHelper.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
+		arxiuFirma.setTipus(ArxiuConversions.toArxiuFirmaTipus(firma.getTipusFirmaEni()));
+		ArxiuFirmaPerfilEnumDto perfil = ArxiuConversions.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 		arxiuFirma.setPerfil(perfil);
 		
 		
 		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
 		
 		DocumentFirmaTipusEnumDto documentFirmaTipus = getDocumentFirmaTipus(firma);
+		document.updateDocumentFirmaTipus(documentFirmaTipus);
 		
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
 //			FitxerDto fitxerNou = new FitxerDto(
@@ -91,7 +93,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 			document.setGesDocAdjuntFirmaId(null);
 		}
 
-
+		document.setArxiuUuidFirma(null);
 		logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 		return arxiuFirma;
 	}

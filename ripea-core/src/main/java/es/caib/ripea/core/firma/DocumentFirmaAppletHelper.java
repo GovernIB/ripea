@@ -59,7 +59,6 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 		// Registra al log la firma del document
 		logAll(document, LogTipusEnumDto.FIRMA_CLIENT, null, null);
 		logFirmat(document);
-		document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		
 		
 		List<ArxiuFirmaDto> firmes = null;
@@ -70,17 +69,18 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 			firmes = Arrays.asList(firma);
 		}
 		
-		ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		
+		document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+		
+		ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 		contingutHelper.arxiuPropagarModificacio(
 				document,
-				null,
-				DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+				firmes.get(0).getFitxer(),
+				arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
 				firmes,
 				arxiuEstat);
 		
-
-		// Registra al log la custòdia de la firma del document
-		logAll(document, LogTipusEnumDto.ARXIU_CUSTODIAT, document.getArxiuUuid(), null);
 	}
 
 	public SecretKeySpec buildKey(String message) throws Exception {

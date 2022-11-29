@@ -119,7 +119,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"where " +
 			"	 d.expedient = :expedient "  + 
 			"and d.arxiuEstat = :arxiuEstat ")
-	List<DocumentEntity> findByExpedientAndEsborratAndArxiuEstat(
+	List<DocumentEntity> findByExpedientAndArxiuEstat(
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat);
 	

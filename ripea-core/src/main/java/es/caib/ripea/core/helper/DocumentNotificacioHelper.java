@@ -168,7 +168,10 @@ public class DocumentNotificacioHelper {
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 			logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
 			
-			documentHelper.actualitzarEstatADefinititu(documentEntity);
+			if (!documentEntity.isArxiuEstatDefinitu()) {
+				documentHelper.actualitzarEstatADefinititu(documentEntity);
+			}
+
 		}
 	}
 	

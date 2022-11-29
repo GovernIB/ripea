@@ -175,7 +175,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		SistemaExternException sex = portafirmesEnviar(
 				documentPortafirmes,
 				transaccioId);
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		if (sex != null) {
 			throw sex;
 		}
@@ -279,7 +279,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			exception = portafirmesProcessar(documentPortafirmes);
 		}
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		return exception;
 	}
 	
@@ -348,8 +348,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						}
 						
 						// ============================== SAVE IN ARXIU ==========================
-						ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-						
+						ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 						if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
 							
 							List<ArxiuFirmaDto> firmes = null;
@@ -360,15 +359,17 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 								firmes = Arrays.asList(firma);
 							}
 							
+							document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+							
 							contingutHelper.arxiuPropagarModificacio(
 									document,
-									null,
-									DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+									firmes.get(0).getFitxer(),
+									arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
 									firmes,
 									arxiuEstat);
 
 
-						} else {
+						} else { // i am not sure if cades is supported
 							FitxerDto fitxer = documentHelper.getFitxerAssociatFirmat(
 									document, 
 									null);
@@ -391,10 +392,16 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							arxiuFirma.setDetalls(detalls);
 							arxiuFirma.setAutofirma(true);
 							
+							
+							if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY) {
+								pluginHelper.arxiuPropagarFirmaSeparada(
+										document,
+										arxiuFirma.getFitxer());
+							}
 							contingutHelper.arxiuPropagarModificacio(
 									document,
 									fitxer,
-									DocumentFirmaTipusEnumDto.FIRMA_SEPARADA,
+									arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_SEPARADA,
 									Arrays.asList(arxiuFirma),
 									arxiuEstat);
 						}
@@ -418,7 +425,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 							"id=" + documentPortafirmes.getId() + ", " +
 							"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 							ex);
-					cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+					cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 					documentPortafirmes.updateProcessatError(
 							ExceptionUtils.getStackTrace(ExceptionHelper.getRootCauseOrItself(ex)),
 							null);
@@ -428,7 +435,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				
 			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
 			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
-				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 				documentPortafirmes.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentPortafirmes.updateProcessat(
@@ -456,17 +463,6 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				true,
 				new Date());
 		
-		documentHelper.actualitzarVersionsDocument(document);
-		actualitzarInformacioFirma(document);
-		contingutLogHelper.log(
-				documentPortafirmes.getDocument(),
-				LogTipusEnumDto.ARXIU_CUSTODIAT,
-				document.getArxiuUuid(),
-				null,
-				false,
-				false);
-		logExpedient(documentPortafirmes, LogTipusEnumDto.ARXIU_CUSTODIAT);
-		
 		DocumentEstatEnumDto documentEstatNou = document.getEstat();
 		if ((documentEstatAnterior != documentEstatNou)) {
 			alertaHelper.crearAlerta(
@@ -482,7 +478,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		
 		DocumentEntity document = documentPortafirmes.getDocument();
 		
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
 		logFirmat(document);
 
@@ -510,7 +506,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					"id=" + documentPortafirmes.getId() + ", " +
 					"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
 					ex);
-			cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+			cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 			documentPortafirmes.updateProcessatError(
 					ExceptionUtils.getStackTrace(ExceptionHelper.getRootCauseOrItself(ex)),
 					null);
@@ -561,8 +557,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
-		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 		boolean hasFirmaParcial = false;
 		List<DocumentViaFirmaEntity> enviamentsViaFirmaProcessats = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document, 

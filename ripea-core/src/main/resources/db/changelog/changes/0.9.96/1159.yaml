@@ -16,10 +16,22 @@ databaseChangeLog:
         - column:
             name: arxiu_estat
             type: varchar(16 ${varcharunit})
-        tableName: ipa_document
+        - column:
+            name: doc_firma_tipus
+            type: varchar(16 ${varcharunit})      
+        - column:
+            name: arxiu_uuid_firma
+            type: varchar(36 ${varcharunit})   
+        tableName: ipa_document         
     - sql:
         sql:  
             update ipa_document set arxiu_estat = 'ESBORRANY' where estat not in (3, 5) and id in (select id from ipa_contingut where arxiu_uuid is not null);
             update ipa_document set arxiu_estat = 'DEFINITIU' where estat in (3, 5) and id in (select id from ipa_contingut where arxiu_uuid is not null);
             update ipa_document set arxiu_estat = null where id in (select document_id from ipa_registre_annex where error is not null);
+            
+            update ipa_document set doc_firma_tipus = 'SENSE_FIRMA' where nti_tipfir is null;
+            update ipa_document set doc_firma_tipus = 'FIRMA_ADJUNTA' where nti_tipfir !='TF04';
+            update ipa_document set doc_firma_tipus = 'FIRMA_SEPARADA' where nti_tipfir ='TF04';
+
+            
        

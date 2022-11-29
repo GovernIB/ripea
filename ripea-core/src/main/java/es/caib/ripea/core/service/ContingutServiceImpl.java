@@ -366,7 +366,7 @@ public class ContingutServiceImpl implements ContingutService {
 				DocumentEntity document = (DocumentEntity)contingut;
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 
-					DocumentFirmaTipusEnumDto documentFirmaTipus = documentHelper.getDocumentFirmaTipus(document.getNtiTipoFirma());
+					DocumentFirmaTipusEnumDto documentFirmaTipus = document.getDocumentFirmaTipus();
 					List<ArxiuFirmaDto> firmes = null;
 					
 					if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
@@ -394,13 +394,21 @@ public class ContingutServiceImpl implements ContingutService {
 						
 					} 
 					
-					ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+					
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus);
+					
+					if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						pluginHelper.arxiuPropagarFirmaSeparada(
+								document,
+								firmes.get(0).getFitxer());
+					}
 					contingutHelper.arxiuPropagarModificacio(
-							(DocumentEntity) contingut,
+							document,
 							fitxer,
-							documentFirmaTipus,
+							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 							firmes,
 							arxiuEstat);
+					
 				}
 				
 
@@ -1987,7 +1995,8 @@ public class ContingutServiceImpl implements ContingutService {
 					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio(),
 					documentOrigen.getNtiIdDocumentoOrigen(),
-					null);
+					null, 
+					documentOrigen.getDocumentFirmaTipus());
 		}
 		if (creat != null) {
 			if (creat instanceof NodeEntity) {
@@ -2042,7 +2051,8 @@ public class ContingutServiceImpl implements ContingutService {
 					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio(),
 					uuidDocumentoOrigen,
-					null);
+					null, 
+					documentOrigen.getDocumentFirmaTipus());
 		}
 		if (creat != null) {
 			if (creat instanceof DocumentEntity) {

@@ -17,7 +17,7 @@ public enum DocumentEstatEnumDto {
 	FIRMA_PENDENT_VIAFIRMA,
 	DEFINITIU,
 	FIRMA_PARCIAL,
-	ADJUNT_FIRMAT
+	ADJUNT_FIRMAT // TODO: change to FIRMAT
 	
 	
 	// TODO it would be clearer to have only 3 states:

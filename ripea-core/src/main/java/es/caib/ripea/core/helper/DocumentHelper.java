@@ -112,6 +112,17 @@ public class DocumentHelper {
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 					"expedientId=" + expedient.getId() + ")");
 		}
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus;
+		if (!document.isAmbFirma()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (!document.isFirmaSeparada()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		}
+		
+		
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
 				document.getNom(),
@@ -128,12 +139,14 @@ public class DocumentHelper {
 				expedient,
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen(),
-				document.getPinbalIdpeticion());
+				document.getPinbalIdpeticion(), 
+				documentFirmaTipus);
 		
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(document.getFitxerNom());
-		fitxer.setContentType(document.getFitxerContentType());
-		fitxer.setContingut(document.getFitxerContingut());
+		FitxerDto fitxer = new FitxerDto(
+				document.getFitxerNom(),
+				document.getFitxerContentType(),
+				document.getFitxerContingut());
+
 		actualitzarFitxerDB(
 				entity,
 				fitxer);
@@ -151,15 +164,14 @@ public class DocumentHelper {
 			entity.setGesDocAdjuntId(gestioDocumentalAdjuntId);
 		}
 		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
-		if (document.isAmbFirma() && document.isFirmaSeparada()) {
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 					new ByteArrayInputStream(document.getFirmaContingut()));
 			entity.setGesDocAdjuntFirmaId(gestioDocumentalAdjuntFirmaId);
 		}
-
-		if (document.isAmbFirma()) 
-			entity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
+		
+		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
 		
 		try {
 			if (entity.getExpedient().getArxiuUuid() != null) {
@@ -178,25 +190,24 @@ public class DocumentHelper {
 							true);
 				}
 				
+//				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+//					saveFirmaSeparadaOfEsborranyInGestioDocumental(
+//							document.getFirmaContingut(),
+//							entity);
+//				}
 				
-				
-				DocumentFirmaTipusEnumDto documentFirmaTipus;
-				if (!document.isAmbFirma()) {
-					documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
-				} else if (!document.isFirmaSeparada()) {
-					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
-				} else {
-					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+					pluginHelper.arxiuPropagarFirmaSeparada(
+							entity,
+							firmes.get(0).getFitxer());
 				}
-				
-				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
-				
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
-						documentFirmaTipus,
+						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 						firmes,
 						arxiuEstat);
+				
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -204,12 +215,15 @@ public class DocumentHelper {
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					entity.setGesDocAdjuntId(null);
 				}
-				if (gestioDocumentalAdjuntFirmaId != null ) {
+			
+				if (gestioDocumentalAdjuntFirmaId != null) {
 					pluginHelper.gestioDocumentalDelete(
 							gestioDocumentalAdjuntFirmaId,
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					entity.setGesDocAdjuntFirmaId(null);
 				}	
+				
+
 			}
 
 			
@@ -217,7 +231,10 @@ public class DocumentHelper {
 			logger.error("Error al custodiar document en arxiu  (" +
 					"id=" + entity.getId() + ")",
 					ex);
-
+			
+//			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+//				removeFirmaSeparadaOfEsborranyFromGestioDocumental(entity);
+//			}
 		}
 		entity.updateArxiuIntent();
 		
@@ -226,6 +243,45 @@ public class DocumentHelper {
 		else
 			dto.setId(entity.getId());
 		return dto;
+	}
+	
+//	
+//	private void saveFirmaSeparadaOfEsborranyInGestioDocumental(
+//			byte[] contingut,
+//			DocumentEntity entity) {
+//		String gesDocEsborranyFirmaSeparadaId = pluginHelper.gestioDocumentalCreate(
+//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+//				new ByteArrayInputStream(contingut));
+//		entity.setGesDocEsborranyFirmaSeparadaId(gesDocEsborranyFirmaSeparadaId);
+//	}
+//	
+//	private void removeFirmaSeparadaOfEsborranyFromGestioDocumental(
+//			DocumentEntity entity) {
+//		pluginHelper.gestioDocumentalDelete(
+//				entity.getGesDocEsborranyFirmaSeparadaId(),
+//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
+//		entity.setGesDocAdjuntFirmaId(null);
+//		
+//	}
+//	
+//	private byte[] getFirmaSeparadaOfEsborranyFromGestioDocumental(
+//			DocumentEntity entity) {
+//		ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+//		pluginHelper.gestioDocumentalGet(
+//				entity.getGesDocEsborranyFirmaSeparadaId(),
+//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+//				streamAnnex);
+//		return streamAnnex.toByteArray();
+//	}
+//	
+	
+	
+	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus) {
+		return documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPutjatManualmentDefinitu() ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
+	}
+
+	public boolean isFirmatPutjatManualmentDefinitu(){
+		return false;// APB true
 	}
 	
 	
@@ -302,7 +358,19 @@ public class DocumentHelper {
 				DocumentEntity.class);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
+		
+		
 		String nomOriginal = documentEntity.getNom();
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus;
+		if (!document.isAmbFirma()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (!document.isFirmaSeparada()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		}
+		
 		documentEntity.update(
 				metaDocument,
 				document.getNom(),
@@ -317,7 +385,8 @@ public class DocumentHelper {
 				document.getNtiIdDocumentoOrigen(),
 				document.getNtiTipoFirma(),
 				document.getNtiCsv(),
-				document.getNtiCsvRegulacion());
+				document.getNtiCsvRegulacion(), 
+				documentFirmaTipus);
 		FitxerDto fitxer = null;
 
 		Document arxiuDocument = null;
@@ -329,17 +398,7 @@ public class DocumentHelper {
 					true,
 					false);
 		}
-		
-		
-		DocumentFirmaTipusEnumDto documentFirmaTipus;
-		if (!document.isAmbFirma()) {
-			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
-		} else if (!document.isFirmaSeparada()) {
-			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
-		} else {
-			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
-		}
-		
+
 		boolean newFitxer = document.getFitxerContingut() != null;
 		boolean newFirma = document.getFirmaContingut() != null;
 		
@@ -369,6 +428,8 @@ public class DocumentHelper {
 					false, 
 					true);
 			
+			documentEntity.updateEstat(DocumentEstatEnumDto.FIRMAT);
+			
 		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			
 			fitxer = fitxer(
@@ -390,6 +451,8 @@ public class DocumentHelper {
 					firmaContingut, 
 					false, 
 					true);
+			
+			documentEntity.updateEstat(DocumentEstatEnumDto.FIRMAT);
 			
 		}
 		
@@ -413,13 +476,21 @@ public class DocumentHelper {
 
 		if (arxiuDocument == null || arxiuDocument.getEstat() == DocumentEstat.ESBORRANY || isPropagarModificacioDefinitiusActiva()) {
 
-			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+			ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+
+			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+				pluginHelper.arxiuPropagarFirmaSeparada(
+						documentEntity,
+						firmes.get(0).getFitxer());
+			}
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
-					documentFirmaTipus,
+					arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 					firmes,
 					arxiuEstat);
+			
+			
 		}
 
 		return dto;
@@ -583,8 +654,29 @@ public class DocumentHelper {
 			ExpedientEntity expedient,
 			String ubicacio,
 			String ntiIdDocumentoOrigen,
-			String pinbalIdpeticion) {
-		return crearDocumentDB(documentTipus, nom, descripcio, data, dataCaptura, ntiOrgano, ntiOrigen, ntiEstadoElaboracion, ntiTipoDocumental, metaDocument, pare, entitat, expedient, ubicacio, ntiIdDocumentoOrigen, pinbalIdpeticion, true, null, ArxiuEstatEnumDto.DEFINITIU);
+			String pinbalIdpeticion, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus) {
+		return crearDocumentDB(
+				documentTipus,
+				nom,
+				descripcio,
+				data,
+				dataCaptura,
+				ntiOrgano,
+				ntiOrigen,
+				ntiEstadoElaboracion,
+				ntiTipoDocumental,
+				metaDocument,
+				pare,
+				entitat,
+				expedient,
+				ubicacio,
+				ntiIdDocumentoOrigen,
+				pinbalIdpeticion,
+				true,
+				null,
+				ArxiuEstatEnumDto.DEFINITIU, 
+				documentFirmaTipus);
 	}
 
 	public DocumentEntity crearDocumentDB(
@@ -606,10 +698,11 @@ public class DocumentHelper {
 			String pinbalIdpeticion,
 			boolean validacioFirmaCorrecte,
 			String validacioFirmaErrorMsg,
-			ArxiuEstatEnumDto annexArxiuEstat) {
+			ArxiuEstatEnumDto annexArxiuEstat, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
-				DocumentEstatEnumDto.REDACCIO,
+				documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT,
 				nom,
 				descripcio,
 				data,
@@ -623,7 +716,8 @@ public class DocumentHelper {
 				metaDocument,
 				pare,
 				entitat,
-				expedient).
+				expedient, 
+				documentFirmaTipus).
 				ubicacio(ubicacio).
 				pinbalIdpeticion(pinbalIdpeticion).
 				validacioFirmaCorrecte(validacioFirmaCorrecte).
@@ -683,7 +777,7 @@ public class DocumentHelper {
 				true,
 				false);
 		
-		DocumentFirmaTipusEnumDto documentFirmaTipus = getDocumentFirmaTipus(documentEntity.getNtiTipoFirma());
+		DocumentFirmaTipusEnumDto documentFirmaTipus = documentEntity.getDocumentFirmaTipus();
 		
 		FitxerDto fitxer = null;
 		List<ArxiuFirmaDto> firmes = null;
@@ -708,16 +802,22 @@ public class DocumentHelper {
 					documentEntity,
 					arxiuDocument);
 			
-			byte[]  firmaContingut = getFirmaDetachedFromArxiuDocument(arxiuDocument);
+			byte[] firmaSeparada = null;
+			if (documentEntity.getArxiuUuidFirma() != null) {
+				firmaSeparada = pluginHelper.arxiuFirmaSeparadaConsultar(documentEntity);
+			} else {
+				throw new RuntimeException("Firma separada no existeix en arxiu");
+			}
 			
 			firmes = validaFirmaDocument(
 					documentEntity, 
 					fitxer,
-					firmaContingut, 
+					firmaSeparada, 
 					false, 
 					true);
 			
-
+			fitxer = null; // if we pass fitxer not null to arxiuPropagarModificacio() ArxiuPluginCaib throws ArxiuValidacioException: No és possible marcar el document com a definitiu si es vol modificar el seu contingut.
+			
 		}
 
 		contingutHelper.arxiuPropagarModificacio(
@@ -726,8 +826,8 @@ public class DocumentHelper {
 				documentFirmaTipus,
 				firmes,
 				ArxiuEstatEnumDto.DEFINITIU);
-	
 		
+		documentEntity.setArxiuUuidFirma(null);
 	}
 	
 	
@@ -743,6 +843,8 @@ public class DocumentHelper {
 		}
 		return documentFirmaTipus;
 	}
+	
+	
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
@@ -1081,6 +1183,8 @@ public class DocumentHelper {
 								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 								streamAnnex1);
 						firmaSeparada = streamAnnex1.toByteArray();
+					} else {
+						throw new RuntimeException("Firma separada no existeix en gestió documental");
 					}
 					firmes = validaFirmaDocument(
 							documentEntity,
@@ -1100,13 +1204,20 @@ public class DocumentHelper {
 				}
 				
 		
-				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+				
+				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+					pluginHelper.arxiuPropagarFirmaSeparada(
+							documentEntity,
+							firmes.get(0).getFitxer());
+				}
 				contingutHelper.arxiuPropagarModificacio(
 						documentEntity,
 						fitxer,
-						documentFirmaTipus,
+						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
 						firmes,
 						arxiuEstat);
+
 			
 				if (documentEntity.getGesDocAdjuntId() != null ) {
 					pluginHelper.gestioDocumentalDelete(
