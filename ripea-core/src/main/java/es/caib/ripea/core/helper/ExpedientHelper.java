@@ -70,6 +70,7 @@ import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -1197,7 +1198,7 @@ public class ExpedientHelper {
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
 		
 		if (expedient.getArxiuUuid() != null) { // concurrency check
-			throw new RuntimeException("L'expedient ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+			throw new ArxiuJaGuardatException("L'expedient ja s'ha guardat en arxiu per otra persona o el process en segon pla");
 		}
 		concurrencyCheckExpedientJaTancat(expedient);
 		

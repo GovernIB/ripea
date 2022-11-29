@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -352,6 +353,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			
 			try {
 				exception = documentService.guardarDocumentArxiu(documentId);
+			} catch (ArxiuJaGuardatException e) {
+				exception = null;
 			} catch (Exception e) {
 				exception = e;
 			}

@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -601,6 +602,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		Exception exception = null;
 		try {
 			exception = expedientService.guardarExpedientArxiu(expedientId);
+		} catch (ArxiuJaGuardatException e) {
+			exception = null;
 		} catch (Exception e) {
 			exception = e;
 		}

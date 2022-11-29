@@ -29,6 +29,7 @@ import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.config.SchedulingConfig;
@@ -382,6 +383,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksExpedients)) {
 					try {
 						expedientHelper.guardarExpedientArxiu(contingut.getId());
+					} catch (ArxiuJaGuardatException e) {
 					} catch (Exception e) {
 						logger.error("Error al guardar expedient en arxiu, segon pla ", e);
 					}
@@ -392,8 +394,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 					try {
 						documentHelper.guardarDocumentArxiu(contingut.getId());
+					} catch (ArxiuJaGuardatException e) {
 					} catch (Exception e) {
-						logger.error("Error al guardar document en arxiu, segon pla ", e);
+						logger.error("Error al guardar document en arxiu, segon pla ",
+								e);
 					}
 				}
 			}

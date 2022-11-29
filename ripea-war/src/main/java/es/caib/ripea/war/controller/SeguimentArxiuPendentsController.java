@@ -29,6 +29,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -526,6 +527,9 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		for (Long expedientId : seleccio) {
 			Exception exception = expedientService.guardarExpedientArxiu(expedientId);
 
+			if (exception instanceof ArxiuJaGuardatException) {
+				exception = null;
+			}
 			if (exception != null ) {
 				logger.error("Error guardant expedient en arxiu", exception);
 				errors++;
@@ -579,6 +583,9 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 			Exception exception = null;
 			if (document.getArxiuUuid() == null) {
 				exception = documentService.guardarDocumentArxiu(documentId);
+				if (exception instanceof ArxiuJaGuardatException) {
+					exception = null;
+				}
 				if (exception != null ) {
 					logger.error("Error guardant document en arxiu", exception);
 					errors++;

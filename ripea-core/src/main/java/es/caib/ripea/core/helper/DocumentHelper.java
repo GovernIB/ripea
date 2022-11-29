@@ -46,6 +46,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -1157,7 +1158,7 @@ public class DocumentHelper {
 		if (documentEntity.getExpedient().getArxiuUuid() != null) {
 			
 			if (documentEntity.getArxiuUuid() != null) { // concurrency check
-				throw new RuntimeException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+				throw new ArxiuJaGuardatException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
 			}
 			expedientHelper.concurrencyCheckExpedientJaTancat(documentEntity.getExpedient());
 			
