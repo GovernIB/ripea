@@ -1551,10 +1551,14 @@ public class ContingutHelper {
 			ContingutEntity desti,
 			String expedientDestiUuid) {
 		if (contingut instanceof DocumentEntity) {
-			return pluginHelper.arxiuDocumentMoure(
-					(DocumentEntity)contingut,
-					desti.getArxiuUuid(),
-					expedientDestiUuid);
+			String identificador = null;
+			if (desti instanceof ExpedientEntity || (desti instanceof CarpetaEntity && !isCarpetaLogica())) {
+				identificador = pluginHelper.arxiuDocumentMoure(
+						(DocumentEntity)contingut,
+						desti.getArxiuUuid(),
+						expedientDestiUuid);
+			}
+			return identificador;
 		} else if (contingut instanceof CarpetaEntity && !isCarpetaLogica()) {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingut,

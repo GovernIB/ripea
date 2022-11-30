@@ -32,7 +32,7 @@
 		</c:choose>
 			
 		</rip:inputFixed>
-		<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" documentsOrigen="${documentsOrigen}" textKey="contingut.moure.camp.desti" required="true"/>
+		<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" documentsOrigen="${documentsOrigen}" ocultarDocuments="true" textKey="contingut.moure.camp.desti" required="true"/>
 		
 <%-- 		<rip:inputFileChooser name="destiId" contingutOrigen="${contingutOrigen}" textKey="contingut.moure.camp.desti" required="true"/> --%>
 		<div id="modal-botons" class="well">
