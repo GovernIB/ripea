@@ -12,6 +12,7 @@ import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 
@@ -19,9 +20,13 @@ import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 public class ArxiuConversions {
 
 	public static DocumentNtiEstadoElaboracionEnumDto getEstatElaboracio(Document document) {
+		return getEstatElaboracio(document.getMetadades().getEstatElaboracio());
+	}
+	
+	public static DocumentNtiEstadoElaboracionEnumDto getEstatElaboracio(DocumentEstatElaboracio documentEstatElaboracio) {
 		DocumentNtiEstadoElaboracionEnumDto estatElaboracio = null;
 	
-		switch (document.getMetadades().getEstatElaboracio()) {
+		switch (documentEstatElaboracio) {
 		case ORIGINAL:
 			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE01;
 			break;
@@ -65,9 +70,13 @@ public class ArxiuConversions {
 	}
 
 	public static NtiOrigenEnumDto getOrigen(Document documentArxiu) {
+		return getOrigen(documentArxiu.getMetadades().getOrigen());
+	}
+	
+	public static NtiOrigenEnumDto getOrigen(ContingutOrigen contingutOrigen) {
 		NtiOrigenEnumDto origen = null;
 	
-		switch (documentArxiu.getMetadades().getOrigen()) {
+		switch (contingutOrigen) {
 		case CIUTADA:
 			origen = NtiOrigenEnumDto.O0;
 			break;
@@ -91,6 +100,79 @@ public class ArxiuConversions {
 			}
 		}
 		return origen;
+	}
+	
+	@SuppressWarnings("incomplete-switch")
+	public static DocumentNtiTipoDocumentalEnumDto getTipusDocumentalEnum(DocumentTipus documentTipus) {
+		DocumentNtiTipoDocumentalEnumDto tipusDocumental = null;
+	
+		switch (documentTipus) {
+		case RESOLUCIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD01;
+			break;
+		case ACORD:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD02;
+			break;
+		case CONTRACTE:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD03;
+			break;
+		case CONVENI:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD04;
+			break;
+		case DECLARACIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD05;
+			break;
+		case COMUNICACIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD06;
+			break;
+		case NOTIFICACIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD07;
+			break;
+		case PUBLICACIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD08;
+			break;
+		case JUSTIFICANT_RECEPCIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD09;
+			break;
+		case ACTA:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD10;
+			break;
+		case CERTIFICAT:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD11;
+			break;
+		case DILIGENCIA:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD12;
+			break;
+		case INFORME:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD13;
+			break;
+		case SOLICITUD:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD14;
+			break;
+		case DENUNCIA:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD15;
+			break;
+		case ALEGACIO:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD16;
+			break;
+		case RECURS:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD17;
+			break;
+		case COMUNICACIO_CIUTADA:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD18;
+			break;
+		case FACTURA:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD19;
+			break;
+		case ALTRES_INCAUTATS:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD20;
+			break;
+		case ALTRES:
+			tipusDocumental = DocumentNtiTipoDocumentalEnumDto.TD99;
+			break;
+		}
+	
+		return tipusDocumental;
 	}
 
 	@SuppressWarnings("incomplete-switch")

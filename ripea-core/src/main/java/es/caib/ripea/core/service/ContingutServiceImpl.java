@@ -1253,6 +1253,8 @@ public class ContingutServiceImpl implements ContingutService {
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
+		
+		// ##################### EXPEDIENT ##################################
 		if (contingut instanceof ExpedientEntity) {
 			es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(
 					(ExpedientEntity)contingut);
@@ -1282,6 +1284,8 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniOrgans(metadades.getOrgans());
 				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());		
 			}
+			
+		// ##################### DOCUMENT ##################################
 		} else if (contingut instanceof DocumentEntity) {
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 					contingut,
@@ -1295,103 +1299,16 @@ public class ContingutServiceImpl implements ContingutService {
 			if (metadades != null) {
 				arxiuDetall.setEniVersio(metadades.getVersioNti());
 				arxiuDetall.setEniIdentificador(metadades.getIdentificador());
+				arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
 				arxiuDetall.setEniDataCaptura(metadades.getDataCaptura());
-				if (metadades.getOrigen() != null) {
-					switch (metadades.getOrigen()) {
-					case CIUTADA:
-						arxiuDetall.setEniOrigen(NtiOrigenEnumDto.O0);
-						break;
-					case ADMINISTRACIO:
-						arxiuDetall.setEniOrigen(NtiOrigenEnumDto.O1);
-						break;
-					}
-				}
-				if (metadades.getEstatElaboracio() != null) {
-					switch (metadades.getEstatElaboracio()) {
-					case ORIGINAL:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE01);
-						break;
-					case COPIA_CF:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE02);
-						break;
-					case COPIA_DP:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE03);
-						break;
-					case COPIA_PR:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE04);
-						break;
-					case ALTRES:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE99);
-						break;
-					}
-				}
-				if (metadades.getTipusDocumental() != null) {
-					switch (metadades.getTipusDocumental()) {
-					case RESOLUCIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD01);
-						break;
-					case ACORD:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD02);
-						break;
-					case CONTRACTE:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD03);
-						break;
-					case CONVENI:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD04);
-						break;
-					case DECLARACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD05);
-						break;
-					case COMUNICACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD06);
-						break;
-					case NOTIFICACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD07);
-						break;
-					case PUBLICACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD08);
-						break;
-					case JUSTIFICANT_RECEPCIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD09);
-						break;
-					case ACTA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD10);
-						break;
-					case CERTIFICAT:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD11);
-						break;
-					case DILIGENCIA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD12);
-						break;
-					case INFORME:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD13);
-						break;
-					case SOLICITUD:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD14);
-						break;
-					case DENUNCIA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD15);
-						break;
-					case ALEGACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD16);
-						break;
-					case RECURS:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD17);
-						break;
-					case COMUNICACIO_CIUTADA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD18);
-						break;
-					case FACTURA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD19);
-						break;
-					case ALTRES_INCAUTATS:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD20);
-						break;
-					case ALTRES:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
-						break;
-					}
-				}
+				
+				arxiuDetall.setEniOrigen(ArxiuConversions.getOrigen(metadades.getOrigen()));
+
+				arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
+				
+				arxiuDetall.setEniTipusDocumental(ArxiuConversions.getTipusDocumentalEnum(metadades.getTipusDocumental()));
+				
+			
 
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
@@ -1448,6 +1365,8 @@ public class ContingutServiceImpl implements ContingutService {
 				else if (DocumentEstat.DEFINITIU.equals(arxiuDocument.getEstat()))
 					arxiuDetall.setArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 			}
+			
+		// ##################### CARPETA ##################################
 		} else if (contingut instanceof CarpetaEntity) {
 			Carpeta arxiuCarpeta = pluginHelper.arxiuCarpetaConsultar(
 					(CarpetaEntity)contingut);
@@ -1460,6 +1379,8 @@ public class ContingutServiceImpl implements ContingutService {
 					ContingutEntity.class,
 					"Tipus de contingut desconegut: " + contingut.getClass().getName());
 		}
+		
+		// ##################### CONTINGUT ##################################
 		if (continguts != null) {
 			List<ArxiuContingutDto> detallFills = new ArrayList<ArxiuContingutDto>();
 			for (ContingutArxiu cont: continguts) {
@@ -1489,6 +1410,7 @@ public class ContingutServiceImpl implements ContingutService {
 			List<ArxiuFirmaDto> dtos = new ArrayList<ArxiuFirmaDto>();
 			for (Firma firma: firmes) {
 				ArxiuFirmaDto dto = new ArxiuFirmaDto();
+				
 				if (firma.getTipus() != null) {
 					switch (firma.getTipus()) {
 					case CSV:
