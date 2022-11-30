@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1669384545265-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.document.guardar.definitiu.arxiu
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Fer els documents firmats definitius a l'arxiu quan es creen
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 28
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1

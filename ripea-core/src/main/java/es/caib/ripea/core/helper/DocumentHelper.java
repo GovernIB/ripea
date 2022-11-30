@@ -278,13 +278,8 @@ public class DocumentHelper {
 	
 	
 	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus) {
-		return documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPutjatManualmentDefinitu() ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
+		return documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu() ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
 	}
-
-	public boolean isFirmatPutjatManualmentDefinitu(){
-		return false;// APB true
-	}
-	
 	
 	public ArxiuFirmaDto getArxiuFirmaPades(String nom, byte[] contingut){
 		ArxiuFirmaDto firma = new ArxiuFirmaDto();
@@ -1349,6 +1344,10 @@ public class DocumentHelper {
 	public boolean isPropagarModificacioDefinitiusActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");
 	}
+	public boolean isFirmatPujatManualmentDefinitu(){
+		return configHelper.getAsBoolean("es.caib.ripea.document.guardar.definitiu.arxiu");
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 
 }
