@@ -1026,18 +1026,7 @@ public class ExpedientHelper {
 		boolean hiHaDocumentsPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
 		if (hiHaDocumentsPerFirmar) {
 			for (Long documentPerFirmar : documentsPerFirmar) {
-				DocumentEntity document = documentRepository.getOne(documentPerFirmar);
-				if (document != null) {
-					FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-					if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null) {
-						//remove invalid signature
-						fitxer.setContingut(documentFirmaServidorFirma.removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
-					}
-					documentFirmaServidorFirma.firmar(document, fitxer, motiu);
-					//pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
-				} else {
-					throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
-				}
+				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu);
 			}
 		}
 		// Eliminam de l'expedient els esborranys que no s'han firmat
@@ -1062,7 +1051,7 @@ public class ExpedientHelper {
 				expedient,
 				ArxiuEstatEnumDto.ESBORRANY);
 		for (DocumentEntity documentEntity : esborranysArxiu) {
-			documentHelper.actualitzarEstatADefinititu(documentEntity);
+			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		} 
 		
 		
@@ -1077,6 +1066,7 @@ public class ExpedientHelper {
 			}
 		}
 		
+		documentHelper.clearDocuments(expedient);
 		
 		pluginHelper.arxiuExpedientTancar(expedient);
 	}

@@ -223,7 +223,7 @@ $(document).ready(function() {
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsExpedientsTemplate" width="10%">
 							<script id="cellAccionsExpedientsTemplate" type="text/x-jsrender">
-								<a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
+								<a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a>
 							</script>
 						</th>
 					</tr>
@@ -307,9 +307,9 @@ $(document).ready(function() {
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsDocumentsTemplate" width="10%">
 							<script id="cellAccionsDocumentsTemplate" type="text/x-jsrender">
 								{{if !expedientArxiuPropagat}}
-									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a></div>
+									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a></div>
 								{{else}}
-									<a href="<c:url value="/contingut/{{:expedientId}}/document/{{:id}}/guardarDocumentArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
+									<a href="<c:url value="/contingut/{{:expedientId}}/document/{{:id}}/guardarDocumentArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a>
 								{{/if}}
 								{{if annex}}
 									<div id="annex" style="display: none;">
@@ -390,9 +390,9 @@ $(document).ready(function() {
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatsTemplate" width="10%">
 							<script id="cellAccionsInteressatsTemplate" type="text/x-jsrender">
 								{{if !expedientArxiuPropagat}}
-									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a></div>
+									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a></div>
 								{{else}}
-									<a href="<c:url value="/expedient/{{:expedientId}}/guardarInteressatsArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
+									<a href="<c:url value="/expedient/{{:expedientId}}/guardarInteressatsArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a>
 								{{/if}}
 							</script>
 						</th>

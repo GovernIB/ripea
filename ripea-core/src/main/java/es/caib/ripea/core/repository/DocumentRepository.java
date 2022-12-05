@@ -111,6 +111,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			int esborrat);
 	
+	List<DocumentEntity> findByExpedient(
+			ExpedientEntity expedient);
+	
 	
 	@Query(	"select " +
 			"    d " +
