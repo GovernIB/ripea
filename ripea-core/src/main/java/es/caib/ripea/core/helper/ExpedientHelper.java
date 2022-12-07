@@ -101,6 +101,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -180,7 +181,8 @@ public class ExpedientHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-	
+	@Autowired
+	private InteressatRepository interessatRepository;
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
@@ -408,14 +410,28 @@ public class ExpedientHelper {
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
 		for (RegistreInteressatEntity interessatRegistre : expedientPeticioEntity.getRegistre().getInteressats()) {
 			boolean alreadyExists = false;
+			boolean tipusCanviat = false;
 			InteressatEntity interessatExpedient = null;
 			for (InteressatEntity interessatExp : existingInteressats) {
 				if (interessatExp.getDocumentNum() != null && interessatRegistre.getDocumentNumero() != null && interessatExp.getDocumentNum().equals(interessatRegistre.getDocumentNumero())) {
 					alreadyExists = true;
 					interessatExpedient = interessatExp;
+					if (!interessatExp.getDocumentTipus().toString().equals(interessatRegistre.getTipus().toString())) {
+						tipusCanviat = true;
+					}
 				}
 			}
-			if (!alreadyExists) {
+			if (!alreadyExists || tipusCanviat) {
+				
+				if (tipusCanviat) {
+					if (interessatExpedient.getRepresentant() != null) {
+						InteressatEntity repres = interessatExpedient.getRepresentant();
+						interessatExpedient.updateRepresentant(null);
+						interessatRepository.delete(repres);
+					}
+					interessatRepository.delete(interessatExpedient);
+				}
+				
 				InteressatDto createdInteressat = expedientInteressatHelper.create(
 						entitatId,
 						expedientId,
