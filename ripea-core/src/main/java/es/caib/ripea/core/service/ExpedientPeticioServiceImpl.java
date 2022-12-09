@@ -463,6 +463,20 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return arxiu;
 	}
 
+	
+	@Transactional
+	@Override
+	public void canviarProcediment(Long expedientPeticioId, Long procedimentId) {
+
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
+		expedientPeticioEntity.setMetaExpedient(metaExpedient);
+	
+	}
+	
+	
+	
 	@Transactional
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {
