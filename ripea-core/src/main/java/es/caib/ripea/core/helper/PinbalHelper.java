@@ -25,6 +25,8 @@ import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
+import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
+import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
@@ -128,6 +130,34 @@ public class PinbalHelper {
 			return processarScspRespuesta(solicitud, respuesta, "SVDCCAACPASWS01", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SVDCCAACPASWS01", t0);
+		}
+	}
+	
+	
+	public String novaPeticioSvdscddws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			String finalitat,
+			PinbalConsentimentEnumDto consentiment,
+			String comunitatAutonomaCodi,
+			String provinciaCodi) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdscddws01 solicitud = new SolicitudSvdscddws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				finalitat,
+				consentiment);
+		solicitud.setCodigoComunidadAutonoma(comunitatAutonomaCodi);
+		solicitud.setCodigoProvincia(provinciaCodi);
+		try {
+			ScspRespuesta respuesta = getClientSvdscddws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDSCDDWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDSCDDWS01", t0);
 		}
 	}
 
@@ -397,6 +427,19 @@ public class PinbalHelper {
 		if (log.isDebugEnabled())
 			clientSvdccaacpasws01.enableLogginFilter();
 		return clientSvdccaacpasws01;
+	}
+	
+	private ClientSvdscddws01 getClientSvdscddws01() {
+		ClientSvdscddws01 clientSvdscddws01 = new ClientSvdscddws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientSvdscddws01.enableLogginFilter();
+		return clientSvdscddws01;
 	}
 
 	private String getPinbalBaseUrl() {
