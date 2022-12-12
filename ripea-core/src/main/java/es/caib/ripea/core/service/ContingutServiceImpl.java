@@ -775,6 +775,21 @@ public class ContingutServiceImpl implements ContingutService {
 
 	}
 	
+	@Override
+	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
+		long t0 = System.currentTimeMillis();
+		logger.debug("Obtenint contingut amb id per usuari ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ", "
+				+ "ambFills=onlyCarpetes, "
+				+ "ambVersions=false)");
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("findAmbIdUserPerMoureCopiarVincular time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t0) + " ms");
+		
+		return contingutHelper.toContingutDtoSimplificat(contingut, true, null);
+	}
 
 	@Transactional(readOnly = true)
 	@Override

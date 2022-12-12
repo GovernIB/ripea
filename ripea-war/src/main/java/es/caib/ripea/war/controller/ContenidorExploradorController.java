@@ -65,11 +65,12 @@ public class ContenidorExploradorController extends BaseUserOAdminOOrganControll
 			@PathVariable Long contenidorId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contenidor = contenidorService.findAmbIdUser(
-				entitatActual.getId(),
-				contenidorId,
-				true,
-				false, null, null);
+//		ContingutDto contenidor = contenidorService.findAmbIdUser(
+//				entitatActual.getId(),
+//				contenidorId,
+//				true,
+//				false, null, null);
+		ContingutDto contenidor = contenidorService.findAmbIdUserPerMoureCopiarVincular(entitatActual.getId(), contenidorId);
 //		contenidor.setContenidorArrelIdPerPath(contenidorArrelId);
 		return contenidor;
 	}

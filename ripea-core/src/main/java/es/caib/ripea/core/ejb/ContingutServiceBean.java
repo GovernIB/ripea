@@ -376,4 +376,9 @@ public class ContingutServiceBean implements ContingutService {
 				ambEntitat);
 	}
 
+	@Override
+	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
+		return delegate.findAmbIdUserPerMoureCopiarVincular(entitatId, contingutId);
+	}
+
 }

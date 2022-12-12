@@ -712,6 +712,66 @@ public class ContingutHelper {
 			logger.info("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + level + "): "+ (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
+	
+	public ContingutDto toContingutDtoSimplificat(ContingutEntity contingut, boolean nomesFinsExpedientArrel, List<ContingutDto> pathDto) {
+		ContingutDto resposta = null;		
+		if (contingut instanceof ExpedientEntity) {
+			ExpedientDto expedient = new ExpedientDto();
+			resposta = expedient;
+		}
+		
+		if (contingut instanceof CarpetaEntity) {
+			CarpetaDto carpeta = new CarpetaDto();
+			resposta = carpeta;
+		}
+		
+		List<ContingutDto> pathCalculatPerThisContingut = null;
+		if (contingut instanceof ExpedientEntity) {
+			pathCalculatPerThisContingut = null;
+		} else {
+			if (pathDto != null) { // if is called recursively from pare that already calculated path
+				pathCalculatPerThisContingut = pathDto;
+			} else {
+				pathCalculatPerThisContingut = getPathContingutComDto(contingut, nomesFinsExpedientArrel);
+			}
+		}
+		
+		resposta.setId(contingut.getId());
+		resposta.setNom(contingut.getNom());
+		resposta.setPath(pathCalculatPerThisContingut);
+
+		List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
+		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
+				contingut,
+				0,
+				isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
+				contingut,
+				0,
+				new Sort("createdDate"));
+
+		fills.addAll(fillsOrder1);
+		fills.addAll(fillsOrder2);
+		
+		List<ContingutDto> fillsDto = new ArrayList<ContingutDto>();
+		for (ContingutEntity fill: fills) {
+			if (fill instanceof CarpetaEntity) {
+				CarpetaDto carpeta = new CarpetaDto();
+				carpeta.setId(fill.getId());
+				carpeta.setNom(fill.getNom());
+				fillsDto.add(carpeta);
+			}
+			if (fill instanceof DocumentEntity) {
+				DocumentDto document = new DocumentDto();
+				document.setId(fill.getId());
+				document.setNom(fill.getNom());
+				document.setDocumentTipus(((DocumentEntity) fill).getDocumentTipus());
+				fillsDto.add(document);
+			}
+		}
+		resposta.setFills(fillsDto);
+		return resposta;
+	}
 
 	public boolean checkIfUserIsAdminOfContingut(Long contingutId, String rolActual) {
 
@@ -1609,6 +1669,23 @@ public class ContingutHelper {
 								false,
 								false,
 								false, null, false, null, false, level, null, null, false, false));
+				}
+			}
+		}
+		return pathDto;
+	}
+	
+	public List<ContingutDto> getPathContingutComDto(ContingutEntity contingut, boolean nomesFinsExpedientArrel) {
+		List<ContingutEntity> path = getPathContingut(contingut);
+		List<ContingutDto> pathDto = null;
+		if (path != null) {
+			pathDto = new ArrayList<ContingutDto>();
+			boolean expedientArrelTrobat = !nomesFinsExpedientArrel;
+			for (ContingutEntity contingutPath: path) {
+				if (!expedientArrelTrobat && contingutPath instanceof ExpedientEntity)
+					expedientArrelTrobat = true;
+				if (expedientArrelTrobat) {
+					pathDto.add(toContingutDtoSimplificat(contingutPath, false, null));
 				}
 			}
 		}

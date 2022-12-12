@@ -294,6 +294,10 @@ function loadFileChooser(campPath, contenidorId) {
     });
 }
 $(document).ready(function() {
-	loadFileChooser('${campPath}', '${contenidorInicialId}');
+	if (!${moureMateixExpedients}) {
+		loadFileChooser('${campPath}', '${contenidorInicialId}');
+	} else {
+		refrescarOne('${campPath}', '${contenidorInicialId}');
+	}
 });
 </script>
