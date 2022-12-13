@@ -35,7 +35,7 @@ public class MetaDadaDto implements Serializable {
 	private Boolean valorBoolea;
 	private String valorString;
 	
-	
+	private boolean noAplica;
 
 	public Long getValorSencer() {
 		return valorSencer;
@@ -140,6 +140,12 @@ public class MetaDadaDto implements Serializable {
 	}
 	public void setDomini(DominiDto domini) {
 		this.domini = domini;
+	}
+	public boolean isNoAplica() {
+		return noAplica;
+	}
+	public void setNoAplica(boolean noAplica) {
+		this.noAplica = noAplica;
 	}
 	@Override
 	public String toString() {

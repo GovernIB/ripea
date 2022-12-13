@@ -286,6 +286,7 @@ public class ConversioTipusHelper {
 						target.setReadOnly(source.isReadOnly());
 						target.setOrdre(source.getOrdre());
 						target.setActiva(source.isActiva());
+						target.setNoAplica(source.isNoAplica());
 						
 						if (source.getTipus()==MetaDadaTipusEnumDto.BOOLEA) {
 							target.setValorBoolea((Boolean) DadaEntity.getDadaValorPerRetornar(source, source.getValor()));

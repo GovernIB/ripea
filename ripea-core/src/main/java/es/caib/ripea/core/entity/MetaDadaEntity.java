@@ -57,6 +57,9 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	@JoinColumn(name = "meta_node_id")
 	@ForeignKey(name = "ipa_metanode_metadada_fk")
 	private MetaNodeEntity metaNode;
+	@Column(name = "no_aplica")
+	private boolean noAplica;
+	
 	@Version
 	private long version = 0;
 
@@ -93,7 +96,10 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	public long getVersion() {
 		return version;
 	}
-
+	public boolean isNoAplica() {
+		return noAplica;
+	}
+	
 	public void update(
 			String codi,
 			String nom,
@@ -101,7 +107,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			MultiplicitatEnumDto multiplicitat,
 			Object valor,
 			String descripcio,
-			boolean readOnly) {
+			boolean readOnly,
+			boolean noAplica) {
 		this.codi = codi;
 		this.nom = nom;
 		this.tipus = tipus;
@@ -109,6 +116,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 		this.valor = DadaEntity.getDadaValorPerEmmagatzemar(tipus, valor);
 		this.descripcio = descripcio;
 		this.readOnly = readOnly;
+		this.noAplica = noAplica;
 	}
 	public void update(
 			String codi,
@@ -137,7 +145,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			Object valor,
 			boolean readOnly,
 			int ordre,
-			MetaNodeEntity metaNode) {
+			MetaNodeEntity metaNode,
+			boolean noAplica) {
 		return new Builder(
 				codi,
 				nom,
@@ -146,7 +155,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				valor,
 				readOnly,
 				ordre,
-				metaNode);
+				metaNode,
+				noAplica);
 	}
 	public static class Builder {
 		MetaDadaEntity built;
@@ -158,7 +168,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				Object valor,
 				boolean readOnly,
 				int ordre,
-				MetaNodeEntity metaNode) {
+				MetaNodeEntity metaNode,
+				boolean noAplica) {
 			built = new MetaDadaEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -169,6 +180,7 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			built.ordre = ordre;
 			built.metaNode = metaNode;
 			built.activa = true;
+			built.noAplica = noAplica;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

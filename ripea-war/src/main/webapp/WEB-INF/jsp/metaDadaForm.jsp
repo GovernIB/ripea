@@ -74,6 +74,7 @@ $(document).ready(function() {
 			$('#valorImport').parent().parent().hide();
 			$('#valorData').parent().parent().hide();
 			$('#valorBoolea').parent().parent().hide();
+			$('#noAplica').closest('.form-group').show();
 			
 			$.ajax({
 				type: 'GET',
@@ -111,6 +112,7 @@ $(document).ready(function() {
 			$('#domini').parent().parent().hide();
 			$('#codi').removeClass('disabled');
 			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
+			$('#noAplica').closest('.form-group').hide();
 			
 		} else if ($(this).val() == 'DATA') {
 			$('#valorSencer').parent().parent().hide();
@@ -122,6 +124,7 @@ $(document).ready(function() {
 			$('#domini').parent().parent().hide();
 			$('#codi').removeClass('disabled');
 			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
+			$('#noAplica').closest('.form-group').hide();
 			
 		} else if ($(this).val() == 'FLOTANT') {
 			$('#valorSencer').parent().parent().hide();
@@ -133,6 +136,7 @@ $(document).ready(function() {
 			$('#domini').parent().parent().hide();
 			$('#codi').removeClass('disabled');
 			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
+			$('#noAplica').closest('.form-group').hide();
 			
 		} else if ($(this).val() == 'IMPORT') {
 			$('#valorSencer').parent().parent().hide();
@@ -144,6 +148,7 @@ $(document).ready(function() {
 			$('#domini').parent().parent().hide();
 			$('#codi').removeClass('disabled');
 			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
+			$('#noAplica').closest('.form-group').hide();
 			
 		} else if ($(this).val() == 'SENCER') {
 			$('#valorSencer').parent().parent().show();
@@ -155,6 +160,7 @@ $(document).ready(function() {
 			$('#domini').parent().parent().hide();
 			$('#codi').removeClass('disabled');
 			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
+			$('#noAplica').closest('.form-group').hide();
 			
 		}  else if ($(this).val() == 'TEXT') {
 			$('#valorSencer').parent().parent().hide();
@@ -166,6 +172,7 @@ $(document).ready(function() {
 			$('#domini').parent().parent().hide();
 			$('#codi').removeClass('disabled');
 			$('#multiplicitat').nextAll('span:first').removeClass('disabled');
+			$('#noAplica').closest('.form-group').hide();
 		}	
 
 
@@ -280,6 +287,8 @@ $(document).ready(function() {
 		</div>
 	
 		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini" disabled="${bloquejarCamps}"/>
+		<rip:inputCheckbox name="noAplica" textKey="metadada.form.camp.noaplica"/>
+		
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 		<div id="modal-botons">
 			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>

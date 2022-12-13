@@ -1604,13 +1604,13 @@ function deselectAll() {
 function recuperarResultatDomini(
 		metaExpedientId,
 		metaDadaCodi,
-		dadaValor) {
+		dadaValor,
+		noAplica) {
 	var dadaValorUrl = '<c:url value="/metaExpedient/metaDada/domini/' + metaDadaCodi + '/valor"/>';
 	var multipleUrl = '<c:url value="/metaExpedient/metaDada/domini/' + metaDadaCodi + '"/>';
 	var selDomini = $("#" + metaDadaCodi);
-	
 
-	if (dadaValor != '') {
+	if (dadaValor != '' && dadaValor != 'NO_APLICA') {
 		$.ajax({
 	        type: "GET",
 	        url: dadaValorUrl,
@@ -1649,6 +1649,12 @@ function recuperarResultatDomini(
                         id: "", 
                         text: ""
                     })
+                    if (JSON.parse(noAplica)) {
+                    	dominis.push({
+	                        id: "NO_APLICA", 
+	                        text: "<spring:message code="contingut.dada.form.valor.noaplica"/>"
+	                    })
+					}
 	                for (let i = 0; i < data.resultat.length; i++) {
 	                	dominis.push({
 	                        id: data.resultat[i].id, 
@@ -1667,6 +1673,13 @@ function recuperarResultatDomini(
 	        width: '100%',
 	        minimumInputLength: 0
     };
+	
+	if (dadaValor == 'NO_APLICA') {
+    	var newOption = new Option('<spring:message code="contingut.dada.form.valor.noaplica"/>', 'NO_APLICA', false, false);
+    	selDomini.append(newOption);
+    	selDomini.val('NO_APLICA').trigger('change');
+	}
+	
 	selDomini.select2(select2Options);
 }
 
@@ -2603,7 +2616,8 @@ $.views.helpers(myHelpers);
 																				recuperarResultatDomini(
 																						"${contingut.metaNode.id}",
 																						"${metaDada.codi}",
-																						"${dadaValor}");
+																						"${dadaValor}",
+																						"${metaDada.noAplica}");
 																				</script>
 																			</c:when>
 																			<c:otherwise>
@@ -2620,7 +2634,8 @@ $.views.helpers(myHelpers);
 																	recuperarResultatDomini(
 																			"${contingut.metaNode.id}",
 																			"${metaDada.codi}",
-																			"${dadaValor}");
+																			"${dadaValor}",
+																			"${metaDada.noAplica}");
 																	
 																</script>
 															</c:when>

@@ -123,7 +123,8 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 				metaDada.getMultiplicitat(),
 				valor,
 				metaDada.getDescripcio(),
-				metaDada.isReadOnly());
+				metaDada.isReadOnly(),
+				metaDada.isNoAplica());
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			Long metaExpedientId = null;
