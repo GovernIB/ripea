@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +148,12 @@ public class ImportacioServiceImpl implements ImportacioService {
 				}
 				continue outerloop;
 			}
-			String nomDocument = (tituloDoc != null && usingNumeroRegistre) ? (tituloDoc + " - " + numeroRegistre.replace('/', '_')) : documentArxiu.getNom();
+			String nomDocument = null;
+			if (tituloDoc != null && usingNumeroRegistre) {
+				nomDocument = formatTitulo(tituloDoc, numeroRegistre);
+			} else {
+				nomDocument = documentArxiu.getNom();
+			}
 			contingutHelper.comprovarNomValid(
 					crearNovaCarpeta ? carpetaEntity : expedientSuperior,
 					nomDocument,
@@ -306,21 +312,14 @@ public class ImportacioServiceImpl implements ImportacioService {
 	    return corrected;
 	}
 	
-//	private DocumentDto toDocumentDto(
-//			DocumentEntity document) {
-//		return (DocumentDto)contingutHelper.toContingutDto(
-//				document,
-//				false,
-//				false,
-//				false,
-//				false,
-//				true,
-//				true,
-//				false, null, false, null);
-//	}
-
-
-
+	private String formatTitulo(String tituloDoc, String numeroRegistre) {
+		String extension = FilenameUtils.getExtension(tituloDoc);
+		if (extension != null && !extension.isEmpty()) {
+			return FilenameUtils.removeExtension(tituloDoc) + " - " + numeroRegistre.replace('/', '_') + "." + extension;
+		} else {
+			return tituloDoc + " - " + numeroRegistre.replace('/', '_');
+		}
+	}
 
 	private boolean checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
