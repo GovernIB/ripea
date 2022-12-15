@@ -21,5 +21,7 @@ public class PinbalConsultaDto {
 	private PinbalConsentimentEnumDto consentiment;
 	private String comunitatAutonomaCodi;
 	private String provinciaCodi;
-
+	private String dataConsulta;
+	private String dataNaixement;
+	private SiNoEnumDto consentimentTipusDiscapacitat;
 }

@@ -9,13 +9,18 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
+import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Command per a la gestió de les peticions a PINBAL.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class PinbalConsultaCommand {
 
 	@NotNull
@@ -32,56 +37,10 @@ public class PinbalConsultaCommand {
 	private PinbalConsentimentEnumDto consentiment;
 	private String comunitatAutonomaCodi;
 	private String provinciaCodi;
-
-	public Long getEntitatId() {
-		return entitatId;
-	}
-	public void setEntitatId(Long entitatId) {
-		this.entitatId = entitatId;
-	}
-	public Long getPareId() {
-		return pareId;
-	}
-	public void setPareId(Long pareId) {
-		this.pareId = pareId;
-	}
-	public Long getMetaDocumentId() {
-		return metaDocumentId;
-	}
-	public void setMetaDocumentId(Long metaDocumentId) {
-		this.metaDocumentId = metaDocumentId;
-	}
-	public Long getInteressatId() {
-		return interessatId;
-	}
-	public void setInteressatId(Long interessatId) {
-		this.interessatId = interessatId;
-	}
-	public String getFinalitat() {
-		return finalitat;
-	}
-	public void setFinalitat(String finalitat) {
-		this.finalitat = finalitat;
-	}
-	public PinbalConsentimentEnumDto getConsentiment() {
-		return consentiment;
-	}
-	public void setConsentiment(PinbalConsentimentEnumDto consentiment) {
-		this.consentiment = consentiment;
-	}
-	public String getComunitatAutonomaCodi() {
-		return comunitatAutonomaCodi;
-	}
-	public void setComunitatAutonomaCodi(String comunitatAutonomaCodi) {
-		this.comunitatAutonomaCodi = comunitatAutonomaCodi;
-	}
-	public String getProvinciaCodi() {
-		return provinciaCodi;
-	}
-	public void setProvinciaCodi(String provinciaCodi) {
-		this.provinciaCodi = provinciaCodi;
-	}
-
+	private String dataConsulta;
+	private String dataNaixement;
+	private SiNoEnumDto consentimentTipusDiscapacitat;
+	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(
 				command,

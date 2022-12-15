@@ -569,7 +569,10 @@ public class DocumentServiceImpl implements DocumentService {
 					consulta.getFinalitat(),
 					consulta.getConsentiment(),
 					consulta.getComunitatAutonomaCodi(),
-					consulta.getProvinciaCodi());
+					consulta.getProvinciaCodi(),
+					consulta.getDataConsulta(),
+					consulta.getDataNaixement(),
+					consulta.getConsentimentTipusDiscapacitat());
 		} else {
 			throw new ValidationException(
 					"<creacio>",

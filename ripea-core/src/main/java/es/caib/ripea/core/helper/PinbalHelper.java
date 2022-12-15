@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
+import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -60,6 +61,7 @@ public class PinbalHelper {
 	@Autowired
 	private ConfigHelper configHelper;
 
+	/** SVDDGPCIWS02 - Consulta de datos de identidad */
 	public String novaPeticioSvddgpciws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -82,7 +84,7 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "SVDDGPCIWS02", t0);
 		}
 	}
-
+	/** SVDDGPVIWS02 - Verificación de datos de identidad */
 	public String novaPeticioSvddgpviws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -105,7 +107,7 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "SVDDGPVIWS02", t0);
 		}
 	}
-
+	/** SVDCCAACPASWS01 - Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA */
 	public String novaPeticioSvdccaacpasws01(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -133,7 +135,7 @@ public class PinbalHelper {
 		}
 	}
 	
-	
+	/** SVDSCDDWS01 - Servei de consulta de dades de discapacitat */
 	public String novaPeticioSvdscddws01(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -141,7 +143,10 @@ public class PinbalHelper {
 			String finalitat,
 			PinbalConsentimentEnumDto consentiment,
 			String comunitatAutonomaCodi,
-			String provinciaCodi) throws PinbalException {
+			String provinciaCodi,
+			String dataConsulta,
+			String dataNaixement,
+			SiNoEnumDto consentimentTipusDiscapacitat) throws PinbalException {
 		long t0 = System.currentTimeMillis();
 		SolicitudSvdscddws01 solicitud = new SolicitudSvdscddws01();
 		emplenarSolicitudBase(
@@ -153,12 +158,27 @@ public class PinbalHelper {
 				consentiment);
 		solicitud.setCodigoComunidadAutonoma(comunitatAutonomaCodi);
 		solicitud.setCodigoProvincia(provinciaCodi);
+		solicitud.setFechaConsulta(dataConsulta);
+		solicitud.setFechaNacimiento(dataNaixement);
+		solicitud.setConsentimientoTiposDiscapacidad(toSNString(consentimentTipusDiscapacitat));
 		try {
 			ScspRespuesta respuesta = getClientSvdscddws01().peticionSincrona(Arrays.asList(solicitud));
 			return processarScspRespuesta(solicitud, respuesta, "SVDSCDDWS01", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SVDSCDDWS01", t0);
 		}
+	}
+	
+	private String toSNString(SiNoEnumDto consentimentTipusDiscapacitat) {
+		String sn = null;
+		if (consentimentTipusDiscapacitat != null) {
+			if (consentimentTipusDiscapacitat == SiNoEnumDto.SI) {
+				sn = "S";
+			} else if (consentimentTipusDiscapacitat == SiNoEnumDto.NO) {
+				sn = "N";
+			}
+		}
+		return sn;
 	}
 
 	public FitxerDto getJustificante(String idPeticion) throws PinbalException {
