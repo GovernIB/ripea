@@ -335,7 +335,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 
 					// Si el document no ha estat custodiat pel portafirmes
 					// actualitza la informació de firma a l'arxiu.
-					if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
+					if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 						
 						
 						String gestioDocumentalId = document.getGesDocFirmatId();
