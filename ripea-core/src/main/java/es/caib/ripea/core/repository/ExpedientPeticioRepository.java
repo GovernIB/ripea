@@ -47,7 +47,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"    ExpedientPeticioEntity e " +
 			"where " +
 			"e.registre.entitat = :entitat " +
-			"and e.metaExpedient in :metaExpedientsPermesos " +
+			"and (:rolActual = 'IPA_ADMIN' or e.metaExpedient in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
 			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
@@ -64,6 +64,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			)
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("rolActual") String rolActual,
 			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,

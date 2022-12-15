@@ -161,6 +161,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		
 		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
+				rolActual,
 				metaExpedientsPermesos,
 				metaExpedient == null,
 				metaExpedient,

@@ -219,6 +219,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
+				rolActual,
 				null,
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,

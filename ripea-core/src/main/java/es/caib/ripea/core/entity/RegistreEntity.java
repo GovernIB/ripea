@@ -121,10 +121,9 @@ public class RegistreEntity extends RipeaAuditable<Long> {
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
 	
 	
+	// removed "cascade = CascadeType.ALL, orphanRemoval = true" because registreRepository.delete(registre) in ExpedientPeticioHelper.crearExpedientsPeticions() was removing also expedientPeticio
 	@OneToMany(
 			mappedBy = "registre",
-			cascade = CascadeType.ALL,
-			orphanRemoval = true,
 			fetch = FetchType.LAZY)
 	private List<ExpedientPeticioEntity> expedientPeticions = new ArrayList<ExpedientPeticioEntity>();
 	
