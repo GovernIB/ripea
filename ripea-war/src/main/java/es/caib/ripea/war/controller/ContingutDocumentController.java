@@ -24,6 +24,7 @@ import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentGenericCommand;
 import es.caib.ripea.war.helper.*;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -361,6 +362,15 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		} else if (document.isPendentMoverArxiu()) {
 			try {
 				exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+			} catch (Exception e) {
+				exception = e;
+			}
+		} else if (!StringUtils.isEmpty(document.getGesDocFirmatId())) {
+			
+			try {
+				exception = documentService.portafirmesReintentar(
+						entitatActual.getId(),
+						documentId);
 			} catch (Exception e) {
 				exception = e;
 			}

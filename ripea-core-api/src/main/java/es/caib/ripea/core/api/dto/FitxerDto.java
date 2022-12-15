@@ -17,7 +17,6 @@ import java.io.Serializable;
 public class FitxerDto implements Serializable {
 
 	private String nom;
-	private String nomFitxerFirmat;
 	private String contentType;
 	private byte[] contingut;
 	private long tamany;
@@ -56,17 +55,6 @@ public class FitxerDto implements Serializable {
 		}
 	}
 	
-	public String getExtensioFitxerFirmat() {
-		if (nomFitxerFirmat == null)
-			return null;
-
-		int indexPunt = nomFitxerFirmat != null ? nomFitxerFirmat.lastIndexOf(".") : -1;
-		if (indexPunt != -1 && indexPunt < nomFitxerFirmat.length() - 1) {
-			return nomFitxerFirmat.substring(indexPunt + 1);
-		} else {
-			return null;
-		}
-	}
 
 	@Override
 	public String toString() {

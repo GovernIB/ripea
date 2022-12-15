@@ -300,7 +300,7 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				<c:if test="${(contingut.estat == 'CUSTODIAT' or contingut.estat == 'DEFINITIU') and !isTasca or contingut.fitxerExtension=='zip'}">
+				<c:if test="${(contingut.documentFirmaTipus != 'SENSE_FIRMA' && !empty contingut.arxiuUuid) and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
 					<c:if test="${expedientPare.metaNode.notificacioActiva}"> 
@@ -326,7 +326,7 @@
 			</c:if>
 			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 				<%---- Seguiment portafirmes ----%>
-				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMAT') && contingut.documentTipus == 'DIGITAL'}">
+				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || (contingut.estat == 'FIRMAT' && empty contingut.arxiuUuid)) && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/portafirmes/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>

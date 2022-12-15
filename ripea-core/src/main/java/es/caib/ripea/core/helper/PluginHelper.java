@@ -3141,8 +3141,8 @@ public class PluginHelper {
 				getMetadades(
 						documentEntity,
 						fitxer,
-						firmes, 
-						arxiuEstat));
+						documentFirmaTipus, 
+						firmes, arxiuEstat));
 		
 		return documentArxiu;
 
@@ -3152,6 +3152,7 @@ public class PluginHelper {
 	private DocumentMetadades getMetadades(
 			DocumentEntity documentEntity,
 			FitxerDto fitxer,
+			DocumentFirmaTipusEnumDto documentFirmaTipus, 
 			List<ArxiuFirmaDto> firmes, 
 			ArxiuEstatEnumDto arxiuEstat){
 
@@ -3164,7 +3165,9 @@ public class PluginHelper {
 		metadades.setEstatElaboracio(ArxiuConversions.getDocumentEstatElaboracio(documentEntity.getNtiEstadoElaboracion()));
 		metadades.setIdentificadorOrigen(documentEntity.getNtiIdDocumentoOrigen());
 		ArxiuConversions.setTipusDocumental(metadades, documentEntity.getNtiTipoDocumental());
-		setExtensioFormat(metadades, fitxer);
+		DocumentExtensio extensio = getDocumentExtensio(fitxer, documentFirmaTipus, firmes);
+		metadades.setExtensio(extensio);
+		metadades.setFormat(getDocumentFormat(extensio));
 		metadades.setOrgans(Arrays.asList(documentEntity.getNtiOrgano()));
 		metadades.setSerieDocumental(documentEntity.getExpedient().getMetaExpedient().getSerieDocumental());
 		
@@ -3186,27 +3189,36 @@ public class PluginHelper {
 		return metadades;
 	}
 
-	private void setExtensioFormat(DocumentMetadades metadades, FitxerDto fitxer) {
-		DocumentExtensio extensio = getDocumentExtensio(fitxer);
-		metadades.setExtensio(extensio);
-		metadades.setFormat(getDocumentFormat(extensio));
-	}
+
 	
-	private DocumentExtensio getDocumentExtensio(FitxerDto fitxer) {
+	private DocumentExtensio getDocumentExtensio(FitxerDto fitxer, DocumentFirmaTipusEnumDto documentFirmaTipus, List<ArxiuFirmaDto> firmes) {
 		DocumentExtensio extensio = null;
 		
-		String fitxerExtensio = null;
-		if (fitxer != null && fitxer.getNomFitxerFirmat() != null) {
-			fitxerExtensio = fitxer.getExtensioFitxerFirmat();
-		} else if (fitxer != null && fitxer.getNom() != null) {
-			fitxerExtensio = fitxer.getExtensio();
+		String fitxerNom = null;
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			ArxiuFirmaDto primeraFirma = firmes.get(0);
+			fitxerNom = primeraFirma.getFitxerNom();
+		} else {
+			if (fitxer != null) {
+				fitxerNom = fitxer.getNom();
+			}
 		}
 		
-		if (fitxerExtensio != null) {
-			String extensioAmbPunt = (fitxerExtensio.startsWith(".")) ? fitxerExtensio.toLowerCase(): "." + fitxerExtensio.toLowerCase();
-			extensio = DocumentExtensio.toEnum(extensioAmbPunt);
-		}
+		extensio = DocumentExtensio.toEnum(getExtensio(fitxerNom));
 		
+		return extensio;
+	}
+	
+	private String getExtensio(String nom) {
+
+		String extensio = null;
+		if (nom != null) {
+			int indexPunt = nom.lastIndexOf(".");
+			if (indexPunt != -1 && indexPunt < nom.length() - 1) {
+				extensio = nom.substring(indexPunt).toLowerCase();
+
+			}
+		}
 		return extensio;
 	}
 	

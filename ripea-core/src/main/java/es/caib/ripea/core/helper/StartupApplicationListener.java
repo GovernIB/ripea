@@ -160,9 +160,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			List<Date> months = Arrays.asList(month_06_2022, month_07_2022, month_08_2022);
 			for (Date month : months) {
 				if (historicHelper.checkIfHistoricsExist(month, HistoricTipusEnumDto.MENSUAL)) {
-					log.info("Historics already exist for month: "  + DateHelper.getDayString(month));                        
+					log.info("Historics already exist for month: "  + DateHelper.getMonthString(month));                        
 				} else {
-					log.info("Generating historics for day: " + DateHelper.getDayString(month));
+					log.info("Generating historics for month: " + DateHelper.getMonthString(month));
 					historicHelper.computeData(month, HistoricTipusEnumDto.MENSUAL);
 				}
 			}

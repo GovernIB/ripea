@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -218,6 +219,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
+				rolActual,
 				null,
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,
@@ -286,6 +288,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(
 				entitatId,
 				rolActual);
+		if (CollectionUtils.isEmpty(metaExpedientsPermesos)) {
+			metaExpedientsPermesos = null;
+		}
 		
 		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
 				entitatId,

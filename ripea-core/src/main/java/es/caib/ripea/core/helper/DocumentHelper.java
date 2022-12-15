@@ -763,9 +763,12 @@ public class DocumentHelper {
 				false);
 	}
 	
-	public void actualitzarEstatADefinititu(DocumentEntity documentEntity) {
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void actualitzarEstatADefinititu(Long documentId) {
 		
 
+		DocumentEntity documentEntity = documentRepository.findOne(documentId);		
+		
 		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 				documentEntity,
 				null,
@@ -825,6 +828,20 @@ public class DocumentHelper {
 		
 		documentEntity.setArxiuUuidFirma(null);
 	}
+	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void clearDocuments(ExpedientEntity expedient) {
+		// remove deleted documents in db and clear uuids of any firma for esborrany
+		List<DocumentEntity> docs = documentRepository.findByExpedient(expedient);
+		for (DocumentEntity doc : docs) {
+			if (doc.getEsborrat() == 0) {
+				doc.setArxiuUuidFirma(null);
+			} else {
+				documentRepository.delete(doc);
+			}
+		}
+	}
+	
 	
 	
 	public DocumentFirmaTipusEnumDto getDocumentFirmaTipus(DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto) {

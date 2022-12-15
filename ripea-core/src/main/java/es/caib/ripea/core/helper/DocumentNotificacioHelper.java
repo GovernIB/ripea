@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
@@ -87,6 +88,11 @@ public class DocumentNotificacioHelper {
 //		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
+		
+		if (!documentEntity.isArxiuEstatDefinitu()) {
+			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
+		}
+		
 		notificacionsWithError = new HashMap<String, String>();
 		for (Long interessatId : notificacioDto.getInteressatsIds()) {
 			
@@ -168,10 +174,6 @@ public class DocumentNotificacioHelper {
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 			logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
 			
-			if (!documentEntity.isArxiuEstatDefinitu()) {
-				documentHelper.actualitzarEstatADefinititu(documentEntity);
-			}
-
 		}
 	}
 	
@@ -417,8 +419,7 @@ public class DocumentNotificacioHelper {
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if ((!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !DocumentEstatEnumDto.CUSTODIAT.equals(document.getEstat()))
-			&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
+		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA || document.getArxiuUuid() == null)) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
