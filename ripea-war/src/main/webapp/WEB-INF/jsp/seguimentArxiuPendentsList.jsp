@@ -178,7 +178,7 @@ $(document).ready(function() {
 						<rip:inputText name="elementNom" inline="true" placeholderKey="seguiment.list.filtre.camp.expedientNom"/>
 					</div>		
 					<div class="col-md-4">					
-						<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
+						<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
@@ -252,7 +252,7 @@ $(document).ready(function() {
 		 					inline="true"/>
 					</div>				
 					<div class="col-md-4">					
-						<rip:inputSelect name="metaExpedientId2" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
+						<rip:inputSelect name="metaExpedientId2" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
@@ -342,7 +342,7 @@ $(document).ready(function() {
 		 					inline="true"/>
 					</div>				
 					<div class="col-md-4">					
-						<rip:inputSelect name="metaExpedientId3" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
+						<rip:inputSelect name="metaExpedientId3" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
