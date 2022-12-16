@@ -573,6 +573,15 @@ public class DocumentServiceImpl implements DocumentService {
 					consulta.getDataConsulta(),
 					consulta.getDataNaixement(),
 					consulta.getConsentimentTipusDiscapacitat());
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SCDCPAJU) {
+			idPeticion = pinbalHelper.novaPeticioScdcpaju(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment(),
+					consulta.getProvinciaCodi(),
+					consulta.getMunicipiCodi());
 		} else {
 			throw new ValidationException(
 					"<creacio>",

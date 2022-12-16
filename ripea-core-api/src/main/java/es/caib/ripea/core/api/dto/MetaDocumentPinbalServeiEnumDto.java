@@ -13,4 +13,5 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDDGPVIWS02, // Verificación de datos de identidad
 	SVDCCAACPASWS01, // Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA
 	SVDSCDDWS01, // Servei de consulta de dades de discapacitat
+	SCDCPAJU, // Servei de consulta de padró de convivència
 }

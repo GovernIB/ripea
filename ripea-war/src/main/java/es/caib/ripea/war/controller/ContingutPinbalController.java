@@ -29,6 +29,7 @@ import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
+import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -51,6 +52,8 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 	private DocumentService documentService;
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
+	@Autowired
+	private DadesExternesService dadesExternesService;
 	
 	@RequestMapping(value = "/{pareId}/pinbal/new", method = RequestMethod.GET)
 	public String get(
@@ -211,6 +214,11 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"provincies",
 				Arrays.asList(new HtmlOption("07", "Illes Balears")));
+		model.addAttribute(
+				"municipis",
+				dadesExternesService.findMunicipisPerProvincia("07"));
+		
+		
 	}
 
 	

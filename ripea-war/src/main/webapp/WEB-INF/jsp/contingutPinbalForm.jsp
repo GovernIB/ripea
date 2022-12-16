@@ -28,19 +28,27 @@ $(document).ready(function() {
 	$('#metaDocumentId').on('change', function() {
 		if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPASWS01") { // SVDCCAACPASWS01 - Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA
 			$('#bloc-datos-especificos').show();
-			$('#comunitatAutonomaCodi').show();
-			$('#provinciaCodi').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').show();
 			$('#divDataConsulta').hide();
 			$('#divDataNaixement').hide();
 			$('#divConsentimentTipusDiscapacitat').hide();
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCDDWS01") { // SVDSCDDWS01 - Servei de consulta de dades de discapacitat
 				$('#bloc-datos-especificos').show();
-				$('#comunitatAutonomaCodi').show();
-				$('#provinciaCodi').show();
+				$('#divComunitatAutonomaCodi').show();
+				$('#divProvinciaCodi').show();
 				$('#divDataConsulta').show();
 				$('#divDataNaixement').show();
 				$('#divConsentimentTipusDiscapacitat').show();
+				
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de dades de discapacitat
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').hide();
+			$('#divProvinciaCodi').show();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
 				
 		} else {
 			$('#bloc-datos-especificos').hide();
@@ -87,8 +95,9 @@ $(document).ready(function() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="datos-especificos">
-					<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
-					<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+					<div id="divComunitatAutonomaCodi"><rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/></div>
+					<div id="divProvinciaCodi"><rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/></div>
+					<div id="divMunicipiCodi"><rip:inputSelect name="municipiCodi" textKey="interessat.form.camp.organ.filtre.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
 					<div id="divDataConsulta"><rip:inputDate name="dataConsulta" textKey="contingut.pinbal.form.camp.data.consulta" /></div>
 					<div id="divDataNaixement"><rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" /></div>
 					<div id="divConsentimentTipusDiscapacitat"><rip:inputSelect name="consentimentTipusDiscapacitat" textKey="contingut.pinbal.form.camp.consentiment.tipus.discapacitat" optionEnum="SiNoEnumDto" emptyOption="true"/></div>

@@ -37,6 +37,7 @@ public class PinbalConsultaCommand {
 	private PinbalConsentimentEnumDto consentiment;
 	private String comunitatAutonomaCodi;
 	private String provinciaCodi;
+	private String municipiCodi;
 	private String dataConsulta;
 	private String dataNaixement;
 	private SiNoEnumDto consentimentTipusDiscapacitat;

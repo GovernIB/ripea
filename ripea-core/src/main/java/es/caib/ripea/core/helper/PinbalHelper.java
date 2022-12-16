@@ -19,6 +19,8 @@ import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimient
 import es.caib.pinbal.client.recobriment.model.ScspTitular;
 import es.caib.pinbal.client.recobriment.model.ScspTitular.ScspTipoDocumentacion;
 import es.caib.pinbal.client.recobriment.model.SolicitudBase;
+import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
+import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
@@ -56,8 +58,6 @@ public class PinbalHelper {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-	@Autowired
-	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ConfigHelper configHelper;
 
@@ -168,6 +168,38 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "SVDSCDDWS01", t0);
 		}
 	}
+	
+	
+	/** SCDCPAJU - Servei de consulta de padró de convivència */
+	public String novaPeticioScdcpaju(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			String finalitat,
+			PinbalConsentimentEnumDto consentiment,
+			String provinciaCodi,
+			String municipiCodi) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudScdcpaju solicitud = new SolicitudScdcpaju();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				finalitat,
+				consentiment);
+		solicitud.setLlocSolicitud(provinciaCodi, municipiCodi);
+		solicitud.setConsultaPerDocumentIdentitat(interessat.getDocumentTipus().toString(), interessat.getDocumentNum(), null);
+
+		try {
+			ScspRespuesta respuesta = getClientScdcpaju().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SCDCPAJU", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SCDCPAJU", t0);
+		}
+	}
+	
+	
 	
 	private String toSNString(SiNoEnumDto consentimentTipusDiscapacitat) {
 		String sn = null;
@@ -460,6 +492,19 @@ public class PinbalHelper {
 		if (log.isDebugEnabled())
 			clientSvdscddws01.enableLogginFilter();
 		return clientSvdscddws01;
+	}
+	
+	private ClientScdcpaju getClientScdcpaju() {
+		ClientScdcpaju clientScdcpaju = new ClientScdcpaju(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientScdcpaju.enableLogginFilter();
+		return clientScdcpaju;
 	}
 
 	private String getPinbalBaseUrl() {
