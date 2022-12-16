@@ -40,6 +40,8 @@
 				suggestText="codiINom"
 				labelSize="2"/>
 				
+		<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2"/>
+				
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="organGestor"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

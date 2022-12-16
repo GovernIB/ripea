@@ -48,6 +48,9 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     
     @Column(name = "gestio_direct")
     private boolean gestioDirect;
+    
+    @Column(name = "cif", length = 10)
+    private String cif;
 
     @Column(name = "estat", length = 1)
     @Enumerated(EnumType.STRING)
@@ -155,17 +158,23 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
             built.estat = estat;
             return this;
         }
+        public Builder cif(String cif) {
+            built.cif = cif;
+            return this;
+        }
     }
 
 	public void update(
 			String codi,
 			String nom,
 			OrganGestorEntity pare,
-			boolean gestioDirect) {
+			boolean gestioDirect, 
+			String cif) {
 		this.codi = codi;
 		this.nom = nom;
 		this.pare = pare;
 		this.gestioDirect = gestioDirect;
+		this.cif = cif;
 	}
 	
 	public void updateEstat(

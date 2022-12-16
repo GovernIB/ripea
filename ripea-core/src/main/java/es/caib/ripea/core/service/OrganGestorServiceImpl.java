@@ -136,6 +136,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				pare(organPareEntity).
 				gestioDirect(true).
 				estat(OrganEstatEnumDto.V).
+				cif(organGestorDto.getCif()).
 				build();
 		
 		OrganGestorEntity organGestorEntity = organGestorRepository.save(entity);
@@ -162,7 +163,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organGestorDto.getCodi(),
 				organGestorDto.getNom(),
 				organPareEntity,
-				true);
+				true, 
+				organGestorDto.getCif());
 
 		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
 	}

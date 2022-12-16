@@ -660,6 +660,7 @@ public class ConversioTipusHelper {
 						target.setGestioDirect(source.isGestioDirect());
 						target.setEstat(source.getEstat());
 						target.setTipusTransicio(source.getTipusTransicio());
+						target.setCif(source.getCif());
 						return target;
 					}
 				});

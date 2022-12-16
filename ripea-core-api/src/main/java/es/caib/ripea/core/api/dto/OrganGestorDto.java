@@ -31,6 +31,8 @@ public class OrganGestorDto extends AuditoriaDto {
     private OrganEstatEnumDto estat;
     private TipusTransicioEnumDto tipusTransicio;
     
+    private String cif;
+    
     public int getPermisosCount() {
         if (permisos == null)
             return 0;
