@@ -60,7 +60,14 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"							(:estat = 'PENDENT' and e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PENDENT) or " +
 			"							(:estat = 'ACCEPTAT' and (e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT or e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT)) or " +
 			" 							(:estat = 'REBUTJAT' and e.estat = es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto.REBUTJAT)) " +
-			"and (:esNullAccio = true or e.expedientPeticioAccioEnumDto = :accio) "
+			"and (:esNullAccio = true or e.expedientPeticioAccioEnumDto = :accio) " +
+			"and (:esNullInteressat = true " +
+			"		or  e.registre.id in (" +
+			"			select interessat.registre.id " +
+			"			from RegistreInteressatEntity interessat " +	
+			"			where (lower(interessat.documentNumero||' '||interessat.nom||' '||interessat.llinatge1||' '||interessat.llinatge2) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
+			"					or lower(interessat.documentNumero) like lower('%'||:interessat||'%')))) "			
 			)
 	Page<ExpedientPeticioEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -86,6 +93,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("estat") String estat,
 			@Param("esNullAccio") boolean esNullAccio,
 			@Param("accio") ExpedientPeticioAccioEnumDto accio,
+			@Param("esNullInteressat") boolean esNullInteressat,
+			@Param("interessat") String interessat,
 			Pageable pageable);
 
 	@Query(	"select " +

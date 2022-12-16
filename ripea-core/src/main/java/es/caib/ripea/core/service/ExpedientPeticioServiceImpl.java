@@ -183,6 +183,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				estatView != null ? estatView.toString() : null,
 				filtre.getAccioEnum() == null,
 				filtre.getAccioEnum(),
+				StringUtils.isEmpty(filtre.getInteressat()),
+				filtre.getInteressat(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));

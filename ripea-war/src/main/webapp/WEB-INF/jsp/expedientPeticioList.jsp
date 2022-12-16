@@ -92,7 +92,9 @@ table.dataTable td {
 			<div class="col-md-4">							
 				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
 			</div>		
-						
+			<div class="col-md-4">
+				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
+			</div>						
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
