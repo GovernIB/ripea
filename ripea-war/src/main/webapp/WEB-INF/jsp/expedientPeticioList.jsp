@@ -151,6 +151,7 @@ table.dataTable td {
 								{{/if}}
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
+									<li><a href="<c:url value="/expedientPeticio/retornarPendent/{{:id}}"/>" data-refresh-pagina="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="expedient.peticio.list.btn.retornarPendent"/></a></li>
 								{{/if}}
 								<c:if test="${isRolActualAdmin}">
 									{{if pendentEnviarDistribucio}}

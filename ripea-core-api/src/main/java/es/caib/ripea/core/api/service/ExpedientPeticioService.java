@@ -100,4 +100,7 @@ public interface ExpedientPeticioService {
 	public void canviarProcediment(
 			Long expedientPeticioId,
 			Long procedimentId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void retornarPendent(Long expedientPeticioId);
  }

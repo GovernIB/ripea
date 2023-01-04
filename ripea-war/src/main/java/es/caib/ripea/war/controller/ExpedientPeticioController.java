@@ -466,6 +466,21 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	}
 	
 	
+	
+	@RequestMapping(value = "/retornarPendent/{expedientPeticioId}", method = RequestMethod.GET)
+	public String retornarPendent(HttpServletRequest request, @PathVariable Long expedientPeticioId) {
+
+		try {
+			expedientPeticioService.retornarPendent(expedientPeticioId);
+			return getModalControllerReturnValueSuccess(request, "redirect:/expedientPeticio", "expedient.peticio.controller.retornar.pendent.ok");
+		} catch (Exception ex) {
+			logger.error("Error al retornar a pendent", ex);
+			return getModalControllerReturnValueErrorMessageText(request, "redirect:/expedientPeticio", ex.getMessage(), ex);
+		}
+	}
+
+	
+	
 	@RequestMapping(value = "/canviarProcediment/{expedientPeticioId}", method = RequestMethod.GET)
 	public String canviarProcedimentGet(HttpServletRequest request, @PathVariable Long expedientPeticioId, Model model) {
 		

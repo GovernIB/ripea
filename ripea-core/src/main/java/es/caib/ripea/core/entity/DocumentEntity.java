@@ -176,10 +176,7 @@ public class DocumentEntity extends NodeEntity {
 	protected List<DocumentNotificacioEntity> notificacions;
 	
 	
-	@OneToMany(
-			mappedBy = "document",
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
+	@OneToMany(mappedBy = "document")
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
 	
 	@OneToOne

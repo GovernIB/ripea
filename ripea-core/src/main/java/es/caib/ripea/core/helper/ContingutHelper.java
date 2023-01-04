@@ -1605,26 +1605,20 @@ public class ContingutHelper {
 					"Només es pot enllaçar un contingut del tipus document");
 		}
 	}
-
-	public String arxiuPropagarMoviment(
-			ContingutEntity contingut,
+	
+	
+	public String arxiuDocumentPropagarMoviment(
+			String uuid,
 			ContingutEntity desti,
-			String expedientDestiUuid) {
-		if (contingut instanceof DocumentEntity) {
+			String uuidExpedientDesti) {
 			String identificador = null;
 			if (desti instanceof ExpedientEntity || (desti instanceof CarpetaEntity && !isCarpetaLogica())) {
 				identificador = pluginHelper.arxiuDocumentMoure(
-						(DocumentEntity)contingut,
+						uuid,
 						desti.getArxiuUuid(),
-						expedientDestiUuid);
+						uuidExpedientDesti);
 			}
 			return identificador;
-		} else if (contingut instanceof CarpetaEntity && !isCarpetaLogica()) {
-			pluginHelper.arxiuCarpetaMoure(
-					(CarpetaEntity)contingut,
-					desti.getArxiuUuid());
-		}
-		return null;
 	}
 
 
@@ -2016,7 +2010,7 @@ public class ContingutHelper {
 
 					// 3. Crear el document a partir de l'annex
 					String uuidDesti = pluginHelper.arxiuDocumentMoure(
-							document,
+							document.getArxiuUuid(),
 							document.getPare().getArxiuUuid(),
 							document.getExpedient().getArxiuUuid());
 

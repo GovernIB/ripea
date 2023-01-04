@@ -217,5 +217,11 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 		
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void retornarPendent(Long expedientPeticioId) {
+		delegate.retornarPendent(expedientPeticioId);
+	}
+
 
 }

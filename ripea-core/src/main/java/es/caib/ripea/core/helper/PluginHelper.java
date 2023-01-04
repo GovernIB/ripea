@@ -1374,21 +1374,21 @@ public class PluginHelper {
 		}
 	}
 
-	public String arxiuDocumentMoure(DocumentEntity document, String arxiuUuidDesti, String expedientDestiUuid) {
+	public String arxiuDocumentMoure(String uuid, String uuidDesti, String uuidExpedientDesti) {
 
 		String accioDescripcio = "Moure document";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("id", document.getId().toString());
-		accioParams.put("títol", document.getNom());
-		accioParams.put("arxiuUuidOrigen", document.getArxiuUuid());
-		accioParams.put("arxiuUuidDesti", arxiuUuidDesti);
+
+		accioParams.put("arxiuUuidOrigen", uuid);
+		accioParams.put("uuidDesti", uuidDesti);
+		accioParams.put("uuidExpedientDesti", uuidExpedientDesti);
 		long t0 = System.currentTimeMillis();
 		try {
 			boolean throwException = false;//throwException = true
 			if (throwException) {
 				throw new RuntimeException("Mock excepcion moving document ");
 			}
-			ContingutArxiu nouDocumentArxiu = getArxiuPlugin().documentMoure(document.getArxiuUuid(), arxiuUuidDesti, expedientDestiUuid);
+			ContingutArxiu nouDocumentArxiu = getArxiuPlugin().documentMoure(uuid, uuidDesti, uuidExpedientDesti);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 			if (nouDocumentArxiu != null) {
 				return nouDocumentArxiu.getIdentificador();

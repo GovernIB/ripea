@@ -27,6 +27,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -643,29 +644,33 @@ public class ExpedientHelper {
 
 		Exception exception = null;
 		
-		// ############################ MOVE DOCUMENT IN ARXIU ####################
-		exception = moveDocumentArxiu(registreAnnexEntity.getId());
+		// ############################ MOVE ANNEX IN ARXIU ####################
+		exception = moveAnnexArxiu(registreAnnexEntity.getId());
 		return exception;
 	}
 	
 	
-	public Exception moveDocumentArxiu(Long registreAnnexId) {
+	public Exception moveAnnexArxiu(Long registreAnnexId) {
 		
 		RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		DocumentEntity docEntity = registreAnnexEntity.getDocument();
 		ContingutEntity pare = docEntity.getPare();
 		ExpedientEntity expedientEntity = docEntity.getExpedient();
 		Exception exception = null;
+
 		
-		// put arxiu uuid of annex
-		if (docEntity.getArxiuUuid() == null || docEntity.getArxiuUuid().isEmpty()) {
-			docEntity.updateArxiu(registreAnnexEntity.getUuid());
+		String uuidToMove = null;
+		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
+			uuidToMove = registreAnnexEntity.getUuidDispatched();
+		} else {
+			uuidToMove = registreAnnexEntity.getUuid();
 		}
-		documentRepository.saveAndFlush(docEntity);
+		
+		docEntity.updateArxiu(uuidToMove);
 		
 		try {
-			String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-					docEntity,
+			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+					uuidToMove,
 					pare,
 					expedientEntity.getArxiuUuid());
 			// if document was dispatched, update uuid to new document
@@ -715,7 +720,7 @@ public class ExpedientHelper {
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Exception moveDocumentArxiuNewTransaction(Long registreAnnexId) {
-		return moveDocumentArxiu(registreAnnexId);
+		return moveAnnexArxiu(registreAnnexId);
 	}
 	
 	
@@ -842,8 +847,8 @@ public class ExpedientHelper {
 				carpetaEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-						docEntity,
+				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+						docEntity.getArxiuUuid(),
 						carpetaEntity,
 						expedientEntity.getArxiuUuid());
 				// if document was dispatched, update uuid to new document
@@ -868,8 +873,8 @@ public class ExpedientHelper {
 				expedientEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-						docEntity,
+				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+						docEntity.getArxiuUuid(),
 						expedientEntity,
 						expedientEntity.getArxiuUuid());
 				// if document was dispatched, update uuid to new document

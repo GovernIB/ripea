@@ -127,10 +127,7 @@ public class ExpedientEntity extends NodeEntity {
 			inverseName = "ipa_expedient_rel_exp_fk")
 	protected List<ExpedientEntity> relacionatsPer = new ArrayList<ExpedientEntity>();
 	
-	@OneToMany(
-			mappedBy = "expedient",
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
+	@OneToMany(mappedBy = "expedient")
 	private List<ExpedientPeticioEntity> peticions = new ArrayList<ExpedientPeticioEntity>();
 	
 	@OneToMany(

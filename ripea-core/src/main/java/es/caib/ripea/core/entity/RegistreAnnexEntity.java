@@ -109,6 +109,11 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	private DocumentEntity document;
 	
 	
+	// arxiu doesn't allow multiple dispatch of the same document (after more than two dispatches it giver error in arxiu) that's why for another dispatch we use result of previous dispatch
+	@Column(name = "uuid_dispatched", length = 100)
+	private String uuidDispatched;
+	
+	
 	public static Builder getBuilder(
 			 String nom,
 			 Date ntiFechaCaptura,
@@ -282,7 +287,9 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	public void updateAnnexArxiuEstat(ArxiuEstatEnumDto annexArxiuEstat) {
 		this.annexArxiuEstat = annexArxiuEstat;
 	}
-	
+	public void updateUuidDispatched(String uuidDispatched) {
+		this.uuidDispatched = uuidDispatched;
+	}
 	
 	
 	

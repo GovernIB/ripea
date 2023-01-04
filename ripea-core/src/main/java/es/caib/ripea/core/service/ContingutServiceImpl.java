@@ -521,10 +521,20 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, null, false, null, false, 0, null, null, true);
-		contingutHelper.arxiuPropagarMoviment(
-				contingutOrigen,
-				contingutDesti,
-				expedientDesti.getArxiuUuid());
+		
+		
+		if (contingutOrigen instanceof DocumentEntity){
+			contingutHelper.arxiuDocumentPropagarMoviment(
+					contingutOrigen.getArxiuUuid(),
+					contingutDesti,
+					expedientDesti.getArxiuUuid());
+		} else if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
+			pluginHelper.arxiuCarpetaMoure(
+					(CarpetaEntity)contingutOrigen,
+					contingutDesti.getArxiuUuid());
+		}
+		
+
 		return dto;
 	}
 
