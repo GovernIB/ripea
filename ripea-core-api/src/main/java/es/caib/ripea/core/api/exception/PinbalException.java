@@ -11,8 +11,15 @@ package es.caib.ripea.core.api.exception;
 @SuppressWarnings("serial")
 public class PinbalException extends RuntimeException {
 
+	private String metode;
+	
 	public PinbalException(Throwable cause) {
 		super(cause);
+	}
+	
+	public PinbalException(Throwable cause, String metode) {
+		super(cause);
+		this.metode = metode;
 	}
 
 	public PinbalException(String message) {
@@ -24,5 +31,18 @@ public class PinbalException extends RuntimeException {
 			Throwable cause) {
 		super(message, cause);
 	}
+	
+	public PinbalException(
+			String message,
+			Throwable cause, 
+			String metode) {
+		super(message, cause);
+		this.metode = metode;
+	}
+
+	public String getMetode() {
+		return metode;
+	}
+
 
 }

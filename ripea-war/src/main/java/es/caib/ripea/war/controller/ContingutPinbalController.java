@@ -11,6 +11,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
+import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -36,6 +38,7 @@ import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.war.command.PinbalConsultaCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
+import es.caib.ripea.war.helper.ExceptionHelper;
 
 /**
  * Controlador per a la gestió de peticions a PINBAL.
@@ -97,7 +100,15 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueSuccess(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.ok");
 		} catch (Exception ex) {
 			logger.error("Error en la consulta PINBAL", ex);
-			return getModalControllerReturnValueError(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.error", new String[] {ex.getMessage()}, ex);
+			String info = "";
+			Exception pinbalExcepcion = ExceptionHelper.findExceptionInstance(ex, PinbalException.class, 3);
+			if (pinbalExcepcion != null) {
+				String metode = ((PinbalException) pinbalExcepcion).getMetode();
+				if (StringUtils.isNotEmpty(metode)) {
+					info = " [" + metode + "] ";
+				}
+			}
+			return getModalControllerReturnValueError(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.error", new String[] {info + ex.getMessage()}, ex);
 		}
 	}
 	

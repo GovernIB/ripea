@@ -240,7 +240,7 @@ public class PinbalHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					null);
-			throw new PinbalException(ex);
+			throw new PinbalException(ex, "getJustificante");
 		}
 	}
 
@@ -393,7 +393,8 @@ public class PinbalHelper {
 				ex);
 		return new PinbalException(
 				missatge,
-				ex);
+				ex,
+				"peticionSincrona");
 	}
 
 	private Map<String, String> getAccioParams(
