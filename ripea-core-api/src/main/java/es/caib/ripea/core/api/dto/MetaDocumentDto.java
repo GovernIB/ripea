@@ -44,6 +44,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private boolean perDefecte;
 	private Long metaExpedientId;
 	private boolean leftPerCreacio;
+	private boolean pinbalUtilitzarCifOrgan;
 	
 	
 	public boolean isPermetMultiple() {

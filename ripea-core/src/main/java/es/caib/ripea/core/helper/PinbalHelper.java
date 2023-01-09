@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -254,8 +255,19 @@ public class PinbalHelper {
 		EntitatEntity entitat = metaDocument.getEntitat();
 		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
 		String codiSia = getPinbalDefaultSia();
-		solicitud.setNombreSolicitante(entitat.getNom());
-		solicitud.setIdentificadorSolicitante(entitat.getCif());
+
+		String identificadorSolicitante;
+		String nombreSolicitante;
+		if (metaDocument.isPinbalUtilitzarCifOrgan() && StringUtils.isNotEmpty(expedient.getOrganGestor().getCif())) {
+			identificadorSolicitante = expedient.getOrganGestor().getCif();
+			nombreSolicitante = expedient.getOrganGestor().getNom();
+		} else {
+			identificadorSolicitante = entitat.getCif();
+			nombreSolicitante = entitat.getNom();
+		}
+		solicitud.setIdentificadorSolicitante(identificadorSolicitante);
+		solicitud.setNombreSolicitante(nombreSolicitante);
+		
 		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacioSia());
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		solicitud.setFinalidad(finalitat);
