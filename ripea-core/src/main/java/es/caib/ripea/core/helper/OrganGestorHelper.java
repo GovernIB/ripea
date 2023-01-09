@@ -479,6 +479,7 @@ public class OrganGestorHelper {
 						.pare(organPare)
 						.estat(unitatWS.getEstat())
 						.gestioDirect(false)
+						.cif(unitatWS.getNifCif())
 						.build();
 				organGestorRepository.save(unitat);
 
@@ -495,7 +496,7 @@ public class OrganGestorHelper {
 				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi())).isIsNew(false).codiOrgan(unitatWS.getCodi())
 						.nomAntic(unitat.getNom()).estatAntic(unitat.getEstat())
 						.nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
-				unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), organPare);
+				unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), organPare, unitatWS.getNifCif());
 			}
 
 			// Si el pare encara no existeix ho ficam en un mapa de pendents
