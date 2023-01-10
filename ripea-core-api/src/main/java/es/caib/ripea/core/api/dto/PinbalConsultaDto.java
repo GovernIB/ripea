@@ -25,4 +25,5 @@ public class PinbalConsultaDto {
 	private String dataConsulta;
 	private String dataNaixement;
 	private SiNoEnumDto consentimentTipusDiscapacitat;
+	private String numeroTitol;
 }

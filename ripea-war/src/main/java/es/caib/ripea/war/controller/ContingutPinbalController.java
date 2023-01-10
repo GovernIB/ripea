@@ -221,7 +221,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 						"pinbal.consentiment.enum."));
 		model.addAttribute(
 				"comunitats",
-				Arrays.asList(new HtmlOption("07", "Illes Balears")));
+				Arrays.asList(new HtmlOption("04", "Illes Balears")));
 		model.addAttribute(
 				"provincies",
 				Arrays.asList(new HtmlOption("07", "Illes Balears")));

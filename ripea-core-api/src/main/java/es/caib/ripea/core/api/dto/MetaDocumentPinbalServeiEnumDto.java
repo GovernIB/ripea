@@ -14,4 +14,5 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDCCAACPASWS01, // Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA
 	SVDSCDDWS01, // Servei de consulta de dades de discapacitat
 	SCDCPAJU, // Servei de consulta de padró de convivència
+	SVDSCTFNWS01, // Servei de consulta de família nombrosa
 }

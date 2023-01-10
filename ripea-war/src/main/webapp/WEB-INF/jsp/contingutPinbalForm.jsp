@@ -30,26 +30,42 @@ $(document).ready(function() {
 			$('#bloc-datos-especificos').show();
 			$('#divComunitatAutonomaCodi').show();
 			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').hide();
 			$('#divDataConsulta').hide();
 			$('#divDataNaixement').hide();
 			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCDDWS01") { // SVDSCDDWS01 - Servei de consulta de dades de discapacitat
-				$('#bloc-datos-especificos').show();
-				$('#divComunitatAutonomaCodi').show();
-				$('#divProvinciaCodi').show();
-				$('#divDataConsulta').show();
-				$('#divDataNaixement').show();
-				$('#divConsentimentTipusDiscapacitat').show();
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').show();
+			$('#divDataNaixement').show();
+			$('#divConsentimentTipusDiscapacitat').show();
+			$('#divNumeroTitol').hide();
 				
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de dades de discapacitat
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de padró de convivència
 			$('#bloc-datos-especificos').show();
 			$('#divComunitatAutonomaCodi').hide();
 			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').show();
 			$('#divDataConsulta').hide();
 			$('#divDataNaixement').hide();
 			$('#divConsentimentTipusDiscapacitat').hide();
-				
+			$('#divNumeroTitol').hide();
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCTFNWS01") { // SVDSCTFNWS01 - Servei de consulta de família nombrosa
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').hide();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').show();
+			$('#divDataNaixement').show();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').show();
+							
 		} else {
 			$('#bloc-datos-especificos').hide();
 		}
@@ -101,6 +117,7 @@ $(document).ready(function() {
 					<div id="divDataConsulta"><rip:inputDate name="dataConsulta" textKey="contingut.pinbal.form.camp.data.consulta" /></div>
 					<div id="divDataNaixement"><rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" /></div>
 					<div id="divConsentimentTipusDiscapacitat"><rip:inputSelect name="consentimentTipusDiscapacitat" textKey="contingut.pinbal.form.camp.consentiment.tipus.discapacitat" optionEnum="SiNoEnumDto" emptyOption="true"/></div>
+					<div id="divNumeroTitol"><rip:inputText name="numeroTitol" textKey="contingut.pinbal.form.camp.numero.titol" /></div>
 				</div>
 			</div>
 		</div>

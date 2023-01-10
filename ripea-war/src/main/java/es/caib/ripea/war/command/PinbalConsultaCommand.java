@@ -41,6 +41,7 @@ public class PinbalConsultaCommand {
 	private String dataConsulta;
 	private String dataNaixement;
 	private SiNoEnumDto consentimentTipusDiscapacitat;
+	private String numeroTitol;
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(

@@ -30,9 +30,12 @@ import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
+import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
+import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
@@ -197,6 +200,35 @@ public class PinbalHelper {
 			return processarScspRespuesta(solicitud, respuesta, "SCDCPAJU", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SCDCPAJU", t0);
+		}
+	}
+	
+	/** SVDSCTFNWS01 - Servei de consulta de família nombrosa */
+	public String novaPeticioSvdsctfnws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdsctfnws01 solicitud = new SolicitudSvdsctfnws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		solicitud.setCodigoComunidadAutonoma(pinbalConsulta.getComunitatAutonomaCodi());
+		solicitud.setFechaConsulta(pinbalConsulta.getDataConsulta());
+		solicitud.setFechaNacimiento(pinbalConsulta.getDataNaixement());
+		solicitud.setNumeroTitulo(pinbalConsulta.getNumeroTitol());
+
+		try {
+			ScspRespuesta respuesta = getClientSvdsctfnws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDSCTFNWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDSCTFNWS01", t0);
 		}
 	}
 	
@@ -519,6 +551,23 @@ public class PinbalHelper {
 			clientScdcpaju.enableLogginFilter();
 		return clientScdcpaju;
 	}
+	
+	
+	private ClientSvdsctfnws01 getClientSvdsctfnws01() {
+		ClientSvdsctfnws01 clientSvdsctfnws01 = new ClientSvdsctfnws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientSvdsctfnws01.enableLogginFilter();
+		return clientSvdsctfnws01;
+	}
+	
+	
+	
 
 	private String getPinbalBaseUrl() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");
