@@ -594,6 +594,12 @@ public class DocumentServiceImpl implements DocumentService {
 					metaDocument,
 					interessat,
 					consulta);			
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.Q2827003ATGSS001) {
+			idPeticion = pinbalHelper.novaPeticioQ2827003atgss001(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta);				
 		} else {
 			throw new ValidationException(
 					"<creacio>",

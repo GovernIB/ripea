@@ -20,6 +20,8 @@ import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimient
 import es.caib.pinbal.client.recobriment.model.ScspTitular;
 import es.caib.pinbal.client.recobriment.model.ScspTitular.ScspTipoDocumentacion;
 import es.caib.pinbal.client.recobriment.model.SolicitudBase;
+import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001;
+import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001.SolicitudQ2827003atgss001;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
@@ -260,6 +262,33 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "SVDCCAACPCWS01", t0);
 		}
 	}
+	
+	
+	/** Q2827003ATGSS001  - Estar al corriente de pago con la Seguridad Social */
+	public String novaPeticioQ2827003atgss001(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudQ2827003atgss001 solicitud = new SolicitudQ2827003atgss001();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+
+		try {
+			ScspRespuesta respuesta = getClientQ2827003atgss001().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "Q2827003ATGSS001", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "Q2827003ATGSS001", t0);
+		}
+	}
+	
 	
 	
 	
@@ -597,7 +626,7 @@ public class PinbalHelper {
 	
 	
 	private ClientSvdccaacpcws01 getClientSvdccaacpcws01() {
-		ClientSvdccaacpcws01 clientScdcpaju = new ClientSvdccaacpcws01(
+		ClientSvdccaacpcws01 client = new ClientSvdccaacpcws01(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),
@@ -605,8 +634,21 @@ public class PinbalHelper {
 				null,
 				null);
 		if (log.isDebugEnabled())
-			clientScdcpaju.enableLogginFilter();
-		return clientScdcpaju;
+			client.enableLogginFilter();
+		return client;
+	}
+
+	private ClientQ2827003atgss001 getClientQ2827003atgss001() {
+		ClientQ2827003atgss001 client = new ClientQ2827003atgss001(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
 	}
 
 	
