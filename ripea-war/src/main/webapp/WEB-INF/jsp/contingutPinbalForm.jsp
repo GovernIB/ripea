@@ -65,7 +65,16 @@ $(document).ready(function() {
 			$('#divDataNaixement').show();
 			$('#divConsentimentTipusDiscapacitat').hide();
 			$('#divNumeroTitol').show();
-							
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPCWS01") { // SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+											
 		} else {
 			$('#bloc-datos-especificos').hide();
 		}

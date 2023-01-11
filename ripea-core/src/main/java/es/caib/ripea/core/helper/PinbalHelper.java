@@ -24,6 +24,8 @@ import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
+import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01;
+import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01.SolicitudSvdccaacpcws01;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
@@ -229,6 +231,33 @@ public class PinbalHelper {
 			return processarScspRespuesta(solicitud, respuesta, "SVDSCTFNWS01", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SVDSCTFNWS01", t0);
+		}
+	}
+	
+	/** SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA */
+	public String novaPeticioSvdccaacpcws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdccaacpcws01 solicitud = new SolicitudSvdccaacpcws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		solicitud.setCodigoComunidadAutonoma(pinbalConsulta.getComunitatAutonomaCodi());
+		solicitud.setCodigoProvincia(pinbalConsulta.getProvinciaCodi());
+
+		try {
+			ScspRespuesta respuesta = getClientSvdccaacpcws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDCCAACPCWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDCCAACPCWS01", t0);
 		}
 	}
 	
@@ -566,6 +595,20 @@ public class PinbalHelper {
 		return clientSvdsctfnws01;
 	}
 	
+	
+	private ClientSvdccaacpcws01 getClientSvdccaacpcws01() {
+		ClientSvdccaacpcws01 clientScdcpaju = new ClientSvdccaacpcws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientScdcpaju.enableLogginFilter();
+		return clientScdcpaju;
+	}
+
 	
 	
 

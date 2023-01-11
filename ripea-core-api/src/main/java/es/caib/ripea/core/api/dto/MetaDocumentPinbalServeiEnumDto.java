@@ -15,4 +15,5 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDSCDDWS01, // Servei de consulta de dades de discapacitat
 	SCDCPAJU, // Servei de consulta de padró de convivència
 	SVDSCTFNWS01, // Servei de consulta de família nombrosa
+	SVDCCAACPCWS01, // Estar al corriente de obligaciones tributarias para contratación con la CCAA
 }
