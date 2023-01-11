@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
+import es.caib.ripea.core.api.dto.SexeEnumDto;
 import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
@@ -42,6 +43,21 @@ public class PinbalConsultaCommand {
 	private String dataNaixement;
 	private SiNoEnumDto consentimentTipusDiscapacitat;
 	private String numeroTitol;
+	
+	
+	private String codiNacionalitat = "724";
+	private String paisNaixament = "724";
+	private String provinciaNaixament;
+	private String poblacioNaixament;
+	private String codiPoblacioNaixament;
+	private SexeEnumDto sexe;
+	private String nomPare;
+	private String nomMare;
+	@NotEmpty
+	private String dataNaixementObligatori;
+	private String telefon;
+	private String email;
+	
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(

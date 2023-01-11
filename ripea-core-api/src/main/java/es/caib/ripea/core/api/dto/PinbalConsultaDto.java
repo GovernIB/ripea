@@ -26,4 +26,18 @@ public class PinbalConsultaDto {
 	private String dataNaixement;
 	private SiNoEnumDto consentimentTipusDiscapacitat;
 	private String numeroTitol;
+	
+	
+	private String codiNacionalitat;
+	private String paisNaixament;
+	private String provinciaNaixament;
+	private String poblacioNaixament;
+	private String codiPoblacioNaixament;
+	private SexeEnumDto sexe;
+	private String nomPare;
+	private String nomMare;
+	private String dataNaixementObligatori;
+	private String telefon;
+	private String email;
+	
 }

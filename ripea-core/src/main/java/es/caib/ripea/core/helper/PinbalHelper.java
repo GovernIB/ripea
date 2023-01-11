@@ -28,6 +28,9 @@ import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01;
 import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01.SolicitudSvdccaacpcws01;
+import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01;
+import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01;
+import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01.Sexe;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
@@ -286,6 +289,43 @@ public class PinbalHelper {
 			return processarScspRespuesta(solicitud, respuesta, "Q2827003ATGSS001", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "Q2827003ATGSS001", t0);
+		}
+	}
+	
+	
+	/** SVDDELSEXWS01  - Consulta de inexistencia de delitos sexuales por datos de filiación */
+	public String novaPeticioSvddelsexws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvddelsexws01 solicitud = new SolicitudSvddelsexws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+
+		solicitud.setNacionalidad(pinbalConsulta.getCodiNacionalitat());
+		solicitud.setPaisNacimiento(pinbalConsulta.getPaisNaixament());
+		solicitud.setProvinciaNacimiento(pinbalConsulta.getProvinciaNaixament());
+		solicitud.setPoblacionNacimiento(pinbalConsulta.getPoblacioNaixament());
+		solicitud.setCodPoblacionNacimiento(pinbalConsulta.getCodiPoblacioNaixament());
+		solicitud.setSexo(pinbalConsulta.getSexe() != null ? Sexe.valueOf(pinbalConsulta.getSexe().toString()) : null);
+		solicitud.setNombrePadre(pinbalConsulta.getNomPare());
+		solicitud.setNombreMadre(pinbalConsulta.getNomMare());
+		solicitud.setFechaNacimiento(pinbalConsulta.getDataNaixementObligatori());
+		solicitud.setTelefono(pinbalConsulta.getTelefon());
+		solicitud.setMail(pinbalConsulta.getEmail());
+		try {
+			ScspRespuesta respuesta = getClientSvddelsexws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDDELSEXWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDDELSEXWS01", t0);
 		}
 	}
 	
@@ -651,7 +691,18 @@ public class PinbalHelper {
 		return client;
 	}
 
-	
+	private ClientSvddelsexws01 getClientSvddelsexws01() {
+		ClientSvddelsexws01 client = new ClientSvddelsexws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
 	
 
 	private String getPinbalBaseUrl() {
