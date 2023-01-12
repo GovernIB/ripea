@@ -1313,7 +1313,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// ##################### DOCUMENT ##################################
 		} else if (contingut instanceof DocumentEntity) {
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-					contingut,
+					(DocumentEntity) contingut,
 					null,
 					null,
 					true);

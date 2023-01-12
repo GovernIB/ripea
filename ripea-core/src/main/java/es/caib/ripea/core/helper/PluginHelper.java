@@ -1136,18 +1136,18 @@ public class PluginHelper {
 		}
 	}
 	
-	public Document arxiuDocumentConsultar(ContingutEntity contingut, String nodeId, String versio, boolean ambContingut) {
+	public Document arxiuDocumentConsultar(DocumentEntity contingut, String nodeId, String versio, boolean ambContingut) {
 		return arxiuDocumentConsultar(contingut, nodeId, versio, ambContingut, false);
 	}
 
-	public Document arxiuDocumentConsultar(ContingutEntity contingut, String arxiuUuid, String versio, boolean ambContingut, boolean ambVersioImprimible) {
+	public Document arxiuDocumentConsultar(DocumentEntity document, String arxiuUuid, String versio, boolean ambContingut, boolean ambVersioImprimible) {
 
 		
 		String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		if (contingut != null) {
-			accioParams.put("contingutId", contingut.getId().toString());
-			accioParams.put("contingutNom", contingut.getNom());
+		if (document != null) {
+			accioParams.put("contingutId", document.getId().toString());
+			accioParams.put("contingutNom", document.getNom());
 		}
 		if (arxiuUuid != null) {
 			accioParams.put("arxiuUuid", arxiuUuid);
@@ -1157,7 +1157,7 @@ public class PluginHelper {
 		accioParams.put("ambVersioImprimible", new Boolean(ambVersioImprimible).toString());
 		long t0 = System.currentTimeMillis();
 		try {
-			String arxiuUuidConsulta = (contingut != null && contingut instanceof DocumentEntity) ? contingut.getArxiuUuid() : arxiuUuid;
+			String arxiuUuidConsulta = (document != null && document instanceof DocumentEntity) ? document.getArxiuUuid() : arxiuUuid;
 			accioParams.put("arxiuUuidConsulta", arxiuUuidConsulta);
 			Document documentDetalls = getArxiuPlugin().documentDetalls(arxiuUuidConsulta, versio, ambContingut);
 			if (ambContingut && documentDetalls.getContingut() == null) {
@@ -1430,7 +1430,9 @@ public class PluginHelper {
 		try {
 			DocumentContingut documentContingut = getArxiuPlugin().documentImprimible(document.getArxiuUuid());
 			FitxerDto fitxer = new FitxerDto();
-			fitxer.setNom(documentContingut.getArxiuNom());
+			
+			String titol = document.getFitxerNom().replace(".pdf", "_imprimible.pdf");
+			fitxer.setNom(titol);
 			fitxer.setContentType(documentContingut.getTipusMime());
 			fitxer.setTamany(documentContingut.getTamany());
 			fitxer.setContingut(documentContingut.getContingut());

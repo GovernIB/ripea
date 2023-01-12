@@ -317,7 +317,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (document != null) {
 			DocumentContingut documentContingut = document.getContingut();
 			if (documentContingut != null) {
-				fitxer.setNom(versioImprimible ? documentContingut.getArxiuNom() : registreAnnex.getNom());
+				
+				fitxer.setNom(versioImprimible ? registreAnnex.getNom().replace(".pdf", "_imprimible.pdf") : registreAnnex.getNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
 				fitxer.setTamany(documentContingut.getContingut().length);
