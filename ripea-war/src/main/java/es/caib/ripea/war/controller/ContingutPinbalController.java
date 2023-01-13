@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
@@ -90,11 +91,17 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), command.getMetaDocumentId());
+	
+		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
+			bindingResult.rejectValue("dataNaixementObligatori", "NotEmpty");
+		}
+			
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(request, pareId, model);
 			return "contingutPinbalForm";
 		}
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
 			documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.ok");
@@ -227,7 +234,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 				Arrays.asList(new HtmlOption("07", "Illes Balears")));
 		model.addAttribute(
 				"municipis",
-				dadesExternesService.findMunicipisPerProvincia("07"));
+				dadesExternesService.findMunicipisPerProvinciaPinbal("07"));
 		
 		
 	}

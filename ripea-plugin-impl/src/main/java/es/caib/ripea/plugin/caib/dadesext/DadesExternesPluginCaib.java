@@ -303,7 +303,7 @@ public class DadesExternesPluginCaib extends RipeaAbstractPluginProperties imple
 
 	private String getBaseUrl() {
 		String baseUrl = getProperty(
-				"plugin.dadesext.service.url");
+				"plugin.dadesextcaib.service.url");
 		if (baseUrl != null && baseUrl.length() > 0) {
 			return baseUrl;
 		} else {

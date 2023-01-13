@@ -373,6 +373,12 @@ public class CacheHelper {
 				pluginHelper.dadesExternesMunicipisFindAmbProvincia(provinciaCodi),
 				MunicipiDto.class);
 	}
+	@Cacheable(value = "municipisPerProvinciaPinbal", key="#provinciaCodi")
+	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(String provinciaCodi) {
+		return conversioTipusHelper.convertirList(
+				pluginHelper.dadesExternesMunicipisFindAmbProvinciaPinbal(provinciaCodi),
+				MunicipiDto.class);
+	}
 
 	@Cacheable(value = "nivellAdministracio")
 	public List<NivellAdministracioDto> findNivellAdministracio() {

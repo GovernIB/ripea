@@ -36,6 +36,7 @@ $(document).ready(function() {
 			$('#divConsentimentTipusDiscapacitat').hide();
 			$('#divNumeroTitol').hide();
 
+			$('#divPaisNaixament').hide();
 			$('#divCodiNacionalitat').hide();
 			$('#divProvinciaNaixament').hide();
 			$('#divPoblacioNaixament').hide();
@@ -58,6 +59,7 @@ $(document).ready(function() {
 			$('#divConsentimentTipusDiscapacitat').show();
 			$('#divNumeroTitol').hide();
 
+			$('#divPaisNaixament').hide();
 			$('#divCodiNacionalitat').hide();
 			$('#divProvinciaNaixament').hide();
 			$('#divPoblacioNaixament').hide();
@@ -80,6 +82,7 @@ $(document).ready(function() {
 			$('#divConsentimentTipusDiscapacitat').hide();
 			$('#divNumeroTitol').hide();
 
+			$('#divPaisNaixament').hide();
 			$('#divCodiNacionalitat').hide();
 			$('#divProvinciaNaixament').hide();
 			$('#divPoblacioNaixament').hide();
@@ -102,6 +105,7 @@ $(document).ready(function() {
 			$('#divConsentimentTipusDiscapacitat').hide();
 			$('#divNumeroTitol').show();
 
+			$('#divPaisNaixament').hide();
 			$('#divCodiNacionalitat').hide();
 			$('#divProvinciaNaixament').hide();
 			$('#divPoblacioNaixament').hide();
@@ -124,6 +128,7 @@ $(document).ready(function() {
 			$('#divConsentimentTipusDiscapacitat').hide();
 			$('#divNumeroTitol').hide();
 
+			$('#divPaisNaixament').hide();
 			$('#divCodiNacionalitat').hide();
 			$('#divProvinciaNaixament').hide();
 			$('#divPoblacioNaixament').hide();
@@ -145,8 +150,8 @@ $(document).ready(function() {
 			$('#divDataNaixement').hide();
 			$('#divConsentimentTipusDiscapacitat').hide();
 			$('#divNumeroTitol').hide();
-			$('#divDataNaixementObligatori').hide();
 
+			$('#divPaisNaixament').show();
 			$('#divCodiNacionalitat').show();
 			$('#divProvinciaNaixament').show();
 			$('#divPoblacioNaixament').show();
@@ -219,7 +224,7 @@ $(document).ready(function() {
 				  	<div id="divCodiPoblacioNaixament"><rip:inputText name="codiPoblacioNaixament" textKey="contingut.pinbal.form.camp.codi.poblacio.naixament" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment"/></div>
 					<div id="divNomPare"><rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare" comment="contingut.pinbal.form.camp.nom.pare.comment"/></div>
 					<div id="divNomMare"><rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare" comment="contingut.pinbal.form.camp.nom.mare.comment"/></div>
-					<div id="divDataNaixement"><rip:inputDate name="dataNaixementObligatori" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/></div>
+					<div id="divDataNaixementObligatori"><rip:inputDate name="dataNaixementObligatori" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/></div>
 					<div id="divTelefon"><rip:inputText name="telefon" textKey="contingut.pinbal.form.camp.telefon"/></div>
 					<div id="divEmail"><rip:inputText name="email" textKey="contingut.pinbal.form.camp.email"/></div>
 			

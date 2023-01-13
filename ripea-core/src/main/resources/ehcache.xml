@@ -18,6 +18,7 @@
 	<cache name="provinciesPerComunitat" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="municipis" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="municipisPerProvincia" maxElementsInMemory="1000" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
+	<cache name="municipisPerProvinciaPinbal" maxElementsInMemory="1000" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="unitatOrganitzativa" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="municipisAmbNom" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="nivellAdministracio" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />

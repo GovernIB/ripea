@@ -53,7 +53,6 @@ public class PinbalConsultaCommand {
 	private SexeEnumDto sexe;
 	private String nomPare;
 	private String nomMare;
-	@NotEmpty
 	private String dataNaixementObligatori;
 	private String telefon;
 	private String email;

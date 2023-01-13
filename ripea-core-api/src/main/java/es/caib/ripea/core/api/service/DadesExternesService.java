@@ -72,4 +72,8 @@ public interface DadesExternesService {
 	@PreAuthorize("hasRole('tothom')")
 	public List<NivellAdministracioDto> findNivellAdministracions();
 
+	@PreAuthorize("hasRole('tothom')")
+	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(
+			String provinciaCodi);
+
 }

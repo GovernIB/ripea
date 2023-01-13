@@ -195,6 +195,7 @@ public class PluginHelper {
 	private Map<String, DigitalitzacioPlugin> digitalitzacioPlugins = new HashMap<>();
 	private Map<String, ConversioPlugin> conversioPlugins = new HashMap<>();
 	private Map<String, DadesExternesPlugin> dadesExternesPlugins = new HashMap<>();
+	private Map<String, DadesExternesPlugin> dadesExternesPinbalPlugins = new HashMap<>();
 	private Map<String, IArxiuPlugin> arxiuPlugins = new HashMap<>();
 	private Map<String, IValidateSignaturePlugin> validaSignaturaPlugins = new HashMap<>();
 	private Map<String, NotificacioPlugin> notificacioPlugins = new HashMap<>();
@@ -2460,6 +2461,23 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
 		}
 	}
+	
+	public List<Municipi> dadesExternesMunicipisFindAmbProvinciaPinbal(String provinciaCodi) {
+
+		String accioDescripcio = "Consulta dels municipis d'una província per consultes a PINBAL";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("provinciaCodi", provinciaCodi);
+		long t0 = System.currentTimeMillis();
+		try {
+			List<Municipi> municipis = getDadesExternesPinbalPlugin().municipiFindByProvincia(provinciaCodi);
+			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_DADESEXT, accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
+			return municipis;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de dades externes";
+			integracioHelper.addAccioError(IntegracioHelper.INTCODI_DADESEXT, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, errorDescripcio, ex);
+		}
+	}
 
 	public List<NivellAdministracioDto> dadesExternesNivellsAdministracioAll() {
 
@@ -3750,7 +3768,7 @@ public class PluginHelper {
 		}
 		String pluginClass = getPropertyPluginDadesExternes();
 		if (Strings.isNullOrEmpty(pluginClass)) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_CIUTADA, "No està configurada la classe per al plugin de dades externes");
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, "No està configurada la classe per al plugin de dades externes");
 		}
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
@@ -3759,7 +3777,33 @@ public class PluginHelper {
 			dadesExternesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
-			throw new SistemaExternException(IntegracioHelper.INTCODI_CIUTADA, "Error al crear la instància del plugin de consulta de dades externes", ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, "Error al crear la instància del plugin de consulta de dades externes", ex);
+		}
+	}
+	
+	private DadesExternesPlugin getDadesExternesPinbalPlugin() {
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+		DadesExternesPlugin plugin = dadesExternesPinbalPlugins.get(entitatCodi);
+//		loadPluginProperties("DADES_EXT");
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginDadesExternesPinbal();
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, "No està configurada la classe per al plugin de dades externes per a consultes a PINBAL");
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+			dadesExternesPinbalPlugins.put(entitatCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new SistemaExternException(IntegracioHelper.INTCODI_DADESEXT, "Error al crear la instància del plugin de consulta de dades externes per a consultes a PINBAL", ex);
 		}
 	}
 
@@ -3949,6 +3993,7 @@ public class PluginHelper {
 		digitalitzacioPlugins  = new HashMap<>();
 		conversioPlugins  = new HashMap<>();
 		dadesExternesPlugins  = new HashMap<>();
+		dadesExternesPinbalPlugins  = new HashMap<>();
 		arxiuPlugins = new HashMap<>();
 		validaSignaturaPlugins  = new HashMap<>();
 		notificacioPlugins  = new HashMap<>();
@@ -3979,6 +4024,9 @@ public class PluginHelper {
 
 	private String getPropertyPluginDadesExternes() {
 		return configHelper.getConfig("es.caib.ripea.plugin.dadesext.class");
+	}
+	private String getPropertyPluginDadesExternesPinbal() {
+		return configHelper.getConfig("es.caib.ripea.plugin.dadesextpinbal.class");
 	}
 	private String getPropertyPluginProcediment() {
 		return configHelper.getConfig("es.caib.ripea.plugin.procediment.class");
