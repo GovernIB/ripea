@@ -93,12 +93,11 @@ public class InteressatDocumentValidator implements ConstraintValidator<Interess
 		if (!niePattern.matcher(nie).matches()) {
 			return false;
 		}
-		String nums = nie.substring(1, 8);
+		String nums = (char)(nie.charAt(0) - 40) + nie.substring(1, 8);
 		String lletra = nie.substring(8);
 		return lletra.equals(lletraDniONie(new Integer(nums).intValue()));
 	}
 
-	
 	
 	// ========== Validació CIF ================
 	// Només s'admeten nombres com a caràcter de control
