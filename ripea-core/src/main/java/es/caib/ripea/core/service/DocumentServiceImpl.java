@@ -767,26 +767,7 @@ public class DocumentServiceImpl implements DocumentService {
 		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId, name);
 	}
 
-	@Transactional
-	@Override
-	public Exception portafirmesReintentar(
-			Long entitatId,
-			Long id) {
-		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false, false, null);
-		return firmaPortafirmesHelper.portafirmesReintentar(
-				entitatId,
-				document);
 
-	}
 	
 	@Transactional
 	@Override
@@ -796,29 +777,21 @@ public class DocumentServiceImpl implements DocumentService {
 			String rolActual) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
 				+ "entitatId=" + entitatId + ", "
-				+ "ids=" + id + ")");
+				+ "id=" + id
+				+ "rolActual=" + rolActual +")");
 
-			boolean checkPerMassiuAdmin = false;
-			if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-				checkPerMassiuAdmin = true;
-			} 
-			
-			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
-					entitatId,
-					id,
-					false,
-					true,
-					false,
-					false, 
-					checkPerMassiuAdmin, null);
-			Exception exception = firmaPortafirmesHelper.portafirmesReintentar(
-					entitatId,
-					document);
-			if (exception != null) {
-				return exception;
-			
-		}
-		return null;
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+				entitatId,
+				id,
+				false,
+				true,
+				false,
+				false, 
+				false, 
+				rolActual);
+		return firmaPortafirmesHelper.portafirmesReintentar(
+				entitatId,
+				document);
 	}
 	
 

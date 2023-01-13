@@ -3,7 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Informació d'un registre annex.

@@ -370,7 +370,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			try {
 				exception = documentService.portafirmesReintentar(
 						entitatActual.getId(),
-						documentId);
+						documentId, 
+						RolHelper.getRolActual(request));
 			} catch (Exception e) {
 				exception = e;
 			}
