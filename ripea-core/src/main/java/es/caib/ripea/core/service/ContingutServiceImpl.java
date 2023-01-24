@@ -90,6 +90,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private ContingutsOrfesHelper contingutRepositoryHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	@Transactional
 	@Override
@@ -433,6 +435,8 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutOrigenId,
 			Long contingutDestiId, 
 			String rolActual) {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutOrigenId));
 		logger.debug("Movent el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutOrigenId=" + contingutOrigenId + ", "

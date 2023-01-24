@@ -97,6 +97,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private PinbalHelper pinbalHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	@Transactional
 	@Override
@@ -499,6 +501,7 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId,
 			Long metaDocumentId,
 			PinbalConsultaDto consulta) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
 		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				pareId,
@@ -1280,6 +1283,7 @@ public class DocumentServiceImpl implements DocumentService {
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug("Converteix un document en PDF per a la firma client ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");

@@ -43,6 +43,7 @@ import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -74,6 +75,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
@@ -83,6 +86,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			Long entitatId,
 			Long contingutId,
 			ImportacioDto params) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutId));
 		logger.debug("Important documents de l'arxiu digital (" +
 				"numeroRegistre=" + params.getNumeroRegistre() + ")");
 		ExpedientEntity expedientSuperior;
@@ -200,6 +204,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			FitxerDto fitxer,
 			boolean usingNumeroRegistre,
 			String codiEniOrigen) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientSuperior.getId()));
 		// TIPUS DE DOCUMENT PER DEFECTE
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientSuperior.getMetaExpedient());
 		

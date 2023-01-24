@@ -60,6 +60,7 @@ import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -93,9 +94,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private ContingutRepository contingutRepository;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
+	@Override
+	public void actualitzarOrganCodi(String organCodi) {
+		organGestorHelper.actualitzarOrganCodi(organCodi);
+	}
 
 	@Override
 	@Transactional(readOnly = true)
@@ -224,6 +231,19 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				false);
 		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatAndFiltre(
 				entitat,
+				filter == null || filter.isEmpty(),
+				filter);
+		return conversioTipusHelper.convertirList(
+				organs,
+				OrganGestorDto.class);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<OrganGestorDto> findAll(
+			String filter) {
+
+		List<OrganGestorEntity> organs = organGestorRepository.findByFiltre(
 				filter == null || filter.isEmpty(),
 				filter);
 		return conversioTipusHelper.convertirList(
@@ -973,6 +993,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 	}
 	
+	
+	@Transactional
+	@Override
+	public String getOrganCodiFromContingutId(Long contingutId) {
+		return organGestorHelper.getOrganCodiFromContingutId(contingutId);
+	}
 	
 	
 	

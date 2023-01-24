@@ -5,6 +5,7 @@ package es.caib.ripea.core.api.dto.config;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import es.caib.ripea.core.api.dto.EntitatDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,6 +26,9 @@ ConfigDto {
     private String entitatCodi;
     private String entitatValue;
     private boolean configurable;
+    private boolean configurableOrgan;
+    private boolean configurableEntitatActiu;
+    private boolean configurableOrganActiu;
 
     private String typeCode;
     private List<String> validValues;

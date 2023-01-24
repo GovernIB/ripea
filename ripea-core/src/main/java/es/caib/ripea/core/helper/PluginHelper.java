@@ -222,7 +222,7 @@ public class PluginHelper {
 	@Autowired
 	private ExpedientRepository expedientRepository;
 	@Autowired
-	private ContingutHelper contingutHelper;
+	private OrganGestorHelper organGestorHelper;
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -456,7 +456,7 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientActualitzar(ExpedientEntity expedient) {
-		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		boolean throwExceptionExpedientArxiu = false;
 		if (throwExceptionExpedientArxiu) { // throwExceptionExpedientArxiu = true;
 			throw new RuntimeException("Mock excepcion al actualitzar expedient al arxiu");
@@ -606,7 +606,7 @@ public class PluginHelper {
 	}
 
 	public Expedient arxiuExpedientConsultar(ExpedientEntity expedient) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		String accioDescripcio = "Consulta d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
@@ -625,7 +625,7 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientEsborrar(ExpedientEntity expedient) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		String accioDescripcio = "Eliminació d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
@@ -660,7 +660,7 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientTancar(ExpedientEntity expedient) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		String accioDescripcio = "Tancament d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
@@ -683,7 +683,7 @@ public class PluginHelper {
 
 
 	public void arxiuExpedientReobrir(ExpedientEntity expedient) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		String accioDescripcio = "Reobertura d'un expedient";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
@@ -702,7 +702,7 @@ public class PluginHelper {
 	}
 
 	public String arxiuExpedientExportar(ExpedientEntity expedient) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		String accioDescripcio = "Exportar expedient en format ENI";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", expedient.getId().toString());
@@ -720,7 +720,7 @@ public class PluginHelper {
 	}
 	
 	public void arxiuExpedientEnllacar(ExpedientEntity expedientFill, ExpedientEntity expedientPare) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientPare.getId()));
 		String accioDescripcio = "Enllaçant dos expedients (expedientUuidPare=" + expedientPare.getId() + ", expedientUuidFill=" + expedientFill.getId() + ")";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idExpedientPare", expedientPare.getId().toString());
@@ -739,7 +739,7 @@ public class PluginHelper {
 	}
 
 	public void arxiuExpedientDesenllacar(ExpedientEntity expedientFill, ExpedientEntity expedientPare) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientPare.getId()));
 		String accioDescripcio = "Desenllaçant dos expedients (expedientUuidPare=" + expedientPare.getId() + ", expedientUuidFill=" + expedientFill.getId() + ")";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("idExpedientPare", expedientPare.getId().toString());
@@ -763,6 +763,7 @@ public class PluginHelper {
 			DocumentFirmaTipusEnumDto documentFirmaTipus, 
 			List<ArxiuFirmaDto> firmes,	
 			ArxiuEstatEnumDto arxiuEstat) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		ContingutArxiu documentArxiuCreatOModificat;
 		
 		boolean throwExceptionDocumentArxiu = false;
@@ -831,7 +832,7 @@ public class PluginHelper {
 	public void arxiuPropagarFirmaSeparada(
 			DocumentEntity document,
 			FitxerDto fitxerFirma) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		boolean throwExceptionDocumentArxiu = false;
 		if (throwExceptionDocumentArxiu) { // throwExceptionDocumentArxiu = true;
 			throw new RuntimeException("Mock excepcion al actualitzar firma al arxiu");
@@ -924,6 +925,7 @@ public class PluginHelper {
 	@Experimental
 	public void arxiuDocumentSetDefinitiu(  
 			DocumentEntity document) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		try {
 			Document documentArxiu = new Document();
 			documentArxiu.setIdentificador(document.getArxiuUuid());
@@ -1099,6 +1101,7 @@ public class PluginHelper {
 
 	public Document arxiuDocumentConsultar(String arxiuUuid) {
 
+		
 		IntegracioAccioDto integracioAccio = getIntegracioAccio(
 				arxiuUuid,
 				"Consulta d'un document");
@@ -1143,7 +1146,7 @@ public class PluginHelper {
 
 	public Document arxiuDocumentConsultar(DocumentEntity document, String arxiuUuid, String versio, boolean ambContingut, boolean ambVersioImprimible) {
 
-		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		if (document != null) {
@@ -1246,7 +1249,7 @@ public class PluginHelper {
 	
 	
 	public byte[] arxiuFirmaSeparadaConsultar(DocumentEntity document) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		IntegracioAccioDto integracioAccio = getIntegracioAccio(
 				document,
 				"Consulta d'una firma separada del document esboranny");
@@ -1270,6 +1273,7 @@ public class PluginHelper {
 
 	public void arxiuDocumentEsborrar(DocumentEntity document) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Eliminació d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -1291,7 +1295,7 @@ public class PluginHelper {
 	}
 
 	public List<ContingutArxiu> arxiuDocumentObtenirVersions(DocumentEntity document) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Obtenir versions del document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -1340,6 +1344,7 @@ public class PluginHelper {
 
 	public void arxiuDocumentCopiar(DocumentEntity document, String arxiuUuidDesti) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Copiar document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -1357,6 +1362,7 @@ public class PluginHelper {
 	}
 	public ContingutArxiu arxiuDocumentLink(DocumentEntity document, String arxiuUuidDesti) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Enllaçar document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -1404,7 +1410,8 @@ public class PluginHelper {
 	}
 
 	public String arxiuDocumentExportar(DocumentEntity document) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
+		
 		String accioDescripcio = "Exportar document en format ENI";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -1448,6 +1455,8 @@ public class PluginHelper {
 
 	public void arxiuCarpetaActualitzar(CarpetaEntity carpeta, ContingutEntity contingutPare) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
+		
 		String accioDescripcio = "Actualització de les dades d'una carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", carpeta.getId().toString());
@@ -1473,6 +1482,7 @@ public class PluginHelper {
 
 	public Carpeta arxiuCarpetaConsultar(CarpetaEntity carpeta) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
 		String accioDescripcio = "Consulta d'una carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", carpeta.getId().toString());
@@ -1491,6 +1501,7 @@ public class PluginHelper {
 
 	public void arxiuCarpetaEsborrar(CarpetaEntity carpeta) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
 		String accioDescripcio = "Eliminació d'una carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", carpeta.getId().toString());
@@ -1509,6 +1520,8 @@ public class PluginHelper {
 
 	public void arxiuCarpetaCopiar(CarpetaEntity carpeta, String arxiuUuidDesti) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
 		String accioDescripcio = "Copiar carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", carpeta.getId().toString());
@@ -1608,6 +1621,7 @@ public class PluginHelper {
 	public String portafirmesUpload(DocumentEntity document, String motiu, PortafirmesPrioritatEnum prioritat, Date dataCaducitat, String documentTipus,
 									String[] responsables, MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus, String fluxId, List<DocumentEntity> annexos, String transaccioId) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(document, motiu, prioritat, dataCaducitat, documentTipus, responsables, fluxTipus, fluxId, annexos);
 		List<PortafirmesDocument> portafirmesAnnexos = null;
@@ -2674,6 +2688,8 @@ public class PluginHelper {
 
 	public RespostaEnviar notificacioEnviar(DocumentNotificacioDto notificacioDto, ExpedientEntity expedientEntity, DocumentEntity documentEntity, InteressatEntity interessat) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
+		
 		MetaExpedientEntity metaExpedient = expedientEntity.getMetaExpedient();
 		String accioDescripcio = "Enviament d'una notificació electrònica";
 		Map<String, String> accioParams = getNotificacioAccioParams(notificacioDto, expedientEntity, documentEntity, interessat);
@@ -2792,6 +2808,8 @@ public class PluginHelper {
 	public byte[] notificacioConsultarIDescarregarCertificacio(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
+		
 		RespostaConsultaEstatEnviament resposta;
 		try {
 			resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
@@ -2823,6 +2841,8 @@ public class PluginHelper {
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
+		
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
 		RespostaConsultaEstatEnviament resposta = null;
 		String accioDescripcio = "Consulta d'estat d'una notificació electrònica";
@@ -2864,6 +2884,8 @@ public class PluginHelper {
 
 	public void actualitzarDadesRegistre(DocumentEnviamentInteressatEntity enviament) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(enviament.getNotificacio().getExpedient().getId()));
+		
 		String accioDescripcio = "Consulta dades registre de l'enviament amb referència: " + enviament.getEnviamentReferencia();
 		Map<String, String> accioParams = getAccioParams(enviament);
 		long t0 = System.currentTimeMillis();
@@ -2918,6 +2940,7 @@ public class PluginHelper {
 
 	public SignaturaResposta firmaServidorFirmar(DocumentEntity document, FitxerDto fitxer, String motiu, String idioma) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		String accioDescripcio = "Firma en servidor d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		accioParams.put("id", document.getId().toString());
@@ -2936,6 +2959,7 @@ public class PluginHelper {
 
 	public String viaFirmaUpload(DocumentEntity document, DocumentViaFirmaEntity documentViaFirmaEntity) {
 
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		ViaFirmaParams parametresViaFirma = new ViaFirmaParams();
 		ViaFirmaDispositiu viaFirmaDispositiu = new ViaFirmaDispositiu();
 		ViaFirmaResponse viaFirmaResponse;
@@ -3575,7 +3599,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (UnitatsOrganitzativesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			unitatsOrganitzativesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3584,13 +3608,37 @@ public class PluginHelper {
 	}
 
 	public IArxiuPlugin getArxiuPlugin() {
+		
 
 		String entitatCodi = configHelper.getEntitatActualCodi();
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		IArxiuPlugin plugin = arxiuPlugins.get(entitatCodi);
-//		loadPluginProperties("ARXIU");
+		
+		IArxiuPlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = arxiuPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.arxiu.class");
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi));
+					arxiuPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = arxiuPlugins.get(entitatCodi);
 		if (plugin != null) {
 			return plugin;
 		}
@@ -3601,13 +3649,19 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IArxiuPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			arxiuPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
 		}
+		
 	}
+
+	
+	
+
+
 
 	private PortafirmesPlugin getPortafirmesPlugin() {
 
@@ -3627,7 +3681,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (PortafirmesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class).
-						newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			portafirmesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3641,7 +3695,31 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		ConversioPlugin plugin = conversioPlugins.get(entitatCodi);
+		
+		ConversioPlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = conversioPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.conversio.class");
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (ConversioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi));
+					conversioPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = conversioPlugins.get(entitatCodi);
 //		loadPluginProperties("CONVERSIO");
 		if (plugin != null) {
 			return plugin;
@@ -3653,7 +3731,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ConversioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			conversioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3679,7 +3757,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DigitalitzacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			digitalitzacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3773,7 +3851,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			dadesExternesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3799,7 +3877,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			dadesExternesPinbalPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3825,7 +3903,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			validaSignaturaPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3839,7 +3917,31 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		NotificacioPlugin plugin = notificacioPlugins.get(entitatCodi);
+		
+		NotificacioPlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = notificacioPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.notificacio.class");
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (NotificacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi));
+					notificacioPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = notificacioPlugins.get(entitatCodi);
 //		loadPluginProperties("NOTIB");
 		if (plugin != null) {
 			return plugin;
@@ -3851,7 +3953,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (NotificacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			notificacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3865,7 +3967,31 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		FirmaServidorPlugin plugin = firmaServidorPlugins.get(entitatCodi);
+		
+		FirmaServidorPlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = firmaServidorPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.firmaservidor.class");
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi));
+					firmaServidorPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = firmaServidorPlugins.get(entitatCodi);
 //		loadPluginProperties("FIRMA_SERVIDOR");
 		if (plugin != null) {
 			return plugin;
@@ -3877,7 +4003,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (FirmaServidorPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			firmaServidorPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3904,7 +4030,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (ViaFirmaPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-								.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			viaFirmaPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {
@@ -3930,7 +4056,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			procedimentPlugin = (ProcedimentPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			procedimentPlugins.put(entitatCodi, procedimentPlugin);
 			return procedimentPlugin;
 		} catch (Exception ex) {
@@ -3956,7 +4082,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (GestioDocumentalPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getAllEntityProperties(entitatCodi));
+						.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
 			gestioDocumentalPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

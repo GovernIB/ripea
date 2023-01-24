@@ -669,6 +669,7 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(uuidToMove);
 		
 		try {
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
 			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
 					uuidToMove,
 					pare,
@@ -739,6 +740,7 @@ public class ExpedientHelper {
 			String arxiuUuid, 
 			Long expedientPeticioId,
 			Long justificantIdMetaDoc) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
@@ -1015,6 +1017,7 @@ public class ExpedientHelper {
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug(
 				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(

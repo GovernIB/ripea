@@ -50,6 +50,7 @@ import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.config.OrganConfigDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
@@ -75,6 +76,8 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import ma.glasnost.orika.CustomConverter;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -95,7 +98,10 @@ public class ConversioTipusHelper {
 	private ContingutHelper contingutHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
-	
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private TascaHelper tascaHelper;
 	public ConversioTipusHelper() {
@@ -172,6 +178,7 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<ExpedientTascaEntity, ExpedientTascaDto>() {
 					public ExpedientTascaDto convert(ExpedientTascaEntity source, Type<? extends ExpedientTascaDto> destinationClass) {
+						organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(source.getExpedient().getId()));
 						ExpedientTascaDto target = new ExpedientTascaDto();
 						target.setId(source.getId());
 						target.setExpedient((ExpedientDto) contingutHelper.toContingutDto(source.getExpedient()));
@@ -654,6 +661,7 @@ public class ConversioTipusHelper {
 						target.setNom(source.getNom());
 						target.setEntitatId(source.getEntitat() != null ? source.getEntitat().getId().toString() : null);
 						target.setEntitatNom(source.getEntitat() != null ? source.getEntitat().getNom() : null);
+						target.setEntitatCodi(source.getEntitat() != null ? source.getEntitat().getCodi() : null);
 						target.setPareId(source.getPare() != null ? source.getPare().getId() : null);
 						target.setPareCodi(source.getPare() != null ? source.getPare().getCodi() : null);
 						target.setPareNom(source.getPare() != null ? source.getPare().getNom() : null);
@@ -707,7 +715,31 @@ public class ConversioTipusHelper {
 					}
 				});
 		
-		
+		mapperFactory.getConverterFactory().registerConverter(
+				new CustomConverter<ConfigEntity, OrganConfigDto>() {
+					@Override
+					public OrganConfigDto convert(ConfigEntity source, Type<? extends OrganConfigDto> destinationClass) {
+						OrganConfigDto target = new OrganConfigDto();
+						OrganGestorEntity organGestor = organGestorRepository.findByCodi(source.getOrganCodi());
+						target.setOrganGestorId(organGestor.getId());
+						target.setOrganGestorCodiNom(organGestor.getCodi() + " - " + organGestor.getNom() + " (" + organGestor.getEntitat().getCodi() + ")");
+						
+						target.setKey(source.getKey());
+						target.setTypeCode(source.getTypeCode());
+						target.setJbossProperty(source.isJbossProperty());
+						
+			            if ("PASSWORD".equals(source.getTypeCode())){
+			            	target.setValue("*****");
+			            } else if (source.isJbossProperty()) {
+			                // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat a la base de dades.
+			            	target.setValue(ConfigHelper.JBossPropertiesHelper.getProperties().getProperty(source.getKey(), source.getValue()));
+			            } else {
+			            	target.setValue(source.getValue());
+			            }
+	
+						return target;
+					}
+				});
 		
 		
 		

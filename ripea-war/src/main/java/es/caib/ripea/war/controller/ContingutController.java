@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +62,8 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
@@ -113,12 +114,16 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	private BeanGeneratorHelper beanGeneratorHelper;
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private OrganGestorService organGestorService;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
 		
 		try {
 			
@@ -137,6 +142,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					RolHelper.getRolActual(request), 
 					EntitatHelper.getOrganGestorActualId(request),
 					false);
+
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,
@@ -332,6 +338,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutOrigenId,
 			Model model) {
+		
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutOrigenId));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		//Moure múltiples documents a carpetes del mateix expedient
 		@SuppressWarnings("unchecked")

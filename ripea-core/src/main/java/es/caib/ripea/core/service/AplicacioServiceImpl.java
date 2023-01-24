@@ -76,6 +76,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
 		configHelper.setEntitat(entitat);
 	}
+	
+	@Override
+	public void actualitzarOrganCodi(String organCodi) {
+		ConfigHelper.setOrganCodi(organCodi);
+	}
 
 	@Transactional
 	@Override

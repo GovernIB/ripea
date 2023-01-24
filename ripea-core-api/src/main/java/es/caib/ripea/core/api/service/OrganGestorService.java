@@ -287,4 +287,16 @@ public interface OrganGestorService {
 	public ArbreDto<OrganGestorDto> findOrgansArbreAmbFiltre(
 			Long entitatId,
 			OrganGestorFiltreDto filtre);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<OrganGestorDto> findAll(
+			String filter);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getOrganCodiFromContingutId(
+			Long contingutId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void actualitzarOrganCodi(
+			String organCodi);
 }

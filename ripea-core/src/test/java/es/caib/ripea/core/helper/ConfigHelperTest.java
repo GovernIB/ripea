@@ -72,8 +72,8 @@ public class ConfigHelperTest {
     public void crearEntitatKeyTest() throws Exception {
 
         // When
-        String propertyValue = configHelper.crearEntitatKey(entitatCodi, ConfigDto.prefix + configKey);
-        String propertyValue2 = configHelper.crearEntitatKey(entitatCodi, configKey);
+        String propertyValue = configHelper.getKeyEntitat(entitatCodi, ConfigDto.prefix + configKey);
+        String propertyValue2 = configHelper.getKeyEntitat(entitatCodi, configKey);
 
         // Then
         Assert.assertEquals(ConfigDto.prefix + "." +entitatCodi + configKey, propertyValue);
@@ -83,7 +83,7 @@ public class ConfigHelperTest {
     @Test(expected = RuntimeException.class)
     public void crearEntitatKeyTest_throwException() throws Exception {
         // When
-        configHelper.crearEntitatKey(entitatCodi, null);
+        configHelper.getKeyEntitat(entitatCodi, null);
     }
 
     @Test

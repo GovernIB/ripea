@@ -35,12 +35,20 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 	public List<OrganGestorEntity> findByEntitatAndHasPare(
 			@Param("entitat") EntitatEntity entitat);
 
+
 	@Query(	"from " +
 			"    OrganGestorEntity og " +
 			"where (og.entitat = :entitat)" +
 			" and (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
 	public List<OrganGestorEntity> findByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre);
+	
+	@Query(	"from " +
+			"    OrganGestorEntity og " +
+			"where (:esNullFiltre = true or lower(og.codi) like lower('%'||:filtre||'%') or lower(og.nom) like lower('%'||:filtre||'%')) ")
+	public List<OrganGestorEntity> findByFiltre(
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre);
 	

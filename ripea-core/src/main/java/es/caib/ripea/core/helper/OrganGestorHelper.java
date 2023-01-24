@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
 import es.caib.ripea.core.entity.AvisEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientOrganPareEntity;
@@ -36,6 +37,7 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.repository.AvisRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -67,6 +69,8 @@ public class OrganGestorHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private MessageHelper messageHelper;
+	@Autowired
+	private ContingutRepository contingutRepository;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
@@ -447,6 +451,16 @@ public class OrganGestorHelper {
 		}
 		entitat.setDataActualitzacio(ara);
 
+	}
+	
+	public void actualitzarOrganCodi(String organCodi) {
+		ConfigHelper.setOrganCodi(organCodi);
+	}
+
+	
+	public String getOrganCodiFromContingutId(Long contingutId) {
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		return contingut.getExpedientPare().getOrganGestor().getCodi();
 	}
 
 	private String organsToCodiList(List<OrganGestorEntity> organs) {

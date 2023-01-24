@@ -182,7 +182,7 @@ public class ContingutHelper {
 			Long organActualId, 
 			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare, boolean ambEntitat) {
 		level++;
-    	
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
@@ -2009,6 +2009,7 @@ public class ContingutHelper {
 					document.updateArxiu(annexUuid);
 
 					// 3. Crear el document a partir de l'annex
+					organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 					String uuidDesti = pluginHelper.arxiuDocumentMoure(
 							document.getArxiuUuid(),
 							document.getPare().getArxiuUuid(),
