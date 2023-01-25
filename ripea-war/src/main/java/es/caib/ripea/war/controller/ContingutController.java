@@ -63,7 +63,6 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
