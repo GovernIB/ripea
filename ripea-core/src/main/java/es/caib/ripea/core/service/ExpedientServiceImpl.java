@@ -215,7 +215,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual, 
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
+		
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorRepository.findOne(organGestorId).getCodi());
 		logger.info(
 				"Creant nou expedient Service(" +
 						"entitatId=" + entitatId + ", " +
