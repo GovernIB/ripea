@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +30,6 @@ import es.caib.ripea.war.command.ConfigCommand;
 import es.caib.ripea.war.command.OrganConfigCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import fr.opensagres.xdocreport.core.utils.StringUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
