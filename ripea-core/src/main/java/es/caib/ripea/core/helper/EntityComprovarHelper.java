@@ -130,6 +130,20 @@ public class EntityComprovarHelper {
 	}
 	
 	public EntitatEntity comprovarEntitat(
+			Long entitatId) throws NotFoundException {
+		
+		return comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				false,
+				false);
+		
+	}
+	
+	
+	public EntitatEntity comprovarEntitat(
 			Long entitatId,
 			boolean comprovarPermisUsuari,
 			boolean comprovarPermisAdmin,
@@ -554,6 +568,23 @@ public class EntityComprovarHelper {
 			        + entitat.getId() + ") no coincideix amb l'entitat de la carpeta");
 		}
 		return carpeta;
+	}
+	
+	public ExpedientEntity comprovarExpedient(
+			Long entitatId,
+			Long expedientId) {
+		
+		return comprovarExpedient(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				false,
+				false,
+				null);
+		
 	}
 
 	public ExpedientEntity comprovarExpedient(

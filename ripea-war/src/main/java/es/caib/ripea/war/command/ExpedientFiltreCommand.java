@@ -8,6 +8,7 @@ import java.util.Date;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 
@@ -64,10 +65,10 @@ public class ExpedientFiltreCommand {
 		this.metaExpedientId = metaExpedientId;
 	}
 	public void setMetaExpedientDominiCodi(String metaExpedientDominiCodi) {
-		this.metaExpedientDominiCodi = metaExpedientDominiCodi != null ? metaExpedientDominiCodi.trim() : null;
+		this.metaExpedientDominiCodi = Utils.getTrimOrNull(metaExpedientDominiCodi);
 	}
 	public void setNom(String nom) {
-		this.nom = nom != null ? nom.trim() : null;
+		this.nom = Utils.getTrimOrNull(nom);
 	}
 	public void setDataCreacioInici(Date dataCreacioInici) {
 		this.dataCreacioInici = dataCreacioInici;
@@ -76,7 +77,7 @@ public class ExpedientFiltreCommand {
 		this.dataCreacioFi = dataCreacioFi;
 	}
 	public void setNumero(String numero) {
-		this.numero = numero != null ? numero.trim() : null;
+		this.numero = Utils.getTrimOrNull(numero);
 	}
 	public void setExpedientEstatId(Long expedientEstatId) {
 		this.expedientEstatId = expedientEstatId;
@@ -94,13 +95,13 @@ public class ExpedientFiltreCommand {
 		this.tipusId = tipusId;
 	}
 	public void setInteressat(String interessat) {
-		this.interessat = interessat != null ? interessat.trim() : null;
+		this.interessat = Utils.getTrimOrNull(interessat);
 	}
 	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
-		this.metaExpedientDominiValor = metaExpedientDominiValor != null ? metaExpedientDominiValor.trim() : null;
+		this.metaExpedientDominiValor = Utils.getTrimOrNull(nom);
 	}
 	public void setAgafatPer(String agafatPer) {
-		this.agafatPer = agafatPer != null ? agafatPer.trim() : null;
+		this.agafatPer = Utils.getTrimOrNull(agafatPer);
 	}
 
 }

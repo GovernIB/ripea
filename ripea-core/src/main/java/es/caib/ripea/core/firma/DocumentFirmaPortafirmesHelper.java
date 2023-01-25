@@ -15,15 +15,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerAmbFirmaArxiuDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -45,10 +48,12 @@ import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -88,6 +93,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	private PortafirmesBlockInfoRepository portafirmesBlockInfoRepository;
 	@Autowired
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
+	@Autowired
+	private ContingutHelper contingutHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -168,7 +175,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		SistemaExternException sex = portafirmesEnviar(
 				documentPortafirmes,
 				transaccioId);
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		if (sex != null) {
 			throw sex;
 		}
@@ -272,7 +279,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		} else if (DocumentEnviamentEstatEnumDto.ENVIAT.equals(documentPortafirmes.getEstat())) {
 			exception = portafirmesProcessar(documentPortafirmes);
 		}
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 		return exception;
 	}
 	
@@ -307,172 +314,128 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 	}
 
+	/**
+	 * Processes document received in callback from portafirmes
+	 */
 	public Exception portafirmesProcessar(
 			DocumentPortafirmesEntity documentPortafirmes) {
-		DocumentEntity document = documentPortafirmes.getDocument();
-		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
-		PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
-		if (PortafirmesCallbackEstatEnumDto.FIRMAT.equals(callbackEstat)) {
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
-			document.updateEstat(
-					DocumentEstatEnumDto.FIRMAT);
-			logFirmat(document);
-
-			PortafirmesDocument portafirmesDocument = null;
-			try {
-				String gestioDocumentalId = document.getGesDocFirmatId();
+		
+		try {
+			DocumentEntity document = documentPortafirmes.getDocument();
+			DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
+			PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
+			
+			// =============================================== DOCUMENT WAS FIRMAT EN PORTAFIRMES ============================================
+			if (PortafirmesCallbackEstatEnumDto.FIRMAT.equals(callbackEstat)) {
+				PortafirmesDocument portafirmesDocument = null;
 				
-				if (gestioDocumentalId == null || gestioDocumentalId.isEmpty()) {
-					// Descarrega el document firmat del portafirmes
-					portafirmesDocument = pluginHelper.portafirmesDownload(
-							documentPortafirmes);
-				} else {
-					portafirmesDocument = new PortafirmesDocument();
-					ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-					pluginHelper.gestioDocumentalGet(
-							gestioDocumentalId,
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
-							streamAnnex);
-					portafirmesDocument.setArxiuNom(document.getNomFitxerFirmat());
-					portafirmesDocument.setArxiuContingut(streamAnnex.toByteArray());
-				}
+				portafirmesDocument = getDocumentFirmatPortafirmes(documentPortafirmes);
+				
+				try {
 
-			} catch (Exception ex) {
-				logger.error("Error al descarregar document de portafirmes (" +
-						"id=" + documentPortafirmes.getId() + ", " +
-						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
-						ex);
-				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
-				Throwable rootCause = ExceptionUtils.getRootCause(ex);
-				if (rootCause == null) rootCause = ex;
-				documentPortafirmes.updateProcessatError(
-						ExceptionUtils.getStackTrace(rootCause),
-						null);
-				return ex;
-			}
-			try {
-				if (portafirmesDocument.isCustodiat()) {
-					// Si el document ja ha estat custodiat pel portafirmes
-					// actualitza la informació de custòdia.
-					document.updateInformacioCustodia(
-							new Date(),
-							portafirmesDocument.getCustodiaId(),
-							portafirmesDocument.getCustodiaUrl());
-					documentPortafirmes.updateProcessat(
-							true,
-							new Date());
-				} else {
 					// Si el document no ha estat custodiat pel portafirmes
 					// actualitza la informació de firma a l'arxiu.
-					FitxerDto fitxer = new FitxerDto();
-					ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
-					if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
-						fitxer.setNom(document.getFitxerNom());
-						fitxer.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
-						fitxer.setContingut(portafirmesDocument.getArxiuContingut());
-						fitxer.setContentType("application/pdf");
-					} else {
-						fitxer = documentHelper.getFitxerAssociatFirmat(
-								document, 
-								null);
-						arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
-						arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
-						arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
-						arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
-						arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+					if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 						
-						List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
-						for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
-							ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
-							detall.setData(firmant.getData());
-							detall.setEmissorCertificat(firmant.getEmissorCertificat());
-							detall.setResponsableNif(firmant.getResponsableNif());
-							detall.setResponsableNom(firmant.getResponsableNom());
-							detalls.add(detall);
-						}
-						arxiuFirma.setDetalls(detalls);
-						arxiuFirma.setAutofirma(true);
-					}
-					// Si no ha estat custodiat
-					if (!documentEstatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) {
-						documentPortafirmes.updateProcessat(
-								true,
-								new Date());
 						
 						String gestioDocumentalId = document.getGesDocFirmatId();
-							if (gestioDocumentalId == null ) {
-								gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
-										PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
-										new ByteArrayInputStream(portafirmesDocument.getArxiuContingut()));
-								document.setGesDocFirmatId(gestioDocumentalId);
-								document.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
-							}
+						if (gestioDocumentalId == null ) {
+							gestioDocumentalId = pluginHelper.gestioDocumentalCreate(
+									PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+									new ByteArrayInputStream(portafirmesDocument.getArxiuContingut()));
+							document.setGesDocFirmatId(gestioDocumentalId);
+							document.setNomFitxerFirmat(portafirmesDocument.getArxiuNom());
 						}
-					
-				
-						String custodiaDocumentId = null;
+						
+						// ============================== SAVE IN ARXIU ==========================
+						ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 						if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
-							custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(
+							
+							List<ArxiuFirmaDto> firmes = null;
+							if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
+								firmes = pluginHelper.validaSignaturaObtenirFirmes(portafirmesDocument.getArxiuContingut(), null, "application/pdf", true);
+							} else {
+								ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(portafirmesDocument.getArxiuNom(), portafirmesDocument.getArxiuContingut());
+								firmes = Arrays.asList(firma);
+							}
+							
+							document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+							
+							contingutHelper.arxiuPropagarModificacio(
 									document,
-									fitxer);
-						} else {
-							custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaCades(
-									document, 
-									fitxer, 
-									Arrays.asList(arxiuFirma));
-						}
-						document.updateInformacioCustodia(
-								new Date(),
-								custodiaDocumentId,
-								document.getCustodiaCsv());
+									firmes.get(0).getFitxer(),
+									arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+									firmes,
+									arxiuEstat);
 
-						documentHelper.actualitzarVersionsDocument(document);
-						actualitzarInformacioFirma(document);
-						contingutLogHelper.log(
-								documentPortafirmes.getDocument(),
-								LogTipusEnumDto.ARXIU_CUSTODIAT,
-								custodiaDocumentId,
-								null,
-								false,
-								false);
-						logExpedient(documentPortafirmes, LogTipusEnumDto.ARXIU_CUSTODIAT);
+
+						} else { // i am not sure if cades is supported
+							FitxerDto fitxer = documentHelper.getFitxerAssociatFirmat(
+									document, 
+									null);
+							
+							ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
+							arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
+							arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
+							arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
+							arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+							arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+							List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+							for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
+								ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+								detall.setData(firmant.getData());
+								detall.setEmissorCertificat(firmant.getEmissorCertificat());
+								detall.setResponsableNif(firmant.getResponsableNif());
+								detall.setResponsableNom(firmant.getResponsableNom());
+								detalls.add(detall);
+							}
+							arxiuFirma.setDetalls(detalls);
+							arxiuFirma.setAutofirma(true);
+							
+							
+							if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY) {
+								pluginHelper.arxiuPropagarFirmaSeparada(
+										document,
+										arxiuFirma.getFitxer());
+							}
+							contingutHelper.arxiuPropagarModificacio(
+									document,
+									fitxer,
+									arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_SEPARADA,
+									Arrays.asList(arxiuFirma),
+									arxiuEstat);
+						}
 						
-						
-						String gestioDocumentalId = document.getGesDocFirmatId();
-						if (gestioDocumentalId != null ) {
+						String gestioDocumentalDeleteId = document.getGesDocFirmatId();
+						if (gestioDocumentalDeleteId != null ) {
 							pluginHelper.gestioDocumentalDelete(
-									gestioDocumentalId,
+									gestioDocumentalDeleteId,
 									PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB);
 							document.setGesDocFirmatId(null);
 						}
-
+						
+						actualitzarInfoDocumentPortafirmesGuardatArxiu(
+								documentPortafirmes,
+								documentEstatAnterior);
+					}
 					
+
+				} catch (Exception ex) {
+					logger.error("Error al custodiar document de portafirmes (" +
+							"id=" + documentPortafirmes.getId() + ", " +
+							"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
+							ex);
+					cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
+					documentPortafirmes.updateProcessatError(
+							ExceptionUtils.getStackTrace(ExceptionHelper.getRootCauseOrItself(ex)),
+							null);
+					throw ex;
 				}
-				DocumentEstatEnumDto documentEstatNou = document.getEstat();
-				if (documentEstatAnterior != DocumentEstatEnumDto.CUSTODIAT && (documentEstatAnterior != documentEstatNou)) {
-					alertaHelper.crearAlerta(
-							"La firma del document " + document.getNom() + " ha finalitzat correctament",
-							null,
-							document.getExpedient().getId());
-					emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
-				}
-			} catch (Exception ex) {
-				logger.error("Error al custodiar document de portafirmes (" +
-						"id=" + documentPortafirmes.getId() + ", " +
-						"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
-						ex);
-				cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
-				Throwable rootCause = ExceptionUtils.getRootCause(ex);
-				if (rootCause == null) rootCause = ex;
-				documentPortafirmes.updateProcessatError(
-						ExceptionUtils.getStackTrace(rootCause),
-						null);
-				return ex;
-			}
-		}
-		if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
-			cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
-			try {
+				
+				
+			// ========================================== DOCUMENT WAS REBUTJAT EN PORTAFIRMES ==============================================
+			} else if (PortafirmesCallbackEstatEnumDto.REBUTJAT.equals(callbackEstat)) {
+				cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
 				documentPortafirmes.getDocument().updateEstat(
 						DocumentEstatEnumDto.REDACCIO);
 				documentPortafirmes.updateProcessat(
@@ -484,14 +447,109 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						null,
 						document.getExpedient().getId());
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
-			} catch (Exception ex) {
-				Throwable rootCause = ExceptionUtils.getRootCause(ex);
-				if (rootCause == null) rootCause = ex;
-				return ex;
 			}
+			return null;
+		} catch (Exception e) {
+			return e;
 		}
-		return null;
 	}
+	
+	
+	private void actualitzarInfoDocumentPortafirmesGuardatArxiu(
+			DocumentPortafirmesEntity documentPortafirmes,
+			DocumentEstatEnumDto documentEstatAnterior) {
+		DocumentEntity document = documentPortafirmes.getDocument();
+		documentPortafirmes.updateProcessat(
+				true,
+				new Date());
+		
+		DocumentEstatEnumDto documentEstatNou = document.getEstat();
+		if ((documentEstatAnterior != documentEstatNou)) {
+			alertaHelper.crearAlerta(
+					"La firma del document " + document.getNom() + " ha finalitzat correctament",
+					null,
+					document.getExpedient().getId());
+			emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
+		}
+		
+	}
+	
+	private PortafirmesDocument getDocumentFirmatPortafirmes(DocumentPortafirmesEntity documentPortafirmes) {
+		
+		DocumentEntity document = documentPortafirmes.getDocument();
+		
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		logFirmat(document);
+
+		PortafirmesDocument portafirmesDocument = null;
+		try {
+			String gestioDocumentalId = document.getGesDocFirmatId();
+			
+			if (gestioDocumentalId == null || gestioDocumentalId.isEmpty()) {
+				// Descarrega el document firmat del portafirmes
+				portafirmesDocument = pluginHelper.portafirmesDownload(
+						documentPortafirmes);
+			} else {
+				portafirmesDocument = new PortafirmesDocument();
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						gestioDocumentalId,
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+						streamAnnex);
+				portafirmesDocument.setArxiuNom(document.getNomFitxerFirmat());
+				portafirmesDocument.setArxiuContingut(streamAnnex.toByteArray());
+			}
+
+		} catch (Exception ex) {
+			logger.error("Error al descarregar document de portafirmes (" +
+					"id=" + documentPortafirmes.getId() + ", " +
+					"portafirmesId=" + documentPortafirmes.getPortafirmesId() + ")",
+					ex);
+			cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
+			documentPortafirmes.updateProcessatError(
+					ExceptionUtils.getStackTrace(ExceptionHelper.getRootCauseOrItself(ex)),
+					null);
+			throw ex;
+		}
+		return portafirmesDocument;
+	}
+	
+	
+	private FitxerAmbFirmaArxiuDto getFitxerAmbFirma(PortafirmesDocument portafirmesDocument, DocumentEntity document) {
+		FitxerAmbFirmaArxiuDto fitxerAmbFirmaArxiuDto = new FitxerAmbFirmaArxiuDto();
+		FitxerDto fitxer = new FitxerDto();
+		
+		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
+		
+		fitxer = documentHelper.getFitxerAssociatFirmat(
+				document, 
+				null);
+		arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
+		arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
+		arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
+		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
+		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
+		
+		List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
+		for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
+			ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
+			detall.setData(firmant.getData());
+			detall.setEmissorCertificat(firmant.getEmissorCertificat());
+			detall.setResponsableNif(firmant.getResponsableNif());
+			detall.setResponsableNom(firmant.getResponsableNom());
+			detalls.add(detall);
+		}
+		arxiuFirma.setDetalls(detalls);
+		arxiuFirma.setAutofirma(true);
+		
+		
+		fitxerAmbFirmaArxiuDto.setFitxer(fitxer);
+		fitxerAmbFirmaArxiuDto.setArxiuFirma(arxiuFirma);
+		
+		return fitxerAmbFirmaArxiuDto;
+	}
+	
 	
 	public void portafirmesCancelar(
 			Long entitatId,
@@ -499,8 +557,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ")");
-		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedientPare());
-		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedientPare());
+		cacheHelper.evictEnviamentsPortafirmesPendentsPerExpedient(document.getExpedient());
+		cacheHelper.evictEnviamentsPortafirmesAmbErrorPerExpedient(document.getExpedient());
 		boolean hasFirmaParcial = false;
 		List<DocumentViaFirmaEntity> enviamentsViaFirmaProcessats = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document, 

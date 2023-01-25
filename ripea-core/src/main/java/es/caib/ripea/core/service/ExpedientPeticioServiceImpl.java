@@ -378,9 +378,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				byte[] firmaContingut = arxiuFirma.getContingut();
 				String contentType = document.getContingut().getTipusMime();
 
-				return pluginHelper.validaSignaturaObtenirFirmes(documentContingut,
+				return pluginHelper.validaSignaturaObtenirFirmes(
+						documentContingut,
 						firmaContingut,
-						contentType);
+						contentType, 
+						false);
 			}
 		}
 		return null;

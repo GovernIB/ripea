@@ -31,6 +31,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
@@ -107,17 +108,38 @@ public class DocumentEntity extends NodeEntity {
 	@Column(name = "descripcio", length = 512)
 	protected String descripcio;
 
-	//document signed by portafib that haven't been saved in arxiu 
+	
+	//Tipus de document firmat:
+		//Document firmat putjat manualment
+		//Document firmat des dels navegador
+		//Document firmat que es rep des del portafirmes callback
+		//Document que vene d'una anotació de registre
+		//Document generat de les resposta de PINBAL
+	
+	// document signed in portafirmes that arrived in callback and was not saved in arxiu 
 	@Column(name = "ges_doc_firmat_id", length = 256)
 	private String gesDocFirmatId;
 	@Column(name = "nom_fitxer_firmat", length = 512)
 	private String nomFitxerFirmat;
 	
-	// document adjunt when creating document that haven't been saved in arxiu
+	//document uploaded manually in ripea that was not saved in arxiu
+	// document sense firma o amb firma adjunta
 	@Column(name = "ges_doc_adjunt_id", length = 256)
 	private String gesDocAdjuntId;
+	// firma separada
 	@Column(name = "ges_doc_adjunt_firma_id", length = 256)
 	private String gesDocAdjuntFirmaId;
+	
+	
+//	// firma separada of document saved as esborrany in arxiu
+//	@Column(name = "ges_doc_esborrany_firma_id", length = 256)
+//	private String gesDocEsborranyFirmaSeparadaId;
+	
+	
+	// firma separada of document saved as esborrany in arxiu
+	@Column(name = "arxiu_uuid_firma", length = 36)
+	private String arxiuUuidFirma;
+	
 	@Column(name = "pinbal_idpeticion", length = 64)
 	private String pinbalIdpeticion;
 
@@ -128,6 +150,20 @@ public class DocumentEntity extends NodeEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "annex_estat")
 	private ArxiuEstatEnumDto annexArxiuEstat;
+	
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "arxiu_estat", length = 16)
+	private ArxiuEstatEnumDto arxiuEstat;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(name = "doc_firma_tipus", length = 16)
+	private DocumentFirmaTipusEnumDto documentFirmaTipus;
+	
+	
+	
+	
+	
 	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
@@ -163,6 +199,14 @@ public class DocumentEntity extends NodeEntity {
 		return pare.getId();
 	}
 	
+	
+    /**
+
+     * @deprecated
+     * DocumentEntity already has field expedient, there is no need to calculate it
+     * <p> Use {@link #getExpedient()} instead.
+     */
+    @Deprecated
 	public ExpedientEntity getExpedientPare() {
 		ContingutEntity contingutPare = this.pare;
 		while(contingutPare != null && !(contingutPare instanceof ExpedientEntity)) {
@@ -203,6 +247,14 @@ public class DocumentEntity extends NodeEntity {
 			MetaDocumentEntity metaDocument) {
 		this.metaNode = metaDocument;
 	}
+	
+	public void updateArxiuEstat(ArxiuEstatEnumDto arxiuEstat) {
+		this.arxiuEstat = arxiuEstat;
+	}
+	
+	public void updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto documentFirmaTipus) {
+		this.documentFirmaTipus = documentFirmaTipus;
+	}
 
 	public void update(
 			MetaDocumentEntity metaDocument,
@@ -218,7 +270,8 @@ public class DocumentEntity extends NodeEntity {
 			String ntiIdDocumentoOrigen,
 			DocumentNtiTipoFirmaEnumDto ntiTipoFirma,
 			String ntiCsv,
-			String ntiCsvRegulacion) {
+			String ntiCsvRegulacion, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus) {
 		this.metaNode = metaDocument;
 		this.nom = nom;
 		this.descripcio = descripcio;
@@ -233,6 +286,7 @@ public class DocumentEntity extends NodeEntity {
 		this.ntiTipoFirma = ntiTipoFirma;
 		this.ntiCsv = ntiCsv;
 		this.ntiCsvRegulacion = ntiCsvRegulacion;
+		this.documentFirmaTipus = documentFirmaTipus;
 	}
 
 	public void updateNtiIdentificador(
@@ -312,6 +366,10 @@ public class DocumentEntity extends NodeEntity {
 		return "";
 	}
 
+	public boolean isArxiuEstatDefinitu() {
+		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
+	}
+	
 	public boolean isErrorEnviamentPortafirmes() {
 		DocumentPortafirmesEntity docPortLast = null;
 		if (enviaments != null) {
@@ -352,7 +410,8 @@ public class DocumentEntity extends NodeEntity {
 			MetaNodeEntity metaNode,
 			ContingutEntity pare,
 			EntitatEntity entitat,
-			ExpedientEntity expedient) {
+			ExpedientEntity expedient, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus) {
 		return new Builder(
 				documentTipus,
 				estat,
@@ -369,7 +428,8 @@ public class DocumentEntity extends NodeEntity {
 				metaNode,
 				pare,
 				entitat,
-				expedient);
+				expedient, 
+				documentFirmaTipus);
 	}
 	public static class Builder {
 		DocumentEntity built;
@@ -389,7 +449,8 @@ public class DocumentEntity extends NodeEntity {
 				MetaNodeEntity metaNode,
 				ContingutEntity pare,
 				EntitatEntity entitat,
-				ExpedientEntity expedient) {
+				ExpedientEntity expedient, 
+				DocumentFirmaTipusEnumDto documentFirmaTipus) {
 			built = new DocumentEntity();
 			built.documentTipus = documentTipus;
 			built.estat = estat;
@@ -411,6 +472,8 @@ public class DocumentEntity extends NodeEntity {
 			built.tipus = ContingutTipusEnumDto.DOCUMENT;
 			built.versioCount = 0;
 			built.validacioFirmaCorrecte = true;
+			built.documentFirmaTipus = documentFirmaTipus;
+			
 		}
 		public Builder ubicacio(String ubicacio) {
 			built.ubicacio = ubicacio;

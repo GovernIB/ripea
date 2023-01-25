@@ -76,6 +76,7 @@ function refrescarFileChooser(campPath, contenidorId) {
 			var ocultarDocuments = <c:choose><c:when test="${ocultarDocuments}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
 			$("input#" + campPath).val(data.id);
 			
+			data = JSOG.decode(data);
 			// SEETING PATH IN THE PANEL HEADER
 			var path = "";
 			if (data.id == '${contenidorBaseId}') { // if the returned container is the root container

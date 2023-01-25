@@ -218,6 +218,7 @@
 									return false;
 								} else if (event.which == 1) {
 									if (!plugin.settings.rowhrefToggle) {
+										$("body").addClass("loading");
 										window.location.href = $(this).data('href');
 										return false;
 									} else {
@@ -450,12 +451,14 @@
 					dataTableOptions = $.extend({
 						stateSave: true,
 						stateSaveCallback: function(settings, data) {
-							sessionStorage.setItem( 'DataTables_' + settings.sInstance, JSON.stringify(data) )
+							var tableUniqueId = 'DataTables_' + settings.sInstance + "_" + (settings.ajax.url).replace('/ripea/','').replace('/datatable','');
+							sessionStorage.setItem( tableUniqueId, JSON.stringify(data) )
 						}
 					}, dataTableOptions);
 					dataTableOptions = $.extend({
 						stateLoadCallback: function(settings) {
-							return JSON.parse( sessionStorage.getItem( 'DataTables_' + settings.sInstance ) )
+							var tableUniqueId = 'DataTables_' + settings.sInstance + "_" + (settings.ajax.url).replace('/ripea/','').replace('/datatable','');
+							return JSON.parse( sessionStorage.getItem( tableUniqueId ) )
 						}
 					}, dataTableOptions);
 				}

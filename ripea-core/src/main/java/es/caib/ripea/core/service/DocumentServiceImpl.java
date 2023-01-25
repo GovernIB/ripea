@@ -41,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -143,7 +142,6 @@ public class DocumentServiceImpl implements DocumentService {
 				pare,
 				expedient,
 				metaDocument,
-				null,
 				true);
 	}
 
@@ -295,7 +293,10 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception guardarDocumentArxiu(
 			Long docId) {
-		synchronized (SynchronizationHelper.get0To99Lock(docId, SynchronizationHelper.locksGuardarDocumentArxiu)) {
+		
+		Long expedientId = documentRepository.findExpedientId(docId);
+		
+		synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
 			return documentHelper.guardarDocumentArxiu(docId);
 		}
 	}
@@ -423,19 +424,18 @@ public class DocumentServiceImpl implements DocumentService {
 				true,
 				false);
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
-				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-						document,
-						null,
-						versio,
-						true,
-						false);
-				List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
-						documentHelper.getContingutFromArxiuDocument(arxiuDocument),
-						documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
-						null);
-				return arxiuFirmes.get(0).getDetalls();
-			}
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					document,
+					null,
+					versio,
+					true,
+					false);
+			List<ArxiuFirmaDto> arxiuFirmes = pluginHelper.validaSignaturaObtenirFirmes(
+					documentHelper.getContingutFromArxiuDocument(arxiuDocument),
+					documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument),
+					null, 
+					false);
+			return arxiuFirmes.get(0).getDetalls();
 		}
 		return null;
 	}
@@ -599,15 +599,12 @@ public class DocumentServiceImpl implements DocumentService {
 		document.setAmbFirma(true);
 		document.setFirmaSeparada(false);
 		document.setPinbalIdpeticion(idPeticion);
-		ArxiuFirmaDto firma = new ArxiuFirmaDto();
-		firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
-		firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+
 		documentHelper.crearDocument(
 				document,
 				pare,
 				expedient,
 				metaDocument,
-				Arrays.asList(firma),
 				true);
 	}
 
@@ -891,7 +888,7 @@ public class DocumentServiceImpl implements DocumentService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});
@@ -1471,7 +1468,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				true,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
 	
 

@@ -8,6 +8,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -236,6 +237,9 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 
 			} catch (Exception ex) {
 				exception = ex;
+			}
+			if (exception instanceof ArxiuJaGuardatException) {
+				exception = null;
 			}
 			if (exception != null ) {
 				logger.error("Error al custodiar document pendent", exception);

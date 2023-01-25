@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -222,6 +223,41 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					"firma.info.processat.ok");
 		}
 	}
+	
+	@RequestMapping(value = "/{documentId}/portafirmes/reintentarGuardarArxiu", method = RequestMethod.GET)
+	public String portafirmesReintentarGuardarArxiu(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		Exception exc = documentService.portafirmesReintentar(
+				entitatActual.getId(),
+				documentId);
+		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
+		if (exc == null) {
+			return this.getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"document.controller.guardar.arxiu.ok");
+
+		} else {
+			Throwable root = ExceptionHelper.getRootCauseOrItself(exc);
+			String msg = null;
+			if (root instanceof ConnectException || (root.getMessage() != null && root.getMessage().contains("timed out"))) {
+				msg = getMessage(request,"error.arxiu.connectTimedOut");
+			} else {
+				msg = root.getMessage();
+			}
+			return getAjaxControllerReturnValueError(
+					request,
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"document.controller.guardar.arxiu.error",
+					new Object[] {msg},
+					root);
+		}
+	}
+	
+	
 
 	@RequestMapping(value = "/{documentId}/portafirmes/cancel", method = RequestMethod.GET)
 	public String portafirmesCancel(
@@ -515,7 +551,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		
 		String forsarTancamentModal = aplicacioService.propertyFindByNom("plugin.passarelafirma.forsar.tancament.modal");
 		if (ignorarModal) {
-			return "redirect:/contingut/" + documentId;
+			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+			return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
 		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
 			String propertyValue = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga");
 			boolean usingNewVersion = propertyValue == null || !propertyValue.equals("true");

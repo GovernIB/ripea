@@ -235,6 +235,7 @@ public class ConversioTipusHelper {
 							target = new InteressatAdministracioDto();
 							((InteressatAdministracioDto)target).setOrganCodi(((InteressatAdministracioEntity)source).getOrganCodi());
 							((InteressatAdministracioDto)target).setOrganNom(((InteressatAdministracioEntity)source).getOrganNom());
+							((InteressatAdministracioDto)target).setAmbOficinaSir(((InteressatAdministracioEntity)source).getAmbOficinaSir());
 						} else if (source instanceof  InteressatPersonaFisicaEntity) {
 							target = new InteressatPersonaFisicaDto();
 							((InteressatPersonaFisicaDto)target).setNom(((InteressatPersonaFisicaEntity)source).getNom());

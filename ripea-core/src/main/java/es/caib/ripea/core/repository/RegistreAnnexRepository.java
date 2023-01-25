@@ -28,6 +28,15 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 	public RegistreAnnexEntity findById(
 			@Param("id") Long id);
 	
+	@Query(	"select " +
+			"    a.document.expedient.id " +
+			"from " +
+			"    RegistreAnnexEntity a  " +
+			"where " +
+			"    a.id = :id ")
+	public Long findExpedientId(
+			@Param("id") Long id);
+	
 	
 	
 	@Query(	"select " +

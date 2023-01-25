@@ -143,13 +143,6 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public String propertyBaseUrl();
 
-	/**
-	 * Retorna si el plugin d'arxiu està actiu.
-	 * 
-	 * @return true si està actiu o false si no ho està.
-	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
-	public boolean isPluginArxiuActiu();
 
 	/**
 	 * Retorna el valor de la propietat es.caib.ripea.plugin.passarelafirma.ids.
@@ -217,5 +210,7 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public void evictRolsPerUsuari(String usuariCodi);
+
+	public boolean mostrarLogsRendiment();
 
 }

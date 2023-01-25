@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
@@ -85,6 +87,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	private MetaDocumentHelper metaDocumentHelper;
 	@Resource
 	private MetaExpedientRepository metaExpedientRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	@Transactional
 	@Override
@@ -745,6 +749,9 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			MetaExpedientEntity metaExpedient, 
 			boolean findAllMarkDisponiblesPerCreacio) {
 		
+		long t1 = System.currentTimeMillis();
+		
+		
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<MetaDocumentEntity>();
 		// Dels meta-documents actius pel meta-expedient només deixa els que
 		// encara es poden afegir segons la multiplicitat.
@@ -789,6 +796,10 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			metaDocuments = metaDocumentsDelMetaExpedient;
 		}
 
+		
+    	if (cacheHelper.mostrarLogsRendiment())
+    		logger.info("findMetaDocumentsDisponiblesPerCreacio time (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		
 		return metaDocuments;
 	}
 

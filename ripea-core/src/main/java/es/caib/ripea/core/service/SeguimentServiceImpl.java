@@ -4,15 +4,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
@@ -31,6 +38,8 @@ import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
@@ -67,6 +76,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private InteressatRepository interessatRepository;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -184,7 +197,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
+	public PaginaDto<ExpedientPeticioListDto> findAnotacionsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams, 
@@ -239,268 +252,226 @@ public class SeguimentServiceImpl implements SeguimentService {
 	
 	
 	
-	@Override
-	@Transactional(readOnly = true)
-	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsExpedients(
-			Long entitatId,
-			SeguimentArxiuPendentsFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
-		
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false, 
-					false, 
-					null, null);
-		}
-		
-		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("expedientNumeroNom", new String[] { "codi", "any", "sequencia", "nom" });
-		ordenacioMap.put("dataDarrerIntent", new String[] { "arxiuIntentData" });
-		
-
-		Page<ExpedientEntity> exps = expedientRepository.findArxiuPendents(
-				entitat,
-				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-				metaExpedient == null,
-				metaExpedient,
-				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
-
-		
-		return paginacioHelper.toPaginaDto(exps, SeguimentArxiuPendentsDto.class);
-		
-	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Long> findArxiuPendentsExpedients(
+	public ResultDto<SeguimentArxiuPendentsDto> findPendentsArxiu(
 			Long entitatId,
-			SeguimentArxiuPendentsFiltreDto filtre) {
-
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
-
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false,
-					false,
-					null, null);
-		}
-
-		return expedientRepository.findArxiuPendents(
-				entitat,
-				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-				metaExpedient == null,
-				metaExpedient);
-	}
+			SeguimentArxiuPendentsFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			ResultEnumDto resultEnum,
+			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum) {
+		ResultDto<SeguimentArxiuPendentsDto> result = new ResultDto<SeguimentArxiuPendentsDto>();
 	
-	
-	@Override
-	@Transactional(readOnly = true)
-	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsDocuments(
-			Long entitatId,
-			SeguimentArxiuPendentsFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId);
+
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
-					filtre.getMetaExpedientId(),
-					false,
-					false,
-					false,
-					false, 
-					false,
-					null, null);
+					filtre.getMetaExpedientId());
 		}
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
 					entitatId,
-					filtre.getExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false,
-					false,
-					null);
+					filtre.getExpedientId());
+		}
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		boolean nomesAgafats = true;
+		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
+			nomesAgafats = false;
+		}
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(
+				entitatId,
+				rolActual);
+		if (CollectionUtils.isEmpty(metaExpedientsPermesos)) {
+			metaExpedientsPermesos = null;
 		}
 		
-		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("expedientNumeroNom", new String[] { "expedient.codi", "expedient.any", "expedient.sequencia"});
-		ordenacioMap.put("elementNom", new String[] { "nom" });
-		ordenacioMap.put("dataDarrerIntent", new String[] { "c.arxiuIntentData" });
-		
+		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+				entitatId,
+				rolActual);
 
-		Page<DocumentEntity> docs = documentRepository.findArxiuPendents(
-				entitat,
-				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-				expedient == null,
-				expedient,
-				metaExpedient == null,
-				metaExpedient,
-				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 
-		
-		return paginacioHelper.toPaginaDto(docs, SeguimentArxiuPendentsDto.class);
-		
+		// =========================================== EXPEDIENT =======================================================
+		if (arxiuPendentTipusEnum == ArxiuPendentTipusEnumDto.EXPEDIENT) {
+
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("expedientNumeroNom", new String[] { "codi", "any", "sequencia", "nom" });
+			ordenacioMap.put("dataDarrerIntent", new String[] { "arxiuIntentData" });
+
+			if (resultEnum == ResultEnumDto.PAGE) {
+				
+//				Page<ExpedientEntity> exps = expedientRepository.findArxiuPendents(
+//						entitat,
+//						permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+//						permisosPerExpedients.getIdsMetaExpedientsPermesos(),
+//						permisosPerExpedients.getIdsOrgansPermesos() == null,
+//						permisosPerExpedients.getIdsOrgansPermesos(),
+//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
+//						permisosPerExpedients.getIdsProcedimentsComuns(),
+//						nomesAgafats,
+//						auth.getName(),
+//						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+//						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+//						metaExpedient == null,
+//						metaExpedient,
+//						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+
+				
+				// ============ RETURNS PAGE (DATATABLE) ===============
+				Page<ExpedientEntity> exps = expedientRepository.findArxiuPendents(
+						entitat,
+						metaExpedientsPermesos,
+						nomesAgafats,
+						auth.getName(),
+						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+						metaExpedient == null,
+						metaExpedient,
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+				result.setPagina(paginacioHelper.toPaginaDto(exps, SeguimentArxiuPendentsDto.class));
+
+			} else {
+				// =========== RETURNS IDS (SELECCIONAR TOTS) ==============
+				List<Long> exps = expedientRepository.findIdsArxiuPendents(
+						entitat,
+						metaExpedientsPermesos,
+						nomesAgafats,
+						auth.getName(),
+						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+						metaExpedient == null,
+						metaExpedient);
+				result.setIds(exps);
+			}
+
+		// =========================================== DOCUMENT =========================================================
+		} else if (arxiuPendentTipusEnum == ArxiuPendentTipusEnumDto.DOCUMENT) {
+
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("expedientNumeroNom", new String[] { "expedient.codi", "expedient.any", "expedient.sequencia" });
+			ordenacioMap.put("elementNom", new String[] { "nom" });
+			ordenacioMap.put("dataDarrerIntent", new String[] { "c1.arxiuIntentData" });
+
+			if (resultEnum == ResultEnumDto.PAGE) {
+
+//				List<DocumentEntity> docs1 = documentRepository.findArxiuPendents2();
+				
+				
+				// ============ RETURNS PAGE (DATATABLE) ================
+				Page<DocumentEntity> docs = documentRepository.findArxiuPendents(
+						entitat,
+						metaExpedientsPermesos,
+						nomesAgafats,
+						auth.getName(),
+						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+						expedient == null,
+						expedient,
+						metaExpedient == null,
+						metaExpedient, 
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+				
+				
+//				Page<DocumentEntity> docs = documentRepository.findArxiuPendents(
+//						entitat,
+//						permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+//						permisosPerExpedients.getIdsMetaExpedientsPermesos(),
+//						permisosPerExpedients.getIdsOrgansPermesos() == null,
+//						permisosPerExpedients.getIdsOrgansPermesos(),
+//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+//						permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+//						permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
+//						permisosPerExpedients.getIdsProcedimentsComuns(),
+//						nomesAgafats,
+//						auth.getName(),
+//						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+//						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+//						expedient == null,
+//						expedient,
+//						metaExpedient == null,
+//						metaExpedient, 
+//						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+
+				result.setPagina(paginacioHelper.toPaginaDto(docs, SeguimentArxiuPendentsDto.class));
+
+			} else {
+
+				// =========== RETURNS IDS (SELECCIONAR TOTS) ==============
+				List<Long> docs = documentRepository.findIdsArxiuPendents(
+						entitat,
+						metaExpedientsPermesos,
+						nomesAgafats,
+						auth.getName(),
+						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+						expedient == null,
+						expedient,
+						metaExpedient == null,
+						metaExpedient);
+				result.setIds(docs);
+			}
+
+		// =========================================== INTERESSAT =======================================================
+		} else if (arxiuPendentTipusEnum == ArxiuPendentTipusEnumDto.INTERESSAT) {
+
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("expedientNumeroNom", new String[] { "expedient.codi", "expedient.any", "expedient.sequencia" });
+			ordenacioMap.put("elementNom", new String[] { "nom" });
+			ordenacioMap.put("dataDarrerIntent", new String[] { "arxiuIntentData" });
+
+			if (resultEnum == ResultEnumDto.PAGE) {
+
+				// ============ RETURNS PAGE (DATATABLE) ================
+				Page<InteressatEntity> ints = interessatRepository.findArxiuPendents(
+						entitat,
+						metaExpedientsPermesos,
+						nomesAgafats,
+						auth.getName(),
+						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+						expedient == null,
+						expedient,
+						metaExpedient == null,
+						metaExpedient,
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+
+				result.setPagina(paginacioHelper.toPaginaDto(ints, SeguimentArxiuPendentsDto.class));
+			} else {
+
+				// =========== RETURNS IDS (SELECCIONAR TOTS) ==============
+				List<Long> ints = interessatRepository.findIdsArxiuPendents(
+						entitat,
+						metaExpedientsPermesos,
+						nomesAgafats,
+						auth.getName(),
+						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
+						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
+						expedient == null,
+						expedient,
+						metaExpedient == null,
+						metaExpedient);
+
+				result.setIds(ints);
+
+			}
+		} else {
+			throw new RuntimeException("Enum not supported");
+		}
+
+		return result;
+
 	}
 
-	@Override
-	public List<Long> findArxiuPendentsDocuments(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false,
-					null, null);
-		}
-		ExpedientEntity expedient = null;
-		if (filtre.getExpedientId() != null) {
-			expedient = entityComprovarHelper.comprovarExpedient(
-					entitatId,
-					filtre.getExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false,
-					false,
-					null);
-		}
-
-		return documentRepository.findArxiuPendents(
-				entitat,
-				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-				expedient == null,
-				expedient,
-				metaExpedient == null,
-				metaExpedient);
-	}
-
-
-	@Override
-	@Transactional(readOnly = true)
-	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsInteressats(
-			Long entitatId,
-			SeguimentArxiuPendentsFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-		
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					false,
-					false,
-					false,
-					false, 
-					false,
-					null, null);
-		}
-		ExpedientEntity expedient = null;
-		if (filtre.getExpedientId() != null) {
-			expedient = entityComprovarHelper.comprovarExpedient(
-					entitatId,
-					filtre.getExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false,
-					false,
-					null);
-		}
-		
-		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("expedientNumeroNom", new String[] { "expedient.codi", "expedient.any", "expedient.sequencia"});
-		ordenacioMap.put("elementNom", new String[] { "nom" });
-		ordenacioMap.put("dataDarrerIntent", new String[] { "arxiuIntentData" });
-		
-
-		Page<InteressatEntity> ints = interessatRepository.findArxiuPendents(
-				entitat,
-				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-				expedient == null,
-				expedient,
-				metaExpedient == null,
-				metaExpedient,
-				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
-
-		
-		return paginacioHelper.toPaginaDto(ints, SeguimentArxiuPendentsDto.class);
-		
-	}
-
-	@Override
-	public List<Long> findArxiuPendentsInteressats(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
-
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false,
-					null, null);
-		}
-		ExpedientEntity expedient = null;
-		if (filtre.getExpedientId() != null) {
-			expedient = entityComprovarHelper.comprovarExpedient(
-					entitatId,
-					filtre.getExpedientId(),
-					false,
-					false,
-					false,
-					false,
-					false,
-					false,
-					null);
-		}
-
-		return interessatRepository.findArxiuPendents(
-				entitat,
-				filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-				filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-				expedient == null,
-				expedient,
-				metaExpedient == null,
-				metaExpedient);
-	}
 
 
 }

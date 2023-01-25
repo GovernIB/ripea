@@ -217,6 +217,7 @@ $(document).ready(function() {
  	$('select#organCodi').change(function() {
  		munOrgan = '';
  	 	if ($(this).val() != "") {
+ 	 		let optionSelected = $("option:selected", this);
 	 		$.ajax({
 				type: 'GET',
 				url: "<c:url value="/expedient/organ/"/>" + $(this).val(),
@@ -231,6 +232,7 @@ $(document).ready(function() {
 		 	 		$('#codiPostal').val(data.codiPostal);
 		 	 		$('#adresa').val(data.adressa);
 		 	 		$('#documentNum').val(data.nifCif);
+		 	 		$('#ambOficinaSir').val(optionSelected.hasClass('ambOficinaSir'));
 				}
 			});
  	 	} else {
@@ -394,7 +396,8 @@ $(document).ready(function() {
 							"id": val.codi,
 							"text": val.denominacio
 						});
-						selOrgan.append("<option value=\"" + val.codi + "\">" + val.denominacio + "</option>");
+						//Afegim la classe per identificar si és SIR, la cridada a dir3 (obtenerUnidad) al seleccionar un òrgan no retorna cap camp que ho indiqui
+						selOrgan.append("<option value=\"" + val.codi + "\" class=\"" + (val.ambOficinaSir ? "ambOficinaSir" : '') + "\">" + val.denominacio + "</option>");
 					});
 				}
 				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
@@ -585,6 +588,7 @@ function canviVisibilitat(tipus) {
 				<span class="fa fa-bars"></span>
 			</button>
 		</div>
+		<form:hidden path="ambOficinaSir"/>
 		<!-- 		</div> -->
 		<!-- FILA: Document interessat -->
 		<div class="row">

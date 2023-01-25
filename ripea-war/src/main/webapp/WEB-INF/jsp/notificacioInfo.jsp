@@ -169,9 +169,9 @@ $(document).ready(function(){
 							<h3 class="panel-title"><strong><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</strong></h3>
 						</div>
 						
-						<%-- DO NOT DELETE, uncomment to manually refresh state from Notib
+						<!-- DO NOT DELETE, uncomment to manually refresh state from Notib
 						<a href="<c:url value="/document/notificacio/actualitzarEstat/${notificacio.enviamentIdentificador}/${enviament.enviamentReferencia}"/>" class="btn btn-default btn-sm pull-right"><span class="fa fa-refresh"></span></a>
-						--%>
+						-->
 						<table class="table table-bordered" width="100%">
 						  <!------- INTERESSAT ------->							
 						  <tr>

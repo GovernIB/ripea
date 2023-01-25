@@ -129,7 +129,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
 
 	@Transactional
@@ -224,7 +224,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -344,7 +344,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -354,22 +354,70 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 
-		if (!conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
+		if (!contingutHelper.conteDocumentsDefinitius(contingut) && !(contingut instanceof DocumentEntity && ((DocumentEntity) contingut).getGesDocAdjuntId() != null)) {
 
 			// Propaga l'acció a l'arxiu
 			FitxerDto fitxer = null;
-			if (contingut instanceof DocumentEntity) {
+
+			if (contingut instanceof ExpedientEntity) {
+				contingutHelper.arxiuPropagarModificacio((ExpedientEntity) contingut);
+			} else if (contingut instanceof DocumentEntity) {
+				
 				DocumentEntity document = (DocumentEntity)contingut;
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
-					fitxer = contingutHelper.fitxerDocumentEsborratLlegir((DocumentEntity)contingut);
+
+					DocumentFirmaTipusEnumDto documentFirmaTipus = document.getDocumentFirmaTipus();
+					List<ArxiuFirmaDto> firmes = null;
+					
+					if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+						
+						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								null, 
+								false, 
+								true);
+						
+					} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						
+						fitxer = contingutHelper.fitxerDocumentEsborratLlegir(document);
+						byte[] firmaContingut = contingutHelper.firmaSeparadaEsborratLlegir(document);
+						firmes = documentHelper.validaFirmaDocument(
+								document, 
+								fitxer,
+								firmaContingut, 
+								false, 
+								true);
+						
+					} 
+					
+					
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(documentFirmaTipus);
+					
+					if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+						pluginHelper.arxiuPropagarFirmaSeparada(
+								document,
+								firmes.get(0).getFitxer());
+					}
+					contingutHelper.arxiuPropagarModificacio(
+							document,
+							fitxer,
+							arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+							firmes,
+							arxiuEstat);
+					
 				}
+				
+
+			} else if (contingut instanceof CarpetaEntity) {
+				contingutHelper.arxiuPropagarModificacio(
+						(CarpetaEntity) contingut,
+						false);
 			}
-			contingutHelper.arxiuPropagarModificacio(
-					contingut,
-					fitxer,
-					false,
-					false,
-					null, false);
+
 			if (fitxer != null) {
 				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
@@ -472,7 +520,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		contingutHelper.arxiuPropagarMoviment(
 				contingutOrigen,
 				contingutDesti,
@@ -575,7 +623,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -681,7 +729,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		return dto;
 	}
 
@@ -701,7 +749,9 @@ public class ContingutServiceImpl implements ContingutService {
 				true, 
 				rolActual, null);
 	}
-
+	
+	
+	
 	@Transactional(readOnly = true)
 	@Override
 	public ContingutDto findAmbIdUser(
@@ -712,6 +762,33 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambPermisos, 
 			String rolActual, 
 			Long organActualId) {
+		
+		return findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				ambPermisos,
+				rolActual,
+				organActualId,
+				true);
+
+	}
+	
+
+	@Transactional(readOnly = true)
+	@Override
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos, 
+			String rolActual, 
+			Long organActualId,
+			boolean ambEntitat) {
+		
+		long t2 = System.currentTimeMillis();
 		logger.debug("Obtenint contingut amb id per usuari ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
@@ -745,6 +822,7 @@ public class ContingutServiceImpl implements ContingutService {
 //				}
 //			}
 //		}
+		Long t0 = System.currentTimeMillis();
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -754,12 +832,27 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false, null);
+				rolActual, false, null, true, 0, null, null, true, ambEntitat);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
+
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("findAmbIdUser time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		return dto;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public boolean isExpedient(
+			Long contingutId) {
+
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+
+		return contingut instanceof ExpedientEntity;
+	}
+
 
 	@Transactional(readOnly = true)
 	@Override
@@ -787,7 +880,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null, false, null);
+				true, null, false, null, false, 0, null, null, true);
 	}
 
 	@Transactional(readOnly = true)
@@ -1071,7 +1164,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null, false, null);
+								false, null, false, null, false, 0, null, null, true);
 					}
 				});
 	}
@@ -1132,7 +1225,7 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null, false, null);
+								false, null, false, null, false, 0, null, null, true);
 					}
 				});
 	}
@@ -1160,6 +1253,8 @@ public class ContingutServiceImpl implements ContingutService {
 		List<ContingutArxiu> continguts = null;
 		List<Firma> firmes = null;
 		ArxiuDetallDto arxiuDetall = new ArxiuDetallDto();
+		
+		// ##################### EXPEDIENT ##################################
 		if (contingut instanceof ExpedientEntity) {
 			es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(
 					(ExpedientEntity)contingut);
@@ -1189,6 +1284,8 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniOrgans(metadades.getOrgans());
 				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());		
 			}
+			
+		// ##################### DOCUMENT ##################################
 		} else if (contingut instanceof DocumentEntity) {
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 					contingut,
@@ -1202,103 +1299,16 @@ public class ContingutServiceImpl implements ContingutService {
 			if (metadades != null) {
 				arxiuDetall.setEniVersio(metadades.getVersioNti());
 				arxiuDetall.setEniIdentificador(metadades.getIdentificador());
+				arxiuDetall.setSerieDocumental(metadades.getSerieDocumental());
 				arxiuDetall.setEniDataCaptura(metadades.getDataCaptura());
-				if (metadades.getOrigen() != null) {
-					switch (metadades.getOrigen()) {
-					case CIUTADA:
-						arxiuDetall.setEniOrigen(NtiOrigenEnumDto.O0);
-						break;
-					case ADMINISTRACIO:
-						arxiuDetall.setEniOrigen(NtiOrigenEnumDto.O1);
-						break;
-					}
-				}
-				if (metadades.getEstatElaboracio() != null) {
-					switch (metadades.getEstatElaboracio()) {
-					case ORIGINAL:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE01);
-						break;
-					case COPIA_CF:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE02);
-						break;
-					case COPIA_DP:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE03);
-						break;
-					case COPIA_PR:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE04);
-						break;
-					case ALTRES:
-						arxiuDetall.setEniEstatElaboracio(DocumentNtiEstadoElaboracionEnumDto.EE99);
-						break;
-					}
-				}
-				if (metadades.getTipusDocumental() != null) {
-					switch (metadades.getTipusDocumental()) {
-					case RESOLUCIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD01);
-						break;
-					case ACORD:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD02);
-						break;
-					case CONTRACTE:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD03);
-						break;
-					case CONVENI:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD04);
-						break;
-					case DECLARACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD05);
-						break;
-					case COMUNICACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD06);
-						break;
-					case NOTIFICACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD07);
-						break;
-					case PUBLICACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD08);
-						break;
-					case JUSTIFICANT_RECEPCIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD09);
-						break;
-					case ACTA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD10);
-						break;
-					case CERTIFICAT:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD11);
-						break;
-					case DILIGENCIA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD12);
-						break;
-					case INFORME:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD13);
-						break;
-					case SOLICITUD:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD14);
-						break;
-					case DENUNCIA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD15);
-						break;
-					case ALEGACIO:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD16);
-						break;
-					case RECURS:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD17);
-						break;
-					case COMUNICACIO_CIUTADA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD18);
-						break;
-					case FACTURA:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD19);
-						break;
-					case ALTRES_INCAUTATS:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD20);
-						break;
-					case ALTRES:
-						arxiuDetall.setEniTipusDocumental(DocumentNtiTipoDocumentalEnumDto.TD99);
-						break;
-					}
-				}
+				
+				arxiuDetall.setEniOrigen(ArxiuConversions.getOrigen(metadades.getOrigen()));
+
+				arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
+				
+				arxiuDetall.setEniTipusDocumental(ArxiuConversions.getTipusDocumentalEnum(metadades.getTipusDocumental()));
+				
+			
 
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
@@ -1355,6 +1365,8 @@ public class ContingutServiceImpl implements ContingutService {
 				else if (DocumentEstat.DEFINITIU.equals(arxiuDocument.getEstat()))
 					arxiuDetall.setArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 			}
+			
+		// ##################### CARPETA ##################################
 		} else if (contingut instanceof CarpetaEntity) {
 			Carpeta arxiuCarpeta = pluginHelper.arxiuCarpetaConsultar(
 					(CarpetaEntity)contingut);
@@ -1367,6 +1379,8 @@ public class ContingutServiceImpl implements ContingutService {
 					ContingutEntity.class,
 					"Tipus de contingut desconegut: " + contingut.getClass().getName());
 		}
+		
+		// ##################### CONTINGUT ##################################
 		if (continguts != null) {
 			List<ArxiuContingutDto> detallFills = new ArrayList<ArxiuContingutDto>();
 			for (ContingutArxiu cont: continguts) {
@@ -1396,6 +1410,7 @@ public class ContingutServiceImpl implements ContingutService {
 			List<ArxiuFirmaDto> dtos = new ArrayList<ArxiuFirmaDto>();
 			for (Firma firma: firmes) {
 				ArxiuFirmaDto dto = new ArxiuFirmaDto();
+				
 				if (firma.getTipus() != null) {
 					switch (firma.getTipus()) {
 					case CSV:
@@ -1605,7 +1620,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});
@@ -1759,7 +1774,7 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null);
+									false, null, false, null, false, 0, null, null, true);
 							return dto;
 						}
 					});
@@ -1902,7 +1917,8 @@ public class ContingutServiceImpl implements ContingutService {
 					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio(),
 					documentOrigen.getNtiIdDocumentoOrigen(),
-					null);
+					null, 
+					documentOrigen.getDocumentFirmaTipus());
 		}
 		if (creat != null) {
 			if (creat instanceof NodeEntity) {
@@ -1957,7 +1973,8 @@ public class ContingutServiceImpl implements ContingutService {
 					contingutDesti.getExpedient(),
 					documentOrigen.getUbicacio(),
 					uuidDocumentoOrigen,
-					null);
+					null, 
+					documentOrigen.getDocumentFirmaTipus());
 		}
 		if (creat != null) {
 			if (creat instanceof DocumentEntity) {
@@ -2065,21 +2082,6 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 	}
 
-	private boolean conteDocumentsDefinitius(ContingutEntity contingut) {
-		boolean conteDefinitius = false;
-		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
-			for (ContingutEntity contingutFill: contingut.getFills()) {
-				conteDefinitius = conteDocumentsDefinitius(contingutFill);
-				if (conteDefinitius)
-					break;
-			}
-		} else if (deproxied instanceof DocumentEntity) {
-			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat());
-		}
-		return conteDefinitius;
-	}
 
 
 	// Mètodes per evitar errors al tenir continguts orfes en base de dades

@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -39,9 +40,8 @@ import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.Expedient;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
@@ -66,10 +66,11 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -84,6 +85,7 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -101,6 +103,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -173,16 +176,17 @@ public class ExpedientHelper {
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private MetaExpedientRepository metaExpedientRepository;
+	
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	
 	
 
-	/**
-	 * 
-	 * This method is synchronized to avoid possibility of getting and using same sequence by concurrent threads, to avoid creating expedients with the same name by concurrent threads, to avoid creating expedients from the same annotation by concurrent threads
-	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long create(
 			Long entitatId,
@@ -366,12 +370,7 @@ public class ExpedientHelper {
 		try {
 			// create expedient in arxiu
 			contingutHelper.arxiuPropagarModificacio(
-					expedient,
-					null,
-					false,
-					false,
-					null,
-					false);
+					expedient);
 
 			for (InteressatEntity interessat : expedient.getInteressats()) {
 				interessat.updateArxiuIntent(true);
@@ -580,7 +579,6 @@ public class ExpedientHelper {
 						"expedientId=" + expedientEntity.getId() + ")");
 			}
 			
-			
 		
 			DocumentEntity docEntity = documentHelper.crearDocumentDB(
 					documentDto.getDocumentTipus(),
@@ -601,15 +599,16 @@ public class ExpedientHelper {
 					null,
 					registreAnnexEntity.isValidacioFirmaCorrecte(),
 					registreAnnexEntity.getValidacioFirmaErrorMsg(),
-					registreAnnexEntity.getAnnexArxiuEstat());
+					registreAnnexEntity.getAnnexArxiuEstat(), 
+					documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()));
 			FitxerDto fitxer = new FitxerDto();
 			fitxer.setNom(documentDto.getFitxerNom());
 			fitxer.setContentType(documentDto.getFitxerContentType());
 			fitxer.setContingut(documentDto.getFitxerContingut());
 			if (documentDto.getFitxerContingut() != null) {
-				documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
+				documentHelper.actualitzarFitxerDB(docEntity, fitxer);
 				if (documentDto.isAmbFirma()) {
-					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 				}
 			} else {
 				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
@@ -656,6 +655,12 @@ public class ExpedientHelper {
 			// if document was dispatched, update uuid to new document
 			if (uuidDesti != null) {
 				docEntity.updateArxiu(uuidDesti);
+			}
+			
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
+				docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+			} else {
+				docEntity.updateArxiuEstat(ArxiuEstatEnumDto.ESBORRANY);
 			}
 			
 			registreAnnexEntity.updateError(null);
@@ -780,15 +785,16 @@ public class ExpedientHelper {
 				expedientEntity,
 				documentDto.getUbicacio(),
 				documentDto.getNtiIdDocumentoOrigen(),
-				null);
+				null, 
+				documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()));
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(documentDto.getFitxerNom());
 		fitxer.setContentType(documentDto.getFitxerContentType());
 		fitxer.setContingut(documentDto.getFitxerContingut());
 		if (documentDto.getFitxerContingut() != null) {
-			documentHelper.actualitzarFitxerDocument(docEntity, fitxer);
+			documentHelper.actualitzarFitxerDB(docEntity, fitxer);
 			if (documentDto.isAmbFirma()) {
-				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut());
+				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 			}
 		} else {
 			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
@@ -801,6 +807,7 @@ public class ExpedientHelper {
 		// ##########################################
 		// put arxiu uuid of annex
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
+		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
 		if (isCarpetaActive) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
@@ -980,12 +987,12 @@ public class ExpedientHelper {
 				false,
 				false,
 				rolActual,
-				onlyForList, null);
+				onlyForList, null, false, 0, null, null, true);
 		return expedientDto;
 	}
 	
 	
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
 		logger.debug(
 				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
@@ -999,9 +1006,7 @@ public class ExpedientHelper {
 				false, 
 				checkPerMassiuAdmin, null);
 		
-		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) { // concurrency
-			throw new RuntimeException("L'expedient ja se ha tancat");
-		}
+		concurrencyCheckExpedientJaTancat(expedient);
 		
 		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
@@ -1009,51 +1014,61 @@ public class ExpedientHelper {
 		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
 		}
-		boolean hiHaEsborranysPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
-		if (!documentRepository.hasAnyDocumentDefinitiu(expedient) && !hiHaEsborranysPerFirmar) {
-			throw new ExpedientTancarSenseDocumentsDefinitiusException();
-		}
+
 		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
 		expedient.updateExpedientEstat(null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-		if (pluginHelper.isArxiuPluginActiu()) {
-			List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
-					entitatId,
-					id);
-			// Firmam els documents seleccionats
-			if (hiHaEsborranysPerFirmar) {
-				for (Long documentPerFirmar : documentsPerFirmar) {
-					DocumentEntity document = documentRepository.getOne(documentPerFirmar);
-					if (document != null) {
-						FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);
-						if (!document.isValidacioFirmaCorrecte() || document.getArxiuUuid() == null) {
-							//remove invalid signature
-							fitxer.setContingut(documentFirmaServidorFirma.removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
-						}
-						documentFirmaServidorFirma.firmar(document, fitxer, motiu);
-						//pluginHelper.arxiuDocumentGuardarFirmaCades(document, fitxer, Arrays.asList(arxiuFirma));
-					} else {
-						throw new NotFoundException(documentPerFirmar, DocumentEntity.class);
-					}
-				}
+		List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
+				entitatId,
+				id);
+		
+		// Firmam els documents seleccionats
+		boolean hiHaDocumentsPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
+		if (hiHaDocumentsPerFirmar) {
+			for (Long documentPerFirmar : documentsPerFirmar) {
+				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu);
 			}
-			// Eliminam de l'expedient els esborranys que no s'han firmat
-			for (DocumentEntity esborrany : esborranys) {
-				boolean trobat = false;
-				if (documentsPerFirmar != null) {
-					for (Long documentPerFirmarId : documentsPerFirmar) {
-						if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
-							trobat = true;
-							break;
-						}
-					}
-				}
-				if (!trobat) {
-					documentRepository.delete(esborrany);
-				}
-			}
-			pluginHelper.arxiuExpedientTancar(expedient);
 		}
+		// Eliminam de l'expedient els esborranys que no s'han firmat
+		for (DocumentEntity esborrany : esborranys) {
+			boolean trobat = false;
+			if (documentsPerFirmar != null) {
+				for (Long documentPerFirmarId : documentsPerFirmar) {
+					if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
+						trobat = true;
+						break;
+					}
+				}
+			}
+			if (!trobat) {
+				documentRepository.delete(esborrany);
+			}
+		}
+		
+		
+		// Marquem esborannys firmats com a definitius
+		List<DocumentEntity> esborranysArxiu = documentRepository.findByExpedientAndArxiuEstat(
+				expedient,
+				ArxiuEstatEnumDto.ESBORRANY);
+		for (DocumentEntity documentEntity : esborranysArxiu) {
+			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
+		} 
+		
+		
+		// remove eborranys in arxiu
+		List<ContingutArxiu> contingutsArxiu = pluginHelper.arxiuExpedientConsultarPerUuid(expedient.getArxiuUuid()).getContinguts();
+		for (ContingutArxiu contingutArxiu : contingutsArxiu) {
+			if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT) {
+				Document document = pluginHelper.arxiuDocumentConsultar(contingutArxiu.getIdentificador());
+				if (document.getEstat() == DocumentEstat.ESBORRANY) {
+					pluginHelper.arxiuDocumentEsborrar(document.getIdentificador());
+				}
+			}
+		}
+		
+		documentHelper.clearDocuments(expedient);
+		
+		pluginHelper.arxiuExpedientTancar(expedient);
 	}
 
 	
@@ -1110,7 +1125,7 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
 
 
@@ -1172,13 +1187,13 @@ public class ExpedientHelper {
 		
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
 		
+		if (expedient.getArxiuUuid() != null) { // concurrency check
+			throw new ArxiuJaGuardatException("L'expedient ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+		}
+		concurrencyCheckExpedientJaTancat(expedient);
+		
 		try {
-			contingutHelper.arxiuPropagarModificacio(
-					expedient,
-					null,
-					false,
-					false,
-					null, false);
+			contingutHelper.arxiuPropagarModificacio(expedient);
 			
 			for (InteressatEntity interessat : expedient.getInteressats()) {
 				interessat.updateArxiuIntent(true);
@@ -1295,6 +1310,70 @@ public class ExpedientHelper {
 			resultat = contingutHelper.generarIndex(entitatActual, expedients, exportar);
 		}
 		return resultat;
+	}
+	
+	
+	
+	public PermisosPerExpedientsDto findPermisosPerExpedients(
+			Long entitatId,
+			String rolActual) {
+		PermisosPerExpedientsDto permisosPerExpedientsDto = new PermisosPerExpedientsDto();
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+
+		long t7 = System.currentTimeMillis();
+		List<Long> idsMetaExpedientsPermesos = null;
+		if (rolActual.equals("IPA_ADMIN")) {
+			idsMetaExpedientsPermesos = metaExpedientRepository.findAllIdsByEntitat(entitat);
+		} else {
+			// Cercam els metaExpedients amb permisos assignats directament
+			idsMetaExpedientsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					MetaNodeEntity.class,
+					ExtendedPermission.READ));
+		}
+		permisosPerExpedientsDto.setIdsMetaExpedientsPermesos(idsMetaExpedientsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsMetaExpedientsPermesos (" + (idsMetaExpedientsPermesos != null ? idsMetaExpedientsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t7) + " ms");
+		
+		// Cercam els òrgans amb permisos assignats directament
+		long t8 = System.currentTimeMillis();
+		List<Long> idsOrgansPermesos;
+		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			idsOrgansPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					OrganGestorEntity.class,
+					ExtendedPermission.ADMINISTRATION));
+		} else {
+			idsOrgansPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+					OrganGestorEntity.class,
+					ExtendedPermission.READ));
+		}
+		permisosPerExpedientsDto.setIdsOrgansPermesos(idsOrgansPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsOrgansPermesos (" + (idsOrgansPermesos != null ? idsOrgansPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t8) + " ms");
+		
+		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
+		long t9 = System.currentTimeMillis();
+		List<Long> idsMetaExpedientOrganPairsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				MetaExpedientOrganGestorEntity.class,
+				ExtendedPermission.READ));
+		permisosPerExpedientsDto.setIdsMetaExpedientOrganPairsPermesos(idsMetaExpedientOrganPairsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsMetaExpedientOrganPairsPermesos (" + (idsMetaExpedientOrganPairsPermesos != null ? idsMetaExpedientOrganPairsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t9) + " ms");
+		
+		// Cercam els òrgans amb permisos per procediemnts comuns
+		long t91 = System.currentTimeMillis();
+		List<Long> idsOrgansAmbProcedimentsComunsPermesos = toListLong(permisosHelper.getObjectsIdsWithTwoPermissions(
+				OrganGestorEntity.class,
+				ExtendedPermission.COMU,
+				ExtendedPermission.READ));
+		permisosPerExpedientsDto.setIdsOrgansAmbProcedimentsComunsPermesos(idsOrgansAmbProcedimentsComunsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + " " + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
+		
+		
+		List<Long> procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
+		permisosPerExpedientsDto.setIdsProcedimentsComuns(procedimentsComunsIds);
+		return permisosPerExpedientsDto;
+		
 	}
 	
 	private BigDecimal crearFilesCarpetaActual(
@@ -1510,10 +1589,10 @@ public class ExpedientHelper {
 		document.setFitxerNom(documentArxiu.getNom());
 		document.setArxiuUuid(documentArxiu.getIdentificador());
 		document.setDataCaptura(documentArxiu.getMetadades().getDataCaptura());
-		document.setNtiOrigen(getOrigen(documentArxiu));
-		document.setNtiTipoDocumental(getTipusDocumental(documentArxiu));
-		document.setNtiEstadoElaboracion(getEstatElaboracio(documentArxiu));
-		document.setNtiTipoFirma(getNtiTipoFirma(documentArxiu));
+		document.setNtiOrigen(ArxiuConversions.getOrigen(documentArxiu));
+		document.setNtiTipoDocumental(ArxiuConversions.getTipusDocumental(documentArxiu));
+		document.setNtiEstadoElaboracion(ArxiuConversions.getEstatElaboracio(documentArxiu));
+		document.setNtiTipoFirma(ArxiuConversions.getNtiTipoFirma(documentArxiu));
 		document.setFitxerContentType(documentArxiu.getContingut().getTipusMime());
 		document.setNtiVersion("1.0");
 		document.setNtiOrgano(getOrgans(documentArxiu));
@@ -1539,163 +1618,9 @@ public class ExpedientHelper {
 		return organs;
 	}
 	
-	private static DocumentNtiEstadoElaboracionEnumDto getEstatElaboracio(Document document) {
-		DocumentNtiEstadoElaboracionEnumDto estatElaboracio = null;
 
-		switch (document.getMetadades().getEstatElaboracio()) {
-		case ORIGINAL:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE01;
-			break;
-		case COPIA_CF:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE02;
-			break;
-		case COPIA_DP:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE03;
-			break;
-		case COPIA_PR:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE04;
-			break;
-		case ALTRES:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE99;
-			break;
-		}
-		return estatElaboracio;
-	}
 	
-	private static NtiOrigenEnumDto getOrigen(Document document) {
-		NtiOrigenEnumDto origen = null;
-
-		switch (document.getMetadades().getOrigen()) {
-		case CIUTADA:
-			origen = NtiOrigenEnumDto.O0;
-			break;
-		case ADMINISTRACIO:
-			origen = NtiOrigenEnumDto.O1;
-			break;
-		}
-		return origen;
-	}
 	
-	private DocumentNtiTipoFirmaEnumDto getNtiTipoFirma(Document documentArxiu) {
-		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
-		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-			FirmaTipus firmaTipus = null;
-			for (Firma firma: documentArxiu.getFirmes()) {
-				if (firma.getTipus() != FirmaTipus.CSV) {
-					firmaTipus = firma.getTipus();
-					break;
-				}
-			}
-			switch (firmaTipus) {
-			case CSV:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
-				break;
-			case XADES_DET:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
-				break;
-			case XADES_ENV:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
-				break;
-			case CADES_DET:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
-				break;
-			case CADES_ATT:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
-				break;
-			case PADES:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
-				break;
-			case SMIME:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
-				break;
-			case ODT:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
-				break;
-			case OOXML:
-				ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
-				break;
-			}
-		}
-		return ntiTipoFirma;
-	}
-	
-	@SuppressWarnings("incomplete-switch")
-	private static String getTipusDocumental(Document document) {
-		String tipusDocumental = null;
-
-		if (document.getMetadades().getTipusDocumental() != null) {
-			switch (document.getMetadades().getTipusDocumental()) {
-			case RESOLUCIO:
-				tipusDocumental = "TD01";
-				break;
-			case ACORD:
-				tipusDocumental = "TD02";
-				break;
-			case CONTRACTE:
-				tipusDocumental = "TD03";
-				break;
-			case CONVENI:
-				tipusDocumental = "TD04";
-				break;
-			case DECLARACIO:
-				tipusDocumental = "TD05";
-				break;
-			case COMUNICACIO:
-				tipusDocumental = "TD06";
-				break;
-			case NOTIFICACIO:
-				tipusDocumental = "TD07";
-				break;
-			case PUBLICACIO:
-				tipusDocumental = "TD08";
-				break;
-			case JUSTIFICANT_RECEPCIO:
-				tipusDocumental = "TD09";
-				break;
-			case ACTA:
-				tipusDocumental = "TD10";
-				break;
-			case CERTIFICAT:
-				tipusDocumental = "TD11";
-				break;
-			case DILIGENCIA:
-				tipusDocumental = "TD12";
-				break;
-			case INFORME:
-				tipusDocumental = "TD13";
-				break;
-			case SOLICITUD:
-				tipusDocumental = "TD14";
-				break;
-			case DENUNCIA:
-				tipusDocumental = "TD15";
-				break;
-			case ALEGACIO:
-				tipusDocumental = "TD16";
-				break;
-			case RECURS:
-				tipusDocumental = "TD17";
-				break;
-			case COMUNICACIO_CIUTADA:
-				tipusDocumental = "TD18";
-				break;
-			case FACTURA:
-				tipusDocumental = "TD19";
-				break;
-			case ALTRES_INCAUTATS:
-				tipusDocumental = "TD20";
-				break;
-			case ALTRES:
-				tipusDocumental = "TD99";
-				break;
-			}
-		} else if (document.getMetadades().getTipusDocumentalAddicional() != null) {
-			tipusDocumental = document.getMetadades().getTipusDocumentalAddicional();
-		}
-
-		return tipusDocumental;
-	}
-
 	private InteressatDto toInteressatDto(RegistreInteressatEntity registreInteressatEntity, Long existingInteressatId) {
 		InteressatDto interessatDto = null;
 		switch (registreInteressatEntity.getTipus()) {
@@ -1994,6 +1919,13 @@ public class ExpedientHelper {
 	}
 	
 	
+	public void concurrencyCheckExpedientJaTancat(ExpedientEntity expedient) {
+		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) { 
+			throw new RuntimeException("L'expedient ja se ha tancat per otra persona. No és possible fer cap canvi");
+		}
+	}
+	
+	
 	//crea les carpetes per defecte definides al procediment
 	private void crearCarpetesMetaExpedient(
 			Long entitatId, 
@@ -2101,6 +2033,14 @@ public class ExpedientHelper {
 //					"Ja existeix un altre expedient amb el mateix tipus i nom");
 //		}
 //	}
+	
+	private List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper.class);
 

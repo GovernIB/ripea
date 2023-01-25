@@ -111,6 +111,9 @@
 		var requestLocale = '${requestLocale}';
 		var contextAddress = '${pageContext.request.contextPath}';
 
+		$(window).bind("pageshow", function(event) {
+		    $('body').removeClass('loading');
+		});
 		
 		$(document).ready(function() {
 			$('button[value="filtrar"]').click(function() {
@@ -325,8 +328,6 @@ body {
 								<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 								<%---- Excepcions ----%>
 								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
-								<%---- Elements pendents arxiu ----%>
-								<li><a href="<c:url value="/seguimentArxiuPendents"/>"><spring:message code="decorator.menu.pendents.arxiu"/></a></li>
 							</ul>
 						</div>
 						<div class="btn-group">
@@ -468,7 +469,7 @@ body {
 							</c:if>
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 							<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
-							<li><a href="<c:url value="/massiu/custodiar"/>"><spring:message code="massiu.custodiar"/></a></li>
+							<li><a href="<c:url value="/seguimentArxiuPendents"/>"><spring:message code="decorator.menu.pendents.arxiu"/></a></li>
 							<li>
 								<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
 									<spring:message code="decorator.menu.accions.massives.user"/>

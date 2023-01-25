@@ -74,6 +74,14 @@ public class DocumentDto extends NodeDto {
 	private String validacioFirmaErrorMsg;
 	private ArxiuEstatEnumDto annexArxiuEstat; // Estat a l'arxiu en l'origen
 	
+	private ArxiuEstatEnumDto arxiuEstat;
+	
+	private DocumentFirmaTipusEnumDto documentFirmaTipus;
+	
+	public boolean isArxiuEstatDefinitu() {
+		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
+	}
+	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
 			return fitxerNom.substring(

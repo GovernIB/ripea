@@ -29,6 +29,7 @@ import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.config.SchedulingConfig;
@@ -54,6 +55,7 @@ import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.helper.TestHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EmailPendentEnviarRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
@@ -109,6 +111,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private MetaExpedientComentariRepository metaExpedientComentariRepository;
 	@Autowired
 	private SchedulingConfig schedulingConfig;
+	
+	@Autowired
+	private DocumentRepository documentRepository;
 
 
 	private static final String PREFIX_RIPEA = "[RIPEA]";
@@ -375,13 +380,25 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			ConfigHelper.setEntitat(entitat);
 
 			if (contingut instanceof ExpedientEntity) {
-				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
-					expedientHelper.guardarExpedientArxiu(contingut.getId());
+				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksExpedients)) {
+					try {
+						expedientHelper.guardarExpedientArxiu(contingut.getId());
+					} catch (ArxiuJaGuardatException e) {
+					} catch (Exception e) {
+						logger.error("Error al guardar expedient en arxiu, segon pla ", e);
+					}
 				}
 
 			} else if (contingut instanceof DocumentEntity) {
-				synchronized (SynchronizationHelper.get0To99Lock(contingut.getId(), SynchronizationHelper.locksGuardarDocumentArxiu)) {
-					documentHelper.guardarDocumentArxiu(contingut.getId());
+				Long expedientId = documentRepository.findExpedientId(contingut.getId());
+				synchronized (SynchronizationHelper.get0To99Lock(expedientId, SynchronizationHelper.locksExpedients)) {
+					try {
+						documentHelper.guardarDocumentArxiu(contingut.getId());
+					} catch (ArxiuJaGuardatException e) {
+					} catch (Exception e) {
+						logger.error("Error al guardar document en arxiu, segon pla ",
+								e);
+					}
 				}
 			}
 		}
@@ -400,8 +417,12 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			EntitatDto entitat = conversioTipusHelper.convertir(interessat.getExpedient().getEntitat(), EntitatDto.class);
 			ConfigHelper.setEntitat(entitat);
 
-			synchronized (SynchronizationHelper.get0To99Lock(interessat.getExpedient().getId(), SynchronizationHelper.locksGuardarExpedientArxiu)) {
-				expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+			synchronized (SynchronizationHelper.get0To99Lock(interessat.getExpedient().getId(), SynchronizationHelper.locksExpedients)) {
+				try {
+					expedientInteressatHelper.guardarInteressatsArxiu(interessat.getExpedient().getId());
+				} catch (Exception e) {
+					logger.error("Error al guardar interessat en arxiu, segon pla ", e);
+				}
 			}
 		}
 	}

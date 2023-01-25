@@ -121,6 +121,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		
 		try {
+			
+	    	if (aplicacioService.mostrarLogsRendiment())
+	    		logger.info("contingutGet start (" + contingutId + ")");
+	    	
+			long t1 = System.currentTimeMillis();
 		
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			ContingutDto contingut = contingutService.findAmbIdUser(
@@ -128,8 +133,10 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId,
 					true,
 					true, 
+					true,
 					RolHelper.getRolActual(request), 
-					EntitatHelper.getOrganGestorActualId(request));
+					EntitatHelper.getOrganGestorActualId(request),
+					false);
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,
@@ -163,6 +170,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			}
 			model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
 	
+			long t11 = System.currentTimeMillis();
 			List<MetaDocumentDto> metaDocumentsPerCreacio = metaDocumentService.findActiusPerCreacio(
 					entitatActual.getId(),
 					contingutId, 
@@ -188,8 +196,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(EnviamentEstat.class,
 							"notificacio.enviamentEstat.enum."));
+			
+	    	if (aplicacioService.mostrarLogsRendiment())
+	    		logger.info("metaDocumentsPerCreacio time (" + contingutId + "):  " + (System.currentTimeMillis() - t11) + " ms");
+			
+	    	if (aplicacioService.mostrarLogsRendiment())
+	    		logger.info("contingutGet end (" + contingutId + "):  " + (System.currentTimeMillis() - t1) + " ms");
+			
 			return "contingut";
-		
 		
 		} catch (Exception e) {
 			System.out.println("Error al obtenir detalls del contingut" +  ExceptionUtils.getStackTrace(e));
@@ -619,12 +633,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<InteressatDto> interessats = null;
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				false, null, null);
-		if (contingut instanceof ExpedientDto) {
+		if (contingutService.isExpedient(contingutId)) {
 			interessats = interessatService.findByExpedient(
 					entitatActual.getId(),
 					contingutId,
@@ -800,6 +809,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			ContingutDto contingut,
 			boolean pipellaAnotacionsRegistre,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		
+		long t1 = System.currentTimeMillis();
+		
 		model.addAttribute("contingut", contingut);
 		model.addAttribute(
 				"metaExpedients",
@@ -882,9 +894,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				EnumHelper.getOptionsForEnum(
 						InteressatTipusEnumDto.class,
 						"interessat.tipus.enum."));
-		model.addAttribute(
-				"pluginArxiuActiu",
-				aplicacioService.isPluginArxiuActiu());
+
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
 		
 		Set<Long> seleccio = new HashSet<Long>();
@@ -892,6 +902,10 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				SESSION_ATTRIBUTE_SELECCIO,
 				seleccio);
+		
+    	if (aplicacioService.mostrarLogsRendiment())
+    		logger.info("omplirModelPerMostrarContingut time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		
 	}
 
 	private void omplirModelPerMoureOCopiarVincular(

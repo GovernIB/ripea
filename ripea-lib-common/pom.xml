@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.95</version>
+		<version>0.9.96</version>
 	</parent>
 	<artifactId>ripea-lib-common</artifactId>
 	<packaging>pom</packaging>
@@ -294,7 +294,7 @@
 		<dependency>
 			<groupId>org.fundaciobit.pluginsib.arxiu</groupId>
 			<artifactId>pluginsib-arxiu-filesystem</artifactId>
-			<version>${pluginsib-arxiu.version}</version>
+			<version>2.0.22</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j</groupId>

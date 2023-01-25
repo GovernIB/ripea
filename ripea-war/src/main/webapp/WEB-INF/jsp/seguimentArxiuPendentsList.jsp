@@ -6,8 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-	<title><spring:message code="seguiment.arxiu.pendents.list.titol"/></title>
-	
+	<title><spring:message code="accio.massiva.titol"/>: <spring:message code="decorator.menu.pendents.arxiu"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -179,7 +178,7 @@ $(document).ready(function() {
 						<rip:inputText name="elementNom" inline="true" placeholderKey="seguiment.list.filtre.camp.expedientNom"/>
 					</div>		
 					<div class="col-md-4">					
-						<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
+						<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
@@ -196,7 +195,7 @@ $(document).ready(function() {
 					<a id="expSeleccioAll" title="<spring:message code="seguiment.list.expedients.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 					<a id="expSeleccioNone" title="<spring:message code="seguiment.list.expedients.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 					<a id="expReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/expedients/reintentar'/>" >
-						<span id="expSeleccioCount" class="badge">${fn:length(expSeleccio)}</span> <spring:message code="seguiment.list.expedients.boto.reintentar"/>
+						<span id="expSeleccioCount" class="badge">${fn:length(expSeleccio)}</span> <spring:message code="accio.massiva.boto.custodiar"/>
 					</a>
 				</div>
 			</script>
@@ -211,15 +210,20 @@ $(document).ready(function() {
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
 				data-selection-enabled="true"
+				data-save-state="true"
 				style="width:100%">
 				<thead> 
 					<tr>
-						<th data-col-name="expedientNumeroNom"><spring:message code="seguiment.list.columna.expedient"/></th>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink1" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+							<script id="cellExpedientLink1" type="text/x-jsrender">
+								<a href="<c:url value="/contingut/{{:id}}"/>">{{:expedientNumeroNom}}</a>	
+							</script>
+						</th>
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsExpedientsTemplate" width="10%">
 							<script id="cellAccionsExpedientsTemplate" type="text/x-jsrender">
-								<a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
+								<a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a>
 							</script>
 						</th>
 					</tr>
@@ -248,7 +252,7 @@ $(document).ready(function() {
 		 					inline="true"/>
 					</div>				
 					<div class="col-md-4">					
-						<rip:inputSelect name="metaExpedientId2" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
+						<rip:inputSelect name="metaExpedientId2" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
@@ -264,7 +268,7 @@ $(document).ready(function() {
 					<a id="docSeleccioAll" title="<spring:message code="seguiment.list.documents.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 					<a id="docSeleccioNone" title="<spring:message code="seguiment.list.documents.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 					<a id="docReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/documents/reintentar'/>" >
-						<span id="docSeleccioCount" class="badge">${fn:length(docSeleccio)}</span> <spring:message code="seguiment.list.documents.boto.reintentar"/>
+						<span id="docSeleccioCount" class="badge">${fn:length(docSeleccio)}</span> <spring:message code="accio.massiva.boto.custodiar"/>
 					</a>
 				</div>
 			</script>
@@ -279,16 +283,17 @@ $(document).ready(function() {
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
 				data-selection-enabled="true"
+				data-save-state="true"
 				style="width:100%">
 				<thead> 
 					<tr>
 						<th data-col-name="expedientId" data-visible="false"></th>
 						<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.document"/></th>
-						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
-						<script id="cellExpedientLink" type="text/x-jsrender">
-							<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
-						</script>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink2" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+							<script id="cellExpedientLink2" type="text/x-jsrender">
+								<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
+							</script>
 						</th>
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
@@ -302,9 +307,9 @@ $(document).ready(function() {
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsDocumentsTemplate" width="10%">
 							<script id="cellAccionsDocumentsTemplate" type="text/x-jsrender">
 								{{if !expedientArxiuPropagat}}
-									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a></div>
+									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a></div>
 								{{else}}
-									<a href="<c:url value="/contingut/{{:expedientId}}/document/{{:id}}/guardarDocumentArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
+									<a href="<c:url value="/contingut/{{:expedientId}}/document/{{:id}}/guardarDocumentArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a>
 								{{/if}}
 								{{if annex}}
 									<div id="annex" style="display: none;">
@@ -337,7 +342,7 @@ $(document).ready(function() {
 		 					inline="true"/>
 					</div>				
 					<div class="col-md-4">					
-						<rip:inputSelect name="metaExpedientId3" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
+						<rip:inputSelect name="metaExpedientId3" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
@@ -353,7 +358,7 @@ $(document).ready(function() {
 					<a id="intSeleccioAll" title="<spring:message code="seguiment.list.interessats.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 					<a id="intSeleccioNone" title="<spring:message code="seguiment.list.interessats.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 					<a id="intReintentar" class="btn btn-default" href="<c:url value='/seguimentArxiuPendents/interessats/reintentar'/>" >
-						<span id="intSeleccioCount" class="badge">${fn:length(intSeleccio)}</span> <spring:message code="seguiment.list.interessats.boto.reintentar"/>
+						<span id="intSeleccioCount" class="badge">${fn:length(intSeleccio)}</span> <spring:message code="accio.massiva.boto.custodiar"/>
 					</a>
 				</div>
 			</script>
@@ -368,21 +373,26 @@ $(document).ready(function() {
 				class="table table-striped table-bordered" 
 				data-rowhref-toggle="modal"
 				data-selection-enabled="true"
+				data-save-state="true"
 				style="width:100%">
 				<thead> 
 					<tr>
 						<th data-col-name="expedientId" data-visible="false"></th>
 						<th data-col-name="expedientArxiuPropagat" data-visible="false"></th>
 						<th data-col-name="elementNom"><spring:message code="seguiment.list.columna.interessat"/></th>
-						<th data-col-name="expedientNumeroNom"><spring:message code="seguiment.list.columna.expedient"/></th>
+						<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink3" data-orderable="false"><spring:message code="seguiment.list.columna.expedient"/>
+							<script id="cellExpedientLink3" type="text/x-jsrender">
+								<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
+							</script>
+						</th>						
 						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatsTemplate" width="10%">
 							<script id="cellAccionsInteressatsTemplate" type="text/x-jsrender">
 								{{if !expedientArxiuPropagat}}
-									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a></div>
+									<div class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a></div>
 								{{else}}
-									<a href="<c:url value="/expedient/{{:expedientId}}/guardarInteressatsArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.reintentar"/></a>
+									<a href="<c:url value="/expedient/{{:expedientId}}/guardarInteressatsArxiu?origin=seguiment"/>" class="btn btn-default"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="accio.massiva.boto.custodiar"/></a>
 								{{/if}}
 							</script>
 						</th>

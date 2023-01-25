@@ -119,10 +119,6 @@ public class CarpetaHelper {
 		} else {
 			contingutHelper.arxiuPropagarModificacio(
 					carpetaEntity,
-					null,
-					false,
-					false,
-					null, 
 					fromAnotacio);
 		}
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);
@@ -139,7 +135,7 @@ public class CarpetaHelper {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);

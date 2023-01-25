@@ -132,10 +132,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 		CarpetaDto dto = carpetaHelper.toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
-				null,
-				false,
-				false,
-				null, false);
+				false);
 		return dto;
 	}
 

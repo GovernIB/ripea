@@ -859,7 +859,9 @@ tr.clicable {
 							<div class="panel-heading">
 								<h3 class="panel-title">
 									<span class="fa fa-file"></span>
-									${annex.titol} <c:if test="${!annex.validacioFirmaCorrecte}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${annex.validacioFirmaErrorMsg}"/>"></span></c:if>
+									${annex.titol} 
+									<c:if test="${!annex.validacioFirmaCorrecte}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${annex.validacioFirmaErrorMsg}"/>"></span></c:if>
+									<c:if test="${not empty annex.documentId && not empty annex.error}"><span class="fa fa-warning text-warning" title="<spring:message code="contingut.icona.estat.pendentMoverArxiu"/>"></span></c:if>
 									<button class="btn btn-default btn-xs pull-right" data-toggle="collapse" data-target="#collapse-annex-${status.index}"><span class="fa fa-chevron-down"></span></button>
 								</h3>
 							</div>

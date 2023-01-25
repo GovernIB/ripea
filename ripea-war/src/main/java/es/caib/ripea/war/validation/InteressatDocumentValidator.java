@@ -99,7 +99,6 @@ public class InteressatDocumentValidator implements ConstraintValidator<Interess
 	}
 
 	
-	
 	// ========== Validació CIF ================
 	// Només s'admeten nombres com a caràcter de control
 	private static final String CONTROL_SOLO_NUMEROS = "ABEH";

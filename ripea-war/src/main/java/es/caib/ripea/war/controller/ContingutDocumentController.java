@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -23,6 +24,7 @@ import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.DocumentGenericCommand;
 import es.caib.ripea.war.helper.*;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -109,7 +111,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Model model) throws ClassNotFoundException, IOException {
 		return get(request, pareId, null, model);
 	}
-	@RequestMapping(value = "/{pareId}/document/{documentId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{pareId}/document/modificar/{documentId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
@@ -131,10 +133,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				model.addAttribute("nomDocument", document.getFitxerNom());
 			}
 			model.addAttribute("documentEstat", document.getEstat());
-			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-			if (!document.isValidacioFirmaCorrecte()) {
-				command.setAmbFirma(true);
-			}
+			
+			setTipusFirma(command, document);
+			
 			model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
 			omplirModelFormulari(request, command, documentId, model);
 			
@@ -156,9 +157,27 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		model.addAttribute(command);
 		model.addAttribute("contingutId", pareId);
-		model.addAttribute("documentId", documentId);
+		model.addAttribute("documentId", documentId);		
 		return "contingutDocumentForm";
 	}
+	
+	
+	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
+		
+		if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+			command.setAmbFirma(false);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+		} else if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			command.setAmbFirma(true);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
+		} else if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+			command.setAmbFirma(true);
+			command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
+		}
+
+	}
+	
+	
 	@RequestMapping(value = "/{pareId}/document/docNew", method = RequestMethod.POST)
 	public String postNew(
 			HttpServletRequest request,
@@ -332,9 +351,29 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
 		Exception exception = null;
 		if (document.getArxiuUuid() == null) {
-			exception = documentService.guardarDocumentArxiu(documentId);
+			
+			try {
+				exception = documentService.guardarDocumentArxiu(documentId);
+			} catch (ArxiuJaGuardatException e) {
+				exception = null;
+			} catch (Exception e) {
+				exception = e;
+			}
 		} else if (document.isPendentMoverArxiu()) {
-			exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+			try {
+				exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+			} catch (Exception e) {
+				exception = e;
+			}
+		} else if (!StringUtils.isEmpty(document.getGesDocFirmatId())) {
+			
+			try {
+				exception = documentService.portafirmesReintentar(
+						entitatActual.getId(),
+						documentId);
+			} catch (Exception e) {
+				exception = e;
+			}
 		}
 		
 		
@@ -1082,6 +1121,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.propagar.modificacio.arxiu");
 	}
 	
+	private Boolean isDeteccioFirmaAutomaticaActiva() {
+		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.deteccio.firma.automatica");
+	}
+	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {
 			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
@@ -1179,7 +1222,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 	}
 
-
 	
 	private void omplirModelFormulari(
 			HttpServletRequest request,
@@ -1248,6 +1290,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("contingutId", contingutId);
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
+		model.addAttribute("isDeteccioFirmaAutomaticaActiva", isDeteccioFirmaAutomaticaActiva());
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

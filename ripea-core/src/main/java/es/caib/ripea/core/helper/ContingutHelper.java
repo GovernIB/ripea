@@ -130,8 +130,9 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
+	
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut,
 			boolean ambPermisos,
@@ -143,14 +144,53 @@ public class ContingutHelper {
 			boolean ambVersions,
 			String rolActual,
 			boolean onlyForList,
-			Long organActualId) {
+			Long organActualId, 
+			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare) {
+		
+		return toContingutDto(
+				contingut,
+				ambPermisos,
+				ambFills,
+				filtrarFillsSegonsPermisRead,
+				ambDades,
+				ambPath,
+				pathNomesFinsExpedientArrel,
+				ambVersions,
+				rolActual,
+				onlyForList,
+				organActualId,
+				onlyFirstDescendant,
+				level,
+				expedientDto,
+				pathDto,
+				ambExpedientPare,
+				true);
+	}
+	
+	
+	public ContingutDto toContingutDto(
+			ContingutEntity contingut,
+			boolean ambPermisos,
+			boolean ambFills,
+			boolean filtrarFillsSegonsPermisRead,
+			boolean ambDades,
+			boolean ambPath,
+			boolean pathNomesFinsExpedientArrel,
+			boolean ambVersions,
+			String rolActual,
+			boolean onlyForList,
+			Long organActualId, 
+			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare, boolean ambEntitat) {
+		level++;
+    	
 		ContingutDto resposta = null;
 		MetaNodeDto metaNode = null;
 		// Crea el contenidor del tipus correcte
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		// ##################### EXPEDIENT ##################################
 		if (deproxied instanceof ExpedientEntity) {
-
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toExpedientDto start (" + contingut.getId() + ", level=" + level + ") ");
 			long t1 = System.currentTimeMillis();
 
 			ExpedientEntity expedient = (ExpedientEntity)deproxied;
@@ -272,14 +312,15 @@ public class ContingutHelper {
 			}
 
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto time:  " + (System.currentTimeMillis() - t1) + " ms");
+				logger.info("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 
 			resposta = dto;
 		// ##################### DOCUMENT ##################################
 		} else if (deproxied instanceof DocumentEntity) {
-
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto start (" + contingut.getId() + ", level=" + level + ") ");
 			long t2 = System.currentTimeMillis();
-
+			long t10 = System.currentTimeMillis();
 			DocumentEntity document = (DocumentEntity)deproxied;
 			DocumentDto dto = new DocumentDto();
 			dto.setDescripcio(document.getDescripcio());
@@ -299,7 +340,7 @@ public class ContingutHelper {
 			dto.setDataCaptura(document.getDataCaptura());
 			dto.setVersioDarrera(document.getVersioDarrera());
 			dto.setVersioCount(document.getVersioCount());
-			if (ambVersions && pluginHelper.isArxiuPluginActiu() && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == 0) {
+			if (ambVersions && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == 0) {
 				List<ContingutArxiu> arxiuVersions = pluginHelper.arxiuDocumentObtenirVersions(document);
 				if (arxiuVersions != null) {
 					List<DocumentVersioDto> versions = new ArrayList<DocumentVersioDto>();
@@ -312,6 +353,9 @@ public class ContingutHelper {
 					dto.setVersions(versions);
 				}
 			}
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto 1/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t10) + " ms");
+			long t20 = System.currentTimeMillis();
 			dto.setNtiVersion(document.getNtiVersion());
 			dto.setNtiIdentificador(document.getNtiIdentificador());
 			dto.setNtiOrgano(document.getNtiOrgano());
@@ -364,17 +408,30 @@ public class ContingutHelper {
 					document.getMetaNode(),
 					MetaDocumentDto.class);
 			dto.setMetaNode(metaNode);
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto 2/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t20) + " ms");
+
+			long t3 = System.currentTimeMillis();
 			dto.setValid(
 					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
 			dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
 			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
+			dto.setArxiuEstat(document.getArxiuEstat());
+			dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
+			
 			resposta = dto;
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toDocumentDto 3/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
 
 			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto time:  " + (System.currentTimeMillis() - t2) + " ms");
+				logger.info("toDocumentDto end (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		// ##################### CARPETA ##################################
 		} else if (deproxied instanceof CarpetaEntity) {
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toCarpetaDto start (" + contingut.getId() + ", level=" + level + ") ");
+			
+			long t2 = System.currentTimeMillis();
 			CarpetaDto dto = new CarpetaDto();
 			CarpetaEntity carpeta = (CarpetaEntity)deproxied;
 			if (carpeta.getExpedientRelacionat() != null)
@@ -387,27 +444,47 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, true, null));
+								false, null, true, null, onlyFirstDescendant, level, null, null, ambExpedientPare, ambEntitat));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
 			resposta = dto;
+			
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("toCarpetaDto end (" + carpeta.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		}
 
-		long t3 = System.currentTimeMillis();
+		
 		// ##################### CONTINGUT ##################################
-
+		long t3 = System.currentTimeMillis();
+		
+		long t234 = System.currentTimeMillis();
+		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("propertiesContingut1 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t234) + " ms");
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("toContingutDto[" + tipus + "] start (" + contingut.getId() + ", level=" + level + ") ");
+		
+		long t23 = System.currentTimeMillis();
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setCreatedDate(contingut.getCreatedDate().toDate());
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("propertiesContingut2 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t23) + " ms");
 
+		
+		long t22 = System.currentTimeMillis();
 		resposta.setAlerta(
 				alertaRepository.countByLlegidaAndContingutId(
 				false,
 				contingut.getId()) > 0);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("setAlerta time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t22) + " ms");
 
 		if (!onlyForList) {
+
+			long t2341 = System.currentTimeMillis();
 
 			resposta.setEsborrat(contingut.getEsborrat());
 			resposta.setEsborratData(contingut.getEsborratData());
@@ -418,25 +495,23 @@ public class ContingutHelper {
 			} else {
 				resposta.setHasFills(false);
 			}
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("propertiesContingut3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2341) + " ms");
 
-			if (contingut.getExpedient() != null) {
-				resposta.setExpedientPare(
-						(ExpedientDto)toContingutDto(
-								contingut.getExpedient(),
-								ambPermisos,
-								false,
-								false,
-								true,
-								false,
-								false,
-								false,
-								rolActual, onlyForList, organActualId));
+			
+			if (ambEntitat) {
+				long t2342 = System.currentTimeMillis();
+				resposta.setEntitat(
+						conversioTipusHelper.convertir(
+								contingut.getEntitat(),
+									EntitatDto.class));
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("propertiesContingut4 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2342) + " ms");
 			}
-			resposta.setEntitat(
-					conversioTipusHelper.convertir(
-							contingut.getEntitat(),
-								EntitatDto.class));
+
+			
 			if (contingut.getDarrerMoviment() != null) {
+				long t1 = System.currentTimeMillis();
 				ContingutMovimentEntity darrerMoviment = contingut.getDarrerMoviment();
 				resposta.setDarrerMovimentUsuari(
 						conversioTipusHelper.convertir(
@@ -444,17 +519,30 @@ public class ContingutHelper {
 								UsuariDto.class));
 				resposta.setDarrerMovimentData(darrerMoviment.getCreatedDate().toDate());
 				resposta.setDarrerMovimentComentari(darrerMoviment.getComentari());
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("propertiesContingut5 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 			}
 
 			if (ambPermisos && metaNode != null) {
+				long t2 = System.currentTimeMillis();
 				// Omple els permisos
 				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambPermisosmetaNode time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				
 			}
 
 			if (ambPermisos) {
+				
+				long t2 = System.currentTimeMillis();
 				resposta.setAdmin(checkIfUserIsAdminOfContingut(contingut.getId(), rolActual));
+				
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambPermisos time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				
 			}
 
+			long t1 = System.currentTimeMillis();
 			// Omple la informació d'auditoria
 			resposta.setCreatedBy(
 					conversioTipusHelper.convertir(
@@ -465,24 +553,104 @@ public class ContingutHelper {
 							contingut.getLastModifiedBy(),
 							UsuariDto.class));
 			resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
+			if (cacheHelper.mostrarLogsRendiment())
+				logger.info("propertiesContingut6 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+			
 
-
-			if (ambPath) {
-				// Calcula el path
-				List<ContingutDto> path = getPathContingutComDto(
-						contingut,
-						ambPermisos,
-						pathNomesFinsExpedientArrel);
-				resposta.setPath(path);
+			if (ambDades && contingut instanceof NodeEntity) {
+				long t2 = System.currentTimeMillis();
+				NodeEntity node = (NodeEntity)contingut;
+				List<DadaEntity> dades = dadaRepository.findByNode(node);
+				((NodeDto)resposta).setDades(
+						conversioTipusHelper.convertirList(
+								dades,
+								DadaDto.class));
+				for (int i = 0; i < dades.size(); i++) {
+					((NodeDto)resposta).getDades().get(i).setValor(dades.get(i).getValor());
+				}
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambDades time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
+			
+			
+			
+			ExpedientDto expedientCalculat = null;
+			if (ambExpedientPare) {
+				if (contingut instanceof ExpedientEntity) { //if is expedient
+					expedientCalculat = (ExpedientDto) resposta;
+				} else {
+					if (expedientDto != null) { //if is called recursively from pare that already calculated expedient
+						expedientCalculat = expedientDto;
+					} else { //if is not called recursively from pare that already calculated expedient, calculate expedient now
+						long t2 = System.currentTimeMillis();
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("expedientPare (recursive) start (" + contingut.getId() + ") " );
+	
+						expedientCalculat = (ExpedientDto) toContingutDto(
+								contingut.getExpedient(),
+								ambPermisos,
+								false,
+								false,
+								true,
+								false,
+								false,
+								false,
+								rolActual,
+								onlyForList,
+								organActualId,
+								onlyFirstDescendant,
+								level,
+								null,
+								null, 
+								ambExpedientPare, 
+								ambEntitat);
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+					}
+					resposta.setExpedientPare(expedientCalculat);
+				}
+			}
+			
+			List<ContingutDto> pathCalculatPerFills = null;
+			List<ContingutDto> pathCalculatPerThisContingut = null;
+			if (ambPath) {
+				if (contingut instanceof ExpedientEntity) { //if is expedient
+					pathCalculatPerThisContingut = null;
+				} else {
+					if (pathDto != null) { //if is called recursively from pare that already calculated path
+						pathCalculatPerThisContingut = pathDto;
+					} else { //if is not called recursively from pare that already calculated path, calculate path now
+						long t2 = System.currentTimeMillis();
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("ambPath (recursive) start (" + contingut.getId() + ") " );
+						pathCalculatPerThisContingut = getPathContingutComDto(
+								contingut,
+								ambPermisos,
+								pathNomesFinsExpedientArrel, level);
+						if (cacheHelper.mostrarLogsRendiment())
+							logger.info("ambPath (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+						
+					}
+				}
+				resposta.setPath(pathCalculatPerThisContingut);
+			
+			
+				pathCalculatPerFills = new ArrayList<>();
+				if (pathCalculatPerThisContingut != null) {
+					pathCalculatPerFills.addAll(pathCalculatPerThisContingut);
+				}
+				pathCalculatPerFills.add(resposta);
+
+			}
+			
 			if (ambFills) {
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambFills (recursive) start (" + contingut.getId() + ")");
+				
+				long t2 = System.currentTimeMillis();
 				// Cerca els nodes fills
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				List<ContingutDto> contenidorDtos = new ArrayList<ContingutDto>();
-//				List<ContingutEntity> fills = contingutRepository.findByPareAndEsborrat(
-//						contingut,
-//						0,
-//						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+
 				List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
 				List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
 						contingut,
@@ -514,55 +682,34 @@ public class ContingutHelper {
 						}
 					}
 				}
-				List<ContingutDto> fillPath = null;
-				if (ambPath) {
-					fillPath = new ArrayList<ContingutDto>();
-					if (resposta.getPath() != null)
-						fillPath.addAll(resposta.getPath());
-					fillPath.add(toContingutDto(
-							contingut,
-							ambPermisos,
-							false,
-							false,
-							false,
-							false,
-							false,
-							false, rolActual, onlyForList, organActualId));
-				}
+				
+				List<ContingutDto> fillsDtos = new ArrayList<ContingutDto>();
 				for (ContingutEntity fill: fills) {
 					if (fill.getEsborrat() == 0) {
 						ContingutDto fillDto = toContingutDto(
 								fill,
 								ambPermisos,
-								true,
+								onlyFirstDescendant ? false : true,
 								false,
 								false,
+								ambPath,
 								false,
-								false,
-								false, rolActual, onlyForList, organActualId);
+								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare, ambEntitat);
 						// Configura el pare de cada fill
-						fillDto.setPath(fillPath);
-						contenidorDtos.add(fillDto);
+						fillsDtos.add(fillDto);
 					}
 				}
-				resposta.setFills(contenidorDtos);
+
+				resposta.setFills(fillsDtos);
+				
+				if (cacheHelper.mostrarLogsRendiment())
+					logger.info("ambFills (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 
-			if (ambDades && contingut instanceof NodeEntity) {
-				NodeEntity node = (NodeEntity)contingut;
-				List<DadaEntity> dades = dadaRepository.findByNode(node);
-				((NodeDto)resposta).setDades(
-						conversioTipusHelper.convertirList(
-								dades,
-								DadaDto.class));
-				for (int i = 0; i < dades.size(); i++) {
-					((NodeDto)resposta).getDades().get(i).setValor(dades.get(i).getValor());
-				}
-			}
+
 		}
-
 		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toContingutDto time:  " + (System.currentTimeMillis() - t3) + " ms");
+			logger.info("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + level + "): "+ (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
 
@@ -641,7 +788,7 @@ public class ContingutHelper {
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
 
 //			## Comprovar si la certificació està firmada
-			if (resposta.getCertificacioTipusMime() != null && resposta.getCertificacioTipusMime().equals("application/pdf") && isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
+			if (isCertificacioAmbFirma(resposta.getCertificacioContingut())) {
 				dto.setAmbFirma(true);
 			}
 		}
@@ -881,7 +1028,7 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -922,6 +1069,7 @@ public class ContingutHelper {
 				DocumentEntity document = (DocumentEntity)contingut;
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) && document.getGesDocAdjuntId() == null) {
 					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
+					fitxerDocumentEsborratGuardarFirmaEnTmp((DocumentEntity)contingut);
 				}
 				// Elimina contingut a l'arxiu
 				arxiuPropagarEliminacio(contingut);
@@ -934,7 +1082,7 @@ public class ContingutHelper {
 		return dto;
 	}
 
-	private boolean conteDocumentsDefinitius(ContingutEntity contingut) {
+	public boolean conteDocumentsDefinitius(ContingutEntity contingut) {
 		boolean conteDefinitius = false;
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		if (deproxied instanceof ExpedientEntity || deproxied instanceof CarpetaEntity) {
@@ -945,7 +1093,7 @@ public class ContingutHelper {
 			}
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = !DocumentEstatEnumDto.REDACCIO.equals(document.getEstat()) && !DocumentEstatEnumDto.FIRMA_PARCIAL.equals(document.getEstat());
+			conteDefinitius = document.isArxiuEstatDefinitu();
 		}
 		return conteDefinitius;
 	}
@@ -960,6 +1108,29 @@ public class ContingutHelper {
 				null);
 		outContent.write(fitxer.getContingut());
 		outContent.close();
+	}
+	
+	private void fitxerDocumentEsborratGuardarFirmaEnTmp(
+			DocumentEntity document) throws IOException {
+		
+		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+				document,
+				null,
+				null,
+				true,
+				false);
+	
+		byte[]  firmaContingut =  documentHelper.getFirmaDetachedFromArxiuDocument(arxiuDocument);
+		
+		if (firmaContingut != null) {
+			File fContent = new File(getBaseDirFirma() + "/" + document.getId());
+			fContent.getParentFile().mkdirs();
+			FileOutputStream outContent = new FileOutputStream(fContent);
+			
+			outContent.write(firmaContingut);
+			outContent.close();
+		}
+
 	}
 
 
@@ -1254,103 +1425,89 @@ public class ContingutHelper {
 					"El nom del contingut no és vàlid (no pot acabar amb un \" \")");
 		}
 	}
-
+	
+	
+	
+	
+	
+	
+	
+	
 	public void arxiuPropagarModificacio(
-			ContingutEntity contingut,
-			FitxerDto fitxer,
-			boolean documentAmbFirma,
-			boolean firmaSeparada,
-			List<ArxiuFirmaDto> firmes,
+			ExpedientEntity expedient) {
+
+		pluginHelper.arxiuExpedientActualitzar(expedient);
+	}
+	
+	public void arxiuPropagarModificacio(
+			CarpetaEntity carpeta,
 			boolean fromAnotacio) {
 
-		boolean throwExcepcion = false;//throwExcepcion = true;
-		if (throwExcepcion) {
-			throw new RuntimeException("Mock Excepcion al actualitzar contingut en arxiu");
+		boolean utilitzarCarpetesEnArxiu = fromAnotacio && !isCarpetaLogica();
+		
+		if (utilitzarCarpetesEnArxiu) {
+				pluginHelper.arxiuCarpetaActualitzar( 
+						carpeta,
+						carpeta.getPare());
 		}
+	}
+	
+	
+	
 
-		boolean utilitzarCarpetes = fromAnotacio && !isCarpetaLogica();
-
-		String serieDocumental = null;
-		ExpedientEntity expedient = contingut.getExpedient();
-		if (expedient != null) {
-			serieDocumental = expedient.getMetaExpedient().getSerieDocumental();
-		}
-		if (pluginHelper.isArxiuPluginActiu()) {
-			//##################### EXPEDIENT #####################
-			if (contingut instanceof ExpedientEntity) {
-				pluginHelper.arxiuExpedientActualitzar((ExpedientEntity)contingut);
-			//##################### DOCUMENT #####################
-			} else if (contingut instanceof DocumentEntity) {
-				//No actualizar dins SGD si és un document importat de Regweb
-				String custodiaDocumentId = null;
-				DocumentEntity document = (DocumentEntity) contingut;
-				custodiaDocumentId = pluginHelper.arxiuDocumentActualitzar(
-						(DocumentEntity) contingut,
-						utilitzarCarpetes ? contingut.getPare() : contingut.getExpedientPare(),
-						serieDocumental,
-						fitxer,
-						documentAmbFirma,
-						firmaSeparada,
-						firmes);
-				documentHelper.actualitzarVersionsDocument((DocumentEntity) contingut);
-				if (firmes != null) {
-					// Custodia el document firmat
-					((DocumentEntity) contingut).updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-					((DocumentEntity) contingut).updateInformacioCustodia(
-							new Date(),
-							custodiaDocumentId != null ? custodiaDocumentId : document.getArxiuUuid(),
-							((DocumentEntity) contingut).getCustodiaCsv());
-					// Registra al log la custòdia de la firma del document
-					contingutLogHelper.log((
-							(DocumentEntity) contingut),
-							LogTipusEnumDto.ARXIU_CUSTODIAT,
-							custodiaDocumentId != null ? custodiaDocumentId : document.getArxiuUuid(),
-							null,
-							false,
-							false);
-				}
-			//##################### CARPETA #####################
-			} else if (contingut instanceof CarpetaEntity) {
-				if (utilitzarCarpetes) {
-					pluginHelper.arxiuCarpetaActualitzar((CarpetaEntity) contingut,
-							contingut.getPare());
-				}
-			} else {
-				throw new ValidationException(
-						contingut.getId(),
-						ContingutEntity.class,
-						"El contingut que es vol propagar a l'arxiu no és del tipus expedient, document o carpeta");
+	public void arxiuPropagarModificacio(
+			DocumentEntity document,
+			FitxerDto fitxer,
+			DocumentFirmaTipusEnumDto documentFirmaTipus,
+			List<ArxiuFirmaDto> firmes,
+			ArxiuEstatEnumDto arxiuEstat) {
+		
+		pluginHelper.arxiuDocumentActualitzar(
+				(DocumentEntity) document,
+				fitxer,
+				documentFirmaTipus,
+				firmes,
+				arxiuEstat);
+		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
+		
+		if (arxiuEstat == ArxiuEstatEnumDto.DEFINITIU) {
+			
+			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
+				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
+
+			// Registra al log la custòdia de la firma del document
+			contingutLogHelper.log((
+					(DocumentEntity) document),
+					LogTipusEnumDto.ARXIU_CUSTODIAT,
+					document.getArxiuUuid(),
+					null,
+					false,
+					false);
 		}
 	}
 
 	public void arxiuPropagarEliminacio(ContingutEntity contingut) {
 		if (contingut.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
-				if (contingut instanceof ExpedientEntity) {
-					pluginHelper.arxiuExpedientEsborrar(
-							(ExpedientEntity)contingut);
-				} else if (contingut instanceof DocumentEntity) {
-					DocumentTipusEnumDto documentTipus = ((DocumentEntity)contingut).getDocumentTipus();
-					if (!documentTipus.equals(DocumentTipusEnumDto.IMPORTAT)) {
-						pluginHelper.arxiuDocumentEsborrar(
-								(DocumentEntity)contingut);
-					}
-				} else if (contingut instanceof CarpetaEntity) {
-					pluginHelper.arxiuCarpetaEsborrar(
-							(CarpetaEntity)contingut);
-				} else {
-					throw new ValidationException(
-							contingut.getId(),
-							ContingutEntity.class,
-							"El contingut que es vol esborrar de l'arxiu no és del tipus expedient, document o carpeta");
+			if (contingut instanceof ExpedientEntity) {
+				pluginHelper.arxiuExpedientEsborrar(
+						(ExpedientEntity)contingut);
+			} else if (contingut instanceof DocumentEntity) {
+				DocumentTipusEnumDto documentTipus = ((DocumentEntity)contingut).getDocumentTipus();
+				if (!documentTipus.equals(DocumentTipusEnumDto.IMPORTAT)) {
+					pluginHelper.arxiuDocumentEsborrar(
+							(DocumentEntity)contingut);
 				}
+			} else if (contingut instanceof CarpetaEntity) {
+				pluginHelper.arxiuCarpetaEsborrar(
+						(CarpetaEntity)contingut);
 			} else {
 				throw new ValidationException(
 						contingut.getId(),
 						ContingutEntity.class,
-						"S'ha d'esborrar un contingut de l'arxiu però el plugin no està habilitat");
+						"El contingut que es vol esborrar de l'arxiu no és del tipus expedient, document o carpeta");
 			}
+
 		//Carpeta lògica
 		} else if (contingut.getArxiuUuid() == null && contingut instanceof CarpetaEntity) {
 			for (ContingutEntity fill : contingut.getFills()) {
@@ -1394,10 +1551,14 @@ public class ContingutHelper {
 			ContingutEntity desti,
 			String expedientDestiUuid) {
 		if (contingut instanceof DocumentEntity) {
-			return pluginHelper.arxiuDocumentMoure(
-					(DocumentEntity)contingut,
-					desti.getArxiuUuid(),
-					expedientDestiUuid);
+			String identificador = null;
+			if (desti instanceof ExpedientEntity || (desti instanceof CarpetaEntity && !isCarpetaLogica())) {
+				identificador = pluginHelper.arxiuDocumentMoure(
+						(DocumentEntity)contingut,
+						desti.getArxiuUuid(),
+						expedientDestiUuid);
+			}
+			return identificador;
 		} else if (contingut instanceof CarpetaEntity && !isCarpetaLogica()) {
 			pluginHelper.arxiuCarpetaMoure(
 					(CarpetaEntity)contingut,
@@ -1428,7 +1589,7 @@ public class ContingutHelper {
 	public List<ContingutDto> getPathContingutComDto(
 			ContingutEntity contingut,
 			boolean ambPermisos,
-			boolean nomesFinsExpedientArrel) {
+			boolean nomesFinsExpedientArrel, int level) {
 		List<ContingutEntity> path = getPathContingut(contingut);
 		List<ContingutDto> pathDto = null;
 		if (path != null) {
@@ -1447,7 +1608,7 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, false, null));
+								false, null, false, null, false, level, null, null, false, false));
 				}
 			}
 		}
@@ -1561,6 +1722,28 @@ public class ContingutHelper {
 			return null;
 		}
 	}
+	
+	
+	public byte[] firmaSeparadaEsborratLlegir(
+			DocumentEntity document)  {
+		File fContent = new File(getBaseDirFirma() + "/" + document.getId());
+		fContent.getParentFile().mkdirs();
+		if (fContent.exists()) {
+			byte fileContent[] = null;
+			try {
+				FileInputStream inContent = new FileInputStream(fContent);
+				fileContent = new byte[(int)fContent.length()];
+				inContent.read(fileContent);
+				inContent.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+
+			return fileContent;
+		} else {
+			return null;
+		}
+	}
 
 	public void fitxerDocumentEsborratEsborrar(
 			DocumentEntity document) {
@@ -1581,6 +1764,10 @@ public class ContingutHelper {
 
 	public String getBaseDir() {
 		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-tmp";
+	}
+	
+	public String getBaseDirFirma() {
+		return configHelper.getConfig("es.caib.ripea.app.data.dir") + "/esborrats-firma-tmp";
 	}
 
 	public boolean isCarpetaLogica() {

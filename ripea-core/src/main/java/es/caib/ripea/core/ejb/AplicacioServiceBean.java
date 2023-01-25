@@ -111,10 +111,6 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.permisosFindRolsDistinctAll();
 	}
 
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public boolean isPluginArxiuActiu() {
-		return delegate.isPluginArxiuActiu();
-	}
 
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
@@ -215,6 +211,11 @@ public class AplicacioServiceBean implements AplicacioService {
 	@RolesAllowed("tothom")
 	public void evictRolsPerUsuari(String usuariCodi) {
 		delegate.evictRolsPerUsuari(usuariCodi);		
+	}
+
+	@Override
+	public boolean mostrarLogsRendiment() {
+		return delegate.mostrarLogsRendiment();
 	}
 
 

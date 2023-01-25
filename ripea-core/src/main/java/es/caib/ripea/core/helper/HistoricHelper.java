@@ -1,13 +1,13 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -33,7 +33,9 @@ import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class HistoricHelper {
 
@@ -55,18 +57,8 @@ public class HistoricHelper {
 		LocalDate date = (new LocalDate()).minusDays(1);
 		for (int i = 1; i <= nMonths; i++) {
 			Date currentDateIni = date.withDayOfMonth(1).toDateTimeAtStartOfDay().minusMonths(i).toDate();
-
-			// Get last day of month
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(currentDateIni);
-			cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-			cal.set(Calendar.HOUR, 23);
-			cal.set(Calendar.MINUTE, 59);
-			cal.set(Calendar.SECOND, 59);
-			cal.set(Calendar.MILLISECOND, 999);
-			Date currentDateEnd = cal.getTime();
-
-			computeData(currentDateIni, currentDateEnd, HistoricTipusEnumDto.MENSUAL);
+			
+			computeData(currentDateIni, HistoricTipusEnumDto.MENSUAL);
 		}
 	}
 	
@@ -75,29 +67,59 @@ public class HistoricHelper {
 		for (int i = 0; i <= nDays; i++) {
 			LocalDate date = (new LocalDate()).minusDays(i);
 			Date currentDateIni = date.toDateTimeAtStartOfDay().toDate();
-			Date currentDateEnd = date.toDateTimeAtStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59).plusMillis(
-					999).toDate();
-	
-			computeData(currentDateIni, currentDateEnd, HistoricTipusEnumDto.DIARI);
+			
+			computeData(currentDateIni, HistoricTipusEnumDto.DIARI);
 		}
 	}
 	
-	public void computeData(Date currentDateIni, Date currentDateEnd, HistoricTipusEnumDto tipus) {
-		Collection<HistoricExpedientEntity> historicsExpedients = calcularHistoricExpedient(
-				currentDateIni,
-				currentDateEnd,
+
+    
+    
+    public Date getStartDate(Date date, HistoricTipusEnumDto tipus) {
+    	Date dateCalculat = null;
+		if (tipus == HistoricTipusEnumDto.DIARI) {
+			dateCalculat =  DateHelper.toStartOfTheDay(date);
+		} else if (tipus == HistoricTipusEnumDto.MENSUAL) {
+			dateCalculat =  DateHelper.toStartOfTheMonth(date);
+		}
+		return dateCalculat;
+    }
+    
+    public Date getEndDate(Date date, HistoricTipusEnumDto tipus) {
+    	Date dateCalculat = null;
+		if (tipus == HistoricTipusEnumDto.DIARI) {
+			dateCalculat =  DateHelper.toEndOfTheDay(date);
+		} else if (tipus == HistoricTipusEnumDto.MENSUAL) {
+			dateCalculat =  DateHelper.toEndOfTheMonth(date);
+		}
+		return dateCalculat;
+    }
+    
+	public boolean checkIfHistoricsExist(Date date, HistoricTipusEnumDto tipus) {
+
+		List<HistoricExpedientEntity> historic = historicExpedientRepository.findByDateAndTipus(
+				date,
 				tipus);
+		return !CollectionUtils.isEmpty(historic);
+	}
+
+	@Transactional
+	public void computeData(Date date, HistoricTipusEnumDto tipus) {
+		
+		Collection<HistoricExpedientEntity> historicsExpedients = calcularHistoricExpedient(
+				date,
+				tipus);
+		
+		// list of metaexpedients with logs counted on given day/month
 		historicExpedientRepository.save(historicsExpedients);
 
 		Collection<HistoricUsuariEntity> historicsUsuaris = calcularHistoricUsuari(
-				currentDateIni,
-				currentDateEnd,
+				date,
 				tipus);
 		historicUsuariRepository.save(historicsUsuaris);
 
 		Collection<HistoricInteressatEntity> historicsInteressats = calcularHistoricInteressat(
-				currentDateIni,
-				currentDateEnd,
+				date,
 				tipus);
 		historicInteressatRepository.save(historicsInteressats);
 	}
@@ -105,41 +127,89 @@ public class HistoricHelper {
 	/**
 	 * Calcula l'històric de tots els metaexpedients de la base de dades de dins el rang de dades especificat
 	 * per paràmetre.
-	 * 
-	 * @param currentDateIni Data a partir de la qual es volen calcular els historics
-	 * @param currentDateEnd Data fins a la qual es volen calcular els historics
 	 * @param tipusLog Indica si estem agrupant els històrics per mes o per dia.
 	 * 
 	 * @return Llistat d'històrics dels metaexpedients de la base de dades 
 	 */
 	public Collection<HistoricExpedientEntity> calcularHistoricExpedient(
-			Date currentDateIni,
-			Date currentDateEnd,
+			Date date,
 			HistoricTipusEnumDto tipusLog) {
+		
+		Date startDate = getStartDate(date, tipusLog);
+		Date endDate = getEndDate(date, tipusLog);
+		
+		MapHistoricMetaExpedients mapExpedients = new MapHistoricMetaExpedients(startDate, tipusLog);
 
+		// all logs created for all expedients between dates, count of logs grouped by metaxpedient and log tipus 
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByMetaExpedient(
-				currentDateIni,
-				currentDateEnd);
-		MapHistoricMetaExpedients mapExpedients = new MapHistoricMetaExpedients(currentDateIni, tipusLog);
-		registreHistoricExpedients(logsCount, mapExpedients);
+				startDate,
+				endDate);
+//		+---------------+------------+-------+
+//		| METAEXPEDIENT | TIPUS      | COUNT |
+//		+---------------+------------+-------+
+//		| 1             | CREACIO    | 10    |
+//		+---------------+------------+-------+
+//		| 1             | REOBERTURA | 15    |
+//		+---------------+------------+-------+
+//		| 1             | TANCAMENT  | 20    |
+//		+---------------+------------+-------+
+//		| 2             | CREACIO    | 30    |
+//		+---------------+------------+-------+
+//		| 2             | REOBERTURA | 35    |
+//		+---------------+------------+-------+
+//		| 2             | TANCAMENT  | 40    |
+//		+---------------+------------+-------+
+		
 
+		
+		// tranform data to get have them grouped by metaexpedient
+		registreHistoricExpedients(logsCount, mapExpedients);
+//		+---------------+------------+--------------+-------------+		+----------+--------------+-------------+-------------------+
+//		| METAEXPEDIENT | NUM_CREATS | NUM_OBERTS 	| NUM_TANCATS |		| ENTITAT  | ORGANGESTOR  | DATE        | TIPUS_LOG 		|
+//		+---------------+------------+--------------+-------------+		+----------+--------------+-------------+-------------------+
+//		| 1             | 10         | 15           | 20          |		| LIM      | A04026960    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+		+----------+--------------+-------------+-------------------+
+//		| 2             | 30         | 35           | 40          |		| LIM      | A04027064    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+		+----------+--------------+-------------+-------------------+
+		
+
+		// count all logs created until date specified
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBeforeCreatedDateGroupByMetaExpedient(
-				currentDateEnd);
+				endDate);
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapExpedients);
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+//		| METAEXPEDIENT | NUM_CREATS | NUM_OBERTS 	| NUM_TANCATS | NUM_CREATS_TOTAL | NUM_OBERTS_TOTAL   | NUM_TANCATS_TOTAL |		| ENTITAT  | ORGANGESTOR  | DATE        | TIPUS_LOG 		|
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+//		| 1             | 10         | 15           | 20          | 100              | 120                | 130               |		| LIM      | A04026960    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+//		| 2             | 30         | 35           | 40          | 200              | 220                | 230               |		| LIM      | A04027064    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+		
 
 		for (HistoricExpedientEntity historic : mapExpedients.getValues()) {
 			historic.setNumExpedientsOberts(historic.getNumExpedientsOberts() + historic.getNumExpedientsCreats());
 			historic.setNumExpedientsObertsTotal(
 					historic.getNumExpedientsObertsTotal() + historic.getNumExpedientsCreatsTotal());
 		}
+		// NUM_OBERTS = NUM_OBERTS + NUM_CREATS
+		// NUM_OBERTS_TOTAL = NUM_OBERTS_TOTAL + NUM_CREATS_TOTAL
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+//		| METAEXPEDIENT | NUM_CREATS | NUM_OBERTS 	| NUM_TANCATS | NUM_CREATS_TOTAL | NUM_OBERTS_TOTAL   | NUM_TANCATS_TOTAL |		| ENTITAT  | ORGANGESTOR  | DATE        | TIPUS_LOG 		|
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+//		| 1             | 10         | 25           | 20          | 100              | 220                | 130               |		| LIM      | A04026960    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
+//		| 2             | 30         | 65           | 40          | 200              | 420                | 230               |		| LIM      | A04027064    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+		+----------+--------------+-------------+-------------------+
 
+
+		
 		List<ContingutLogCountAggregation<MetaExpedientEntity>> countsSignats = contingutLogRepository.findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
-				currentDateIni,
-				currentDateEnd);
+				startDate,
+				endDate);
 		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countsSignats) {
 			HistoricExpedientEntity historic = mapExpedients.getHistoric(
 					count.getMetaExpedient().getId(),
-					currentDateIni,
+					startDate,
 					count.getMetaExpedient());
 			switch (count.getTipus()) {
 			case DOC_FIRMAT:
@@ -153,24 +223,33 @@ public class HistoricHelper {
 			}
 
 		}
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+------------------+---------------------+		+----------+--------------+-------------+-------------------+
+//		| METAEXPEDIENT | NUM_CREATS | NUM_OBERTS   | NUM_TANCATS | NUM_CREATS_TOTAL | NUM_OBERTS_TOTAL   | NUM_TANCATS_TOTAL | NUM_DOCS_FIRMATS | NUM_DOCS_NOTIFICATS |		| ENTITAT  | ORGANGESTOR  | DATE        | TIPUS_LOG 		|
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+------------------+---------------------+		+----------+--------------+-------------+-------------------+
+//		| 1             | 10         | 15           | 20          | 100              | 120                | 130               | 3                | 5                   |		| LIM      | A04026960    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+------------------+---------------------+		+----------+--------------+-------------+-------------------+
+//		| 2             | 30         | 35           | 40          | 200              | 220                | 230               | 2                | 4                   |		| LIM      | A04027064    | 2022/11/01  | DIARI/MENSUAL     |
+//		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+------------------+---------------------+		+----------+--------------+-------------+-------------------+
 
 		return mapExpedients.getValues();
 
 	}
 
 	public Collection<HistoricUsuariEntity> calcularHistoricUsuari(
-			Date currentDateIni,
-			Date currentDateEnd,
+			Date date,
 			HistoricTipusEnumDto tipusLog) {
 
+		Date startDate = getStartDate(date, tipusLog);
+		Date endDate = getEndDate(date, tipusLog);
+		
 		List<ContingutLogCountAggregation<UsuariEntity>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
-				currentDateIni,
-				currentDateEnd);
-		MapHistoricUsuaris mapHistorics = new MapHistoricUsuaris(currentDateIni, tipusLog);
+				startDate,
+				endDate);
+		MapHistoricUsuaris mapHistorics = new MapHistoricUsuaris(startDate, tipusLog);
 		registreHistoricExpedients(logsCount, mapHistorics);
 
 		List<ContingutLogCountAggregation<UsuariEntity>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByCreatedByAndTipus(
-				currentDateEnd);
+				endDate);
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics);
 
 		for (HistoricUsuariEntity historic : mapHistorics.getValues()) {
@@ -190,18 +269,21 @@ public class HistoricHelper {
 	}
 
 	public Collection<HistoricInteressatEntity> calcularHistoricInteressat(
-			Date currentDateIni,
-			Date currentDateEnd,
+			Date date,
 			HistoricTipusEnumDto tipusLog) {
+		
+		
+		Date startDate = getStartDate(date, tipusLog);
+		Date endDate = getEndDate(date, tipusLog);
 
 		List<ContingutLogCountAggregation<String>> logsCount = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
-				currentDateIni,
-				currentDateEnd);
-		MapHistoricInteressat mapHistorics = new MapHistoricInteressat(currentDateIni, tipusLog);
+				startDate,
+				endDate);
+		MapHistoricInteressat mapHistorics = new MapHistoricInteressat(startDate, tipusLog);
 		registreHistoricExpedients(logsCount, mapHistorics);
 
 		List<ContingutLogCountAggregation<String>> logsCountAccum = contingutLogRepository.findLogsExpedientBetweenCreatedDateGroupByInteressatAndTipus(
-				currentDateEnd);
+				endDate);
 		registreHistoricExpedientsAcumulats(logsCountAccum, mapHistorics);
 
 		for (HistoricInteressatEntity historic : mapHistorics.getValues()) {
@@ -262,16 +344,16 @@ public class HistoricHelper {
 		for (ContingutLogCountAggregation countObject : logsCount) {
 			LogTipusEnumDto tipusLog = countObject.getTipus();
 
-			HistoricEntity historicUsuari = mapHistorics.getHistoric(countObject);
+			HistoricEntity historic = mapHistorics.getHistoric(countObject);
 			switch (tipusLog) {
 			case CREACIO:
-				historicUsuari.setNumExpedientsCreats(countObject.getCount());
+				historic.setNumExpedientsCreats(countObject.getCount());
 				break;
 			case REOBERTURA:
-				historicUsuari.setNumExpedientsOberts(countObject.getCount());
+				historic.setNumExpedientsOberts(countObject.getCount());
 				break;
 			case TANCAMENT:
-				historicUsuari.setNumExpedientsTancats(countObject.getCount());
+				historic.setNumExpedientsTancats(countObject.getCount());
 				break;
 			default:
 				break;
@@ -285,17 +367,17 @@ public class HistoricHelper {
 			IMapHistoric mapHistorics) {
 		for (ContingutLogCountAggregation countObject : logsCountAccum) {
 			LogTipusEnumDto tipusLog = countObject.getTipus();
-			HistoricEntity historicUsuari = mapHistorics.getHistoric(countObject);
+			HistoricEntity historic = mapHistorics.getHistoric(countObject);
 
 			switch (tipusLog) {
 			case CREACIO:
-				historicUsuari.setNumExpedientsCreatsTotal(countObject.getCount());
+				historic.setNumExpedientsCreatsTotal(countObject.getCount());
 				break;
 			case REOBERTURA:
-				historicUsuari.setNumExpedientsObertsTotal(countObject.getCount());
+				historic.setNumExpedientsObertsTotal(countObject.getCount());
 				break;
 			case TANCAMENT:
-				historicUsuari.setNumExpedientsTancatsTotal(countObject.getCount());
+				historic.setNumExpedientsTancatsTotal(countObject.getCount());
 				break;
 			default:
 				break;

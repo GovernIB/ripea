@@ -1,22 +1,5 @@
 package es.caib.ripea.core.firma;
 
-import com.sun.jersey.core.util.Base64;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import lombok.Getter;
-import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -24,7 +7,33 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.List;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.sun.jersey.core.util.Base64;
+
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import lombok.Getter;
+import lombok.Setter;
 
 @Component
 public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
@@ -37,6 +46,8 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private DocumentHelper documentHelper;
+	@Autowired
+	private ContingutHelper contingutHelper;
 
 	public void processarFirmaClient(
 			String identificador,
@@ -49,18 +60,27 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 		logAll(document, LogTipusEnumDto.FIRMA_CLIENT, null, null);
 		logFirmat(document);
 		
-		// Custodia el document firmat
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(arxiuNom);
-		fitxer.setContingut(arxiuContingut);
-		fitxer.setContentType("application/pdf");
-		document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-		String custodiaDocumentId = pluginHelper.arxiuDocumentGuardarFirmaPades(document, fitxer);
-		document.updateInformacioCustodia(new Date(), custodiaDocumentId, document.getCustodiaCsv());
-		documentHelper.actualitzarVersionsDocument(document);
-
-		// Registra al log la custòdia de la firma del document
-		logAll(document, LogTipusEnumDto.ARXIU_CUSTODIAT, custodiaDocumentId, null);
+		
+		List<ArxiuFirmaDto> firmes = null;
+		if (pluginHelper.getPropertyArxiuFirmaDetallsActiu()) {
+			firmes = pluginHelper.validaSignaturaObtenirFirmes(arxiuContingut, null, "application/pdf", true);
+		} else {
+			ArxiuFirmaDto firma = documentHelper.getArxiuFirmaPades(arxiuNom, arxiuContingut);
+			firmes = Arrays.asList(firma);
+		}
+		
+		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		
+		document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+		
+		ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+		contingutHelper.arxiuPropagarModificacio(
+				document,
+				firmes.get(0).getFitxer(),
+				arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA,
+				firmes,
+				arxiuEstat);
+		
 	}
 
 	public SecretKeySpec buildKey(String message) throws Exception {

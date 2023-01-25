@@ -3,14 +3,50 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.sun.jersey.core.util.Base64;
+
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.caib.ArxiuPluginCaib;
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.core.api.dto.DocumentOrigenEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -20,23 +56,6 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.repository.DocumentRepository;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -62,13 +81,14 @@ public class DocumentHelper {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
 			ContingutEntity pare,
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
-			List<ArxiuFirmaDto> firmes,
 			boolean returnDetail) {
 		DocumentDto dto =  new DocumentDto();
 		if (expedient != null) {
@@ -93,6 +113,17 @@ public class DocumentHelper {
 					"metaDocumentMultiplicitat=" + metaDocument.getMultiplicitat() + ", " +
 					"expedientId=" + expedient.getId() + ")");
 		}
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus;
+		if (!document.isAmbFirma()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (!document.isFirmaSeparada()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		}
+		
+		
 		DocumentEntity entity = crearDocumentDB(
 				document.getDocumentTipus(),
 				document.getNom(),
@@ -109,29 +140,22 @@ public class DocumentHelper {
 				expedient,
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen(),
-				document.getPinbalIdpeticion());
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(document.getFitxerNom());
-		fitxer.setContentType(document.getFitxerContentType());
-		fitxer.setContingut(document.getFitxerContingut());
-		List<ArxiuFirmaDto> firmesValidacio = null;
-		if (document.getFitxerContingut() != null) {
-			actualitzarFitxerDocument(
-					entity,
-					fitxer);
-			if (document.isAmbFirma() && firmes == null) {
-				firmesValidacio = validaFirmaDocument(
-						entity, 
-						fitxer,
-						document.getFirmaContingut());
-			}
-		}
+				document.getPinbalIdpeticion(), 
+				documentFirmaTipus);
+		
+		FitxerDto fitxer = new FitxerDto(
+				document.getFitxerNom(),
+				document.getFitxerContentType(),
+				document.getFitxerContingut());
+
+		actualitzarFitxerDB(
+				entity,
+				fitxer);
+
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
 				true);
-		logger.debug("[CERT] Fitxer nom: " + fitxer.getNom());
-		
 		
 		String gestioDocumentalAdjuntId = document.getGesDocAdjuntId();
 		if (document.getFitxerContingut() != null) {
@@ -141,25 +165,50 @@ public class DocumentHelper {
 			entity.setGesDocAdjuntId(gestioDocumentalAdjuntId);
 		}
 		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
-		if (document.isAmbFirma() && document.isFirmaSeparada()) {
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
 					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 					new ByteArrayInputStream(document.getFirmaContingut()));
 			entity.setGesDocAdjuntFirmaId(gestioDocumentalAdjuntFirmaId);
 		}
-
-		if (document.isAmbFirma()) 
-			entity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
+		
+		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
 		
 		try {
 			if (entity.getExpedient().getArxiuUuid() != null) {
+				
+				List<ArxiuFirmaDto> firmes = null;
+				if (isDocumentFromPinbal(entity)) {
+					ArxiuFirmaDto firma = getArxiuFirmaPades(null, null);
+					firmes = Arrays.asList(firma);
+					
+				} else if (document.isAmbFirma()) {
+					firmes = validaFirmaDocument(
+							entity, 
+							fitxer,
+							document.getFirmaContingut(), 
+							false, 
+							true);
+				}
+				
+//				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+//					saveFirmaSeparadaOfEsborranyInGestioDocumental(
+//							document.getFirmaContingut(),
+//							entity);
+//				}
+				
+				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+					pluginHelper.arxiuPropagarFirmaSeparada(
+							entity,
+							firmes.get(0).getFitxer());
+				}
 				contingutHelper.arxiuPropagarModificacio(
 						entity,
 						fitxer,
-						document.isAmbFirma(),
-						document.isFirmaSeparada(),
-						firmes != null ? firmes : firmesValidacio, 
-						false);
+						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+						firmes,
+						arxiuEstat);
+				
 				
 				if (gestioDocumentalAdjuntId != null ) {
 					pluginHelper.gestioDocumentalDelete(
@@ -167,12 +216,15 @@ public class DocumentHelper {
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					entity.setGesDocAdjuntId(null);
 				}
-				if (gestioDocumentalAdjuntFirmaId != null ) {
+			
+				if (gestioDocumentalAdjuntFirmaId != null) {
 					pluginHelper.gestioDocumentalDelete(
 							gestioDocumentalAdjuntFirmaId,
 							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
 					entity.setGesDocAdjuntFirmaId(null);
 				}	
+				
+
 			}
 
 			
@@ -180,7 +232,10 @@ public class DocumentHelper {
 			logger.error("Error al custodiar document en arxiu  (" +
 					"id=" + entity.getId() + ")",
 					ex);
-
+			
+//			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+//				removeFirmaSeparadaOfEsborranyFromGestioDocumental(entity);
+//			}
 		}
 		entity.updateArxiuIntent();
 		
@@ -190,6 +245,80 @@ public class DocumentHelper {
 			dto.setId(entity.getId());
 		return dto;
 	}
+	
+//	
+//	private void saveFirmaSeparadaOfEsborranyInGestioDocumental(
+//			byte[] contingut,
+//			DocumentEntity entity) {
+//		String gesDocEsborranyFirmaSeparadaId = pluginHelper.gestioDocumentalCreate(
+//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+//				new ByteArrayInputStream(contingut));
+//		entity.setGesDocEsborranyFirmaSeparadaId(gesDocEsborranyFirmaSeparadaId);
+//	}
+//	
+//	private void removeFirmaSeparadaOfEsborranyFromGestioDocumental(
+//			DocumentEntity entity) {
+//		pluginHelper.gestioDocumentalDelete(
+//				entity.getGesDocEsborranyFirmaSeparadaId(),
+//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS);
+//		entity.setGesDocAdjuntFirmaId(null);
+//		
+//	}
+//	
+//	private byte[] getFirmaSeparadaOfEsborranyFromGestioDocumental(
+//			DocumentEntity entity) {
+//		ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+//		pluginHelper.gestioDocumentalGet(
+//				entity.getGesDocEsborranyFirmaSeparadaId(),
+//				PluginHelper.GESDOC_AGRUPACIO_DOCS_ESBORRANYS,
+//				streamAnnex);
+//		return streamAnnex.toByteArray();
+//	}
+//	
+	
+	
+	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus) {
+		return documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu() ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
+	}
+	
+	public ArxiuFirmaDto getArxiuFirmaPades(String nom, byte[] contingut){
+		ArxiuFirmaDto firma = new ArxiuFirmaDto();
+		
+		firma.setTipus(ArxiuFirmaTipusEnumDto.PADES);
+		firma.setPerfil(ArxiuFirmaPerfilEnumDto.EPES);
+		firma.setTipusMime("application/pdf");
+		
+		firma.setFitxerNom(nom);
+		firma.setContingut(contingut);
+		return firma;
+	}
+	
+	
+	public static boolean isDocumentFromRipea(DocumentEntity document) {
+		return getDocumentOrigen(document) == DocumentOrigenEnumDto.RIPEA;
+	}
+	
+	public static boolean isDocumentFromDistribucio(DocumentEntity document) {
+		return getDocumentOrigen(document) == DocumentOrigenEnumDto.DISTRIBUCIO;
+	}
+	
+	public static boolean isDocumentFromPinbal(DocumentEntity document) {
+		return getDocumentOrigen(document) == DocumentOrigenEnumDto.PINBAL;
+	}
+	
+	
+	public static DocumentOrigenEnumDto getDocumentOrigen(DocumentEntity document) {
+		if (document.getPinbalIdpeticion() != null) {
+			return DocumentOrigenEnumDto.PINBAL;
+		} else if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
+			return DocumentOrigenEnumDto.DISTRIBUCIO;
+		} else if (document.getDocumentTipus() == DocumentTipusEnumDto.IMPORTAT){
+			return DocumentOrigenEnumDto.ANOTHER;
+		} else {
+			return DocumentOrigenEnumDto.RIPEA;
+		}
+	}
+	
 	
 	public DocumentDto updateDocument(
 			Long entitatId,
@@ -212,15 +341,11 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
-		if (!isModificacioCustodiatsActiva() && (
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) && !documentEntity.isDocFromAnnex()) {
+		if (!isModificacioCustodiatsActiva() && documentEntity.isArxiuEstatDefinitu()) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
-					"No es poden actualitzar les metadades d'un document definitiu");
+					"No es poden actualitzar un document definitiu");
 		}
 		contingutHelper.comprovarNomValid(
 				documentEntity.getPare(),
@@ -229,7 +354,19 @@ public class DocumentHelper {
 				DocumentEntity.class);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
 		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
+		
+		
 		String nomOriginal = documentEntity.getNom();
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus;
+		if (!document.isAmbFirma()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (!document.isFirmaSeparada()) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		}
+		
 		documentEntity.update(
 				metaDocument,
 				document.getNom(),
@@ -244,19 +381,10 @@ public class DocumentHelper {
 				document.getNtiIdDocumentoOrigen(),
 				document.getNtiTipoFirma(),
 				document.getNtiCsv(),
-				document.getNtiCsvRegulacion());
+				document.getNtiCsvRegulacion(), 
+				documentFirmaTipus);
 		FitxerDto fitxer = null;
-		if (document.getFitxerContingut() != null && (
-				(document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) && !documentEntity.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || 
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMAT) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) ||
-				documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU))) {
-			throw new ValidationException(
-					documentEntity.getId(),
-					DocumentEntity.class,
-					"No es pot actualitzar el contingut d'un document importat o definitiu");
-		}
+
 		Document arxiuDocument = null;
 		if (documentEntity.getArxiuUuid() != null) {
 			arxiuDocument = pluginHelper.arxiuDocumentConsultar(
@@ -266,35 +394,72 @@ public class DocumentHelper {
 					true,
 					false);
 		}
+
+		boolean newFitxer = document.getFitxerContingut() != null;
+		boolean newFirma = document.getFirmaContingut() != null;
 		
-		if (document.getFitxerContingut() != null) {
-			fitxer = new FitxerDto();
-			fitxer.setNom(document.getFitxerNom());
-			fitxer.setContentType(document.getFitxerContentType());
-			fitxer.setContingut(document.getFitxerContingut());
-		} else if (arxiuDocument != null) {
-			fitxer = new FitxerDto();
-			fitxer.setContentType(documentEntity.getFitxerContentType());
-			fitxer.setNom(documentEntity.getFitxerNom());
-			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-		}
-		if (document.getFitxerContingut() != null) {
-			actualitzarFitxerDocument(
+		
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+			
+			fitxer = fitxer(
+					newFitxer,
 					documentEntity,
-					fitxer);
-			if (document.isAmbFirma()) {
-				firmes = validaFirmaDocument(
-						documentEntity, 
-						fitxer,
-						document.getFirmaContingut());
+					document,
+					arxiuDocument);
+	
+			documentEntity.updateEstat(DocumentEstatEnumDto.REDACCIO);
+			
+		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			
+			fitxer = fitxer(
+					newFitxer,
+					documentEntity,
+					document,
+					arxiuDocument);
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					null, 
+					false, 
+					true);
+			
+			documentEntity.updateEstat(DocumentEstatEnumDto.FIRMAT);
+			
+		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+			
+			fitxer = fitxer(
+					newFitxer,
+					documentEntity,
+					document,
+					arxiuDocument);
+			
+			byte[]  firmaContingut;
+			if (newFirma) {
+				firmaContingut = document.getFirmaContingut();
+			} else {
+				firmaContingut = getFirmaDetachedFromArxiuDocument(arxiuDocument);
 			}
-			// Al modificar el document, eliminam l'alerta de document invàlid,
-			// i el passam de importat a digital, ja que no és el mateix document que haviem importat
-			if (!documentEntity.isValidacioFirmaCorrecte()) {
-				documentEntity.setValidacioFirmaCorrecte(true);
-//				documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-			}
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					firmaContingut, 
+					false, 
+					true);
+			
+			documentEntity.updateEstat(DocumentEstatEnumDto.FIRMAT);
+			
 		}
+		
+		
+		// Al modificar el document, eliminam l'alerta de document invàlid,
+		// i el passam de importat a digital, ja que no és el mateix document que haviem importat
+		if (!documentEntity.isValidacioFirmaCorrecte()) {
+			documentEntity.setValidacioFirmaCorrecte(true);
+//			documentEntity.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+		}
+		
 		// Registra al log la modificació del document
 		contingutLogHelper.log(
 				documentEntity,
@@ -306,17 +471,79 @@ public class DocumentHelper {
 		DocumentDto dto = toDocumentDto(documentEntity);
 
 		if (arxiuDocument == null || arxiuDocument.getEstat() == DocumentEstat.ESBORRANY || isPropagarModificacioDefinitiusActiva()) {
+
+			ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+
+			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+				pluginHelper.arxiuPropagarFirmaSeparada(
+						documentEntity,
+						firmes.get(0).getFitxer());
+			}
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
-					document.isAmbFirma(),
-					document.isFirmaSeparada(),
-					firmes, 
-					false);
+					arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+					firmes,
+					arxiuEstat);
+			
+			
 		}
 
 		return dto;
 	}
+	
+	private FitxerDto fitxer(
+			boolean newFitxer,
+			DocumentEntity documentEntity,
+			DocumentDto document,
+			Document arxiuDocument) {
+		FitxerDto fitxer = null;
+		if (newFitxer) {
+			fitxer = getFitxerNew(
+					documentEntity,
+					document);
+		} else {
+			fitxer = getFitxerExisting(
+					documentEntity,
+					arxiuDocument);
+
+		}
+		return fitxer;
+	}
+	
+	private FitxerDto getFitxerNew(
+			DocumentEntity documentEntity,
+			DocumentDto document) {
+		FitxerDto fitxer = null;
+		fitxer = new FitxerDto(
+				document.getFitxerNom(),
+				document.getFitxerContentType(),
+				document.getFitxerContingut());
+
+		actualitzarFitxerDB(
+				documentEntity,
+				fitxer);
+
+		return fitxer;
+	}
+	
+	private FitxerDto getFitxerExisting(
+			DocumentEntity documentEntity,
+			Document arxiuDocument) {
+		FitxerDto fitxer = null;
+
+		fitxer = new FitxerDto(
+				documentEntity.getFitxerNom(),
+				documentEntity.getFitxerContentType(),
+				getContingutFromArxiuDocument(arxiuDocument));
+		
+		return fitxer;
+	}
+	
+	
+	
+	
+	
 	
 	public boolean updateTipusDocumentDocument(
 			Long entitatId,
@@ -393,13 +620,13 @@ public class DocumentHelper {
 			//		}
 				}
 			}
+			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
-					false, //##no validar firma en actualitzar tipus document
-					false,
-					firmes, 
-					false);
+					DocumentFirmaTipusEnumDto.SENSE_FIRMA, //##no validar firma en actualitzar tipus document
+					firmes,
+					arxiuEstat);
 			return true;
 		} else {
 			return true;
@@ -423,8 +650,29 @@ public class DocumentHelper {
 			ExpedientEntity expedient,
 			String ubicacio,
 			String ntiIdDocumentoOrigen,
-			String pinbalIdpeticion) {
-		return crearDocumentDB(documentTipus, nom, descripcio, data, dataCaptura, ntiOrgano, ntiOrigen, ntiEstadoElaboracion, ntiTipoDocumental, metaDocument, pare, entitat, expedient, ubicacio, ntiIdDocumentoOrigen, pinbalIdpeticion, true, null, ArxiuEstatEnumDto.DEFINITIU);
+			String pinbalIdpeticion, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus) {
+		return crearDocumentDB(
+				documentTipus,
+				nom,
+				descripcio,
+				data,
+				dataCaptura,
+				ntiOrgano,
+				ntiOrigen,
+				ntiEstadoElaboracion,
+				ntiTipoDocumental,
+				metaDocument,
+				pare,
+				entitat,
+				expedient,
+				ubicacio,
+				ntiIdDocumentoOrigen,
+				pinbalIdpeticion,
+				true,
+				null,
+				ArxiuEstatEnumDto.DEFINITIU, 
+				documentFirmaTipus);
 	}
 
 	public DocumentEntity crearDocumentDB(
@@ -446,10 +694,11 @@ public class DocumentHelper {
 			String pinbalIdpeticion,
 			boolean validacioFirmaCorrecte,
 			String validacioFirmaErrorMsg,
-			ArxiuEstatEnumDto annexArxiuEstat) {
+			ArxiuEstatEnumDto annexArxiuEstat, 
+			DocumentFirmaTipusEnumDto documentFirmaTipus) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
-				DocumentEstatEnumDto.REDACCIO,
+				documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT,
 				nom,
 				descripcio,
 				data,
@@ -463,7 +712,8 @@ public class DocumentHelper {
 				metaDocument,
 				pare,
 				entitat,
-				expedient).
+				expedient, 
+				documentFirmaTipus).
 				ubicacio(ubicacio).
 				pinbalIdpeticion(pinbalIdpeticion).
 				validacioFirmaCorrecte(validacioFirmaCorrecte).
@@ -485,6 +735,10 @@ public class DocumentHelper {
 		if ((document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) || document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) || document.getEstat().equals(DocumentEstatEnumDto.ADJUNT_FIRMAT)) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 			document.updateEstat(nouEstat);
 		}
+		if (nouEstat.equals(DocumentEstatEnumDto.DEFINITIU)) {
+			document.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
+		}
+		
 		if (isPropagarConversioDefinitiuActiu() && nouEstat.equals(DocumentEstatEnumDto.DEFINITIU)) {
 			FitxerDto fitxer = null;
 			if (document.getArxiuUuid() != null) {
@@ -492,13 +746,13 @@ public class DocumentHelper {
 				fitxer.setContentType(document.getFitxerContentType());
 				fitxer.setNom(document.getFitxerNom());
 			}
+			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
 			contingutHelper.arxiuPropagarModificacio(
 					document,
 					fitxer,
-					false,
-					false,
+					DocumentFirmaTipusEnumDto.SENSE_FIRMA,
 					null,
-					false);
+					arxiuEstat);
 		}
 		contingutLogHelper.log(
 				document,
@@ -508,6 +762,103 @@ public class DocumentHelper {
 				false,
 				false);
 	}
+	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void actualitzarEstatADefinititu(Long documentId) {
+		
+
+		DocumentEntity documentEntity = documentRepository.findOne(documentId);		
+		
+		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+				documentEntity,
+				null,
+				null,
+				true,
+				false);
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus = documentEntity.getDocumentFirmaTipus();
+		
+		FitxerDto fitxer = null;
+		List<ArxiuFirmaDto> firmes = null;
+		
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			
+			fitxer = getFitxerExisting(
+					documentEntity,
+					arxiuDocument);
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					null, 
+					false, 
+					true);
+			
+			
+		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+			
+			fitxer = getFitxerExisting(
+					documentEntity,
+					arxiuDocument);
+			
+			byte[] firmaSeparada = null;
+			if (documentEntity.getArxiuUuidFirma() != null) {
+				firmaSeparada = pluginHelper.arxiuFirmaSeparadaConsultar(documentEntity);
+			} else {
+				throw new RuntimeException("Firma separada no existeix en arxiu");
+			}
+			
+			firmes = validaFirmaDocument(
+					documentEntity, 
+					fitxer,
+					firmaSeparada, 
+					false, 
+					true);
+			
+			fitxer = null; // if we pass fitxer not null to arxiuPropagarModificacio() ArxiuPluginCaib throws ArxiuValidacioException: No és possible marcar el document com a definitiu si es vol modificar el seu contingut.
+			
+		}
+
+		contingutHelper.arxiuPropagarModificacio(
+				documentEntity,
+				fitxer,
+				documentFirmaTipus,
+				firmes,
+				ArxiuEstatEnumDto.DEFINITIU);
+		
+		documentEntity.setArxiuUuidFirma(null);
+	}
+	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void clearDocuments(ExpedientEntity expedient) {
+		// remove deleted documents in db and clear uuids of any firma for esborrany
+		List<DocumentEntity> docs = documentRepository.findByExpedient(expedient);
+		for (DocumentEntity doc : docs) {
+			if (doc.getEsborrat() == 0) {
+				doc.setArxiuUuidFirma(null);
+			} else {
+				documentRepository.delete(doc);
+			}
+		}
+	}
+	
+	
+	
+	public DocumentFirmaTipusEnumDto getDocumentFirmaTipus(DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto) {
+		
+		DocumentFirmaTipusEnumDto documentFirmaTipus = null;
+		if (documentNtiTipoFirmaEnumDto == null) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		} else if (documentNtiTipoFirmaEnumDto == DocumentNtiTipoFirmaEnumDto.TF04) {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+		}
+		return documentFirmaTipus;
+	}
+	
+	
+	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto)contingutHelper.toContingutDto(
@@ -518,9 +869,9 @@ public class DocumentHelper {
 				false,
 				true,
 				true,
-				false, null, false, null);
+				false, null, false, null, false, 0, null, null, true);
 	}
-		
+
 
 
 	public void actualitzarVersionsDocument(
@@ -557,20 +908,13 @@ public class DocumentHelper {
 	// FITXER DEL DOCUMENT - ARXIU
 	////
 	
-	public void actualitzarFitxerDocument(
+	public void actualitzarFitxerDB(
 			DocumentEntity document,
 			FitxerDto fitxer) {
-		if (pluginHelper.isArxiuPluginActiu()) {
-			document.updateFitxer(
-					fitxer.getNom(),
-					fitxer.getContentType(),
-					null);
-		} else {
-			document.updateFitxer(
-					fitxer.getNom(),
-					fitxer.getContentType(),
-					fitxer.getContingut());
-		}
+		document.updateFitxer(
+				fitxer.getNom(),
+				fitxer.getContentType(),
+				null);
 	}
 
 	public FitxerDto getFitxerAssociat(
@@ -578,40 +922,34 @@ public class DocumentHelper {
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
+			
+			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
 				
-				if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
-					
-					ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
-					pluginHelper.gestioDocumentalGet(
-							document.getGesDocFirmatId(),
-							PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
-							streamAnnex);
-					fitxer = new FitxerDto();
-					fitxer.setContingut(streamAnnex.toByteArray());
-					fitxer.setNom(document.getNomFitxerFirmat());
-					fitxer.setContentType(document.getFitxerContentType());
-				} else {
-					
-                    String fitxerNom = document.getFitxerNom();
-                    String fitxerFirmatNom = document.getNomFitxerFirmat();
-					fitxer = new FitxerDto();
-	                fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
-	                fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
-					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-							document,
-							null,
-							versio,
-							true,
-							false);
-					fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-				}
-
+				ByteArrayOutputStream streamAnnex = new ByteArrayOutputStream();
+				pluginHelper.gestioDocumentalGet(
+						document.getGesDocFirmatId(),
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB,
+						streamAnnex);
+				fitxer = new FitxerDto();
+				fitxer.setContingut(streamAnnex.toByteArray());
+				fitxer.setNom(document.getNomFitxerFirmat());
+				fitxer.setContentType(document.getFitxerContentType());
 			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_ARXIU,
-						"S'està intentant obtenir l'arxiu associat a un document pujat a l'arxiu i el plugin d'arxiu no està activat");
+				
+                String fitxerNom = document.getFitxerNom();
+                String fitxerFirmatNom = document.getNomFitxerFirmat();
+				fitxer = new FitxerDto();
+                fitxer.setContentType(fitxerFirmatNom != null ? "application/pdf" : document.getFitxerContentType());
+                fitxer.setNom(fitxerFirmatNom != null ? fitxerFirmatNom : fitxerNom);
+				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+						document,
+						null,
+						versio,
+						true,
+						false);
+				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
 			}
+
 		} else {
 			fitxer = new FitxerDto();
 
@@ -641,22 +979,17 @@ public class DocumentHelper {
 			String versio) {
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
-			if (pluginHelper.isArxiuPluginActiu()) {
-				fitxer = new FitxerDto();
-				fitxer.setContentType(document.getFitxerContentType());
-				fitxer.setNom(document.getFitxerNom());
-				Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-						document,
-						null,
-						versio,
-						true,
-						false);
-				fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
-			} else {
-				throw new SistemaExternException(
-						IntegracioHelper.INTCODI_ARXIU,
-						"S'està intentant obtenir l'arxiu associat a un document pujat a l'arxiu i el plugin d'arxiu no està activat");
-			}
+			fitxer = new FitxerDto();
+			fitxer.setContentType(document.getFitxerContentType());
+			fitxer.setNom(document.getFitxerNom());
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+					document,
+					null,
+					versio,
+					true,
+					false);
+			fitxer.setContingut(getContingutFromArxiuDocument(arxiuDocument));
+
 		} else {
 			fitxer = new FitxerDto();
 			if (document.getGesDocFirmatId() != null && !document.getGesDocFirmatId().isEmpty()) {
@@ -834,7 +1167,13 @@ public class DocumentHelper {
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);
-		if (documentEntity.getExpedientPare().getArxiuUuid() != null) {
+		if (documentEntity.getExpedient().getArxiuUuid() != null) {
+			
+			if (documentEntity.getArxiuUuid() != null) { // concurrency check
+				throw new ArxiuJaGuardatException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+			}
+			expedientHelper.concurrencyCheckExpedientJaTancat(documentEntity.getExpedient());
+			
 			try {
 				FitxerDto fitxer = new FitxerDto();
 				fitxer.setNom(documentEntity.getFitxerNom());
@@ -857,36 +1196,54 @@ public class DocumentHelper {
 								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 								streamAnnex1);
 						firmaSeparada = streamAnnex1.toByteArray();
+					} else {
+						throw new RuntimeException("Firma separada no existeix en gestió documental");
 					}
 					firmes = validaFirmaDocument(
 							documentEntity,
 							fitxer,
-							firmaSeparada);
+							firmaSeparada, 
+							false, 
+							true);
 				}
-			
-				if (documentEntity.getEstat() == DocumentEstatEnumDto.FIRMAT)
-					documentEntity.updateEstat(DocumentEstatEnumDto.ADJUNT_FIRMAT);
-		
-		
-					contingutHelper.arxiuPropagarModificacio(
-							documentEntity,
-							fitxer,
-							documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT,
-							documentEntity.getGesDocAdjuntFirmaId() != null,
-							firmes, false);
 				
-					if (documentEntity.getGesDocAdjuntId() != null ) {
-						pluginHelper.gestioDocumentalDelete(
-								documentEntity.getGesDocAdjuntId(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-						documentEntity.setGesDocAdjuntId(null);
-					}
-					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
-						pluginHelper.gestioDocumentalDelete(
-								documentEntity.getGesDocAdjuntFirmaId(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-						documentEntity.setGesDocAdjuntFirmaId(null);
-					}
+				DocumentFirmaTipusEnumDto documentFirmaTipus;
+				if (documentEntity.getEstat() != DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+				} else if (documentEntity.getGesDocAdjuntFirmaId() == null) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+				} else {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+				}
+				
+		
+				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+				
+				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+					pluginHelper.arxiuPropagarFirmaSeparada(
+							documentEntity,
+							firmes.get(0).getFitxer());
+				}
+				contingutHelper.arxiuPropagarModificacio(
+						documentEntity,
+						fitxer,
+						arxiuEstat == ArxiuEstatEnumDto.ESBORRANY ? DocumentFirmaTipusEnumDto.SENSE_FIRMA : documentFirmaTipus,
+						firmes,
+						arxiuEstat);
+
+			
+				if (documentEntity.getGesDocAdjuntId() != null ) {
+					pluginHelper.gestioDocumentalDelete(
+							documentEntity.getGesDocAdjuntId(),
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					documentEntity.setGesDocAdjuntId(null);
+				}
+				if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
+					pluginHelper.gestioDocumentalDelete(
+							documentEntity.getGesDocAdjuntFirmaId(),
+							PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+					documentEntity.setGesDocAdjuntFirmaId(null);
+				}
 			} catch (Exception ex) {
 				logger.error("Error al custodiar en arxiu document adjunt  (" +
 						"id=" + documentEntity.getId() + ")",
@@ -913,14 +1270,19 @@ public class DocumentHelper {
 	public List<ArxiuFirmaDto> validaFirmaDocument(
 			DocumentEntity document,
 			FitxerDto fitxer,
-			byte[] contingutFirma) {
+			byte[] contingutFirma, 
+			boolean updateEstat, 
+			boolean throwExceptionIfNotValid) {
 		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
 				+ "documentID=" + document.getId() + ")");
 		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
 				fitxer.getContingut(), 
 				(contingutFirma != null && contingutFirma.length > 0) ? contingutFirma : null,
-				fitxer.getContentType());
-		document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+				fitxer.getContentType(), 
+				throwExceptionIfNotValid);
+		if (updateEstat) {
+			document.updateEstat(DocumentEstatEnumDto.FIRMAT);
+		}
 		contingutLogHelper.log(
 				document,
 				LogTipusEnumDto.DOC_FIRMAT,
@@ -984,7 +1346,7 @@ public class DocumentHelper {
 							false, 
 							true, 
 							false, 
-							false, null, false, null));
+							false, null, false, null, false, 0, null, null, true));
 			
 		}
 		return documentsDto;
@@ -999,6 +1361,10 @@ public class DocumentHelper {
 	public boolean isPropagarModificacioDefinitiusActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");
 	}
+	public boolean isFirmatPujatManualmentDefinitu(){
+		return configHelper.getAsBoolean("es.caib.ripea.document.guardar.definitiu.arxiu");
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
 
 }

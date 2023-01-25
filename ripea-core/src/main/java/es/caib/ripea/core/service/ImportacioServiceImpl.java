@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import es.caib.ripea.core.helper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,18 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.plugins.arxiu.api.FirmaTipus;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
@@ -41,6 +37,8 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.helper.ArxiuConversions;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
@@ -186,6 +184,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		return documentsArxiu;
 	}
 	
+	
 	private void crearDocumentActualitzarMetadades(
 			String nomDocument,
 			Document documentArxiu,
@@ -197,6 +196,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 			String codiEniOrigen) {
 		// TIPUS DE DOCUMENT PER DEFECTE
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientSuperior.getMetaExpedient());
+		
+		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnum = ArxiuConversions.getNtiTipoFirma(documentArxiu);
+		
 		DocumentEntity entity = documentHelper.crearDocumentDB(
 				DocumentTipusEnumDto.IMPORTAT,
 				nomDocument,
@@ -205,16 +207,17 @@ public class ImportacioServiceImpl implements ImportacioService {
 				documentArxiu.getMetadades().getDataCaptura(),
 				//Només hi ha un òrgan
 				getOrgans(documentArxiu),
-				getOrigen(documentArxiu),
-				getEstatElaboracio(documentArxiu),
-				getTipusDocumental(documentArxiu),
+				ArxiuConversions.getOrigen(documentArxiu),
+				ArxiuConversions.getEstatElaboracio(documentArxiu),
+				ArxiuConversions.getTipusDocumental(documentArxiu),
 				metaDocument, //metaDocumentEntity
 				contenidor,
 				pareActual.getEntitat(),
 				expedientSuperior,
 				null,
 				expedientSuperior.getArxiuUuid(),
-				null);
+				null, 
+				documentHelper.getDocumentFirmaTipus(documentNtiTipoFirmaEnum));
 		if (fitxer != null) {
 			entity.updateFitxer(
 					fitxer.getNom(),
@@ -228,6 +231,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		} else {
 			entity.updateEstat(DocumentEstatEnumDto.DEFINITIU);
 		}
+		entity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 
 		// MOU/COPIA EL DOCUMENT
 		documentArxiu = pluginHelper.importarDocument(
@@ -242,13 +246,13 @@ public class ImportacioServiceImpl implements ImportacioService {
 				obtenirNumeroVersioEniDocument(documentArxiu.getMetadades().getVersioNti()),
 				documentArxiu.getMetadades().getIdentificador(),
 				getOrgans(documentArxiu),
-				getOrigen(documentArxiu),
-				getEstatElaboracio(documentArxiu),
-				getTipusDocumental(documentArxiu),
+				ArxiuConversions.getOrigen(documentArxiu),
+				ArxiuConversions.getEstatElaboracio(documentArxiu),
+				ArxiuConversions.getTipusDocumental(documentArxiu),
 				documentArxiu.getMetadades().getIdentificadorOrigen(),
-				getNtiTipoFirma(documentArxiu),
-				getNtiCsv(documentArxiu)[0],
-				getNtiCsv(documentArxiu)[1]);
+				documentNtiTipoFirmaEnum,
+				ArxiuConversions.getNtiCsv(documentArxiu)[0],
+				ArxiuConversions.getNtiCsv(documentArxiu)[1]);
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
@@ -315,178 +319,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 //				false, null, false, null);
 //	}
 
-	private static NtiOrigenEnumDto getOrigen(Document document) {
-		NtiOrigenEnumDto origen = null;
 
-		switch (document.getMetadades().getOrigen()) {
-		case CIUTADA:
-			origen = NtiOrigenEnumDto.O0;
-			break;
-		case ADMINISTRACIO:
-			origen = NtiOrigenEnumDto.O1;
-			break;
-		}
-		return origen;
-	}
 
-	private static DocumentNtiEstadoElaboracionEnumDto getEstatElaboracio(Document document) {
-		DocumentNtiEstadoElaboracionEnumDto estatElaboracio = null;
 
-		switch (document.getMetadades().getEstatElaboracio()) {
-		case ORIGINAL:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE01;
-			break;
-		case COPIA_CF:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE02;
-			break;
-		case COPIA_DP:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE03;
-			break;
-		case COPIA_PR:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE04;
-			break;
-		case ALTRES:
-			estatElaboracio = DocumentNtiEstadoElaboracionEnumDto.EE99;
-			break;
-		}
-		return estatElaboracio;
-	}
-
-	@SuppressWarnings("incomplete-switch")
-	private static String getTipusDocumental(Document document) {
-		String tipusDocumental = null;
-
-		if (document.getMetadades().getTipusDocumental() != null) {
-			switch (document.getMetadades().getTipusDocumental()) {
-			case RESOLUCIO:
-				tipusDocumental = "TD01";
-				break;
-			case ACORD:
-				tipusDocumental = "TD02";
-				break;
-			case CONTRACTE:
-				tipusDocumental = "TD03";
-				break;
-			case CONVENI:
-				tipusDocumental = "TD04";
-				break;
-			case DECLARACIO:
-				tipusDocumental = "TD05";
-				break;
-			case COMUNICACIO:
-				tipusDocumental = "TD06";
-				break;
-			case NOTIFICACIO:
-				tipusDocumental = "TD07";
-				break;
-			case PUBLICACIO:
-				tipusDocumental = "TD08";
-				break;
-			case JUSTIFICANT_RECEPCIO:
-				tipusDocumental = "TD09";
-				break;
-			case ACTA:
-				tipusDocumental = "TD10";
-				break;
-			case CERTIFICAT:
-				tipusDocumental = "TD11";
-				break;
-			case DILIGENCIA:
-				tipusDocumental = "TD12";
-				break;
-			case INFORME:
-				tipusDocumental = "TD13";
-				break;
-			case SOLICITUD:
-				tipusDocumental = "TD14";
-				break;
-			case DENUNCIA:
-				tipusDocumental = "TD15";
-				break;
-			case ALEGACIO:
-				tipusDocumental = "TD16";
-				break;
-			case RECURS:
-				tipusDocumental = "TD17";
-				break;
-			case COMUNICACIO_CIUTADA:
-				tipusDocumental = "TD18";
-				break;
-			case FACTURA:
-				tipusDocumental = "TD19";
-				break;
-			case ALTRES_INCAUTATS:
-				tipusDocumental = "TD20";
-				break;
-			case ALTRES:
-				tipusDocumental = "TD99";
-				break;
-			}
-		} else if (document.getMetadades().getTipusDocumentalAddicional() != null) {
-			tipusDocumental = document.getMetadades().getTipusDocumentalAddicional();
-		}
-
-		return tipusDocumental;
-	}
-
-	private DocumentNtiTipoFirmaEnumDto getNtiTipoFirma(Document documentArxiu) {
-		DocumentNtiTipoFirmaEnumDto ntiTipoFirma = null;
-		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-			FirmaTipus firmaTipus = null;
-			for (Firma firma: documentArxiu.getFirmes()) {
-				if (firma.getTipus() != FirmaTipus.CSV) {
-					firmaTipus = firma.getTipus();
-					break;
-				}
-			}
-			if (firmaTipus != null) {
-				switch (firmaTipus) {
-				case CSV:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF01;
-					break;
-				case XADES_DET:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF02;
-					break;
-				case XADES_ENV:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF03;
-					break;
-				case CADES_DET:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF04;
-					break;
-				case CADES_ATT:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF05;
-					break;
-				case PADES:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF06;
-					break;
-				case SMIME:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF07;
-					break;
-				case ODT:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF08;
-					break;
-				case OOXML:
-					ntiTipoFirma = DocumentNtiTipoFirmaEnumDto.TF09;
-					break;
-				}
-			}
-		}
-		return ntiTipoFirma;
-	}
-	
-	private String[] getNtiCsv(Document documentArxiu) {
-		String [] ntiCsv = new String[2]; 
-		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {
-			for (Firma firma : documentArxiu.getFirmes()) {
-				if (firma.getTipus() == FirmaTipus.CSV) {
-					ntiCsv[0] = firma.getCsvRegulacio();
-					ntiCsv[1] = firma.getContingut() != null ? new String(firma.getContingut()) : null;
-				}
-			}
-		}
-		return ntiCsv;
-	}
-	
 	private boolean checkDocumentUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.DOCUMENT);

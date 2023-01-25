@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -597,7 +598,15 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			@RequestParam(value = "origin") String origin,
 			Model model)  {
 
-		Exception exception = expedientService.guardarExpedientArxiu(expedientId);
+		
+		Exception exception = null;
+		try {
+			exception = expedientService.guardarExpedientArxiu(expedientId);
+		} catch (ArxiuJaGuardatException e) {
+			exception = null;
+		} catch (Exception e) {
+			exception = e;
+		}
 		
 		String redirect = null;
 		if (origin.equals("expDetail")) {
@@ -1651,20 +1660,27 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
 			
-			Date now = new Date();
-			Calendar c = Calendar.getInstance(); 
-			c.setTime(now); 
-			c.add(Calendar.MONTH, -3);
-	        c.set(Calendar.HOUR, 0);
-	        c.set(Calendar.MINUTE, 0);
-	        c.set(Calendar.SECOND, 0);
-			filtreCommand.setDataCreacioInici(c.getTime());
+			if (isFiltreDataCreacioActiu()) {
+				Date now = new Date();
+				Calendar c = Calendar.getInstance(); 
+				c.setTime(now); 
+				c.add(Calendar.MONTH, -3);
+		        c.set(Calendar.HOUR, 0);
+		        c.set(Calendar.MINUTE, 0);
+		        c.set(Calendar.SECOND, 0);
+				filtreCommand.setDataCreacioInici(c.getTime());
+			}
 			filtreCommand.setExpedientEstatId(Long.valueOf(0));
+			
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
 
 		return filtreCommand;
+	}
+	
+	private boolean isFiltreDataCreacioActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.filtre.data.creacio.actiu"));
 	}
 
 	private ExpedientFiltreCommand getRelacionarFiltreCommand(

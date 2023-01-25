@@ -468,16 +468,14 @@ public class IndexHelper {
 				subTitols = new ArrayList<String>();
 				Map<Integer, Date> datesFirmes = null;
 				try {
-					if (pluginHelper.isArxiuPluginActiu()) {
-						es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-								document,
-								null,
-								null,
-								true,
-								false);
-						byte[] contingutArxiu = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
-						datesFirmes = getDataFirmaFromDocument(contingutArxiu);
-					}
+					es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+							document,
+							null,
+							null,
+							true,
+							false);
+					byte[] contingutArxiu = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
+					datesFirmes = getDataFirmaFromDocument(contingutArxiu);
 				} catch (Exception ex) {
 					logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
 				}

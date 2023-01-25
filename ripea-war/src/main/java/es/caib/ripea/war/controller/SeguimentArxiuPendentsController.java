@@ -4,20 +4,13 @@
 package es.caib.ripea.war.controller;
 
 
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.SeguimentService;
-import es.caib.ripea.war.command.SeguimentArxiuPendentsFiltreCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +22,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.SeguimentService;
+import es.caib.ripea.war.command.SeguimentArxiuPendentsFiltreCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
  * Controlador per al manteniment de seguiment de elements pendents de guardar a dins l'arxiu
@@ -42,7 +48,7 @@ import java.util.Set;
  */
 @Controller
 @RequestMapping("/seguimentArxiuPendents")
-public class SeguimentArxiuPendentsController extends BaseSuperController {
+public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganController {
 	
 	private static final String SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS = "SeguimentPortafirmesController.session.filtre.expedients";
 	private static final String SESSION_ATTRIBUTE_FILTRE_DOCUMENTS = "SeguimentPortafirmesController.session.filtre.documents";
@@ -59,13 +65,15 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 	private DocumentService documentService;
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
+	@Autowired
+	private MetaExpedientService metaExpedientService;
 
 
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
     	
-		EntitatDto entitatActual = getEntitatActual(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
     	SeguimentArxiuPendentsFiltreCommand commandExp = getFiltreCommandExpedients(request);
     	SeguimentArxiuPendentsFiltreCommand commandDoc = getFiltreCommandDocuments(request);
@@ -106,7 +114,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
-		getEntitatActual(request);
+		getEntitatActualComprovantPermisos(request);
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
@@ -127,14 +135,19 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
     public DatatablesResponse datatableExpedients(HttpServletRequest request) {
 		PaginaDto<SeguimentArxiuPendentsDto> docsPortafirmes = new PaginaDto<SeguimentArxiuPendentsDto>();
 
-		EntitatDto entitat = getEntitatActual(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandExpedients(request);
 
-        docsPortafirmes = seguimentService.findArxiuPendentsExpedients(
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+        docsPortafirmes = seguimentService.findPendentsArxiu(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
-				DatatablesHelper.getPaginacioDtoFromRequest(request));
+				DatatablesHelper.getPaginacioDtoFromRequest(request),
+				rolActual,
+				ResultEnumDto.PAGE,
+				ArxiuPendentTipusEnumDto.EXPEDIENT).getPagina();
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
@@ -167,7 +180,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
-		getEntitatActual(request);
+		getEntitatActualComprovantPermisos(request);
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
@@ -188,14 +201,20 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
     public DatatablesResponse datatableDocuments(HttpServletRequest request) {
 		PaginaDto<SeguimentArxiuPendentsDto> docs = new PaginaDto<SeguimentArxiuPendentsDto>();
 
-		EntitatDto entitat = getEntitatActual(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandDocuments(request);
 
-        docs = seguimentService.findArxiuPendentsDocuments(
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+        
+		docs = seguimentService.findPendentsArxiu(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
-				DatatablesHelper.getPaginacioDtoFromRequest(request));
+				DatatablesHelper.getPaginacioDtoFromRequest(request),
+				rolActual,
+				ResultEnumDto.PAGE,
+				ArxiuPendentTipusEnumDto.DOCUMENT).getPagina();
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
@@ -229,7 +248,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
-		getEntitatActual(request);
+		getEntitatActualComprovantPermisos(request);
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
@@ -250,14 +269,20 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
     public DatatablesResponse datatableInteressats(HttpServletRequest request) {
 		PaginaDto<SeguimentArxiuPendentsDto> docsPortafirmes = new PaginaDto<SeguimentArxiuPendentsDto>();
 
-		EntitatDto entitat = getEntitatActual(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 
         SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandInteressats(request);
 
-        docsPortafirmes = seguimentService.findArxiuPendentsInteressats(
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+        
+        docsPortafirmes = seguimentService.findPendentsArxiu(
 				entitat.getId(),
 				SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand),
-				DatatablesHelper.getPaginacioDtoFromRequest(request));
+				DatatablesHelper.getPaginacioDtoFromRequest(request), 
+				rolActual,
+				ResultEnumDto.PAGE,
+				ArxiuPendentTipusEnumDto.INTERESSAT).getPagina();
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
@@ -292,6 +317,8 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -308,12 +335,16 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 				seleccio.add(id);
 			}
 		} else {
-			EntitatDto entitatActual = getEntitatActual(request);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandExpedients(request);
 			seleccio.addAll(
-					seguimentService.findArxiuPendentsExpedients(
+					seguimentService.findPendentsArxiu(
 							entitatActual.getId(),
-							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand)));
+							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand), 
+							null,
+							rolActual,
+							ResultEnumDto.IDS,
+							ArxiuPendentTipusEnumDto.EXPEDIENT).getIds());
 		}
 		return seleccio.size();
 	}
@@ -349,6 +380,9 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -365,12 +399,16 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 				seleccio.add(id);
 			}
 		} else {
-			EntitatDto entitatActual = getEntitatActual(request);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandDocuments(request);
 			seleccio.addAll(
-					seguimentService.findArxiuPendentsDocuments(
+					seguimentService.findPendentsArxiu(
 							entitatActual.getId(),
-							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand)));
+							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand), 
+							null,
+							rolActual,
+							ResultEnumDto.IDS,
+							ArxiuPendentTipusEnumDto.DOCUMENT).getIds());
 		}
 		return seleccio.size();
 	}
@@ -406,6 +444,10 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			HttpServletRequest request,
 			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
+		
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -422,12 +464,16 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 				seleccio.add(id);
 			}
 		} else {
-			EntitatDto entitatActual = getEntitatActual(request);
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			SeguimentArxiuPendentsFiltreCommand filtreCommand = getFiltreCommandInteressats(request);
 			seleccio.addAll(
-					seguimentService.findArxiuPendentsInteressats(
+					seguimentService.findPendentsArxiu(
 							entitatActual.getId(),
-							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand)));
+							SeguimentArxiuPendentsFiltreCommand.asDto(filtreCommand), 
+							null,
+							rolActual,
+							ResultEnumDto.IDS,
+							ArxiuPendentTipusEnumDto.INTERESSAT).getIds());
 		}
 		return seleccio.size();
 	}
@@ -481,6 +527,9 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 		for (Long expedientId : seleccio) {
 			Exception exception = expedientService.guardarExpedientArxiu(expedientId);
 
+			if (exception instanceof ArxiuJaGuardatException) {
+				exception = null;
+			}
 			if (exception != null ) {
 				logger.error("Error guardant expedient en arxiu", exception);
 				errors++;
@@ -523,7 +572,7 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 					null);
 		}
 		
-		EntitatDto entitatActual = getEntitatActual(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		int errors = 0;
 		int correctes = 0;
@@ -534,6 +583,9 @@ public class SeguimentArxiuPendentsController extends BaseSuperController {
 			Exception exception = null;
 			if (document.getArxiuUuid() == null) {
 				exception = documentService.guardarDocumentArxiu(documentId);
+				if (exception instanceof ArxiuJaGuardatException) {
+					exception = null;
+				}
 				if (exception != null ) {
 					logger.error("Error guardant document en arxiu", exception);
 					errors++;

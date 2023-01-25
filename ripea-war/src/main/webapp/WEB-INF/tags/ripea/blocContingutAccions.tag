@@ -48,17 +48,20 @@
 				</c:otherwise>
 			</c:choose>	
 		</c:if>
-		<c:if test="${contingut.arxiuUuid==null}">
-			<c:choose>
-				<c:when test="${contingut.document}">
-					<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
-					<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-				</c:when>
-				<c:when test="${contingut.expedient}">
-					<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-				</c:when>
-			</c:choose>
-		</c:if>
+		
+		
+		<c:choose>
+			<c:when test="${contingut.document && contingut.arxiuUuid==null}">
+				<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
+				<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+			</c:when>
+			<c:when test="${contingut.document && contingut.gesDocFirmatId != null}">
+				<li><a href="<c:url value="/document/${contingut.id}/portafirmes/reintentarGuardarArxiu"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+			</c:when>			
+			<c:when test="${contingut.expedient && contingut.arxiuUuid==null}">
+				<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+			</c:when>
+		</c:choose>
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
 			<c:choose>
 				<c:when test="${contingut.carpeta}">
@@ -89,13 +92,14 @@
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
-				<c:when test="${((contingut.document and contingut.estat == 'REDACCIO') || (contingut.document and contingut.documentTipus == 'IMPORTAT') || isPermesModificarCustodiatsVar) && expedientPareObert}">
+				
+				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitu || isPermesModificarCustodiatsVar) && expedientPareObert}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 						</c:when>
 						<c:otherwise>
-							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+							<li class="${(contingut.document && (contingut.arxiuUuid==null || contingut.gesDocFirmatId != null)) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/modificar/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 						</c:otherwise>
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
@@ -146,6 +150,12 @@
 							</c:when>
 							<c:otherwise>
 								<c:choose>
+									<c:when test="${!contingut.valid}">
+										<li class="disabledMsg" title="<spring:message code="contingut.errors.expedient.validacio"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+									</c:when>								
+									<c:when test="${!contingut.conteDocuments}">
+										<li class="disabledMsg" title="<spring:message code="disabled.button.msg.noConteCapDocument"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+									</c:when>
 									<c:when test="${contingut.conteDocumentsEnProcessDeFirma}">
 										<li class="disabledMsg" title="<spring:message code="disabled.button.msg.conteDocumentsEnProcessDeFirma"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 									</c:when>
@@ -171,7 +181,7 @@
 				<c:when test="${contingut.document && contingut.estat == 'FIRMA_PENDENT'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat.pendent"/> </c:set>
 				</c:when>
-				<c:when test="${contingut.document && contingut.estat != 'REDACCIO' && contingut.estat != 'FIRMA_PARCIAL'}">
+				<c:when test="${contingut.document && contingut.arxiuEstat == 'DEFINITIU'}">
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.firmat"/> </c:set>
 				</c:when>
 				<c:otherwise>
@@ -290,7 +300,7 @@
 					</c:choose>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
-				<c:if test="${(contingut.estat == 'CUSTODIAT' or contingut.estat == 'DEFINITIU') and !isTasca or contingut.fitxerExtension=='zip'}">
+				<c:if test="${(contingut.documentFirmaTipus != 'SENSE_FIRMA' && !empty contingut.arxiuUuid) and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
 					<c:if test="${expedientPare.metaNode.notificacioActiva}"> 
@@ -316,7 +326,7 @@
 			</c:if>
 			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
 				<%---- Seguiment portafirmes ----%>
-				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMAT') && contingut.documentTipus == 'DIGITAL'}">
+				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || (contingut.estat == 'FIRMAT' && empty contingut.arxiuUuid)) && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/portafirmes/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>
@@ -349,20 +359,14 @@
 			<li class="${contingut.document && contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 		</c:if>
 		<c:if test="${(contingut.expedient or contingut.document) and !isTasca}">
-			<c:choose>
-				<c:when test="${!empty nodeco}">
-					<c:set var="exportarUrl"><c:url value="/nodeco/contingut/${contingut.id}/exportar"/></c:set>	
-				</c:when>
-				<c:otherwise>
-					<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
-				</c:otherwise>
-			</c:choose>	
 			<c:if test="${contingut.expedient}">
 				<c:choose>
 					<c:when test="${contingut.hasFills}">
+						<%---- Exportar índex PDF... ----%>
 						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>
+						<%---- Índex PDF i exportació ENI... ----%>
 						<c:choose>
-							<c:when test="${contingut.conteDocumentsFirmats}">
+							<c:when test="${contingut.conteDocumentsDefinitius}">
 								<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
 			 				</c:when>
 			 				<c:otherwise>
@@ -375,16 +379,31 @@
 					</c:otherwise>
 				</c:choose>	
 			</c:if>
-			<c:if test="${pluginArxiuActiu}"> 
-				<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
-			</c:if>
+			<c:choose>
+				<c:when test="${contingut.arxiuUuid != null}">
+					<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+ 				</c:when>
+ 				<c:otherwise>
+ 					<li><a class="disabled" href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+				</c:otherwise>
+			</c:choose>			
+			
+			<%---- Exportació ENI ----%>
 			<c:if test="${contingut.document && contingut.fitxerExtension!='zip'}">
 				<c:choose>
-					<c:when test="${contingut.document && contingut.estat != 'CUSTODIAT' || contingut.expedient && !contingut.conteDocumentsFirmats}">
-						<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+					<c:when test="${contingut.conteDocumentsDefinitius}">
+						<c:choose>
+							<c:when test="${!empty nodeco}">
+								<c:set var="exportarUrl"><c:url value="/nodeco/contingut/${contingut.id}/exportar"/></c:set>	
+							</c:when>
+							<c:otherwise>
+								<c:set var="exportarUrl"><c:url value="/contingut/${contingut.id}/exportar"/></c:set>
+							</c:otherwise>
+						</c:choose>	
+						<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
 					</c:when>
 					<c:otherwise>
-						<li><a href="${exportarUrl}"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
+						<li class="disabled"><a href="#"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.exportar.eni"/></a></li>
 					</c:otherwise>
 				</c:choose>		
 			</c:if>		

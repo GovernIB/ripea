@@ -552,4 +552,17 @@ public interface ContingutService {
     Boolean netejaContingutsOrfes();
 	@PreAuthorize("hasRole('IPA_SUPER')")
     ResultDocumentsSenseContingut arreglaDocumentsSenseContingut();
+
+	public boolean isExpedient(
+			Long contingutId);
+
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions,
+			boolean ambPermisos,
+			String rolActual,
+			Long organActualId,
+			boolean ambEntitat);
 }

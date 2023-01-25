@@ -89,6 +89,8 @@ public class InteressatCommand  {
 	
 	private Boolean incapacitat;
 	
+	private Boolean ambOficinaSir;
+	
 	@NotNull
 	protected InteressatTipusEnumDto tipus;
 	protected boolean comprovat = false;
@@ -291,6 +293,12 @@ public class InteressatCommand  {
 	}
 	public void setOrganNom(String organNom) {
 		this.organNom = organNom != null ? organNom.trim() : null;
+	}
+	public Boolean getAmbOficinaSir() {
+		return ambOficinaSir;
+	}
+	public void setAmbOficinaSir(Boolean ambOficinaSir) {
+		this.ambOficinaSir = ambOficinaSir;
 	}
 	public static InteressatCommand asCommand(InteressatDto dto) {
 		InteressatCommand command = ConversioTipusHelper.convertir(

@@ -374,114 +374,115 @@ $(document).ready(function() {
 	$('#ntiEstadoElaboracion').trigger('change');
 
 
-	
-	$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
-		 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
-	     $('#loading').show();
-	     $('#inputAmbFirma').addClass('hidden');
-		 $('#arxiuInput').hide();
-		 $('#unselect').val(true);
-		 $("#inputDoc .fileinput").fileinput('reset');
-		 $("#documentCommand").prop("target", 'target_iframe');
-		 $('#documentCommand').submit();
-	});
-	$("#inputDoc .fileinput").on("reset.bs.fileinput", function(e){
-		console.log('before reset');
-	    e.stopPropagation();
-	    e.preventDefault();
-	});
-	$("#inputDoc .fileinput").on("reseted.bs.fileinput", function(e){
-		console.log('after reset');
-	});
-	
-	
-	
-	$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
-		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
-	    $('#onlyFileSubmit').val(true);
-	    $('#loading').show();
-	    $('#arxiuInput').hide();
-		$('#inputAmbFirma').removeClass('hidden');
-	    $("#documentCommand").prop("target", 'target_iframe');
-	    $('#documentCommand').submit();
+	<c:if test="${isDeteccioFirmaAutomaticaActiva}">
+		$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
+			 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+		     $('#loading').show();
+		     $('#inputAmbFirma').addClass('hidden');
+			 $('#arxiuInput').hide();
+			 $('#unselect').val(true);
+			 $("#inputDoc .fileinput").fileinput('reset');
+			 $("#documentCommand").prop("target", 'target_iframe');
+			 $('#documentCommand').submit();
+		});
+		$("#inputDoc .fileinput").on("reset.bs.fileinput", function(e){
+			console.log('before reset');
+		    e.stopPropagation();
+		    e.preventDefault();
+		});
+		$("#inputDoc .fileinput").on("reseted.bs.fileinput", function(e){
+			console.log('after reset');
+		});
 		
-	});
-	
-	$('#target_iframe').load(function() {
-	    $("#documentCommand").prop("target", '');
-	    $('#unselect').val(false);
-		$('#onlyFileSubmit').val(false);
-
 		
-	    var isSignedAttached = $('iframe[name=target_iframe]').contents().find('#isSignedAttached').val();
-	    var isSignedAttachedTrue = (isSignedAttached === 'true');
-	    
-	    if (isSignedAttachedTrue && !$('#ambFirma').prop('checked')) {
-	        $('#ambFirma').click();
-	        $('#ambFirma').attr('onclick', 'return false;');
-	        $("#ambFirma").css({"cursor": "not-allowed"});
-		    $('#tipusFirma1').parent().show();
-		    $('#tipusFirma2').parent().hide();
-		    $('#input-firma-arxiu').addClass('hidden');
-		    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
-		    $('#tipusFirma1').click();
-	    } else if (!isSignedAttachedTrue && $('#ambFirma').prop('checked')){
-	    	$('#ambFirma').attr('onclick', null);
-	    	$("#ambFirma").css({"cursor": ""});
-	    	$('#ambFirma').click();
-		    $('#tipusFirma1').parent().hide();
-		    $('#tipusFirma2').parent().show();
-		    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
-		    $('#tipusFirma2').click();
-		} else if (!isSignedAttachedTrue && !$('#ambFirma').prop('checked')){
-		    $('#tipusFirma1').parent().hide();
-		    $('#tipusFirma2').parent().show();
-		    $('#tipusFirma2').click();
-		    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
-		} else if (isSignedAttachedTrue && $('#ambFirma').prop('checked')){
-	        $('#ambFirma').attr('onclick', 'return false;');
-	        $("#ambFirma").css({"cursor": "not-allowed"});
-		    $('#tipusFirma1').parent().show();
-		    $('#tipusFirma2').parent().hide();
-		    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
-		    $('#tipusFirma1').click();
-		}
-
-
-	    var isError = $('iframe[name=target_iframe]').contents().find('#isError').val();
-	    var isErrorTrue = (isError === 'true');
-		if (isErrorTrue) {
-			var errorMsg = $('iframe[name=target_iframe]').contents().find('#errorMsg').val();
-			$('#inputDoc').find('div.alert.alert-danger').remove();
-			$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
-		} else {
-			$('#inputDoc').find('div.alert.alert-danger').remove();
-		}
-	   
-
-	    $('#loading').hide();
-	    $('#arxiuInput').show();
-	    
-		//if (!isErrorTrue) {
-			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
-		//}
-
-	});
-
-
+		
+		$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
+			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+		    $('#onlyFileSubmit').val(true);
+		    $('#loading').show();
+		    $('#arxiuInput').hide();
+			$('#inputAmbFirma').removeClass('hidden');
+		    $("#documentCommand").prop("target", 'target_iframe');
+		    $('#documentCommand').submit();
+			
+		});
+		
+		$('#target_iframe').load(function() {
+		    $("#documentCommand").prop("target", '');
+		    $('#unselect').val(false);
+			$('#onlyFileSubmit').val(false);
 	
-	if(${not empty nomDocument}){
-		$('#inputAmbFirma').removeClass('hidden');
-	}
-    if($('#ambFirma').prop('checked') && $('#tipusFirma1').is(":checked")){
-        $('#ambFirma').attr('onclick', 'return false;');
-        $('#tipusFirma1').parent().show();
-        $('#tipusFirma2').parent().hide();
-    } else if($('#ambFirma').prop('checked') && $('#tipusFirma2').is(":checked")){
-        $('#tipusFirma1').parent().hide();
-        $('#tipusFirma2').parent().show();
-    }
+			
+		    var isSignedAttached = $('iframe[name=target_iframe]').contents().find('#isSignedAttached').val();
+		    var isSignedAttachedTrue = (isSignedAttached === 'true');
+		    
+		    if (isSignedAttachedTrue && !$('#ambFirma').prop('checked')) {
+		        $('#ambFirma').click();
+		        $('#ambFirma').attr('onclick', 'return false;');
+		        $("#ambFirma").css({"cursor": "not-allowed"});
+			    $('#tipusFirma1').parent().show();
+			    $('#tipusFirma2').parent().hide();
+			    $('#input-firma-arxiu').addClass('hidden');
+			    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
+			    $('#tipusFirma1').click();
+		    } else if (!isSignedAttachedTrue && $('#ambFirma').prop('checked')){
+		    	$('#ambFirma').attr('onclick', null);
+		    	$("#ambFirma").css({"cursor": ""});
+		    	$('#ambFirma').click();
+			    $('#tipusFirma1').parent().hide();
+			    $('#tipusFirma2').parent().show();
+			    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+			    $('#tipusFirma2').click();
+			} else if (!isSignedAttachedTrue && !$('#ambFirma').prop('checked')){
+			    $('#tipusFirma1').parent().hide();
+			    $('#tipusFirma2').parent().show();
+			    $('#tipusFirma2').click();
+			    $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+			} else if (isSignedAttachedTrue && $('#ambFirma').prop('checked')){
+		        $('#ambFirma').attr('onclick', 'return false;');
+		        $("#ambFirma").css({"cursor": "not-allowed"});
+			    $('#tipusFirma1').parent().show();
+			    $('#tipusFirma2').parent().hide();
+			    $('input[type=radio][name=tipusFirma]').val('ADJUNT');
+			    $('#tipusFirma1').click();
+			}
 	
+	
+		    var isError = $('iframe[name=target_iframe]').contents().find('#isError').val();
+		    var isErrorTrue = (isError === 'true');
+			if (isErrorTrue) {
+				var errorMsg = $('iframe[name=target_iframe]').contents().find('#errorMsg').val();
+				$('#inputDoc').find('div.alert.alert-danger').remove();
+				$('#inputDoc').append('<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span><spring:message code="contingut.document.form.error.validacio"/>: ' + errorMsg + '</span></div>');
+			} else {
+				$('#inputDoc').find('div.alert.alert-danger').remove();
+			}
+		   
+	
+		    $('#loading').hide();
+		    $('#arxiuInput').show();
+		    
+			//if (!isErrorTrue) {
+				$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
+			//}
+	
+		});
+	
+	
+		
+		if(${not empty nomDocument}){
+			$('#inputAmbFirma').removeClass('hidden');
+		}
+	    if($('#ambFirma').prop('checked') && $('#tipusFirma1').is(":checked")){
+	        $('#ambFirma').attr('onclick', 'return false;');
+	        $('#tipusFirma1').parent().show();
+	        $('#tipusFirma2').parent().hide();
+	    } else if($('#ambFirma').prop('checked') && $('#tipusFirma2').is(":checked")){
+	        $('#tipusFirma1').parent().hide();
+	        $('#tipusFirma2').parent().show();
+	        $('input[type=radio][name=tipusFirma]').val('SEPARAT');
+	    }
+	</c:if>
 	
 });
 
@@ -504,7 +505,7 @@ function removeLoading() {
 		</c:otherwise>
 	</c:choose>
 	
-	<c:if test="${!empty documentCommand.id && documentCommand.estat!='REDACCIO' && !isPermesPropagarModificacioDefinitius}">
+	<c:if test="${!empty documentCommand.id && documentCommand.arxiuEstatDefinitu && !isPermesPropagarModificacioDefinitius}">
 		<div class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span>&nbsp; <spring:message code="contingut.document.form.arxiu.definitiu.avis"/></div>
 	</c:if>
 	
@@ -547,7 +548,7 @@ function removeLoading() {
 			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true" comment="contingut.document.form.camp.id.doc.origen.comtentari"/>
 		</div>
 <%--		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">--%>
-		<c:if test="${!isImportatNoBorrador && isPermesModificarCustodiatsVar}">
+		<c:if test="${!documentCommand.arxiuEstatDefinitu || isPermesModificarCustodiatsVar}">
 			<ul class="nav nav-tabs" role="tablist">
 				<li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
 				<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
@@ -555,25 +556,39 @@ function removeLoading() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="fitxer">
-					<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
-					<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
-					<div id="arxiuInput">
-						<div id="inputDoc">
-							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
-							<c:if test="${!empty documentCommand.id && !documentCommand.validacioFirmaCorrecte}">
-								<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
-							</c:if>
-						</div>
-						<div id="inputAmbFirma" class="hidden">
-							<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-						</div>
-						<div id="input-firma" class="hidden">
-							<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-							<div id="input-firma-arxiu" class="hidden">
-								<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+					<c:choose>
+						<c:when test="${isDeteccioFirmaAutomaticaActiva}">
+							<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
+							<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
+							<div id="arxiuInput">
+								<div id="inputDoc">
+									<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+									<c:if test="${!empty documentCommand.id && !documentCommand.validacioFirmaCorrecte}">
+										<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
+									</c:if>
+								</div>
+								<div id="inputAmbFirma" class="hidden">
+									<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+								</div>
+								<div id="input-firma" class="hidden">
+									<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+									<div id="input-firma-arxiu" class="hidden">
+										<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}" fileName="${documentCommand.tipusFirma=='SEPARAT' ? 'firma_separada' : ''}"/>
+									</div>
+								</div>
 							</div>
-						</div>
-					</div>
+						</c:when>
+						<c:otherwise>
+							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+							<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+							<div id="input-firma" class="hidden">
+								<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+								<div id="input-firma-arxiu" class="hidden">
+									<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
+								</div>
+							</div>
+						</c:otherwise>
+					</c:choose>
 				</div>
 				<div role="tabpanel" class="tab-pane" id="escaneig">
 				<c:if test="${not empty noFileScanned}">

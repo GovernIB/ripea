@@ -7,17 +7,18 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 import es.caib.ripea.core.api.service.SeguimentService;
-
-import java.util.List;
 
 /**
  * Implementació de SeguimentService com a EJB que empra una clase delegada
@@ -68,65 +69,34 @@ public  class SeguimentServiceBean implements SeguimentService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ExpedientPeticioListDto> findExpedientsPendents(
+	public PaginaDto<ExpedientPeticioListDto> findAnotacionsPendents(
 			Long entitatId,
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, String rolActual) {
-		return delegate.findExpedientsPendents(
+			PaginacioParamsDto paginacioParams,
+			String rolActual) {
+		return delegate.findAnotacionsPendents(
 				entitatId,
 				filtre,
-				paginacioParams, rolActual);
+				paginacioParams,
+				rolActual);
 	}
 
 	@Override
-	@RolesAllowed("IPA_SUPER")
-	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsExpedients(
+	@RolesAllowed({ "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom" })
+	public ResultDto<SeguimentArxiuPendentsDto> findPendentsArxiu(
 			Long entitatId,
 			SeguimentArxiuPendentsFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findArxiuPendentsExpedients(
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			ResultEnumDto resultEnum,
+			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum) {
+		return delegate.findPendentsArxiu(
 				entitatId,
 				filtre,
-				paginacioParams);
-	}
-
-	@Override
-	public List<Long> findArxiuPendentsExpedients(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
-		return delegate.findArxiuPendentsExpedients(entitatId, filtre);
-	}
-
-	@Override
-	@RolesAllowed("IPA_SUPER")
-	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsDocuments(
-			Long entitatId,
-			SeguimentArxiuPendentsFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findArxiuPendentsDocuments(
-				entitatId,
-				filtre,
-				paginacioParams);
-	}
-
-	@Override
-	public List<Long> findArxiuPendentsDocuments(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
-		return delegate.findArxiuPendentsDocuments(entitatId, filtre);
-	}
-
-	@Override
-	@RolesAllowed("IPA_SUPER")
-	public PaginaDto<SeguimentArxiuPendentsDto> findArxiuPendentsInteressats(
-			Long entitatId,
-			SeguimentArxiuPendentsFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findArxiuPendentsInteressats(
-				entitatId,
-				filtre,
-				paginacioParams);
-	}
-
-	@Override
-	public List<Long> findArxiuPendentsInteressats(Long entitatId, SeguimentArxiuPendentsFiltreDto filtre) {
-		return delegate.findArxiuPendentsInteressats(entitatId, filtre);
+				paginacioParams,
+				rolActual,
+				resultEnum,
+				arxiuPendentTipusEnum);
 	}
 
 

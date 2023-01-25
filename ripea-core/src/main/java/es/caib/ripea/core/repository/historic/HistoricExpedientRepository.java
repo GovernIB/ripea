@@ -126,4 +126,20 @@ public interface HistoricExpedientRepository extends HistoricRepository<Historic
 			@Param("metaExpedients") List<Long> metaExpedients,
 			@Param("dataInici") Date dataInici,
 			@Param("dataFi") Date dataFi);
+	
+	
+	
+	
+	
+	@Query( "select " +
+			"h "+
+		" from " +
+		"    HistoricExpedientEntity h " +
+		" where " +
+		"    	 h.data = :data " +
+		"    and h.tipus = :tipus " )
+	List<HistoricExpedientEntity> findByDateAndTipus(
+			@Param("data") Date data,
+			@Param("tipus") HistoricTipusEnumDto tipus);
+
 }

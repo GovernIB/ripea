@@ -95,7 +95,7 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
             
             ExpedientPeticioFiltreCommand filtreCommand = getFiltreCommand(request);
 
-            docsPortafirmes = seguimentService.findExpedientsPendents(
+            docsPortafirmes = seguimentService.findAnotacionsPendents(
 					entitat.getId(),
 					ExpedientPeticioFiltreCommand.asDto(filtreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request), 

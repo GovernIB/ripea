@@ -582,6 +582,14 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 
 let pageSizeDominis = 20;
 $(document).ready(function() {
+
+	$('.nav-tabs a[href$="#interessats"]').on('click', function() {
+		$('#taulaInteressats').webutilDatatable();
+	});
+	
+	$('.nav-tabs a[href$="#notificacions"]').on('click', function() {
+		$('#taulaNotificacions').webutilDatatable();
+	});
 	
 	if (/#contingut/.test(window.location.href)) {
 		$('.nav-tabs a[href$="#contingut"]').trigger('click');	
@@ -1786,8 +1794,8 @@ function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 	
     // Mostrar contingut capçalera visor
     resumViewer.find('*').not('#container').remove();
-    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px;">\
-									<table style="width: 453px;">\
+    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px; display: flex; flex-wrap: wrap;">\
+									<table style="width: 453px; flex-basis: calc(100%/3); margin-bottom: 10px;">\
 										<tbody id="detallSignantsPreview">\
 										</tbody>\
 									</table>\
@@ -2189,11 +2197,18 @@ $.views.helpers(myHelpers);
 							<a href="#versions" data-toggle="tab"><spring:message code="contingut.tab.versions"/>&nbsp;<span class="badge" id="versions-count">${fn:length(contingut.versions)}</span></a>
 						</li>
 					</c:if>
-					<c:if test="${contingut.document && pluginArxiuActiu}">
+					<c:if test="${contingut.document}">
 						<div class="dropdown" style="float: right;" id="documentDropdownAccions">
 							<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret caret-white"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+								<c:choose>
+									<c:when test="${contingut.arxiuUuid != null}">
+										<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+					 				</c:when>
+					 				<c:otherwise>
+					 					<li><a class="disabled" href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+									</c:otherwise>
+								</c:choose>									
 							</ul>
 						</div>
 					</c:if>	
@@ -2632,7 +2647,6 @@ $.views.helpers(myHelpers);
 						<div class="tab-pane" id="interessats">
 							<table 
 								id="taulaInteressats" 
-								data-toggle="datatable" 
 								data-url="<c:url value="/contingut/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/datatable"/>" 
 								data-paging-enabled="false"
 								data-botons-template="#taulaInteressatsNouBoton" 
@@ -2715,7 +2729,6 @@ $.views.helpers(myHelpers);
 						<div class="tab-pane" id="notificacions">
 							<table
 								id="taulaNotificacions"
-								data-toggle="datatable"
 								data-url="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/enviament/NOTIFICACIO/datatable"/>"
 								data-paging-enabled="false"
 								data-agrupar="5"

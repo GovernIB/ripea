@@ -16,6 +16,8 @@ public class InteressatAdministracioDto extends InteressatDto {
 	protected String organCodi;
 	protected String organNom;
 
+	protected Boolean ambOficinaSir;
+	
 	public String getOrganNom() {
 		return organNom;
 	}
@@ -34,6 +36,12 @@ public class InteressatAdministracioDto extends InteressatDto {
 	}
 	public void setOrganCodi(String organCodi) {
 		this.organCodi = organCodi;
+	}
+	public Boolean getAmbOficinaSir() {
+		return ambOficinaSir;
+	}
+	public void setAmbOficinaSir(Boolean ambOficinaSir) {
+		this.ambOficinaSir = ambOficinaSir;
 	}
 
 	@Override
