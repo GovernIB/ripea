@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - changeSet:
+      id: 1670837833869-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_metadada
+            columns:
+              - column:
+                  name: no_aplica
+                  type: BOOLEAN
+                  defaultValue: ${booleanFalse}

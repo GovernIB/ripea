@@ -26,8 +26,143 @@ metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
 </c:forEach>
 $(document).ready(function() {
 	$('#metaDocumentId').on('change', function() {
-		if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPASWS01") {
+		if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPASWS01") { // SVDCCAACPASWS01 - Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA
 			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+			
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCDDWS01") { // SVDSCDDWS01 - Servei de consulta de dades de discapacitat
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').show();
+			$('#divDataNaixement').show();
+			$('#divConsentimentTipusDiscapacitat').show();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+				
+				
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de padró de convivència
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').hide();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').show();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+			
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCTFNWS01") { // SVDSCTFNWS01 - Servei de consulta de família nombrosa
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').hide();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').show();
+			$('#divDataNaixement').show();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').show();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+			
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPCWS01") { // SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').show();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+			
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDDELSEXWS01") { // SVDDELSEXWS01 - Consulta de inexistencia de delitos sexuales por datos de filiación
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').hide();
+			$('#divProvinciaCodi').hide();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').show();
+			$('#divCodiNacionalitat').show();
+			$('#divProvinciaNaixament').show();
+			$('#divPoblacioNaixament').show();
+			$('#divCodiPoblacioNaixament').show();
+			$('#divSexe').show();
+			$('#divNomPare').show();
+			$('#divNomMare').show();
+			$('#divTelefon').show();
+			$('#divEmail').show();
+			$('#divDataNaixementObligatori').show();
+															
 		} else {
 			$('#bloc-datos-especificos').hide();
 		}
@@ -73,8 +208,27 @@ $(document).ready(function() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="datos-especificos">
-					<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
-					<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+					<div id="divComunitatAutonomaCodi"><rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/></div>
+					<div id="divProvinciaCodi"><rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/></div>
+					<div id="divMunicipiCodi"><rip:inputSelect name="municipiCodi" textKey="interessat.form.camp.organ.filtre.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
+					<div id="divDataConsulta"><rip:inputDate name="dataConsulta" textKey="contingut.pinbal.form.camp.data.consulta" /></div>
+					<div id="divDataNaixement"><rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" /></div>
+					<div id="divConsentimentTipusDiscapacitat"><rip:inputSelect name="consentimentTipusDiscapacitat" textKey="contingut.pinbal.form.camp.consentiment.tipus.discapacitat" optionEnum="SiNoEnumDto" emptyOption="true"/></div>
+					<div id="divNumeroTitol"><rip:inputText name="numeroTitol" textKey="contingut.pinbal.form.camp.numero.titol" /></div>
+					
+				  	<div id="divCodiNacionalitat"><rip:inputText name="codiNacionalitat" textKey="contingut.pinbal.form.camp.codi.nacionalitat" comment="contingut.pinbal.form.camp.codi.nacionalitat.comment"/></div>
+				  	<div id="divSexe"><rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/></div>
+				  	<div id="divPaisNaixament"><rip:inputText name="paisNaixament" textKey="contingut.pinbal.form.camp.pais.naixament" comment="contingut.pinbal.form.camp.codi.nacionalitat.comment"/></div>
+				  	<div id="divProvinciaNaixament"><rip:inputSelect name="provinciaNaixament" textKey="contingut.pinbal.form.camp.provincia.naixament" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text" comment="contingut.pinbal.form.camp.provincia.naixament.comment"/></div>
+				  	<div id="divPoblacioNaixament"><rip:inputText name="poblacioNaixament" textKey="contingut.pinbal.form.camp.poblacio.naixament" comment="contingut.pinbal.form.camp.poblacio.naixament.comment"/></div>
+				  	<div id="divCodiPoblacioNaixament"><rip:inputText name="codiPoblacioNaixament" textKey="contingut.pinbal.form.camp.codi.poblacio.naixament" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment"/></div>
+					<div id="divNomPare"><rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare" comment="contingut.pinbal.form.camp.nom.pare.comment"/></div>
+					<div id="divNomMare"><rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare" comment="contingut.pinbal.form.camp.nom.mare.comment"/></div>
+					<div id="divDataNaixementObligatori"><rip:inputDate name="dataNaixementObligatori" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/></div>
+					<div id="divTelefon"><rip:inputText name="telefon" textKey="contingut.pinbal.form.camp.telefon"/></div>
+					<div id="divEmail"><rip:inputText name="email" textKey="contingut.pinbal.form.camp.email"/></div>
+			
+					
 				</div>
 			</div>
 		</div>

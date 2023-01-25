@@ -90,6 +90,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private ContingutsOrfesHelper contingutRepositoryHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	@Transactional
 	@Override
@@ -433,6 +435,8 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutOrigenId,
 			Long contingutDestiId, 
 			String rolActual) {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutOrigenId));
 		logger.debug("Movent el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutOrigenId=" + contingutOrigenId + ", "
@@ -521,10 +525,20 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false, null, false, null, false, 0, null, null, true);
-		contingutHelper.arxiuPropagarMoviment(
-				contingutOrigen,
-				contingutDesti,
-				expedientDesti.getArxiuUuid());
+		
+		
+		if (contingutOrigen instanceof DocumentEntity){
+			contingutHelper.arxiuDocumentPropagarMoviment(
+					contingutOrigen.getArxiuUuid(),
+					contingutDesti,
+					expedientDesti.getArxiuUuid());
+		} else if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
+			pluginHelper.arxiuCarpetaMoure(
+					(CarpetaEntity)contingutOrigen,
+					contingutDesti.getArxiuUuid());
+		}
+		
+
 		return dto;
 	}
 
@@ -775,6 +789,21 @@ public class ContingutServiceImpl implements ContingutService {
 
 	}
 	
+	@Override
+	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
+		long t0 = System.currentTimeMillis();
+		logger.debug("Obtenint contingut amb id per usuari ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ", "
+				+ "ambFills=onlyCarpetes, "
+				+ "ambVersions=false)");
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("findAmbIdUserPerMoureCopiarVincular time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t0) + " ms");
+		
+		return contingutHelper.toContingutDtoSimplificat(contingut, true, null);
+	}
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1288,7 +1317,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// ##################### DOCUMENT ##################################
 		} else if (contingut instanceof DocumentEntity) {
 			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-					contingut,
+					(DocumentEntity) contingut,
 					null,
 					null,
 					true);

@@ -247,5 +247,27 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		delegate.setServicesForSynctest(metaExpedientHelper, pluginHelper);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<OrganGestorDto> findAll(
+			String filter) {
+		return delegate.findAll(filter);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public String getOrganCodiFromContingutId(
+			Long contingutId) {
+		return delegate.getOrganCodiFromContingutId(contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void actualitzarOrganCodi(
+			String organCodi) {
+		delegate.actualitzarOrganCodi(organCodi);
+		
+	}
+
 
 }

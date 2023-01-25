@@ -122,6 +122,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "pinbal_servei_doc_permes_pas", nullable = false)
 	private boolean pinbalServeiDocPermesPas;
 	
+	@Column(name = "pinbal_utilitzar_cif_organ", nullable = false)
+	private boolean pinbalUtilitzarCifOrgan;
 	
 	
 	@Column(name = "per_defecte")
@@ -212,9 +214,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public void setLeftPerCreacio(boolean leftPerCreacio) {
 		this.leftPerCreacio = leftPerCreacio;
 	}
-
 	
-	
+	public boolean isPinbalUtilitzarCifOrgan() {
+		return pinbalUtilitzarCifOrgan;
+	}
 	public List<PinbalServeiDocPermesEnumDto> getPinbalServeiDocsPermesos() {
 		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesosEnumDto = new ArrayList<>();
 		
@@ -261,7 +264,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			boolean pinbalActiu,
 			MetaDocumentPinbalServeiEnumDto pinbalServei,
 			String pinbalFinalitat,
-			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
+			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos, 
+			boolean pinbalUtilitzarCifOrgan) {
 		update(
 				codi,
 				nom,
@@ -285,6 +289,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 		this.pinbalActiu = pinbalActiu;
 		this.pinbalServei = pinbalServei;
 		this.pinbalFinalitat = pinbalFinalitat;
+		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
 		
 		if (pinbalServeiDocsPermesos != null) {
 			this.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);

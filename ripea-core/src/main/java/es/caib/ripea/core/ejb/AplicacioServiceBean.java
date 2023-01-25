@@ -218,5 +218,12 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.mostrarLogsRendiment();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void actualitzarOrganCodi(
+			String organCodi) {
+		delegate.actualitzarOrganCodi(organCodi);
+	}
+
 
 }

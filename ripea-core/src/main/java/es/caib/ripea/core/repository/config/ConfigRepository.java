@@ -2,6 +2,8 @@ package es.caib.ripea.core.repository.config;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,14 +29,37 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
     @Query("FROM ConfigEntity c WHERE c.key like concat('%', :key, '%') AND c.entitatCodi IS NOT NULL")
     List<ConfigEntity> findLikeKeyEntitatNotNull(@Param("key") String key);
 
-    @Query("FROM ConfigEntity c WHERE c.key like concat('%', :key, '%') AND c.entitatCodi IS NOT NULL AND c.configurable = true")
-    List<ConfigEntity> findLikeKeyEntitatNotNullAndConfigurable(@Param("key") String key);
+    @Query("FROM ConfigEntity c WHERE c.key like (:prefix||'.'||c.entitatCodi||:suffix) AND c.entitatCodi IS NOT NULL AND c.configurable = true and c.organCodi IS NULL")
+    List<ConfigEntity> findLikeKeyEntitatNotNullAndConfigurable(@Param("prefix") String prefix, @Param("suffix") String suffix);
 
 	@Query("FROM ConfigEntity c WHERE c.entitatCodi IS NULL AND c.configurable = true")
 	List<ConfigEntity> findByEntitatCodiIsNullAndConfigurableIsTrue();
 
     @Query("FROM ConfigEntity c WHERE c.configurable = true AND c.jbossProperty = true")
     List<ConfigEntity> findJBossConfigurables();
+    
+    
+	@Query(	"from " +
+			"    ConfigEntity c " +
+			"where " +
+			"c.organCodi is not null " +
+			"and c.key like (:prefix||'.'||c.entitatCodi||'.'||c.organCodi||:suffix) ")
+	Page<ConfigEntity> findConfOrgansByKey(
+			@Param("prefix") String prefix, 
+			@Param("suffix") String suffix,
+			Pageable pageable);
+	
+	
+    
+	@Query(	"from " +
+			"    ConfigEntity c " +
+			"where " +
+			"c.organCodi is not null " +
+			"and c.key like (:prefix||'.'||c.entitatCodi||'.'||c.organCodi||:suffix) ")
+	List<ConfigEntity> findConfOrgansByKey(
+			@Param("prefix") String prefix, 
+			@Param("suffix") String suffix);
+    
 
     @Transactional
     @Modifying

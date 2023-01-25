@@ -434,24 +434,7 @@ public interface DocumentService {
 			String administrationId,
 			String name) throws NotFoundException;
 
-	/**
-	 * Reintenta la custòdia d'un document firmat amb portafirmes que ha donat
-	 * error al custodiar.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contenidor.
-	 * @param documentId
-	 *            Atribut id del document que es vol custodiar.
-	 * @return TODO
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws SistemaExternException
-	 *             Hi ha hagut algun error en la comunicació amb la custòdia.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public Exception portafirmesReintentar(
-			Long entitatId,
-			Long documentId) throws NotFoundException, SistemaExternException;
+
 
 	/**
 	 * Retorna la informació del darrer enviament a portafirmes del document.

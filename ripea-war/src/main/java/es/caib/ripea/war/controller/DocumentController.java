@@ -212,7 +212,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
-				documentId);
+				documentId,
+				RolHelper.getRolActual(request));
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
 		if (exc != null || doc.getGesDocFirmatId() != null) {
 			return "redirect:./info";
@@ -232,7 +233,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
-				documentId);
+				documentId,
+				RolHelper.getRolActual(request));
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
 		if (exc == null) {
 			return this.getModalControllerReturnValueSuccess(
@@ -347,7 +349,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		documentService.portafirmesReintentar(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				RolHelper.getRolActual(request));
 		return this.getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../../../../contingut/" + documentId,

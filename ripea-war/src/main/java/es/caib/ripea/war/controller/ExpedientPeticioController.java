@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -57,6 +59,7 @@ import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ExpedientPeticioAcceptarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
+import es.caib.ripea.war.command.ExpedientPeticioModificarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
 import es.caib.ripea.war.command.RegistreAnnexCommand;
 import es.caib.ripea.war.command.RegistreJustificantCommand;
@@ -460,6 +463,77 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptat.warning"));
 		}
 		return getModalControllerReturnValueSuccess(request, "redirect:expedientPeticio", "expedient.peticio.controller.acceptat.ok");
+	}
+	
+	
+	
+	@RequestMapping(value = "/retornarPendent/{expedientPeticioId}", method = RequestMethod.GET)
+	public String retornarPendent(HttpServletRequest request, @PathVariable Long expedientPeticioId) {
+
+		try {
+			expedientPeticioService.retornarPendent(expedientPeticioId);
+			return getModalControllerReturnValueSuccess(request, "redirect:/expedientPeticio", "expedient.peticio.controller.retornar.pendent.ok");
+		} catch (Exception ex) {
+			logger.error("Error al retornar a pendent", ex);
+			return getModalControllerReturnValueErrorMessageText(request, "redirect:/expedientPeticio", ex.getMessage(), ex);
+		}
+	}
+
+	
+	
+	@RequestMapping(value = "/canviarProcediment/{expedientPeticioId}", method = RequestMethod.GET)
+	public String canviarProcedimentGet(HttpServletRequest request, @PathVariable Long expedientPeticioId, Model model) {
+		
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitatActual.getId(), rolActual);
+		model.addAttribute("metaExpedients", metaExpedients);
+		
+		
+		ExpedientPeticioModificarCommand command = new ExpedientPeticioModificarCommand();
+		command.setId(expedientPeticioId);
+		command.setExtracte(expedientPeticioDto.getRegistre().getExtracte());
+		command.setNumero(expedientPeticioDto.getRegistre().getIdentificador());
+		command.setMetaExpedientId(expedientPeticioDto.getMetaExpedientId());
+		model.addAttribute("expedientPeticioModificarCommand", command);
+		
+		return "expedientPeticioModificarForm";
+
+	}
+	
+	
+	@RequestMapping(value = "/canviarProcediment", method = RequestMethod.POST)
+	public String canviarProcedimentPost(
+			HttpServletRequest request,
+			@Valid ExpedientPeticioModificarCommand command,
+			BindingResult bindingResult,
+			Model model) throws JsonMappingException {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		try {
+			expedientPeticioService.canviarProcediment(
+					command.getId(),
+					command.getMetaExpedientId());
+
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"metaexpedient.controller.modificat.ok");
+
+		} catch (Exception e) {
+			logger.error("Error al canvair procediemnt de expedient peticio", e);
+			Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:expedientPeticio",
+					"metaexpedient.controller.modificar.error",
+					new String[] {throwable.getMessage()},
+					throwable);
+		}
+		
 	}
 	
 	

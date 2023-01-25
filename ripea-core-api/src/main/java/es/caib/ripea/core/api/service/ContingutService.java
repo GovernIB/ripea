@@ -215,6 +215,23 @@ public interface ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions, String rolActual, Long organActualId) throws NotFoundException;
+	
+	/**
+	 * Obté una informació simplificada del contingut especificat per moure/copiar/vincular documents.
+	 * 
+	 * @param entitatId
+	 *            Atribut id de l'entitat a la qual pertany el contingut.
+	 * @param contingutId
+	 *            Atribut id del contingut del qual es vol consultar el contingut.
+	 *            
+	 * @return El contingut amb l'id especificat.
+	 * @throws NotFoundException
+	 *             Si no s'ha trobat l'objecte amb l'id especificat.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ContingutDto findAmbIdUserPerMoureCopiarVincular(
+			Long entitatId,
+			Long contingutId) throws NotFoundException;
 
 	/**
 	 * Obté la informació del contingut especificat.

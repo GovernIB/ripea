@@ -53,6 +53,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.TascaHelper;
@@ -110,6 +111,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private TascaHelper tascaHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -617,6 +620,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			Long entitatId,
 			Long tascaId,
 			Long documentId) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
+		
 		logger.debug("Converteix un document en PDF per a la firma client ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + documentId + ")");

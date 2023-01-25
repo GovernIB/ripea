@@ -79,6 +79,7 @@ public class MetaDocumentCommand {
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
 	private String pinbalFinalitat;
 	private List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos;
+	private boolean pinbalUtilitzarCifOrgan;
 	
 	private boolean comu;
 
@@ -228,7 +229,11 @@ public class MetaDocumentCommand {
 	public void setPinbalServeiDocsPermesos(List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
 		this.pinbalServeiDocsPermesos = pinbalServeiDocsPermesos;
 	}
-	
+
+	public void setPinbalUtilitzarCifOrgan(boolean pinbalUtilitzarCifOrgan) {
+		this.pinbalUtilitzarCifOrgan = pinbalUtilitzarCifOrgan;
+	}
+
 
 	
 }

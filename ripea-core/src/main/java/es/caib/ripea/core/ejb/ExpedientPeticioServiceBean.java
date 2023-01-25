@@ -206,5 +206,22 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 				rolActual);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void canviarProcediment(
+			Long expedientPeticioId,
+			Long procedimentId) {
+		delegate.canviarProcediment(
+				expedientPeticioId,
+				procedimentId);
+		
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void retornarPendent(Long expedientPeticioId) {
+		delegate.retornarPendent(expedientPeticioId);
+	}
+
 
 }

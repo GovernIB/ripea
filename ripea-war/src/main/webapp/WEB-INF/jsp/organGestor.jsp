@@ -108,6 +108,15 @@
 				<th data-col-name="pareCodiNom" data-orderable="false" width="40%">
 					<spring:message code="organgestor.list.columna.pare" />
 				</th>
+				
+				<th data-col-name="cif" data-orderable="false" width="40%">
+					<spring:message code="entitat.list.columna.cif" />
+				</th>
+				
+				<th data-col-name="estat" data-renderer="enum(OrganEstatEnumDto)">
+					<spring:message code="organgestor.list.columna.estat" />
+				</th>
+				
 				<th data-col-name="id" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 					<script id="cellPermisosTemplate" type="text/x-jsrender">
 						<a href="organgestor/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
@@ -117,9 +126,6 @@
 					<spring:message code="organgestor.list.columna.nom"/>
 				</th>
 
-				<th data-col-name="estat" data-renderer="enum(OrganEstatEnumDto)">
-					<spring:message code="organgestor.list.columna.estat" />
-				</th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

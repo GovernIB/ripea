@@ -29,7 +29,7 @@
                 <form:hidden path="key"/>
                 <div class="form-group">
                     <label for="config_${config.key}" class="col-sm-3 control-label" style="word-wrap: break-word;">${ config.description }</label>
-                    <div class="col-sm-8">
+                    <div class="col-sm-7">
                         <c:choose>
                             <c:when test="${config.typeCode == 'INT'}">
                                 <form:input  id="config_${config.key}" cssClass="form-control" path="value" placeholder="${config.key}"
@@ -74,16 +74,48 @@
                         </c:choose>
                         <div id="config_${config.key}_key"><span class="help-block display-inline">${config.key}</span></div>
                     </div>
-                    <div class="col-sm-1">
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    <div class="col-sm-2">
                         <c:if test="${not config.jbossProperty}">
                             <button class="btn btn-success" style="padding: 4px 8px"><i class="fa fa-save"></i></button>
                         </c:if>
+                        
                         <c:if test="${config.configurable}">
-                            <div class="btn btn-default btn-sm btn-rowInfo entitats" id="${config.key}"><span class="fa fa-caret-down"></span></div>
-                        </c:if>
+							<div class="btn-group">
+								<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" style="padding: 4px 8px">
+			  						<span class="fa fa-ellipsis-h"></span>
+								</button>
+								<ul class="dropdown-menu">
+									<li>
+										<a class="configurable entitat">
+											<span class="${config.configurableEntitatActiu ? 'fa fa-check-square-o' : 'fa fa-square-o'}"></span>&nbsp;&nbsp;<spring:message code="config.propietats.btn.configurable.entitat"/>
+										</a>
+									</li>	
+									<c:if test="${config.configurableOrgan}"> 
+										<li>
+											<a class="configurable organ">
+												<span class="${config.configurableOrganActiu ? 'fa fa-check-square-o' : 'fa fa-square-o'}"></span>&nbsp;&nbsp;<spring:message code="config.propietats.btn.configurable.organ"/>
+											</a>
+										</li>
+									</c:if>
+															
+								</ul>
+							</div>       
+						</c:if>                
+						
+                        
+                       <div class="btn btn-default btn-sm btn-rowInfo btnDesplegable" style="${config.configurableEntitatActiu or config.configurableOrganActiu ? '' : 'display: none;' }" id="${config.key}"><span class="fa fa-caret-down"></span></div>
                     </div>
                 </div>
-                <div class="form-group entitats-config separador"></div>
+                
+                <div class="form-group entitats-config separador" style="margin-top: -10px;"></div>
+                <div class="form-group organs-config separador" style="margin-top: -10px; padding-bottom: 20px; padding-left: 20px; padding-right: 20px;"></div>
             </form:form>
         </c:forEach>
 

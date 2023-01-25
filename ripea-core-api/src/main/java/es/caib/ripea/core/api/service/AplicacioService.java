@@ -213,4 +213,8 @@ public interface AplicacioService {
 
 	public boolean mostrarLogsRendiment();
 
+	@PreAuthorize("hasRole('tothom')")
+	public void actualitzarOrganCodi(
+			String organCodi);
+
 }

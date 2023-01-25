@@ -60,6 +60,8 @@ public class MetaDadaCommand {
 	private Boolean valorBoolea;
 	private String valorString;
 	
+	private boolean noAplica;
+	
 	public static List<MetaDadaCommand> toMetaDadaCommands(
 			List<MetaDadaDto> dtos) {
 		List<MetaDadaCommand> commands = new ArrayList<MetaDadaCommand>();
@@ -131,5 +133,8 @@ public class MetaDadaCommand {
 	}
 	public void setValorString(String valorString) {
 		this.valorString = valorString != null ? valorString.trim() : null;
+	}
+	public void setNoAplica(boolean noAplica) {
+		this.noAplica = noAplica;
 	}
 }

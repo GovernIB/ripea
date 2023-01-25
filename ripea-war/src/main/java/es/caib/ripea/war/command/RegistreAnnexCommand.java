@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.command;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Informació d'un registre annex.
  * 
@@ -17,6 +19,7 @@ public class RegistreAnnexCommand {
 	
 	private Long metaDocumentId;
 	private String nom;
+	private String titolINom;
 
 
 	public Long getId() {
@@ -53,7 +56,10 @@ public class RegistreAnnexCommand {
 		this.nom = nom;
 	}
 	public String getTitolINom() {
-		return titol + " (" + nom + ")";
+		return StringUtils.isNotEmpty(titolINom) ? titolINom : (titol + " (" + nom + ")");
+	}
+	public void setTitolINom(String titolINom) {
+		this.titolINom = titolINom;
 	}
 	
 

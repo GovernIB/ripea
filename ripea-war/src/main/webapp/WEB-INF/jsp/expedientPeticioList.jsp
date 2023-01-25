@@ -92,7 +92,9 @@ table.dataTable td {
 			<div class="col-md-4">							
 				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
 			</div>		
-						
+			<div class="col-md-4">
+				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
+			</div>						
 			<div class="col-md-3 pull-right">
 				<div class="pull-right">
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
@@ -145,9 +147,11 @@ table.dataTable td {
 								{{if estatView == 'PENDENT' && !pendentEnviarDistribucio}}
 									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
 									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
+									<li><a href="<c:url value="/expedientPeticio/canviarProcediment/{{:id}}"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								{{/if}}
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
+									<li><a href="<c:url value="/expedientPeticio/retornarPendent/{{:id}}"/>" data-refresh-pagina="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="expedient.peticio.list.btn.retornarPendent"/></a></li>
 								{{/if}}
 								<c:if test="${isRolActualAdmin}">
 									{{if pendentEnviarDistribucio}}

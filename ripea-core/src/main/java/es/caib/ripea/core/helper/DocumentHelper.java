@@ -83,6 +83,8 @@ public class DocumentHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
@@ -325,6 +327,8 @@ public class DocumentHelper {
 			DocumentEntity documentEntity,
 			DocumentDto document,
 			boolean comprovarMetaExpedient) {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
 		MetaDocumentEntity metaDocument = null;
 		List<ArxiuFirmaDto> firmes = null;
@@ -550,6 +554,8 @@ public class DocumentHelper {
 			DocumentEntity documentEntity,
 			Long metaDocumentId,
 			boolean comprovarMetaExpedient) {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
 
 		MetaDocumentEntity metaDocument = null;
 		if (metaDocumentId != null) {
@@ -876,6 +882,7 @@ public class DocumentHelper {
 
 	public void actualitzarVersionsDocument(
 			DocumentEntity document) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		if (pluginHelper.arxiuSuportaVersionsDocuments()) {
 			try {
 				List<ContingutArxiu> versions = pluginHelper.arxiuDocumentObtenirVersions(

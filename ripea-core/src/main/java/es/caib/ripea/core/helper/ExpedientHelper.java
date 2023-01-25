@@ -27,6 +27,7 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -101,6 +102,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -180,7 +182,8 @@ public class ExpedientHelper {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-	
+	@Autowired
+	private InteressatRepository interessatRepository;
 
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
@@ -408,14 +411,28 @@ public class ExpedientHelper {
 		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
 		for (RegistreInteressatEntity interessatRegistre : expedientPeticioEntity.getRegistre().getInteressats()) {
 			boolean alreadyExists = false;
+			boolean tipusCanviat = false;
 			InteressatEntity interessatExpedient = null;
 			for (InteressatEntity interessatExp : existingInteressats) {
 				if (interessatExp.getDocumentNum() != null && interessatRegistre.getDocumentNumero() != null && interessatExp.getDocumentNum().equals(interessatRegistre.getDocumentNumero())) {
 					alreadyExists = true;
 					interessatExpedient = interessatExp;
+					if (!interessatExp.getDocumentTipus().toString().equals(interessatRegistre.getTipus().toString())) {
+						tipusCanviat = true;
+					}
 				}
 			}
-			if (!alreadyExists) {
+			if (!alreadyExists || tipusCanviat) {
+				
+				if (tipusCanviat) {
+					if (interessatExpedient.getRepresentant() != null) {
+						InteressatEntity repres = interessatExpedient.getRepresentant();
+						interessatExpedient.updateRepresentant(null);
+						interessatRepository.delete(repres);
+					}
+					interessatRepository.delete(interessatExpedient);
+				}
+				
 				InteressatDto createdInteressat = expedientInteressatHelper.create(
 						entitatId,
 						expedientId,
@@ -627,29 +644,34 @@ public class ExpedientHelper {
 
 		Exception exception = null;
 		
-		// ############################ MOVE DOCUMENT IN ARXIU ####################
-		exception = moveDocumentArxiu(registreAnnexEntity.getId());
+		// ############################ MOVE ANNEX IN ARXIU ####################
+		exception = moveAnnexArxiu(registreAnnexEntity.getId());
 		return exception;
 	}
 	
 	
-	public Exception moveDocumentArxiu(Long registreAnnexId) {
+	public Exception moveAnnexArxiu(Long registreAnnexId) {
 		
 		RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		DocumentEntity docEntity = registreAnnexEntity.getDocument();
 		ContingutEntity pare = docEntity.getPare();
 		ExpedientEntity expedientEntity = docEntity.getExpedient();
 		Exception exception = null;
+
 		
-		// put arxiu uuid of annex
-		if (docEntity.getArxiuUuid() == null || docEntity.getArxiuUuid().isEmpty()) {
-			docEntity.updateArxiu(registreAnnexEntity.getUuid());
+		String uuidToMove = null;
+		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
+			uuidToMove = registreAnnexEntity.getUuidDispatched();
+		} else {
+			uuidToMove = registreAnnexEntity.getUuid();
 		}
-		documentRepository.saveAndFlush(docEntity);
+		
+		docEntity.updateArxiu(uuidToMove);
 		
 		try {
-			String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-					docEntity,
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientEntity.getId()));
+			String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+					uuidToMove,
 					pare,
 					expedientEntity.getArxiuUuid());
 			// if document was dispatched, update uuid to new document
@@ -699,7 +721,7 @@ public class ExpedientHelper {
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Exception moveDocumentArxiuNewTransaction(Long registreAnnexId) {
-		return moveDocumentArxiu(registreAnnexId);
+		return moveAnnexArxiu(registreAnnexId);
 	}
 	
 	
@@ -718,6 +740,7 @@ public class ExpedientHelper {
 			String arxiuUuid, 
 			Long expedientPeticioId,
 			Long justificantIdMetaDoc) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
 		ExpedientEntity expedientEntity;
 		EntitatEntity entitat;
 		CarpetaEntity carpetaEntity = null;
@@ -826,8 +849,8 @@ public class ExpedientHelper {
 				carpetaEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-						docEntity,
+				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+						docEntity.getArxiuUuid(),
 						carpetaEntity,
 						expedientEntity.getArxiuUuid());
 				// if document was dispatched, update uuid to new document
@@ -852,8 +875,8 @@ public class ExpedientHelper {
 				expedientEntity.updateArxiu(documentUuid);
 			}
 			if (!documentExistsInArxiu) {
-				String uuidDesti = contingutHelper.arxiuPropagarMoviment(
-						docEntity,
+				String uuidDesti = contingutHelper.arxiuDocumentPropagarMoviment(
+						docEntity.getArxiuUuid(),
 						expedientEntity,
 						expedientEntity.getArxiuUuid());
 				// if document was dispatched, update uuid to new document
@@ -994,6 +1017,7 @@ public class ExpedientHelper {
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug(
 				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(

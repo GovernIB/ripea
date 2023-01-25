@@ -56,7 +56,7 @@ let mostrarMissatge = (id, data) => {
     let span = document.createElement("span");
     span.className = "fa fa-times alert-config-boto";
     div.append(span);
-    elem.closest(".col-sm-8").append(div);
+    elem.closest(".col-sm-7").append(div);
     span.addEventListener("click", () => div.remove());
     window.setTimeout(() => div ? div.remove() : "", data.status === 1 ? 2250 : 4250);
 };

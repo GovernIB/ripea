@@ -28,6 +28,7 @@ public class ExpedientPeticioFiltreCommand {
 	private ExpedientPeticioEstatViewEnumDto estat;
 	private Long metaExpedientId;
 	private String procedimentCodi;
+	private String interessat;
 	
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	
@@ -44,13 +45,13 @@ public class ExpedientPeticioFiltreCommand {
 		this.estat = estat;
 	}
 	public void setProcediment(String procediment) {
-		this.procediment = procediment != null ? procediment.trim() : null;
+		this.procediment =  StringUtils.trim(procediment);
 	}
 	public void setNumero(String numero) {
-		this.numero = numero != null ? numero.trim() : null;
+		this.numero = StringUtils.trim(numero);
 	}
 	public void setExtracte(String extracte) {
-		this.extracte = extracte != null ? extracte.trim() : null;
+		this.extracte = StringUtils.trim(extracte);
 	}
 	public void setDataInicial(Date dataInicial) {
 		this.dataInicial = dataInicial;
@@ -70,6 +71,10 @@ public class ExpedientPeticioFiltreCommand {
 	public void setProcedimentCodi(String procedimentCodi) {
 		this.procedimentCodi = StringUtils.trim(procedimentCodi);
 	}
+	public void setInteressat(String interessat) {
+		this.interessat = StringUtils.trim(interessat);
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
@@ -82,4 +87,5 @@ public class ExpedientPeticioFiltreCommand {
 		return ConversioTipusHelper.convertir(command,
 				ExpedientPeticioFiltreDto.class);
 	}
+
 }

@@ -63,7 +63,18 @@ public class ConfigEntity {
     
     @Column(name = "CONFIGURABLE")
     private boolean configurable;
-     
+    
+    @Column(name = "configurable_entitat_actiu")
+    private boolean configurableEntitatActiu;
+    
+    @Column(name = "configurable_organ")
+    private boolean configurableOrgan;
+    
+    @Column(name = "configurable_organ_actiu")
+    private boolean configurableOrganActiu;
+    
+    @Column(name = "organ_codi", length = 64)
+    private String organCodi;
 
     @Column(name = "POSITION")
     private int position;
@@ -94,7 +105,16 @@ public class ConfigEntity {
         this.value = value;
     }
     
-    public void crearConfigNova(String key, String entitatCodi, ConfigEntity entitat) {
+    public void updateConfigurableEntitat(boolean configurable) {
+        this.configurableEntitatActiu = configurable;
+    }
+    
+    public void updateConfigurableOrgan(boolean configurableOrgan) {
+        this.configurableOrganActiu = configurableOrgan;
+    }
+    
+    
+    public void crearConfigNova(String key, String entitatCodi, String organCodi, ConfigEntity entitat) {
 
         this.key = key;
         this.value = null;
@@ -103,7 +123,11 @@ public class ConfigEntity {
         this.groupCode = entitat.getGroupCode();
         this.type = entitat.getType();
         this.entitatCodi = entitatCodi;
+        this.organCodi = organCodi;
         this.configurable = entitat.isConfigurable();
+        this.configurableEntitatActiu = entitat.isConfigurableEntitatActiu();
+        this.configurableOrgan = entitat.isConfigurableOrgan();
+        this.configurableOrganActiu = entitat.isConfigurableOrganActiu();
     }
     
 }

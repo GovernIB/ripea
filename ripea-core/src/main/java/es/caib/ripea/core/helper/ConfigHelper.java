@@ -7,14 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.annotation.PostConstruct;
-
-import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Strings;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
@@ -22,7 +21,6 @@ import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.entity.config.ConfigGroupEntity;
-import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.config.ConfigGroupRepository;
 import es.caib.ripea.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -36,14 +34,22 @@ public class ConfigHelper {
     @Autowired
     private ConfigGroupRepository configGroupRepository;
     
-    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();    
-    
+    private static ThreadLocal<EntitatDto> entitat = new ThreadLocal<>();   
+    private static ThreadLocal<String> organCodi = new ThreadLocal<>();   
     public static ThreadLocal<EntitatDto> getEntitat() {
 		return entitat;
 	}
 
 	public static void setEntitat(EntitatDto entitat) {
 		ConfigHelper.entitat.set(entitat);
+	}
+	
+    public static ThreadLocal<String> getOrganCodi() {
+		return organCodi;
+	}
+
+	public static void setOrganCodi(String organCodi) {
+		ConfigHelper.organCodi.set(organCodi);
 	}
 
     @Transactional(readOnly = true)
@@ -58,25 +64,46 @@ public class ConfigHelper {
     	
     	String entitatCodi  = getEntitatActualCodi();
 		String value = null;
-		ConfigEntity configEntity = configRepository.findOne(keyGeneral);
-		if (configEntity == null) {
+		ConfigEntity config = configRepository.findOne(keyGeneral);
+		if (config == null) {
             return getJBossProperty(keyGeneral);
         }
-        // Propietat trobada en db
-        if (configEntity.isConfigurable() && !Strings.isNullOrEmpty(entitatCodi)) {
+		
+        if (config.isConfigurableOrganActiu()) {
+            // Propietat a nivell d'organ
+            String keyOrgan = getKeyOrgan(entitatCodi, getOrganActualCodi(), keyGeneral);
+            ConfigEntity configOrganEntity = configRepository.findOne(keyOrgan);
+            if (configOrganEntity != null) {
+                value = getValue(configOrganEntity);
+            }
+        } else if (config.isConfigurableEntitatActiu() && !Strings.isNullOrEmpty(entitatCodi)) {
             // Propietat a nivell d'entitat
-            String keyEntitat = crearEntitatKey(entitatCodi, keyGeneral);
+            String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
             ConfigEntity configEntitatEntity = configRepository.findOne(keyEntitat);
             if (configEntitatEntity != null) {
-                value = getConfig(configEntitatEntity);
+                value = getValue(configEntitatEntity);
             }
         }
         if (value == null) {
             // Propietat global
-            value = getConfig(configEntity);
+            value = getValue(config);
         }
 		return value;
 	}
+    
+    
+	
+	public String getValueForOrgan(String entitatCodi, String organCodi, String keyGeneral) {
+		
+        String keyOrgan = getKeyOrgan(entitatCodi, getOrganActualCodi(), keyGeneral);
+        ConfigEntity configOrganEntity = configRepository.findOne(keyOrgan);
+        if (configOrganEntity != null) {
+            return getValue(configOrganEntity);
+        } else {
+        	return null;
+        }
+	}
+	
 
     @Transactional(readOnly = true)
     public Properties getGroupProperties(String codeGroup) {
@@ -127,46 +154,81 @@ public class ConfigHelper {
     }
 
     @Transactional(readOnly = true)
-    public Properties getAllEntityProperties(String entitatCodi) {
+    public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi) {
 
         Properties properties = new Properties();
-//        List<ConfigEntity> configs = !Strings.isNullOrEmpty(entitatCodi) ? configRepository.findConfigEntitaCodiAndGlobals(entitatCodi) : configRepository.findByEntitatCodiIsNull();
-        List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNull();
-        for (ConfigEntity config: configs) {
-            String value = !Strings.isNullOrEmpty(entitatCodi) ? getConfigKeyByEntitat(entitatCodi, config.getKey()) : getConfig(config);
+        List<ConfigEntity> configsGeneral = configRepository.findByEntitatCodiIsNull();
+        for (ConfigEntity configGeneral: configsGeneral) {
+            String value = getValueEntitatOrGeneral(entitatCodi, configGeneral.getKey());
             if (value != null) {
-                properties.put(config.getKey(), value);
-            }
+                properties.put(configGeneral.getKey(), value);
+			}
+
         }
         return properties;
     }
+    
+    @Transactional(readOnly = true)
+    public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi, String organCodi) {
+
+        Properties properties = new Properties();
+        List<ConfigEntity> configsGeneral = configRepository.findByEntitatCodiIsNull();
+        for (ConfigEntity configGeneral: configsGeneral) {
+            String value = getValueOrganOrEntitatOrGeneral(entitatCodi, organCodi, configGeneral.getKey());
+            if (value != null) {
+                properties.put(configGeneral.getKey(), value);
+			}
+        }
+        return properties;
+    }
+    
+  
 
     @Transactional(readOnly = true)
     public String getEntitatActualCodi() {
 
         return entitat != null && entitat.get() != null ? entitat.get().getCodi() : null;
     }
-
+    
     @Transactional(readOnly = true)
-    public String getConfigKeyByEntitat(String entitatCodi, String property) {
+    public String getOrganActualCodi() {
 
-        String key = crearEntitatKey(entitatCodi, property);
-        ConfigEntity configEntity = configRepository.findOne(key);
-        if (configEntity != null && (configEntity.isJbossProperty() && configEntity.getValue() == null || configEntity.getValue() != null)) {
-            String config = getConfig(configEntity);
-            if (!Strings.isNullOrEmpty(config)) {
-                return config;
-            }
-        }
-        configEntity = configRepository.findOne(property);
-        if (configEntity != null) {
-            return getConfig(configEntity);
-        }
-        log.error("No s'ha trobat la propietat -> key global: " + property + " key entitat: " + key);
-        throw new NotDefinedConfigException(property);
+        return organCodi != null ? organCodi.get() : null;
     }
 
-    public String crearEntitatKey(String entitatCodi, String key) {
+
+    @Transactional(readOnly = true)
+    public String getValueEntitatOrGeneral(String entitatCodi, String keyGeneral) {
+
+        String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
+        ConfigEntity configEntitat = configRepository.findOne(keyEntitat);
+        String value = getValue(configEntitat);
+        if (Strings.isNullOrEmpty(value)) {
+        	ConfigEntity configGeneral = configRepository.findOne(keyGeneral);
+        	value = getValue(configGeneral);
+        }
+		return value;
+    }
+    
+    @Transactional(readOnly = true)
+    public String getValueOrganOrEntitatOrGeneral(String entitatCodi, String organCodi, String keyGeneral) {
+
+    	String keyOrgan = getKeyOrgan(entitatCodi, organCodi, keyGeneral);
+        ConfigEntity configOrgan = configRepository.findOne(keyOrgan);
+        String value = getValue(configOrgan);
+	        if (Strings.isNullOrEmpty(value)) {
+	        String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
+	        ConfigEntity configEntitat = configRepository.findOne(keyEntitat);
+	        value = getValue(configEntitat);
+	        if (Strings.isNullOrEmpty(value)) {
+	        	ConfigEntity configGeneral = configRepository.findOne(keyGeneral);
+	        	value = getValue(configGeneral);
+	        }
+        }
+        return value;
+    }
+
+    public String getKeyEntitat(String entitatCodi, String key) {
 
         if (Strings.isNullOrEmpty(entitatCodi) || Strings.isNullOrEmpty(key)) {
             String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
@@ -181,27 +243,73 @@ public class ConfigHelper {
         }
         return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + split[1]);
     }
+    
+    public String getKeyOrgan(String entitatCodi, String organCodi, String key) {
 
-    private String getConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
-
-        if (configEntity.isJbossProperty()) {
-            // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat per defecte a la base de dades.
-            return getJBossProperty(configEntity.getKey(), configEntity.getValue());
+        if (Strings.isNullOrEmpty(entitatCodi) || Strings.isNullOrEmpty(organCodi) || Strings.isNullOrEmpty(key)) {
+            String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
+            log.error(msg);
+            throw new RuntimeException(msg);
         }
-        return configEntity.getValue();
+        String [] split = key.split(ConfigDto.prefix);
+        if (split == null) {
+            String msg = "Format no reconegut per la key: " + key;
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+        return split.length < 2 ? split.length == 0 ? null : split[0] : (ConfigDto.prefix + "." + entitatCodi + "." + organCodi + split[1]);
+    }
+    
+    
+    public void crearConfigPerEntitats(ConfigEntity config,  List<EntitatEntity> entitats) {
+
+        for (EntitatEntity entitat : entitats) {
+            String key = getKeyEntitat(entitat.getCodi(), config.getKey());
+            if (configRepository.findByKey(key) == null ) {
+                ConfigEntity nova = new ConfigEntity();
+                nova.crearConfigNova(key, entitat.getCodi(), null, config);
+                configRepository.save(nova);
+            }
+        }
+    }
+    
+    
+    public void removeConfigPerEntitats(ConfigEntity config,  List<EntitatEntity> entitats) {
+
+        for (EntitatEntity entitat : entitats) {
+            String key = getKeyEntitat(entitat.getCodi(), config.getKey());
+            ConfigEntity configEntitat = configRepository.findByKey(key);
+            if (config != null ) {
+                configRepository.delete(configEntitat);
+            }
+        }
+    }
+
+    private String getValue(ConfigEntity configEntity) throws NotDefinedConfigException {
+
+		if (configEntity != null) {
+	        if (configEntity.isJbossProperty()) {
+	            // Les propietats de Jboss es llegeixen del fitxer de properties i si no estan definides prenen el valor especificat per defecte a la base de dades.
+	            return getJBossProperty(configEntity.getKey(), configEntity.getValue());
+	        } else {
+	            return configEntity.getValue();
+	        }
+		} else {
+			return null;
+		}
     }
     
     private String getConfigGeneralIfConfigEntitatNull(ConfigEntity configEntity) throws NotDefinedConfigException {
     	
 		if (configEntity.getEntitatCodi() == null) {
-			return getConfig(configEntity);
+			return getValue(configEntity);
 		}
-        String value = getConfig(configEntity);
+        String value = getValue(configEntity);
         if (value != null) {
             return value;
         }
         ConfigEntity conf = findGeneralConfigForEntitatConfig(configEntity);
-        return conf != null ? getConfig(conf) : null;
+        return conf != null ? getValue(conf) : null;
     }
     
     private ConfigEntity findGeneralConfigForEntitatConfig(ConfigEntity configEntity) throws NotDefinedConfigException {
@@ -222,7 +330,7 @@ public class ConfigHelper {
                 dto.setKey(config.getKey());
                 String key = dto.crearEntitatKey();
                 nova = new ConfigEntity();
-                nova.crearConfigNova(key, codiEntitat, config);
+                nova.crearConfigNova(key, codiEntitat, null, config);
                 confs.add(nova);
             }
         }

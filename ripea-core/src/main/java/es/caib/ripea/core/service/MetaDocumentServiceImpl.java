@@ -217,7 +217,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalServei(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos());
+				metaDocument.getPinbalServeiDocsPermesos(), 
+				metaDocument.isPinbalUtilitzarCifOrgan());
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(
 					plantillaNom,
@@ -278,7 +279,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalServei(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos());
+				metaDocument.getPinbalServeiDocsPermesos(), 
+				metaDocument.isPinbalUtilitzarCifOrgan());
 		
 		if (plantillaContingut != null) {
 			entity.updatePlantilla(

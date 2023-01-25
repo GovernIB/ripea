@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,16 +20,31 @@ import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimient
 import es.caib.pinbal.client.recobriment.model.ScspTitular;
 import es.caib.pinbal.client.recobriment.model.ScspTitular.ScspTipoDocumentacion;
 import es.caib.pinbal.client.recobriment.model.SolicitudBase;
+import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001;
+import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001.SolicitudQ2827003atgss001;
+import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
+import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
+import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01;
+import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01.SolicitudSvdccaacpcws01;
+import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01;
+import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01;
+import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01.Sexe;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
+import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
+import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
+import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
+import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
+import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -54,10 +70,9 @@ public class PinbalHelper {
 	@Autowired
 	private IntegracioHelper integracioHelper;
 	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
 	private ConfigHelper configHelper;
 
+	/** SVDDGPCIWS02 - Consulta de datos de identidad */
 	public String novaPeticioSvddgpciws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -80,7 +95,7 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "SVDDGPCIWS02", t0);
 		}
 	}
-
+	/** SVDDGPVIWS02 - Verificación de datos de identidad */
 	public String novaPeticioSvddgpviws02(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -103,7 +118,7 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "SVDDGPVIWS02", t0);
 		}
 	}
-
+	/** SVDCCAACPASWS01 - Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA */
 	public String novaPeticioSvdccaacpasws01(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -129,6 +144,204 @@ public class PinbalHelper {
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SVDCCAACPASWS01", t0);
 		}
+	}
+	
+	/** SVDSCDDWS01 - Servei de consulta de dades de discapacitat */
+	public String novaPeticioSvdscddws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			String finalitat,
+			PinbalConsentimentEnumDto consentiment,
+			String comunitatAutonomaCodi,
+			String provinciaCodi,
+			String dataConsulta,
+			String dataNaixement,
+			SiNoEnumDto consentimentTipusDiscapacitat) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdscddws01 solicitud = new SolicitudSvdscddws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				finalitat,
+				consentiment);
+		solicitud.setCodigoComunidadAutonoma(comunitatAutonomaCodi);
+		solicitud.setCodigoProvincia(provinciaCodi);
+		solicitud.setFechaConsulta(dataConsulta);
+		solicitud.setFechaNacimiento(dataNaixement);
+		solicitud.setConsentimientoTiposDiscapacidad(toSNString(consentimentTipusDiscapacitat));
+		try {
+			ScspRespuesta respuesta = getClientSvdscddws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDSCDDWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDSCDDWS01", t0);
+		}
+	}
+	
+	
+	/** SCDCPAJU - Servei de consulta de padró de convivència */
+	public String novaPeticioScdcpaju(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			String finalitat,
+			PinbalConsentimentEnumDto consentiment,
+			String provinciaCodi,
+			String municipiCodi) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudScdcpaju solicitud = new SolicitudScdcpaju();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				finalitat,
+				consentiment);
+		solicitud.setLlocSolicitud(provinciaCodi, municipiCodi);
+		solicitud.setConsultaPerDocumentIdentitat(interessat.getDocumentTipus().toString(), interessat.getDocumentNum(), null);
+
+		try {
+			ScspRespuesta respuesta = getClientScdcpaju().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SCDCPAJU", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SCDCPAJU", t0);
+		}
+	}
+	
+	/** SVDSCTFNWS01 - Servei de consulta de família nombrosa */
+	public String novaPeticioSvdsctfnws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdsctfnws01 solicitud = new SolicitudSvdsctfnws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		solicitud.setCodigoComunidadAutonoma(pinbalConsulta.getComunitatAutonomaCodi());
+		solicitud.setFechaConsulta(pinbalConsulta.getDataConsulta());
+		solicitud.setFechaNacimiento(pinbalConsulta.getDataNaixement());
+		solicitud.setNumeroTitulo(pinbalConsulta.getNumeroTitol());
+
+		try {
+			ScspRespuesta respuesta = getClientSvdsctfnws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDSCTFNWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDSCTFNWS01", t0);
+		}
+	}
+	
+	/** SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA */
+	public String novaPeticioSvdccaacpcws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdccaacpcws01 solicitud = new SolicitudSvdccaacpcws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		solicitud.setCodigoComunidadAutonoma(pinbalConsulta.getComunitatAutonomaCodi());
+		solicitud.setCodigoProvincia(pinbalConsulta.getProvinciaCodi());
+
+		try {
+			ScspRespuesta respuesta = getClientSvdccaacpcws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDCCAACPCWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDCCAACPCWS01", t0);
+		}
+	}
+	
+	
+	/** Q2827003ATGSS001  - Estar al corriente de pago con la Seguridad Social */
+	public String novaPeticioQ2827003atgss001(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudQ2827003atgss001 solicitud = new SolicitudQ2827003atgss001();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+
+		try {
+			ScspRespuesta respuesta = getClientQ2827003atgss001().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "Q2827003ATGSS001", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "Q2827003ATGSS001", t0);
+		}
+	}
+	
+	
+	/** SVDDELSEXWS01  - Consulta de inexistencia de delitos sexuales por datos de filiación */
+	public String novaPeticioSvddelsexws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvddelsexws01 solicitud = new SolicitudSvddelsexws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+
+		solicitud.setNacionalidad(pinbalConsulta.getCodiNacionalitat());
+		solicitud.setPaisNacimiento(pinbalConsulta.getPaisNaixament());
+		solicitud.setProvinciaNacimiento(pinbalConsulta.getProvinciaNaixament());
+		solicitud.setPoblacionNacimiento(pinbalConsulta.getPoblacioNaixament());
+		solicitud.setCodPoblacionNacimiento(pinbalConsulta.getCodiPoblacioNaixament());
+		solicitud.setSexo(pinbalConsulta.getSexe() != null ? Sexe.valueOf(pinbalConsulta.getSexe().toString()) : null);
+		solicitud.setNombrePadre(pinbalConsulta.getNomPare());
+		solicitud.setNombreMadre(pinbalConsulta.getNomMare());
+		solicitud.setFechaNacimiento(pinbalConsulta.getDataNaixementObligatori());
+		solicitud.setTelefono(pinbalConsulta.getTelefon());
+		solicitud.setMail(pinbalConsulta.getEmail());
+		try {
+			ScspRespuesta respuesta = getClientSvddelsexws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDDELSEXWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDDELSEXWS01", t0);
+		}
+	}
+	
+	
+	
+	
+	private String toSNString(SiNoEnumDto consentimentTipusDiscapacitat) {
+		String sn = null;
+		if (consentimentTipusDiscapacitat != null) {
+			if (consentimentTipusDiscapacitat == SiNoEnumDto.SI) {
+				sn = "S";
+			} else if (consentimentTipusDiscapacitat == SiNoEnumDto.NO) {
+				sn = "N";
+			}
+		}
+		return sn;
 	}
 
 	public FitxerDto getJustificante(String idPeticion) throws PinbalException {
@@ -158,7 +371,7 @@ public class PinbalHelper {
 					System.currentTimeMillis() - t0,
 					errorDescripcio,
 					null);
-			throw new PinbalException(ex);
+			throw new PinbalException(ex, "getJustificante");
 		}
 	}
 
@@ -172,8 +385,19 @@ public class PinbalHelper {
 		EntitatEntity entitat = metaDocument.getEntitat();
 		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
 		String codiSia = getPinbalDefaultSia();
-		solicitud.setNombreSolicitante(entitat.getNom());
-		solicitud.setIdentificadorSolicitante(entitat.getCif());
+
+		String identificadorSolicitante;
+		String nombreSolicitante;
+		if (metaDocument.isPinbalUtilitzarCifOrgan() && StringUtils.isNotEmpty(expedient.getOrganGestor().getCif())) {
+			identificadorSolicitante = expedient.getOrganGestor().getCif();
+			nombreSolicitante = expedient.getOrganGestor().getNom();
+		} else {
+			identificadorSolicitante = entitat.getCif();
+			nombreSolicitante = entitat.getNom();
+		}
+		solicitud.setIdentificadorSolicitante(identificadorSolicitante);
+		solicitud.setNombreSolicitante(nombreSolicitante);
+		
 		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacioSia());
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		solicitud.setFinalidad(finalitat);
@@ -311,7 +535,8 @@ public class PinbalHelper {
 				ex);
 		return new PinbalException(
 				missatge,
-				ex);
+				ex,
+				"peticionSincrona");
 	}
 
 	private Map<String, String> getAccioParams(
@@ -398,6 +623,87 @@ public class PinbalHelper {
 			clientSvdccaacpasws01.enableLogginFilter();
 		return clientSvdccaacpasws01;
 	}
+	
+	private ClientSvdscddws01 getClientSvdscddws01() {
+		ClientSvdscddws01 clientSvdscddws01 = new ClientSvdscddws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientSvdscddws01.enableLogginFilter();
+		return clientSvdscddws01;
+	}
+	
+	private ClientScdcpaju getClientScdcpaju() {
+		ClientScdcpaju clientScdcpaju = new ClientScdcpaju(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientScdcpaju.enableLogginFilter();
+		return clientScdcpaju;
+	}
+	
+	
+	private ClientSvdsctfnws01 getClientSvdsctfnws01() {
+		ClientSvdsctfnws01 clientSvdsctfnws01 = new ClientSvdsctfnws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			clientSvdsctfnws01.enableLogginFilter();
+		return clientSvdsctfnws01;
+	}
+	
+	
+	private ClientSvdccaacpcws01 getClientSvdccaacpcws01() {
+		ClientSvdccaacpcws01 client = new ClientSvdccaacpcws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+
+	private ClientQ2827003atgss001 getClientQ2827003atgss001() {
+		ClientQ2827003atgss001 client = new ClientQ2827003atgss001(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+
+	private ClientSvddelsexws01 getClientSvddelsexws01() {
+		ClientSvddelsexws01 client = new ClientSvddelsexws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
 
 	private String getPinbalBaseUrl() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");

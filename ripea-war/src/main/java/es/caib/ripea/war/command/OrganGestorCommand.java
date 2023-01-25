@@ -3,6 +3,9 @@
  */
 package es.caib.ripea.war.command;
 
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -24,6 +27,8 @@ public class OrganGestorCommand {
     @NotEmpty
     private String nom;
     private Long pareId;
+    @Size(max=9)
+    private String cif;
 
 
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {
@@ -46,14 +51,16 @@ public class OrganGestorCommand {
 		this.id = id;
 	}
 	public void setCodi(String codi) {
-		this.codi = codi != null ? codi.trim() : null;
+		this.codi = StringUtils.trim(codi);
 	}
 	public void setNom(String nom) {
-		this.nom = nom != null ? nom.trim() : null;
+		this.nom = StringUtils.trim(nom);
 	}
 	public void setPareId(Long pareId) {
 		this.pareId = pareId;
 	}
-	
+	public void setCif(String cif) {
+		this.cif = StringUtils.trim(cif);
+	}
 
 }

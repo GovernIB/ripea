@@ -30,6 +30,7 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	private ExpedientPeticioEstatViewEnumDto estat;
 	private Long metaExpedientId;
 	private String procedimentCodi;
+	private String interessat;
 	
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	private boolean nomesPendentEnviarDistribucio;

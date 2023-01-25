@@ -62,6 +62,14 @@ public class DadesExternesServiceImpl implements DadesExternesService {
 				"provinciaCodi=" + provinciaCodi + ")");
 		return cacheHelper.findMunicipisPerProvincia(provinciaCodi);
 	}
+	
+	@Override
+	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(String provinciaCodi) {
+		LOGGER.debug("Cercant els municipis de la província per a consultes a PINBAL (" +
+				"provinciaCodi=" + provinciaCodi + ")");
+		return cacheHelper.findMunicipisPerProvinciaPinbal(provinciaCodi);
+	}
+
 
 	@Override
 	public List<NivellAdministracioDto> findNivellAdministracions() {

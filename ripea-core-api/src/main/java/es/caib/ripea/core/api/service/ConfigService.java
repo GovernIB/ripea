@@ -5,8 +5,11 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.dto.config.OrganConfigDto;
 import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 
 /**
@@ -58,5 +61,41 @@ public interface ConfigService {
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	void actualitzarPropietatsJBossBdd();
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void configurableEntitat(
+			String key,
+			boolean value);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void configurableOrgan(
+			String key,
+			boolean value);
+
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void createPropertyOrgan(
+			OrganConfigDto property);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public PaginaDto<OrganConfigDto> findConfigsOrgans(
+			String key,
+			PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public OrganConfigDto findConfigOrgan(
+			String key);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void modificarPropertyOrgan(
+			OrganConfigDto property);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void deletePropertyOrgan(
+			String key);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public ConfigDto findConfig(
+			String key);
 }
 

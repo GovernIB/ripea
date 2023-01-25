@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
@@ -48,6 +50,7 @@ import es.caib.ripea.core.api.dto.RegistreJustificantDto;
 import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
@@ -66,6 +69,7 @@ import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -117,6 +121,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private ExpedientPeticioHelper expedientPeticioHelper;
+	@Resource
+	private DocumentRepository documentRepository;
 
 	
 	@Transactional(readOnly = true)
@@ -183,6 +189,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				estatView != null ? estatView.toString() : null,
 				filtre.getAccioEnum() == null,
 				filtre.getAccioEnum(),
+				StringUtils.isEmpty(filtre.getInteressat()),
+				filtre.getInteressat(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));
@@ -309,7 +317,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (document != null) {
 			DocumentContingut documentContingut = document.getContingut();
 			if (documentContingut != null) {
-				fitxer.setNom(versioImprimible ? documentContingut.getArxiuNom() : registreAnnex.getNom());
+				
+				fitxer.setNom(versioImprimible ? registreAnnex.getNom().replace(".pdf", "_imprimible.pdf") : registreAnnex.getNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
 				fitxer.setTamany(documentContingut.getContingut().length);
@@ -425,6 +434,72 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (entitatAnotacio != null)
 			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
 	}
+	
+	
+	@Transactional
+	@Override
+	public void retornarPendent(Long expedientPeticioId) {
+
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+//TODO change back to BACK_REBUDA in distribucio		
+//		try {
+//			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
+//			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
+//			anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
+//			
+//			// change state of registre in DISTRIBUCIO to BACK_REBUDA
+//			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacioRegistreId, Estat.REBUDA, "");
+//			expedientPeticioEntity.setEstatCanviatDistribucio(true);
+//
+//		} catch (Exception e) {
+//			throw e;
+//		}
+		
+		ExpedientEntity expedient = expedientPeticioEntity.getExpedient();
+		
+		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) {
+			throw new RuntimeException("No es pot retornar l'anotació a estat pendent. Expedient relacionat ja se ha tancat.");
+		}
+		
+		// indicates if expedient contains documents not related with this anotacion (documents from other annotacions or created manually)
+		boolean containsDocumentsNotRelated = false;
+		List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
+		for (DocumentEntity documentEntity : documents) {
+			 if (CollectionUtils.isEmpty(documentEntity.getAnnexos())){
+				 containsDocumentsNotRelated = true;
+			 }
+		}
+		
+		if (containsDocumentsNotRelated) {
+			throw new RuntimeException("No es pot retornar l'anotació a estat pendent. Expedient relacionat conté documents no relacionts amb l'anotació.");
+		}
+		
+
+		for (RegistreAnnexEntity registreAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
+			
+
+			DocumentEntity document = registreAnnexEntity.getDocument();
+			
+			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
+			
+			registreAnnexEntity.updateDocument(null);
+			
+//			documentRepository.delete(document);
+			
+
+		}
+//		if (!containsDocumentsNotRelated) {
+			expedientRepository.delete(expedient);
+//		}
+
+		
+		expedientPeticioEntity.setExpedient(null);
+		
+		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.PENDENT);
+
+	}
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -464,6 +539,20 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return arxiu;
 	}
 
+	
+	@Transactional
+	@Override
+	public void canviarProcediment(Long expedientPeticioId, Long procedimentId) {
+
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
+		expedientPeticioEntity.setMetaExpedient(metaExpedient);
+	
+	}
+	
+	
+	
 	@Transactional
 	@Override
 	public ExpedientPeticioDto findOne(Long expedientPeticioId) {

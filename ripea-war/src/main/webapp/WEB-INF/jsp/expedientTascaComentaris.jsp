@@ -49,11 +49,15 @@
 			enviarLlistarComentaris("");
 
 			$('textarea').keyup(function(e) {
-			    var $lines = $(this).val().split(/\r|\r\n|\n/).length;
-			    if ($lines>10) {
-			    	$lines = 10;
+
+				var lineheight = parseInt($('textarea').css('lineHeight'), 10);
+				var padding = parseInt($('textarea').css('paddingTop'), 10) + parseInt($('textarea').css('paddingBottom'), 10)
+				var lines = ($('textarea').prop('scrollHeight') - padding) / lineheight;
+
+				if (lines > 10) {
+				    lines = 10;
 				}
-			    $(this).get(0).rows = $lines;
+			    $(this).get(0).rows = lines;
 			    window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
 			});			
 		});
@@ -94,7 +98,7 @@
 				if (!propi)
 					comentariHtml += '<div class="comentari-autor"><strong>' + comentari.createdBy.nom + '</strong></div>';
 				
-				comentariHtml +='<p style="white-space: pre;">' + comentari.text + '</p>' +
+				comentariHtml +='<p style="word-break: break-word;">' + comentari.text + '</p>' +
 				'<small class="pull-right comentari-autor">' + comentari.createdDateAmbFormat + '</small>' +
 				'</div>';
 				$("#comentaris_content").append(comentariHtml);

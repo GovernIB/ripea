@@ -215,7 +215,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual, 
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc) {
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
 		logger.info(
 				"Creant nou expedient Service(" +
 						"entitatId=" + entitatId + ", " +
@@ -341,6 +341,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc,
 			boolean agafarExpedient) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
 		logger.info("Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"expedientPeticioId=" + expedientPeticioId + ")");
@@ -1119,6 +1120,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	@SuppressWarnings("serial")
 	public void relacioCreate(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug(
 				"Relacionant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "relacionatId=" +
 						relacionatId + ")");
@@ -1184,6 +1186,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	@Override
 	@SuppressWarnings("serial")
 	public boolean relacioDelete(Long entitatId, final Long id, final Long relacionatId, String rolActual) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug(
 				"Esborrant la relació de l'expedient amb un altre expedient (" + "entitatId=" + entitatId + ", " +
 						"id=" + id + ", " + "relacionatId=" + relacionatId + ")");

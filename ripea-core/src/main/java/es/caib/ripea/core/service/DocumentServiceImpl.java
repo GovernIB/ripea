@@ -97,6 +97,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private PinbalHelper pinbalHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	@Transactional
 	@Override
@@ -499,6 +501,7 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId,
 			Long metaDocumentId,
 			PinbalConsultaDto consulta) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
 		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				pareId,
@@ -561,6 +564,51 @@ public class DocumentServiceImpl implements DocumentService {
 					consulta.getConsentiment(),
 					consulta.getComunitatAutonomaCodi(),
 					consulta.getProvinciaCodi());
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDSCDDWS01) {
+			idPeticion = pinbalHelper.novaPeticioSvdscddws01(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment(),
+					consulta.getComunitatAutonomaCodi(),
+					consulta.getProvinciaCodi(),
+					consulta.getDataConsulta(),
+					consulta.getDataNaixement(),
+					consulta.getConsentimentTipusDiscapacitat());
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SCDCPAJU) {
+			idPeticion = pinbalHelper.novaPeticioScdcpaju(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta.getFinalitat(),
+					consulta.getConsentiment(),
+					consulta.getProvinciaCodi(),
+					consulta.getMunicipiCodi());
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDSCTFNWS01) {
+			idPeticion = pinbalHelper.novaPeticioSvdsctfnws01(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta);
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPCWS01) {
+			idPeticion = pinbalHelper.novaPeticioSvdccaacpcws01(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta);			
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.Q2827003ATGSS001) {
+			idPeticion = pinbalHelper.novaPeticioQ2827003atgss001(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta);		
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
+			idPeticion = pinbalHelper.novaPeticioSvddelsexws01(
+					expedient,
+					metaDocument,
+					interessat,
+					consulta);				
 		} else {
 			throw new ValidationException(
 					"<creacio>",
@@ -722,26 +770,7 @@ public class DocumentServiceImpl implements DocumentService {
 		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId, name);
 	}
 
-	@Transactional
-	@Override
-	public Exception portafirmesReintentar(
-			Long entitatId,
-			Long id) {
-		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false, false, null);
-		return firmaPortafirmesHelper.portafirmesReintentar(
-				entitatId,
-				document);
 
-	}
 	
 	@Transactional
 	@Override
@@ -751,29 +780,21 @@ public class DocumentServiceImpl implements DocumentService {
 			String rolActual) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
 				+ "entitatId=" + entitatId + ", "
-				+ "ids=" + id + ")");
+				+ "id=" + id
+				+ "rolActual=" + rolActual +")");
 
-			boolean checkPerMassiuAdmin = false;
-			if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-				checkPerMassiuAdmin = true;
-			} 
-			
-			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
-					entitatId,
-					id,
-					false,
-					true,
-					false,
-					false, 
-					checkPerMassiuAdmin, null);
-			Exception exception = firmaPortafirmesHelper.portafirmesReintentar(
-					entitatId,
-					document);
-			if (exception != null) {
-				return exception;
-			
-		}
-		return null;
+		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+				entitatId,
+				id,
+				false,
+				true,
+				false,
+				false, 
+				false, 
+				rolActual);
+		return firmaPortafirmesHelper.portafirmesReintentar(
+				entitatId,
+				document);
 	}
 	
 
@@ -1262,6 +1283,7 @@ public class DocumentServiceImpl implements DocumentService {
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug("Converteix un document en PDF per a la firma client ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");

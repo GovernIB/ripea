@@ -95,4 +95,12 @@ public interface ExpedientPeticioService {
 			Long entitatId,
 			Long organActualId,
 			String rolActual);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void canviarProcediment(
+			Long expedientPeticioId,
+			Long procedimentId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void retornarPendent(Long expedientPeticioId);
  }

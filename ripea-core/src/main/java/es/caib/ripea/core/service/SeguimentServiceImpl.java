@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -242,6 +243,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 				"PENDENT",
 				true,
 				null,
+				StringUtils.isEmpty(filtre.getInteressat()),
+				filtre.getInteressat(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						null));

@@ -1,0 +1,20 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1671191152106-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: cif
+            type: varchar(10 ${varcharunit})
+        tableName: ipa_organ_gestor
+

@@ -68,4 +68,10 @@ public class DadesExternesServiceBean implements DadesExternesService {
 		return delegate.findNivellAdministracions();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(String provinciaCodi) {
+		return delegate.findMunicipisPerProvinciaPinbal(provinciaCodi);
+	}
+
 }

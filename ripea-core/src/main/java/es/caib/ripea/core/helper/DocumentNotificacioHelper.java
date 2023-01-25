@@ -279,14 +279,19 @@ public class DocumentNotificacioHelper {
 					documentEnviamentInteressat.getInteressat().setPaisNom(paisDto.getNom());
 				}
 			}
-			for (ProvinciaDto provinciaDto : dadesExternesService.findProvincies()) {
-				if (provinciaDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getProvincia())) {
-					documentEnviamentInteressat.getInteressat().setProvinciaNom(provinciaDto.getNom());
+			if (provinciaCodi != null) {
+				for (ProvinciaDto provinciaDto : dadesExternesService.findProvincies()) {
+					if (provinciaDto.getCodi().equals(provinciaCodi)) {
+						documentEnviamentInteressat.getInteressat().setProvinciaNom(provinciaDto.getNom());
+					}
 				}
-			}
-			for (MunicipiDto municipiDto : dadesExternesService.findMunicipisPerProvincia(provinciaCodi)) {
-				if (municipiDto.getCodi().equals(documentEnviamentInteressat.getInteressat().getMunicipi())) {
-					documentEnviamentInteressat.getInteressat().setMunicipiNom(municipiDto.getNom());
+				String municipiCodi = documentEnviamentInteressat.getInteressat().getMunicipi();
+				if (municipiCodi != null) {
+					for (MunicipiDto municipiDto : dadesExternesService.findMunicipisPerProvincia(provinciaCodi)) {
+						if (municipiDto.getCodi().equals(municipiCodi)) {
+							documentEnviamentInteressat.getInteressat().setMunicipiNom(municipiDto.getNom());
+						}
+					}
 				}
 			}
 		}

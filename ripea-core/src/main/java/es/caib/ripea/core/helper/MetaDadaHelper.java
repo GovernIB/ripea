@@ -77,7 +77,8 @@ public class MetaDadaHelper {
 				valor,
 				metaDada.isReadOnly(),
 				ordre,
-				metaNode).
+				metaNode,
+				metaDada.isNoAplica()).
 				descripcio(metaDada.getDescripcio()).
 				build();
 		

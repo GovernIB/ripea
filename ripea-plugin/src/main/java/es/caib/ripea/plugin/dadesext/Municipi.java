@@ -17,14 +17,18 @@ public class Municipi implements Serializable, Comparable<Municipi> {
 	private String codiProvincia;
 	private String nom;
 
+	public Municipi() {
+		super();
+	}
+
 	public Municipi(
 			Long codi,
 			String codiEntitatGeografica,
 			Long codiProvincia,
 			String nom) {
-		this.setCodi(codi);
+		this.setLCodi(codi);
 		this.codiEntitatGeografica = codiEntitatGeografica;
-		this.setCodiProvincia(codiProvincia);
+		this.setLCodiProvincia(codiProvincia);
 		this.nom = nom;
 	}
 
@@ -34,7 +38,7 @@ public class Municipi implements Serializable, Comparable<Municipi> {
 	public void setCodi(String codi) {
 		this.codi = codi;
 	}
-	public void setCodi(Long lCodi) {
+	public void setLCodi(Long lCodi) {
 		this.codi = lCodi.toString();
 	}
 
@@ -51,7 +55,7 @@ public class Municipi implements Serializable, Comparable<Municipi> {
 	public void setCodiProvincia(String codiProvincia) {
 		this.codiProvincia = codiProvincia;
 	}
-	public void setCodiProvincia(Long lCodiProvincia) {
+	public void setLCodiProvincia(Long lCodiProvincia) {
 		String sCodiProvincia = lCodiProvincia.toString();
 		this.codiProvincia = ("00" + sCodiProvincia).substring(sCodiProvincia.length());
 	}

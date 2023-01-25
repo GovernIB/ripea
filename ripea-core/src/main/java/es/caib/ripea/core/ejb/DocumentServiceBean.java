@@ -196,15 +196,6 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.portafirmesCallback(documentId, estat, motiuRebuig, administrationId, name);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public Exception portafirmesReintentar(
-			Long entitatId,
-			Long id) {
-		return delegate.portafirmesReintentar(
-				entitatId,
-				id);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
