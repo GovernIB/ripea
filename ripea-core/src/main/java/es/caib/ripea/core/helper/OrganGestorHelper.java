@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
@@ -458,6 +459,7 @@ public class OrganGestorHelper {
 	}
 
 	
+	@Transactional
 	public String getOrganCodiFromContingutId(Long contingutId) {
 		ContingutEntity contingut = contingutRepository.findOne(contingutId);
 		return contingut.getExpedientPare().getOrganGestor().getCodi();
