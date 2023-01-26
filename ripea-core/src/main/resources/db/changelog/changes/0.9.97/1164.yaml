@@ -15,6 +15,14 @@ databaseChangeLog:
     name: booleanUnit
     value: true
     dbms: postgresql    
+- property:
+    name: booleanFalse
+    value: 0
+    dbms: oracle
+- property:
+    name: booleanFalse
+    value: false
+    dbms: postgresql     
 - changeSet:
     id: 1673857608869-1
     author: limit
@@ -38,9 +46,10 @@ databaseChangeLog:
                 type: boolean
                 defaultValueBoolean: false                
       - sql:
-          sql: "update ipa_config set configurable_entitat_actiu = configurable;"  
-      - sql:
           sql: "
+          
+                update ipa_config set configurable_entitat_actiu = configurable;
+                
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.creacio.carpetes.activa';
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.mostrar.carpetes.anotacions';                
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.carpetes.logiques';                
@@ -125,6 +134,14 @@ databaseChangeLog:
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu';  
                 
                 
+                update ipa_config set configurable = ${booleanFalse}, configurable_entitat_actiu = ${booleanFalse} where key = 'es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients';
+                delete from ipa_config where entitat_codi is not null and key like '%'||'segonpla.guardar.arxiu.max.reintents.expedients';
+
+                update ipa_config set configurable = ${booleanFalse}, configurable_entitat_actiu = ${booleanFalse} where key = 'es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents';
+                delete from ipa_config where entitat_codi is not null and key like '%'||'guardar.arxiu.max.reintents.documents';                
+                
+                update ipa_config set configurable = ${booleanFalse}, configurable_entitat_actiu = ${booleanFalse} where key = 'es.caib.ripea.segonpla.guardar.arxiu.max.reintents.interessats';
+                delete from ipa_config where entitat_codi is not null and key like '%'||'segonpla.guardar.arxiu.max.reintents.interessats';
           "  
 
 
