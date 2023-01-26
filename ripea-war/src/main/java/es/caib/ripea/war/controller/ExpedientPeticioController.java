@@ -57,6 +57,7 @@ import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.ExpedientPeticioAcceptarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.command.ExpedientPeticioModificarCommand;
@@ -96,6 +97,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private MetaDocumentService metaDocumentService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -658,7 +661,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ArxiuFirmaDto> firmaInfoContent(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId, Model model) {
-
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromAnnexId(annexId));
 		try {
 			RegistreAnnexDto registreAnnexDto = expedientPeticioService.findAnnexById(annexId);
 			return expedientPeticioService.annexFirmaInfo(registreAnnexDto.getUuid());
@@ -685,6 +688,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/firmaInfo/{annexId}", method = RequestMethod.GET)
 	public String firmaInfo(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId, Model model) {
 
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromAnnexId(annexId));
 		try {
 			RegistreAnnexDto registreAnnexDto = expedientPeticioService.findAnnexById(annexId);
 			model.addAttribute("annexId", registreAnnexDto.getId());
@@ -702,6 +706,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		try {
 			RegistreDto registreDto = expedientPeticioService.findRegistreById(registreId);
+			organGestorService.actualitzarOrganCodi(registreDto.getDestiCodi());
 			model.addAttribute("firmes", expedientPeticioService.annexFirmaInfo(registreDto.getJustificantArxiuUuid()));
 			return "registreAnnexFirmes";
 		} catch (Exception ex) {

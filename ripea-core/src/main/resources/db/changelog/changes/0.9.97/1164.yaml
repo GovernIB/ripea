@@ -100,11 +100,31 @@ databaseChangeLog:
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.firmaservidor.portafib.signerEmail';
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.firmaservidor.portafib.location';
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.firmaservidor.portafib.username';    
+
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.validatesignature.class';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.endpoint';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.username';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.password';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.applicationID';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.ignoreservercertificates';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.TransformersTemplatesPath';  
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.path';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.type';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.password';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.cert.alias';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugins.validatesignature.afirmacxf.authorization.ks.cert.password';                              
                             
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.tasca.preavisDataLimitEnDies';
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.propagar.relacio.expedients';
-                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.incorporacio.anotacions.duplicada';  
-  
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.incorporacio.anotacions.duplicada'; 
+                
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.document.nou.escanejar.actiu';                 
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.creacio.documents.publicar.activa';                 
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.estat.elaboracio.identificador.origen.obligat';                 
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.document.propagar.modificacio.arxiu';                 
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu';  
+                
+                
           "  
 
 

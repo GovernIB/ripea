@@ -455,15 +455,25 @@ public class OrganGestorHelper {
 	}
 	
 	public void actualitzarOrganCodi(String organCodi) {
-		ConfigHelper.setOrganCodi(organCodi);
+		if (organCodi != null) {
+			ConfigHelper.setOrganCodi(organCodi);
+		}
 	}
 
 	
 	@Transactional
 	public String getOrganCodiFromContingutId(Long contingutId) {
-		ContingutEntity contingut = contingutRepository.findOne(contingutId);
-		return contingut.getExpedientPare().getOrganGestor().getCodi();
+//		if (contingutId == null) {
+//			logger.error("No es pot actualitzar organCodi porque esta null", new RuntimeException());
+//			return null;
+//		} else {
+			ContingutEntity contingut = contingutRepository.findOne(contingutId);
+			return contingut.getExpedientPare().getOrganGestor().getCodi();
+//		}
+
 	}
+	
+	
 
 	private String organsToCodiList(List<OrganGestorEntity> organs) {
 		String text = "";

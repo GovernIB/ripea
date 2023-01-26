@@ -269,5 +269,12 @@ public class OrganGestorServiceBean implements OrganGestorService {
 		
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public String getOrganCodiFromAnnexId(
+			Long annexId) {
+		return delegate.getOrganCodiFromAnnexId(annexId);
+	}
+
 
 }

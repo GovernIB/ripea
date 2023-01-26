@@ -29,6 +29,7 @@ import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
 import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
@@ -50,6 +51,8 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	private AlertaHelper alertaHelper;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	@Autowired
 	private ContingutHelper contingutHelper;
@@ -87,6 +90,7 @@ public class DocumentFirmaViaFirmaHelper extends DocumentFirmaHelper{
 	public Exception viaFirmaProcessar(
 			DocumentViaFirmaEntity documentViaFirma) {
 		DocumentEntity document = documentViaFirma.getDocument();
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 		ViaFirmaCallbackEstatEnumDto callbackEstat = documentViaFirma.getCallbackEstat();
 		if (ViaFirmaCallbackEstatEnumDto.RESPONSED.equals(callbackEstat)) {

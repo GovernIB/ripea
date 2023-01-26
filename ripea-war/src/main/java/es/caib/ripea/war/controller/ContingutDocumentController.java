@@ -149,6 +149,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
 			Model model) throws ClassNotFoundException, IOException {
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
 		FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = null;
@@ -217,7 +218,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
-
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
 		if (!command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
 			FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
 					request,
@@ -297,7 +298,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 
-		
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
 		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
 				request,
 				command,
@@ -533,6 +534,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) throws IOException {
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<ArxiuFirmaDetallDto> detallSignants;
 		try {

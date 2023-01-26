@@ -21,16 +21,14 @@ import com.sun.jersey.core.util.Base64;
 
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,6 +46,8 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 	private DocumentHelper documentHelper;
 	@Autowired
 	private ContingutHelper contingutHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	public void processarFirmaClient(
 			String identificador,
@@ -55,7 +55,7 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 			byte[] arxiuContingut,
 			DocumentEntity document) {
 		logger.debug("Custodiar identificador firma applet (" + "identificador=" + identificador + ")");
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		// Registra al log la firma del document
 		logAll(document, LogTipusEnumDto.FIRMA_CLIENT, null, null);
 		logFirmat(document);

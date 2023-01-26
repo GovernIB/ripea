@@ -1280,6 +1280,7 @@ public class DocumentHelper {
 			byte[] contingutFirma, 
 			boolean updateEstat, 
 			boolean throwExceptionIfNotValid) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		logger.debug("Recuperar la informació de les firmes amb el plugin ValidateSignature ("
 				+ "documentID=" + document.getId() + ")");
 		List<ArxiuFirmaDto> firmes = pluginHelper.validaSignaturaObtenirFirmes(
