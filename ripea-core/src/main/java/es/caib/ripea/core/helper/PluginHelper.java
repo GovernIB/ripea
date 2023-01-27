@@ -74,6 +74,7 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
@@ -2840,7 +2841,7 @@ public class PluginHelper {
 	
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-
+		ConfigHelper.setEntitat(conversioTipusHelper.convertir(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat(), EntitatDto.class));
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
 		
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
