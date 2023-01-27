@@ -1076,6 +1076,9 @@ public class ContingutHelper {
 			Long entitatId,
 			ContingutEntity contingut,
 			String rolActual) throws IOException {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
+		
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingut.getId() + ")");

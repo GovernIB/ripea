@@ -47,6 +47,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -63,6 +64,7 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
@@ -96,7 +98,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private ContingutRepository contingutRepository;
-
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
 	@Override
@@ -1000,6 +1003,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return organGestorHelper.getOrganCodiFromContingutId(contingutId);
 	}
 	
+	
+	@Transactional
+	@Override
+	public String getOrganCodiFromAnnexId(Long annexId) {
+		RegistreAnnexEntity annexEntity = registreAnnexRepository.findById(annexId);
+		return annexEntity.getRegistre().getDestiCodi();
+	}
 	
 	
 	private List<OrganGestorEntity> findPermesosByEntitatAndExpedientTipusIdAndFiltre(

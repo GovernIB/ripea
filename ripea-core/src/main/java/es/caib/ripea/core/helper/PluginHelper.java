@@ -74,6 +74,7 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
@@ -2840,7 +2841,7 @@ public class PluginHelper {
 	
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-
+		ConfigHelper.setEntitat(conversioTipusHelper.convertir(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat(), EntitatDto.class));
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
 		
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
@@ -3713,7 +3714,7 @@ public class PluginHelper {
 					conversioPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de conversió de documents", ex);
 				}
 			}
 		}
@@ -3891,7 +3892,31 @@ public class PluginHelper {
 		if (entitatCodi == null) {
 			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
 		}
-		IValidateSignaturePlugin plugin = validaSignaturaPlugins.get(entitatCodi);
+		
+		IValidateSignaturePlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = validaSignaturaPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.validatesignature.class");
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (IValidateSignaturePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi));
+					validaSignaturaPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de validació de signatures", ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = validaSignaturaPlugins.get(entitatCodi);
 //		loadPluginProperties("VALIDATE_SIGNATURE");
 		if (plugin != null) {
 			return plugin;
@@ -3935,7 +3960,7 @@ public class PluginHelper {
 					notificacioPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de notificació", ex);
 				}
 			}
 		}
@@ -3985,7 +4010,7 @@ public class PluginHelper {
 					firmaServidorPlugins.put(entitatCodi + "." + organCodi, plugin);
 					return plugin;
 				} catch (Exception ex) {
-					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin d'arxiu digital", ex);
+					throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, "Error al crear la instància del plugin de firma en servidor", ex);
 				}
 			}
 		}

@@ -54,6 +54,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -95,6 +96,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
 	@Autowired
 	private ContingutHelper contingutHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -322,6 +325,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		
 		try {
 			DocumentEntity document = documentPortafirmes.getDocument();
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 			DocumentEstatEnumDto documentEstatAnterior = document.getEstat();
 			PortafirmesCallbackEstatEnumDto callbackEstat = documentPortafirmes.getCallbackEstat();
 			
