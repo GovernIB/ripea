@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -18,9 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 
 import es.caib.notib.client.NotificacioRestClient;
 import es.caib.notib.client.NotificacioRestClientFactory;
+import es.caib.notib.domini.NotificacioCanviClient;
 import es.caib.notib.ws.notificacio.Certificacio;
 import es.caib.notib.ws.notificacio.DadesConsulta;
 import es.caib.notib.ws.notificacio.DocumentV2;
@@ -55,7 +60,7 @@ import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
  */
 public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implements NotificacioPlugin {
 
-	
+	private boolean test = false; //test = true;
 	private NotificacioRestClient clientV2;
 
 	public NotificacioPluginNotib() {
@@ -187,6 +192,26 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				}
 				resposta.setError(respostaAlta.isError());
 				resposta.setErrorDescripcio(respostaAlta.getErrorDescripcio());
+				
+				
+				if (test) {
+					final String identitifcador = respostaAlta.getIdentificador();
+					final String referencia = respostaAlta.getReferencies().get(0).getReferencia();
+					Thread t = new Thread(new Runnable() {
+						public void run() {
+							try {
+								TimeUnit.SECONDS.sleep(5);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							testCallbackNotificaCanvi(
+									identitifcador,
+									referencia);
+						}
+					});
+					t.start();
+				}
+				
 				return resposta;
 			}
 			
@@ -232,6 +257,10 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			String referencia) throws SistemaExternException {
 		try {
 			
+			if (test) {
+				referencia = "40cafe28-dfd1-4570-a472-0d10afc2de22";
+			}
+			
 			es.caib.notib.ws.notificacio.RespostaConsultaEstatEnviament respostaConsultaEstat = getNotificacioService().consultaEstatEnviament(referencia);
 
 			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
@@ -256,7 +285,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			resposta.setError(respostaConsultaEstat.isError());
 			resposta.setErrorDescripcio(respostaConsultaEstat.getErrorDescripcio());
 			
-				return resposta;
+			return resposta;
 			
 		} catch (Exception ex) {
 			throw new SistemaExternException(
@@ -266,6 +295,35 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 	}
 	
+	
+	
+
+
+
+	public void testCallbackNotificaCanvi(String identificador, String referenciaEnviament) {
+		
+		final String NOTIFICACIO_SERVICE_PATH = "/notificaCanvi";
+		NotificacioCanviClient notificacio;
+		String baseUrl;
+		baseUrl = "http://localhost:8080/ripea/rest/notib";
+		notificacio = new NotificacioCanviClient(
+				identificador, 
+				referenciaEnviament);
+		try {
+			String urlAmbMetode = baseUrl + NOTIFICACIO_SERVICE_PATH;
+			ObjectMapper mapper  = new ObjectMapper();
+			String body = mapper.writeValueAsString(notificacio);
+			Client jerseyClient = Client.create();
+			jerseyClient.addFilter(new LoggingFilter(System.out));
+			ClientResponse response = jerseyClient.
+					resource(urlAmbMetode).
+					type("application/json").
+					post(ClientResponse.class, body);
+				
+		} catch (Exception ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 	
 	
 
