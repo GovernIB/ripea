@@ -558,6 +558,15 @@ body.loading .rmodal {
 
 <script>
 
+function enableNotificar() {
+	$('.btnNotificar').closest('li').removeClass('disabled');
+	$('.btnNotificar').closest('li').next().hide();
+
+	let url = '<c:url value="/document/"/>' + $('.btnNotificar').closest('tr').data("contenidor-id") + '/notificar';
+	$('.btnNotificar').attr("href", url);
+}
+
+
 var notificacioEnviamentEstats = new Array();
 <c:forEach var="estat" items="${notificacioEnviamentEstats}">
 notificacioEnviamentEstats["${estat.value}"] = "<spring:message code="${estat.text}"/>";
@@ -2736,7 +2745,7 @@ $.views.helpers(myHelpers);
 							</table>
 							<script id="taulaInteressatsNouBoton" type="text/x-jsrender">
 							<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT') : contingut.expedientPare.estat != 'TANCAT')}">
-								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-refresh-pagina="false"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
+								<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="enableNotificar" ><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 							</c:if>
 						</script>
 						</div>
