@@ -21,7 +21,7 @@
 	<form:hidden path="pareId"/>
 	<c:choose>
 		<c:when test="${empty expedientCommand.id}">
-			<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" emptyOption="${fn:length(metaExpedients) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" labelSize="2" optionMinimumResultsForSearch="0"/>
+			<rip:inputSelect name="metaNodeId" textKey="contingut.expedient.form.camp.metanode" required="true" emptyOption="${fn:length(metaExpedients) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="codiSiaINom" labelSize="2" optionMinimumResultsForSearch="0"/>
 		</c:when>
 		<c:otherwise>
 			<form:hidden path="metaNodeId"/>
