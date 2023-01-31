@@ -651,7 +651,7 @@ public class ExpedientHelper {
 	
 	
 	public Exception moveAnnexArxiu(Long registreAnnexId) {
-		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(registreAnnexId));
 		RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		DocumentEntity docEntity = registreAnnexEntity.getDocument();
 		ContingutEntity pare = docEntity.getPare();

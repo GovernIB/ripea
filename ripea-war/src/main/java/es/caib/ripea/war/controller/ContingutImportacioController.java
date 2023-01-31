@@ -3,18 +3,14 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
-import es.caib.ripea.core.api.dto.TipusImportEnumDto;
-import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
-import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
-import es.caib.ripea.core.api.service.ImportacioService;
-import es.caib.ripea.war.command.ImportacioCommand;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -26,12 +22,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Semaphore;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
+import es.caib.ripea.core.api.dto.TipusImportEnumDto;
+import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
+import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.core.api.service.ImportacioService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.command.ImportacioCommand;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per al manteniment d'importació de documents.
@@ -44,6 +47,8 @@ public class ContingutImportacioController extends BaseUserController {
 
 	@Autowired
 	private ImportacioService importacioService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	
 	private final Semaphore semafor = new Semaphore(1, true);
 
@@ -88,6 +93,7 @@ public class ContingutImportacioController extends BaseUserController {
 			@Valid ImportacioCommand command,
 			BindingResult bindingResult,
 			Model model) throws Exception {
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			emplenarModelImportacio(contingutId, command, model);

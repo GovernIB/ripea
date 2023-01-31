@@ -1007,8 +1007,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	@Transactional
 	@Override
 	public String getOrganCodiFromAnnexId(Long annexId) {
-		RegistreAnnexEntity annexEntity = registreAnnexRepository.findById(annexId);
-		return annexEntity.getRegistre().getDestiCodi();
+		return organGestorHelper.getOrganCodiFromAnnexId(annexId);
 	}
 	
 	

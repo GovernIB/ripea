@@ -771,7 +771,7 @@ public class DocumentHelper {
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void actualitzarEstatADefinititu(Long documentId) {
-		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 
 		DocumentEntity documentEntity = documentRepository.findOne(documentId);		
 		
@@ -927,6 +927,7 @@ public class DocumentHelper {
 	public FitxerDto getFitxerAssociat(
 			DocumentEntity document,
 			String versio) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
 			
@@ -984,6 +985,7 @@ public class DocumentHelper {
 	public FitxerDto getFitxerAssociatFirmat(
 			DocumentEntity document,
 			String versio) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		FitxerDto fitxer = null;
 		if (document.getArxiuUuid() != null) {
 			fitxer = new FitxerDto();

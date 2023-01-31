@@ -673,9 +673,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/descarregarJustificant/{registreId}", method = RequestMethod.GET)
 	public String descarregarJustificant(HttpServletRequest request, HttpServletResponse response, @PathVariable Long registreId) throws IOException {
-
+		
 		try{
 			RegistreDto registreDto = expedientPeticioService.findRegistreById(registreId);
+			organGestorService.actualitzarOrganCodi(registreDto.getDestiCodi());
 			FitxerDto fitxer = expedientPeticioService.getJustificantContent(registreDto.getJustificantArxiuUuid());
 			writeFileToResponse(fitxer.getNom(), fitxer.getContingut(), response);
 			return null;
