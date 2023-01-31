@@ -1147,7 +1147,7 @@ public class PluginHelper {
 
 	public Document arxiuDocumentConsultar(DocumentEntity document, String arxiuUuid, String versio, boolean ambContingut, boolean ambVersioImprimible) {
 
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
+		
 		String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		if (document != null) {

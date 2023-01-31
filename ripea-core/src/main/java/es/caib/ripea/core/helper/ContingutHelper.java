@@ -1175,7 +1175,7 @@ public class ContingutHelper {
 	
 	private void fitxerDocumentEsborratGuardarFirmaEnTmp(
 			DocumentEntity document) throws IOException {
-		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 				document,
 				null,
@@ -1961,7 +1961,7 @@ public class ContingutHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public ResultDocumentSenseContingut arreglaDocumentSenseContingut(Long annexId) {
 		ResultDocumentSenseContingutBuilder resultBuilder = ResultDocumentSenseContingut.builder();
-
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		try {
 			RegistreAnnexEntity registreAnnex = registreAnnexRepository.findById(annexId);
 			String annexUuid = registreAnnex.getUuid();

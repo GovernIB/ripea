@@ -651,7 +651,7 @@ public class ExpedientHelper {
 	
 	
 	public Exception moveAnnexArxiu(Long registreAnnexId) {
-		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(registreAnnexId));
 		RegistreAnnexEntity registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		DocumentEntity docEntity = registreAnnexEntity.getDocument();
 		ContingutEntity pare = docEntity.getPare();
@@ -660,11 +660,11 @@ public class ExpedientHelper {
 
 		
 		String uuidToMove = null;
-		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
-			uuidToMove = registreAnnexEntity.getUuidDispatched();
-		} else {
+//		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
+//			uuidToMove = registreAnnexEntity.getUuidDispatched();
+//		} else {
 			uuidToMove = registreAnnexEntity.getUuid();
-		}
+//		}
 		
 		docEntity.updateArxiu(uuidToMove);
 		

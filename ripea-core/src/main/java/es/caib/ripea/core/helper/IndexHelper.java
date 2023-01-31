@@ -69,6 +69,8 @@ public class IndexHelper {
 	private ContingutHelper contingutHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 
 	public byte[] generarIndexPerExpedient(
 			List<ExpedientEntity> expedients, 
@@ -364,6 +366,7 @@ public class IndexHelper {
 		EntitatEntity entitatActual,
 		BigDecimal num,
 		boolean isRelacio) throws Exception {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		if (contingut instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)contingut;
 			logger.debug("Afegint nova fila a la taula de documents...");

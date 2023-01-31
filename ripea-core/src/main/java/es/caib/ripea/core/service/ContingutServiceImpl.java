@@ -1265,6 +1265,7 @@ public class ContingutServiceImpl implements ContingutService {
 	public ArxiuDetallDto getArxiuDetall(
 			Long entitatId,
 			Long contingutId) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutId));
 		logger.debug("Obtenint informació de l'arxiu pel contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");

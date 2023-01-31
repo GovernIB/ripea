@@ -37,6 +37,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.repository.AvisRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -45,6 +46,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
 @Component
@@ -72,6 +74,8 @@ public class OrganGestorHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private ContingutRepository contingutRepository;
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
@@ -471,6 +475,12 @@ public class OrganGestorHelper {
 			return contingut.getExpedientPare().getOrganGestor().getCodi();
 //		}
 
+	}
+	
+	@Transactional
+	public String getOrganCodiFromAnnexId(Long annexId) {
+		RegistreAnnexEntity annexEntity = registreAnnexRepository.findById(annexId);
+		return annexEntity.getRegistre().getDestiCodi();
 	}
 	
 	

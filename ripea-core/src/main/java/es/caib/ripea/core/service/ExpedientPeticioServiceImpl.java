@@ -67,6 +67,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -123,6 +124,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Resource
 	private DocumentRepository documentRepository;
+	@Resource
+	private OrganGestorHelper organGestorHelper;
 
 	
 	@Transactional(readOnly = true)
@@ -301,6 +304,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getAnnexContent(Long annexId, boolean versioImprimible) {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.findOne(annexId);
 		FitxerDto fitxer = new FitxerDto();
 
@@ -481,7 +486,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 			DocumentEntity document = registreAnnexEntity.getDocument();
 			
-			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
+//			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
 			
 			registreAnnexEntity.updateDocument(null);
 			
@@ -504,6 +509,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public FitxerDto getAnnexFirmaContingut(Long annexId) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(annexId));
 		RegistreAnnexEntity annex = registreAnnexRepository.findOne(annexId);
 		FitxerDto arxiu = new FitxerDto();
 
@@ -565,6 +571,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		
 		for (RegistreAnnexEntity registreAnnex : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			if (registreAnnex.getTamany() == 0) {
+				organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromAnnexId(registreAnnex.getId()));
 				Document documentDetalls = pluginHelper.arxiuDocumentConsultar(
 						null, 
 						registreAnnex.getUuid(), 

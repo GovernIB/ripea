@@ -372,7 +372,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				resposta.setError(respostaConsultaJustificantEnviament.isError());
 				resposta.setErrorData(toDate(respostaConsultaJustificantEnviament.getErrorData()));
 				resposta.setErrorDescripcio(respostaConsultaJustificantEnviament.getErrorDescripcio());
-				resposta.setJustificant(respostaConsultaJustificantEnviament.getJustificant() != null ? respostaConsultaJustificantEnviament.getJustificant().getContingut() : null);
+				resposta.setJustificant(respostaConsultaJustificantEnviament.getJustificant() != null ? new Base64().decode(respostaConsultaJustificantEnviament.getJustificant().getContingut()) : null);
 			}
 		return resposta;
 
