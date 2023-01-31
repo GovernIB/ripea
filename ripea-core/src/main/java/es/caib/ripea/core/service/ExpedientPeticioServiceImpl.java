@@ -481,7 +481,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 			DocumentEntity document = registreAnnexEntity.getDocument();
 			
-			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
+//			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
 			
 			registreAnnexEntity.updateDocument(null);
 			

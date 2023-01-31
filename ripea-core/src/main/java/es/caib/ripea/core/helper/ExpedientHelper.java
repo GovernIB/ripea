@@ -660,11 +660,11 @@ public class ExpedientHelper {
 
 		
 		String uuidToMove = null;
-		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
-			uuidToMove = registreAnnexEntity.getUuidDispatched();
-		} else {
+//		if (!StringUtils.isEmpty(registreAnnexEntity.getUuidDispatched())) {
+//			uuidToMove = registreAnnexEntity.getUuidDispatched();
+//		} else {
 			uuidToMove = registreAnnexEntity.getUuid();
-		}
+//		}
 		
 		docEntity.updateArxiu(uuidToMove);
 		
