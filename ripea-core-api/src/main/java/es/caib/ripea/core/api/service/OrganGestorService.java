@@ -303,4 +303,7 @@ public interface OrganGestorService {
 	@PreAuthorize("hasRole('tothom')")
 	public String getOrganCodiFromAnnexId(
 			Long annexId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getOrganCodi();
 }

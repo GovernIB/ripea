@@ -47,7 +47,6 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -100,12 +99,21 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired
+	private ConfigHelper configHelper;
+	
+	
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 
 	@Override
 	public void actualitzarOrganCodi(String organCodi) {
 		organGestorHelper.actualitzarOrganCodi(organCodi);
 	}
+	@Override
+	public String getOrganCodi() {
+		return configHelper.getOrganActualCodi();
+	}
+
 
 	@Override
 	@Transactional(readOnly = true)

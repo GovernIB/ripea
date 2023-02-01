@@ -1,5 +1,6 @@
 package es.caib.ripea.war.passarelafirma;
 
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
@@ -29,7 +30,8 @@ public class PassarelaFirmaController {
 
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
-
+	@Autowired
+	private OrganGestorService organGestorService;
 
 
 	@RequestMapping(value = "/selectsignmodule/{signaturesSetId}")
@@ -38,6 +40,7 @@ public class PassarelaFirmaController {
 			HttpServletResponse response,
 			@PathVariable("signaturesSetId") String signaturesSetId,
 			Model model) throws Exception {
+		String organCodi = organGestorService.getOrganCodi();
 		List<PassarelaFirmaPlugin> pluginsFiltered = passarelaFirmaHelper.getAllPlugins(
 				request,
 				signaturesSetId);
@@ -89,6 +92,7 @@ public class PassarelaFirmaController {
 			HttpServletResponse response,
 			@PathVariable("pluginId") Long pluginId,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
+		String organCodi = organGestorService.getOrganCodi();
 		PassarelaFirmaConfig pfss = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);

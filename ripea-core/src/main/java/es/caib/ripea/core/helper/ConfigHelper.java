@@ -106,7 +106,7 @@ public class ConfigHelper {
 	
 
     @Transactional(readOnly = true)
-    public Properties getGroupProperties(String codeGroup) {
+    public Properties getPropertiesByGroup(String codeGroup) {
         Properties properties = new Properties();
         ConfigGroupEntity configGroup = configGroupRepository.findOne(codeGroup);
         fillGroupProperties(configGroup, properties);

@@ -131,7 +131,7 @@ public class ConfigHelperTest {
         );
 
         // When
-        Properties groupProperties = configHelper.getGroupProperties("GROUP_1");
+        Properties groupProperties = configHelper.getPropertiesByGroup("GROUP_1");
 
         // Then
         Assert.assertNotNull(groupProperties.get("CONFIG_1_1_KEY"));

@@ -319,10 +319,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public Properties propertyFindByGroup(String codiGrup) {
+	public Properties propertiesFindByGroup(String codiGrup) {
 		logger.debug("Consulta del valor de les properties d'un grup (" +
 				"codi grup=" + codiGrup + ")");
-		return configHelper.getGroupProperties(codiGrup);
+		return configHelper.getPropertiesByGroup(codiGrup);
 	}
 
 	@Override

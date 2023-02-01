@@ -414,7 +414,7 @@ public class PassarelaFirmaHelper {
 		plugins = new ArrayList<PassarelaFirmaPlugin>();
 		for (String id: ids) {
 			String base = PROPERTIES_BASE + id + ".";
-			Properties pluginProperties = aplicacioService.propertyFindByGroup("FIRMA_PASSARELA-" + id);
+			Properties pluginProperties = aplicacioService.propertiesFindByGroup("FIRMA_PASSARELA-" + id);
 			String nom = pluginProperties.getProperty(base + "nom");
 			String classe = pluginProperties.getProperty(base + "class");
 			String descripcioCurta = pluginProperties.getProperty(base + "desc");

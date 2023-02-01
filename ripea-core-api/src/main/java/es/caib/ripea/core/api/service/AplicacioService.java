@@ -174,7 +174,7 @@ public interface AplicacioService {
 	 * 
 	 * @return els valors com a un objecte Properties.
 	 */
-	Properties propertyFindByGroup(String codiGrup);
+	Properties propertiesFindByGroup(String codiGrup);
 
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	String propertyFindByNom(String nom);
