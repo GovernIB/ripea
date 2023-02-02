@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 
 /**
  * Classes s'ajuda per a les accions de la passarel·la de firma.
@@ -46,9 +47,13 @@ public class PassarelaFirmaHelper {
 
 	@Autowired
 	private AplicacioService aplicacioService;
-
-	private Map<String, PassarelaFirmaConfig> signaturesSetsMap = new HashMap<String, PassarelaFirmaConfig>();
+	@Autowired
+	private OrganGestorService organGestorService;
 	private long lastCheckFirmesCaducades = 0;
+	
+	private Map<String, PassarelaFirmaConfig> signaturesSetsMap = new HashMap<String, PassarelaFirmaConfig>();
+	private Map<Long, ISignatureWebPlugin> instancesCache = new HashMap<Long, ISignatureWebPlugin>();
+	private List<PassarelaFirmaPlugin> pluginsCache;
 
 
 
@@ -336,6 +341,7 @@ public class PassarelaFirmaHelper {
 		return f;
 	}
 
+	@SuppressWarnings("deprecation")
 	private FileInfoSignature getFileInfoSignature(
 			String signatureId,
 			File fileToSign,
@@ -402,16 +408,20 @@ public class PassarelaFirmaHelper {
 		return fis;
 	}
 
-	private List<PassarelaFirmaPlugin> plugins;
+
 	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.passarelafirma.";
 	private List<PassarelaFirmaPlugin> getAllPluginsFromProperties() {
-		if (plugins != null) {
-			return plugins;
+		
+		
+		String organCodi = organGestorService.getOrganCodi();
+		
+		if (pluginsCache != null) {
+			return pluginsCache;
 
 		}
 		String idsStr = aplicacioService.propertyPluginPassarelaFirmaIds();
 		String[] ids = idsStr.split(",");
-		plugins = new ArrayList<PassarelaFirmaPlugin>();
+		pluginsCache = new ArrayList<PassarelaFirmaPlugin>();
 		for (String id: ids) {
 			String base = PROPERTIES_BASE + id + ".";
 			Properties pluginProperties = aplicacioService.propertiesFindByGroup("FIRMA_PASSARELA-" + id);
@@ -438,7 +448,7 @@ public class PassarelaFirmaHelper {
 						"propertyProcessat=" + (PROPERTIES_BASE + nomFinal) + ", " +
 						"valor=" + value + ")");
 			}
-			plugins.add(
+			pluginsCache.add(
 					new PassarelaFirmaPlugin(
 							new Long(id),
 							nom,
@@ -446,22 +456,23 @@ public class PassarelaFirmaHelper {
 							classe,
 							pluginPropertiesProcessat));
 		}
-		return plugins;
+		return pluginsCache;
 	}
 
-	private Map<Long, ISignatureWebPlugin> instancesCache = new HashMap<Long, ISignatureWebPlugin>();
-	private Map<Long, PassarelaFirmaPlugin> pluginsCache = new HashMap<Long, PassarelaFirmaPlugin>();
+	
+
+
+	
+	
+	
+
 	private ISignatureWebPlugin getInstanceByPluginId(
 			long pluginId) throws Exception {
 		ISignatureWebPlugin instance = instancesCache.get(pluginId);
 		if (instance == null) {
-			PassarelaFirmaPlugin plugin = getPluginFromCache(pluginId);
+			PassarelaFirmaPlugin plugin = getPluginById(pluginId);
 			if (plugin == null) {
-				plugin = getPluginById(pluginId);
-				if (plugin == null) {
-					return null;
-				}
-				addPluginToCache(pluginId, plugin);
+				return null;
 			}
 			instance = (ISignatureWebPlugin)PluginsManager.instancePluginByClassName(
 					plugin.getClasse(),
@@ -474,19 +485,7 @@ public class PassarelaFirmaHelper {
 		}
 		return instance;
 	}
-	private void addPluginToCache(
-			Long pluginId,
-			PassarelaFirmaPlugin pluginInstance) {
-		synchronized (pluginsCache) {
-			pluginsCache.put(pluginId, pluginInstance);
-		}
-	}
-	private PassarelaFirmaPlugin getPluginFromCache(
-			Long pluginId) {
-		synchronized (pluginsCache) {
-			return pluginsCache.get(pluginId);
-		}
-	}
+
 
 	private PassarelaFirmaPlugin getPluginById(long pluginId) {
 		for (PassarelaFirmaPlugin plugin: getAllPluginsFromProperties()) {
@@ -530,6 +529,14 @@ public class PassarelaFirmaHelper {
 
 	private String getBaseUrlProperty() {
 		return aplicacioService.propertyBaseUrl();
+	}
+	
+	public void resetPlugin() {
+		
+//		signaturesSetsMap = new HashMap<String, PassarelaFirmaConfig>();
+//		instancesCache = new HashMap<Long, ISignatureWebPlugin>();
+//		pluginsCache = null;
+
 	}
 
 	private static Logger log = LoggerFactory.getLogger(PassarelaFirmaHelper.class);

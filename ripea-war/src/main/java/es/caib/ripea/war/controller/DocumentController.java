@@ -421,6 +421,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		return "passarelaFirmaForm";
 	}
+	
+	// Web signature passarela BEFORE 1
 	@RequestMapping(value = "/{documentId}/firmaPassarela", method = RequestMethod.POST)
 	public String firmaPassarelaPost(
 			HttpServletRequest request,
@@ -475,6 +477,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		}
 	}
 
+	
+	// Web signature passarela AFTER 3
 	@RequestMapping(value = "/{documentId}/firmaPassarelaFinal")
 	public String firmaPassarelaFinal(
 			HttpServletRequest request,

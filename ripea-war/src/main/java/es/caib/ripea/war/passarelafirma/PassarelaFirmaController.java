@@ -1,6 +1,8 @@
 package es.caib.ripea.war.passarelafirma;
 
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
@@ -33,7 +35,9 @@ public class PassarelaFirmaController {
 	@Autowired
 	private OrganGestorService organGestorService;
 
-
+	
+	
+	// Web signature passarela BEFORE 2
 	@RequestMapping(value = "/selectsignmodule/{signaturesSetId}")
 	public String selectSignModules(
 			HttpServletRequest request,
@@ -86,6 +90,8 @@ public class PassarelaFirmaController {
 		return "passarelaFirmaSeleccio";
 	}
 
+	
+	// Web signature passarela BEFORE 3
 	@RequestMapping(value = "/showsignaturemodule/{pluginId}/{signaturesSetId}")
 	public RedirectView showSignatureModule(
 			HttpServletRequest request,
@@ -108,6 +114,9 @@ public class PassarelaFirmaController {
 	}
 
 	private static final String REQUEST_PLUGIN_MAPPING = "/requestPlugin/{signaturesSetId}/{signatureIndex}/**";
+	
+	
+	// Web signature passarela AFTER 1
 	@RequestMapping(value = REQUEST_PLUGIN_MAPPING)
 	public void requestPlugin(
 			HttpServletRequest request,
@@ -134,11 +143,14 @@ public class PassarelaFirmaController {
 				query);
 	}
 
+	// Web signature passarela AFTER 2
 	@RequestMapping(value = "/final/{signaturesSetId}")
 	public String finalProcesDeFirma(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
+		
+		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
 		PassarelaFirmaConfig pss = passarelaFirmaHelper.finalitzarProcesDeFirma(
 				request,
 				signaturesSetId);

@@ -3564,7 +3564,7 @@ public class PluginHelper {
 
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 
-		//loadPluginProperties("USUARIS");
+		loadPluginProperties("USUARIS");
 		if (dadesUsuariPlugin != null) {
 			return dadesUsuariPlugin;
 		}
@@ -4115,27 +4115,27 @@ public class PluginHelper {
 		}
 	}
 
-//	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
-//	private synchronized void loadPluginProperties(String codeProperties) {
-//		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
-//			propertiesLoaded.put(codeProperties, true);
-//			Properties pluginProps = configHelper.getGroupProperties(codeProperties);
-//			for (Map.Entry<Object, Object> entry : pluginProps.entrySet() ) {
-//				String value = entry.getValue() == null ? "" : (String) entry.getValue();
-//				PropertiesHelper.getProperties().setProperty((String) entry.getKey(), value);
-//			}
-//		}
-//	}
-//
-//	/**
-//	 * Esborra les properties del grup indicat per paràmetre de la memòria.
-//	 *
-//	 * @param codeProperties Codi del grup de propietats que vols esborrar de memòria.
-//	 */
-//	public void reloadProperties(String codeProperties) {
-//		if (propertiesLoaded.containsKey(codeProperties))
-//			propertiesLoaded.put(codeProperties, false);
-//	}
+	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
+	private synchronized void loadPluginProperties(String codeProperties) {
+		if (!propertiesLoaded.containsKey(codeProperties) || !propertiesLoaded.get(codeProperties)) {
+			propertiesLoaded.put(codeProperties, true);
+			Properties pluginProps = configHelper.getPropertiesByGroup(codeProperties);
+			for (Map.Entry<Object, Object> entry : pluginProps.entrySet() ) {
+				String value = entry.getValue() == null ? "" : (String) entry.getValue();
+				PropertiesHelper.getProperties().setProperty((String) entry.getKey(), value);
+			}
+		}
+	}
+
+	/**
+	 * Esborra les properties del grup indicat per paràmetre de la memòria.
+	 *
+	 * @param codeProperties Codi del grup de propietats que vols esborrar de memòria.
+	 */
+	public void reloadProperties(String codeProperties) {
+		if (propertiesLoaded.containsKey(codeProperties))
+			propertiesLoaded.put(codeProperties, false);
+	}
 
 	public void resetPlugins() {
 		dadesUsuariPlugin = null;
