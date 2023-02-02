@@ -951,7 +951,7 @@ public class UsuariTascaController extends BaseUserController {
 					documentId);
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 			String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-			String procesFirmaUrl = passarelaFirmaHelper.iniciarProcesDeFirma(
+			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSetAndPutItInMap(
 					request,
 					fitxerPerFirmar,
 					usuariActual.getNif(),

@@ -45,7 +45,7 @@ public class PassarelaFirmaController {
 			@PathVariable("signaturesSetId") String signaturesSetId,
 			Model model) throws Exception {
 		String organCodi = organGestorService.getOrganCodi();
-		List<PassarelaFirmaPlugin> pluginsFiltered = passarelaFirmaHelper.getAllPlugins(
+		List<PassarelaFirmaPlugin> pluginsFiltered = passarelaFirmaHelper.getFilteredPlugins(
 				request,
 				signaturesSetId);
 		// Si només hi ha un mòdul de firma llavors anar a firmar directament

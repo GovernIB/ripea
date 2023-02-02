@@ -463,7 +463,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					documentId);
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 			String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-			String procesFirmaUrl = passarelaFirmaHelper.iniciarProcesDeFirma(
+			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSetAndPutItInMap(
 					request,
 					fitxerPerFirmar,
 					usuariActual.getNif(),
@@ -522,6 +522,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 									"document.controller.firma.passarela.final.ok"));
 				}
 			} else {
+				logger.error("Error firma passarela: " +  firmaStatus.getErrorMsg());
 				MissatgesHelper.error(
 						request,
 						getMessage(
