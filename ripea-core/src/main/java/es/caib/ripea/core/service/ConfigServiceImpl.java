@@ -297,6 +297,8 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
+
+    
     @Override
     @Transactional
     public void crearPropietatsConfigPerEntitats() {

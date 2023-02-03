@@ -97,5 +97,7 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public ConfigDto findConfig(
 			String key);
+
+
 }
 

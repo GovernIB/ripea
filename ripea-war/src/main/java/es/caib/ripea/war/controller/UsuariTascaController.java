@@ -88,7 +88,7 @@ import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
+import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -971,7 +971,7 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long documentId,
 			@RequestParam("signaturesSetId") String signaturesSetId,
 			Model model) throws IOException {
-		PassarelaFirmaConfig signaturesSet = passarelaFirmaHelper.getSignaturesSet(
+		SignaturesSetExtend signaturesSet = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
 		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
@@ -1051,7 +1051,7 @@ public class UsuariTascaController extends BaseUserController {
 			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
 			for (String ignorarModalId: ignorarModalIds) {
 				if (StringUtils.isNumeric(ignorarModalId)) {
-					if (new Long(ignorarModalId).longValue() == signaturesSet.getPluginId().longValue()) {
+					if (ignorarModalId == signaturesSet.getPluginId()) {
 						ignorarModal = true;
 						break;
 					}

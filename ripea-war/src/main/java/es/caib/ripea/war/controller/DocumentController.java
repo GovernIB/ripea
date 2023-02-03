@@ -67,7 +67,7 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
+import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -490,7 +490,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		
 		String organCodi = organGestorService.getOrganCodi();
 		
-		PassarelaFirmaConfig signaturesSet = passarelaFirmaHelper.getSignaturesSet(
+		SignaturesSetExtend signaturesSet = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
 		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
@@ -577,7 +577,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
 			for (String ignorarModalId: ignorarModalIds) {
 				if (StringUtils.isNumeric(ignorarModalId)) {
-					if (new Long(ignorarModalId).longValue() == signaturesSet.getPluginId().longValue()) {
+					if (ignorarModalId == signaturesSet.getPluginId()) {
 						ignorarModal = true;
 						break;
 					}

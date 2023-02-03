@@ -217,4 +217,30 @@ public interface AplicacioService {
 	public void actualitzarOrganCodi(
 			String organCodi);
 
+	@PreAuthorize("hasRole('tothom')")
+	public String getEntitatActualCodi();
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getValueForOrgan(String entitatCodi,
+			String organCodi,
+			String keyGeneral);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi,
+			String organCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getGroupPropertiesEntitatOrGeneral(
+			String groupCode,
+			String entitatCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getGroupPropertiesOrganOrEntitatOrGeneral(
+			String groupCode,
+			String entitatCodi,
+			String organCodi);
+
 }
