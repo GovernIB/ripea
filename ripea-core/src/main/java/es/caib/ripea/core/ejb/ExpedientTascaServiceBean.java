@@ -237,15 +237,17 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 
 	@Override
 	public void processarFirmaClient(
-			String identificador,
+			Long entitatId,
+			Long documentId,
 			String arxiuNom,
-			byte[] arxiuContingut,
+			byte[] arxiuContingut, 
 			Long tascaId) {
 
 		delegate.processarFirmaClient(
-				identificador,
+				entitatId,
+				documentId,
 				arxiuNom,
-				arxiuContingut,
+				arxiuContingut, 
 				tascaId);
 	}
 

@@ -671,10 +671,14 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional
 	@Override
 	public void processarFirmaClient(
-			String identificador,
+			Long entitatId,
+			Long documentId,
 			String arxiuNom,
-			byte[] arxiuContingut,
+			byte[] arxiuContingut, 
 			Long tascaId) {
+		String identificador = documentHelper.generarIdentificadorFirmaClient(
+				entitatId,
+				documentId);
 		logger.debug("Custodiar identificador firma applet ("
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;

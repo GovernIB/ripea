@@ -23,7 +23,9 @@ public class ModalHelper {
 
 	public static final String ACCIO_MODAL_TANCAR = PREFIX_MODAL + "/tancar";
 
-
+	public static String getString(HttpServletRequest request) {
+		return isModal(request) ? PREFIX_MODAL : "";
+	}
 
 	public static boolean isModal(HttpServletRequest request) {
 		return request.getAttribute(REQUEST_ATTRIBUTE_MODAL) != null;

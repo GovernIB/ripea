@@ -430,8 +430,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@Valid PassarelaFirmaEnviarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+
+		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		if (bindingResult.hasErrors()) {
 			emplenarModelFirmaClient(
 					request,
@@ -439,15 +441,31 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					model);
 			return "passarelaFirmaForm";
 		}
-		if (!command.getFirma().isEmpty()) {
-			String identificador = documentService.generarIdentificadorFirmaClient(
-					entitatActual.getId(),
+		// ======== generate SignaturesSet ==========
+		if (command.getFirma().isEmpty()) {
+			FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
+					entitatActualId,
 					documentId);
+			UsuariDto usuariActual = aplicacioService.getUsuariActual();
+			String urlFinal = ModalHelper.getString(request) + "/document/" + documentId + "/firmaPassarelaFinal";
+			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSet(
+					request,
+					fitxerPerFirmar,
+					usuariActual.getNif(),
+					command.getMotiu(),
+					(command.getLloc() != null) ? command.getLloc() : "RIPEA",
+					usuariActual.getEmail(),
+					LocaleContextHolder.getLocale().getLanguage(),
+					urlFinal,
+					false);
+			return "redirect:" + procesFirmaUrl;
+
+		} else {
 			documentService.processarFirmaClient(
-					identificador,
-					command.getFirma().getOriginalFilename(),
-					command.getFirma().getBytes(), 
-					RolHelper.getRolActual(request));
+					entitatActualId,
+					documentId,
+					command.getFirma().getOriginalFilename(), 
+					command.getFirma().getBytes(), RolHelper.getRolActual(request));
 			MissatgesHelper.success(
 					request,
 					getMessage(
@@ -457,23 +475,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					request, 
 					"redirect:/contingut/" + documentId,
 					null);
-		} else {
-			FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
-					entitatActual.getId(),
-					documentId);
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSetAndPutItInMap(
-					request,
-					fitxerPerFirmar,
-					usuariActual.getNif(),
-					command.getMotiu(),
-					(command.getLloc() != null) ? command.getLloc() : "RIPEA",
-					usuariActual.getEmail(),
-					LocaleContextHolder.getLocale().getLanguage(),
-					modalStr + "/document/" + documentId + "/firmaPassarelaFinal",
-					false);
-			return "redirect:" + procesFirmaUrl;
 		}
 	}
 
@@ -485,9 +486,15 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@PathVariable Long documentId,
 			@RequestParam("signaturesSetId") String signaturesSetId,
 			Model model) throws IOException {
-		PassarelaFirmaConfig signaturesSet = passarelaFirmaHelper.finalitzarProcesDeFirma(
+		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
+		
+		String organCodi = organGestorService.getOrganCodi();
+		
+		PassarelaFirmaConfig signaturesSet = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
+		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
+		
 		StatusSignaturesSet status = signaturesSet.getStatusSignaturesSet();
 		switch (status.getStatus()) {
 		case StatusSignaturesSet.STATUS_FINAL_OK:
@@ -506,15 +513,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 							null);
 				} else {
 					FileInputStream fis = new FileInputStream(firmaStatus.getSignedData());
-					EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-					String identificador = documentService.generarIdentificadorFirmaClient(
-							entitatActual.getId(),
-							documentId);
+
 					documentService.processarFirmaClient(
-							identificador,
-							firmaStatus.getSignedData().getName(),
-							IOUtils.toByteArray(fis), 
-							RolHelper.getRolActual(request));
+							entitatActualId,
+							documentId,
+							firmaStatus.getSignedData().getName(), 
+							IOUtils.toByteArray(fis), RolHelper.getRolActual(request));
+					
 					MissatgesHelper.success(
 							request,
 							getMessage(
@@ -553,7 +558,11 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 							request, 
 							"document.controller.firma.passarela.final.desconegut"));
 		}
-		passarelaFirmaHelper.closeSignaturesSet(
+		
+		
+		
+		
+		passarelaFirmaHelper.closeTransactionInWS(
 				request,
 				signaturesSet);
 		

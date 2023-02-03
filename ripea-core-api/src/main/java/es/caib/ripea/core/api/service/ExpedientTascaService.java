@@ -104,10 +104,10 @@ public interface ExpedientTascaService {
 			Long tascaId,
 			Long id);
 
-	public void processarFirmaClient(String identificador,
+	public void processarFirmaClient(Long entitatId,
+			Long documentId,
 			String arxiuNom,
-			byte[] arxiuContingut,
-			Long tascaId);
+			byte[] arxiuContingut, Long tascaId);
 
 	public void portafirmesReintentar(
 			Long entitatId,

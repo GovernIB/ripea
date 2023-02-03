@@ -562,9 +562,9 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								documentCreat.getId());
 						assertNotNull(identificador);
 						documentService.processarFirmaClient(
-								identificador,
-								"firma.pdf",
-								dto.getFitxerContingut(), null);
+								null,
+								null,
+								"firma.pdf", dto.getFitxerContingut(), null);
 						expedientService.tancar(
 								entitatCreada.getId(),
 								expedientCreat.getId(),

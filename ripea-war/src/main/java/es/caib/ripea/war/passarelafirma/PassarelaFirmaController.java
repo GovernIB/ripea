@@ -30,10 +30,13 @@ public class PassarelaFirmaController {
 
 	public static final boolean stepSelectionWhenOnlyOnePlugin = true;
 
+	private static final String SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI = "PassarelaFirmaController.organActualCodi";
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
 	@Autowired
 	private OrganGestorService organGestorService;
+	
+	
 
 	
 	
@@ -44,8 +47,10 @@ public class PassarelaFirmaController {
 			HttpServletResponse response,
 			@PathVariable("signaturesSetId") String signaturesSetId,
 			Model model) throws Exception {
+		
 		String organCodi = organGestorService.getOrganCodi();
-		List<PassarelaFirmaPlugin> pluginsFiltered = passarelaFirmaHelper.getFilteredPlugins(
+		
+		List<PassarelaFirmaPlugin> pluginsFiltered = passarelaFirmaHelper.instanciatePlugins(
 				request,
 				signaturesSetId);
 		// Si només hi ha un mòdul de firma llavors anar a firmar directament
@@ -98,18 +103,22 @@ public class PassarelaFirmaController {
 			HttpServletResponse response,
 			@PathVariable("pluginId") Long pluginId,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
-		String organCodi = organGestorService.getOrganCodi();
+		
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI, organGestorService.getOrganCodi());
 		PassarelaFirmaConfig pfss = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
 		pfss.setPluginId(pluginId);
-		String pluginUrl = passarelaFirmaHelper.getPluginUrl(
+		String pluginUrl = passarelaFirmaHelper.openTransactionInWS(
 				request,
 				signaturesSetId);
+		
 		log.debug("Mostrant mòdul de signatura (" +
 				"pluginId = " + pluginId + ", " +
 				"signaturesSetId = " + signaturesSetId + ", " +
 				"pluginUrl = " + pluginUrl + ")");
+
+		
 		return new RedirectView(pluginUrl, false);
 	}
 
@@ -118,11 +127,15 @@ public class PassarelaFirmaController {
 	
 	// Web signature passarela AFTER 1
 	@RequestMapping(value = REQUEST_PLUGIN_MAPPING)
-	public void requestPlugin(
+	public void loadResultFromWS(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable String signaturesSetId,
 			@PathVariable int signatureIndex) throws Exception {
+		
+		String organCodi = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI);
+		organGestorService.actualitzarOrganCodi(organCodi);
+		
 		String servletPath = request.getServletPath();
 		int indexBarra = StringUtils.ordinalIndexOf(
 				servletPath,
@@ -135,7 +148,7 @@ public class PassarelaFirmaController {
 				"signaturesSetId = " + signaturesSetId + ", " +
 				"signatureIndex = " + signatureIndex + ", " +
 				"requestUri = " + request.getRequestURI() + ")");
-		passarelaFirmaHelper.requestPlugin(
+		passarelaFirmaHelper.loadResultFromWS(
 				request,
 				response,
 				signaturesSetId,
@@ -143,19 +156,17 @@ public class PassarelaFirmaController {
 				query);
 	}
 
-	// Web signature passarela AFTER 2
+	// Web signature passarela AFTER 2 
 	@RequestMapping(value = "/final/{signaturesSetId}")
-	public String finalProcesDeFirma(
+	public String redirect(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
 		
-		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		PassarelaFirmaConfig pss = passarelaFirmaHelper.finalitzarProcesDeFirma(
+		PassarelaFirmaConfig pss = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
-		log.debug("Final del procés de firma (" +
-				"signaturesSetId = " + signaturesSetId + ")");
+		log.debug("Final del procés de firma (" + "signaturesSetId = " + signaturesSetId + ")");
 		return "redirect:" + pss.getUrlFinalRipea() + "?signaturesSetId=" + signaturesSetId;
 	}
 

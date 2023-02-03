@@ -1337,10 +1337,16 @@ public class DocumentServiceImpl implements DocumentService {
 	@Transactional
 	@Override
 	public void processarFirmaClient(
-			String identificador,
-			String arxiuNom,
+			Long entitatId,
+			Long documentId,
+			String arxiuNom, 
 			byte[] arxiuContingut, 
 			String rolActual) {
+		
+		String identificador = documentHelper.generarIdentificadorFirmaClient(
+				entitatId,
+				documentId);
+		
 		logger.debug("Custodiar identificador firma applet ("
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;

@@ -248,9 +248,9 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								documentCreat.getId());
 						assertNotNull(identificador);
 						documentService.processarFirmaClient(
-								identificador,
-								"firma.pdf",
-								dto.getFitxerContingut(), null);
+								null,
+								null,
+								"firma.pdf", dto.getFitxerContingut(), null);
 						DocumentDto documentFirmat = documentService.findById(
 								entitatCreada.getId(),
 								documentCreat.getId());
