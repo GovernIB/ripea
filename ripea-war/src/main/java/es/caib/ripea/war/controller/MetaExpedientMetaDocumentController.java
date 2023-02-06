@@ -3,22 +3,13 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.api.service.PortafirmesFluxService;
-import es.caib.ripea.core.api.service.TipusDocumentalService;
-import es.caib.ripea.war.command.MetaDocumentCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +24,36 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
+import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
+import es.caib.ripea.core.api.service.TipusDocumentalService;
+import es.caib.ripea.war.command.MetaDocumentCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
+import es.caib.ripea.war.helper.SessioHelper;
 
 /**
  * Controlador per al manteniment de meta-documents asociats a un
@@ -59,6 +75,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	private PortafirmesFluxService portafirmesFluxService;
 	@Autowired
 	private TipusDocumentalService tipusDocumentalService;
+	@Autowired
+	private OrganGestorService organGestorService;
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument", method = RequestMethod.GET)
 	public String get(
@@ -128,6 +146,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@PathVariable Long metaDocumentId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		SessioHelper.setOrganActual(request, organGestorService.getOrganCodiFromMetaExpedientId(metaExpedientId));
+		
 		MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaExpedientId);
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
@@ -362,6 +382,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			@RequestParam(value = "nom", required = false) String nom,
 			@RequestParam(value = "plantillaId", required = false) String plantillaId,
 			Model model) throws UnsupportedEncodingException {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		String urlReturn;
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		try {
@@ -392,6 +413,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/metaDocument/flux/returnurl/{transactionId}", method = RequestMethod.GET)
 	public String transaccioEstat(HttpServletRequest request, @PathVariable String transactionId, Model model) {
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 
 		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
@@ -418,6 +440,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
 		return resposta;
 	}
@@ -425,6 +448,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/metaDocument/flux/esborrar/{plantillaId}", method = RequestMethod.GET)
 	@ResponseBody
 	public boolean esborrarPlantilla(HttpServletRequest request, @PathVariable String plantillaId, Model model) {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 	
@@ -433,6 +457,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 	public List<PortafirmesCarrecDto> recuperarCarrecs(
 			HttpServletRequest request, 
 			Model model) {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		return portafirmesFluxService.recuperarCarrecs();
 	}
 
@@ -440,6 +465,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			HttpServletRequest request,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
 		model.addAttribute("isPortafirmesDocumentTipusSuportat", new Boolean(tipus != null));

@@ -3,33 +3,13 @@
  */
 package es.caib.ripea.core.service;
 
-import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.portafib.ws.api.v1.WsValidationException;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
-import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
-import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
-import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
-import es.caib.ripea.core.helper.*;
-import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
-import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
-import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
-import es.caib.ripea.core.repository.InteressatRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
-import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +19,93 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.portafib.ws.api.v1.WsValidationException;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
+import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalConsultaDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
+import es.caib.ripea.core.api.dto.ViaFirmaRespostaDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
+import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.DocumentNotificacioHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PinbalHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
+import es.caib.ripea.core.helper.ViaFirmaHelper;
+import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
+import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -99,6 +161,7 @@ public class DocumentServiceImpl implements DocumentService {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+
 	
 	@Transactional
 	@Override
@@ -670,6 +733,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long[] annexosIds,
 			String transaccioId, 
 			String rolActual) {
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ", " +
@@ -815,6 +880,8 @@ public class DocumentServiceImpl implements DocumentService {
 				id,
 				true,
 				false);
+		
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		
 		DocumentPortafirmesDto docPortafir = null;
 		

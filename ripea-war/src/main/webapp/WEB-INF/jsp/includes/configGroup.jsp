@@ -23,7 +23,7 @@
     </div>
     <div class="panel-body">
         <c:forEach items="${ group.configs }" var="config" varStatus="status_group">
-            <c:set var = "configKey" value = "${fn:replace(config.key,'.','_')}"/>
+            <c:set var = "configKey" value = "${fn:replace(config.key,'.','-')}"/>
 
             <form:form method="post" cssClass="config-form form-update-config form-horizontal" action="config/update" commandName="config_${configKey}">
                 <form:hidden path="key"/>

@@ -513,6 +513,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			Long[] annexosIds,
 			Long tascaId,
 			String transaccioId) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentId + ", " +

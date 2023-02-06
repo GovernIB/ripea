@@ -1,9 +1,10 @@
 package es.caib.ripea.war.passarelafirma;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.war.helper.EntitatHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.slf4j.Logger;
@@ -15,9 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.SessioHelper;
 
 /**
  * Controller per a les accions de la passarel·la de firma.
@@ -30,7 +31,7 @@ public class PassarelaFirmaController {
 
 	public static final boolean stepSelectionWhenOnlyOnePlugin = true;
 
-	private static final String SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI = "PassarelaFirmaController.organActualCodi";
+
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
 	@Autowired
@@ -102,7 +103,7 @@ public class PassarelaFirmaController {
 			@PathVariable("pluginId") String pluginId,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
 		
-		request.getSession().setAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI, organGestorService.getOrganCodi());
+		SessioHelper.setOrganActual(request, organGestorService.getOrganCodi());
 		SignaturesSetExtend pfss = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
@@ -131,8 +132,7 @@ public class PassarelaFirmaController {
 			@PathVariable String signaturesSetId,
 			@PathVariable int signatureIndex) throws Exception {
 		
-		String organCodi = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI);
-		organGestorService.actualitzarOrganCodi(organCodi);
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		
 		String servletPath = request.getServletPath();
 		int indexBarra = StringUtils.ordinalIndexOf(

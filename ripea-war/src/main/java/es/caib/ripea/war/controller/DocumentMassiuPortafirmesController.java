@@ -40,7 +40,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 
 	@Autowired
-	private DocumentService documentService;
+	private OrganGestorService organGestorService;
 	@Autowired
 	private ContingutService contingutService;
 	@Autowired
@@ -298,6 +298,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, @PathVariable Long metadocumentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromMetaDocumentId(metadocumentId));
 		List<PortafirmesFluxRespostaDto> resposta;
 
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
@@ -447,6 +448,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			MetaDocumentDto metaDocument,
 			Model model,
 			PortafirmesEnviarCommand command) {
+		
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromMetaDocumentId(metaDocument.getId()));
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 		if (metaDocument.getPortafirmesFluxTipus() != null) {
 			command.setPortafirmesFluxTipus(metaDocument.getPortafirmesFluxTipus());

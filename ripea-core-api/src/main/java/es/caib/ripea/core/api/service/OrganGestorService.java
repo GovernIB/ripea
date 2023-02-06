@@ -306,4 +306,10 @@ public interface OrganGestorService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public String getOrganCodi();
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getOrganCodiFromMetaDocumentId(Long metaDocumentId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId);
 }

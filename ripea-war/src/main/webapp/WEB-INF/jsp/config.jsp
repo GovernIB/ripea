@@ -93,7 +93,7 @@ $(document).ready(function() {
 	                    expand(configFormKey, isEntitatConfigSelected, isOrganConfigSelected, true);
 
 	                    for (let entitat of entitats) {
-	                        let keyReplaced = entitat.key.replaceAll('.', '_');
+	                        let keyReplaced = entitat.key.replaceAll('.', '-');
 	                        let string = '<div>';
 	                        let disabled = entitat.jbossProperty || !entitat.value ? 'disabled' : '';
 	                        let textGray = disabled ? "text-gray" : "";
@@ -297,7 +297,7 @@ $(document).ready(function() {
        	
        	var configFormKey = $(this).closest('form').attr('id');
 
-       	var key = configFormKey.replace("config_", "").replaceAll("_", ".");
+       	var key = configFormKey.replace("config_", "").replaceAll("-", ".");
 
        	let spinner = addSpinner('config_' + key);
 

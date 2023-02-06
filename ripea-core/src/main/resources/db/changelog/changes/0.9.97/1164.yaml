@@ -154,7 +154,11 @@ databaseChangeLog:
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.plugins.signatureweb.miniappletinserver.base_dir';
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.plugins.signatureweb.miniappletinserver.ignore_certificate_filter';
                                 
-                
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.class';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.portafib.base.url';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.portafib.username';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.portafib.password';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio';
                 
                 
                 update ipa_config set configurable = ${booleanFalse}, configurable_entitat_actiu = ${booleanFalse} where key = 'es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients';

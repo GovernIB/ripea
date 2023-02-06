@@ -75,7 +75,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		configHelper.setEntitat(entitat);
+		ConfigHelper.setEntitat(entitat);
 	}
 	
 	@Override

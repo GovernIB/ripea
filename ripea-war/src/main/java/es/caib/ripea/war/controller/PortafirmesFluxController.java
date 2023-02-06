@@ -30,8 +30,10 @@ import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.SessioHelper;
 
 /**
  * Controlador per definir fluxos de firma
@@ -50,6 +52,8 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 	private PortafirmesFluxService portafirmesFluxService;
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	
 	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
@@ -57,6 +61,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
 			Model model) {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 //		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
 //		String descripcio = getMessage(
@@ -83,6 +88,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@RequestParam(value = "plantillaId", required = false) String plantillaId,
 			Model model) {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
 		try {
 			if (plantillaId != null && !plantillaId.isEmpty()) {
@@ -112,6 +118,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable String transactionId,
 			Model model) {
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
 
 		if (resposta.isError() && resposta.getEstat() != null) {
@@ -144,6 +151,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, @PathVariable Long documentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
 		List<PortafirmesFluxRespostaDto> resposta;
 		
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");

@@ -1018,6 +1018,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		return organGestorHelper.getOrganCodiFromAnnexId(annexId);
 	}
 	
+	@Transactional
+	@Override
+	public String getOrganCodiFromMetaDocumentId(Long metaDocumentId) {
+		return organGestorHelper.getOrganCodiFromMetaDocumentId(metaDocumentId);
+	}
+	
+	@Transactional
+	@Override
+	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId) {
+		return organGestorHelper.getOrganCodiFromMetaExpedientId(metaExpedientId);
+	}
+	
 	
 	private List<OrganGestorEntity> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,

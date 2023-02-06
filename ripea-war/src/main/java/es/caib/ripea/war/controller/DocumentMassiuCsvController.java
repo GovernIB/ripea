@@ -44,6 +44,8 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
+	@Autowired
+	private OrganGestorService organGestorService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String portafirmesGet(
@@ -214,6 +216,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, @PathVariable Long metadocumentId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromMetaDocumentId(metadocumentId));
 		List<PortafirmesFluxRespostaDto> resposta;
 
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");

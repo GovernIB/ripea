@@ -27,6 +27,8 @@ public class SessioHelper {
 	public static final String SESSION_ATTRIBUTE_CONTENIDOR_VISTA = "SessioHelper.contenidorVista";
 	private static final String SESSION_ATTRIBUTE_PIPELLA_ANOT_REG = "SessioHelper.pipellaAnotacioRegistre";
 	private static final String SESSION_ATTRIBUTE_IDIOMA_USUARI = "SessionHelper.idiomaUsuari";
+	
+	public static final String SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI = "SessionHelper.organActualCodiUsuari"; // organ derived from current contingut or procediment on which user is working
 
 	public static void processarAutenticacio(HttpServletRequest request, HttpServletResponse response, AplicacioService aplicacioService, EntitatService entitatService) {
 
@@ -81,6 +83,18 @@ public class SessioHelper {
 		Boolean llegit = (Boolean)request.getSession().getAttribute(SESSION_ATTRIBUTE_PIPELLA_ANOT_REG);
 		request.getSession().removeAttribute(SESSION_ATTRIBUTE_PIPELLA_ANOT_REG);
 		return llegit != null && llegit;
+	}
+	
+	public static String getOrganActual(HttpServletRequest request) {
+		return (String) request.getSession().getAttribute(SessioHelper.SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI);
+	}
+	
+	public static void setOrganActual(HttpServletRequest request, String organActual) {
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI, organActual);
+	}
+	
+	public static void removeOrganActual(HttpServletRequest request) {
+		request.getSession().removeAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI);
 	}
 
 }

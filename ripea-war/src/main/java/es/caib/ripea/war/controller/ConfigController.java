@@ -260,7 +260,7 @@ public class ConfigController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				configService.findConfigsOrgans(
-						keyUnderscore.replace("_", "."),
+						keyUnderscore.replace("-", "."),
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				"id");
 	}
@@ -275,10 +275,9 @@ public class ConfigController extends BaseUserController{
             if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
                 continue;
             }
-            model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+            model.addAttribute("config_" + config.getKey().replace('.', '-'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             for (EntitatDto entitat : entitats) {
                 key = config.addEntitatKey(entitat);
-//                model.addAttribute("entitat_config_" + key.replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             }
             confs.add(config);
         }

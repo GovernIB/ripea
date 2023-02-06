@@ -142,12 +142,11 @@ public class PassarelaFirmaHelper {
 		
 		for (String id: ids) {
 			
+			// 1.- Instanciar el plugin
 			ISignatureWebPluginWrapper pluginWrapper = getPluginWrapper(id);
-			
-			// 1.- Es pot instanciar el plugin ?
 			ISignatureWebPlugin plugin = pluginWrapper.getPlugin();
 			
-			// 2.- Passa el filtre ...
+			// 2.- Passa el filtre
 			String filter = plugin.filter(request, signaturesSet, null);
 			if (filter == null) {
 				pluginsWrappers.add(pluginWrapper);
