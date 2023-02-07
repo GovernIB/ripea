@@ -3877,7 +3877,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DadesExternesPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("DADES_EXT", entitatCodi));;
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral(Arrays.asList("DADES_EXT", "ORGANISMES"), entitatCodi));
 			dadesExternesPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

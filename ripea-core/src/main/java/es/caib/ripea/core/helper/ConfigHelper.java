@@ -183,6 +183,15 @@ public class ConfigHelper {
     }
     
     @Transactional(readOnly = true)
+    public Properties getGroupPropertiesEntitatOrGeneral(List<String> groupCodes, String entitatCodi) {
+    	Properties properties = new Properties();
+    	for (String groupCode : groupCodes) {
+    		properties.putAll(getGroupPropertiesEntitatOrGeneral(groupCode, entitatCodi));
+		}
+        return properties;
+    }
+    
+    @Transactional(readOnly = true)
     public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
 
         Properties properties = new Properties();

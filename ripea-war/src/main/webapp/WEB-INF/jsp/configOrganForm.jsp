@@ -39,7 +39,7 @@
 		name="organGestorId" 
 		urlConsultaInicial="${urlConsultaInicial}"
 		urlConsultaLlistat="${urlConsultaLlistat}"
-		minimumInputLength="1"
+		minimumInputLength="3"
 		textKey="metaexpedient.form.camp.organgestor" 
 		suggestValue="id" 
 		suggestText="codiINomIEntitat"
