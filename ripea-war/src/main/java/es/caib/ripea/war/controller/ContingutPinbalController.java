@@ -94,7 +94,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), command.getMetaDocumentId());
 	
-		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
+		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01 && StringUtils.isEmpty(command.getDataNaixementObligatori())) {
 			bindingResult.rejectValue("dataNaixementObligatori", "NotEmpty");
 		}
 			
