@@ -98,7 +98,7 @@
 				if (!propi)
 					comentariHtml += '<div class="comentari-autor"><strong>' + comentari.createdBy.nom + '</strong></div>';
 				
-				comentariHtml +='<p style="word-break: break-word;">' + comentari.text + '</p>' +
+				comentariHtml +='<p style="word-break: break-word; white-space: pre-line;">' + comentari.text + '</p>' +
 				'<small class="pull-right comentari-autor">' + comentari.createdDateAmbFormat + '</small>' +
 				'</div>';
 				$("#comentaris_content").append(comentariHtml);
