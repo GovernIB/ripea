@@ -1301,7 +1301,16 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			List<ContingutArxiu> versions = getArxiuPlugin().documentVersions(document.getArxiuUuid());
+			Expedient arxiuExpedient = getArxiuPlugin().expedientDetalls(document.getExpedient().getArxiuUuid(), null);
+			boolean isOpen = false;
+			ExpedientMetadades metadades = arxiuExpedient.getMetadades();
+			if (metadades != null && metadades.getEstat() != null && metadades.getEstat() == ExpedientEstat.OBERT) {
+				isOpen = true;
+			}
+			List<ContingutArxiu> versions  =  new ArrayList<>();
+			if (isOpen) { // currently it is not possible to get versions of documents from arxiu caib if the expedient is closed
+				versions = getArxiuPlugin().documentVersions(document.getArxiuUuid());
+			}
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 			return versions;
 		} catch (Exception ex) {
