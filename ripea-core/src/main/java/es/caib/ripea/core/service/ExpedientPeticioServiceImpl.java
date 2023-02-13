@@ -552,8 +552,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
-		expedientPeticioEntity.setMetaExpedient(metaExpedient);
+		if (procedimentId != null) {
+			MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
+			expedientPeticioEntity.updateMetaExpedient(metaExpedient);
+		} else {
+			expedientPeticioEntity.updateMetaExpedient(null);
+		}
 	
 	}
 	
