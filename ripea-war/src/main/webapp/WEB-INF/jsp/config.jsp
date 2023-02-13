@@ -98,7 +98,7 @@ $(document).ready(function() {
 	                        let disabled = entitat.jbossProperty || !entitat.value ? 'disabled' : '';
 	                        let textGray = disabled ? "text-gray" : "";
 	                        string += '<label id="' + keyReplaced + '_codi_entitat" for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom ' + textGray + '" style="word-wrap: break-word;">- ' + entitat.entitatCodi + '</label>';
-	                        string += '<div class="col-sm-7 margin-bottom">';
+	                        string += '<div class="col-sm-7 margin-bottom div-form-control">';
 	                        let placeHolder = "placeholder=" + entitat.key;
 	                        let configurable = "";
 	                        if (entitat.typeCode === "INT") {

@@ -29,7 +29,7 @@
                 <form:hidden path="key"/>
                 <div class="form-group">
                     <label for="config_${config.key}" class="col-sm-3 control-label" style="word-wrap: break-word;">${ config.description }</label>
-                    <div class="col-sm-7">
+                    <div class="col-sm-7 div-form-control">
                         <c:choose>
                             <c:when test="${config.typeCode == 'INT'}">
                                 <form:input  id="config_${config.key}" cssClass="form-control" path="value" placeholder="${config.key}"
