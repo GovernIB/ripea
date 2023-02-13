@@ -642,7 +642,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		boolean alreadyExists = false;
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
-		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
+		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressatsORepresentants();
 		//### Si alguns dels interessats existeix sol·licitar confirmació usuari
 		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
 			for (InteressatEntity interessatExpedient : existingInteressats) {

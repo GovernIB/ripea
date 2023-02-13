@@ -74,6 +74,7 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
@@ -361,32 +362,22 @@ public class ExpedientHelper {
 
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public boolean createArxiu(
+	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(
+			Long expedientId) {
+		return arxiuPropagarExpedientAmbInteressats(expedientId);
+	}
+	
+	
+	public boolean arxiuPropagarExpedientAmbInteressats(
 			Long expedientId) {
 
 		logger.info(
 				"Expedient crear ARXIU Helper START(" +
 						"expedientId=" + expedientId + ")");
-		boolean ok = true;
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 
-		try {
-			// create expedient in arxiu
-			contingutHelper.arxiuPropagarModificacio(
-					expedient);
-
-			for (InteressatEntity interessat : expedient.getInteressats()) {
-				interessat.updateArxiuIntent(true);
-			}
-		} catch (Exception ex) {
-			ok = false;
-			logger.error(
-					"Error al custodiar expedient en arxiu  (" + "id=" + expedient.getId() + ")",
-					ex);
-			for (InteressatEntity interessat : expedient.getInteressats()) {
-				interessat.updateArxiuIntent(false);
-			}
-		}
+		Exception exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);
+		
 		expedient.updateArxiuIntent();
 		
 		boolean throwExcepcion = false;//throwExcepcion = true;
@@ -400,7 +391,7 @@ public class ExpedientHelper {
 						"any=" + expedient.getAny() + ", " +
 						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 		
-		return ok;
+		return exception == null;
 	}
 
 
@@ -408,64 +399,70 @@ public class ExpedientHelper {
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
-		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
-		for (RegistreInteressatEntity interessatRegistre : expedientPeticioEntity.getRegistre().getInteressats()) {
-			boolean alreadyExists = false;
-			boolean tipusCanviat = false;
-			InteressatEntity interessatExpedient = null;
-			for (InteressatEntity interessatExp : existingInteressats) {
-				if (interessatExp.getDocumentNum() != null && interessatRegistre.getDocumentNumero() != null && interessatExp.getDocumentNum().equals(interessatRegistre.getDocumentNumero())) {
-					alreadyExists = true;
-					interessatExpedient = interessatExp;
-					if (!interessatExp.getDocumentTipus().toString().equals(interessatRegistre.getTipus().toString())) {
-						tipusCanviat = true;
-					}
+		Set<InteressatEntity> interessatsORepresenantsRipea = expedientEntity.getInteressatsORepresentants();
+		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
+			
+			InteressatEntity interessatRipeaOverwritten = checkForInteressatOverwritten(interessatDistribucio, interessatsORepresenantsRipea);
+			
+			if (interessatRipeaOverwritten != null) {
+				if (interessatRipeaOverwritten.getRepresentant() != null) {
+					expedientInteressatHelper.deleteRepresentant(
+							entitatId, 
+							expedientId, 
+							interessatRipeaOverwritten.getId(), 
+							interessatRipeaOverwritten.getRepresentant().getId(), 
+							rolActual);
 				}
-			}
-			if (!alreadyExists || tipusCanviat) {
-				
-				if (tipusCanviat) {
-					if (interessatExpedient.getRepresentant() != null) {
-						InteressatEntity repres = interessatExpedient.getRepresentant();
-						interessatExpedient.updateRepresentant(null);
-						interessatRepository.delete(repres);
-					}
-					interessatRepository.delete(interessatExpedient);
-				}
-				
-				InteressatDto createdInteressat = expedientInteressatHelper.create(
+				expedientInteressatHelper.delete(
 						entitatId,
 						expedientId,
-						null,
-						toInteressatDto(interessatRegistre, null),
-						true, 
+						interessatRipeaOverwritten.getId(),
+						rolActual);
+			}
+			
+			InteressatDto createdInteressat = expedientInteressatHelper.create(
+					entitatId,
+					expedientId,
+					toInteressatDto(interessatDistribucio, null),
+					false, 
+					permission, 
+					rolActual, 
+					false);
+			if (interessatDistribucio.getRepresentant() != null) {
+				expedientInteressatHelper.createRepresentant(
+						entitatId,
+						expedientId,
+						createdInteressat.getId(),
+						toInteressatDto(interessatDistribucio.getRepresentant(), null),
+						false, 
 						permission, 
 						rolActual, 
 						false);
-				if (interessatRegistre.getRepresentant() != null) {
-					expedientInteressatHelper.create(
-							entitatId,
-							expedientId,
-							createdInteressat.getId(),
-							toInteressatDto(interessatRegistre.getRepresentant(), null),
-							true, 
-							permission, 
-							rolActual, 
-							false);
-				}
-			} else {
-				RegistreInteressatEntity representantRegistre = interessatRegistre.getRepresentant();
-				Long idRepresentantExpedient = representantRegistre != null && interessatExpedient != null && interessatExpedient.getRepresentant() != null ? interessatExpedient.getRepresentant().getId() : null; //modificar o afegir
-				expedientInteressatHelper.update(
-						entitatId, 
-						expedientId, 
-						interessatExpedient.getId(), 
-						toInteressatDto(interessatRegistre, interessatExpedient.getId()), 
-						true,
-						representantRegistre != null ? toInteressatDto(representantRegistre, idRepresentantExpedient) : null, rolActual);
 			}
 		}
 	}
+	
+	public InteressatEntity checkForInteressatOverwritten(RegistreInteressatEntity interessatDistribucio, Set<InteressatEntity> interessatsORepresenantsRipea) {
+		List<InteressatEntity> interessatsRipea = new ArrayList<>();
+		for (InteressatEntity inter : interessatsORepresenantsRipea) {
+			if (!inter.isEsRepresentant()) {
+				interessatsRipea.add(inter);
+			}
+		}
+		
+		InteressatEntity interessatRipeaOverwritten = null;
+		for (InteressatEntity interessatRipea : interessatsRipea) {
+
+			if (Utils.isNotNullAndEqual(interessatRipea.getDocumentNum(), interessatDistribucio.getDocumentNumero()) || // interessatRipea == interessatDistribucio
+					interessatRipea.getRepresentant() != null && Utils.isNotNullAndEqual(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getDocumentNumero()) ||  // representantRipea == interessatDistribucio
+					interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEqual(interessatRipea.getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero()) || // interessatRipea == representantDistribucio
+					interessatRipea.getRepresentant() != null && interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEqual(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero())) { // representantRipea == representantDistribucio
+				interessatRipeaOverwritten = interessatRipea;
+			}
+		}
+		return interessatRipeaOverwritten;
+	}
+	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
@@ -503,6 +500,7 @@ public class ExpedientHelper {
 		
 		if (associarInteressats) {
 			associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual);
+			arxiuPropagarExpedientAmbInteressats(expedientId);
 		}
 	}
 
@@ -1216,22 +1214,8 @@ public class ExpedientHelper {
 		}
 		concurrencyCheckExpedientJaTancat(expedient);
 		
-		try {
-			contingutHelper.arxiuPropagarModificacio(expedient);
-			
-			for (InteressatEntity interessat : expedient.getInteressats()) {
-				interessat.updateArxiuIntent(true);
-			}
-			
-		} catch (Exception ex) {
-			logger.error("Error al custodiar expedient en arxiu  (" +
-					"id=" + expedient.getId() + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")",
-					ex);
-			exception = ex;
-			for (InteressatEntity interessat : expedient.getInteressats()) {
-				interessat.updateArxiuIntent(false);
-			}
-		}
+		exception = expedientInteressatHelper.arxiuPropagarInteressats(expedient, null);
+		
 		expedient.updateArxiuIntent();
 		
 		return exception;

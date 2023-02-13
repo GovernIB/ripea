@@ -253,7 +253,7 @@ public class ExpedientEntity extends NodeEntity {
 	public UsuariEntity getAgafatPer() {
 		return agafatPer;
 	}
-	public Set<InteressatEntity> getInteressats() {
+	public Set<InteressatEntity> getInteressatsORepresentants() {
 		return interessats;
 	}
 	public List<ExpedientEntity> getRelacionatsAmb() {

@@ -302,7 +302,7 @@ public class ContingutHelper {
 					}
 				}
 
-				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
 				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 

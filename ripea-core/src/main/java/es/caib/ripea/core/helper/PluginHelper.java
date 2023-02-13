@@ -481,7 +481,7 @@ public class PluginHelper {
 				classificacio = organCodiDir3 + "_PRO_RIP" + String.format("%027d", metaExpedient.getId());
 			}
 			List<String> interessats = new ArrayList<String>();
-			for (InteressatEntity interessat: expedient.getInteressats()) {
+			for (InteressatEntity interessat: expedient.getInteressatsORepresentants()) {
 				if (interessat.getDocumentNum() != null) {
 					interessats.add(interessat.getDocumentNum());
 				}

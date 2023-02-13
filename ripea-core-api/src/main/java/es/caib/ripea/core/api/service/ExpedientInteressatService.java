@@ -112,7 +112,7 @@ public interface ExpedientInteressatService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual);
+	public void deleteRepresentant(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual);
 
 	/**
 	 * Consulta l'interessat donat el seu id.
@@ -257,4 +257,13 @@ public interface ExpedientInteressatService {
 
 	@PreAuthorize("hasRole('tothom')")
     public Long findExpedientIdByInteressat(Long interessatId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public InteressatDto createRepresentant(
+			Long entitatId,
+			Long expedientId,
+			Long interessatId,
+			InteressatDto interessat,
+			boolean propagarArxiu,
+			String rolActual);
 }
