@@ -51,7 +51,7 @@ $(document).ready(function() {
 		<form:textarea path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" rows="6" maxlength="${maxlength}"/>
 		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		<c:if test="${showsize && not empty maxlength}">
-			<p class="info-length text-success col-xs-12" style="font-size: 12px;">
+			<p class="info-length text-success" style="font-size: 12px; margin: 2px 0 0 0 !important;">
 				<span class="glyphicon glyphicon-info-sign"></span>
 				<span class="inputCurrentLength_${name}">0</span>
 					<spring:message code="comu.camp.logitud.count"/>
