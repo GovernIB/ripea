@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1028,19 +1029,12 @@ public class ExpedientHelper {
 				false, 
 				checkPerMassiuAdmin, null);
 		
-		concurrencyCheckExpedientJaTancat(expedient);
-		
-		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
-			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
-		}
-		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
-		}
+		checkIfExpedientCanBeClosed(expedient);
 
 		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
 		expedient.updateExpedientEstat(null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-		List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatId,
 				id);
 		
@@ -1063,7 +1057,7 @@ public class ExpedientHelper {
 				}
 			}
 			if (!trobat) {
-				documentRepository.delete(esborrany);
+				documentHelper.deleteDefinitiu(esborrany);
 			}
 		}
 		
@@ -1092,7 +1086,34 @@ public class ExpedientHelper {
 		
 		pluginHelper.arxiuExpedientTancar(expedient);
 	}
-
+	
+	
+	public void checkIfExpedientCanBeClosed(ExpedientEntity expedient) {
+		
+		concurrencyCheckExpedientJaTancat(expedient);
+		
+		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
+			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
+		}
+		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
+			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
+		}
+		if (CollectionUtils.isEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0))) {
+			throw new ValidationException("No es pot tancar un expedient sense cap document");
+		}
+		if (CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient))) {
+			throw new ValidationException("No es pot tancar un expedient amb documents en procés de firma");
+		}	
+		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient))) {
+			throw new ValidationException("No es pot tancar un expedient amb documents firmats de portafirmes pendents de custodiar");
+		}
+		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, contingutHelper.getArxiuMaxReintentsDocuments()))) {
+			throw new ValidationException("No es pot tancar un expedient amb documents amb reintents pendents de guardar a l'arxiu");
+		}	
+		if (CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient))) {
+			throw new ValidationException("No es pot tancar un expedient amb documents d'anotacions no moguts a la sèrie documental final");
+		}		
+	}
 	
 
 
@@ -1929,7 +1950,7 @@ public class ExpedientHelper {
 	
 	public void concurrencyCheckExpedientJaTancat(ExpedientEntity expedient) {
 		if (expedient.getEstat() == ExpedientEstatEnumDto.TANCAT) { 
-			throw new RuntimeException("L'expedient ja se ha tancat per otra persona. No és possible fer cap canvi");
+			throw new RuntimeException("L'expedient ja ha estat tancat per una altre persona. No és possible fer cap canvi");
 		}
 	}
 	

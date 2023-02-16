@@ -2932,11 +2932,13 @@ public class PluginHelper {
 		}
 	}
 	public void gestioDocumentalDelete(String id, String agrupacio) {
-		try {
-			getGestioDocumentalPlugin().delete(id, agrupacio);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de gestió documental";
-			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
+		if (id != null) {
+			try {
+				getGestioDocumentalPlugin().delete(id, agrupacio);
+			} catch (Exception ex) {
+				String errorDescripcio = "Error al accedir al plugin de gestió documental";
+				throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, errorDescripcio, ex);
+			}
 		}
 	}
 	public void gestioDocumentalGet(String id, String agrupacio, OutputStream contingutOut) {

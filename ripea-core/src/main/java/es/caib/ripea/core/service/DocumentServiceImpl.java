@@ -398,11 +398,11 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId) {
 		
-		List<DocumentEntity> documents = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		List<DocumentEntity> documents = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatId,
 				expedientId);
 		

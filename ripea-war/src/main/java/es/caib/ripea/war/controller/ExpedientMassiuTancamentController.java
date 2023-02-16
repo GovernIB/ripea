@@ -347,7 +347,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					false, 
 					null, 
 					null);
-			List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalida(
+			List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 					entitatActual.getId(),
 					expedientId);
 			if (esborranys != null && !esborranys.isEmpty()) {

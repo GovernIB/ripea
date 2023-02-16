@@ -675,7 +675,7 @@ public interface DocumentService {
 			Long metaDocumentId);
 
 	@PreAuthorize("hasRole('tothom')")
-	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId);
 

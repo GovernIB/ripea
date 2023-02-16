@@ -1724,7 +1724,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				true,
 				false, null, null);
 		model.addAttribute("expedient", expedient);
-		List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatActual.getId(),
 				expedientId);
 		model.addAttribute("esborranys", esborranys);

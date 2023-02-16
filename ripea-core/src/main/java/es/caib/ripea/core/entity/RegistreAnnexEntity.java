@@ -83,6 +83,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	@Column(name = "uuid", length = 100)
 	private String uuid;
 	
+	// TODO: when document is created and moved in arxiu estat should be changed to MOGUT
 	@Enumerated(EnumType.STRING)
 	@Column(name = "estat", length = 20, nullable = false)
 	private RegistreAnnexEstatEnumDto estat;
@@ -284,9 +285,7 @@ public class RegistreAnnexEntity extends RipeaAuditable<Long> {
 	public void updateDocument(DocumentEntity document) {
 		this.document = document;
 	}
-	public void updateAnnexArxiuEstat(ArxiuEstatEnumDto annexArxiuEstat) {
-		this.annexArxiuEstat = annexArxiuEstat;
-	}
+
 //	public void updateUuidDispatched(String uuidDispatched) {
 //		this.uuidDispatched = uuidDispatched;
 //	}

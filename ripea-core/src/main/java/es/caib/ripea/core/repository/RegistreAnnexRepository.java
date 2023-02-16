@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 
@@ -37,6 +38,16 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 	public Long findExpedientId(
 			@Param("id") Long id);
 	
+	
+	@Query(	"select " +
+			"    a " +
+			"from " +
+			"    RegistreAnnexEntity a left join a.registre.expedientPeticions ep " +
+			"where " +
+			"    ep.expedient = :expedient " +
+			"and (a.document is null or a.error is not null)" )
+	List<RegistreAnnexEntity> findDocumentsDeAnotacionesNoMogutsASerieFinal(
+			@Param("expedient") ExpedientEntity expedient);
 	
 	
 	@Query(	"select " +

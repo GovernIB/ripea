@@ -40,6 +40,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de seguiment de elements pendents de guardar a dins l'arxiu
@@ -576,13 +577,18 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 
 		int errors = 0;
 		int correctes = 0;
-
+		
+		
 		for (Long documentId : seleccio) {
 			
 			DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
 			Exception exception = null;
-			if (document.getArxiuUuid() == null) {
-				exception = documentService.guardarDocumentArxiu(documentId);
+			if (document.getArxiuUuid() == null) { //documents uploaded manually in ripea that were not saved in arxiu
+				try {
+					exception = documentService.guardarDocumentArxiu(documentId);
+				} catch (Exception e) {
+					exception = e;
+				}
 				if (exception instanceof ArxiuJaGuardatException) {
 					exception = null;
 				}
@@ -592,16 +598,35 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				} else {
 					correctes++;
 				}
-			} else if (document.isPendentMoverArxiu()) {
-				exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+			} else if (document.isPendentMoverArxiu()) { //documents from distribucio that were not moved in arxiu to ripea expedient
+				try {
+					exception = expedientService.retryMoverAnnexArxiu(document.getAnnexId());
+				} catch (Exception e) {
+					exception = e;
+				}
 				if (exception != null ) {
 					logger.error("Error mover annex en arxiu", exception);
 					errors++;
 				} else {
 					correctes++;
 				}
-			}
+			} else if (document.getGesDocFirmatId() != null) { // documents signed in portafirmes that arrived in callback and were not saved in arxiu 
+				try {
+					exception = documentService.portafirmesReintentar(
+							entitatActual.getId(),
+							documentId,
+							RolHelper.getRolActual(request));
+				} catch (Exception e) {
+					exception = e;
+				}
+				if (exception != null ) {
+					logger.error("Error guardant document portafirmes en arxiu", exception);
+					errors++;
+				} else {
+					correctes++;
+				}				
 
+			}
 		}
 
 		if (correctes > 0){

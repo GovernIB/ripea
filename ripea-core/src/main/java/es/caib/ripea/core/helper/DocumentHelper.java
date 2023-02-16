@@ -846,9 +846,32 @@ public class DocumentHelper {
 			if (doc.getEsborrat() == 0) {
 				doc.setArxiuUuidFirma(null);
 			} else {
-				documentRepository.delete(doc);
+				deleteDefinitiu(doc);
 			}
 		}
+	}
+	
+	
+
+
+	public void deleteDefinitiu(DocumentEntity document) {
+
+		pluginHelper.gestioDocumentalDelete(
+				document.getGesDocAdjuntId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+		
+		pluginHelper.gestioDocumentalDelete(
+				document.getGesDocAdjuntFirmaId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+
+		pluginHelper.gestioDocumentalDelete(
+				document.getGesDocFirmatId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB);
+
+		contingutHelper.fitxerDocumentEsborratEsborrar(document);
+		contingutHelper.firmaSeparadaEsborratEsborrar(document);
+		
+		documentRepository.delete(document);
 	}
 	
 	
@@ -1024,7 +1047,7 @@ public class DocumentHelper {
 	}
 	
 	
-	public List<DocumentEntity> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentEntity> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId) {
 		logger.debug("Obtenint els documents no firmats o amb firma invalida (" +
@@ -1043,7 +1066,7 @@ public class DocumentHelper {
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentEntity> documentsChosen = new ArrayList<DocumentEntity>();
 		for (DocumentEntity document: documents) {
-			if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || document.getArxiuUuid() == null) {
+			if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || document.getArxiuUuid() == null ) {
 				documentsChosen.add(document);
 			}
 		}

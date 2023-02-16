@@ -145,7 +145,7 @@
 				<c:choose>
 					<c:when test="${contingut.estat == 'OBERT'}">
 						<c:choose>
-							<c:when test="${contingut.valid && contingut.conteDocuments && !contingut.conteDocumentsEnProcessDeFirma && !contingut.conteDocumentsPendentsReintentsArxiu}">
+							<c:when test="${contingut.valid && contingut.conteDocuments && !contingut.conteDocumentsEnProcessDeFirma && !contingut.conteDocumentsDePortafirmesNoCustodiats && !contingut.conteDocumentsPendentsReintentsArxiu && !contingut.conteDocumentsDeAnotacionesNoMogutsASerieFinal}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 							</c:when>
 							<c:otherwise>
@@ -159,9 +159,15 @@
 									<c:when test="${contingut.conteDocumentsEnProcessDeFirma}">
 										<li class="disabledMsg" title="<spring:message code="disabled.button.msg.conteDocumentsEnProcessDeFirma"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 									</c:when>
+									<c:when test="${contingut.conteDocumentsDePortafirmesNoCustodiats}">
+										<li class="disabledMsg" title="<spring:message code="disabled.button.msg.conteDocumentsDePortafirmesNoCustodiats"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+									</c:when>									
 									<c:when test="${contingut.conteDocumentsPendentsReintentsArxiu}">
 										<li class="disabledMsg" title="<spring:message code="disabled.button.msg.conteDocumentsPendentsReintentsArxiu"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
-									</c:when>									
+									</c:when>		
+									<c:when test="${contingut.conteDocumentsDeAnotacionesNoMogutsASerieFinal}">
+										<li class="disabledMsg" title="<spring:message code="disabled.button.msg.conteDocumentsDeAnotacionesNoMogutsASerieFinal"/>"><a class="disabled"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+									</c:when>																
 									<c:otherwise>
 										<li class="disabled"><a href="#"/><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
 									</c:otherwise>

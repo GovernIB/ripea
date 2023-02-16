@@ -443,10 +443,10 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId) {
-		return delegate.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		return delegate.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatId,
 				expedientId);
 	}
