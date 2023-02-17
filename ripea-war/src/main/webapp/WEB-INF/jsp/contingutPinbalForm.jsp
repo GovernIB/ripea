@@ -216,12 +216,12 @@ $(document).ready(function() {
 					<div id="divConsentimentTipusDiscapacitat"><rip:inputSelect name="consentimentTipusDiscapacitat" textKey="contingut.pinbal.form.camp.consentiment.tipus.discapacitat" optionEnum="SiNoEnumDto"/></div>
 					<div id="divNumeroTitol"><rip:inputText name="numeroTitol" textKey="contingut.pinbal.form.camp.numero.titol" /></div>
 					
-				  	<div id="divCodiNacionalitat"><rip:inputText name="codiNacionalitat" textKey="contingut.pinbal.form.camp.codi.nacionalitat" comment="contingut.pinbal.form.camp.codi.nacionalitat.comment"/></div>
+				  	<div id="divCodiNacionalitat"><rip:inputSelect name="codiNacionalitat" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
 				  	<div id="divSexe"><rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/></div>
-				  	<div id="divPaisNaixament"><rip:inputText name="paisNaixament" textKey="contingut.pinbal.form.camp.pais.naixament" comment="contingut.pinbal.form.camp.codi.nacionalitat.comment"/></div>
+				  	<div id="divPaisNaixament">	<rip:inputSelect name="paisNaixament" textKey="contingut.pinbal.form.camp.pais.naixament" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
 				  	<div id="divProvinciaNaixament"><rip:inputSelect name="provinciaNaixament" textKey="contingut.pinbal.form.camp.provincia.naixament" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text" comment="contingut.pinbal.form.camp.provincia.naixament.comment"/></div>
 				  	<div id="divPoblacioNaixament"><rip:inputText name="poblacioNaixament" textKey="contingut.pinbal.form.camp.poblacio.naixament" comment="contingut.pinbal.form.camp.poblacio.naixament.comment"/></div>
-				  	<div id="divCodiPoblacioNaixament"><rip:inputText name="codiPoblacioNaixament" textKey="contingut.pinbal.form.camp.codi.poblacio.naixament" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment"/></div>
+				  	<div id="divCodiPoblacioNaixament"><rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi.naixament" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment"/></div>
 					<div id="divNomPare"><rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare" comment="contingut.pinbal.form.camp.nom.pare.comment"/></div>
 					<div id="divNomMare"><rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare" comment="contingut.pinbal.form.camp.nom.mare.comment"/></div>
 					<div id="divDataNaixementObligatori"><rip:inputDate name="dataNaixementObligatori" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/></div>
