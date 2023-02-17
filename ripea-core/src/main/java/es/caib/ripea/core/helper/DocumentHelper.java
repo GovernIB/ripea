@@ -838,20 +838,8 @@ public class DocumentHelper {
 		documentEntity.setArxiuUuidFirma(null);
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public void clearDocuments(ExpedientEntity expedient) {
-		// remove deleted documents in db and clear uuids of any firma for esborrany
-		List<DocumentEntity> docs = documentRepository.findByExpedient(expedient);
-		for (DocumentEntity doc : docs) {
-			if (doc.getEsborrat() == 0) {
-				doc.setArxiuUuidFirma(null);
-			} else {
-				deleteDefinitiu(doc);
-			}
-		}
-	}
-	
-	
+
+
 
 
 	public void deleteDefinitiu(DocumentEntity document) {

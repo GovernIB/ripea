@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,6 @@ import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
@@ -42,7 +40,6 @@ import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
@@ -73,7 +70,6 @@ import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -186,7 +182,10 @@ public class ExpedientHelper {
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private InteressatRepository interessatRepository;
-
+	@Autowired
+	private ExpedientHelper2 expedientHelper2;
+	
+	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
 	
@@ -1014,106 +1013,28 @@ public class ExpedientHelper {
 	}
 	
 	
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
-		logger.debug(
-				"Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + "," + "motiu=" + motiu + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false,
-				false, 
-				checkPerMassiuAdmin, null);
-		
-		checkIfExpedientCanBeClosed(expedient);
+	public void tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
+		logger.debug("Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + expedientId + "," + "motiu=" + motiu + ")");
 
-		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
-		expedient.updateExpedientEstat(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-		List<DocumentEntity> esborranys = documentHelper.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
-				entitatId,
-				id);
 		
-		// Firmam els documents seleccionats
-		boolean hiHaDocumentsPerFirmar = documentsPerFirmar != null && documentsPerFirmar.length > 0;
-		if (hiHaDocumentsPerFirmar) {
-			for (Long documentPerFirmar : documentsPerFirmar) {
-				documentFirmaServidorFirma.firmar(documentPerFirmar, motiu);
-			}
-		}
-		// Eliminam de l'expedient els esborranys que no s'han firmat
-		for (DocumentEntity esborrany : esborranys) {
-			boolean trobat = false;
-			if (documentsPerFirmar != null) {
-				for (Long documentPerFirmarId : documentsPerFirmar) {
-					if (documentPerFirmarId.longValue() == esborrany.getId().longValue()) {
-						trobat = true;
-						break;
-					}
-				}
-			}
-			if (!trobat) {
-				documentHelper.deleteDefinitiu(esborrany);
-			}
-		}
+		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
+		
+		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar);
+		
+		expedientHelper2.deleteDocumentsNotSelectedDB(entitatId, expedientId, documentsPerFirmar);
+		
+		expedientHelper2.markAllDocumentsEsborranysAsDefinitiusArxiu(expedientId);
+		
+		expedientHelper2.deleteDocumentsEsborranysArxiu(expedientId);
+		
+		expedientHelper2.closeExpedientDbAndArxiu(expedientId, motiu);
 		
 		
-		// Marquem esborannys firmats com a definitius
-		List<DocumentEntity> esborranysArxiu = documentRepository.findByExpedientAndArxiuEstat(
-				expedient,
-				ArxiuEstatEnumDto.ESBORRANY);
-		for (DocumentEntity documentEntity : esborranysArxiu) {
-			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
-		} 
-		
-		
-		// remove eborranys in arxiu
-		List<ContingutArxiu> contingutsArxiu = pluginHelper.arxiuExpedientConsultarPerUuid(expedient.getArxiuUuid()).getContinguts();
-		for (ContingutArxiu contingutArxiu : contingutsArxiu) {
-			if (contingutArxiu.getTipus() == ContingutTipus.DOCUMENT) {
-				Document document = pluginHelper.arxiuDocumentConsultar(contingutArxiu.getIdentificador());
-				if (document.getEstat() == DocumentEstat.ESBORRANY) {
-					pluginHelper.arxiuDocumentEsborrar(document.getIdentificador());
-				}
-			}
-		}
-		
-		documentHelper.clearDocuments(expedient);
-		
-		pluginHelper.arxiuExpedientTancar(expedient);
 	}
 	
 	
-	public void checkIfExpedientCanBeClosed(ExpedientEntity expedient) {
-		
-		concurrencyCheckExpedientJaTancat(expedient);
-		
-		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
-			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
-		}
-		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
-		}
-		if (CollectionUtils.isEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0))) {
-			throw new ValidationException("No es pot tancar un expedient sense cap document");
-		}
-		if (CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient))) {
-			throw new ValidationException("No es pot tancar un expedient amb documents en procés de firma");
-		}	
-		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient))) {
-			throw new ValidationException("No es pot tancar un expedient amb documents firmats de portafirmes pendents de custodiar");
-		}
-		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, contingutHelper.getArxiuMaxReintentsDocuments()))) {
-			throw new ValidationException("No es pot tancar un expedient amb documents amb reintents pendents de guardar a l'arxiu");
-		}	
-		if (CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient))) {
-			throw new ValidationException("No es pot tancar un expedient amb documents d'anotacions no moguts a la sèrie documental final");
-		}		
-	}
+
 	
 
 

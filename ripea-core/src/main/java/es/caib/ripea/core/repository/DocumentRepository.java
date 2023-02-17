@@ -111,6 +111,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			int esborrat);
 	
+	
 	List<DocumentEntity> findByExpedient(
 			ExpedientEntity expedient);
 	
@@ -126,6 +127,38 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	List<DocumentEntity> findByExpedientAndArxiuEstat(
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat);
+	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.expedient.id = :expedientId " )
+	List<DocumentEntity> findByExpedientId(
+			@Param("expedientId") Long expedientId);
+	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.expedient.id = :expedientId " + 
+			"and d.esborrat != 0 ")
+	List<DocumentEntity> findDeleted(
+			@Param("expedientId") Long expedientId);
+	
+	
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"	 d.expedient = :expedient "  + 
+			"and d.esborrat = 0 " +
+			"and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.ESBORRANY " + 
+			"and d.documentFirmaTipus != es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto.SENSE_FIRMA ")
+	List<Long> findPendentsDeMarcarComADefinitius(
+			@Param("expedient") ExpedientEntity expedient);
 	
 	@Query(	"select " +
 			"    c " +
