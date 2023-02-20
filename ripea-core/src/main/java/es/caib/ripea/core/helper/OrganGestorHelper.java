@@ -476,7 +476,8 @@ public class OrganGestorHelper {
 //			return null;
 //		} else {
 			ContingutEntity contingut = contingutRepository.findOne(contingutId);
-			return contingut.getExpedientPare().getOrganGestor().getCodi();
+			ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+			return deproxied.getExpedientPare().getOrganGestor().getCodi();
 //		}
 
 	}

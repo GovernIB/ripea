@@ -107,7 +107,7 @@
 
             if ( self.children[ nodeId ] > 0 ) {
                 $( TT.expanderTemplate )
-                    .prependTo( $node.find( 'td' ).get( 0 ) )
+                    .prependTo( $node.find( 'td' ).get( 1 ) )
                     .addClass( (self.options.startCollapsed)
                         ? self.options.collapsedClass
                         : self.options.expandedClass );

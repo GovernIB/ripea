@@ -43,6 +43,7 @@
     <script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
 	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/js/jquery.filedrop.js"/>"></script>
+	<script src="<c:url value="/js/jquery.treetable.js"/>"></script><!-- https://www.jqueryscript.net/table/Minimal-Collapsible-Tree-Table-Plugin-With-jQuery-treetable.html -->
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -73,6 +74,41 @@
 	    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	</c:if>
 <style>
+
+        .treetable-expanded > td:nth-child(2),
+        .treetable-collapsed > td:nth-child(2) {
+            padding-left: 2em;
+        }
+
+        .treetable-expanded > td:nth-child(2) > .treetable-expander,
+        .treetable-collapsed > td:nth-child(2) > .treetable-expander {
+            top: 0.05em;
+            position: relative;
+            margin-left: -1.5em;
+            margin-right: 0.25em;
+        }
+
+        .treetable-expanded .treetable-expander, 
+        .treetable-expanded .treetable-expander {
+            width: 1em;
+            height: 1em;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+        }
+
+        .treetable-depth-1 > td:nth-child(2) {
+            padding-left: 3em;
+        }
+        
+        .treetable-depth-2 > td:nth-child(2) {
+            padding-left: 4.5em;
+        }
+
+        .treetable-depth-3 > td:nth-child(2) {
+            padding-left: 6em;
+        }
+
 span {
 	display: inline-block;
 }
@@ -592,6 +628,9 @@ publicacioEstatText["${option.value}"] = "<spring:message code="${option.text}"/
 let pageSizeDominis = 20;
 $(document).ready(function() {
 
+	$('#table-documents').treeTable();
+		
+
 	$('.nav-tabs a[href$="#interessats"]').on('click', function() {
 		$('#taulaInteressats').webutilDatatable();
 	});
@@ -676,18 +715,20 @@ $(document).ready(function() {
 			useNativeClamp: true
 		});
 	});
+
+
 	
 	//ordenacio habilitada
 	if (${isOrdenacioPermesa}) {
-		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(4), :nth-child(7))').css('cursor','pointer');
-		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(4), :nth-child(7))').click(function(event) {
+		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(2), :nth-child(4), :nth-child(7))').css('cursor','pointer');
+		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(2), :nth-child(4), :nth-child(7))').click(function(event) {
 			event.stopPropagation();
 			$('a:first', $(this).parent())[0].click();
 		});
 	} else {
 		//ordenacio per defecte (createdDate)
-		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').css('cursor','pointer');
-		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(4))').click(function(event) {
+		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(2), :nth-child(4))').css('cursor','pointer');
+		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(2), :nth-child(4))').click(function(event) {
 			event.stopPropagation();
 			$('a:first', $(this).parent())[0].click();
 		});
@@ -2370,6 +2411,7 @@ $.views.helpers(myHelpers);
 								</div>
 							</c:if>							
 							<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
+							
 							<div class="text-right" id="contingut-botons">
 							
 								<c:if test="${contingut.expedient or contingut.carpeta}">
@@ -2540,6 +2582,7 @@ $.views.helpers(myHelpers);
 									</div>
 								</c:if>
 							</div>
+							
 							<%---- TABLE/GRID OF CONTINGUTS ----%>
 							<div id="loading">
 								<img src="<c:url value="/img/loading.gif"/>"/>
@@ -2755,7 +2798,6 @@ $.views.helpers(myHelpers);
 								id="taulaNotificacions"
 								data-url="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/enviament/NOTIFICACIO/datatable"/>"
 								data-paging-enabled="false"
-								data-agrupar="5"
 								class="table table-bordered table-striped"
 								style="width:100%"
 								data-row-info="true">
@@ -2856,7 +2898,6 @@ $.views.helpers(myHelpers);
 								data-toggle="datatable"
 								data-url="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/enviament/PUBLICACIO/datatable"/>"
 								data-paging-enabled="false"
-								data-agrupar="5"
 								class="table table-bordered table-striped"
 								style="width:100%"
 								data-row-info="true">
@@ -2923,7 +2964,6 @@ $.views.helpers(myHelpers);
 									data-paging-enabled="false" 
 									data-default-order="3" 
 									data-default-dir="desc"
-									data-agrupar="5" 
 									class="table table-bordered table-striped" 
 									style="width: 100%">
 									<thead>
@@ -2989,7 +3029,6 @@ $.views.helpers(myHelpers);
 								data-toggle="datatable"
 								data-url="<c:url value="/expedientTasca/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/datatable"/>"
 								data-paging-enabled="false"
-								data-agrupar="6"
 								class="table table-bordered table-striped"
 								style="width:100%"
 								data-botons-template="#taulaTasquesNouBoton">
@@ -3070,3 +3109,4 @@ $.views.helpers(myHelpers);
 	</div>
 </body>
 </html>
+

@@ -824,7 +824,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				ambVersions, 
-				rolActual, false, null, true, 0, null, null, true, ambEntitat);
+				rolActual, false, null, false, 0, null, null, true, ambEntitat);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
