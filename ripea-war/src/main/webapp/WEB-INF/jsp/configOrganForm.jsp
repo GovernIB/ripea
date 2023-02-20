@@ -46,9 +46,9 @@
 		required="true"
 		disabled="${!organConfigCommand.crear}"/>
 		
-	
+	<c:set var="campErrors"><form:errors path="value"/></c:set>
 	<c:if test="${!config.jbossProperty}">
-		<div class="form-group">
+		<div class="form-group <c:if test="${not empty campErrors}">has-error</c:if>">
 			<label class="col-sm-4 control-label" style="word-wrap: break-word;"><spring:message code="config.propietats.form.camp.value"/> *</label>
 			<div class="col-sm-8">
 		
@@ -74,6 +74,7 @@
 					</c:when>
 					<c:when test="${config.validValues != null and fn:length(config.validValues) > 2}">
 					    <form:select path="value" cssClass="form-control" style="width:100%" data-toggle="select2">
+							<option value=""></option>					    
 					        <c:forEach var="opt" items="${config.validValues}">
 					            <form:option value="${opt}"/>
 					        </c:forEach>
@@ -92,6 +93,8 @@
 					                 type="text" maxlength="2048" />
 					</c:otherwise>
 				</c:choose>
+				
+				<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="value"/></p></c:if>				
 			</div>
 		</div>	
 	</c:if>

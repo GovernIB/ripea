@@ -38,6 +38,11 @@
 	cursor: pointer;
 }
 
+.table-organ-key {
+	font-size: 11px;
+	color: #aaa;
+}
+
 </style>
 
 <script>
@@ -199,23 +204,27 @@ $(document).ready(function() {
         		tableHtml += 'data-toggle="datatable" ' 
         		tableHtml += 'data-url="'+url+'" ' 
         		tableHtml += 'class="table table-bordered table-striped table-hover" '
-        		tableHtml += 'data-default-order="1" '
+        		tableHtml += 'data-default-order="2" '
         		tableHtml += 'data-default-dir="desc" '
 	        	tableHtml += 'data-paging-enabled="false" '		        		
         		tableHtml += 'style="width:100%"> '
         		tableHtml += '<thead> '
         		tableHtml += '	<tr> '
             	tableHtml += '		<th data-col-name="typeCode" data-visible="false"></th> '            		
+                tableHtml += '		<th data-col-name="key" data-visible="false"></th> '                   	
         		tableHtml += '		<th data-col-name="organGestorCodiNom" data-orderable="true" width="45%"><spring:message code="metaexpedient.form.camp.organgestor"/></th> '
         		tableHtml += '		<th data-col-name="value" data-template="#' + scriptValueId + '" data-orderable="true" width="45%"><spring:message code="config.propietats.form.camp.value"/> '
-        		tableHtml += '			<script id="' + scriptValueId + '" type="text/x-jsrender"> '       	
+        		tableHtml += '			<script id="' + scriptValueId + '" type="text/x-jsrender"> '  
+        		tableHtml += '				<div style="min-height: 20px;"> '        		     	
         		tableHtml += '				{{if typeCode == "BOOL"}} '
                 tableHtml += '					{{if value == "true"}}<span class="fa fa-check"></span>{{/if}} '  	            		
             	tableHtml += '				{{else typeCode == "PASSWORD"}} '    	
                 tableHtml += '					{{:value}} '                       	
                 tableHtml += '				{{else}} '  	
                 tableHtml += '					{{:value}} '                      
-                tableHtml += '				{{/if}} '                     						
+                tableHtml += '				{{/if}} '   
+                tableHtml += '				</div> '                     
+                tableHtml += '				<div class="table-organ-key">{{:key}}</div> '                                             						
             	tableHtml += '				</div> '                	          		
         		tableHtml += '			</'+'script> '
        			tableHtml += '		</th> '        		

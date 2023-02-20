@@ -188,11 +188,11 @@ public class ConfigController extends BaseUserController{
 			bindingResult.rejectValue("organGestorId", "NotNull");
 		}
 		if (!command.isJbossProperty() && StringUtils.isEmpty(command.getValue())) {
-			bindingResult.rejectValue("organGestorId", "NotEmpty");
+			bindingResult.rejectValue("value", "NotEmpty");
 		}
-		
 		if (bindingResult.hasErrors()) {
 			command.setCrear(true);
+			model.addAttribute("config", configService.findConfig(command.getKey()));
 			return "configOrganForm";
 		}
 		
@@ -230,10 +230,12 @@ public class ConfigController extends BaseUserController{
 			@Validated OrganConfigCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		
 		if (!command.isJbossProperty() && StringUtils.isEmpty(command.getValue())) {
-			bindingResult.rejectValue("organGestorId", "NotEmpty");
+			bindingResult.rejectValue("value", "NotEmpty");
 		}
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("config", configService.findConfig(command.getKey()));
 			return "configOrganForm";
 		}
 		
@@ -244,7 +246,6 @@ public class ConfigController extends BaseUserController{
 				request,
 				"redirect:../config",
 				"config.controller.organ.edit.ok");
-			
 
 	}
 	
