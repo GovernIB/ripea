@@ -95,12 +95,27 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), command.getMetaDocumentId());
 	
 		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
-			bindingResult.rejectValue("dataNaixementObligatori", "NotEmpty");
+			if (StringUtils.isEmpty(command.getDataNaixementObligatori())) {
+				bindingResult.rejectValue("dataNaixementObligatori", "NotEmpty");
+			}
+			if (command.getPaisNaixament().equals("724") && StringUtils.isEmpty(command.getMunicipiNaixament())) {
+				bindingResult.rejectValue("municipiNaixament", "NotEmpty");
+			}
+			if (!command.getPaisNaixament().equals("724") && StringUtils.isEmpty(command.getPoblacioNaixament())) {
+				bindingResult.rejectValue("poblacioNaixament", "NotEmpty");
+			}			
+			if (command.getCodiNacionalitat().equals("724") && StringUtils.isEmpty(command.getNomPare()) && StringUtils.isEmpty(command.getNomMare())) {
+				bindingResult.rejectValue("nomPare", "NotEmpty");
+			}
 		}
 			
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(request, pareId, model);
 			return "contingutPinbalForm";
+		}
+		
+		if (command.getPaisNaixament().equals("724")) {
+			command.setCodiPoblacioNaixament(command.getProvinciaNaixament() + command.getMunicipiNaixament());
 		}
 		try {
 			documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command));
@@ -235,6 +250,10 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"municipis",
 				dadesExternesService.findMunicipisPerProvinciaPinbal("07"));
+		
+		model.addAttribute(
+				"paisos",
+				dadesExternesService.findPaisos());
 		
 		
 	}

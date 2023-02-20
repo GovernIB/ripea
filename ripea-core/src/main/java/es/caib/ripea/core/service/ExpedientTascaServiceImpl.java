@@ -513,6 +513,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			Long[] annexosIds,
 			Long tascaId,
 			String transaccioId) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentId + ", " +
@@ -671,10 +672,14 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Transactional
 	@Override
 	public void processarFirmaClient(
-			String identificador,
+			Long entitatId,
+			Long documentId,
 			String arxiuNom,
-			byte[] arxiuContingut,
+			byte[] arxiuContingut, 
 			Long tascaId) {
+		String identificador = documentHelper.generarIdentificadorFirmaClient(
+				entitatId,
+				documentId);
 		logger.debug("Custodiar identificador firma applet ("
 				+ "identificador=" + identificador + ")");
 		ObjecteFirmaApplet objecte = null;

@@ -8,12 +8,13 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import es.caib.ripea.plugin.helper.RestClient;
+import lombok.extern.slf4j.Slf4j;
 
-
-
+@Slf4j
 public class UnitatsOrganitzativesRestClient extends RestClient{
 
 
@@ -51,9 +52,10 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 			params.add("fechaSincronizacion", fechaSincronizacion);
 			params.add("denominacionCooficial", "false");
 			
-			
 			String urlAmbMetode = baseUrl + "rest/unidades/obtenerArbolUnidades";
 			Client jerseyClient = generarIAuthenticarClient(urlAmbMetode);
+			
+			log.info("obtenerArbolUnidades REST request urlAmbMetode: " + urlAmbMetode + ", params: " + params);
 			
 			String json = jerseyClient.
 					resource(urlAmbMetode).
@@ -61,9 +63,14 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 					type("application/json").
 					get(String.class);
 			
-			
+			log.info("obtenerArbolUnidades REST response: " + json);
 			return getMapper().readValue(json, new TypeReference<List<UnidadRest>>(){});
-		} catch (Exception ex) {
+		} catch (Exception ex) { 
+			if (ex instanceof UniformInterfaceException) { 
+				if (((UniformInterfaceException) ex).getResponse().getStatusInfo().getStatusCode() == 204) { //com.sun.jersey.api.client.UniformInterfaceException: GET returned a response status of 204 No Content
+					return null;
+				}
+			}
 			throw new RuntimeException(ex);
 		}
 	}

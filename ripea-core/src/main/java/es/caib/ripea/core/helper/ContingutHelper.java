@@ -23,6 +23,8 @@ import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -282,9 +284,11 @@ public class ContingutHelper {
 				dto.setSistraClau(expedient.getSistraClau());
 				dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions( ).isEmpty() ? true : false);
 
-				dto.setConteDocuments(documentRepository.findByExpedientAndEsborrat(expedient, 0).size() > 0);
-				dto.setConteDocumentsEnProcessDeFirma(documentRepository.findEnProccessDeFirma(expedient).size() > 0);	
-				dto.setConteDocumentsPendentsReintentsArxiu(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments()).size() > 0);
+				dto.setConteDocuments(CollectionUtils.isNotEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0)));
+				dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));	
+				dto.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient)));	
+				dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
+				dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));	
 
 				dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
 				dto.setConteDocumentsFirmats(
@@ -302,7 +306,7 @@ public class ContingutHelper {
 					}
 				}
 
-				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressats(),InteressatDto.class));
+				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
 				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 
@@ -1823,7 +1827,20 @@ public class ContingutHelper {
 			DocumentEntity document) {
 		File fContent = new File(getBaseDir() + "/" + document.getId());
 		fContent.getParentFile().mkdirs();
-		fContent.delete();
+		if (fContent.exists()) {
+			fContent.delete();
+		}
+	}
+	
+	
+	public void firmaSeparadaEsborratEsborrar(
+			DocumentEntity document)  {
+		
+		File fContent = new File(getBaseDirFirma() + "/" + document.getId());
+		fContent.getParentFile().mkdirs();
+		if (fContent.exists()) {
+			fContent.delete();
+		}
 	}
 
 	public boolean checkUniqueContraint (String nom, ContingutEntity pare, EntitatEntity entitat, ContingutTipusEnumDto tipus) {
@@ -2042,7 +2059,7 @@ public class ContingutHelper {
 	}
 
 	
-	private int getArxiuMaxReintentsDocuments() {
+	public int getArxiuMaxReintentsDocuments() {
 		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
 	}

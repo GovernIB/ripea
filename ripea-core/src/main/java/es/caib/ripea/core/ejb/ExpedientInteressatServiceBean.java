@@ -69,8 +69,8 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 
 	@Override
 	@RolesAllowed("tothom")
-	public void delete(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual) {
-		delegate.delete(entitatId, expedientId, interessatId, representantId, rolActual);
+	public void deleteRepresentant(Long entitatId, Long expedientId, Long interessatId, Long representantId, String rolActual) {
+		delegate.deleteRepresentant(entitatId, expedientId, interessatId, representantId, rolActual);
 	}
 
 	@Override
@@ -162,6 +162,24 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 	@RolesAllowed("tothom")
 	public Long findExpedientIdByInteressat(Long interessatId) {
 		return delegate.findExpedientIdByInteressat(interessatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public InteressatDto createRepresentant(
+			Long entitatId,
+			Long expedientId,
+			Long interessatId,
+			InteressatDto interessat,
+			boolean propagarArxiu,
+			String rolActual) {
+		return delegate.createRepresentant(
+				entitatId,
+				expedientId,
+				interessatId,
+				interessat,
+				propagarArxiu,
+				rolActual);
 	}
 
 }

@@ -138,8 +138,8 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public Properties propertyFindByGroup(String codiGrup) {
-		return delegate.propertyFindByGroup(codiGrup);
+	public Properties propertiesFindByGroup(String codiGrup) {
+		return delegate.propertiesFindByGroup(codiGrup);
 	}
 
 	@Override
@@ -223,6 +223,59 @@ public class AplicacioServiceBean implements AplicacioService {
 	public void actualitzarOrganCodi(
 			String organCodi) {
 		delegate.actualitzarOrganCodi(organCodi);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public String getEntitatActualCodi() {
+		return delegate.getEntitatActualCodi();
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public String getValueForOrgan(
+			String entitatCodi,
+			String organCodi,
+			String keyGeneral) {
+		return delegate.getValueForOrgan(
+				entitatCodi,
+				organCodi,
+				keyGeneral);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi,
+			String organCodi) {
+		return delegate.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi) {
+		return delegate.getAllPropertiesEntitatOrGeneral(entitatCodi);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Properties getGroupPropertiesEntitatOrGeneral(
+			String groupCode,
+			String entitatCodi) {
+		return delegate.getGroupPropertiesEntitatOrGeneral(
+				groupCode, 
+				entitatCodi);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Properties getGroupPropertiesOrganOrEntitatOrGeneral(
+			String groupCode,
+			String entitatCodi,
+			String organCodi) {
+		return delegate.getGroupPropertiesOrganOrEntitatOrGeneral(
+				groupCode,
+				entitatCodi,
+				organCodi);
 	}
 
 

@@ -106,7 +106,7 @@ public class ConfigHelper {
 	
 
     @Transactional(readOnly = true)
-    public Properties getGroupProperties(String codeGroup) {
+    public Properties getPropertiesByGroup(String codeGroup) {
         Properties properties = new Properties();
         ConfigGroupEntity configGroup = configGroupRepository.findOne(codeGroup);
         fillGroupProperties(configGroup, properties);
@@ -182,6 +182,44 @@ public class ConfigHelper {
         return properties;
     }
     
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesEntitatOrGeneral(List<String> groupCodes, String entitatCodi) {
+    	Properties properties = new Properties();
+    	for (String groupCode : groupCodes) {
+    		properties.putAll(getGroupPropertiesEntitatOrGeneral(groupCode, entitatCodi));
+		}
+        return properties;
+    }
+    
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
+
+        Properties properties = new Properties();
+        List<ConfigEntity> configsGeneral = configRepository.findByEntitatCodiIsNullAndGroupCode(groupCode);
+        for (ConfigEntity configGeneral: configsGeneral) {
+            String value = getValueEntitatOrGeneral(entitatCodi, configGeneral.getKey());
+            if (value != null) {
+                properties.put(configGeneral.getKey(), value);
+			}
+
+        }
+        return properties;
+    }
+    
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesOrganOrEntitatOrGeneral(String groupCode, String entitatCodi, String organCodi) {
+
+        Properties properties = new Properties();
+        List<ConfigEntity> configsGeneral = configRepository.findByEntitatCodiIsNullAndGroupCode(groupCode);
+        for (ConfigEntity configGeneral: configsGeneral) {
+            String value = getValueOrganOrEntitatOrGeneral(entitatCodi, organCodi, configGeneral.getKey());
+            if (value != null) {
+                properties.put(configGeneral.getKey(), value);
+			}
+        }
+        return properties;
+    }
+    
   
 
     @Transactional(readOnly = true)
@@ -216,7 +254,7 @@ public class ConfigHelper {
     	String keyOrgan = getKeyOrgan(entitatCodi, organCodi, keyGeneral);
         ConfigEntity configOrgan = configRepository.findOne(keyOrgan);
         String value = getValue(configOrgan);
-	        if (Strings.isNullOrEmpty(value)) {
+	    if (Strings.isNullOrEmpty(value)) {
 	        String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
 	        ConfigEntity configEntitat = configRepository.findOne(keyEntitat);
 	        value = getValue(configEntitat);

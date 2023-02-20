@@ -50,6 +50,7 @@ public class PinbalConsultaCommand {
 	private String provinciaNaixament;
 	private String poblacioNaixament;
 	private String codiPoblacioNaixament;
+	private String municipiNaixament;
 	private SexeEnumDto sexe;
 	private String nomPare;
 	private String nomMare;

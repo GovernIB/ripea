@@ -31,6 +31,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -74,7 +75,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
-		configHelper.setEntitat(entitat);
+		ConfigHelper.setEntitat(entitat);
 	}
 	
 	@Override
@@ -82,6 +83,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 		ConfigHelper.setOrganCodi(organCodi);
 	}
 
+	@Override
+    @Transactional(readOnly = true)
+    public String getEntitatActualCodi() {
+        return configHelper.getEntitatActualCodi();
+    }
+	
+	
 	@Transactional
 	@Override
 	public void processarAutenticacioUsuari() {
@@ -319,10 +327,10 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 
 	@Override
-	public Properties propertyFindByGroup(String codiGrup) {
+	public Properties propertiesFindByGroup(String codiGrup) {
 		logger.debug("Consulta del valor de les properties d'un grup (" +
 				"codi grup=" + codiGrup + ")");
-		return configHelper.getGroupProperties(codiGrup);
+		return configHelper.getPropertiesByGroup(codiGrup);
 	}
 
 	@Override
@@ -394,6 +402,43 @@ public class AplicacioServiceImpl implements AplicacioService {
 		return codisUsuaris;
 	}
 	
+	
+    @Override
+    @Transactional
+	public String getValueForOrgan(
+			String entitatCodi,
+			String organCodi,
+			String keyGeneral) {
+		return configHelper.getValueForOrgan(
+				entitatCodi,
+				organCodi,
+				keyGeneral);
+	}
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi, String organCodi) {
+        return configHelper.getAllPropertiesOrganOrEntitatOrGeneral(entitatCodi, organCodi);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi) {
+        return configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi);
+    }
+    
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesEntitatOrGeneral(String groupCode, String entitatCodi) {
+        return configHelper.getGroupPropertiesEntitatOrGeneral(groupCode, entitatCodi);
+    }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Properties getGroupPropertiesOrganOrEntitatOrGeneral(String groupCode, String entitatCodi, String organCodi) {
+    	 return configHelper.getGroupPropertiesOrganOrEntitatOrGeneral(groupCode, entitatCodi, organCodi);
+    }
 	
 	
 

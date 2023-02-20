@@ -27,7 +27,7 @@ public class EntitatHelper {
 	private static final String SESSION_ATTRIBUTE_ENTITAT_ACTUAL = "EntitatHelper.entitatActual";
 	
 	private static final String REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL = "canviOrganGestor";
-	private static final String SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL = "EntitatHelper.organGestorActual";
+	private static final String SESSION_ATTRIBUTE_ORGAN_GESTOR_ACTUAL = "EntitatHelper.organGestorActual"; // current organ chosen by administrador d'organ
 	private static final String ORGANS_ACCESSIBLES= "organs.accessiblesUsuari";
 
 	public static List<EntitatDto> findEntitatsAccessibles(HttpServletRequest request) {

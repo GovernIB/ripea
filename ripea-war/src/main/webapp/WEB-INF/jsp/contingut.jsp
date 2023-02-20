@@ -2824,7 +2824,7 @@ $.views.helpers(myHelpers);
 															<span class="label label-success"><span class="fa fa-check"></span> <spring:message code="notificacio.notificacioEstat.enum.PROCESSADA"/></span>
 													{{/if}}
 												{{/if}}
-												{{if notificacioEstat == 'PROCESSADA'}}
+												{{if notificacioEstat == 'PROCESSADA' || notificacioEstat == 'FINALITZADA'}}
 												{{:~recuperarEstatEnviament(id)}}
 												<p class="estat_{{:id}}"  style="display:inline"></p>
 												{{/if}}

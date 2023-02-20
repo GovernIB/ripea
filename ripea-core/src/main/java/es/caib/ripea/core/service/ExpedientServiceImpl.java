@@ -248,7 +248,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual);
 		}
 
-		boolean expCreatArxiuOk = expedientHelper.createArxiu(expedientId);
+		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		logger.info(
@@ -1373,7 +1373,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			fila[5] = expedient.getMetaExpedient().getNom();
 			
 			String intressatsString = "";
-			for (InteressatEntity interessat : expedient.getInteressats()) {
+			for (InteressatEntity interessat : expedient.getInteressatsORepresentants()) {
 				intressatsString += interessat.getIdentificador() + " (" + interessat.getDocumentNum() + ") | ";
 			}
 			intressatsString = intressatsString.replaceAll(",","");

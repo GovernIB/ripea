@@ -552,8 +552,12 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		
-		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
-		expedientPeticioEntity.setMetaExpedient(metaExpedient);
+		if (procedimentId != null) {
+			MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
+			expedientPeticioEntity.updateMetaExpedient(metaExpedient);
+		} else {
+			expedientPeticioEntity.updateMetaExpedient(null);
+		}
 	
 	}
 	
@@ -642,7 +646,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		boolean alreadyExists = false;
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
-		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressats();
+		Set<InteressatEntity> existingInteressats = expedientEntity.getInteressatsORepresentants();
 		//### Si alguns dels interessats existeix sol·licitar confirmació usuari
 		for (RegistreInteressatEntity registreInteressatEntity : expedientPeticioEntity.getRegistre().getInteressats()) {
 			for (InteressatEntity interessatExpedient : existingInteressats) {

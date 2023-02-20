@@ -242,56 +242,19 @@ public class ContingutServiceImpl implements ContingutService {
 					cont.getPare().getFills().remove(cont);
 				}
 				if (cont instanceof DocumentEntity) {
-					DocumentEntity documentEntity = (DocumentEntity) cont;
-					if (documentEntity.getGesDocAdjuntId() != null ) {
-						pluginHelper.gestioDocumentalDelete(
-								documentEntity.getGesDocAdjuntId(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-					}
-					if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
-						pluginHelper.gestioDocumentalDelete(
-								documentEntity.getGesDocAdjuntFirmaId(),
-								PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-					}
-					if (contingutHelper.fitxerDocumentEsborratLlegir(documentEntity) != null) {
-						contingutHelper.fitxerDocumentEsborratEsborrar(documentEntity);
-					}
-				} 
-				contingutRepository.delete(cont);
+					documentHelper.deleteDefinitiu((DocumentEntity) cont);
+				} else {
+					contingutRepository.delete(cont);
+				}
+				
 			}
+		} else if (contingut instanceof DocumentEntity) {
+			documentHelper.deleteDefinitiu((DocumentEntity) contingut);
+		} else {
+			contingutRepository.delete(contingut);
 		}
-		
-		if (contingut instanceof DocumentEntity) {
-			DocumentEntity documentEntity = (DocumentEntity) contingut;
-			
-			if (documentEntity.getGesDocAdjuntId() != null ) {
-				pluginHelper.gestioDocumentalDelete(
-						documentEntity.getGesDocAdjuntId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-			}
-			if (documentEntity.getGesDocAdjuntFirmaId() != null ) {
-				pluginHelper.gestioDocumentalDelete(
-						documentEntity.getGesDocAdjuntFirmaId(),
-						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
-			}
-			
-			if (contingutHelper.fitxerDocumentEsborratLlegir(documentEntity) != null) {
-				contingutHelper.fitxerDocumentEsborratEsborrar(documentEntity);
-			}
-			
-		}
-		
-		contingutRepository.delete(contingut);
-//		// Propaga l'acció a l'arxiu
-//		contingutHelper.arxiuPropagarEliminacio(contingut);
-//		// Registra al log l'eliminació definitiva del contingut
-//		contingutLogHelper.log(
-//				contingut,
-//				LogTipusEnumDto.ELIMINACIODEF,
-//				null,
-//				null,
-//				true,
-//				true);
+
+
 		return dto;
 	}
 	

@@ -16,7 +16,7 @@
             <c:set var = "disabled" value = "${config.jbossProperty || empty config.value ? 'disabled' : ''}"/>
             <div class="padding-top-bottom">
                 <label id="${configKey}_codi_entitat" for="${configKey}" class="col-sm-3 control-label label-config ${textGray}" style="word-wrap: break-word;">${ config.description }</label>
-                <div class="col-sm-8 padding-top-7">
+                <div class="col-sm-8 padding-top-7 div-form-control">
                     <c:choose>
                         <c:when test="${config.typeCode == 'INT'}">
                             <input id="${configKey}" class="form-control entitat-input" type="number" maxlength="2048" value="${config.value}"

@@ -174,7 +174,7 @@ public interface AplicacioService {
 	 * 
 	 * @return els valors com a un objecte Properties.
 	 */
-	Properties propertyFindByGroup(String codiGrup);
+	Properties propertiesFindByGroup(String codiGrup);
 
 	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
 	String propertyFindByNom(String nom);
@@ -215,6 +215,32 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public void actualitzarOrganCodi(
+			String organCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getEntitatActualCodi();
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getValueForOrgan(String entitatCodi,
+			String organCodi,
+			String keyGeneral);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getAllPropertiesOrganOrEntitatOrGeneral(String entitatCodi,
+			String organCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getAllPropertiesEntitatOrGeneral(String entitatCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getGroupPropertiesEntitatOrGeneral(
+			String groupCode,
+			String entitatCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Properties getGroupPropertiesOrganOrEntitatOrGeneral(
+			String groupCode,
+			String entitatCodi,
 			String organCodi);
 
 }

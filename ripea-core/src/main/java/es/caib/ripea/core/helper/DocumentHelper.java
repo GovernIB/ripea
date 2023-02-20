@@ -55,6 +55,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
 
 /**
@@ -85,6 +86,8 @@ public class DocumentHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private DocumentFirmaAppletHelper firmaAppletHelper;
 	
 	public DocumentDto crearDocument(
 			DocumentDto document,
@@ -835,17 +838,28 @@ public class DocumentHelper {
 		documentEntity.setArxiuUuidFirma(null);
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public void clearDocuments(ExpedientEntity expedient) {
-		// remove deleted documents in db and clear uuids of any firma for esborrany
-		List<DocumentEntity> docs = documentRepository.findByExpedient(expedient);
-		for (DocumentEntity doc : docs) {
-			if (doc.getEsborrat() == 0) {
-				doc.setArxiuUuidFirma(null);
-			} else {
-				documentRepository.delete(doc);
-			}
-		}
+
+
+
+
+	public void deleteDefinitiu(DocumentEntity document) {
+
+		pluginHelper.gestioDocumentalDelete(
+				document.getGesDocAdjuntId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+		
+		pluginHelper.gestioDocumentalDelete(
+				document.getGesDocAdjuntFirmaId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS);
+
+		pluginHelper.gestioDocumentalDelete(
+				document.getGesDocFirmatId(),
+				PluginHelper.GESDOC_AGRUPACIO_DOCS_FIRMATS_PORTAFIB);
+
+		contingutHelper.fitxerDocumentEsborratEsborrar(document);
+		contingutHelper.firmaSeparadaEsborratEsborrar(document);
+		
+		documentRepository.delete(document);
 	}
 	
 	
@@ -1021,7 +1035,7 @@ public class DocumentHelper {
 	}
 	
 	
-	public List<DocumentEntity> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentEntity> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId) {
 		logger.debug("Obtenint els documents no firmats o amb firma invalida (" +
@@ -1040,7 +1054,7 @@ public class DocumentHelper {
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentEntity> documentsChosen = new ArrayList<DocumentEntity>();
 		for (DocumentEntity document: documents) {
-			if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || document.getArxiuUuid() == null) {
+			if (document.getEstat() == DocumentEstatEnumDto.REDACCIO || document.getArxiuUuid() == null ) {
 				documentsChosen.add(document);
 			}
 		}
@@ -1165,6 +1179,38 @@ public class DocumentHelper {
 					"El contingut especificat no és un document");
 		}
 		return (DocumentEntity)node;
+	}
+	
+	
+	public String generarIdentificadorFirmaClient(
+			Long entitatId,
+			Long id) {
+		logger.debug("Generar identificador firma al navegador ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				id,
+				true,
+				false);
+		try {
+			return firmaAppletHelper.firmaClientXifrar(
+					firmaAppletHelper.obtainInstanceObjecteFirmaApplet( 
+							new Long(System.currentTimeMillis()),
+							entitatId,
+							id));
+		} catch (Exception ex) {
+			logger.error(
+					"Error al generar l'identificador per la firma al navegador (" +
+					"entitatId=" + entitatId + ", " +
+					"documentId=" + id + ")",
+					ex);
+			throw new RuntimeException(
+					"Error al generar l'identificador per la firma al navegador (" +
+					"entitatId=" + entitatId + ", " +
+					"documentId=" + id + ")",
+					ex);
+		}
 	}
 	
 	

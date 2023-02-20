@@ -12,12 +12,12 @@ import org.fundaciobit.plugins.signatureweb.api.SignaturesSetWeb;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public class PassarelaFirmaConfig extends SignaturesSetWeb {
+public class SignaturesSetExtend extends SignaturesSetWeb {
 
-	protected Long pluginId = null;
+	protected String pluginId = null;
 	protected final String urlFinalRipea;
 
-	public PassarelaFirmaConfig(
+	public SignaturesSetExtend(
 			String signaturesSetId,
 			Date expiryDate,
 			CommonInfoSignature commonInfoSignature,
@@ -32,10 +32,10 @@ public class PassarelaFirmaConfig extends SignaturesSetWeb {
 		this.urlFinalRipea = urlFinalRipea;
 	}
 
-	public Long getPluginId() {
+	public String getPluginId() {
 		return pluginId;
 	}
-	public void setPluginId(Long pluginId) {
+	public void setPluginId(String pluginId) {
 		this.pluginId = pluginId;
 	}
 	public String getUrlFinalRipea() {

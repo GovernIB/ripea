@@ -30,4 +30,8 @@ public class Utils {
 		return value == null || value.isEmpty() ? null : value.trim();
 	}
 	
+	public static boolean isNotNullAndEqual(String object1, String object2) {
+		return object1 != null && object2 != null && object1.equals(object2);
+	}
+	
 }

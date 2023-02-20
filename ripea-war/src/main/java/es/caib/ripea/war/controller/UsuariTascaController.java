@@ -88,7 +88,7 @@ import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
+import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -927,14 +927,11 @@ public class UsuariTascaController extends BaseUserController {
 			return "passarelaFirmaForm";
 		}
 		if (!command.getFirma().isEmpty()) {
-			String identificador = documentService.generarIdentificadorFirmaClient(
-					entitatActual.getId(),
-					documentId);
 			expedientTascaService.processarFirmaClient(
-					identificador,
+					null,
+					null,
 					command.getFirma().getOriginalFilename(),
-					command.getFirma().getBytes(),
-					tascaId);
+					command.getFirma().getBytes(), tascaId);
 			MissatgesHelper.success(
 					request,
 					getMessage(
@@ -951,7 +948,7 @@ public class UsuariTascaController extends BaseUserController {
 					documentId);
 			UsuariDto usuariActual = aplicacioService.getUsuariActual();
 			String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-			String procesFirmaUrl = passarelaFirmaHelper.iniciarProcesDeFirma(
+			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSet(
 					request,
 					fitxerPerFirmar,
 					usuariActual.getNif(),
@@ -974,9 +971,11 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long documentId,
 			@RequestParam("signaturesSetId") String signaturesSetId,
 			Model model) throws IOException {
-		PassarelaFirmaConfig signaturesSet = passarelaFirmaHelper.finalitzarProcesDeFirma(
+		SignaturesSetExtend signaturesSet = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
+		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
+		
 		StatusSignaturesSet status = signaturesSet.getStatusSignaturesSet();
 		switch (status.getStatus()) {
 		case StatusSignaturesSet.STATUS_FINAL_OK:
@@ -1001,10 +1000,10 @@ public class UsuariTascaController extends BaseUserController {
 							tascaId,
 							documentId);
 					expedientTascaService.processarFirmaClient(
-							identificador,
+							null,
+							null,
 							firmaStatus.getSignedData().getName(),
-							IOUtils.toByteArray(fis),
-							tascaId);
+							IOUtils.toByteArray(fis), tascaId);
 					MissatgesHelper.success(
 							request,
 							getMessage(
@@ -1043,7 +1042,7 @@ public class UsuariTascaController extends BaseUserController {
 							request, 
 							"document.controller.firma.passarela.final.desconegut"));
 		}
-		passarelaFirmaHelper.closeSignaturesSet(
+		passarelaFirmaHelper.closeTransactionInWS(
 				request,
 				signaturesSet);
 		boolean ignorarModal = false;
@@ -1052,7 +1051,7 @@ public class UsuariTascaController extends BaseUserController {
 			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
 			for (String ignorarModalId: ignorarModalIds) {
 				if (StringUtils.isNumeric(ignorarModalId)) {
-					if (new Long(ignorarModalId).longValue() == signaturesSet.getPluginId().longValue()) {
+					if (ignorarModalId == signaturesSet.getPluginId()) {
 						ignorarModal = true;
 						break;
 					}

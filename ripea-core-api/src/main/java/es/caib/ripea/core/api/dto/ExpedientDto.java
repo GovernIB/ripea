@@ -42,6 +42,8 @@ public class ExpedientDto extends NodeDto {
 	private boolean conteDocuments;
 	private boolean conteDocumentsFirmats;
 	private boolean conteDocumentsEnProcessDeFirma;
+	private boolean conteDocumentsDePortafirmesNoCustodiats;
+	private boolean conteDocumentsDeAnotacionesNoMogutsASerieFinal;
 	private long numComentaris;
 	private ExpedientEstatDto expedientEstat;
 	private Long expedientEstatId;

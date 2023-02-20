@@ -327,7 +327,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		
 		String msgKey = "interessat.controller.representant.afegit.ok";
 		if (interessatCommand.getId() == null) {
-			InteressatDto representant = expedientInteressatService.create(
+			InteressatDto representant = expedientInteressatService.createRepresentant(
 					entitatActual.getId(),
 					expedientId,
 					interessatId,
@@ -366,7 +366,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long representantId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		expedientInteressatService.delete(
+		expedientInteressatService.deleteRepresentant(
 				entitatActual.getId(),
 				expedientId,
 				interessatId,

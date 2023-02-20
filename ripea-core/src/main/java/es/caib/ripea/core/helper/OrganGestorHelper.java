@@ -33,6 +33,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientOrganPareEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
@@ -43,6 +44,7 @@ import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
@@ -76,6 +78,8 @@ public class OrganGestorHelper {
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
@@ -483,6 +487,31 @@ public class OrganGestorHelper {
 		return annexEntity.getRegistre().getDestiCodi();
 	}
 	
+	
+	@Transactional
+	public String getOrganCodiFromMetaDocumentId(Long metaDocumentId) {
+		String organCodi = null;
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(metaDocumentId);
+		MetaExpedientEntity metaExpedient = metaDocument.getMetaExpedient();
+		if (metaExpedient != null) {
+			OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+			if (organGestor != null) {
+				organCodi = organGestor.getCodi();
+			}
+		}
+		return organCodi;
+	}
+	
+	@Transactional
+	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId) {
+		String organCodi = null;
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
+		OrganGestorEntity organGestor = metaExpedient.getOrganGestor();
+		if (organGestor != null) {
+			organCodi = organGestor.getCodi();
+		}
+		return organCodi;
+	}
 	
 
 	private String organsToCodiList(List<OrganGestorEntity> organs) {

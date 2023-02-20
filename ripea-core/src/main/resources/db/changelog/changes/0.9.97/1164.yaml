@@ -133,6 +133,33 @@ databaseChangeLog:
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.document.propagar.modificacio.arxiu';                 
                 update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu';  
                 
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.versio.antiga';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.ids';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.ignorar.modal.ids';
+                                
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.1.class';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.1.nom';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.1.desc';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.1.plugins.signatureweb.portafib.api_passarela_url';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.1.plugins.signatureweb.portafib.api_passarela_username';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.1.plugins.signatureweb.portafib.api_passarela_password';
+                     
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.2.class';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.2.nom';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.2.desc';
+                   
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.class';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.nom';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.desc';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.plugins.signatureweb.miniappletinserver.base_dir';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.passarelafirma.3.plugins.signatureweb.miniappletinserver.ignore_certificate_filter';
+                                
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.class';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.portafib.base.url';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.portafib.username';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.portafib.password';
+                update ipa_config set configurable_organ = ${booleanUnit} where key = 'es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio';
+                
                 
                 update ipa_config set configurable = ${booleanFalse}, configurable_entitat_actiu = ${booleanFalse} where key = 'es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients';
                 delete from ipa_config where entitat_codi is not null and key like '%'||'segonpla.guardar.arxiu.max.reintents.expedients';

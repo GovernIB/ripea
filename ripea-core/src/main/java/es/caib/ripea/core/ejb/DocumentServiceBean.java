@@ -297,13 +297,15 @@ public class DocumentServiceBean implements DocumentService {
 	@Override
 	@RolesAllowed("tothom")
 	public void processarFirmaClient(
-			String identificador,
-			String arxiuNom,
+			Long entitatId,
+			Long documentId,
+			String arxiuNom, 
 			byte[] arxiuContingut, 
 			String rolActual) {
 		delegate.processarFirmaClient(
-				identificador,
-				arxiuNom,
+				entitatId,
+				documentId,
+				arxiuNom, 
 				arxiuContingut, 
 				rolActual);
 	}
@@ -441,10 +443,10 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId) {
-		return delegate.findDocumentsNoFirmatsOAmbFirmaInvalida(
+		return delegate.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatId,
 				expedientId);
 	}

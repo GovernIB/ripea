@@ -68,7 +68,7 @@ public class ConfigServiceImpl implements ConfigService {
         log.info(String.format("Actualització valor propietat %s a %s ", property.getKey(), property.getValue()));
         ConfigEntity configEntity = configRepository.findOne(property.getKey());
         configEntity.update(!"null".equals(property.getValue()) ? property.getValue() : null);
-        pluginHelper.reloadProperties(configEntity.getGroupCode());
+//        pluginHelper.reloadProperties(configEntity.getGroupCode());
         pluginHelper.resetPlugins();
        // cacheHelper.clearAllCaches();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
@@ -97,7 +97,7 @@ public class ConfigServiceImpl implements ConfigService {
         }
         
         
-        pluginHelper.reloadProperties(configEntity.getGroupCode());
+//        pluginHelper.reloadProperties(configEntity.getGroupCode());
         pluginHelper.resetPlugins();
     }
     
@@ -111,7 +111,7 @@ public class ConfigServiceImpl implements ConfigService {
         	confOrgan.setValue(property.getValue());
         }
         
-        pluginHelper.reloadProperties(confOrgan.getGroupCode());
+//        pluginHelper.reloadProperties(confOrgan.getGroupCode());
         pluginHelper.resetPlugins();
     }
     
@@ -125,7 +125,7 @@ public class ConfigServiceImpl implements ConfigService {
         	configRepository.delete(confOrgan);
         }
         
-        pluginHelper.reloadProperties(confOrgan.getGroupCode());
+//        pluginHelper.reloadProperties(confOrgan.getGroupCode());
         pluginHelper.resetPlugins();
     }
     
@@ -203,7 +203,7 @@ public class ConfigServiceImpl implements ConfigService {
             ConfigEntity configEntity = configRepository.findOne(key);
             if (configEntity != null) {
                 configEntity.update(value);
-                pluginHelper.reloadProperties(configEntity.getGroupCode());
+//                pluginHelper.reloadProperties(configEntity.getGroupCode());
                 if (configEntity.getKey().endsWith(".class")){
                     pluginHelper.resetPlugins();
                 }
@@ -297,6 +297,8 @@ public class ConfigServiceImpl implements ConfigService {
         }
     }
 
+
+    
     @Override
     @Transactional
     public void crearPropietatsConfigPerEntitats() {

@@ -43,7 +43,8 @@ public class ExecucioMassivaHelper{
 	private PluginHelper pluginHelper;
 	@Autowired
 	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
-
+	@Autowired
+	private OrganGestorHelper organGestorHelper;
 	
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -99,7 +100,10 @@ public class ExecucioMassivaHelper{
 	
 	
 	public Throwable enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
+		
+
 		ContingutEntity contingut = emc.getContingut();
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		Throwable exc = null;
 		try {
 			emc.updateDataInici(new Date());

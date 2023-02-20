@@ -90,9 +90,6 @@ public class GestioDocumentalPluginFilesystem extends RipeaAbstractPluginPropert
 			fContent.getParentFile().mkdirs();
 			if (fContent.exists()) {
 				fContent.delete();
-			} else {
-				throw new SistemaExternException(
-						"No s'ha trobat l'arxiu (id=" + id + ")");
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(

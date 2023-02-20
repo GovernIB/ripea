@@ -111,6 +111,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			ExpedientEntity expedient,
 			int esborrat);
 	
+	
 	List<DocumentEntity> findByExpedient(
 			ExpedientEntity expedient);
 	
@@ -121,10 +122,43 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    DocumentEntity d " +
 			"where " +
 			"	 d.expedient = :expedient "  + 
+			"and d.esborrat = 0 " +
 			"and d.arxiuEstat = :arxiuEstat ")
 	List<DocumentEntity> findByExpedientAndArxiuEstat(
 			@Param("expedient") ExpedientEntity expedient,
 			@Param("arxiuEstat") ArxiuEstatEnumDto arxiuEstat);
+	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.expedient.id = :expedientId " )
+	List<DocumentEntity> findByExpedientId(
+			@Param("expedientId") Long expedientId);
+	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.expedient.id = :expedientId " + 
+			"and d.esborrat != 0 ")
+	List<DocumentEntity> findDeleted(
+			@Param("expedientId") Long expedientId);
+	
+	
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"	 d.expedient = :expedient "  + 
+			"and d.esborrat = 0 " +
+			"and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.ESBORRANY " + 
+			"and d.documentFirmaTipus != es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto.SENSE_FIRMA ")
+	List<Long> findPendentsDeMarcarComADefinitius(
+			@Param("expedient") ExpedientEntity expedient);
 	
 	@Query(	"select " +
 			"    c " +
@@ -138,6 +172,19 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	or c.estat = es.caib.ripea.core.api.dto.DocumentEstatEnumDto.FIRMA_PARCIAL)")
 	List<DocumentEntity> findEnProccessDeFirma(
 			@Param("expedient") ExpedientEntity expedient);
+	
+	
+	@Query(	"select " +
+			"    d " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"    d.expedient = :expedient " +
+			"and d.esborrat = 0 " +
+			"and d.gesDocFirmatId is not null")
+	List<DocumentEntity> findDocumentsDePortafirmesNoCustodiats(
+			@Param("expedient") ExpedientEntity expedient);
+	
 	
 	
 	@Query(	"select " +
@@ -491,13 +538,13 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	@Query(	"select " +
 			"    d " +
 			"from " +
-			"    DocumentEntity d inner join d.contingut c1 " + // d.contingut c is used in ordenacioMap
+			"    DocumentEntity d inner join d.contingut c1 " + // d.contingut c1 is used in ordenacioMap
 			"	 left join d.annexos a " + 
 			"where " +
 			"	 c1.esborrat = 0 " +
 			"and (c1.arxiuUuid = null " + //documents uploaded manually in ripea that were not saved in arxiu
 			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
-			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and was not saved in arxiu 		
+			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
 			"and d.entitat = :entitat " +
 			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +

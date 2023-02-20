@@ -558,9 +558,8 @@ public interface DocumentService {
 
 	/**
 	 * Envia a custòdia un document firmat al navegador.
-	 * 
-	 * @param identificador
-	 *            Identificador del document generat amb anterioritat.
+	 * @param entitatId TODO
+	 * @param documentId TODO
 	 * @param arxiuNom
 	 *            Nom de l'arxiu firmat.
 	 * @param arxiuContingut
@@ -573,9 +572,9 @@ public interface DocumentService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public void processarFirmaClient(
-			String identificador,
-			String arxiuNom,
-			byte[] arxiuContingut, String rolActual) throws NotFoundException, SistemaExternException;
+			Long entitatId,
+			Long documentId,
+			String arxiuNom, byte[] arxiuContingut, String rolActual) throws NotFoundException, SistemaExternException;
 
 	FitxerDto descarregarImprimible(Long entitatId, Long id, String versio);
 	
@@ -676,7 +675,7 @@ public interface DocumentService {
 			Long metaDocumentId);
 
 	@PreAuthorize("hasRole('tothom')")
-	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalida(
+	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId);
 

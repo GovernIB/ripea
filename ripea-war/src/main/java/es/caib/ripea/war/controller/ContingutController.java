@@ -121,8 +121,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		
-		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
+		String organCodi = organGestorService.getOrganCodiFromContingutId(contingutId);
+		SessioHelper.setOrganActual(request, organCodi);
+		organGestorService.actualitzarOrganCodi(organCodi);
 		
 		try {
 			

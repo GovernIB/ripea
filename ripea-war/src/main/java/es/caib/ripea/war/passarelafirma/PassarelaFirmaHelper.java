@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.CommonInfoSignature;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
 import org.fundaciobit.plugins.signature.api.ITimeStampGenerator;
@@ -31,8 +32,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.base.Strings;
+
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 
 /**
  * Classes s'ajuda per a les accions de la passarel·la de firma.
@@ -44,15 +49,22 @@ public class PassarelaFirmaHelper {
 
 	public static final String CONTEXTWEB = "/firmapassarela";
 
+
+	@Autowired
+	private ConfigService configService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	@Autowired
 	private AplicacioService aplicacioService;
-
-	private Map<String, PassarelaFirmaConfig> signaturesSetsMap = new HashMap<String, PassarelaFirmaConfig>();
 	private long lastCheckFirmesCaducades = 0;
+	private static final Object lock = new Object();
+	
+	private Map<String, SignaturesSetExtend> signaturesSets = new HashMap<String, SignaturesSetExtend>();
+	private Map<String, ISignatureWebPluginWrapper> plugins = new HashMap<String, ISignatureWebPluginWrapper>();
 
 
 
-	public String iniciarProcesDeFirma(
+	public String generateSignaturesSet(
 			HttpServletRequest request,
 			FitxerDto fitxerPerFirmar,
 			String destinatariNif,
@@ -99,58 +111,64 @@ public class PassarelaFirmaHelper {
 				false, // userRequiresTimeStamp,
 				null, // timeStampGenerator,
 				null); // svcsi
-		PassarelaFirmaConfig signaturesSet = new PassarelaFirmaConfig(
+		SignaturesSetExtend signaturesSet = new SignaturesSetExtend(
 				signaturesSetId,
 				caducitat.getTime(),
 				commonInfoSignature,
 				new FileInfoSignature[] {fis},
 				urlFinal,
 				urlFinalRipea);
-		startSignatureProcess(signaturesSet);
+		
+		synchronized (lock) {
+			signaturesSets.put(signaturesSetId, signaturesSet);
+		}
+		
 		return CONTEXTWEB + "/selectsignmodule/" + signaturesSetId;
 	}
 
-	public List<PassarelaFirmaPlugin> getAllPlugins(
+	public List<ISignatureWebPluginWrapper> instanciatePlugins(
 			HttpServletRequest request,
 			String signaturesSetId) throws Exception {
-		PassarelaFirmaConfig signaturesSet = getSignaturesSet(request, signaturesSetId);
-		List<PassarelaFirmaPlugin> plugins = getAllPluginsFromProperties();
-		if (plugins == null || plugins.size() == 0) {
-			String msg = "S'ha produit un error llegint els plugins o no se n'han definit.";
+		
+		SignaturesSetExtend signaturesSet = getSignaturesSet(request, signaturesSetId);
+		
+		List<ISignatureWebPluginWrapper> pluginsWrappers = new ArrayList<ISignatureWebPluginWrapper>();
+		String idsStr = aplicacioService.propertyPluginPassarelaFirmaIds();
+		String[] ids = idsStr.split(",");
+		if (ids == null ) {
+			String msg = "No se n'han definit els plugins.";
 			throw new Exception(msg);
 		}
-		List<PassarelaFirmaPlugin> pluginsFiltered = new ArrayList<PassarelaFirmaPlugin>();
-		ISignatureWebPlugin signaturePlugin;
-		for (PassarelaFirmaPlugin pluginDeFirma: plugins) {
-			// 1.- Es pot instanciar el plugin ?
-			signaturePlugin = getInstanceByPluginId(pluginDeFirma.getPluginId());
-			if (signaturePlugin == null) {
-				throw new Exception("No s'ha pogut instanciar el plugin amb id " + pluginDeFirma.getPluginId());
-			}
-			// 2.- Passa el filtre ...
-			String filter = signaturePlugin.filter(request, signaturesSet, null);
+		
+		for (String id: ids) {
+			
+			// 1.- Instanciar el plugin
+			ISignatureWebPluginWrapper pluginWrapper = getPluginWrapper(id);
+			ISignatureWebPlugin plugin = pluginWrapper.getPlugin();
+			
+			// 2.- Passa el filtre
+			String filter = plugin.filter(request, signaturesSet, null);
 			if (filter == null) {
-				pluginsFiltered.add(pluginDeFirma);
+				pluginsWrappers.add(pluginWrapper);
 			} else {
-				log.info("Exclos plugin [" + pluginDeFirma.getNom() + "]: NO PASSA FILTRE: " + filter);
+				log.info("Exclos plugin [" + pluginWrapper.getNom() + "]: NO PASSA FILTRE: " + filter);
 			}
 		}
-		return pluginsFiltered;
+		
+		return pluginsWrappers;
 	}
 
-	public String getPluginUrl(
+	public String openTransactionInWS(
 			HttpServletRequest request,
 			String signaturesSetId) throws Exception {
-		PassarelaFirmaConfig signaturesSet = getSignaturesSet(request, signaturesSetId);
-		Long pluginId = signaturesSet.getPluginId();
-		// El plugin existeix?
-		ISignatureWebPlugin signaturePlugin = getInstanceByPluginId(pluginId);
-		if (signaturePlugin == null) {
-			String msg = "plugin.signatureweb.noexist: " + String.valueOf(pluginId);
-			throw new Exception(msg);
-		}
-		String pluginUrl;
-		pluginUrl = signaturePlugin.signDocuments(
+		SignaturesSetExtend signaturesSet = getSignaturesSet(request, signaturesSetId);
+		String pluginId = signaturesSet.getPluginId();
+
+		ISignatureWebPlugin signaturePlugin = getPluginWrapper(pluginId).getPlugin();
+
+		// Open transaction in WS
+		// put SignaturesSet in map in plugin
+		String pluginUrl = signaturePlugin.signDocuments(
 				request,
 				getRequestPluginBaseUrl(
 						getAbsoluteControllerBase(
@@ -169,25 +187,16 @@ public class PassarelaFirmaHelper {
 		return pluginUrl;
 	}
 
-	public void requestPlugin(
+	public void loadResultFromWS(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			String signaturesSetId,
 			int signatureIndex,
 			String query) throws Exception {
-		PassarelaFirmaConfig ss = getSignaturesSet(request, signaturesSetId);
-		long pluginId = ss.getPluginId();
-		ISignatureWebPlugin signaturePlugin;
-		try {
-			signaturePlugin = getInstanceByPluginId(pluginId);
-		} catch (Exception e) {
-			String msg = "plugin.signatureweb.noexist: " + String.valueOf(pluginId);
-			throw new Exception(msg);
-		}
-		if (signaturePlugin == null) {
-			String msg = "plugin.signatureweb.noexist: " + String.valueOf(pluginId);
-			throw new Exception(msg);
-		}
+		SignaturesSetExtend ss = getSignaturesSet(request, signaturesSetId);
+		String pluginId = ss.getPluginId();
+		ISignatureWebPlugin signaturePlugin = getPluginWrapper(pluginId).getPlugin();
+
 		String absoluteRequestPluginBasePath = getRequestPluginBaseUrl(
 				getAbsoluteControllerBase(
 						request,
@@ -221,15 +230,10 @@ public class PassarelaFirmaHelper {
 		}
 	}
 
-	public PassarelaFirmaConfig finalitzarProcesDeFirma(
-			HttpServletRequest request,
-			String signaturesSetId) {
-		PassarelaFirmaConfig pss = getSignaturesSet(request, signaturesSetId);
-		// Check pss is null
-		if (pss == null) {
-			String msg = "moduldefirma.caducat: " + signaturesSetId;
-			throw new RuntimeException(msg);
-		}
+	
+	public SignaturesSetExtend setStatusFinalitzat(
+			SignaturesSetExtend pss) {
+
 		StatusSignaturesSet sss = pss.getStatusSignaturesSet();
 		if (sss.getStatus() == StatusSignaturesSet.STATUS_INITIALIZING
 				|| sss.getStatus() == StatusSignaturesSet.STATUS_IN_PROGRESS) {
@@ -240,9 +244,24 @@ public class PassarelaFirmaHelper {
 		return pss;
 	}
 
-	public PassarelaFirmaConfig getSignaturesSet(
+	public SignaturesSetExtend getSignaturesSet(
 			HttpServletRequest request,
 			String signaturesSetId) {
+		
+		clearExpiredSignaturesSet(request, signaturesSetId);
+		
+		SignaturesSetExtend pss = signaturesSets.get(signaturesSetId);
+		
+		if (pss == null) {
+			throw new RuntimeException("moduldefirma.caducat: " + signaturesSetId);
+		}
+		return pss;
+	}
+	
+	private void clearExpiredSignaturesSet(
+			HttpServletRequest request,
+			String signaturesSetId) {
+		
 		// Fer net peticions caducades SignaturesSet.getExpiryDate()
 		// Check si existeix algun proces de firma caducat s'ha d'esborrar
 		// Com a mínim cada minut es revisa si hi ha caducats
@@ -250,10 +269,10 @@ public class PassarelaFirmaHelper {
 		final long un_minut_en_ms = 60 * 60 * 1000;
 		if (now + un_minut_en_ms > lastCheckFirmesCaducades) {
 			lastCheckFirmesCaducades = now;
-			List<PassarelaFirmaConfig> keysToDelete = new ArrayList<PassarelaFirmaConfig>();
-			Set<String> ids = signaturesSetsMap.keySet();
+			List<SignaturesSetExtend> keysToDelete = new ArrayList<SignaturesSetExtend>();
+			Set<String> ids = signaturesSets.keySet();
 			for (String id : ids) {
-				PassarelaFirmaConfig ss = signaturesSetsMap.get(id);
+				SignaturesSetExtend ss = signaturesSets.get(id);
 				if (now > ss.getExpiryDate().getTime()) {
 					keysToDelete.add(ss);
 					SimpleDateFormat sdf = new SimpleDateFormat();
@@ -262,38 +281,33 @@ public class PassarelaFirmaHelper {
 				}
 			}
 			if (keysToDelete.size() != 0) {
-				synchronized (signaturesSetsMap) {
+				synchronized (lock) {
 
-					for (PassarelaFirmaConfig pss : keysToDelete) {
-						closeSignaturesSet(request, pss);
+					for (SignaturesSetExtend pss : keysToDelete) {
+						closeTransactionInWS(request, pss);
 					}
 				}
 			}
 		}
-		return signaturesSetsMap.get(signaturesSetId);
 	}
+	
 
-	public void closeSignaturesSet(HttpServletRequest request, PassarelaFirmaConfig pss) {
-		Long pluginId = pss.getPluginId();
+
+	public void closeTransactionInWS(HttpServletRequest request, SignaturesSetExtend pss) {
+		String pluginId = pss.getPluginId();
 		final String signaturesSetId = pss.getSignaturesSetID();
 		if (pluginId != null) {
-			ISignatureWebPlugin signaturePlugin = null;
+			ISignatureWebPlugin signaturePlugin = getPluginWrapper(pluginId).getPlugin();
+
 			try {
-				signaturePlugin = getInstanceByPluginId(pluginId);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-				return;
-			}
-			if (signaturePlugin == null) {
-				log.error("plugin.signatureweb.noexist: " + String.valueOf(pluginId));
-			}
-			try {
+				// Close transaction in WS
+				// Remove SignaturesSet from map in plugin
 				signaturePlugin.closeSignaturesSet(request, signaturesSetId);
 			} catch (Exception e) {
 				log.error("Error borrant dades d'un SignaturesSet " + signaturesSetId + ": " + e.getMessage(), e);
 			}
 		}
-		signaturesSetsMap.remove(signaturesSetId);
+		signaturesSets.remove(signaturesSetId);
 	}
 
 	// -------------------------------------------------------------------------
@@ -302,12 +316,6 @@ public class PassarelaFirmaHelper {
 	// -------------------------------------------------------------------------
 	// -------------------------------------------------------------------------
 
-	private void startSignatureProcess(PassarelaFirmaConfig signaturesSet) {
-		synchronized (signaturesSetsMap) {
-			final String signaturesSetId = signaturesSet.getSignaturesSetID();
-			signaturesSetsMap.put(signaturesSetId, signaturesSet);
-		}
-	}
 
 	private long generateUniqueSignaturesSetId() {
 		long id;
@@ -336,6 +344,7 @@ public class PassarelaFirmaHelper {
 		return f;
 	}
 
+	@SuppressWarnings("deprecation")
 	private FileInfoSignature getFileInfoSignature(
 			String signatureId,
 			File fileToSign,
@@ -402,100 +411,120 @@ public class PassarelaFirmaHelper {
 		return fis;
 	}
 
-	private List<PassarelaFirmaPlugin> plugins;
-	private static final String PROPERTIES_BASE = "es.caib.ripea.plugin.passarelafirma.";
-	private List<PassarelaFirmaPlugin> getAllPluginsFromProperties() {
-		if (plugins != null) {
-			return plugins;
 
-		}
-		String idsStr = aplicacioService.propertyPluginPassarelaFirmaIds();
-		String[] ids = idsStr.split(",");
-		plugins = new ArrayList<PassarelaFirmaPlugin>();
-		for (String id: ids) {
-			String base = PROPERTIES_BASE + id + ".";
-			Properties pluginProperties = aplicacioService.propertyFindByGroup("FIRMA_PASSARELA-" + id);
-			String nom = pluginProperties.getProperty(base + "nom");
-			String classe = pluginProperties.getProperty(base + "class");
-			String descripcioCurta = pluginProperties.getProperty(base + "desc");
-			log.debug("Configurant plugin a partir de les propietats (" +
-					"propertiesBase=" + base + ", " +
-					"class=" + classe + ", " +
-					"nom=" + nom + ", " +
-					"descripcioCurta=" + descripcioCurta + ")");
-			Properties pluginPropertiesProcessat = new Properties();
-			for (Object propertyObj: pluginProperties.keySet()) {
-				String propertyKey = propertyObj.toString();
-				String value = pluginProperties.getProperty(propertyKey);
-				String nomFinal = propertyKey.substring(base.length());
-				pluginPropertiesProcessat.put(
-						PROPERTIES_BASE + nomFinal,
-						value);
-				log.debug(
-						"Afegint propietat al plugin (" +
-						"pluginNom=" + nom + ", " +
-						"propertyOriginal=" + propertyKey + ", " +
-						"propertyProcessat=" + (PROPERTIES_BASE + nomFinal) + ", " +
-						"valor=" + value + ")");
-			}
-			plugins.add(
-					new PassarelaFirmaPlugin(
-							new Long(id),
-							nom,
-							descripcioCurta,
-							classe,
-							pluginPropertiesProcessat));
-		}
-		return plugins;
-	}
+	public static final String PROPERTIES_BASE = "es.caib.ripea.plugin.passarelafirma.";
+	
 
-	private Map<Long, ISignatureWebPlugin> instancesCache = new HashMap<Long, ISignatureWebPlugin>();
-	private Map<Long, PassarelaFirmaPlugin> pluginsCache = new HashMap<Long, PassarelaFirmaPlugin>();
-	private ISignatureWebPlugin getInstanceByPluginId(
-			long pluginId) throws Exception {
-		ISignatureWebPlugin instance = instancesCache.get(pluginId);
-		if (instance == null) {
-			PassarelaFirmaPlugin plugin = getPluginFromCache(pluginId);
-			if (plugin == null) {
-				plugin = getPluginById(pluginId);
-				if (plugin == null) {
-					return null;
-				}
-				addPluginToCache(pluginId, plugin);
-			}
-			instance = (ISignatureWebPlugin)PluginsManager.instancePluginByClassName(
-					plugin.getClasse(),
-					PROPERTIES_BASE,
-					plugin.getProperties());
-			if (instance == null) {
-				throw new Exception("plugin.donotinstantiate: " + plugin.getNom() + " (" + plugin.getClasse() + ")");
-			}
-			instancesCache.put(pluginId, instance);
-		}
-		return instance;
-	}
-	private void addPluginToCache(
-			Long pluginId,
-			PassarelaFirmaPlugin pluginInstance) {
-		synchronized (pluginsCache) {
-			pluginsCache.put(pluginId, pluginInstance);
-		}
-	}
-	private PassarelaFirmaPlugin getPluginFromCache(
-			Long pluginId) {
-		synchronized (pluginsCache) {
-			return pluginsCache.get(pluginId);
-		}
-	}
 
-	private PassarelaFirmaPlugin getPluginById(long pluginId) {
-		for (PassarelaFirmaPlugin plugin: getAllPluginsFromProperties()) {
-			if (plugin.getPluginId() == pluginId) {
-				return plugin;
+	private Properties removePluginIdFromKey (Properties pluginProperties, String base) {
+
+		Properties pluginPropertiesProcessat = new Properties();
+		for (Object propertyObj: pluginProperties.keySet()) {
+			String propertyKey = propertyObj.toString();
+			String value = pluginProperties.getProperty(propertyKey);
+			String nomFinal = propertyKey.substring(base.length());
+			pluginPropertiesProcessat.put(
+					PROPERTIES_BASE + nomFinal,
+					value);
+			log.debug(
+					"Afegint propietat al plugin (" +
+					"propertyOriginal=" + propertyKey + ", " +
+					"propertyProcessat=" + (PROPERTIES_BASE + nomFinal) + ", " +
+					"valor=" + value + ")");
+		}
+
+		return pluginPropertiesProcessat;
+	}
+	
+	
+
+	private ISignatureWebPluginWrapper getPluginWrapper(
+			String pluginId) {
+		
+		String entitatCodi = aplicacioService.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+		String propertyBaseAmbPluginId = PROPERTIES_BASE + pluginId;
+		
+		ISignatureWebPluginWrapper pluginWrapper = null;
+		// ORGAN PLUGIN
+		String organCodi = organGestorService.getOrganCodi();
+		if (organCodi != null) {
+			pluginWrapper = plugins.get(pluginId + "." + entitatCodi + "." + organCodi);
+			if (pluginWrapper != null) {
+				return pluginWrapper;
+			}
+			String pluginClassOrgan = aplicacioService.getValueForOrgan(entitatCodi, organCodi, propertyBaseAmbPluginId + ".class");
+			if (StringUtils.isNotEmpty(pluginClassOrgan)) {
+					Properties pluginProperties = aplicacioService.getGroupPropertiesOrganOrEntitatOrGeneral("FIRMA_PASSARELA-" + pluginId, entitatCodi, organCodi);
+					ISignatureWebPlugin plugin = (ISignatureWebPlugin)PluginsManager.instancePluginByClassName(
+							pluginClassOrgan,
+							propertyBaseAmbPluginId + ".",
+							pluginProperties);
+					pluginWrapper = new ISignatureWebPluginWrapper(
+							pluginProperties,
+							pluginId, 
+							plugin);
+					if (plugin == null) {
+						throw new RuntimeException("plugin.donotinstantiate: " + pluginWrapper.getNom() + " (" + pluginClassOrgan + ")");
+					}
+					plugins.put(pluginId + "." + entitatCodi + "." + organCodi, pluginWrapper);
+					return pluginWrapper;
 			}
 		}
-		return null;
+		
+		
+		// ENTITAT/GENERAL PLUGIN
+		pluginWrapper = plugins.get(pluginId + "." + entitatCodi);
+		if (pluginWrapper != null) {
+			return pluginWrapper;
+		}
+		String pluginClass = aplicacioService.propertyFindByNom(propertyBaseAmbPluginId + ".class");
+		if (Strings.isNullOrEmpty(pluginClass)) {
+			throw new RuntimeException("No està configurada la classe per al plugin: " + propertyBaseAmbPluginId + ".class");
+		}
+		Properties pluginProperties = aplicacioService.getGroupPropertiesEntitatOrGeneral("FIRMA_PASSARELA-" + pluginId, entitatCodi);
+		ISignatureWebPlugin plugin = (ISignatureWebPlugin)PluginsManager.instancePluginByClassName(
+				pluginClass,
+				propertyBaseAmbPluginId + ".",
+				pluginProperties);
+		pluginWrapper = new ISignatureWebPluginWrapper(
+				pluginProperties,
+				pluginId, 
+				plugin);
+		if (plugin == null) {
+			throw new RuntimeException("plugin.donotinstantiate: " + pluginWrapper.getNom() + " (" + pluginClass + ")");
+		}
+		plugins.put(pluginId + "." + entitatCodi, pluginWrapper);
+		return pluginWrapper;
 	}
+	
+	
+//	private ISignatureWebPlugin getInstanceByPlugin(
+//			PassarelaFirmaPlugin pluginDeFirma) throws Exception {
+//		ISignatureWebPlugin instance = instancesCache.get(pluginDeFirma.getPluginId());
+//		if (instance == null) {
+//			instance = createInstanceFromPlugin(pluginDeFirma);
+//		}
+//		return instance;
+//	}
+
+	
+//	private ISignatureWebPlugin createInstanceFromPlugin(
+//			PassarelaFirmaPlugin pluginDeFirma) throws Exception {
+//
+//		ISignatureWebPlugin instance = (ISignatureWebPlugin)PluginsManager.instancePluginByClassName(
+//				pluginDeFirma.getClasse(),
+//				PROPERTIES_BASE,
+//				pluginDeFirma.getProperties());
+//		if (instance == null) {
+//			throw new Exception("plugin.donotinstantiate: " + pluginDeFirma.getNom() + " (" + pluginDeFirma.getClasse() + ")");
+//		}
+//		instancesCache.put(pluginDeFirma.getPluginId(), instance);
+//		return instance;
+//	}
+
 
 	private String getRequestPluginBaseUrl(
 			String base,
@@ -530,6 +559,10 @@ public class PassarelaFirmaHelper {
 
 	private String getBaseUrlProperty() {
 		return aplicacioService.propertyBaseUrl();
+	}
+	
+	public void resetPlugin() {
+		plugins = new HashMap<String, ISignatureWebPluginWrapper>();
 	}
 
 	private static Logger log = LoggerFactory.getLogger(PassarelaFirmaHelper.class);

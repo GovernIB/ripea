@@ -3,8 +3,10 @@
  */
 package es.caib.ripea.core.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -27,6 +29,7 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.util.CollectionUtils;
 
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
@@ -110,6 +113,12 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	private Long representantId;
 	@Transient
 	private Long representantIdentificador;
+	
+//	@OneToMany(
+//			mappedBy = "representant_id",
+//			fetch = FetchType.LAZY)
+//	private List<InteressatEntity> representats = new ArrayList<InteressatEntity>();
+	
 	@Version
 	private long version = 0;
 	
@@ -194,7 +203,9 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		this.arxiuIntentData = new Date();
 	}
 
-
+//	public InteressatEntity getRepresentat() {
+//		return !CollectionUtils.isEmpty(representats) ? representats.get(0) : null;
+//	}
 
 	private static final long serialVersionUID = -2299453443943600172L;
 

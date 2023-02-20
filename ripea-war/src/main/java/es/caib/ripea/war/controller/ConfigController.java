@@ -30,6 +30,7 @@ import es.caib.ripea.war.command.ConfigCommand;
 import es.caib.ripea.war.command.OrganConfigCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,8 @@ public class ConfigController extends BaseUserController{
     private ConfigService configService;
     @Autowired
     private EntitatService entitatService;
+	@Autowired
+	private PassarelaFirmaHelper passarelaFirmaHelper;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -75,6 +78,8 @@ public class ConfigController extends BaseUserController{
         int status = 1;
         try {
             configService.updateProperty(configCommand.asDto());
+    		passarelaFirmaHelper.resetPlugin();
+    		
         } catch (Exception e) {
             e.printStackTrace();
             msg = "config.controller.edit.error";
@@ -90,6 +95,7 @@ public class ConfigController extends BaseUserController{
 
         try {
             List<String> editedProperties = configService.syncFromJBossProperties();
+            passarelaFirmaHelper.resetPlugin();
             return SyncResponse.builder().status(true).editedProperties(editedProperties).build();
         } catch (Exception e) {
             return SyncResponse.builder().status(false).build();
@@ -106,6 +112,7 @@ public class ConfigController extends BaseUserController{
 
         try {
         	configService.configurableEntitat(key, configurable);
+        	passarelaFirmaHelper.resetPlugin();
         	
         	 return SimpleResponse.builder().status(1).message(getMessage(request, "config.controller.edit.ok")).build();
         } catch (Exception ex) {
@@ -126,6 +133,7 @@ public class ConfigController extends BaseUserController{
         try {
         	
         	configService.configurableOrgan(key, configurable);
+        	passarelaFirmaHelper.resetPlugin();
         	
         	 return SimpleResponse.builder().status(1).message(getMessage(request, "config.controller.edit.ok")).build();
         } catch (Exception ex) {
@@ -180,15 +188,16 @@ public class ConfigController extends BaseUserController{
 			bindingResult.rejectValue("organGestorId", "NotNull");
 		}
 		if (!command.isJbossProperty() && StringUtils.isEmpty(command.getValue())) {
-			bindingResult.rejectValue("organGestorId", "NotEmpty");
+			bindingResult.rejectValue("value", "NotEmpty");
 		}
-		
 		if (bindingResult.hasErrors()) {
 			command.setCrear(true);
+			model.addAttribute("config", configService.findConfig(command.getKey()));
 			return "configOrganForm";
 		}
 		
 		configService.createPropertyOrgan(OrganConfigCommand.asDto(command));
+		passarelaFirmaHelper.resetPlugin();
 		
 
 		return getModalControllerReturnValueSuccess(
@@ -221,20 +230,22 @@ public class ConfigController extends BaseUserController{
 			@Validated OrganConfigCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
+		
 		if (!command.isJbossProperty() && StringUtils.isEmpty(command.getValue())) {
-			bindingResult.rejectValue("organGestorId", "NotEmpty");
+			bindingResult.rejectValue("value", "NotEmpty");
 		}
 		if (bindingResult.hasErrors()) {
+			model.addAttribute("config", configService.findConfig(command.getKey()));
 			return "configOrganForm";
 		}
 		
 		configService.modificarPropertyOrgan(OrganConfigCommand.asDto(command));
+		passarelaFirmaHelper.resetPlugin();
 
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../config",
 				"config.controller.organ.edit.ok");
-			
 
 	}
 	
@@ -246,6 +257,8 @@ public class ConfigController extends BaseUserController{
 			Model model) {
 
 		configService.deletePropertyOrgan(key);
+		passarelaFirmaHelper.resetPlugin();
+		
 		return getAjaxControllerReturnValueSuccess(request,
 				"redirect:../../config",
 				"config.controller.organ.esborrada.ok");
@@ -260,7 +273,7 @@ public class ConfigController extends BaseUserController{
 		return DatatablesHelper.getDatatableResponse(
 				request,
 				configService.findConfigsOrgans(
-						keyUnderscore.replace("_", "."),
+						keyUnderscore.replace("-", "."),
 						DatatablesHelper.getPaginacioDtoFromRequest(request)),
 				"id");
 	}
@@ -275,10 +288,9 @@ public class ConfigController extends BaseUserController{
             if (!Strings.isNullOrEmpty(config.getEntitatCodi())) {
                 continue;
             }
-            model.addAttribute("config_" + config.getKey().replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
+            model.addAttribute("config_" + config.getKey().replace('.', '-'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             for (EntitatDto entitat : entitats) {
                 key = config.addEntitatKey(entitat);
-//                model.addAttribute("entitat_config_" + key.replace('.', '_'), ConfigCommand.builder().key(config.getKey()).value(config.getValue()).build());
             }
             confs.add(config);
         }

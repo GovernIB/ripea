@@ -4,25 +4,18 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
-import es.caib.ripea.war.command.PortafirmesEnviarCommand;
-import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.ModalHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaConfig;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
-import lombok.extern.slf4j.Slf4j;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.FileInfoSignature;
@@ -44,16 +37,39 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.exception.ResponsableNoValidPortafirmesException;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
+import es.caib.ripea.war.command.PortafirmesEnviarCommand;
+import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.ModalHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
+import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
+import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador per al manteniment de documents.
@@ -82,6 +98,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	private ContingutService contingutService;
 	@Autowired
 	private ExpedientInteressatService expedientInteressatService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -403,6 +421,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		return "passarelaFirmaForm";
 	}
+	
+	// Web signature passarela BEFORE 1
 	@RequestMapping(value = "/{documentId}/firmaPassarela", method = RequestMethod.POST)
 	public String firmaPassarelaPost(
 			HttpServletRequest request,
@@ -410,7 +430,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			@Valid PassarelaFirmaEnviarCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
+		
 		if (bindingResult.hasErrors()) {
 			emplenarModelFirmaClient(
 					request,
@@ -418,15 +441,31 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					model);
 			return "passarelaFirmaForm";
 		}
-		if (!command.getFirma().isEmpty()) {
-			String identificador = documentService.generarIdentificadorFirmaClient(
-					entitatActual.getId(),
+		// ======== generate SignaturesSet ==========
+		if (command.getFirma().isEmpty()) {
+			FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
+					entitatActualId,
 					documentId);
+			UsuariDto usuariActual = aplicacioService.getUsuariActual();
+			String urlFinal = ModalHelper.getString(request) + "/document/" + documentId + "/firmaPassarelaFinal";
+			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSet(
+					request,
+					fitxerPerFirmar,
+					usuariActual.getNif(),
+					command.getMotiu(),
+					(command.getLloc() != null) ? command.getLloc() : "RIPEA",
+					usuariActual.getEmail(),
+					LocaleContextHolder.getLocale().getLanguage(),
+					urlFinal,
+					false);
+			return "redirect:" + procesFirmaUrl;
+
+		} else {
 			documentService.processarFirmaClient(
-					identificador,
-					command.getFirma().getOriginalFilename(),
-					command.getFirma().getBytes(), 
-					RolHelper.getRolActual(request));
+					entitatActualId,
+					documentId,
+					command.getFirma().getOriginalFilename(), 
+					command.getFirma().getBytes(), RolHelper.getRolActual(request));
 			MissatgesHelper.success(
 					request,
 					getMessage(
@@ -436,35 +475,26 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					request, 
 					"redirect:/contingut/" + documentId,
 					null);
-		} else {
-			FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
-					entitatActual.getId(),
-					documentId);
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-			String procesFirmaUrl = passarelaFirmaHelper.iniciarProcesDeFirma(
-					request,
-					fitxerPerFirmar,
-					usuariActual.getNif(),
-					command.getMotiu(),
-					(command.getLloc() != null) ? command.getLloc() : "RIPEA",
-					usuariActual.getEmail(),
-					LocaleContextHolder.getLocale().getLanguage(),
-					modalStr + "/document/" + documentId + "/firmaPassarelaFinal",
-					false);
-			return "redirect:" + procesFirmaUrl;
 		}
 	}
 
+	
+	// Web signature passarela AFTER 3
 	@RequestMapping(value = "/{documentId}/firmaPassarelaFinal")
 	public String firmaPassarelaFinal(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@RequestParam("signaturesSetId") String signaturesSetId,
 			Model model) throws IOException {
-		PassarelaFirmaConfig signaturesSet = passarelaFirmaHelper.finalitzarProcesDeFirma(
+		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
+		
+		String organCodi = organGestorService.getOrganCodi();
+		
+		SignaturesSetExtend signaturesSet = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
+		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
+		
 		StatusSignaturesSet status = signaturesSet.getStatusSignaturesSet();
 		switch (status.getStatus()) {
 		case StatusSignaturesSet.STATUS_FINAL_OK:
@@ -483,15 +513,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 							null);
 				} else {
 					FileInputStream fis = new FileInputStream(firmaStatus.getSignedData());
-					EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-					String identificador = documentService.generarIdentificadorFirmaClient(
-							entitatActual.getId(),
-							documentId);
+
 					documentService.processarFirmaClient(
-							identificador,
-							firmaStatus.getSignedData().getName(),
-							IOUtils.toByteArray(fis), 
-							RolHelper.getRolActual(request));
+							entitatActualId,
+							documentId,
+							firmaStatus.getSignedData().getName(), 
+							IOUtils.toByteArray(fis), RolHelper.getRolActual(request));
+					
 					MissatgesHelper.success(
 							request,
 							getMessage(
@@ -499,6 +527,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 									"document.controller.firma.passarela.final.ok"));
 				}
 			} else {
+				logger.error("Error firma passarela: " +  firmaStatus.getErrorMsg());
 				MissatgesHelper.error(
 						request,
 						getMessage(
@@ -529,7 +558,11 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 							request, 
 							"document.controller.firma.passarela.final.desconegut"));
 		}
-		passarelaFirmaHelper.closeSignaturesSet(
+		
+		
+		
+		
+		passarelaFirmaHelper.closeTransactionInWS(
 				request,
 				signaturesSet);
 		
@@ -544,7 +577,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
 			for (String ignorarModalId: ignorarModalIds) {
 				if (StringUtils.isNumeric(ignorarModalId)) {
-					if (new Long(ignorarModalId).longValue() == signaturesSet.getPluginId().longValue()) {
+					if (ignorarModalId == signaturesSet.getPluginId()) {
 						ignorarModal = true;
 						break;
 					}

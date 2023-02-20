@@ -1,6 +1,10 @@
 package es.caib.ripea.war.passarelafirma;
 
-import es.caib.ripea.war.helper.MissatgesHelper;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.slf4j.Logger;
@@ -12,9 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.SessioHelper;
 
 /**
  * Controller per a les accions de la passarel·la de firma.
@@ -27,25 +31,32 @@ public class PassarelaFirmaController {
 
 	public static final boolean stepSelectionWhenOnlyOnePlugin = true;
 
+
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
+	@Autowired
+	private OrganGestorService organGestorService;
+	
+	
 
-
-
+	
+	
+	// Web signature passarela BEFORE 2
 	@RequestMapping(value = "/selectsignmodule/{signaturesSetId}")
 	public String selectSignModules(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable("signaturesSetId") String signaturesSetId,
 			Model model) throws Exception {
-		List<PassarelaFirmaPlugin> pluginsFiltered = passarelaFirmaHelper.getAllPlugins(
+		
+		List<ISignatureWebPluginWrapper> pluginsWrappers = passarelaFirmaHelper.instanciatePlugins(
 				request,
 				signaturesSetId);
 		// Si només hi ha un mòdul de firma llavors anar a firmar directament
 		if (stepSelectionWhenOnlyOnePlugin) {
-			if (pluginsFiltered.size() == 1) {
-				PassarelaFirmaPlugin modul = pluginsFiltered.get(0);
-				long pluginID = modul.getPluginId();
+			if (pluginsWrappers.size() == 1) {
+				ISignatureWebPluginWrapper pluginWrapper = pluginsWrappers.get(0);
+				String pluginID = pluginWrapper.getPluginId();
 				log.debug("Seleccionant automàticament plugin de firma (" +
 						"signaturesSetId = " + signaturesSetId + ")");
 				return "redirect:" +
@@ -54,9 +65,9 @@ public class PassarelaFirmaController {
 			}
 		}
 		// Si cap modul compleix llavors mostrar missatge
-		if (pluginsFiltered.size() == 0) {
+		if (pluginsWrappers.size() == 0) {
 			String msg = "No existeix cap mòdul de firma que passi els filtres";
-			PassarelaFirmaConfig pfss = passarelaFirmaHelper.getSignaturesSet(
+			SignaturesSetExtend pfss = passarelaFirmaHelper.getSignaturesSet(
 					request,
 					signaturesSetId);
 			if (pfss == null) {
@@ -77,39 +88,52 @@ public class PassarelaFirmaController {
 			return "redirect:" + redirectUrl;
 		}
 		model.addAttribute("signaturesSetId", signaturesSetId);
-		model.addAttribute("plugins", pluginsFiltered);
+		model.addAttribute("plugins", pluginsWrappers);
 		log.debug("Pantalla de selecció del plugin de firma (" +
 				"signaturesSetId = " + signaturesSetId + ")");
 		return "passarelaFirmaSeleccio";
 	}
 
+	
+	// Web signature passarela BEFORE 3
 	@RequestMapping(value = "/showsignaturemodule/{pluginId}/{signaturesSetId}")
 	public RedirectView showSignatureModule(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable("pluginId") Long pluginId,
+			@PathVariable("pluginId") String pluginId,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
-		PassarelaFirmaConfig pfss = passarelaFirmaHelper.getSignaturesSet(
+		
+		SessioHelper.setOrganActual(request, organGestorService.getOrganCodi());
+		SignaturesSetExtend pfss = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
 		pfss.setPluginId(pluginId);
-		String pluginUrl = passarelaFirmaHelper.getPluginUrl(
+		String pluginUrl = passarelaFirmaHelper.openTransactionInWS(
 				request,
 				signaturesSetId);
+		
 		log.debug("Mostrant mòdul de signatura (" +
 				"pluginId = " + pluginId + ", " +
 				"signaturesSetId = " + signaturesSetId + ", " +
 				"pluginUrl = " + pluginUrl + ")");
+
+		
 		return new RedirectView(pluginUrl, false);
 	}
 
 	private static final String REQUEST_PLUGIN_MAPPING = "/requestPlugin/{signaturesSetId}/{signatureIndex}/**";
+	
+	
+	// Web signature passarela AFTER 1
 	@RequestMapping(value = REQUEST_PLUGIN_MAPPING)
-	public void requestPlugin(
+	public void loadResultFromWS(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable String signaturesSetId,
 			@PathVariable int signatureIndex) throws Exception {
+		
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
+		
 		String servletPath = request.getServletPath();
 		int indexBarra = StringUtils.ordinalIndexOf(
 				servletPath,
@@ -122,7 +146,7 @@ public class PassarelaFirmaController {
 				"signaturesSetId = " + signaturesSetId + ", " +
 				"signatureIndex = " + signatureIndex + ", " +
 				"requestUri = " + request.getRequestURI() + ")");
-		passarelaFirmaHelper.requestPlugin(
+		passarelaFirmaHelper.loadResultFromWS(
 				request,
 				response,
 				signaturesSetId,
@@ -130,16 +154,17 @@ public class PassarelaFirmaController {
 				query);
 	}
 
+	// Web signature passarela AFTER 2 
 	@RequestMapping(value = "/final/{signaturesSetId}")
-	public String finalProcesDeFirma(
+	public String redirect(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable("signaturesSetId") String signaturesSetId) throws Exception {
-		PassarelaFirmaConfig pss = passarelaFirmaHelper.finalitzarProcesDeFirma(
+		
+		SignaturesSetExtend pss = passarelaFirmaHelper.getSignaturesSet(
 				request,
 				signaturesSetId);
-		log.debug("Final del procés de firma (" +
-				"signaturesSetId = " + signaturesSetId + ")");
+		log.debug("Final del procés de firma (" + "signaturesSetId = " + signaturesSetId + ")");
 		return "redirect:" + pss.getUrlFinalRipea() + "?signaturesSetId=" + signaturesSetId;
 	}
 

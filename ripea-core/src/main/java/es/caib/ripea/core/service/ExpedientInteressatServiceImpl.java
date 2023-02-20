@@ -77,6 +77,24 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 		return expedientInteressatHelper.create(
 				entitatId,
 				expedientId,
+				interessat,
+				propagarArxiu,
+				PermissionEnumDto.WRITE, 
+				rolActual, 
+				true);
+	}
+	
+	@Override
+	public InteressatDto createRepresentant(
+			Long entitatId,
+			Long expedientId,
+			Long interessatId,
+			InteressatDto interessat,
+			boolean propagarArxiu, 
+			String rolActual) {
+		return expedientInteressatHelper.createRepresentant(
+				entitatId,
+				expedientId,
 				interessatId,
 				interessat,
 				propagarArxiu, 
@@ -97,7 +115,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				expedientId,
 				null,
 				interessat,
-				rolActual, true);
+				rolActual, 
+				true, 
+				true);
 	}
 
 	@Transactional
@@ -113,7 +133,9 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				expedientId,
 				representatId,
 				interessat,
-				rolActual, true);
+				rolActual, 
+				true, 
+				true);
 	}
 
 	@Transactional
@@ -123,56 +145,23 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			Long expedientId,
 			Long interessatId, 
 			String rolActual) {
-		logger.debug("Esborrant interessat de l'expedient  ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "interessatId=" + interessatId + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+		expedientInteressatHelper.delete(
 				entitatId,
 				expedientId,
-				true,
-				false,
-				true,
-				false,
-				false, 
-				false, 
+				interessatId,
 				rolActual);
-		InteressatEntity interessat = interessatRepository.findOne(interessatId);
-		if (interessat != null) {
-			interessatRepository.delete(interessat);
-			//expedient.deleteInteressat(interessat);
-			// Registra al log la baixa de l'interessat
-			contingutLogHelper.log(
-					expedient,
-					LogTipusEnumDto.MODIFICACIO,
-					interessat,
-					LogObjecteTipusEnumDto.INTERESSAT,
-					LogTipusEnumDto.ELIMINACIO,
-					null,
-					null,
-					false,
-					false);
-		} else {
-			logger.error("No s'ha trobat l'interessat a l'expedient ("
-					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + interessatId + ")");
-			throw new ValidationException(
-					interessatId,
-					InteressatEntity.class,
-					"No s'ha trobat l'interessat a l'expedient (expedientId=" + expedientId + ")");
-		}
 	}
 
 	@Transactional
 	@Override
-	public void delete(
+	public void deleteRepresentant(
 			Long entitatId,
 			Long expedientId,
 			Long interessatId,
 			Long representantId, 
 			String rolActual) {
 
-		expedientInteressatHelper.delete(
+		expedientInteressatHelper.deleteRepresentant(
 				entitatId,
 				expedientId,
 				interessatId,

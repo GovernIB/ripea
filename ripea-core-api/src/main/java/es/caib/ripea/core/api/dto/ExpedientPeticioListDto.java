@@ -34,7 +34,12 @@ public class ExpedientPeticioListDto {
 	private String interessatsResum;
 
     public String getProcedimentCodiSiaINom() {
-    	return procedimentCodi + " - " + metaExpedientNom;
+		if (procedimentCodi != null) {
+			return procedimentCodi + " - " + metaExpedientNom;
+		} else {
+			return "";
+		}
+    	
     }
 	
 	@SuppressWarnings("incomplete-switch")

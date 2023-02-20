@@ -755,25 +755,22 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitat.getId(), rolActual);
 		model.addAttribute("metaExpedients", metaExpedients);
-		MetaExpedientDto metaExpedientDto = expedientPeticioService.findMetaExpedientByEntitatAndProcedimentCodi(
-				expedientPeticioDto.getRegistre().getEntitatCodi(),
-				expedientPeticioDto.getRegistre().getProcedimentCodi());
 		List<ExpedientDto> expedients = null;
 		// if exists metaExpedient with matching codi procediment
-		if (metaExpedientDto!=null) {
+		if (expedientPeticioDto.getMetaExpedientId() != null) {
 			boolean hasPermissions = false;
 			for(MetaExpedientDto metaExpDto : metaExpedients) {
-				if (metaExpDto.getId().equals(metaExpedientDto.getId())) {
+				if (metaExpDto.getId().equals(expedientPeticioDto.getMetaExpedientId())) {
 					hasPermissions = true;
 				}
 			}
 			// if current user has create permissions for this metaexpedient
 			if (hasPermissions) {
-				command.setMetaExpedientId(metaExpedientDto.getId());
-				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), metaExpedientDto.getId(), rolActual, EntitatHelper.getOrganGestorActualId(request));
+				command.setMetaExpedientId(expedientPeticioDto.getMetaExpedientId());
+				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), expedientPeticioDto.getMetaExpedientId(), rolActual, EntitatHelper.getOrganGestorActualId(request));
 				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
 				if (expedientNumero != null && !expedientNumero.isEmpty()) {
-					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(entitat.getId(), metaExpedientDto.getId(), expedientNumero);
+					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(entitat.getId(), expedientPeticioDto.getMetaExpedientId(), expedientNumero);
 					if (expedient == null) {
 						MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.form.acceptar.expedient.noTorbat"));
 					}

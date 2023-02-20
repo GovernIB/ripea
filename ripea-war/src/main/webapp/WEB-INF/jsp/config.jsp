@@ -38,6 +38,11 @@
 	cursor: pointer;
 }
 
+.table-organ-key {
+	font-size: 11px;
+	color: #aaa;
+}
+
 </style>
 
 <script>
@@ -93,12 +98,12 @@ $(document).ready(function() {
 	                    expand(configFormKey, isEntitatConfigSelected, isOrganConfigSelected, true);
 
 	                    for (let entitat of entitats) {
-	                        let keyReplaced = entitat.key.replaceAll('.', '_');
+	                        let keyReplaced = entitat.key.replaceAll('.', '-');
 	                        let string = '<div>';
 	                        let disabled = entitat.jbossProperty || !entitat.value ? 'disabled' : '';
 	                        let textGray = disabled ? "text-gray" : "";
 	                        string += '<label id="' + keyReplaced + '_codi_entitat" for="entitat_config_' + keyReplaced + '" class="col-sm-3 control-label margin-bottom ' + textGray + '" style="word-wrap: break-word;">- ' + entitat.entitatCodi + '</label>';
-	                        string += '<div class="col-sm-7 margin-bottom">';
+	                        string += '<div class="col-sm-7 margin-bottom div-form-control">';
 	                        let placeHolder = "placeholder=" + entitat.key;
 	                        let configurable = "";
 	                        if (entitat.typeCode === "INT") {
@@ -199,23 +204,27 @@ $(document).ready(function() {
         		tableHtml += 'data-toggle="datatable" ' 
         		tableHtml += 'data-url="'+url+'" ' 
         		tableHtml += 'class="table table-bordered table-striped table-hover" '
-        		tableHtml += 'data-default-order="1" '
+        		tableHtml += 'data-default-order="2" '
         		tableHtml += 'data-default-dir="desc" '
 	        	tableHtml += 'data-paging-enabled="false" '		        		
         		tableHtml += 'style="width:100%"> '
         		tableHtml += '<thead> '
         		tableHtml += '	<tr> '
             	tableHtml += '		<th data-col-name="typeCode" data-visible="false"></th> '            		
+                tableHtml += '		<th data-col-name="key" data-visible="false"></th> '                   	
         		tableHtml += '		<th data-col-name="organGestorCodiNom" data-orderable="true" width="45%"><spring:message code="metaexpedient.form.camp.organgestor"/></th> '
         		tableHtml += '		<th data-col-name="value" data-template="#' + scriptValueId + '" data-orderable="true" width="45%"><spring:message code="config.propietats.form.camp.value"/> '
-        		tableHtml += '			<script id="' + scriptValueId + '" type="text/x-jsrender"> '       	
+        		tableHtml += '			<script id="' + scriptValueId + '" type="text/x-jsrender"> '  
+        		tableHtml += '				<div style="min-height: 20px;"> '        		     	
         		tableHtml += '				{{if typeCode == "BOOL"}} '
                 tableHtml += '					{{if value == "true"}}<span class="fa fa-check"></span>{{/if}} '  	            		
             	tableHtml += '				{{else typeCode == "PASSWORD"}} '    	
                 tableHtml += '					{{:value}} '                       	
                 tableHtml += '				{{else}} '  	
                 tableHtml += '					{{:value}} '                      
-                tableHtml += '				{{/if}} '                     						
+                tableHtml += '				{{/if}} '   
+                tableHtml += '				</div> '                     
+                tableHtml += '				<div class="table-organ-key">{{:key}}</div> '                                             						
             	tableHtml += '				</div> '                	          		
         		tableHtml += '			</'+'script> '
        			tableHtml += '		</th> '        		
@@ -297,7 +306,7 @@ $(document).ready(function() {
        	
        	var configFormKey = $(this).closest('form').attr('id');
 
-       	var key = configFormKey.replace("config_", "").replaceAll("_", ".");
+       	var key = configFormKey.replace("config_", "").replaceAll("-", ".");
 
        	let spinner = addSpinner('config_' + key);
 
