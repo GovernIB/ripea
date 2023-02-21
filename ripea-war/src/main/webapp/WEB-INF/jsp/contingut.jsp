@@ -91,11 +91,9 @@
             margin-right: 0.25em;
         }
 
-        .treetable-expanded .treetable-expander, 
         .treetable-expanded .treetable-expander {
             width: 1em;
             height: 1em;
-            cursor: pointer;
             position: relative;
             display: inline-block;
         }
@@ -720,22 +718,22 @@ $(document).ready(function() {
 	});
 
 
+
+
 	
-	//ordenacio habilitada
-	if (${isOrdenacioPermesa}) {
-		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(2), :nth-child(4), :nth-child(7))').css('cursor','pointer');
-		$('.table-hover > tbody > tr > td:not(:last-child, :first-child, :nth-child(2), :nth-child(4), :nth-child(7))').click(function(event) {
-			event.stopPropagation();
-			$('a:first', $(this).parent())[0].click();
-		});
-	} else {
-		//ordenacio per defecte (createdDate)
-		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(2), :nth-child(4))').css('cursor','pointer');
-		$('.table-hover > tbody > tr > td:not(:last-child):not(:first-child, :nth-child(2), :nth-child(4))').click(function(event) {
-			event.stopPropagation();
-			$('a:first', $(this).parent())[0].click();
-		});
-	}
+	//remove treetable click events on unnecessary columns for all rows
+	$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(4), :nth-child(7), :nth-child(8)').css('cursor','default').unbind('click');
+
+	//remove treetable click events on all columns for document rows
+	$('#table-documents > tbody > tr.isDocument > td').css('cursor','default').unbind('click');
+
+	//add show viewer click events on all necessary columns for document rows
+	$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(5), :nth-child(6)').css('cursor','pointer').click(function(event) {
+		event.stopPropagation();
+		$('a:first', $(this).parent())[0].click();
+	});
+	
+	
 	$('ul.interessats li').hover(function() {
 		$('a', this).removeClass('hidden');contingut
 	},

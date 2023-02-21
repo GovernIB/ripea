@@ -35,16 +35,18 @@
 			</c:if>
 		</script>
 		
-		<tr id="info-fill-${fill.id}" class="element-drag-drop element-draggable ui-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && isPdf}"> isPdf</c:if> <c:if test="${fill.document && isDocAdjuntPendentGuardarArxiu}"> docAdjuntPendentGuardarArxiu</c:if>" data-contenidor-id="${fill.id}" data-node="treetable-${fill.id}" data-pnode="treetable-${contingut.id}">
+		<tr id="info-fill-${fill.id}" class="element-drag-drop element-draggable ui-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && isPdf}"> isPdf</c:if> <c:if test="${fill.document && isDocAdjuntPendentGuardarArxiu}"> docAdjuntPendentGuardarArxiu</c:if>" data-contenidor-id="${fill.id}" data-node="treetable-${fill.id}" data-pnode="treetable-${contingut.id}">
 			
+			<%------------ checkbox ----------%>
 			<td>
-			<c:if test="${fill.document}">
-			<input type="checkbox" class="info-fill-${fill.id}" id="${fill.id}" autocomplete="off"/>
-			</c:if>
+				<c:if test="${fill.document}">
+					<input type="checkbox" class="info-fill-${fill.id}" id="${fill.id}" autocomplete="off"/>
+				</c:if>
 			</td>
+			
+			<%------------ Nom ----------%>
 			<td>
 				<rip:blocIconaContingut contingut="${fill}"/>
-<%--							<c:if test="${fill.document && fill.documentTipus != 'IMPORTAT' && fill.estat == 'REDACCIO'}"><span class="icona-esborrany fa fa-bold" title="<spring:message code="contingut.info.estat.redaccio"/>"></span></c:if>--%>
 				<c:if test="${fill.document && fill.estat == 'REDACCIO'}"><span class="icona-esborrany fa fa-bold" title="<spring:message code="contingut.info.estat.redaccio"/>"></span></c:if>
 				<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="importat fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
 				<c:if test="${fill.node and not fill.valid}">&nbsp;<span class="fa fa-exclamation-triangle text-warning"></span></c:if>
@@ -87,22 +89,33 @@
 					<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
 				</c:if>
 			</td>
+			
+			<%------------ Descripció ----------%>
 			<td>
 			<c:if test="${fill.document}">
 				&nbsp;${fill.descripcio}
 			</c:if>
 			</td>
+			
+			<%------------ Tipus -----------%>
 			<td width="25%">
 				<c:if test="${not fill.carpeta}">
 					${fill.metaNode.nom}
 				</c:if>
 			</td>
 			
+			<%------------ Creat el -----------%>
 			<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
+			
+			<%------------ Creat per -----------%>
 			<td>${fill.createdBy.codiAndNom}</td>
+			
+			<%------------ Accions -----------%>
 			<td>
 				<rip:blocContingutAccions className="botons-accions-element" modeLlistat="true" contingut="${fill}"  nodeco="${nodeco}"/>
 			</td>
+			
+			<%------------ sort ----------%>
 			<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
 				<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>">
 					<span class="fa fa-sort"></span>

@@ -1,4 +1,4 @@
-+function ( $ ) {
++ function($) {
     'use strict';
 
     /**
@@ -6,26 +6,17 @@
      */
     var old = $.fn.treeTable;
 
-    /**
-     * Internal constants
-     */
-    var TT = {
-        expander: 'treetable-expander',
-        expanded: 'treetable-expanded',
-        collapsed: 'treetable-collapsed',
-        expanderTemplate: '<span class="treetable-expander"></span>'
-    };
 
     /**
      * Public API constructor.
      * Usage: $( selector ).treeTable({ ... })
      */
-    function Plugin ( options ) {
-        return this.each( function () {
-            var $this = $( this );
-            var data = $this.data( 'treetable' );
+    function Plugin(options) {
+        return this.each(function() {
+            var $this = $(this);
+            var data = $this.data('treetable');
 
-            if ( ! data ) {
+            if (!data) {
                 $this.data(
                     'treetable',
                     new TreeTable(
@@ -33,7 +24,7 @@
                         $.extend(
                             true,
                             $.fn.treeTable.defaults,
-                            typeof options == 'object' ? options : {} )
+                            typeof options == 'object' ? options : {})
                     ));
             }
         });
@@ -43,15 +34,15 @@
      * API Constructor. Takes in an element selector and an options
      * object and converts the table to be rendered as a tree.
      */
-    var TreeTable = function ( element, options ) {
+    var TreeTable = function(element, options) {
         // Reference to each nodes depth, starts with 0
         this.depths = {};
         // Reference to count of children nodes for each node
         this.children = {};
         // Extended options
         this.options = options;
-        this.$table = $( element );
-        this.build( this.$table.find( 'tr[data-node^="treetable"]' ) );
+        this.$table = $(element);
+        this.build(this.$table.find('tr[data-node^="treetable"]'));
     }
 
     /**
@@ -62,63 +53,64 @@
      *   3) Insert expand/collapse buttons for rows with children
      *      amd mark initial state (expanded or collapsed)
      */
-    TreeTable.prototype.build = function ( nodes ) {
+    TreeTable.prototype.build = function(nodes) {
+
+        this.addDepth(nodes);
+        this.addExpanders(nodes);
         this.attachEvents();
-        this.addDepth( nodes );
-        this.addExpanders( nodes );
     };
 
     /**
      * Iterates over the nodes and adds a CSS class and data attribute
      * for the depth of the node in the tree.
      */
-    TreeTable.prototype.addDepth = function ( nodes ) {
+    TreeTable.prototype.addDepth = function(nodes) {
         var self = this;
 
-        nodes.each( function ( idx, node ) {
-            var $node = $( node );
-            var nodeId = $node.data( 'node' );
-            var pnodeId = $node.data( 'pnode' );
-            var depth = ( pnodeId && pnodeId in self.depths )
-                ? self.depths[ pnodeId ] + 1
-                : 0;
+        nodes.each(function(idx, node) {
+            var $node = $(node);
+            var nodeId = $node.data('node');
+            var pnodeId = $node.data('pnode');
+            var depth = (pnodeId && pnodeId in self.depths) ?
+                self.depths[pnodeId] + 1 :
+                0;
 
             // Add a counter to the children if this has a parent
-            if ( pnodeId ) {
-                self.children[ pnodeId ]++;
+            if (pnodeId) {
+                self.children[pnodeId]++;
             }
 
-            self.children[ nodeId ] = 0;
-            $node.data( 'depth', depth );
-            self.depths[ nodeId ] = depth;
-            $node.addClass( 'treetable-depth-' + depth );
+            self.children[nodeId] = 0;
+            $node.data('depth', depth);
+            self.depths[nodeId] = depth;
+            $node.addClass('treetable-depth-' + depth);
         });
     };
 
     /**
      * Renders expander buttons to each row with children.
      */
-    TreeTable.prototype.addExpanders = function ( nodes ) {
+    TreeTable.prototype.addExpanders = function(nodes) {
         var self = this;
 
-        nodes.each( function ( idx, node ) {
-            var $node = $( node );
-            var nodeId = $node.data( 'node' );
+        nodes.each(function(idx, node) {
+            var $node = $(node);
+            var nodeId = $node.data('node');
 
-            if ( self.children[ nodeId ] > 0 ) {
-                $( TT.expanderTemplate )
-                    .prependTo( $node.find( 'td' ).get( 1 ) )
-                    .addClass( (self.options.startCollapsed)
-                        ? self.options.collapsedClass
-                        : self.options.expandedClass );
-                $node.addClass( (self.options.startCollapsed)
-                    ? TT.collapsed
-                    : TT.expanded );
+            if (self.children[nodeId] > 0) {
+                $('<span class="treetable-expander"></span>')
+                    .prependTo($node.find('td').get(1))
+                    .addClass((self.options.startCollapsed) ?
+                        self.options.collapsedClass :
+                        self.options.expandedClass);
+                $node.addClass((self.options.startCollapsed) ?
+                    'treetable-collapsed' :
+                    'treetable-expanded');
 
                 // If the node is to start collapsed, collapse all
                 // of this node's children.
-                if ( self.options.startCollapsed ) {
-                    self.$table.find( 'tr[data-pnode="' + nodeId + '"]' ).hide();
+                if (self.options.startCollapsed) {
+                    self.$table.find('tr[data-pnode="' + nodeId + '"]').hide();
                 }
             }
         });
@@ -128,88 +120,90 @@
      * Attaches an event handler to the table for catching all clicks
      * to the expander buttons.
      */
-    TreeTable.prototype.attachEvents = function () {
+    TreeTable.prototype.attachEvents = function() {
         var self = this;
-
-        this.$table.on( 'click.treetable', '.' + TT.expander, function () {
-            var $this = $( this );
-            self.toggle( $this, $this.closest( 'tr' ) );
+        
+        this.$table.find('tbody > :is(tr.treetable-collapsed, tr.treetable-expanded) > td:not(:last-child)').css('cursor', 'pointer').click(function() {
+            var $this = $(this);
+            self.toggle($this.closest('tr'));
         });
     };
-    
-    
-    
-    
-    TreeTable.prototype.hide = function (nodeId) {
+
+
+
+
+    TreeTable.prototype.hide = function(nodeId) {
 
         var self = this;
-    	
+
         let children = this.$table.find('tr[data-pnode="' + nodeId + '"]');
 
         if (children.length) {
-            children.each(function (i, e) {
-            	self.hide($(e).data( "node"));
+            children.each(function(i, e) {
+                self.hide($(e).data("node"));
             });
-            
-            this.$table.find( 'tr[data-pnode="' + nodeId + '"]' )
-            .addClass( TT.collapsed )
-            .removeClass( TT.expanded )
-            .hide();
-            this.$table.find( 'tr[data-pnode="' + nodeId + '"] .' + TT.expander )
-            .removeClass( this.options.expandedClass )
-            .addClass( this.options.collapsedClass );
+
+            this.$table.find('tr[data-pnode="' + nodeId + '"]')
+                .addClass('treetable-collapsed')
+                .removeClass('treetable-expanded')
+                .hide();
+            this.$table.find('tr[data-pnode="' + nodeId + '"] .treetable-expander')
+                .removeClass(this.options.expandedClass)
+                .addClass(this.options.collapsedClass);
 
         }
     };
-    
-    
 
-    TreeTable.prototype.toggle = function ( $expander, $node ) {
-        var nodeId = $node.data( 'node' );
 
-        $expander.toggleClass( this.options.expandedClass );
-        $expander.toggleClass( this.options.collapsedClass );
-        $node.toggleClass( TT.collapsed ).toggleClass( TT.expanded );
 
-        if ( $node.hasClass( TT.collapsed ) ) { //if collapsing
+    TreeTable.prototype.toggle = function($node) {
+
+
+        let $expander = $node.find('.treetable-expander');
+        var nodeId = $node.data('node');
+
+        $expander.toggleClass(this.options.expandedClass);
+        $expander.toggleClass(this.options.collapsedClass);
+        $node.toggleClass('treetable-collapsed').toggleClass('treetable-expanded');
+
+        if ($node.hasClass('treetable-collapsed')) { //if collapsing
             // Hide all descendant nodes and toggle the state of
             // any expander in the descendants.
-        	
-        	this.hide(nodeId);
+
+            this.hide(nodeId);
 
         } else { //if expanding
             // Just show the immediate children
-            this.$table.find( 'tr[data-pnode="' + nodeId + '"]' ).show();
+            this.$table.find('tr[data-pnode="' + nodeId + '"]').show();
         }
     };
-    
-    
-    
-	$.fn.expandAll = function() {
-		
-		$(this).find( 'tr[data-node]' )
-        .addClass( TT.expanded )
-        .removeClass( TT.collapsed )
-        .show();
-		$(this).find( 'tr[data-node] .' + TT.expander )
-        .removeClass($(this).data('treetable').options.collapsedClass)
-        .addClass($(this).data('treetable').options.expandedClass);
-		
+
+
+
+    $.fn.expandAll = function() {
+
+        $(this).find('tr[data-node]')
+            .addClass('treetable-expanded')
+            .removeClass('treetable-collapsed')
+            .show();
+        $(this).find('tr[data-node] .treetable-expander')
+            .removeClass($(this).data('treetable').options.collapsedClass)
+            .addClass($(this).data('treetable').options.expandedClass);
+
 
     }
-	
-	$.fn.collapseAll = function() {
-		
-		
-		$(this).find( 'tr[data-node]:not(.treetable-depth-0)' )
-        .addClass( TT.collapsed )
-        .removeClass( TT.expanded )
-        .hide();
-		$(this).find( 'tr[data-node] .' + TT.expander )
-        .removeClass( $(this).data('treetable').options.expandedClass )
-        .addClass( $(this).data('treetable').options.collapsedClass );
+
+    $.fn.collapseAll = function() {
+
+        $(this).find('tr[data-node]:not(.treetable-depth-0)').hide();
+        $(this).find('tr[data-node]')
+            .addClass('treetable-collapsed')
+            .removeClass('treetable-expanded');
+        $(this).find('tr[data-node] .treetable-expander')
+            .removeClass($(this).data('treetable').options.expandedClass)
+            .addClass($(this).data('treetable').options.collapsedClass);
     }
-	
+
 
     $.fn.treeTable = Plugin;
     $.fn.treeTable.defaults = {
@@ -219,8 +213,8 @@
         collapsedClass: 'fa fa-angle-right'
     };
 
-    $.fn.treeTable.noConflict = function () {
+    $.fn.treeTable.noConflict = function() {
         $.fn.treeTable = old;
         return this;
     }
-}( jQuery );
+}(jQuery);
