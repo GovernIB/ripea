@@ -3176,7 +3176,7 @@ public class PluginHelper {
 
 		String documentNomInArxiu = documentEntity.getNom();
 		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
-			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), contingutPare.getArxiuUuid());
+			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), documentEntity.getExpedient().getArxiuUuid());
 		}
 		documentArxiu.setNom(documentNomInArxiu);
 		documentArxiu.setDescripcio(documentEntity.getDescripcio());

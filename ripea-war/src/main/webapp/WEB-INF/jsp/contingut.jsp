@@ -75,6 +75,9 @@
 	</c:if>
 <style>
 
+
+
+
         .treetable-expanded > td:nth-child(2),
         .treetable-collapsed > td:nth-child(2) {
             padding-left: 2em;
@@ -84,7 +87,7 @@
         .treetable-collapsed > td:nth-child(2) > .treetable-expander {
             top: 0.05em;
             position: relative;
-            margin-left: -1.5em;
+			margin-left: -0.95em;
             margin-right: 0.25em;
         }
 
@@ -98,15 +101,15 @@
         }
 
         .treetable-depth-1 > td:nth-child(2) {
-            padding-left: 3em;
+            padding-left: 5em;
         }
         
         .treetable-depth-2 > td:nth-child(2) {
-            padding-left: 4.5em;
+            padding-left: 8em;
         }
 
         .treetable-depth-3 > td:nth-child(2) {
-            padding-left: 6em;
+            padding-left: 11em;
         }
 
 span {
@@ -2418,6 +2421,10 @@ $.views.helpers(myHelpers);
 									<rip:blocContenidorPath contingut="${contingut}"/>
 								</c:if>
 								
+								<div class="" style="float: left;display: inline-block;">
+	 								<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
+	 								<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+								</div>
 								<c:if test="${isTasca}">
 									<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
 								</c:if>

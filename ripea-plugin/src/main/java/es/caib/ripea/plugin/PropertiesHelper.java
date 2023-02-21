@@ -3,6 +3,7 @@ package es.caib.ripea.plugin;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,9 +66,17 @@ public class PropertiesHelper extends Properties {
 		String val = getProperty(key);
 		return (val == null) ? defaultValue : val;
 	}
-
+	
+	public boolean getAsBoolean(String key, Boolean defaultValue) {
+		String property = getProperty(key);
+		if (StringUtils.isNotEmpty(property)) {
+			return new Boolean(property).booleanValue();
+		} else {
+			return defaultValue;
+		}
+	}
 	public boolean getAsBoolean(String key) {
-		return new Boolean(getProperty(key)).booleanValue();
+		return getAsBoolean(key, null);
 	}
 	public int getAsInt(String key) {
 		return new Integer(getProperty(key)).intValue();

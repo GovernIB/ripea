@@ -136,6 +136,33 @@
             self.toggle( $this, $this.closest( 'tr' ) );
         });
     };
+    
+    
+    
+    
+    TreeTable.prototype.hide = function (nodeId) {
+
+        var self = this;
+    	
+        let children = this.$table.find('tr[data-pnode="' + nodeId + '"]');
+
+        if (children.length) {
+            children.each(function (i, e) {
+            	self.hide($(e).data( "node"));
+            });
+            
+            this.$table.find( 'tr[data-pnode="' + nodeId + '"]' )
+            .addClass( TT.collapsed )
+            .removeClass( TT.expanded )
+            .hide();
+            this.$table.find( 'tr[data-pnode="' + nodeId + '"] .' + TT.expander )
+            .removeClass( this.options.expandedClass )
+            .addClass( this.options.collapsedClass );
+
+        }
+    };
+    
+    
 
     TreeTable.prototype.toggle = function ( $expander, $node ) {
         var nodeId = $node.data( 'node' );
@@ -144,22 +171,45 @@
         $expander.toggleClass( this.options.collapsedClass );
         $node.toggleClass( TT.collapsed ).toggleClass( TT.expanded );
 
-        if ( $node.hasClass( TT.collapsed ) ) {
+        if ( $node.hasClass( TT.collapsed ) ) { //if collapsing
             // Hide all descendant nodes and toggle the state of
             // any expander in the descendants.
-            this.$table.find( 'tr[data-pnode^="' + nodeId + '"]' )
-                .addClass( TT.collapsed )
-                .removeClass( TT.expanded )
-                .hide();
-            this.$table.find( 'tr[data-pnode^="' + nodeId + '"] .' + TT.expander )
-                .removeClass( this.options.expandedClass )
-                .addClass( this.options.collapsedClass );
-        }
-        else {
+        	
+        	this.hide(nodeId);
+
+        } else { //if expanding
             // Just show the immediate children
             this.$table.find( 'tr[data-pnode="' + nodeId + '"]' ).show();
         }
     };
+    
+    
+    
+	$.fn.expandAll = function() {
+		
+		$(this).find( 'tr[data-node]' )
+        .addClass( TT.expanded )
+        .removeClass( TT.collapsed )
+        .show();
+		$(this).find( 'tr[data-node] .' + TT.expander )
+        .removeClass($(this).data('treetable').options.collapsedClass)
+        .addClass($(this).data('treetable').options.expandedClass);
+		
+
+    }
+	
+	$.fn.collapseAll = function() {
+		
+		
+		$(this).find( 'tr[data-node]:not(.treetable-depth-0)' )
+        .addClass( TT.collapsed )
+        .removeClass( TT.expanded )
+        .hide();
+		$(this).find( 'tr[data-node] .' + TT.expander )
+        .removeClass( $(this).data('treetable').options.expandedClass )
+        .addClass( $(this).data('treetable').options.collapsedClass );
+    }
+	
 
     $.fn.treeTable = Plugin;
     $.fn.treeTable.defaults = {
