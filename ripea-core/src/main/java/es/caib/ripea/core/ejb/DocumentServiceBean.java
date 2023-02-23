@@ -140,12 +140,14 @@ public class DocumentServiceBean implements DocumentService {
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,
-			PinbalConsultaDto consulta) throws NotFoundException, PinbalException {
+			PinbalConsultaDto consulta, 
+			String rolActual) throws NotFoundException, PinbalException {
 		delegate.pinbalNovaConsulta(
 				entitatId, 
 				pareId,
 				metaDocumentId,
-				consulta);
+				consulta, 
+				rolActual);
 	}
 
 	@Override

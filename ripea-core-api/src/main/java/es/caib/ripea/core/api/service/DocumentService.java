@@ -264,6 +264,7 @@ public interface DocumentService {
 	 *            Atribut id del contenidor a on es vol crear el document.
 	 * @param metaDocumentId
 	 *            Atribut id del meta-document.
+	 * @param rolActual
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws PinbalException
@@ -274,7 +275,8 @@ public interface DocumentService {
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,
-			PinbalConsultaDto consulta) throws NotFoundException, PinbalException;
+			PinbalConsultaDto consulta, 
+			String rolActual) throws NotFoundException, PinbalException;
 
 	/**
 	 * Envia un document a firmar al portafirmes.
