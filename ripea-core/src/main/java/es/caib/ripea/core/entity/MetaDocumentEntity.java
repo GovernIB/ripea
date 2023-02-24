@@ -78,6 +78,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@ForeignKey(name = "ipa_metaexp_metadoc_fk")
 	private MetaExpedientEntity metaExpedient;
 	
+	@Column(name = "ordre")
+	private int ordre;
 	@Column(name = "nti_origen", length = 2)
 	@Enumerated(EnumType.STRING)
 	private NtiOrigenEnumDto ntiOrigen;
@@ -207,7 +209,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public boolean isPerDefecte() {
 		return perDefecte;
 	}
-	
+	public int getOrdre() {
+		return ordre;
+	}
 	public boolean isLeftPerCreacio() {
 		return leftPerCreacio;
 	}
@@ -241,6 +245,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	}
 	
 	
+	public void updateOrdre(int ordre) {
+		this.ordre = ordre;
+	}
+
 	
 	public void update(
 			String codi,
@@ -332,7 +340,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String ntiTipoDocumental,
 			boolean pinbalActiu,
 			String pinbalFinalitat,
-			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
+			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos, 
+			int ordre) {
 		return new Builder(
 				entitat,
 				codi,
@@ -344,7 +353,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				ntiTipoDocumental,
 				pinbalActiu,
 				pinbalFinalitat,
-				pinbalServeiDocsPermesos);
+				pinbalServeiDocsPermesos, 
+				ordre);
 	}
 	public static class Builder {
 		MetaDocumentEntity built;
@@ -359,7 +369,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				String ntiTipoDocumental,
 				boolean pinbalActiu,
 				String pinbalFinalitat,
-				List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
+				List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos, 
+				int ordre) {
 			built = new MetaDocumentEntity();
 			built.entitat = entitat;
 			built.codi = codi;
@@ -377,6 +388,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.codiPropi = codi;
 			built.pinbalActiu = pinbalActiu;
 			built.pinbalFinalitat = pinbalFinalitat;
+			built.ordre = ordre;
 			
 			if (pinbalServeiDocsPermesos != null) {
 				built.pinbalServeiDocPermesDni = pinbalServeiDocsPermesos.contains(PinbalServeiDocPermesEnumDto.DNI);

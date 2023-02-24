@@ -86,20 +86,33 @@ public class MetaNodeHelper {
 			MetaDadaEntity metaDada,
 			int posicio) {
 		List<MetaDadaEntity> metaNodeMetaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaNode);
-		int indexOrigen = -1;
-		for (MetaDadaEntity md: metaNodeMetaDades) {
-			if (md.getId().equals(metaDada.getId())) {
-				indexOrigen = md.getOrdre();
+		moveTo(
+				metaDada,
+				metaNodeMetaDades,
+				posicio);
+	}
+	
+	public void moveTo(
+			MetaDadaEntity elementToMove,
+			List<MetaDadaEntity> elements,
+			int posicio) {
+		
+		int anteriorIndex = -1; 
+		for (MetaDadaEntity element: elements) {
+			if (element.getId().equals(elementToMove.getId())) {
+				anteriorIndex = element.getOrdre();
 				break;
 			}
 		}
-		metaNodeMetaDades.add(
+		elements.add(
 				posicio,
-				metaNodeMetaDades.remove(indexOrigen));
-		for (int i = 0; i < metaNodeMetaDades.size(); i++) {
-			metaNodeMetaDades.get(i).updateOrdre(i);
+				elements.remove(anteriorIndex));
+		for (int i = 0; i < elements.size(); i++) {
+			elements.get(i).updateOrdre(i);
 		}
 	}
+	
+	
 
 	public void reordenarMetaDades(
 			MetaNodeEntity metaNode) {

@@ -70,6 +70,10 @@ public class MetaDocumentHelper {
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId);
+		
+		
+		
+		
 		MetaDocumentEntity entity = MetaDocumentEntity.getBuilder(
 				entitat,
 				metaDocument.getCodi(),
@@ -81,7 +85,8 @@ public class MetaDocumentHelper {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos()).
+				metaDocument.getPinbalServeiDocsPermesos(),
+				metaDocumentRepository.countByMetaExpedient(metaExpedient)).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).

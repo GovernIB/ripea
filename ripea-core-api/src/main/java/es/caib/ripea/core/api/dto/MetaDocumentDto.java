@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.dto;
 import java.io.Serializable;
 import java.util.List;
 
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import lombok.Getter;
@@ -45,7 +46,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private Long metaExpedientId;
 	private boolean leftPerCreacio;
 	private boolean pinbalUtilitzarCifOrgan;
-	
+	private int ordre;
 	
 	public boolean isPermetMultiple() {
 		return multiplicitat.equals(MultiplicitatEnumDto.M_0_N) || multiplicitat.equals(MultiplicitatEnumDto.M_1_N);

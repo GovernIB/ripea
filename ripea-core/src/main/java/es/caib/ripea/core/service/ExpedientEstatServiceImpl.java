@@ -521,23 +521,35 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			int posicio) {
 		List<ExpedientEstatEntity> estats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(
 				estat.getMetaExpedient());
-		if (posicio >= 0 && posicio < estats.size()) {
-			if (posicio < estat.getOrdre()) {
-				for (ExpedientEstatEntity est: estats) {
-					if (est.getOrdre() >= posicio && est.getOrdre() < estat.getOrdre()) {
-						est.updateOrdre(est.getOrdre() + 1);
-					}
-				}
-			} else if (posicio > estat.getOrdre()) {
-				for (ExpedientEstatEntity est: estats) {
-					if (est.getOrdre() > estat.getOrdre() && est.getOrdre() <= posicio) {
-						est.updateOrdre(est.getOrdre() - 1);
-					}
-				}
+		
+		moveTo(
+				estat,
+				estats,
+				posicio);
+	}
+	
+	
+	public void moveTo(
+			ExpedientEstatEntity elementToMove,
+			List<ExpedientEstatEntity> elements,
+			int posicio) {
+		
+		int anteriorIndex = -1; 
+		for (ExpedientEstatEntity element: elements) {
+			if (element.getId().equals(elementToMove.getId())) {
+				anteriorIndex = element.getOrdre();
+				break;
 			}
-			estat.updateOrdre(posicio);
+		}
+		elements.add(
+				posicio,
+				elements.remove(anteriorIndex));
+		for (int i = 0; i < elements.size(); i++) {
+			elements.get(i).updateOrdre(i);
 		}
 	}
+	
+	
 
 	private ExpedientDto toExpedientDto(
 			ExpedientEntity expedient,

@@ -1,0 +1,15 @@
+databaseChangeLog:
+- changeSet:
+    id: 1677162604544-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: ordre
+            type: int
+            defaultValueNumeric: 0   
+            constraints:
+                nullable: false         
+        tableName: ipa_metadocument
+

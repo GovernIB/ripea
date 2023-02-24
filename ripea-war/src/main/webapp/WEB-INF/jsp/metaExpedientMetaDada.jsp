@@ -30,7 +30,7 @@ $(document).ready(function() {
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.metadada.boto.afegir"/></a>
 	</div>
-	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/metaDada/datatable"/>" data-drag-enabled="true" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
+	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/metaDada/datatable"/>" data-drag-enabled="true" data-info-type="search" class="table table-striped table-bordered">
 		<thead>
 			<tr>
 				<th data-col-name="ordre" data-visible="false"></th>
