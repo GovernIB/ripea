@@ -364,7 +364,8 @@ public class ContingutServiceBean implements ContingutService {
 			boolean ambPermisos,
 			String rolActual,
 			Long organActualId,
-			boolean ambEntitat) {
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
@@ -373,7 +374,8 @@ public class ContingutServiceBean implements ContingutService {
 				ambPermisos,
 				rolActual,
 				organActualId,
-				ambEntitat);
+				ambEntitat, 
+				ambMapPerTipusDocument);
 	}
 
 	@Override

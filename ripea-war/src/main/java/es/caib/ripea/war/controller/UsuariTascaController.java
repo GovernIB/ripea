@@ -97,6 +97,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+// TODO: merge repeatable methods with ContingutController
 @Slf4j
 @Controller
 @RequestMapping("/usuariTasca")
@@ -107,6 +108,7 @@ public class UsuariTascaController extends BaseUserController {
 
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
+	private static final String CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS = "arbrePerTipusDocuments";
 	
 	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
@@ -670,31 +672,6 @@ public class UsuariTascaController extends BaseUserController {
 				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
 	}
 	
-	
-	@RequestMapping(value = "/{tascaId}/canviVista/icones", method = RequestMethod.GET)
-	public String canviVistaLlistat(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_ICONES);
-		return "redirect:../tramitar";
-	}
-
-	@RequestMapping(value = "/{tascaId}/canviVista/llistat", method = RequestMethod.GET)
-	public String canviVistaIcones(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_LLISTAT);
-		return "redirect:../tramitar";
-	}
-	
 
 	public void omplirModelPerMostrarContingut(
 			HttpServletRequest request,
@@ -716,13 +693,17 @@ public class UsuariTascaController extends BaseUserController {
 
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
-			contingutVista = CONTENIDOR_VISTA_LLISTAT;
+			contingutVista = CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS;
 		model.addAttribute(
 				"vistaIcones",
 				new Boolean(CONTENIDOR_VISTA_ICONES.equals(contingutVista)));
 		model.addAttribute(
 				"vistaLlistat",
 				new Boolean(CONTENIDOR_VISTA_LLISTAT.equals(contingutVista)));
+		model.addAttribute(
+				"vistaTreetablePerTipusDocuments",
+				new Boolean(CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS.equals(contingutVista)));
+		
 		model.addAttribute(
 				"registreTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(

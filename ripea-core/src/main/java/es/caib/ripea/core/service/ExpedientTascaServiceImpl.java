@@ -182,7 +182,17 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				true,
 				true,
-				ambVersions, null, false, null, false, 0, null, null, true);
+				ambVersions,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				true);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -806,7 +816,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
-		return (DocumentDto)contingutHelper.toContingutDto(
+		return (DocumentDto) contingutHelper.toContingutDto(
 				document,
 				false,
 				false,
@@ -814,7 +824,17 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				true,
 				true,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 	}
 
 	/*private String getIdiomaPerDefecte() {

@@ -34,6 +34,10 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 	
 	List<MetaDocumentEntity> findByMetaExpedientOrderByOrdreAsc(
 			MetaExpedientEntity metaExpedient);
+	
+	List<MetaDocumentEntity> findByMetaExpedientAndActiuTrueOrderByOrdreAsc(
+			MetaExpedientEntity metaExpedient);
+	
 	@Query(	"from " +
 			"    MetaDocumentEntity md " +
 			"where " +

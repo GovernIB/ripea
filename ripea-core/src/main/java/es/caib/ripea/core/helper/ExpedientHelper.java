@@ -998,7 +998,7 @@ public class ExpedientHelper {
 
 	@Transactional(readOnly = true)
 	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {
-		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(
+		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
 				false,
@@ -1008,7 +1008,15 @@ public class ExpedientHelper {
 				false,
 				false,
 				rolActual,
-				onlyForList, null, false, 0, null, null, true);
+				onlyForList,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 		return expedientDto;
 	}
 	
@@ -1081,7 +1089,7 @@ public class ExpedientHelper {
 	
 
 	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
-		return (ExpedientDto)contingutHelper.toContingutDto(
+		return (ExpedientDto) contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
 				false,
@@ -1089,7 +1097,17 @@ public class ExpedientHelper {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 	}
 
 

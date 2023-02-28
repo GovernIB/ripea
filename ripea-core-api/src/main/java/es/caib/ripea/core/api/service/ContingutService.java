@@ -581,5 +581,6 @@ public interface ContingutService {
 			boolean ambPermisos,
 			String rolActual,
 			Long organActualId,
-			boolean ambEntitat);
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument);
 }

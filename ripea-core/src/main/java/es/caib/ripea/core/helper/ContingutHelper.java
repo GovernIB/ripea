@@ -12,9 +12,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -101,6 +103,7 @@ import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -178,6 +181,8 @@ public class ContingutHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
 
 
 
@@ -191,41 +196,17 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
-	}
-	
-	public ContingutDto toContingutDto(
-			ContingutEntity contingut,
-			boolean ambPermisos,
-			boolean ambFills,
-			boolean filtrarFillsSegonsPermisRead,
-			boolean ambDades,
-			boolean ambPath,
-			boolean pathNomesFinsExpedientArrel,
-			boolean ambVersions,
-			String rolActual,
-			boolean onlyForList,
-			Long organActualId, 
-			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare) {
-		
-		return toContingutDto(
-				contingut,
-				ambPermisos,
-				ambFills,
-				filtrarFillsSegonsPermisRead,
-				ambDades,
-				ambPath,
-				pathNomesFinsExpedientArrel,
-				ambVersions,
-				rolActual,
-				onlyForList,
-				organActualId,
-				onlyFirstDescendant,
-				level,
-				expedientDto,
-				pathDto,
-				ambExpedientPare,
-				true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true, 
+				false);
 	}
 	
 	
@@ -241,7 +222,13 @@ public class ContingutHelper {
 			String rolActual,
 			boolean onlyForList,
 			Long organActualId, 
-			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare, boolean ambEntitat) {
+			boolean onlyFirstDescendant, 
+			int level, 
+			ExpedientDto expedientDto, 
+			List<ContingutDto> pathDto, 
+			boolean ambExpedientPare, 
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument) {
 		level++;
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		ContingutDto resposta = null;
@@ -372,8 +359,67 @@ public class ContingutHelper {
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
 						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
-			}
+			
+			
+			
+				if (ambMapPerTipusDocument) {
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerTipusDocument start (" + contingut.getId() + ")");
+					long t2 = System.currentTimeMillis();
 
+					Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new HashMap<MetaDocumentDto, List<ContingutDto>>();
+
+					List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
+					
+					for (MetaDocumentEntity metaDocument : metaDocuments) {
+						
+						List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+								expedient,
+								metaDocument,
+								0);
+						
+						MetaDocumentDto metaDocumentDto = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
+						
+						
+						List<ContingutDto> docsDtos = new ArrayList<ContingutDto>(); 
+						if (CollectionUtils.isNotEmpty(documents)) {
+							for (DocumentEntity document : documents) {
+								
+								docsDtos.add(toContingutDto(
+										document,
+										ambPermisos,
+										false,
+										false,
+										false,
+										ambPath,
+										false,
+										false,
+										rolActual,
+										onlyForList,
+										organActualId,
+										onlyFirstDescendant,
+										level,
+										null,
+										null,
+										ambExpedientPare,
+										ambEntitat,
+										false));
+								
+								
+							}
+						} 
+						mapPerTipusDocument.put(metaDocumentDto, docsDtos);
+						
+					}
+					dto.setMapPerTipusDocument(mapPerTipusDocument);
+					
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerTipusDocument end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				}			
+			
+			
+			}
+			
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 
@@ -507,7 +553,17 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, true, null, onlyFirstDescendant, level, null, null, ambExpedientPare, ambEntitat));
+								false,
+								null,
+								true,
+								null,
+								onlyFirstDescendant,
+								level,
+								null,
+								null,
+								ambExpedientPare,
+								ambEntitat,
+								ambMapPerTipusDocument));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
@@ -666,7 +722,7 @@ public class ContingutHelper {
 								null,
 								null, 
 								ambExpedientPare, 
-								ambEntitat);
+								ambEntitat, ambMapPerTipusDocument);
 						if (cacheHelper.mostrarLogsRendiment())
 							logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 					}
@@ -757,7 +813,7 @@ public class ContingutHelper {
 								false,
 								ambPath,
 								false,
-								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare, ambEntitat);
+								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare, ambEntitat, ambMapPerTipusDocument);
 						// Configura el pare de cada fill
 						fillsDtos.add(fillDto);
 					}
@@ -1154,7 +1210,17 @@ public class ContingutHelper {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1722,15 +1788,25 @@ public class ContingutHelper {
 					expedientArrelTrobat = true;
 				if (expedientArrelTrobat) {
 					pathDto.add(
-						toContingutDto(
-								contingutPath,
-								ambPermisos,
-								false,
-								false,
-								false,
-								false,
-								false,
-								false, null, false, null, false, level, null, null, false, false));
+							toContingutDto(
+									contingutPath,
+									ambPermisos,
+									false,
+									false,
+									false,
+									false,
+									false,
+									false,
+									null,
+									false,
+									null,
+									false,
+									level,
+									null,
+									null,
+									false,
+									false,
+									false));
 				}
 			}
 		}

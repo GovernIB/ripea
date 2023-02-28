@@ -457,7 +457,17 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 									false,
 									true,
 									true,
-									false, null, false, null, false, 0, null, null, true);
+									false,
+									null,
+									false,
+									null,
+									false,
+									0,
+									null,
+									null,
+									true,
+									true,
+									false);
 							return dto;
 						}
 					});
@@ -562,7 +572,17 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false,
 				ambPathIPermisos,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 		
 		return expedientDto;
 	}

@@ -1408,7 +1408,7 @@ public class PluginHelper {
 			if (nouDocumentArxiu != null) {
 				return nouDocumentArxiu.getIdentificador();
 			} else {
-				return null;
+			return null;
 			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1464,6 +1464,11 @@ public class PluginHelper {
 	public void arxiuCarpetaActualitzar(CarpetaEntity carpeta, ContingutEntity contingutPare) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
+		
+		boolean throwExceptionCarpetaArxiu = false;
+		if (throwExceptionCarpetaArxiu) { // throwExceptionCarpetaArxiu = true;
+			throw new RuntimeException("Mock excepcion al actualitzar carpeta al arxiu");
+		}
 		
 		String accioDescripcio = "Actualització de les dades d'una carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();

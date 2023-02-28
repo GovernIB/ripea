@@ -89,6 +89,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 
 	private static final String CONTENIDOR_VISTA_ICONES = "icones";
 	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
+	private static final String CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS = "arbrePerTipusDocuments";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	
 	@Autowired
@@ -141,7 +142,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					true,
 					RolHelper.getRolActual(request), 
 					EntitatHelper.getOrganGestorActualId(request),
-					false);
+					false, 
+					true);
 
 			omplirModelPerMostrarContingut(
 					request,
@@ -298,11 +300,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			seleccio.remove(id);
 		}
 	}
-
-	@RequestMapping(value = "/contingut/{contingutId}/canviVista/icones", method = RequestMethod.GET)
-	public String canviVistaLlistat(
+	
+	
+	@RequestMapping(value = "/contingut/{isTasca}/{id}/canviVista/{vista}", method = RequestMethod.GET)
+	public String canviVista(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
+			@PathVariable boolean isTasca,
+			@PathVariable Long id,
+			@PathVariable String vista,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = new HashSet<Long>();
@@ -310,28 +315,19 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				SESSION_ATTRIBUTE_SELECCIO,
 				seleccio);
+		
 		SessioHelper.updateContenidorVista(
 				request,
-				CONTENIDOR_VISTA_ICONES);
-		return "redirect:../../" + contingutId;
-	}
+				vista);
+		if (isTasca) {
+			return "redirect:/usuariTasca/" + id + "/tramitar";
+		} else {
+			return "redirect:/contingut/" + id;
+		}
+		
 
-	@RequestMapping(value = "/contingut/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
-	public String canviVistaIcones(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		Set<Long> seleccio = new HashSet<Long>();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO,
-				seleccio);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_LLISTAT);
-		return "redirect:../../" + contingutId;
 	}
+	
 
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.GET)
 	public String moureForm(
@@ -430,7 +426,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				RolHelper.getRolActual(request));
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../" + contingutOrigen.getPare().getId(),
+				"redirect:../../" + contingutOrigen.getExpedientPare().getId(),
 				"contingut.controller.element.mogut.ok");
 	}
 	
@@ -775,31 +771,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	}
 
 
-
-	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/icones", method = RequestMethod.GET)
-	public String contingutDetailCanviVistaIcones(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_ICONES);
-		return "redirect:../../" + contingutId;
-	}
-
-	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
-	public String contingutDetailCanviVistaLlistat(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_LLISTAT);
-		return "redirect:../../" + contingutId;
-	}
-
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -808,7 +779,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
-
 
 
 	public void omplirModelPerMostrarContingut(
@@ -870,13 +840,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 
 		String contingutVista = SessioHelper.getContenidorVista(request);
 		if (contingutVista == null)
-			contingutVista = CONTENIDOR_VISTA_LLISTAT;
+			contingutVista = CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS;
 		model.addAttribute(
 				"vistaIcones",
 				new Boolean(CONTENIDOR_VISTA_ICONES.equals(contingutVista)));
 		model.addAttribute(
 				"vistaLlistat",
 				new Boolean(CONTENIDOR_VISTA_LLISTAT.equals(contingutVista)));
+		model.addAttribute(
+				"vistaTreetablePerTipusDocuments",
+				new Boolean(CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS.equals(contingutVista)));
+		
 		model.addAttribute(
 				"registreTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(

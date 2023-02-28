@@ -128,10 +128,6 @@ span a {
 	margin-bottom: 0.4em;
 }
 
-.element-hover .thumbnail {
-	border: 2px solid #ddd !important;
-	background-color: #f5f5f5;
-}
 .right {
 	float: right;
 }
@@ -362,7 +358,9 @@ $(document).ready(function() {
 		checkLoadingFinished();
     });
 	
-
+	$('#contenidor-info li a.confirm-delete').click(function() {
+		return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
+	});
 	
 	var iconaIdx = $('.esborranys > p').text().indexOf('(B)');
 	if (iconaIdx != -1) {

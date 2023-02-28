@@ -37,11 +37,11 @@
 }
 
 
-#contenidor-contingut {
+#grid-documents {
 	margin-left: 0;
 	margin-right: -11px;
 }
-#contenidor-contingut li.element-contingut {
+#grid-documents li.element-contingut {
 	margin: 0 0 0px 0;
 	padding: 0 10px 0 0;
 	min-height: 140px;
@@ -52,28 +52,32 @@
 	*display: inline;
 	_height: 140px;
 }
-#contenidor-contingut .thumbnail {
+#grid-documents .thumbnail {
 	margin-bottom: 0 !important;
 	border: 2px solid #f9f9f9;
 }
-#contenidor-contingut .thumbnail:hover {
+#grid-documents .thumbnail:hover {
 	border: 2px solid #ddd;
 	background-color: #f5f5f5;
 	cursor: pointer;
 }
-#contenidor-contingut .thumbnail h4 {
+#grid-documents .thumbnail h4 {
 	margin-top: 4px;
 }
-#contenidor-contingut .thumbnail a {
+#grid-documents .thumbnail a {
 	text-decoration: none;
 }
-#contenidor-contingut .caption p {
+.element-hover .thumbnail {
+	border: 2px solid #ddd !important;
+	background-color: #f5f5f5;
+}
+#grid-documents .caption p {
 	
 }
-#contenidor-contingut .caption .dropdown-menu {
+#grid-documents .caption .dropdown-menu {
 	text-align: left;
 }
-#contenidor-contingut .caption .dropdown-menu li {
+#grid-documents .caption .dropdown-menu li {
 	width: 100%;
 	margin: 0;
 	padding: 0;
@@ -217,6 +221,12 @@
 }
 
 
+
+.ui-droppable-hover{
+	background: #999999 !important;
+}
+
+
 </style>
 
 
@@ -232,58 +242,27 @@ $(document).ready(function() {
 
 	//------------------------- if contingut is not document START ----------------------------------	
 	<c:if test="${!contingut.document}"> 
+
 	
+		clearSelection();
+		enableDisableMultipleButtons();
+
+		$("#tascaBtn").appendTo(".panel-heading h2");
+		<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 	
 		$('#table-documents').treeTable();
 		//remove treetable click events on unnecessary columns for all rows
-		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(4), :nth-child(7), :nth-child(8)').css('cursor','default').unbind('click');
+		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8)').css('cursor','default').unbind('click');
 		//remove treetable click events on all columns for document rows
 		$('#table-documents > tbody > tr.isDocument > td').css('cursor','default').unbind('click');
 		//add show viewer click events on all necessary columns for document rows
-		$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(5), :nth-child(6)').css('cursor','pointer').click(function(event) {
+		$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6)').css('cursor','pointer').click(function(event) {
 			event.stopPropagation();
 			$('a:first', $(this).parent())[0].click();
 		});
 		
-		
-		$("#mostraDetallSignants").click(function(){
-			let contingutId = ${contingut.id}; 
-			getDetallsSignants($('#detallSignants'), contingutId, false);
-		});
-		
-		
-		$('.element-draggable').draggable({
-			containment: 'parent',
-			helper: 'clone',
-			revert: true,
-			revertDuration: 200,
-			opacity: 0.50,
-			zIndex: 100,
-			start: function() {
-				$('div.element-noclick', this).addClass('noclick');
-				$('div.element-noclick', this).tooltip('hide');
-				$('div.element-noclick', this).tooltip('disable');
-			},
-			stop: function() {
-				$('div.element-noclick', this).tooltip('enable');
-			}
-		});	
-		$('.element-droppable').children(":not('.ordre-col')").droppable({
-			accept: '.element-draggable',
-			tolerance: 'pointer',
-			activeClass: 'element-target',
-			hoverClass: 'element-hover',
-			drop: function(event, ui) {
-				showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-				var origenId = ui.draggable.data('contenidor-id');
-				var destiId = $(this).parent().data('contenidor-id');
-				window.location = origenId + "/moure/" + destiId;
-				dropped = true;
-		        $(event.target).addClass('dropped');
-			}
-		});
-		
-		
+
+		// order by dragging
 		$('.ordre-col').on('mouseover', function() {
 			$('.element-draggable').draggable({ disabled: true });
 			$('.element-draggable').droppable({ disabled: true });
@@ -303,7 +282,7 @@ $(document).ready(function() {
 					var tableDocuments = document.getElementById('table-documents');
 					$(tableDocuments).addClass("disabled");
 		            $('#loading').removeClass('hidden');
-					var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'data-contenidor-id'});
+					var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'id'});
 		            var filtered = idsInOrder.filter(function (el) {
 		           		return el != '';
 		            });
@@ -330,8 +309,9 @@ $(document).ready(function() {
 			$('.element-draggable').draggable("enable");
 			$('.element-draggable').droppable("enable");
 		});
-	
-	
+
+		
+		// add new document by dragging it to #drag_container 
 		$('#drag_container').filedrop({
 			maxfiles: 1,
 			fallback_dropzoneClick : false,
@@ -370,122 +350,10 @@ $(document).ready(function() {
 				}
 			}
 		});
-	
-	
-	
-		$('#habilitar-mult').on('click', function() {
-			var contenidorContingut = document.getElementById('contenidor-contingut');
-			var inputs = contenidorContingut.querySelectorAll('li>div');
-			
-			if ($(contenidorContingut).hasClass('multiple')) {
-				<c:if test="${vistaIcones}">
-					$('.checkItAll').addClass('disabled');
-				</c:if>
-				$(contenidorContingut).removeClass('multiple');
-				$(this).removeClass('active');
-				//Inicialitzar contador i array
-				docsIdx = [];
-				var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
-				$.get(
-						multipleUrl,
-						function(data) {
-							$(".seleccioCount").html(data);
-						}
-				);
-				enableDisableButton();
-				inputs.forEach(function(element) {
-					if ($(element).hasClass('selectd')) {
-						$(element).removeClass('selectd');
-					}
-				}); 
-			} else {
-				<c:if test="${vistaIcones}">
-					$('.checkItAll').removeClass('disabled');
-				</c:if>
-				$(contenidorContingut).addClass('multiple');
-				$(this).addClass('active');
-			}
-		});
+
 		
-		enableDisableButton();
-		var tableDocuments = document.getElementById('table-documents');
-		if (tableDocuments != null) {
-			//Vista llista
-			var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-			if (typeof checkItAll !== 'undefined') {
-				checkItAll.addEventListener('change', function() {
-					if (checkItAll.checked) {
-						inputs.forEach(function(input) {
-							/*var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut/' + input.id + '"/>';
-							$.ajax({
-						        type: "GET",
-						        url: comprovacioUrl,
-						        success: function (isDocument) {*/
-						    input.checked = true;
-							var index = docsIdx.indexOf(parseInt(input.id));
-							if (index < 0) {
-								docsIdx.push(parseInt(input.id));
-							}
-							enableDisableButton();
-							selectAll();
-						        /*}
-							});*/
-					    });  
-					} else {
-						inputs.forEach(function(input) {
-							input.checked = false;
-							var index = docsIdx.indexOf(parseInt(input.id));
-							if (index > -1) {
-								docsIdx.splice(index, 1);
-							}
-					    });  
-						enableDisableButton();
-						deselectAll();
-					}
-				});
-			}
-		} else {
-			//Vista icones
-			$(checkItAll).on('click', function(){
-				var listDocuments = document.getElementById('contenidor-contingut');
-				var elements = listDocuments.querySelectorAll('li>div');
-				$(checkItAll).toggleClass('active');
-	
-				if ($(checkItAll).hasClass('active') && $(listDocuments).hasClass('multiple')) {
-					elements.forEach(function(child) {
-						var childParent = $(child.parentElement);
-						var isCarpeta = childParent.hasClass('element-droppable');
-						if (!isCarpeta) {
-							$(child).addClass('selectd');
-							var index = docsIdx.indexOf(parseInt(child.id));
-							if (index < 0) {
-								docsIdx.push(parseInt(child.id));
-							}
-						}
-					}); 
-					enableDisableButton();
-					selectAll();
-				} else if ($(listDocuments).hasClass('multiple')) {
-					elements.forEach(function(input) {
-						$(input).removeClass('selectd');
-						var index = docsIdx.indexOf(parseInt(input.id));
-						if (index > -1) {
-							docsIdx.splice(index, 1);
-						}
-				    });  
-					enableDisableButton();
-					deselectAll();
-				}
-			});
-		}
-	
-	
-		//### canvi tipus documental massiu
+		// canvi tipus document multiple
 		var $botoTipusDocumental = $('#tipusdocumental-mult');
-		$botoTipusDocumental.on('click', function() {
-			$botoTipusDocumental.popover("show");
-		});
-			
 		$botoTipusDocumental.popover({
 			html: true,
 			placement: 'bottom',
@@ -529,27 +397,18 @@ $(document).ready(function() {
 				$botoTipusDocumental.popover('hide');
 			});
 		});
-		$(window).on('load', function() {
-			var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
-			$.get(
-					multipleUrl,
-					function(data) {
-						$(".seleccioCount").html(data);
-					}
-			);
-		});	
-	
-	
-		//=== assignar tipus document a document ====
-		var selTipusDocument = $('.select-tipus-document');
+		$botoTipusDocumental.on('click', function() {
+			$botoTipusDocumental.popover("show");
+		});
+		// canvi tipus document single
+		// TODO: revise, element select-tipus-document doesnt exist
+		var selTipusDocument = $('.select-tipus-document'); 
 		var select2Options = {
 				theme: 'bootstrap', 
 				width: 'auto', 
 				minimumResultsForSearch: "0"};
 		selTipusDocument.select2(select2Options);
-	
 		selTipusDocument.on('change', function(event){
-	
 			var tipusDocumentId = $(':selected', $(this)).attr('id');
 				showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
 				var documentId = $(this).attr('id');
@@ -572,17 +431,14 @@ $(document).ready(function() {
 			        }
 			    });	
 		});
-	
-		<c:if test="${vistaIcones}">
-			var checkItAll = document.getElementById('checkItAll');
-			$('.checkItAll').addClass('disabled');
-		</c:if>
-	
-	
+		
+
+		// Ja has afegit tots els documents a l'expedient
 		$("#document-new-empty-metadocuments").click(function(e){
 		    alert("<spring:message code="contingut.document.alerta.max"/>");
 		    e.preventDefault();
 		});	
+
 		
 		// popover notificacions
 		$("span[class*='popover-']").popover({
@@ -603,32 +459,249 @@ $(document).ready(function() {
 		});	
 
 
-		$("#tascaBtn").appendTo(".panel-heading h2");
-		<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 
 
-		$('#contenidor-contingut li').mouseover(function() {
-			$('a.btn', this).removeClass('hidden');
-		});
-		$('#contenidor-contingut li').mouseout(function() {
-			$('a.btn', this).addClass('hidden');
-		});
-		$('#contenidor-info li a.confirm-delete').click(function() {
-			return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
-		});
-		$('#contenidor-contingut li a.confirm-delete').click(function() {
-			return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
-		});
+
+
+
+		let vistaActiva = $('#vistes').children("a.active").attr('id');
+		//-------------------------------- VISTA GRID  -----------------------------------------﻿
+		if (vistaActiva == 'vistaGrid') {
+			// Habilitar selecció múltiple
+			$('#habilitar-mult').on('click', function() {
+				var contenidorContingut = document.getElementById('grid-documents');
+				var inputs = contenidorContingut.querySelectorAll('li>div');
+				
+				if ($(contenidorContingut).hasClass('multiple')) {
+					$('#checkItAll').addClass('disabled');
+					$(contenidorContingut).removeClass('multiple');
+					$(this).removeClass('active');
+					clearSelection();
+					enableDisableMultipleButtons();
+					inputs.forEach(function(element) {
+						if ($(element).hasClass('selectd')) {
+							$(element).removeClass('selectd');
+						}
+					}); 
+				} else {
+					$('#checkItAll').removeClass('disabled');
+					$(contenidorContingut).addClass('multiple');
+					$(this).addClass('active');
+				}
+			});
+
+			// Seleccionar tots
+			$('#checkItAll').on('click', function(){
+				let docsIdx = [];
+				var listDocuments = document.getElementById('grid-documents');
+				var elements = listDocuments.querySelectorAll('li>div');
+				$('#checkItAll').toggleClass('active');
+	
+				if ($('#checkItAll').hasClass('active') && $(listDocuments).hasClass('multiple')) {
+					elements.forEach(function(child) {
+						var childParent = $(child.parentElement);
+						var isCarpeta = childParent.hasClass('element-droppable');
+						if (!isCarpeta) {
+							$(child).addClass('selectd');
+							var index = docsIdx.indexOf(parseInt(child.id));
+							if (index < 0) {
+								docsIdx.push(parseInt(child.id));
+							}
+						}
+					}); 
+					enableDisableMultipleButtons(docsIdx);
+					selectAll(docsIdx);
+				} else if ($(listDocuments).hasClass('multiple')) {
+					elements.forEach(function(input) {
+						$(input).removeClass('selectd');
+						var index = docsIdx.indexOf(parseInt(input.id));
+						if (index > -1) {
+							docsIdx.splice(index, 1);
+						}
+				    });  
+					enableDisableMultipleButtons(docsIdx);
+					deselectAll();
+				}
+			});
+
+
+			// move to another folder by drag and drop (jquery-ui widget) 
+			// TODO: revise, is necessary for vista icones? 
+			$('.element-draggable').draggable({
+				containment: 'parent',
+				helper: 'clone',
+				revert: true,
+				revertDuration: 200,
+				opacity: 0.50,
+				zIndex: 100,
+				start: function() {
+					$('div.element-noclick', this).addClass('noclick');
+					$('div.element-noclick', this).tooltip('hide');
+					$('div.element-noclick', this).tooltip('disable');
+				},
+				stop: function() {
+					$('div.element-noclick', this).tooltip('enable');
+				}
+			});	
+			$('.element-droppable').children(":not('.ordre-col')").droppable({
+				accept: '.element-draggable',
+				tolerance: 'pointer',
+				activeClass: 'element-target',
+				hoverClass: 'element-hover',
+				drop: function(event, ui) {
+					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+					var origenId = ui.draggable.attr('id');
+					var destiId = $(this).parent().attr('id');
+					window.location = origenId + "/moure/" + destiId;
+					dropped = true;
+			        $(event.target).addClass('dropped');
+				}
+			});
+			
+
+			$('li.element-contingut .caption p').each(function() {
+				$clamp(this, {
+					clamp: 2,
+					useNativeClamp: true
+				});
+			});
+
+			
+			$('#grid-documents li').mouseover(function() {
+				$('a.btn', this).removeClass('hidden');
+			});
+			$('#grid-documents li').mouseout(function() {
+				$('a.btn', this).addClass('hidden');
+			});
+			$('#grid-documents li a.confirm-delete').click(function() {
+				return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
+			});
+			
+		//--------------------------------------  VISTA NOT GRID  ------------------------------------
+		} else {
+
+			// Seleccionar tots
+			$('#checkItAll').on('change', function(){
+
+				let isChecked = $(this).prop('checked');
+				if (isChecked) {
+					$('#table-documents tbody .checkbox').each(function() {
+						$(this).prop('checked', true);
+					});
+				} else {
+					$('#table-documents tbody .checkbox').each(function() {
+						$(this).prop('checked', false);
+					});
+				}
+
+				let idsSelected = getIdsSelectedFromTable();
+				enableDisableMultipleButtons(idsSelected);
+				if (isChecked) {
+					selectAll(idsSelected);
+				} else {
+					deselectAll();
+				}
+				
+			});
+
+			// Select one
+			$('.checkbox').change(function() {
+				
+				let docsIdx = [];
+				let selectedId = $(this).closest('tr').attr('id');
+				docsIdx.push(parseInt(selectedId));
+				
+				if ($(this).prop('checked')) {
+					var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+					$.get(
+							multipleUrl, 
+							{docsIdx: docsIdx},
+							function(data) {
+								$(".seleccioCount").html(data);
+							}
+					);
+				} else {
+					var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+					$.get(
+							multipleUrl, 
+							{docsIdx: docsIdx},
+							function(data) {
+								$(".seleccioCount").html(data);
+							}
+					);
+				}
+
+				let idsSelected = getIdsSelectedFromTable();
+				enableDisableMultipleButtons(idsSelected);
+			});
+
+
+			if (vistaActiva == 'vistaTreetablePerCarpetes'){
+				// move to another folder by drag and drop (jquery-ui widget) 
+				$('.element-draggable').draggable({
+					containment: 'parent',
+					helper: 'clone',
+					revert: true,
+					revertDuration: 200,
+					opacity: 0.50,
+				});	
+				$('.element-droppable').droppable({
+					accept: '.element-draggable',
+					tolerance: 'pointer',
+					drop: function(event, ui) {
+						showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+						let origenId = ui.draggable.attr('id');
+						let destiId = $(this).attr('id');
+						window.location = origenId + "/moure/" + destiId;
+					}
+				});
+
+			} else if (vistaActiva == 'vistaTreetablePerTipusDocuments'){
+				// change tipus de document by drag and drop (jquery-ui widget) 
+				$('.element-draggable').draggable({
+					containment: 'parent',
+					helper: 'clone',
+					revert: true,
+					revertDuration: 200,
+					opacity: 0.50,
+				});	
+				$('.element-droppable').droppable({
+					accept: '.element-draggable',
+					tolerance: 'pointer',
+					drop: function(event, ui) {
+						showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
+						let origenId = ui.draggable.attr('id');
+						let destiId = $(this).attr('id');
+						let updateUrl = '<c:url value="/contingut/' + origenId + '/document/updateTipusDocumentDragDrop"/>' +'?tipusDocumentId=' + destiId;
+						window.location = updateUrl;
+					}
+				});
+			}
+			
+				
+			
+
+
+
+
+			
+		}
+
+
+	
 
 		
-		$('li.element-contingut .caption p').each(function() {
-			$clamp(this, {
-				clamp: 2,
-				useNativeClamp: true
-			});
-		});
 		
 	</c:if>//------------------------- if contingut is not document END ----------------------------------
+
+
+
+	$("#mostraDetallSignants").click(function(){
+		let contingutId = ${contingut.id}; 
+		getDetallsSignants($('#detallSignants'), contingutId, false);
+	});
+	
+	
 });//################################################## document ready END ##############################################################
 
 
@@ -867,7 +940,7 @@ $(document).ready(function() {
 		}
 	}
 
-	function enableDisableButton() {
+	function enableDisableMultipleButtons(docsIdx) {
 		var isTotPdfFirmat = true;
 		var isTotPdf = true;
 		var isTotDocAdjuntGuardatEnArxiu = true;
@@ -878,7 +951,7 @@ $(document).ready(function() {
 		var tableDocuments = document.getElementById('table-documents');
 		$(tableDocuments).addClass("disabled");
 		//icones
-		var gridDocuments = document.getElementById('contenidor-contingut');
+		var gridDocuments = document.getElementById('grid-documents');
 		$(gridDocuments).addClass("disabled");
 	
 			if (docsIdx != undefined && tableDocuments != undefined) {
@@ -906,7 +979,7 @@ $(document).ready(function() {
 			} else if (docsIdx != undefined && gridDocuments != undefined) {
 				var list = gridDocuments.querySelectorAll('li');
 				list.forEach(function(child) {
-					var childId = $(child).attr('data-contenidor-id');
+					var childId = $(child).attr('id');
 					var documentId = parseInt(childId);
 					if (docsIdx.includes(documentId)) {
 						var isFirmatCurrentDocument = $(child).hasClass('firmat');
@@ -947,7 +1020,7 @@ $(document).ready(function() {
 			$('#tipusdocumental-mult').removeClass("disabled");
 		}
 		
-		if (docsIdx.length > 0) {
+		if (docsIdx != undefined && docsIdx.length > 0) {
 			$('#descarregar-mult').removeClass("disabled");
 			$('#moure-mult').removeClass("disabled");
 			$('#tipusdocumental-mult').removeClass("disabled");
@@ -957,12 +1030,12 @@ $(document).ready(function() {
 			$('#moure-mult').addClass("disabled");
 			$('#tipusdocumental-mult').addClass("disabled");
 		}
-		$('#contenidor-contingut ').removeClass("disabled");
+		$('#grid-documents ').removeClass("disabled");
 		$('#table-documents').removeClass("disabled");
 		$('#loading').addClass('hidden');
 	}
 	
-	function selectAll() {
+	function selectAll(docsIdx) {
 		var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
 		$.get(
 				multipleUrl, 
@@ -974,15 +1047,40 @@ $(document).ready(function() {
 	}
 	
 	function deselectAll() {
-		var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+		clearSelection();
+	}
+
+	function clearSelection() {
+		var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
 		$.get(
-				multipleUrl, 
-				{docsIdx: docsIdx},
+				multipleUrl,
 				function(data) {
 					$(".seleccioCount").html(data);
 				}
 		);
 	}
+
+
+
+	function getIdsSelectedFromTable() {
+		let idsSelected = [];
+		$('#table-documents tbody .checkbox').each(function() {
+			if ($(this).prop('checked')) {
+				let id = $(this).closest('tr').attr('id');
+				idsSelected.push(parseInt(id));
+			}
+		});
+		return idsSelected;
+	}
+	
+
+
+
+	
+
+
+
+	
 
 	function showTipusDocumentals() {
 		var content = '<div> \
@@ -1206,9 +1304,10 @@ $(document).ready(function() {
 			</div>
 		</c:if>
 	</c:when>
-	<%--------------- WHEN CONTINGUT IS EXPEDIENT OR CARPETA (SHOWS TABLE/GRID OF CONTINGUTS) ---------------%>
+	<%---------------------------- WHEN CONTINGUT IS EXPEDIENT OR CARPETA (SHOWS ARBRE / GRID OF CONTINGUTS) -------------------------%>
 	<c:otherwise>
 	
+		<%----------- TASCA BUTTONS ----------%>
 		<c:if test="${isTasca}">
 			<div id="tascaBtn" style="float: right">
 				<c:if test="${tascaEstat=='INICIADA'}">
@@ -1219,30 +1318,36 @@ $(document).ready(function() {
 				</c:if>									
 				<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
 			</div>
-		</c:if>							
-		<%---- ACCION BUTTONS (CANVI VISTA, CREATE CONTINGUT) ----%>
-		
+		</c:if>	
+								
+		<%----------------------------------- ACCION BUTTONS --------------------------------%>
 		<div class="text-right" id="contingut-botons">
 		
+			<%---- path ----%>
 			<c:if test="${contingut.expedient or contingut.carpeta}">
 				<rip:blocContenidorPath contingut="${contingut}"/>
 			</c:if>
 			
-			<div class="" style="float: left;display: inline-block;">
+			<%---- expand/collapse tree ----%>
+			<c:if test="${!vistaIcones}">
+				<div class="" style="float: left;display: inline-block;">
 					<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
 					<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
-			</div>
+				</div>
+			</c:if>
 			<c:if test="${isTasca}">
 				<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
 			</c:if>
 			<c:if test="${vistaIcones}">
+				<%---- Habilitar selecció múltiple ----%>
 				<div class="btn-group">
 					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.habilitar"/>" id="habilitar-mult" class="btn-group btn btn-default">
 						<span class="glyphicon glyphicon-th"></span>
 					</div>
 				</div>
+				<%---- Seleccionar tots ----%>
 				<div class="btn-group">
-					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.seleccio"/>" id="checkItAll" class="btn-group btn btn-default checkItAll">
+					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.seleccio"/>" id="checkItAll" class="btn-group btn btn-default disabled">
 						<span class="fa fa-check"></span>
 					</div>
 				</div>
@@ -1257,9 +1362,6 @@ $(document).ready(function() {
 					</a>
 				</div>
 			</div>
-			
-
-			
 			<c:if test="${(expedientAgafatPerUsuariActual or contingut.admin) and !expedientTancat}">
 				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
 				<%---- Button notificar mult ----%>
@@ -1313,35 +1415,27 @@ $(document).ready(function() {
 				</div>
 				----%>
 			</c:if>
-			<div class="btn-group">
-				<%---- Button llistat ----%>
-				<c:choose>
-					<c:when test="${isTasca}">
-						<c:set var="llistatVistaUrl"><c:url value="/usuariTasca/${tascaId}/canviVista/llistat"/></c:set>
-					</c:when>
-					<c:otherwise>
-						<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/llistat"/></c:set>
-					</c:otherwise>
-				</c:choose>	
-				<a href="${llistatVistaUrl}" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
+			<div class="btn-group" id="vistes">
+				<%---- Button treetable per tipus de documents  ----%>
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/arbrePerTipusDocuments"/></c:set>
+				<a href="${llistatVistaUrl}" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
+					<span class="fa fa-bars"></span>
+				</a>
+				<%---- Button treetable per carpetes  ----%>
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/llistat"/></c:set>
+				<a href="${llistatVistaUrl}" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
 					<span class="fa fa-th-list"></span>
 				</a>
-				<%---- Button icones ----%>
-				<c:choose>
-					<c:when test="${isTasca}">
-						<c:set var="iconesVistaUrl"><c:url value="/usuariTasca/${tascaId}/canviVista/icones"/></c:set>
-					</c:when>
-					<c:otherwise>
-						<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/icones"/></c:set>
-					</c:otherwise>
-				</c:choose>										
-				<a href="${iconesVistaUrl}" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
+				<%---- Button grid ----%>
+				<c:set var="iconesVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/icones"/></c:set>					
+				<a href="${iconesVistaUrl}" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
 					<span class="fa fa-th"></span>
 				</a>	
 				<script>
 					var docsIdx = new Array();
 				</script>							
 			</div>
+			
 			<c:if test="${isTasca or ((expedientAgafatPerUsuariActual or contingut.admin) and ((contingut.carpeta && isCreacioCarpetesActiva) or (contingut.expedient and (potModificarContingut or contingut.admin) and (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT'))))}">
 				<div id="botons-crear-contingut" class="btn-group">
 					<%---- Crear contingut ----%>
@@ -1362,13 +1456,13 @@ $(document).ready(function() {
 							<c:otherwise>
 								<li>
 								<c:choose>
-											<c:when test="${empty metaDocumentsLeft}">
+									<c:when test="${empty metaDocumentsLeft}">
 										<a href="#" id="document-new-empty-metadocuments">
 											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 										</a>
 											</c:when>
 									<c:otherwise>
-													<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true">
+										<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true">
 											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 										</a>
 									</c:otherwise>
@@ -1412,11 +1506,175 @@ $(document).ready(function() {
 		</c:choose>
 		
 		<c:choose>
-			<%--############################################################### VIEW TABLE ###############################################################--%>
+			<%--########################################################### VIEW TREETABLE PER TIPUS DE DOCUMENTS ###########################################################--%>
+			<c:when test="${vistaTreetablePerTipusDocuments}">
+			
+				<c:choose>
+					<c:when test="${not empty contingut.mapPerTipusDocument}">
+						<%--------------------- TREETABLE  -------------------%>
+						<table class="table table-striped table-bordered table-hover" id="table-documents">
+							<thead>
+								<tr>
+									<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
+									<th><spring:message code="contingut.info.nom"/></th>
+									<th><spring:message code="contingut.info.descirpcio"/></th>
+									<th><spring:message code="contingut.info.ruta"/></th>
+									<th><spring:message code="contingut.info.createl"/></th>
+									<th><spring:message code="contingut.info.creatper"/></th>
+									<th width="5%">&nbsp;</th>
+									<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+										<th width="1%">&nbsp;</th>
+									</c:if>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${contingut.mapPerTipusDocument}" var="entry">
+									<%------------------------------- Tipus de document ------------------------%>
+									<tr id="${entry.key.id}"
+										class="<c:if test="${entry.key.permetMultiple || fn:length(entry.value) == 0}"> element-droppable</c:if>"
+										data-node="treetable-${entry.key.id}"
+										data-pnode="treetable-${contingut.id}">
+										<%------------ checkbox ----------%>
+										<td></td>
+										<%------------ Nom ----------%>
+										<td><b>${entry.key.nom}</b> 
+										
+											<span class="badge">${fn:length(entry.value)}</span>
+											
+											<span class="label label-info" style="float: right;">
+												<spring:message code="multiplicitat.enum.${entry.key.multiplicitat}"/> 
+											</span>
+										</td>
+										<%------------ Descripció ----------%>
+										<td></td>
+										<%------------ Tipus -----------%>
+										<td width="25%"></td>
+										<%------------ Creat el -----------%>
+										<td></td>
+										<%------------ Creat per -----------%>
+										<td></td>
+										<%------------ Accions -----------%>
+										<td></td>
+										<%------------ sort ----------%>
+										<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+											<td></td>
+										</c:if>
+									</tr>								
+					   				
+					   				 <%------------------------------- Documents ----------------------------%>
+					   				 <c:choose>
+					   				 	<c:when test="${!empty entry.value}">
+						   				     <c:forEach items="${entry.value}" var="fill">
+						   				     
+												<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+												
+													<c:set var="firmat" value="true"/>
+													<c:if test="${fill.document}">
+														<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
+															<c:set var="firmat" value="false"/> 
+														</c:if>
+													</c:if>
+											
+													<tr id="${fill.id}"
+														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+														data-expedient-id="${expedientPare.id}" 
+														data-node="treetable-${fill.id}"
+														data-pnode="treetable-${entry.key.id}">
+														
+											
+														<%------------ checkbox ----------%>
+														<td><c:if test="${fill.document}">
+															<input type="checkbox" class="checkbox" autocomplete="off" />
+														</c:if></td>
+											
+														<%------------ Nom ----------%>
+														<td>
+															<rip:blocIconaContingut contingut="${fill}" /> 
+															<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
+														</td>
+											
+														<%------------ Descripció ----------%>
+														<td><c:if test="${fill.document}">
+															&nbsp;${fill.descripcio}
+														</c:if></td>
+											
+														<%------------ Ruta -----------%>
+														<td width="25%">
+															<c:forEach var="contingutPath" items="${fill.path}" varStatus="status">
+																<c:if test="${!status.first}">/${contingutPath.nom}</c:if>
+															</c:forEach>
+															<c:if test="${fn:length(fill.path) == 1}">/</c:if>
+														</td>
+											
+														<%------------ Creat el -----------%>
+														<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
+											
+														<%------------ Creat per -----------%>
+														<td>${fill.createdBy.codiAndNom}</td>
+											
+														<%------------ Accions -----------%>
+														<td><rip:blocContingutAccions className="botons-accions-element"
+																modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" /></td>
+											
+														<%------------ sort ----------%>
+														<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+															<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
+																class="fa fa-sort"></span></td>
+														</c:if>
+													</tr>
+												</c:if>
+						   				     
+					    					</c:forEach>
+					   					 </c:when>
+					   					 <c:otherwise>
+					   						<tr	data-node="treetable-0"
+												data-pnode="treetable-${entry.key.id}">
+												<td></td><td colspan="6"><spring:message code="contingut.info.table.tree.tipus.document.no.documents"/></td>
+											</tr>
+					   					 </c:otherwise>
+					   				 </c:choose>
+								</c:forEach>							
+							
+
+							
+							</tbody>
+						</table>			
+					</c:when>
+					<c:otherwise>
+						<%--------------------- EMPTY TREETABLE -------------------%>
+						<table class="table table-striped table-bordered table-hover" id="table-documents">
+								<thead>
+									<tr>
+										<th></th>
+										<th><spring:message code="contingut.info.nom"/></th>
+										<th><spring:message code="contingut.info.descirpcio"/></th>
+										<th><spring:message code="contingut.info.tipus" /></th>
+										<th><spring:message code="contingut.info.createl" /></th>
+										<th><spring:message code="contingut.info.creatper" /></th>
+										<th width="10%">&nbsp;</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td colspan="9" valign="top">
+											<h1 style="opacity: .1; text-align: center;">
+												<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
+												<strong><spring:message code="contingut.sense.contingut" /></strong>
+											</h1>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+					</c:otherwise>
+				</c:choose>	
+			</c:when>
+			
+		
+			<%--############################################################### VIEW TREETABLE PER CARPETES ###############################################################--%>
 			<c:when test="${vistaLlistat}">
 				<c:choose>
 					<c:when test="${fn:length(fills) > 0}">
-						<%--------------------- TABLE -------------------%>
+						<%--------------------- TREETABLE -------------------%>
 						<table class="table table-striped table-bordered table-hover" id="table-documents">
 							<thead>
 								<tr>
@@ -1438,13 +1696,14 @@ $(document).ready(function() {
 						</table>			
 					</c:when>
 					<c:otherwise>
-						<%--------------------- EMPTY TABLE -------------------%>
+						<%--------------------- EMPTY TREETABLE -------------------%>
 						<table class="table table-striped table-bordered table-hover" id="table-documents">
 								<thead>
 									<tr>
 										<th></th>
 										<th><spring:message code="contingut.info.nom" /></th>
 										<th><spring:message code="contingut.info.tipus" /></th>
+										<th><spring:message code="contingut.info.descirpcio"/></th>
 										<th><spring:message code="contingut.info.createl" /></th>
 										<th><spring:message code="contingut.info.creatper" /></th>
 										<th width="10%">&nbsp;</th>
@@ -1463,9 +1722,7 @@ $(document).ready(function() {
 							</table>
 					</c:otherwise>
 				</c:choose>	
-				
 			</c:when>
-			
 			
 			
 			<%--################################################################# VIEW GRID ################################################################--%>
@@ -1474,87 +1731,35 @@ $(document).ready(function() {
 					<c:when test="${fn:length(fills) > 0}">
 		
 						<%--------------------- GRID -------------------%>
-						<ul id="contenidor-contingut" class="list-inline row">
+						<ul id="grid-documents" class="list-inline row">
 							<c:forEach var="fill" items="${fills}">
 							<%--  && fill.documentTipus != 'VIRTUAL' --%>
-								<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL') or empty fill.metaNode or fill.metaNode.usuariActualRead}">
+								<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+								
 									<c:set var="firmat" value="true"/>
-									<c:set var="isPdf" value="true"/> 
-									<c:set var="isDocAdjuntPendentGuardarArxiu" value="false"/> 
-									<c:set var="isCarpetaPendentArxiu" value="${(fill.carpeta && !isCreacioCarpetesLogica && fill.arxiuUuid == null)}"/>
-									<script>
-										<c:if test="${fill.document}">
-											<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}">
-												<c:set var="firmat" value="false"/> 
-											</c:if>
-											<c:if test="${fill.fitxerContentType != '' && fill.fitxerContentType != 'application/pdf'}">
-												<c:set var="isPdf" value="false"/> 
-											</c:if>
-											<c:if test="${fill.gesDocAdjuntId != null}">
-												<c:set var="isDocAdjuntPendentGuardarArxiu" value="true"/> 
-											</c:if>							
+									<c:if test="${fill.document}">
+										<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
+											<c:set var="firmat" value="false"/> 
 										</c:if>
-									</script>
-									
-									<li class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && isPdf}"> isPdf</c:if> <c:if test="${fill.document && isDocAdjuntPendentGuardarArxiu}"> docAdjuntPendentGuardarArxiu</c:if>" data-contenidor-id="${fill.id}">
+									</c:if>
+
+									<li id="${fill.id}"
+										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>">
 										<div id="${fill.id}" class="thumbnail element-noclick">
 											<div class="text-center">
-												<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true"/> 
+												<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true" />
 											</div>
 											<div class="caption">
 												<p class="text-center">
-													<c:if test="${fill.document && fill.estat == 'REDACCIO'}"><span class="icona-esborrany fa fa-bold" title="<spring:message code="contingut.info.estat.redaccio"/>"></span></c:if>
-													<c:if test="${fill.document && fill.documentTipus == 'IMPORTAT'}"><span class="importat fa fa-info-circle" title="<spring:message code="contingut.info.estat.importat"/>"></span></c:if>
-													<c:if test="${fill.node and not fill.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
-													<c:if test="${fill.document && (fill.estat == 'CUSTODIAT' || fill.estat == 'FIRMAT' || fill.estat == 'ADJUNT_FIRMAT')}"><span class="firmat fa fa-pencil-square" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
-													<c:if test="${fill.document && fill.estat == 'FIRMAT' && fill.gesDocFirmatId != null}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentCustodiar"/>"></span></c:if>
-													<c:if test="${fill.document && fill.pendentMoverArxiu}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentMoverArxiu"/>"></span></c:if>
-													<c:if test="${fill.document && !fill.validacioFirmaCorrecte}"><span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.invalid.origen" arguments="${fill.validacioFirmaErrorMsg}"/>"></span></c:if>
-													<c:if test="${fill.expedient && fill.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
-													<c:if test="${fill.document && fill.estat == 'DEFINITIU'}"><span class="definitiu fa fa-check-square" title="<spring:message code="contingut.info.estat.defintiu"/>"></span></c:if>
-													<c:if test="${fill.document && fill.ambNotificacions}">
-														<c:choose>
-															<c:when test="${!fill.errorDarreraNotificacio && (fill.estatDarreraNotificacio == 'PENDENT' or fill.estatDarreraNotificacio == 'REGISTRADA')}">
-																<c:set var="envelope" value="pendent fa fa-envelope-square"/>
-															</c:when>
-															<c:when  test="${!fill.errorDarreraNotificacio && fill.estatDarreraNotificacio == 'ENVIADA'}">
-																<c:set var="envelope" value="enviada fa fa-envelope-square"/>
-															</c:when>
-															<c:when  test="${!fill.errorDarreraNotificacio && (fill.estatDarreraNotificacio == 'PROCESSADA' or fill.estatDarreraNotificacio == 'FINALITZADA')}">
-																<c:set var="envelope" value="processada fa fa-envelope-square"/>
-															</c:when>
-															<c:when  test="${fill.errorDarreraNotificacio}">
-																<c:set var="envelope" value="error fa fa-envelope-square"/>
-															</c:when>
-															<c:otherwise>
-																<c:set var="envelope" value="fa fa-envelope-square"/>
-															</c:otherwise>
-														</c:choose>
-														<span class="${envelope} popover-${fill.id}" id="${fill.id}" data-toggle="popover" title="<spring:message code="contingut.info.notificacions"/>"></span>
-													</c:if>
-													<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && (fill.estat == 'FIRMA_PENDENT_VIAFIRMA' || fill.estat == 'FIRMA_PENDENT')}">
-														<span class="pendent fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
-													</c:if>
-													<c:if test="${fill.document && fill.estat == 'FIRMA_PARCIAL'}">
-														<span class="parcial fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
-													</c:if>
-													<c:if test="${fill.document && fill.estat != 'CUSTODIAT' && fill.estat != 'REDACCIO' && fill.errorEnviamentPortafirmes && fill.gesDocFirmatId == null}">
-														<span class="error fa fa-pencil-square" title="<spring:message code="contingut.info.estat.pendentfirma"/>"></span>
-													</c:if>
-													<c:if test="${not fill.carpeta && fill.metaNode == null}">
-														<span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.info.document.tipusdocument"/>"></span>
-													</c:if>
-													${fill.nom}
-													<c:if test="${isCarpetaPendentArxiu || (!fill.carpeta && fill.arxiuUuid == null)}">
-														<span class="fa fa-exclamation-triangle text-danger" title="<spring:message code="contingut.icona.estat.pendentGuardarArxiu"/>"></span>
-													</c:if>
+													<rip:blocContingutNomAmbIcons contingut="${fill}" />
 												</p>
-												<rip:blocContingutAccions id="accions-fill-${fill.id}" className="botons-accions-element" modeLlistat="false" contingut="${fill}" nodeco="${nodeco}"/>
+												<rip:blocContingutAccions id="accions-fill-${fill.id}"
+													className="botons-accions-element" modeLlistat="false" contingut="${fill}"
+													nodeco="${nodeco}" />
 											</div>
-										</div>
-										<script>
+										</div> <script>
 											$('#${fill.id}').click(function(e) {
-												var contenidorContingut = document.getElementById('contenidor-contingut');
+												var contenidorContingut = document.getElementById('grid-documents');
 												
 												if ($(this).hasClass('noclick')) {
 													$(this).removeClass('noclick');
@@ -1588,7 +1793,7 @@ $(document).ready(function() {
 																		}
 																);
 															}
-															enableDisableButton();
+															enableDisableMultipleButtons();
 														} else {
 															window.location = $('#${fill.id} a:first').attr('href');
 														}

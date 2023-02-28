@@ -119,7 +119,7 @@ function enableNotificar() {
 	$('.btnNotificar').closest('li').removeClass('disabled');
 	$('.btnNotificar').closest('li').next().hide();
 
-	let url = '<c:url value="/document/"/>' + $('.btnNotificar').closest('tr').data("contenidor-id") + '/notificar';
+	let url = '<c:url value="/document/"/>' + $('.btnNotificar').closest('tr').attr("id") + '/notificar';
 	$('.btnNotificar').attr("href", url);
 }
 

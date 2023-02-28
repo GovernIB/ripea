@@ -976,7 +976,17 @@ public class DocumentServiceImpl implements DocumentService {
 									false,
 									true,
 									true,
-									false, null, false, null, false, 0, null, null, true);
+									false,
+									null,
+									false,
+									null,
+									false,
+									0,
+									null,
+									null,
+									true,
+									true,
+									false);
 							return dto;
 						}
 					});
@@ -1555,7 +1565,7 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
-		return (DocumentDto)contingutHelper.toContingutDto(
+		return (DocumentDto) contingutHelper.toContingutDto(
 				document,
 				false,
 				false,
@@ -1563,7 +1573,17 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				true,
 				true,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 	}
 	
 

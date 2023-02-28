@@ -131,7 +131,17 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 	}
 
 	@Transactional
@@ -219,14 +229,7 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutId);
 		// No es comproven permisos perquè això només ho pot fer l'administrador
 		ContingutDto dto = contingutHelper.toContingutDto(
-				contingut,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingut);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -309,7 +312,17 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -423,7 +436,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				true, rolActual);
 		// Comprova el tipus del contingut que es vol moure
-		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
+		if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
@@ -487,7 +500,17 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 		
 		
 		if (contingutOrigen instanceof DocumentEntity){
@@ -600,7 +623,16 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true, false);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -706,7 +738,17 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 		return dto;
 	}
 
@@ -717,14 +759,16 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions, 
-			String rolActual, Long organActualId) {
+			String rolActual, 
+			Long organActualId) {
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
 				true, 
-				rolActual, null);
+				rolActual, 
+				organActualId);
 	}
 	
 	
@@ -748,7 +792,8 @@ public class ContingutServiceImpl implements ContingutService {
 				ambPermisos,
 				rolActual,
 				organActualId,
-				true);
+				true, 
+				false);
 
 	}
 	
@@ -778,7 +823,8 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambPermisos, 
 			String rolActual, 
 			Long organActualId,
-			boolean ambEntitat) {
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument) {
 		
 		long t2 = System.currentTimeMillis();
 		logger.debug("Obtenint contingut amb id per usuari ("
@@ -823,8 +869,17 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				true,
-				ambVersions, 
-				rolActual, false, null, false, 0, null, null, true, ambEntitat);
+				ambVersions,
+				rolActual,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				ambEntitat,
+				ambMapPerTipusDocument);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -872,7 +927,17 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true,
 				false,
-				true, null, false, null, false, 0, null, null, true);
+				true,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 	}
 
 	@Transactional(readOnly = true)
@@ -1156,7 +1221,17 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								true,
 								false,
-								false, null, false, null, false, 0, null, null, true);
+								false,
+								null,
+								false,
+								null,
+								false,
+								0,
+								null,
+								null,
+								false,
+								true,
+								false);
 					}
 				});
 	}
@@ -1217,7 +1292,17 @@ public class ContingutServiceImpl implements ContingutService {
 								false,
 								false,
 								false,
-								false, null, false, null, false, 0, null, null, true);
+								false,
+								null,
+								false,
+								null,
+								false,
+								0,
+								null,
+								null,
+								true,
+								true,
+								false);
 					}
 				});
 	}
@@ -1613,7 +1698,17 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null, false, 0, null, null, true);
+									false,
+									null,
+									false,
+									null,
+									false,
+									0,
+									null,
+									null,
+									true,
+									true,
+									false);
 							return dto;
 						}
 					});
@@ -1767,7 +1862,17 @@ public class ContingutServiceImpl implements ContingutService {
 									false,
 									true,
 									true,
-									false, null, false, null, false, 0, null, null, true);
+									false,
+									null,
+									false,
+									null,
+									false,
+									0,
+									null,
+									null,
+									true,
+									true,
+									false);
 							return dto;
 						}
 					});

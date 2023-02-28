@@ -881,7 +881,7 @@ public class DocumentHelper {
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
-		return (DocumentDto)contingutHelper.toContingutDto(
+		return (DocumentDto) contingutHelper.toContingutDto(
 				document,
 				false,
 				false,
@@ -889,7 +889,17 @@ public class DocumentHelper {
 				false,
 				true,
 				true,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false);
 	}
 
 
@@ -1394,15 +1404,25 @@ public class DocumentHelper {
 		List<DocumentEntity> documents = documentRepository.findByArxiuUuidAndEsborrat(arxiuUuid, 0);
 		for (DocumentEntity document : documents) {
 			documentsDto.add(
-					(DocumentDto)contingutHelper.toContingutDto(
-							document, 
-							false, 
-							false, 
-							false, 
-							false, 
-							true, 
-							false, 
-							false, null, false, null, false, 0, null, null, true));
+					(DocumentDto) contingutHelper.toContingutDto(
+							document,
+							false,
+							false,
+							false,
+							false,
+							true,
+							false,
+							false,
+							null,
+							false,
+							null,
+							false,
+							0,
+							null,
+							null,
+							true,
+							true,
+							false));
 			
 		}
 		return documentsDto;

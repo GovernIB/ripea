@@ -369,6 +369,48 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 		
 	}
+	
+	
+	@RequestMapping(value = "/{contingutId}/document/updateTipusDocumentDragDrop", method = RequestMethod.GET)
+	public String updateTipusDocumentDragDrop(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@RequestParam(value = "tipusDocumentId", required = false) Long tipusDocumentId,
+			Model model) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		
+		ContingutDto contingut = contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				contingutId,
+				false,
+				false,
+				null,
+				null);
+		
+		try {
+			documentService.updateTipusDocumental(
+					entitatActual.getId(), 
+					contingutId, 
+					tipusDocumentId, 
+					false);
+
+
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					"redirect:/contingut/" + contingut.getExpedientPare().getId(),
+					"contingut.controller.element.canviar.tipus.document.ok");
+			
+		} catch (Exception e) {
+			logger.error("Error actualitzant el document amb el nou tipus de document", e);
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					"redirect:/contingut/" + contingut.getExpedientPare().getId(),
+					"contingut.controller.element.canviar.tipus.document.error",
+					e);
+			
+		}
+	}
 
 	
 	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarDocumentArxiu", method = RequestMethod.GET)

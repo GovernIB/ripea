@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -29,6 +30,9 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected Long id;
 	protected String nom;
 	protected List<ContingutDto> fills;
+	
+	protected Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument;
+	
 	protected List<ContingutDto> path;
 	protected ExpedientDto expedientPare;
 	protected EntitatDto entitat;
