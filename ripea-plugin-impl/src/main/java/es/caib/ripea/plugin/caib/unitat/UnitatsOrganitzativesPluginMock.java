@@ -44,7 +44,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	public static final String CODI_UNITAT_CUMULATIVE_CHANGES1 = "A00000007";
 	public static final String CODI_UNITAT_CUMULATIVE_CHANGES2 = "A99999906";
 	
-	//PROPS CHANGED
+	//CANVI EN ATRIBUTS
 	public static final String CODI_UNITAT_PROPS_CHANGED = "A00000008";
 
 	//NEW
@@ -53,6 +53,10 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	
 	//EXTINCT
 	public static final String CODI_UNITAT_EXTINCT = "A00000009";
+	
+	//SUBSTITUTION BY ITSLEF
+	public static final String CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF = "A00000010";
+	
 
 	//script to clear entitat
 //	delete from ipa_metaexpedient where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000');
@@ -75,6 +79,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			//NEW
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_ARREL, name(CODI_UNITAT_ARREL), null, null,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_SUPERIOR, name(CODI_UNITAT_SUPERIOR), CODI_UNITAT_ARREL, CODI_UNITAT_ARREL,"V", null));
+			
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, name(CODI_UNITAT_TO_SPLIT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_MERGE1, name(CODI_UNITAT_TO_MERGE1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_MERGE2, name(CODI_UNITAT_TO_MERGE2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
@@ -82,6 +87,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, name(CODI_UNITAT_TO_CUMULATIVE_CHANGES), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_EXTINCT, name(CODI_UNITAT_EXTINCT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
 			
 			ProcedimentPluginMock.secondSyncronization = false;
 
@@ -105,9 +111,9 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, name(CODI_UNITAT_TO_CUMULATIVE_CHANGES), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_CUMULATIVE_CHANGES1))));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_CUMULATIVE_CHANGES1, name(CODI_UNITAT_CUMULATIVE_CHANGES1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_CUMULATIVE_CHANGES2))));
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_CUMULATIVE_CHANGES2, name(CODI_UNITAT_CUMULATIVE_CHANGES2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			
-			//PROPS CHANGED
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", new ArrayList<String>()));
+
+			//CANVI EN ATRIBUTS
+			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED) + " changed", CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", new ArrayList<String>()));
 			
 			//NEW
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_NEW1, name(CODI_UNITAT_NEW1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
@@ -116,6 +122,9 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			//EXTINCT
 			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_EXTINCT, name(CODI_UNITAT_EXTINCT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", null));
 			
+			//SUBSTITUTION BY ITSLEF
+			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF))));
+			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF) + " substituted", CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));			
 			
 			ProcedimentPluginMock.secondSyncronization = true;
 
@@ -199,12 +208,16 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 		} else if (name.equals(CODI_UNITAT_CUMULATIVE_CHANGES2)) {
 			additonal = "to cumulative changes";
 		} else if (name.equals(CODI_UNITAT_PROPS_CHANGED)) {
-			additonal = "props changed";
+			additonal = "props change";
 		} else if (name.equals(CODI_UNITAT_EXTINCT)) {
 			additonal = "to extinct";
 		} else if (name.equals(CODI_UNITAT_NEW1) || name.equals(CODI_UNITAT_NEW1)) {
 			additonal = "new";
+		} else if (name.equals(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF)) {
+			additonal = "substitute by itself";
 		}  
+		
+		
 		if (!additonal.isEmpty()) {
 			additonal = " (" + additonal + ")";
 		}
