@@ -786,14 +786,14 @@ public class ContingutServiceImpl implements ContingutService {
 		ContingutEntity contingut = contingutRepository.findOne(contingutId);
 		
 		entityComprovarHelper.comprovarExpedient(
-				contingut.getExpedient().getId(),
+				contingut.getExpedientPare().getId(),
 				false,
 				true,
 				false,
 				false,
 				false,
-				null, 
-				null);
+				rolActual, 
+				organId);
 	
 	}
 	

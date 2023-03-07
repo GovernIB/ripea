@@ -22,7 +22,7 @@
 		<c:otherwise>false</c:otherwise>
 	</c:choose>
 </c:set>
-<c:set var="expedientObert" scope="request" value="${expedientObert}"/>
+<c:set var="expedientObert" scope="request" value="${!expedientTancat}"/>
 <c:set var="isTasca" scope="request">
 	<c:choose>
 		<c:when test="${not empty tascaId}">true</c:when>
