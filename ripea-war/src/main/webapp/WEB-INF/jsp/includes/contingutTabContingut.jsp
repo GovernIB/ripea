@@ -9,32 +9,6 @@
 
 <style>
 
-.treetable-expanded > td:nth-child(2),
-.treetable-collapsed > td:nth-child(2) {
-    padding-left: 2em;
-}
-.treetable-expanded > td:nth-child(2) > .treetable-expander,
-.treetable-collapsed > td:nth-child(2) > .treetable-expander {
-    top: 0.05em;
-    position: relative;
- 	margin-left: -0.95em;
-    margin-right: 0.25em;
-}
-.treetable-expanded .treetable-expander {
-    width: 1em;
-    height: 1em;
-    position: relative;
-    display: inline-block;
-}
-.treetable-depth-1 > td:nth-child(2) {
-    padding-left: 5em;
-}
-.treetable-depth-2 > td:nth-child(2) {
-    padding-left: 8em;
-}
-.treetable-depth-3 > td:nth-child(2) {
-    padding-left: 11em;
-}
 
 
 #grid-documents {
@@ -294,7 +268,7 @@ $(document).ready(function() {
 		            });
 		
 		            $.ajax({
-				        url: '<c:url value="/contingut/${expedientPare.id}/ordenar"/>',
+				        url: '<c:url value="/contingut/${expedientId}/ordenar"/>',
 				        type: "POST",
 				        contentType: "application/json",
 				        data: JSON.stringify(orderedElements),
@@ -580,6 +554,10 @@ $(document).ready(function() {
 		//--------------------------------------  VISTA NOT GRID  ------------------------------------
 		} else {
 
+			if (!$('#table-documents .treetable-expander').length) {
+				$('#expandCollapseButtons').hide();
+			}
+
 			// Seleccionar tots
 			$('#checkItAll').on('change', function(){
 
@@ -665,6 +643,9 @@ $(document).ready(function() {
 					revertDuration: 200,
 					opacity: 0.50,
 				});	
+
+
+				
 				$('.element-droppable').droppable({
 					accept: '.element-draggable',
 					tolerance: 'pointer',
@@ -672,7 +653,7 @@ $(document).ready(function() {
 						showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
 						let origenId = ui.draggable.attr('id');
 						let destiId = $(this).attr('id');
-						let updateUrl = '<c:url value="/contingut/' + origenId + '/document/updateTipusDocumentDragDrop"/>' +'?tipusDocumentId=' + destiId;
+						let updateUrl = '${pageContext.request.contextPath}/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/updateTipusDocumentDragDrop/' + origenId + '/' + destiId
 						window.location = updateUrl;
 					}
 				});
@@ -1190,6 +1171,7 @@ $(document).ready(function() {
 </script>
 
 
+
 <c:choose>
 	<%--------------- WHEN CONTINGUT IS DOCUMENT (SHOWS DOCUMENT DETAILS) ---------------%>
 	<c:when test="${contingut.document}">
@@ -1330,7 +1312,7 @@ $(document).ready(function() {
 			
 			<%---- expand/collapse tree ----%>
 			<c:if test="${!vistaIcones}">
-				<div class="" style="float: left;display: inline-block;">
+				<div id="expandCollapseButtons" style="float: left;display: inline-block;">
 					<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
 					<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
 				</div>
@@ -1362,7 +1344,7 @@ $(document).ready(function() {
 					</a>
 				</div>
 			</div>
-			<c:if test="${(expedientAgafatPerUsuariActual or contingut.admin) and !expedientTancat}">
+			<c:if test="${(expedientAgafatPerUsuariActual or contingut.admin) and expedientObert}">
 				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
 				<%---- Button notificar mult ----%>
 				<div class="btn-group">
@@ -1416,27 +1398,34 @@ $(document).ready(function() {
 				----%>
 			</c:if>
 			<div class="btn-group" id="vistes">
+				<c:if test="${!isTasca}">
+					<%---- Button treetable per estats  ----%>
+					<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/canviVista/TREETABLE_PER_ESTAT"/></c:set>
+					<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.estat"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerEstats ? 'active' : ''}" draggable="false">
+						<span class="fa fa-ellipsis-v" style="padding-left: 5px; padding-right: 5px;"></span>
+					</a>	
+				</c:if>		
 				<%---- Button treetable per tipus de documents  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/arbrePerTipusDocuments"/></c:set>
-				<a href="${llistatVistaUrl}" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT"/></c:set>
+				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.tipus.document"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
 					<span class="fa fa-bars"></span>
 				</a>
 				<%---- Button treetable per carpetes  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/llistat"/></c:set>
-				<a href="${llistatVistaUrl}" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/TREETABLE_PER_CARPETA"/></c:set>
+				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.carpeta"/>" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
 					<span class="fa fa-th-list"></span>
 				</a>
 				<%---- Button grid ----%>
-				<c:set var="iconesVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/icones"/></c:set>					
-				<a href="${iconesVistaUrl}" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
-					<span class="fa fa-th"></span>
+				<c:set var="iconesVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/GRID"/></c:set>					
+				<a href="${iconesVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.grid"/>" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
+					<span class="fa fa-th" ></span>
 				</a>	
 				<script>
 					var docsIdx = new Array();
 				</script>							
 			</div>
 			
-			<c:if test="${isTasca or ((expedientAgafatPerUsuariActual or contingut.admin) and ((contingut.carpeta && isCreacioCarpetesActiva) or (contingut.expedient and (potModificarContingut or contingut.admin) and (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT'))))}">
+			<c:if test="${potModificar && (!contingut.carpeta || isCreacioCarpetesActiva)}">
 				<div id="botons-crear-contingut" class="btn-group">
 					<%---- Crear contingut ----%>
 					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
@@ -1486,7 +1475,7 @@ $(document).ready(function() {
 								<li><a href="<c:url value="/contingut/${contingut.id}/importacio/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaImportacio}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.importacio"/>...</a></li>
 							</c:if>
 							<c:if test="${isImportacioRelacionatsActiva}">
-								<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/relacionats/${contingut.id}/list"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.expedient.relacionat"/>...</a></li>
+								<li><a href="<c:url value="/expedient/${expedientId}/relacionats/${contingut.id}/list"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.expedient.relacionat"/>...</a></li>
 							</c:if>	
 						</c:if>											
 					</ul>
@@ -1506,6 +1495,169 @@ $(document).ready(function() {
 		</c:choose>
 		
 		<c:choose>
+			<%--########################################################### VIEW TREETABLE PER ESTATS ###########################################################--%>
+			<c:when test="${vistaTreetablePerEstats}">
+			
+				<c:choose>
+					<c:when test="${not empty contingut.mapPerEstat}">
+						<%--------------------- TREETABLE  -------------------%>
+						<table class="table table-striped table-bordered table-hover" id="table-documents">
+							<thead>
+								<tr>
+									<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
+									<th><spring:message code="contingut.info.nom"/></th>
+									<th><spring:message code="contingut.info.descirpcio"/></th>
+									<th><spring:message code="contingut.info.ruta"/></th>
+									<th><spring:message code="contingut.info.createl"/></th>
+									<th><spring:message code="contingut.info.creatper"/></th>
+									<th width="5%">&nbsp;</th>
+									<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+										<th width="1%">&nbsp;</th>
+									</c:if>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${contingut.mapPerEstat}" var="entry">
+									<%------------------------------- Tipus de document ------------------------%>
+									<tr id="${entry.key.id}"
+										data-node="treetable-${entry.key.id}"
+										data-pnode="treetable-${contingut.id}">
+										<%------------ checkbox ----------%>
+										<td></td>
+										<%------------ Nom ----------%>
+										<td><b>${entry.key.nom}</b> 
+										
+											<span class="badge">${fn:length(entry.value)}</span>
+											
+
+										</td>
+										<%------------ Descripció ----------%>
+										<td></td>
+										<%------------ Tipus -----------%>
+										<td width="25%"></td>
+										<%------------ Creat el -----------%>
+										<td></td>
+										<%------------ Creat per -----------%>
+										<td></td>
+										<%------------ Accions -----------%>
+										<td></td>
+										<%------------ sort ----------%>
+										<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+											<td></td>
+										</c:if>
+									</tr>								
+					   				
+					   				 <%------------------------------- Documents ----------------------------%>
+					   				 <c:choose>
+					   				 	<c:when test="${!empty entry.value}">
+						   				     <c:forEach items="${entry.value}" var="fill">
+						   				     
+												<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+												
+													<c:set var="firmat" value="true"/>
+													<c:if test="${fill.document}">
+														<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
+															<c:set var="firmat" value="false"/> 
+														</c:if>
+													</c:if>
+											
+													<tr id="${fill.id}"
+														class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+														data-expedient-id="${expedientId}" 
+														data-node="treetable-${fill.id}"
+														data-pnode="treetable-${entry.key.id}">
+														
+											
+														<%------------ checkbox ----------%>
+														<td><c:if test="${fill.document}">
+															<input type="checkbox" class="checkbox" autocomplete="off" />
+														</c:if></td>
+											
+														<%------------ Nom ----------%>
+														<td>
+															<rip:blocIconaContingut contingut="${fill}" /> 
+															<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
+														</td>
+											
+														<%------------ Descripció ----------%>
+														<td><c:if test="${fill.document}">
+															&nbsp;${fill.descripcio}
+														</c:if></td>
+											
+														<%------------ Ruta -----------%>
+														<td width="25%">
+															<c:forEach var="contingutPath" items="${fill.path}" varStatus="status">
+																<c:if test="${!status.first}">/${contingutPath.nom}</c:if>
+															</c:forEach>
+															<c:if test="${fn:length(fill.path) == 1}">/</c:if>
+														</td>
+											
+														<%------------ Creat el -----------%>
+														<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
+											
+														<%------------ Creat per -----------%>
+														<td>${fill.createdBy.codiAndNom}</td>
+											
+														<%------------ Accions -----------%>
+														<td><rip:blocContingutAccions className="botons-accions-element"
+																modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingut.id}"/></td>
+											
+														<%------------ sort ----------%>
+														<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+															<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
+																class="fa fa-sort"></span></td>
+														</c:if>
+													</tr>
+												</c:if>
+						   				     
+					    					</c:forEach>
+					   					 </c:when>
+					   					 <c:otherwise>
+					   						<tr	data-node="treetable-0"
+												data-pnode="treetable-${entry.key.id}">
+												<td></td><td colspan="6"><spring:message code="contingut.info.table.tree.estat.no.documents"/></td>
+											</tr>
+					   					 </c:otherwise>
+					   				 </c:choose>
+								</c:forEach>							
+							
+
+							
+							</tbody>
+						</table>			
+					</c:when>
+					<c:otherwise>
+						<%--------------------- EMPTY TREETABLE -------------------%>
+						<table class="table table-striped table-bordered table-hover" id="table-documents">
+								<thead>
+									<tr>
+										<th></th>
+										<th><spring:message code="contingut.info.nom"/></th>
+										<th><spring:message code="contingut.info.descirpcio"/></th>
+										<th><spring:message code="contingut.info.tipus" /></th>
+										<th><spring:message code="contingut.info.createl" /></th>
+										<th><spring:message code="contingut.info.creatper" /></th>
+										<th width="10%">&nbsp;</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="odd">
+										<td colspan="9" valign="top">
+											<h1 style="opacity: .1; text-align: center;">
+												<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
+												<strong><spring:message code="contingut.sense.contingut" /></strong>
+											</h1>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+					</c:otherwise>
+				</c:choose>	
+			</c:when>
+			
+			
+			
+					
 			<%--########################################################### VIEW TREETABLE PER TIPUS DE DOCUMENTS ###########################################################--%>
 			<c:when test="${vistaTreetablePerTipusDocuments}">
 			
@@ -1577,7 +1729,7 @@ $(document).ready(function() {
 											
 													<tr id="${fill.id}"
 														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
-														data-expedient-id="${expedientPare.id}" 
+														data-expedient-id="${expedientId}" 
 														data-node="treetable-${fill.id}"
 														data-pnode="treetable-${entry.key.id}">
 														
@@ -1614,7 +1766,7 @@ $(document).ready(function() {
 											
 														<%------------ Accions -----------%>
 														<td><rip:blocContingutAccions className="botons-accions-element"
-																modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" /></td>
+																modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingut.id}" /></td>
 											
 														<%------------ sort ----------%>
 														<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
@@ -1691,7 +1843,7 @@ $(document).ready(function() {
 								</tr>
 							</thead>
 							<tbody>
-								<rip:blocContingutTreeTableFills contingut="${contingut}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}"/>
+								<rip:blocContingutTreeTableFills contingut="${contingut}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}" contingutNavigationId="${contingut.id}"/>
 							</tbody>
 						</table>			
 					</c:when>
@@ -1755,7 +1907,7 @@ $(document).ready(function() {
 												</p>
 												<rip:blocContingutAccions id="accions-fill-${fill.id}"
 													className="botons-accions-element" modeLlistat="false" contingut="${fill}"
-													nodeco="${nodeco}" />
+													nodeco="${nodeco}" contingutNavigationId="${contingut.id}"/>
 											</div>
 										</div> <script>
 											$('#${fill.id}').click(function(e) {
@@ -1828,7 +1980,7 @@ $(document).ready(function() {
 		</div>  
 					
 		
-		<c:if test="${isTasca or ((expedientAgafatPerUsuariActual or contingut.admin) and ((contingut.carpeta and contingut.expedientPare.estat != 'TANCAT') or (contingut.expedient and (potModificarContingut or contingut.admin) and (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT'))))}">
+		<c:if test="${potModificar}">
 			<div id="drag_container" class="drag_activated">
 				<span class="down fa fa-upload"></span>
 				<p>

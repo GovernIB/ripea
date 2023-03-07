@@ -31,7 +31,7 @@ $(document).ready(function() {
 <table 
 	id="taulaAnotacions" 
 	data-toggle="datatable"
-	data-url="<c:url value="/expedientPeticio/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/datatable"/>"
+	data-url="<c:url value="/expedientPeticio/${expedientId}/datatable"/>"
 	data-paging-enabled="false" 
 	data-default-order="3" 
 	data-default-dir="desc"

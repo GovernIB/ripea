@@ -70,15 +70,14 @@ public class ExpedientInteressatHelper {
 	
 		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				comprovarAgafat,
 				permission.equals(PermissionEnumDto.READ),
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),
-				permission.equals(PermissionEnumDto.DELETE), 
-				false, 
-				rolActual);
+				permission.equals(PermissionEnumDto.DELETE),
+				rolActual, 
+				null);
 		
 		InteressatEntity interessatEntity = createDB(
 				entitatId,
@@ -118,15 +117,14 @@ public class ExpedientInteressatHelper {
 
 		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				comprovarAgafat,
 				permission.equals(PermissionEnumDto.READ),
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),
-				permission.equals(PermissionEnumDto.DELETE), 
-				false, 
-				rolActual);
+				permission.equals(PermissionEnumDto.DELETE),
+				rolActual, 
+				null);
 		
 		InteressatEntity representantEntity = createDB(
 				entitatId,
@@ -370,15 +368,14 @@ public class ExpedientInteressatHelper {
 					+ "interessat=" + interessat + ")");
 		}
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				comprovarAgafatPerUsuariActual,
 				false,
 				true,
 				false,
-				false, 
-				false, 
-				rolActual);
+				false,
+				rolActual, 
+				null);
 		InteressatEntity representat = null;
 		if (representatId != null) {
 			representat = interessatRepository.findOne(representatId);
@@ -492,15 +489,14 @@ public class ExpedientInteressatHelper {
 				+ "expedientId=" + expedientId + ", "
 				+ "interessatId=" + interessatId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				true,
 				false,
 				true,
 				false,
-				false, 
-				false, 
-				rolActual);
+				false,
+				rolActual, 
+				null);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			interessatRepository.delete(interessat);
@@ -541,15 +537,14 @@ public class ExpedientInteressatHelper {
 				+ "interessatId=" + interessatId + ", "
 				+ "representantId=" + representantId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				true,
 				false,
 				true,
 				false,
-				false, 
-				false, 
-				rolActual);
+				false,
+				rolActual, 
+				null);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			if (interessat.getRepresentant() != null && 

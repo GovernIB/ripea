@@ -32,7 +32,7 @@ $(document).ready(function() {
 <table
 	id="taulaTasques"
 	data-toggle="datatable"
-	data-url="<c:url value="/expedientTasca/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/datatable"/>"
+	data-url="<c:url value="/expedientTasca/${expedientId}/datatable"/>"
 	data-paging-enabled="false"
 	class="table table-bordered table-striped"
 	style="width:100%"
@@ -75,7 +75,7 @@ $(document).ready(function() {
 						{{if estat != 'FINALITZADA'}}
 							<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
 						{{/if}}
-						<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT')}">
+						<c:if test="${potModificar}">
 							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
 								<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
 							{{/if}}
@@ -89,7 +89,7 @@ $(document).ready(function() {
 	</thead>
 </table>
 <script id="taulaTasquesNouBoton" type="text/x-jsrender">
-	<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT')}">
-		<p style="text-align:right"><a href="<c:url value="/expedientTasca/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
+	<c:if test="${potModificar}">
+		<p style="text-align:right"><a href="<c:url value="/expedientTasca/${expedientId}/new"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nova.tasca"/></a></p>
 	</c:if>	
 </script>

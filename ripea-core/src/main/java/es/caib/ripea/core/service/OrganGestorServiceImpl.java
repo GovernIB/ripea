@@ -1106,14 +1106,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// if we modify expedient we have to insure that we can still see its organ in dropdown even if permissions were removed 
 			if (expedientId != null) {
 				ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
-						entitatId,
 						expedientId,
 						false,
 						false,
 						false,
 						false,
 						false,
-						false, null);
+						null, 
+						null);
 				
 				OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
 				

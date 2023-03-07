@@ -82,6 +82,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.ExpedientHelper;
 import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
@@ -105,10 +106,6 @@ public class UsuariTascaController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientTascaController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
-
-	private static final String CONTENIDOR_VISTA_ICONES = "icones";
-	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
-	private static final String CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS = "arbrePerTipusDocuments";
 	
 	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
@@ -136,6 +133,8 @@ public class UsuariTascaController extends BaseUserController {
 	private DigitalitzacioService digitalitzacioService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -219,7 +218,7 @@ public class UsuariTascaController extends BaseUserController {
 			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.INICIADA, null);
+		expedientTascaService.canviarTascaEstat(expedientTascaId, TascaEstatEnumDto.INICIADA, null);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
@@ -259,7 +258,7 @@ public class UsuariTascaController extends BaseUserController {
 			return "usuariTascaRebuigForm";
 		}
 		
-		expedientTascaService.canviarEstat(
+		expedientTascaService.canviarTascaEstat(
 				command.getId(),
 				TascaEstatEnumDto.REBUTJADA,
 				command.getMotiu());
@@ -278,7 +277,7 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.FINALITZADA, null);
+		expedientTascaService.canviarTascaEstat(expedientTascaId, TascaEstatEnumDto.FINALITZADA, null);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
@@ -497,31 +496,18 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long pareId,
 			@PathVariable Long documentId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
+
+		FitxerDto fitxer = expedientTascaService.descarregar(
 				entitatActual.getId(),
 				documentId,
-				true,
-				false,
-				false, null, null);
-		if (contingut instanceof DocumentDto) {
-			FitxerDto fitxer = expedientTascaService.descarregar(
-					entitatActual.getId(),
-					documentId,
-					tascaId,
-					null);
-			writeFileToResponse(
-					fitxer.getNom(),
-					fitxer.getContingut(),
-					response);
-			return null;
-		}
-		MissatgesHelper.error(
-				request, 
-				getMessage(
-						request, 
-						"document.controller.descarregar.error"),
+				tascaId,
 				null);
-		if (contingut.getPare() != null)
+		writeFileToResponse(
+				fitxer.getNom(),
+				fitxer.getContingut(),
+				response);
+
+		if (pareId != null)
 			return "redirect:../../contingut/" + pareId;
 		else
 			return "redirect:../../expedient";
@@ -691,18 +677,7 @@ public class UsuariTascaController extends BaseUserController {
 						null, 
 						false));
 
-		String contingutVista = SessioHelper.getContenidorVista(request);
-		if (contingutVista == null)
-			contingutVista = CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS;
-		model.addAttribute(
-				"vistaIcones",
-				new Boolean(CONTENIDOR_VISTA_ICONES.equals(contingutVista)));
-		model.addAttribute(
-				"vistaLlistat",
-				new Boolean(CONTENIDOR_VISTA_LLISTAT.equals(contingutVista)));
-		model.addAttribute(
-				"vistaTreetablePerTipusDocuments",
-				new Boolean(CONTENIDOR_VISTA_ARBRE_PER_TIPUS_DOCUMENTS.equals(contingutVista)));
+		expedientHelper.omplirVistaActiva(request, model);
 		
 		model.addAttribute(
 				"registreTipusEnumOptions",

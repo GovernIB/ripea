@@ -356,11 +356,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		try {
-			documentService.updateTipusDocumental(
+			documentService.updateTipusDocument(
 					entitatActual.getId(), 
 					contingutId, 
 					tipusDocumentId, 
-					false);
+					false, 
+					null, 
+					null);
 			return new JsonResponse(new Boolean(true));
 			
 		} catch (Exception e) {
@@ -371,41 +373,45 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	}
 	
 	
-	@RequestMapping(value = "/{contingutId}/document/updateTipusDocumentDragDrop", method = RequestMethod.GET)
+	@RequestMapping(value = "/{isTasca}/{id}/updateTipusDocumentDragDrop/{documentId}/{tipusDocumentId}", method = RequestMethod.GET)
 	public String updateTipusDocumentDragDrop(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			@RequestParam(value = "tipusDocumentId", required = false) Long tipusDocumentId,
+			@PathVariable boolean isTasca,
+			@PathVariable Long id,
+			@PathVariable Long documentId,
+			@PathVariable Long tipusDocumentId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				false,
-				false,
-				null,
-				null);
+		String url;
+		if (isTasca) {
+			url = "redirect:/usuariTasca/" + id + "/tramitar";
+		} else {
+			url = "redirect:/contingut/" + id;
+		}
+	
 		
 		try {
-			documentService.updateTipusDocumental(
+			documentService.updateTipusDocument(
 					entitatActual.getId(), 
-					contingutId, 
+					documentId, 
 					tipusDocumentId, 
-					false);
+					false, 
+					isTasca ? id : null, 
+					RolHelper.getRolActual(request));
 
 
 			return getAjaxControllerReturnValueSuccess(
 					request,
-					"redirect:/contingut/" + contingut.getExpedientPare().getId(),
+					url,
 					"contingut.controller.element.canviar.tipus.document.ok");
+			
 			
 		} catch (Exception e) {
 			logger.error("Error actualitzant el document amb el nou tipus de document", e);
 			return getAjaxControllerReturnValueErrorMessage(
 					request,
-					"redirect:/contingut/" + contingut.getExpedientPare().getId(),
+					url,
 					"contingut.controller.element.canviar.tipus.document.error",
 					e);
 			
@@ -990,7 +996,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (docsIdx != null) {
 			List<Long> docsIdxList = Arrays.asList(docsIdx);
 			for (Long id: seleccio) {
-				if (!docsIdxList.contains(id))
+				if (docsIdxList.contains(id))
 					idxRemove.add(id);
 			}
 		} else {

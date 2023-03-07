@@ -849,20 +849,20 @@ public class EmailHelper {
 			enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n";
 		}
 		if (estatAnterior == null) {
-			subject = PREFIX_RIPEA + " Nova tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
+			subject = PREFIX_RIPEA + " Nova tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 			text = 					
 					"S'ha creat una nova tasca a RIPEA:\n" +
-					"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
-					"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
+					"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+					"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
 					"\tEstat: " + estat + "\n" +
 					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 					enllacTramitar;
 		} else {
-			subject = PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
+			subject = PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 			text = 			
 					"S'ha modificat l'estat de la tasca a RIPEA:\n" +
-							"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
-							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
+							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
 							"\tEstat anterior:" + estatAnterior + "\n" +
 							"\tEstat actual:" + estat + "\n" + 
 							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
@@ -918,11 +918,11 @@ public class EmailHelper {
 				"tascaId=" + expedientTascaEntity.getId() + ")");
 		
 		String from = getRemitent();
-		String subject = PREFIX_RIPEA + " Canvi de responsable de la tasca: " + expedientTascaEntity.getMetaExpedientTasca().getNom();
+		String subject = PREFIX_RIPEA + " Canvi de responsable de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 		String text = 			
 					"S'ha modificat el responsable de la tasca a RIPEA:\n" +
-							"\tNom: " + expedientTascaEntity.getMetaExpedientTasca().getNom() + "\n" +
-							"\tDescripció: " + expedientTascaEntity.getMetaExpedientTasca().getDescripcio() + "\n" +
+							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
 							"\tResponsable:" + expedientTascaEntity.getResponsables().get(0).getNom() + " (" +
 							expedientTascaEntity.getResponsables().get(0).getCodi() + ")";
 		

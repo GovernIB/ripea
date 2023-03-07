@@ -407,12 +407,20 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public boolean updateTipusDocumental(
+	public boolean updateTipusDocument(
 			Long entitatId, 
 			Long documentId, 
 			Long tipusDocumentId,
-			boolean comprovarMetaExpedient) {
-		return delegate.updateTipusDocumental(entitatId, documentId, tipusDocumentId, comprovarMetaExpedient);
+			boolean comprovarMetaExpedient, 
+			Long tascaId, 
+			String rolActual) {
+		return delegate.updateTipusDocument(
+				entitatId,
+				documentId,
+				tipusDocumentId,
+				comprovarMetaExpedient,
+				tascaId,
+				rolActual);
 	}
 
 	@Override

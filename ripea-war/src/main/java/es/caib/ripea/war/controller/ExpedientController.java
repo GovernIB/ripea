@@ -1199,7 +1199,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 //					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "expedientEstatsForm";
 		}
-		expedientEstatService.changeEstatOfExpedient(
+		expedientEstatService.changeExpedientEstat(
 				entitatActual.getId(),
 				command.getId(),
 				command.getExpedientEstatId(), 

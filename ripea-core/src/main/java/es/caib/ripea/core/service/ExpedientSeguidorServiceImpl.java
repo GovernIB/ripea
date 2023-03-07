@@ -48,13 +48,14 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				+ "seguidor=" + auth.getName() + ")");
 		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId, 
 				expedientId, 
+				false, 
 				false, 
 				false,
 				false,
 				false,
-				false, false, null);
+				null, 
+				null);
 		
 		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
 		if (!expedient.getSeguidors().contains(usuariActual)) 
@@ -73,13 +74,14 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				+ "seguidor=" + auth.getName() + ")");
 		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId, 
 				expedientId, 
+				false, 
 				false, 
 				false,
 				false,
 				false,
-				false, false, null);
+				null, 
+				null);
 		
 		UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
 		if (expedient.getSeguidors().contains(usuariActual))
@@ -95,13 +97,14 @@ public class ExpedientSeguidorServiceImpl implements ExpedientSeguidorService {
 				+ "expedientId=" + expedientId + ")");
 		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId, 
 				expedientId, 
+				false, 
 				false, 
 				false,
 				false,
 				false,
-				false, false, null);
+				null, 
+				null);
 		
 		return conversioTipusHelper.convertirList(
 				expedient.getSeguidors(), 

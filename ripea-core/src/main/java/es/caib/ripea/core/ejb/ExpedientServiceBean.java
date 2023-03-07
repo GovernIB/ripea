@@ -458,4 +458,17 @@ public class ExpedientServiceBean implements ExpedientService {
 				entitatId,
 				metaExpedientId);
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public ContingutVistaEnumDto getVistaUsuariActual() {
+		return delegate.getVistaUsuariActual();
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public void setVistaUsuariActual(
+			ContingutVistaEnumDto vistaActual) {
+		delegate.setVistaUsuariActual(vistaActual);
+	}
 }

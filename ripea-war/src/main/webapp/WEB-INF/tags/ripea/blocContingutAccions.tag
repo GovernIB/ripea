@@ -3,19 +3,12 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ attribute name="id" required="false" rtexprvalue="true"%>
 <%@ attribute name="className" required="false" rtexprvalue="true"%>
+<%@ attribute name="contingutNavigationId" required="false" rtexprvalue="true"%>
 <%@ attribute name="contingut" required="true" rtexprvalue="true" type="java.lang.Object"%>
 <%@ attribute name="modeLlistat" required="true" rtexprvalue="true"%>
 <%@ attribute name="mostrarObrir" required="false" rtexprvalue="true"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
-<c:set var="expedientPare" value="${contingut.expedientPare}"/>
-<c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
-<c:set var="expedientPareAgafatPerUsuariActual" value="${false}"/>
-<c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientPareAgafatPerUsuariActual" value="${true}"/></c:if>
-<c:set var="expedientPareObert" value="${empty expedientPare or expedientPare.estat == 'OBERT'}"/>
-<c:set var="potModificarExpedientPare" value="${false}"/>
-<c:if test="${expedientPareAgafatPerUsuariActual and expedientPareObert and (not contingut.node or expedientPare.metaNode.usuariActualWrite) and expedientPare.usuariActualWrite}">
-	<c:set var="potModificarExpedientPare" value="${true}"/>
-</c:if>
+
 <c:set var="mostrarSeparador" value="${false}"/>
 <c:set var="isTasca" value="${not empty tascaId}"/>
 <div <c:if test="${not empty id}">id="${id}" </c:if>class="dropdown<c:if test="${not modeLlistat}"> text-center</c:if><c:if test="${not empty className}"> ${className}</c:if>">
@@ -83,7 +76,7 @@
 			<li><a href="<c:url value="/expedient/${contingut.id}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 		</c:if>
 		
-		<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
+		<c:if test="${potModificar}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
 			<c:set var="isPermesEsborrarFinalsVar" value="${contingut.document && ((isPermesEsborrarFinals && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'DEFINITIU' || contingut.documentTipus == 'IMPORTAT')) || (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMA_PARCIAL'))}"/>
@@ -93,7 +86,7 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 				
-				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitu || isPermesModificarCustodiatsVar) && expedientPareObert}">
+				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitu || isPermesModificarCustodiatsVar) && expedientObert}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
@@ -115,9 +108,6 @@
 				<c:if test="${isMostrarCopiar}">
 					<li><a href="<c:url value="/contingut/${contingut.id}/copiar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.copiar"/>...</a></li>
 				</c:if>
-				<c:if test="${empty expedientPare}">
-					<li><a href="<c:url value="/contingut/${contingut.id}/enviar"/>" data-toggle="modal"><span class="fa fa-send"></span>&nbsp;<spring:message code="comu.boto.enviara"/>...</a></li>
-				</c:if>
 				<c:if test="${contingut.document and !isTasca and isMostrarVincular}">
 					<li><a href="<c:url value="/contingut/${contingut.id}/vincular"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.vincular"/>...</a></li>
 				</c:if>
@@ -128,13 +118,13 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 		</c:if>
-		<c:if test="${contingut.expedient && expedientPareAgafatPerUsuariActual}">
+		<c:if test="${contingut.expedient && expedientAgafatPerUsuariActual}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 		</c:if>
-		<c:if test="${contingut.expedient && not expedientPareAgafatPerUsuariActual}">
+		<c:if test="${contingut.expedient && not expedientAgafatPerUsuariActual}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/agafar"/>"><span class="fa fa-lock"></span>&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
 		</c:if>
-		<c:if test="${(isTasca || potModificarExpedientPare || contingut.admin) || (contingut.carpeta && isCreacioCarpetesActiva)}">
+		<c:if test="${(potModificar) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
@@ -175,7 +165,7 @@
 							</c:otherwise>
 						</c:choose>
 					</c:when>
-					<c:when test="${contingut.estat == 'TANCAT' && isReobrirPermes}">
+					<c:when test="${expedientTancat && isReobrirPermes}">
 						<li><a href="<c:url value="/expedient/${contingut.id}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
 					</c:when>
 				</c:choose>
@@ -200,8 +190,8 @@
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					</c:when>
 					<c:otherwise>
-						<c:if test="${((contingut.expedient && expedientPare.usuariActualDelete) || (contingut.document && expedientPare.usuariActualWrite) || (contingut.carpeta && isCreacioCarpetesActiva && expedientPare.usuariActualDelete )) && expedientPareObert}">
-							<li><a href="<c:url value="/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+						<c:if test="${((contingut.expedient && expedient.usuariActualDelete) || (contingut.document && expedient.usuariActualWrite) || (contingut.carpeta && isCreacioCarpetesActiva && expedient.usuariActualDelete )) && expedientObert}">
+							<li><a href="<c:url value="/contingut/${contingut.id}/delete?contingutNavigationId=${contingutNavigationId}"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 						</c:if>
 					</c:otherwise>
 				</c:choose>
@@ -252,7 +242,7 @@
 			</c:if>
 			
 			<%--------------- FIRMA RELATED ACCIONS -------------------%>
-			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
+			<c:if test="${potModificar}">
 			
 				<%---- Enviar a portafirmes ----%>
 				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && (contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT') && contingut.fitxerExtension!='zip'}">
@@ -309,9 +299,9 @@
 				<c:if test="${(contingut.documentFirmaTipus != 'SENSE_FIRMA' && !empty contingut.arxiuUuid) and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
-					<c:if test="${expedientPare.metaNode.notificacioActiva}"> 
+					<c:if test="${expedient.metaNode.notificacioActiva}"> 
 						<c:choose>
-							<c:when test="${!empty expedientPare.interessatsNotificable}">
+							<c:when test="${!empty expedient.interessatsNotificable}">
 								<li>
 								<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
 								</li>
@@ -331,7 +321,7 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:if>
 			</c:if>
-			<c:if test="${isTasca || potModificarExpedientPare || contingut.admin}">
+			<c:if test="${potModificar}">
 				<%---- Seguiment portafirmes ----%>
 				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || (contingut.estat == 'FIRMAT' && empty contingut.arxiuUuid)) && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>

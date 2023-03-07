@@ -36,7 +36,7 @@ $(document).ready(function() {
 <table
 	id="taulaPublicacions"
 	data-toggle="datatable"
-	data-url="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/enviament/PUBLICACIO/datatable"/>"
+	data-url="<c:url value="/expedient/${expedientId}/enviament/PUBLICACIO/datatable"/>"
 	data-paging-enabled="false"
 	class="table table-bordered table-striped"
 	style="width:100%"

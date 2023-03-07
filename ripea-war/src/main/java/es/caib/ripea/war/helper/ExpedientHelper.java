@@ -7,9 +7,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+
+import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 
 /**
@@ -17,6 +23,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Component
 public class ExpedientHelper {
 
 	private static final String REQUEST_PARAMETER_ACCES_EXPEDIENTS = "ExpedientHelper.teAccesExpedients";
@@ -24,6 +31,11 @@ public class ExpedientHelper {
 	private static final String REQUEST_PARAMETER_STATISTICS_EXPEDIENTS = "ExpedientHelper.teAccesEstadistiques";
 	private static final String SESSION_CONVERSIO_DEFINITIU_ACTIVA = "ExpedientHelper.isConversioDefinitiuActiva";
 	private static final String SESSION_URL_VALIDACIO = "ExpedientHelper.isUrlValidacioDefinida";
+	
+
+	@Autowired
+	private ExpedientService expedientService;
+
 	
 	public static void accesUsuariExpedients(
 			HttpServletRequest request,
@@ -120,6 +132,54 @@ public class ExpedientHelper {
 		request.getSession().setAttribute(
 				SESSION_URL_VALIDACIO,
 				isUrlValidacioDefinida);
+	}
+	
+	
+	
+	public ContingutVistaEnumDto getVistaActiva(HttpServletRequest request) {
+		
+		ContingutVistaEnumDto contingutVista = SessioHelper.getContenidorVista(request);
+		if (contingutVista == null) {
+			contingutVista = expedientService.getVistaUsuariActual();
+			if (contingutVista == null) {
+				contingutVista = ContingutVistaEnumDto.TREETABLE_PER_CARPETA;
+			}
+		}
+		return contingutVista;
+	}
+	
+	
+
+	
+	public void omplirVistaActiva(
+			HttpServletRequest request,
+			Model model) {
+		
+		ContingutVistaEnumDto contingutVista = getVistaActiva(request);
+
+		model.addAttribute(
+				"vistaIcones",
+				contingutVista == ContingutVistaEnumDto.GRID);
+		model.addAttribute(
+				"vistaLlistat",
+				contingutVista == ContingutVistaEnumDto.TREETABLE_PER_CARPETA);
+		model.addAttribute(
+				"vistaTreetablePerTipusDocuments",
+				contingutVista == ContingutVistaEnumDto.TREETABLE_PER_TIPUS_DOCUMENT);
+		model.addAttribute(
+				"vistaTreetablePerEstats",
+				contingutVista == ContingutVistaEnumDto.TREETABLE_PER_ESTAT);
+
+	}
+	
+	public boolean isVistaTreetablePerTipusDocuments(HttpServletRequest request) {
+		ContingutVistaEnumDto contingutVista = getVistaActiva(request);
+		return contingutVista == ContingutVistaEnumDto.TREETABLE_PER_TIPUS_DOCUMENT;
+	}
+	
+	public boolean isVistaTreetablePerEstats(HttpServletRequest request) {
+		ContingutVistaEnumDto contingutVista = getVistaActiva(request);
+		return contingutVista == ContingutVistaEnumDto.TREETABLE_PER_ESTAT;
 	}
 
 }

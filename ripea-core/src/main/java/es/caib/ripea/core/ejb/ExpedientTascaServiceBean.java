@@ -270,11 +270,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	}
 
 	@Override
-	public ExpedientTascaDto canviarEstat(
+	public ExpedientTascaDto canviarTascaEstat(
 			Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
 			String motiu) {
-		return delegate.canviarEstat(
+		return delegate.canviarTascaEstat(
 				expedientTascaId,
 				tascaEstatEnumDto,
 				motiu);

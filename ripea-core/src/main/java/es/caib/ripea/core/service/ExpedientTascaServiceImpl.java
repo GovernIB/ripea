@@ -123,13 +123,14 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				true,
 				false,
 				false,
-				false, false, null);
+				false,
+				null, 
+				null);
 		
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
@@ -178,7 +179,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				contingut,
 				true,
 				ambFills,
-				ambFills,
 				true,
 				true,
 				true,
@@ -192,7 +192,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				null,
 				true,
 				true,
-				true);
+				true,
+				false);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -286,41 +287,41 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto canviarEstat(Long expedientTascaId, TascaEstatEnumDto tascaEstatEnumDto, String motiu) {
+	public ExpedientTascaDto canviarTascaEstat(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu) {
 		logger.debug("Canviant estat del tasca " +
-				"expedientTascaId=" + expedientTascaId +", "+
-				"tascaEstatEnumDto=" + tascaEstatEnumDto +
+				"tascaId=" + tascaId +", "+
+				"tascaEstat=" + tascaEstat +
 				")");
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName());
-		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
-		TascaEstatEnumDto estatAnterior = expedientTascaEntity.getEstat();
+		ExpedientTascaEntity tasca = tascaHelper.comprovarTasca(tascaId);
+		TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
 		
-		if (tascaEstatEnumDto == TascaEstatEnumDto.REBUTJADA) {
-			expedientTascaEntity.updateRebutjar(motiu);
+		if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {
+			tasca.updateRebutjar(motiu);
 		} else {
-			expedientTascaEntity.updateEstat(tascaEstatEnumDto);
+			tasca.updateEstat(tascaEstat);
 		}
 		
-		if(tascaEstatEnumDto == TascaEstatEnumDto.INICIADA) {
-			expedientTascaEntity.updateResponsableActual(responsableActual);
+		if(tascaEstat == TascaEstatEnumDto.INICIADA) {
+			tasca.updateResponsableActual(responsableActual);
 		}
 		
-		if (tascaEstatEnumDto == TascaEstatEnumDto.FINALITZADA && expedientTascaEntity.getMetaExpedientTasca().getEstatFinalitzarTasca() != null) {
-			ExpedientEntity expedientEntity = expedientTascaEntity.getExpedient();
-			expedientEntity.updateExpedientEstat(expedientTascaEntity.getMetaExpedientTasca().getEstatFinalitzarTasca());
+		if (tascaEstat == TascaEstatEnumDto.FINALITZADA && tasca.getMetaTasca().getEstatFinalitzarTasca() != null) {
+			ExpedientEntity expedientEntity = tasca.getExpedient();
+			expedientEntity.updateEstatAdditional(tasca.getMetaTasca().getEstatFinalitzarTasca());
 		}
 		
-		emailHelper.enviarEmailCanviarEstatTasca(expedientTascaEntity, estatAnterior);
+		emailHelper.enviarEmailCanviarEstatTasca(tasca, tascaEstatAnterior);
 		
-		for (UsuariEntity responsable: expedientTascaEntity.getResponsables()) {
+		for (UsuariEntity responsable: tasca.getResponsables()) {
 			cacheHelper.evictCountTasquesPendents(responsable.getCodi());	
 		}
 
-		log(expedientTascaEntity, LogTipusEnumDto.CANVI_ESTAT);
+		log(tasca, LogTipusEnumDto.CANVI_ESTAT);
 		
-		return conversioTipusHelper.convertir(expedientTascaEntity,
+		return conversioTipusHelper.convertir(tasca,
 				ExpedientTascaDto.class);
 	}
 
@@ -383,13 +384,13 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					+ "expedientTasca=" + expedientTasca + ")");
 		
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				false,
 				false,
-				false, false, null);
+				false,
+				null, null);
 
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
@@ -410,7 +411,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		}
 		
 		if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
-			expedient.updateExpedientEstat(metaExpedientTascaEntity.getEstatCrearTasca());
+			expedient.updateEstatAdditional(metaExpedientTascaEntity.getEstatCrearTasca());
 		}
 		
 		for (String responsableCodi: expedientTasca.getResponsablesCodi()) {
@@ -758,15 +759,13 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		}
 
 		entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				tasca.getExpedient().getId(),
 				false,
 				false,
 				true,
 				false,
 				false,
-				false,
-				rolActual);
+				rolActual, null);
 
 		// truncam a 1024 caracters
 		if (text.length() > 1024)
@@ -788,13 +787,13 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		}
 
 		entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				tasca.getExpedient().getId(),
 				false,
 				true,
 				false,
 				false,
-				false, false, null);
+				false,
+				null, null);
 
 		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
 
@@ -808,7 +807,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				expedientTascaEntity,
 				LogObjecteTipusEnumDto.TASCA,
 				tipusLog,
-				expedientTascaEntity.getMetaExpedientTasca().getNom(),
+				expedientTascaEntity.getMetaTasca().getNom(),
 				expedientTascaEntity.getComentaris().size() == 1 ? expedientTascaEntity.getComentaris().get(0).getText() : null, // expedientTascaEntity.getComentari(),
 				false,
 				false);
@@ -818,7 +817,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			DocumentEntity document) {
 		return (DocumentDto) contingutHelper.toContingutDto(
 				document,
-				false,
 				false,
 				false,
 				false,
@@ -834,6 +832,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				null,
 				true,
 				true,
+				false,
 				false);
 	}
 

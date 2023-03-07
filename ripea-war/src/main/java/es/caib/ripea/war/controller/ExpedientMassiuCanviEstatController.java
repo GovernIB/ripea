@@ -264,7 +264,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		} 
 		
 		for (Long expedientId : seleccio) {
-			expedientEstatService.changeEstatOfExpedient(
+			expedientEstatService.changeExpedientEstat(
 					entitatActual.getId(),
 					expedientId,
 					command.getExpedientEstatId(), 

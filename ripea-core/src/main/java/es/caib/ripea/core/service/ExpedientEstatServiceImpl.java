@@ -164,15 +164,14 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false, 
 				true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				true,
 				false,
-				false, 
-				false, 
-				rolActual);
+				false,
+				rolActual, 
+				null);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
@@ -232,44 +231,44 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 
 	@Transactional
 	@Override
-	public ExpedientDto changeEstatOfExpedient(
+	public ExpedientDto changeExpedientEstat(
 			Long entitatId,
 			Long expedientId,
-			Long expedientEstatId,
+			Long estatId,
 			boolean checkPerMassiuAdmin) {
 		logger.debug("Canviant estat del expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
-				"expedientEstatId=" + expedientEstatId + ")");
+				"estatId=" + estatId + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				true,
 				false,
-				false, 
-				checkPerMassiuAdmin, null);
+				false,
+				null, 
+				null);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, expedientId, ExpedientEstatEnumDto.OBERT);
 		ExpedientEstatEntity estat;
-		if (expedientEstatId!=null){
-			estat = expedientEstatRepository.findOne(expedientEstatId);
+		if (estatId != null) {
+			estat = expedientEstatRepository.findOne(estatId);
 		} else { // if it is null it means that "OBERT" state was choosen
 			estat = null;
 		}
 		String codiEstatAnterior;
-		if (expedient.getExpedientEstat()!=null){
-			codiEstatAnterior = expedient.getExpedientEstat().getCodi();
+		if (expedient.getEstatAdditional() != null) {
+			codiEstatAnterior = expedient.getEstatAdditional().getCodi();
 		} else {
 			codiEstatAnterior = messageHelper.getMessage("expedient.estat.enum.OBERT");
 		}
-		expedient.updateExpedientEstat(
+		expedient.updateEstatAdditional(
 				estat);
 		// log change of state
 		String codiEstatNou;
-		if(expedient.getExpedientEstat()!=null){
-			codiEstatNou = expedient.getExpedientEstat().getCodi();
+		if (expedient.getEstatAdditional() != null) {
+			codiEstatNou = expedient.getEstatAdditional().getCodi();
 		} else {
 			codiEstatNou = messageHelper.getMessage("expedient.estat.enum.OBERT");
 		}
@@ -330,20 +329,21 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "expedientId=" + expedientId + ", "
 				+ "usuari=" + codi + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				true,
 				false,
-				false, 
-				false, null);
+				false,
+				null, 
+				null);
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
 				false,
 				false,
 				false,
-				false, null);
+				false, 
+				null);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
 			throw new ValidationException(
@@ -452,21 +452,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 							ExpedientDto dto = (ExpedientDto)contingutHelper.toContingutDto(
 									source,
 									false,
-									false,
-									false,
-									false,
-									true,
-									true,
-									false,
-									null,
-									false,
-									null,
-									false,
-									0,
-									null,
-									null,
-									true,
-									true,
 									false);
 							return dto;
 						}
@@ -565,24 +550,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			ExpedientEntity expedient,
 			boolean ambPathIPermisos) {
 		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
-				expedient,
-				ambPathIPermisos,
-				false,
-				false,
-				false,
-				ambPathIPermisos,
-				false,
-				false,
-				null,
-				false,
-				null,
-				false,
-				0,
-				null,
-				null,
-				true,
-				true,
-				false);
+				expedient, false, false);
 		
 		return expedientDto;
 	}

@@ -12,8 +12,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -86,7 +85,6 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -187,15 +185,16 @@ public class ContingutHelper {
 
 
 	public ContingutDto toContingutDto(
-			ContingutEntity contingut) {
+			ContingutEntity contingut, 
+			boolean ambPath, 
+			boolean pathNomesFinsExpedientArrel) {
 		return toContingutDto(
 				contingut,
 				false,
 				false,
 				false,
-				false,
-				false,
-				false,
+				ambPath,
+				pathNomesFinsExpedientArrel,
 				false,
 				null,
 				false,
@@ -204,8 +203,9 @@ public class ContingutHelper {
 				0,
 				null,
 				null,
-				true,
-				true, 
+				false,
+				false,
+				false, 
 				false);
 	}
 	
@@ -214,21 +214,21 @@ public class ContingutHelper {
 			ContingutEntity contingut,
 			boolean ambPermisos,
 			boolean ambFills,
-			boolean filtrarFillsSegonsPermisRead,
 			boolean ambDades,
 			boolean ambPath,
 			boolean pathNomesFinsExpedientArrel,
 			boolean ambVersions,
 			String rolActual,
 			boolean onlyForList,
-			Long organActualId, 
+			Long organActualId,
 			boolean onlyFirstDescendant, 
 			int level, 
 			ExpedientDto expedientDto, 
 			List<ContingutDto> pathDto, 
 			boolean ambExpedientPare, 
 			boolean ambEntitat, 
-			boolean ambMapPerTipusDocument) {
+			boolean ambMapPerTipusDocument, 
+			boolean ambMapPerEstat) {
 		level++;
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		ContingutDto resposta = null;
@@ -254,45 +254,13 @@ public class ContingutHelper {
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
 
 			// expedient estat
-			if (expedient.getExpedientEstat() != null) {
+			if (expedient.getEstatAdditional() != null) {
 				dto.setExpedientEstat(conversioTipusHelper.convertir(
-						expedient.getExpedientEstat(),
+						expedient.getEstatAdditional(),
 						ExpedientEstatDto.class));
 			}
-			long t10 = System.currentTimeMillis();
-			try {
-				dto.setUsuariActualWrite(false);
-				entityComprovarHelper.comprovarPermisosMetaNode(
-						expedient.getMetaNode(),
-						expedient.getId(),
-						false,
-						true,
-						false,
-						false,
-						false,
-						rolActual,
-						null);
-				dto.setUsuariActualWrite(true);
-			} catch (PermissionDeniedException ex) {
-			}
-
-			try {
-				dto.setUsuariActualDelete(false);
-				entityComprovarHelper.comprovarPermisosMetaNode(
-						expedient.getMetaNode(),
-						expedient.getId(),
-						false,
-						false,
-						false,
-						true,
-						false,
-						rolActual,
-						null);
-				dto.setUsuariActualDelete(true);
-			} catch (PermissionDeniedException ex) {
-			}
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
+			
+			omplirPermisosPerExpedient(dto, rolActual, contingut.getId());
 
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
@@ -343,12 +311,12 @@ public class ContingutHelper {
 								DocumentEstatEnumDto.CUSTODIAT) > 0);
 				dto.setHasAllDocumentsDefinitiu(documentRepository.hasAllDocumentsDefinitiu(expedient));
 				// expedient estat
-				if (expedient.getExpedientEstat() != null) {
-					ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getExpedientEstat().getMetaExpedient(), expedient.getExpedientEstat().getOrdre()+1);
+				if (expedient.getEstatAdditional() != null) {
+					ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getEstatAdditional().getMetaExpedient(), expedient.getEstatAdditional().getOrdre()+1);
 					if (estat != null) {
 						dto.setExpedientEstatNextInOrder(estat.getId());
 					} else {//if there is no estat with higher order, choose previous
-						dto.setExpedientEstatNextInOrder(expedient.getExpedientEstat().getId());
+						dto.setExpedientEstatNextInOrder(expedient.getEstatAdditional().getId());
 					}
 				}
 
@@ -367,7 +335,7 @@ public class ContingutHelper {
 						logger.info("ambMapPerTipusDocument start (" + contingut.getId() + ")");
 					long t2 = System.currentTimeMillis();
 
-					Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new HashMap<MetaDocumentDto, List<ContingutDto>>();
+					Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new LinkedHashMap<MetaDocumentDto, List<ContingutDto>>();
 
 					List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
 					
@@ -385,26 +353,26 @@ public class ContingutHelper {
 						if (CollectionUtils.isNotEmpty(documents)) {
 							for (DocumentEntity document : documents) {
 								
-								docsDtos.add(toContingutDto(
-										document,
-										ambPermisos,
-										false,
-										false,
-										false,
-										ambPath,
-										false,
-										false,
-										rolActual,
-										onlyForList,
-										organActualId,
-										onlyFirstDescendant,
-										level,
-										null,
-										null,
-										ambExpedientPare,
-										ambEntitat,
-										false));
-								
+								docsDtos.add(
+										toContingutDto(
+												document,
+												ambPermisos,
+												false,
+												false,
+												ambPath,
+												false,
+												false,
+												rolActual,
+												onlyForList,
+												organActualId,
+												onlyFirstDescendant,
+												level,
+												null,
+												null,
+												ambExpedientPare,
+												ambEntitat,
+												false,
+												ambMapPerEstat));
 								
 							}
 						} 
@@ -415,9 +383,65 @@ public class ContingutHelper {
 					
 					if (cacheHelper.mostrarLogsRendiment())
 						logger.info("ambMapPerTipusDocument end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-				}			
-			
-			
+				}		
+				if (ambMapPerEstat) {
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerEstat start (" + contingut.getId() + ")");
+					long t2 = System.currentTimeMillis();
+
+					Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat = new LinkedHashMap<ExpedientEstatDto, List<ContingutDto>>();
+
+					List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
+					
+					for (ExpedientEstatEntity expedientEstat : expedientEstats) {
+						
+						List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalAndEsborrat(
+								expedient,
+								expedientEstat,
+								0);
+						
+						ExpedientEstatDto expedientEstatDto = conversioTipusHelper.convertir(expedientEstat, ExpedientEstatDto.class);
+						
+						
+						List<ContingutDto> docsDtos = new ArrayList<ContingutDto>(); 
+						if (CollectionUtils.isNotEmpty(documents)) {
+							for (DocumentEntity document : documents) {
+								
+								docsDtos.add(
+										toContingutDto(
+												document,
+												ambPermisos,
+												false,
+												false,
+												ambPath,
+												false,
+												false,
+												rolActual,
+												onlyForList,
+												organActualId,
+												onlyFirstDescendant,
+												level,
+												null,
+												null,
+												ambExpedientPare,
+												ambEntitat,
+												false,
+												false));
+								
+								
+							}
+						} 
+						mapPerEstat.put(expedientEstatDto, docsDtos);
+						
+					}
+					dto.setMapPerEstat(mapPerEstat);
+					
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerEstat end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				}	
+				
+
+				
 			}
 			
 			if (cacheHelper.mostrarLogsRendiment())
@@ -553,7 +577,6 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false,
 								null,
 								true,
 								null,
@@ -563,7 +586,8 @@ public class ContingutHelper {
 								null,
 								ambExpedientPare,
 								ambEntitat,
-								ambMapPerTipusDocument));
+								ambMapPerTipusDocument,
+								ambMapPerEstat));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
@@ -642,15 +666,6 @@ public class ContingutHelper {
 					logger.info("propertiesContingut5 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 			}
 
-			if (ambPermisos && metaNode != null) {
-				long t2 = System.currentTimeMillis();
-				// Omple els permisos
-				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambPermisosmetaNode time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-				
-			}
-
 			if (ambPermisos) {
 				
 				long t2 = System.currentTimeMillis();
@@ -709,7 +724,6 @@ public class ContingutHelper {
 								contingut.getExpedient(),
 								ambPermisos,
 								false,
-								false,
 								true,
 								false,
 								false,
@@ -720,9 +734,11 @@ public class ContingutHelper {
 								onlyFirstDescendant,
 								level,
 								null,
-								null, 
+								null,
 								ambExpedientPare, 
-								ambEntitat, ambMapPerTipusDocument);
+								ambEntitat, 
+								ambMapPerTipusDocument, 
+								ambMapPerEstat);
 						if (cacheHelper.mostrarLogsRendiment())
 							logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 					}
@@ -783,24 +799,6 @@ public class ContingutHelper {
 
 				fills.addAll(fillsOrder1);
 				fills.addAll(fillsOrder2);
-
-				if (filtrarFillsSegonsPermisRead) {
-					// Filtra els fills que no tenen permis de lectura
-					Iterator<ContingutEntity> it = fills.iterator();
-					while (it.hasNext()) {
-						ContingutEntity c = it.next();
-						if (c instanceof ExpedientEntity) {
-							ExpedientEntity n = (ExpedientEntity)c;
-							if (n.getMetaNode() != null && !permisosHelper.isGrantedAll(
-									n.getMetaNode().getId(),
-									MetaNodeEntity.class,
-									new Permission[] {ExtendedPermission.READ},
-									auth)) {
-								it.remove();
-							}
-						}
-					}
-				}
 				
 				List<ContingutDto> fillsDtos = new ArrayList<ContingutDto>();
 				for (ContingutEntity fill: fills) {
@@ -810,10 +808,20 @@ public class ContingutHelper {
 								ambPermisos,
 								onlyFirstDescendant ? false : true,
 								false,
-								false,
 								ambPath,
 								false,
-								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare, ambEntitat, ambMapPerTipusDocument);
+								false,
+								rolActual,
+								onlyForList,
+								organActualId,
+								onlyFirstDescendant,
+								level,
+								expedientCalculat,
+								pathCalculatPerFills,
+								ambExpedientPare,
+								ambEntitat,
+								ambMapPerTipusDocument,
+								ambMapPerEstat);
 						// Configura el pare de cada fill
 						fillsDtos.add(fillDto);
 					}
@@ -831,6 +839,52 @@ public class ContingutHelper {
 			logger.info("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + level + "): "+ (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
+	
+	
+	
+	public void omplirPermisosPerExpedient(
+			ExpedientDto dto, 
+			String rolActual, 
+			Long expedientId) {
+
+		
+		long t10 = System.currentTimeMillis();
+		try {
+			dto.setUsuariActualWrite(false);
+			
+			
+			entityComprovarHelper.comprovarExpedient(
+					expedientId,
+					false,
+					false,
+					true,
+					false,
+					false,
+					null, null);
+			
+			dto.setUsuariActualWrite(true);
+		} catch (PermissionDeniedException ex) {
+		}
+
+		try {
+			dto.setUsuariActualDelete(false);
+			entityComprovarHelper.comprovarExpedient(
+					expedientId,
+					false,
+					false,
+					false,
+					false,
+					true,
+					null, null);
+			dto.setUsuariActualDelete(true);
+		} catch (PermissionDeniedException ex) {
+		}
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
+	
+
+	}
+	
 	
 	public ContingutDto toContingutDtoSimplificat(ContingutEntity contingut, boolean nomesFinsExpedientArrel, List<ContingutDto> pathDto) {
 		ContingutDto resposta = null;		
@@ -1079,19 +1133,23 @@ public class ContingutHelper {
 			ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
 			if (comprovarPermisWrite) {
 				// if expedient estat has write permissions don't need to check metaExpedient permissions
-				if (comprovarPermisWrite && expedientEntity.getExpedientEstat() != null) {
-					if (hasEstatPermissons(expedientEntity.getExpedientEstat().getId()))
+				if (comprovarPermisWrite && expedientEntity.getEstatAdditional() != null) {
+					if (hasEstatPermissons(expedientEntity.getEstatAdditional().getId()))
 						comprovarPermisWrite = false;
 				}
 			}
-			comprovarPermisosExpedient(
-					expedientEntity,
+			
+			
+			entityComprovarHelper.comprovarExpedient(
+					expedientEntity.getId(),
+					false,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
 					comprovarPermisDelete,
-					checkPerMassiuAdmin,
-					rolActual);
+					null, 
+					null);
+
 		}
 		return contingut;
 	}
@@ -1137,16 +1195,34 @@ public class ContingutHelper {
 				false,
 				false, null);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			comprovarPermisosExpedient(
-					(ExpedientEntity)contingut,
+			
+			entityComprovarHelper.comprovarExpedient(
+					contingut.getId(),
+					false,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					false,
-					false, false, null);
+					false,
+					null, 
+					null);
+
 		}
 		return contingut;
 	}
 
+	
+	public DocumentEntity comprovarDocumentPerTasca(
+			Long entitatId,
+			Long tascaId,
+			Long documentId) {
+
+		
+		comprovarContingutPertanyTascaAccesible(entitatId, tascaId, documentId);
+		DocumentEntity document = documentRepository.findOne(
+				documentId);
+
+		return document;
+	}
 
 	public ContingutEntity comprovarContingutPertanyTascaAccesible(
 			Long entitatId,
@@ -1203,24 +1279,7 @@ public class ContingutHelper {
 				+ "contingutId=" + contingut.getId() + ")");
 
 		ContingutDto dto = toContingutDto(
-				contingut,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false,
-				null,
-				false,
-				null,
-				false,
-				0,
-				null,
-				null,
-				true,
-				true,
-				false);
+				contingut, false, false);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1326,33 +1385,6 @@ public class ContingutHelper {
 	}
 
 
-	private void comprovarPermisosExpedient(
-			ExpedientEntity expedient,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete,
-			boolean checkPerMassiuAdmin,
-			String rolActual) {
-		if (expedient.getMetaNode() != null) {
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					expedient.getMetaNode(),
-					expedient.getId(),
-					comprovarPermisRead,
-					comprovarPermisWrite,
-					comprovarPermisCreate,
-					comprovarPermisDelete,
-					checkPerMassiuAdmin,
-					rolActual,
-					null);
-		} else {
-			throw new ValidationException(
-					expedient.getId(),
-					ContingutEntity.class,
-					"L'expedient no te meta-node associat (expedientId=" + expedient.getId() + ")");
-		}
-	}
-
 	public ExpedientEntity getExpedientSuperior(
 			ContingutEntity contingut,
 			boolean incloureActual,
@@ -1379,7 +1411,7 @@ public class ContingutHelper {
 		}
 		if (expedient != null) {
 			if (comprovarPermisRead) {
-				entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+				entityComprovarHelper.comprovarMetaExpedient(
 						expedient.getEntitat(),
 						expedient.getMetaExpedient().getId(),
 						true,
@@ -1393,16 +1425,17 @@ public class ContingutHelper {
 			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
 
 				// if user has write permissions to expedient estat don't need to check metaExpedient permissions
-				if (expedient.getExpedientEstat() == null || !hasEstatPermissons(expedient.getExpedientEstat().getId())) {
+				if (expedient.getEstatAdditional() == null || !hasEstatPermissons(expedient.getEstatAdditional().getId())) {
 
-					comprovarPermisosExpedient(
-							expedient,
-							false,
-							true,
-							false,
+					
+					entityComprovarHelper.comprovarExpedient(
+							expedient.getId(),
 							false,
 							false,
-							rolActual);
+							comprovarPermisWrite,
+							false,
+							false,
+							null, null);
 
 				}
 			}
@@ -1796,7 +1829,6 @@ public class ContingutHelper {
 									false,
 									false,
 									false,
-									false,
 									null,
 									false,
 									null,
@@ -1804,6 +1836,7 @@ public class ContingutHelper {
 									level,
 									null,
 									null,
+									false,
 									false,
 									false,
 									false));

@@ -135,7 +135,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 		return expedient;
 	}
 
-	public MetaExpedientTascaEntity getMetaExpedientTasca() {
+	public MetaExpedientTascaEntity getMetaTasca() {
 		return metaExpedientTasca;
 	}
 

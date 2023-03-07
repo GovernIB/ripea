@@ -53,6 +53,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
@@ -146,7 +147,8 @@ public class DocumentHelper {
 				document.getUbicacio(),
 				document.getNtiIdDocumentoOrigen(),
 				document.getPinbalIdpeticion(), 
-				documentFirmaTipus);
+				documentFirmaTipus, 
+				expedient.getEstatAdditional());
 		
 		FitxerDto fitxer = new FitxerDto(
 				document.getFitxerNom(),
@@ -660,7 +662,8 @@ public class DocumentHelper {
 			String ubicacio,
 			String ntiIdDocumentoOrigen,
 			String pinbalIdpeticion, 
-			DocumentFirmaTipusEnumDto documentFirmaTipus) {
+			DocumentFirmaTipusEnumDto documentFirmaTipus, 
+			ExpedientEstatEntity expedientEstatAdditional) {
 		return crearDocumentDB(
 				documentTipus,
 				nom,
@@ -681,7 +684,8 @@ public class DocumentHelper {
 				true,
 				null,
 				ArxiuEstatEnumDto.DEFINITIU, 
-				documentFirmaTipus);
+				documentFirmaTipus, 
+				expedientEstatAdditional);
 	}
 
 	public DocumentEntity crearDocumentDB(
@@ -704,7 +708,8 @@ public class DocumentHelper {
 			boolean validacioFirmaCorrecte,
 			String validacioFirmaErrorMsg,
 			ArxiuEstatEnumDto annexArxiuEstat, 
-			DocumentFirmaTipusEnumDto documentFirmaTipus) {
+			DocumentFirmaTipusEnumDto documentFirmaTipus, 
+			ExpedientEstatEntity expedientEstatAdditional) {
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				documentTipus,
 				documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA ? DocumentEstatEnumDto.REDACCIO : DocumentEstatEnumDto.FIRMAT,
@@ -722,7 +727,8 @@ public class DocumentHelper {
 				pare,
 				entitat,
 				expedient, 
-				documentFirmaTipus).
+				documentFirmaTipus, 
+				expedientEstatAdditional).
 				ubicacio(ubicacio).
 				pinbalIdpeticion(pinbalIdpeticion).
 				validacioFirmaCorrecte(validacioFirmaCorrecte).
@@ -882,23 +888,8 @@ public class DocumentHelper {
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
 		return (DocumentDto) contingutHelper.toContingutDto(
-				document,
-				false,
-				false,
-				false,
-				false,
-				true,
-				true,
-				false,
-				null,
-				false,
-				null,
-				false,
-				0,
-				null,
-				null,
-				true,
-				true,
+				document, 
+				false, 
 				false);
 	}
 
@@ -1052,14 +1043,13 @@ public class DocumentHelper {
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				false,
 				false,
-				false, 
-				false, 
+				false,
+				null, 
 				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentEntity> documentsChosen = new ArrayList<DocumentEntity>();
@@ -1145,7 +1135,7 @@ public class DocumentHelper {
 	// COMPROVACIONS PERMISOS
 	////
 
-	public DocumentEntity comprovarDocumentDinsExpedientModificable(
+	public DocumentEntity comprovarDocument(
 			Long entitatId,
 			Long id,
 			boolean comprovarPermisRead,
@@ -1405,23 +1395,8 @@ public class DocumentHelper {
 		for (DocumentEntity document : documents) {
 			documentsDto.add(
 					(DocumentDto) contingutHelper.toContingutDto(
-							document,
-							false,
-							false,
-							false,
-							false,
-							true,
-							false,
-							false,
-							null,
-							false,
-							null,
-							false,
-							0,
-							null,
-							null,
-							true,
-							true,
+							document, 
+							false, 
 							false));
 			
 		}

@@ -84,6 +84,8 @@
             $node.data('depth', depth);
             self.depths[nodeId] = depth;
             $node.addClass('treetable-depth-' + depth);
+
+            $node.find('td:nth-child(2)').css("padding-left", (10 + (depth * 50)) + "px");
         });
     };
 
@@ -97,8 +99,10 @@
             var $node = $(node);
             var nodeId = $node.data('node');
 
+            
+            
             if (self.children[nodeId] > 0) {
-                $('<span class="treetable-expander"></span>')
+                $('<span class="treetable-expander" style="margin-right: 8px;"></span>')
                     .prependTo($node.find('td').get(1))
                     .addClass((self.options.startCollapsed) ?
                         self.options.collapsedClass :

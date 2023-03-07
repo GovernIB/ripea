@@ -7,21 +7,38 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 
-<c:set var="expedientPare" scope="request" value="${contingut.expedientPare}" />
-<c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" scope="request" value="${contingut}"/></c:if>
-<c:set var="potModificarContingut" scope="request" value="${empty expedientPare.metaNode or expedientPare.metaNode.usuariActualWrite or expedientPare.usuariActualWrite}"/>
-<c:set var="expedientAgafatPerUsuariActual" scope="request" value="${false}"/>
-<c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientAgafatPerUsuariActual" scope="request" value="${true}"/></c:if>
-<c:set var="expedientTancat" scope="request" value="${false}"/>
-<c:set var="isTasca" scope="request" value="${not empty tascaId}"/>
-<c:choose>
-	<c:when test="${contingut.expedient}">
-		<c:if test="${contingut.estat == 'TANCAT'}"><c:set var="expedientTancat" value="${true}"/></c:if>
-	</c:when>
-	<c:otherwise>
-		<c:if test="${contingut.expedientPare.estat == 'TANCAT'}"><c:set var="expedientTancat" value="${true}"/></c:if>
-	</c:otherwise>
-</c:choose>
+<c:set var="expedientId" scope="request" value="${contingut.expedientId}" />
+<c:set var="expedient" scope="request" value="${contingut.expedientObject}" />
+
+<c:set var="expedientAgafatPerUsuariActual" scope="request">
+	<c:choose>
+		<c:when test="${expedient.agafatPer.codi == pageContext.request.userPrincipal.name}">true</c:when>
+		<c:otherwise>false</c:otherwise>
+	</c:choose>
+</c:set>
+<c:set var="expedientTancat" scope="request">
+	<c:choose>
+		<c:when test="${expedient.estat == 'TANCAT'}">true</c:when>
+		<c:otherwise>false</c:otherwise>
+	</c:choose>
+</c:set>
+<c:set var="expedientObert" scope="request" value="${expedientObert}"/>
+<c:set var="isTasca" scope="request">
+	<c:choose>
+		<c:when test="${not empty tascaId}">true</c:when>
+		<c:otherwise>false</c:otherwise>
+	</c:choose>
+</c:set>
+
+<c:set var="permissionWrite" scope="request" value="${expedient.usuariActualWrite}"/>
+<c:set var="potModificar" scope="request">
+	<c:choose>
+		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTasca or contingut.admin) and expedientObert}">true</c:when>
+		<c:otherwise>false</c:otherwise>
+	</c:choose>
+</c:set>
+
+
 <c:set var="htmlIconaCarpeta6em"><span class="fa-stack" style="font-size:.6em"><i class="fa fa-folder fa-stack-2x"></i><i class="fa fa-clock-o fa-stack-1x fa-inverse"></i></span></c:set>
 <rip:blocIconaContingutNoms/>
 <html>
@@ -31,13 +48,13 @@
 		<c:choose>
 			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="max-width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
-			<c:when test="${contingut.carpeta}">&nbsp;${contingut.expedientPare.nom}</c:when>
-			<c:when test="${contingut.document}">&nbsp;${contingut.expedientPare.nom}</c:when>
+			<c:when test="${contingut.carpeta}">&nbsp;${expedient.nom}</c:when>
+			<c:when test="${contingut.document}">&nbsp;${expedient.nom}</c:when>
 		</c:choose>
 
 	</title>
 	
-	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut.expedient ? contingut : contingut.expedientPare}" nomesIconaNom="true"/></c:set>
+	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${expedient}" nomesIconaNom="true"/></c:set>
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
 		
@@ -62,18 +79,7 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/webjars/pdf-js/2.5.207/build/pdf.js"/>"></script>
-	<c:if test="${isContingutDetail}">
-		<script src="<c:url value="/webjars/jquery/1.12.0/dist/jquery.min.js"/>"></script>
-		<link href="<c:url value="/webjars/bootstrap/3.3.6/dist/css/bootstrap.min.css"/>" rel="stylesheet"/>
-		<link href="<c:url value="/webjars/font-awesome/4.7.0/css/font-awesome.min.css"/>" rel="stylesheet"/>
-		<link href="<c:url value="/css/estils.css"/>" rel="stylesheet">
-		<link rel="shortcut icon" href="<c:url value="/img/favicon.png"/>" type="image/x-icon" />
-		<!-- Llibreria per a compatibilitat amb HTML5 -->
-		<!--[if lt IE 9]>
-	      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	    <![endif]-->
-	    <script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
-	</c:if>
+
 <style>
 
 
@@ -457,7 +463,7 @@ function removeCookie(cname) {
 
 
 <!-- edicioOnlineActiva currently doesnt exist in application --> 
-<c:if test="${edicioOnlineActiva and contingut.document and contingut.metaNode.usuariActualWrite}">
+<c:if test="${edicioOnlineActiva and contingut.document}">
 	<script src="http://www.java.com/js/deployJava.js"></script>
 	<script type="text/javascript">
 	var officeExecAttributes = {
@@ -508,34 +514,26 @@ function removeCookie(cname) {
 	<input id="contingutId" type="hidden" value="${contingut.id}">
 	
 	<!---------------------------------------- AGAFAR / ALLIBERAR  ------------------------------------------>
-	<c:if test="${(contingut.expedient or contingut.carpeta) and not empty expedientPare.agafatPer and !isTasca}">
+	<c:if test="${(contingut.expedient or contingut.carpeta) and not empty expedient.agafatPer and !isTasca}">
 		<div class="text-right" data-toggle="botons-titol">
 			<ul class="list-group pull-right">
 	  			<li class="list-group-item" style="padding: 5px 12px; margin-right: 4px">
 	  				<spring:message code="contingut.info.agafat.per"/>:
-	  				${expedientPare.agafatPer.codiAndNom}&nbsp;
+	  				${expedient.agafatPer.codiAndNom}&nbsp;
 	  				<c:if test="${expedientAgafatPerUsuariActual}">
-	  					<a href="<c:url value="/expedient/${expedientPare.id}/alliberar?contingutId=${contingut.id}"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
+	  					<a href="<c:url value="/expedient/${expedient.id}/alliberar?contingutId=${contingut.id}"/>" class="btn btn-default btn-xs" title="<spring:message code="comu.boto.alliberar"/>"><span class="fa fa-unlock"></span></a>
 	  				</c:if>
 	  			</li>
 	  		</ul>
 		</div>
 	</c:if>
-	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual && expedientPare.metaNode.usuariActualRead}">
+	<c:if test="${!isTasca && not expedientAgafatPerUsuariActual}">
 		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable" style="min-height: 40px;">
 			<c:if test="${!contingut.admin}">
 				<span class="fa fa-info-circle"></span> 
 				<spring:message code="contingut.alerta.no.agafat"/>
 			</c:if>  
-			<a href="<c:url value="../expedient/${expedientPare.id}/agafar?contingutId=${contingut.id}"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
-		</div>
-	</c:if>
-	
-	<!---------------------------------------- ALERT SENSE PERMISOS  ------------------------------------------>
-	<c:if test="${!isTasca && !expedientPare.metaNode.usuariActualRead}">
-		<div id="alerta-no-agafat" class="alert well-sm alert-info alert-dismissable">
-			<span class="fa fa-info-circle"></span>
-			<spring:message code="contingut.alerta.sense.permisos"/>
+			<a href="<c:url value="../expedient/${expedient.id}/agafar?contingutId=${contingut.id}"/>" class="btn btn-xs btn-default pull-right"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a>
 		</div>
 	</c:if>
 	
@@ -567,34 +565,34 @@ function removeCookie(cname) {
 <%-- 						</c:if> --%>
 						<c:if test="${contingut.carpeta}">
 							<dt><spring:message code="contingut.info.numero"/></dt>
-							<dd>${contingut.expedientPare.numero}</dd>
+							<dd>${expedient.numero}</dd>
 							
 							<dt><spring:message code="contingut.info.titol"/></dt>
-							<dd>${contingut.expedientPare.nom}</dd>							
+							<dd>${expedient.nom}</dd>							
 							
-							<c:if test="${not empty contingut.expedientPare.metaNode}">
+							<c:if test="${not empty expedient.metaNode}">
 								<dt><spring:message code="contingut.info.meta.expedient"/></dt>
-								<dd>${contingut.expedientPare.metaNode.nom}</dd>
+								<dd>${expedient.metaNode.nom}</dd>
 							</c:if>
 							
 							<dt><spring:message code="contingut.info.nti.organ"/></dt>
-							<dd>${contingut.expedientPare.organGestorText}</dd>
+							<dd>${expedient.organGestorText}</dd>
 
 							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
-							<dd><fmt:formatDate value="${contingut.expedientPare.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
+							<dd><fmt:formatDate value="${expedient.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
 							
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
-								<c:when test="${contingut.expedientPare.expedientEstat!=null}">
-									<dd style="<c:if test='${not empty contingut.expedientPare.expedientEstat.color}'>border-left: solid 6px ${contingut.expedientPare.expedientEstat.color}; padding-left: 4px;</c:if>">${contingut.expedientPare.expedientEstat.nom}</dd>
+								<c:when test="${expedient.expedientEstat!=null}">
+									<dd style="<c:if test='${not empty expedient.expedientEstat.color}'>border-left: solid 6px ${expedient.expedientEstat.color}; padding-left: 4px;</c:if>">${expedient.expedientEstat.nom}</dd>
 								</c:when>
 								<c:otherwise>
-									<dd><spring:message code="expedient.estat.enum.${contingut.expedientPare.estat}"/></dd>
+									<dd><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd>
 								</c:otherwise>
 							</c:choose>	
 								
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-							<dd>${contingut.expedientPare.ntiClasificacionSia}</dd>
+							<dd>${expedient.ntiClasificacionSia}</dd>
 
 						</c:if>
 
@@ -647,8 +645,8 @@ function removeCookie(cname) {
 												</a>
 											</span>
 											 <span style="width:10%; height: 16px;" class="align-right qqq">
-												<c:if test="${potModificarContingut}">
-													<a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
+												<c:if test="${permissionWrite}">
+													<a href="<c:url value="/expedient/${expedientId}/relacio/${expedientRelacionat.id}/delete"/>" class="btn btn-default btn-xs" data-confirm="<spring:message code="contingut.info.relacio.esborrar.confirm"/>" style="float: right;">
 														<span class="fa fa-trash-o"></span>
 													</a> 
 												</c:if>										 
@@ -660,7 +658,7 @@ function removeCookie(cname) {
 						</c:if> 
 						
 						<c:if test="${!isTasca}">
-							<rip:blocContingutAccions id="botons-accions-info" contingut="${contingut.expedient ? contingut : contingut.expedientPare}" modeLlistat="true" mostrarObrir="false"/>
+							<rip:blocContingutAccions id="botons-accions-info" contingut="${expedient}" modeLlistat="true" mostrarObrir="false" contingutNavigationId="${contingut.id}"/>
 						</c:if>
 					</dl>
 				</div>
@@ -670,7 +668,7 @@ function removeCookie(cname) {
 		<div class="${contingut.document ? 'col-md-12' : 'col-md-9 col-sm-8'}" id="colContent">
 			
 			<!---------------------------------------- ALERTS ------------------------------------------>
-			<c:if test="${contingut.expedient && !isTasca && !expedientTancat && contingut.hasEsborranys && convertirDefinitiu}">
+			<c:if test="${contingut.expedient && !isTasca && expedientObert && contingut.hasEsborranys && convertirDefinitiu}">
 				<div id="botons-errors-esborranys" class="esborranys alert well-sm alert-info alert-dismissable">
 					<p><spring:message code="contingut.errors.expedient.conte.esborranys"/></p>
 					<b><spring:message code="contingut.errors.expedient.conte.esborranys.bold"/></b>
@@ -686,14 +684,14 @@ function removeCookie(cname) {
 					<a href="<c:url value="/contingut/${contingut.id}/alertes"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.alertes.consultar"/></a>
 				</div>
 			</c:if>
-			<c:if test="${!isTasca && (((contingut.expedient or contingut.document) and not contingut.valid) or ((contingut.carpeta) and not contingut.expedientPare.valid))}">
+			<c:if test="${!isTasca && (((contingut.expedient or contingut.document) and not contingut.valid) or ((contingut.carpeta) and not expedient.valid))}">
 				<div id="botons-errors-validacio" class="alert well-sm alert-warning alert-dismissable">
 					<span class="fa fa-exclamation-triangle"></span>&nbsp;
 					<c:choose>
 						<c:when test="${contingut.expedient or contingut.carpeta}"><spring:message code="contingut.errors.expedient.validacio"/></c:when>
 						<c:when test="${contingut.document}"><spring:message code="contingut.errors.document.validacio"/></c:when>
 					</c:choose>
-					<a href="<c:url value="/contingut/${contingut.carpeta ? contingut.expedientPare.id : contingut.id}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
+					<a href="<c:url value="/contingut/${expedientId}/errors"/>" class="btn btn-xs btn-default pull-right" data-toggle="modal"><spring:message code="contingut.errors.consultar"/></a>
 				</div>
 			</c:if>
 			
@@ -703,9 +701,9 @@ function removeCookie(cname) {
 					<li class="active" id="pipella-contingut">
 						<a href="#contingut" data-toggle="tab"><spring:message code="contingut.tab.contingut"/>&nbsp;<span class="badge">${contingut.fillsHierarchicalCount}</span></a>
 					</li>
-					<c:if test="${((contingut.document or contingut.expedient) and fn:length(contingut.metaNode.metaDades) gt 0) || ((contingut.carpeta) and fn:length(contingut.expedientPare.metaNode.metaDades) gt 0)}">
+					<c:if test="${((contingut.document or contingut.expedient) and fn:length(contingut.metaNode.metaDades) gt 0) || ((contingut.carpeta) and fn:length(expedient.metaNode.metaDades) gt 0)}">
 						<li>
-							<a href="#dades" data-toggle="tab"><spring:message code="contingut.tab.dades"/>&nbsp;<span class="badge" id="dades-count">${contingut.carpeta ? contingut.expedientPare.dadesCount : contingut.dadesCount}</span></a>
+							<a href="#dades" data-toggle="tab"><spring:message code="contingut.tab.dades"/>&nbsp;<span class="badge" id="dades-count">${contingut.carpeta ? expedient.dadesCount : contingut.dadesCount}</span></a>
 						</li>
 					</c:if>
 					<c:if test="${contingut.expedient or contingut.carpeta}">
@@ -722,7 +720,7 @@ function removeCookie(cname) {
 								<a href="#publicacions" data-toggle="tab" id="publicacions-tab"><spring:message code="contingut.tab.publicacions" />&nbsp;<span class="badge" id="publicacions-count">${publicacionsCount}</span></a>
 							</li>
 						</c:if>
-						<c:if test="${(contingut.expedient && contingut.peticions ) || (contingut.carpeta && contingut.expedientPare.peticions)}">
+						<c:if test="${(contingut.expedient && contingut.peticions ) || (contingut.carpeta && expedient.peticions)}">
 							<li>
 								<a href="#anotacions" data-toggle="tab"><spring:message code="contingut.tab.anotacions"/>&nbsp;<span class="badge" id="anotacions-count"></span></a>
 							</li>
@@ -752,7 +750,7 @@ function removeCookie(cname) {
 						</div>
 					</c:if>	
 					<c:if test="${contingut.expedient || contingut.carpeta}">
-						<a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${potModificarContingut ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${contingut.expedient ? contingut.numComentaris : contingut.expedientPare.numComentaris}</span></a>
+						<a href="<c:url value="/expedient/${expedientId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-right ${permissionWrite ? '' : 'disabled'}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${expedient.numComentaris}</span></a>
 					</c:if>
 				</ul>
 			</c:if>
@@ -782,7 +780,7 @@ function removeCookie(cname) {
 							<jsp:include page="includes/contingutTabPublicacions.jsp"/>
 						</div>						
 						<!--  If expedient was created from anotació -->
-						<c:if test="${(contingut.expedient && contingut.peticions ) || (contingut.carpeta && contingut.expedientPare.peticions)}">
+						<c:if test="${(contingut.expedient && contingut.peticions ) || (contingut.carpeta && expedient.peticions)}">
 							<!------------------ Anotacions --------------------->
 							<div class="tab-pane" id="anotacions">
 								<jsp:include page="includes/contingutTabAnotacions.jsp"/>

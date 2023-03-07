@@ -20,6 +20,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 
@@ -239,6 +240,11 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	List<DocumentEntity> findByExpedientAndMetaNodeAndEsborrat(
 			ExpedientEntity expedient,
 			MetaNodeEntity metaNode,
+			int esborrat);
+	
+	List<DocumentEntity> findByExpedientAndExpedientEstatAdditionalAndEsborrat(
+			ExpedientEntity expedient,
+			ExpedientEstatEntity expedientEstatAdditional,
 			int esborrat);
 	
 	List<DocumentEntity> findByMetaNode(

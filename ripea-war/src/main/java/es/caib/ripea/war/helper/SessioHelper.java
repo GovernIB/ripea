@@ -6,11 +6,12 @@ package es.caib.ripea.war.helper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
+import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -24,7 +25,7 @@ public class SessioHelper {
 
 	public static final String SESSION_ATTRIBUTE_AUTH_PROCESSADA = "SessioHelper.autenticacioProcessada";
 	public static final String SESSION_ATTRIBUTE_USUARI_ACTUAL = "SessioHelper.usuariActual";
-	public static final String SESSION_ATTRIBUTE_CONTENIDOR_VISTA = "SessioHelper.contenidorVista";
+	public static final String SESSION_ATTRIBUTE_CONTINGUT_VISTA = "SessioHelper.contingutVista";
 	private static final String SESSION_ATTRIBUTE_PIPELLA_ANOT_REG = "SessioHelper.pipellaAnotacioRegistre";
 	private static final String SESSION_ATTRIBUTE_IDIOMA_USUARI = "SessionHelper.idiomaUsuari";
 	
@@ -67,12 +68,12 @@ public class SessioHelper {
 		request.getSession().setAttribute(SESSION_ATTRIBUTE_USUARI_ACTUAL, usuari);
 	}
 
-	public static void updateContenidorVista(HttpServletRequest request, String vista) {
-		request.getSession().setAttribute(SESSION_ATTRIBUTE_CONTENIDOR_VISTA, vista);
+	public static void updateContenidorVista(HttpServletRequest request, ContingutVistaEnumDto vista) {
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_CONTINGUT_VISTA, vista);
 	}
 
-	public static String getContenidorVista(HttpServletRequest request) {
-		return (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_CONTENIDOR_VISTA);
+	public static ContingutVistaEnumDto getContenidorVista(HttpServletRequest request) {
+		return (ContingutVistaEnumDto)request.getSession().getAttribute(SESSION_ATTRIBUTE_CONTINGUT_VISTA);
 	}
 
 	public static void marcatLlegit(HttpServletRequest request) {

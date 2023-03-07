@@ -407,7 +407,7 @@ public class OrganGestorHelper {
 		progres.setProgres(22);
 
 		// Definint tipus de transició
-		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));//TODO: should only take unitats obsolets in last sincronization (should be taken from unitatsWs), now it takes from DB so it takes all obsoletes (even from previous syncronizations) 
 		
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();

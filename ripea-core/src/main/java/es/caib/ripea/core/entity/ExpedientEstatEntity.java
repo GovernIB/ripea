@@ -55,7 +55,7 @@ public class ExpedientEstatEntity extends RipeaAuditable<Long>{
 	
 	
 	@OneToMany(
-			mappedBy = "expedientEstat",
+			mappedBy = "estatAdditional",
 			cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY,
 			orphanRemoval = true)

@@ -105,15 +105,13 @@ $(document).ready(function() {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/${expedientId}/relacionats/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="10" 
+		data-default-order="8" 
 		data-default-dir="desc"
 		data-save-state="true"
 		style="width:100%">
 		<thead>
 			<tr>
 				<th data-col-name="usuariActualWrite" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualWrite" data-visible="false"></th>
-				<th data-col-name="metaNode.usuariActualDelete" data-visible="false"></th>
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="expedientEstat" data-visible="false"></th>

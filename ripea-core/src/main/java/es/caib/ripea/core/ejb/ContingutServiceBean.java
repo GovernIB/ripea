@@ -33,17 +33,6 @@ public class ContingutServiceBean implements ContingutService {
 
 
 
-	@Override
-	@RolesAllowed("tothom")
-	public ContingutDto rename(
-			Long entitatId,
-			Long contingutId,
-			String nom) {
-		return delegate.rename(
-				entitatId,
-				contingutId,
-				nom);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
@@ -121,12 +110,10 @@ public class ContingutServiceBean implements ContingutService {
 	@RolesAllowed("IPA_ADMIN")
 	public ContingutDto findAmbIdAdmin(
 			Long entitatId,
-			Long contingutId,
-			boolean ambFills) {
+			Long contingutId) {
 		return delegate.findAmbIdAdmin(
 				entitatId,
-				contingutId,
-				ambFills);
+				contingutId);
 	}
 
 	@Override
@@ -223,23 +210,7 @@ public class ContingutServiceBean implements ContingutService {
 
 
 
-	@Override
-	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ContingutDto> findEsborrats(
-			Long entitatId,
-			String nom,
-			String usuariCodi,
-			Date dataInici,
-			Date dataFi,
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findEsborrats(
-				entitatId,
-				nom,
-				usuariCodi,
-				dataInici,
-				dataFi,
-				paginacioParams);
-	}
+
 
 	@Override
 	@RolesAllowed("tothom")
@@ -308,13 +279,17 @@ public class ContingutServiceBean implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions,
-			boolean ambPermis, String rolActual, Long organActualId) {
+			boolean ambPermis, 
+			String rolActual, 
+			Long organActualId) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
-				ambPermis, null, null);
+				ambPermis, 
+				rolActual, 
+				organActualId);
 	}
 
 	@Override
@@ -365,7 +340,8 @@ public class ContingutServiceBean implements ContingutService {
 			String rolActual,
 			Long organActualId,
 			boolean ambEntitat, 
-			boolean ambMapPerTipusDocument) {
+			boolean ambMapPerTipusDocument, 
+			boolean ambMapPerEstat) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
@@ -375,12 +351,27 @@ public class ContingutServiceBean implements ContingutService {
 				rolActual,
 				organActualId,
 				ambEntitat, 
-				ambMapPerTipusDocument);
+				ambMapPerTipusDocument, 
+				ambMapPerEstat);
 	}
 
 	@Override
 	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
 		return delegate.findAmbIdUserPerMoureCopiarVincular(entitatId, contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void checkIfPermittedAccess(
+			Long contingutId,
+			String rolActual,
+			Long organId) {
+		delegate.checkIfPermittedAccess(
+				contingutId,
+				rolActual,
+				organId);
+		
+		
 	}
 
 }

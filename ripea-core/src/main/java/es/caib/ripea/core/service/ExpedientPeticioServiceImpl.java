@@ -261,8 +261,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (expedientEntity == null) {
 			return null;
 		} else {
-			return expedientHelper.toExpedientDto(expedientEntity,
-					false);
+			return expedientHelper.toExpedientDto(expedientEntity);
 		}
 	}
 
@@ -273,14 +272,14 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Long expedientId,
 			PaginacioParamsDto paginacioParams) {
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				true,
 				false,
 				false,
-				false, 
-				false, null);
+				false,
+				null, 
+				null);
 		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByExpedient(
 				expedient, 
 				paginacioHelper.toSpringDataPageable(paginacioParams));

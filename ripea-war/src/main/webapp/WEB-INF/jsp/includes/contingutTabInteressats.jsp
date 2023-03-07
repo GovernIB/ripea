@@ -129,7 +129,7 @@ function enableNotificar() {
 
 <table 
 	id="taulaInteressats" 
-	data-url="<c:url value="/contingut/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/datatable"/>" 
+	data-url="<c:url value="/contingut/${expedientId}/interessat/datatable"/>" 
 	data-paging-enabled="false"
 	data-botons-template="#taulaInteressatsNouBoton" 
 	class="table table-striped table-bordered" 
@@ -169,7 +169,7 @@ function enableNotificar() {
 					{{/if}}													
 				</script>										
 			</th>
-			<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT')}">
+			<c:if test="${potModificar}">
 			<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
 				<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
 					<div class="dropdown">
@@ -179,18 +179,18 @@ function enableNotificar() {
 								{{if !expedientArxiuPropagat}}
 									<li class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 								{{else}}
-									<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+									<li><a href="<c:url value="/expedient/${expedientId}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 								{{/if}}
 							{{/if}}	
-							<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="false" class="btnModificarInteressat"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-							<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="false" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+							<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="false" class="btnModificarInteressat"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+							<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="false" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							{{if tipus != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>'}}
 								<li class="divider" role="separator"></li>
 								{{if representantId}}
-									<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/{{:id}}/representant/{{:representantId}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.modificar.prepresentant"/></a></li>
-									<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/{{:id}}/representant/{{:representantId}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.representant"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.borrar.representant"/></a></li>
+									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.modificar.prepresentant"/></a></li>
+									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.representant"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.borrar.representant"/></a></li>
 								{{else}}
-									<li><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/{{:id}}/representant/new"/>" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.nou.prepresentant"/></a></li>														
+									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/new"/>" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.nou.prepresentant"/></a></li>														
 								{{/if}}
 							{{/if}}
 						</ul>
@@ -202,7 +202,7 @@ function enableNotificar() {
 	</thead>
 </table>
 <script id="taulaInteressatsNouBoton" type="text/x-jsrender">
-	<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && (contingut.expedient ? (contingut.expedient ? contingut.estat != 'TANCAT' : contingut.expedientPare.estat != 'TANCAT') : contingut.expedientPare.estat != 'TANCAT')}">
-		<p style="text-align:right"><a href="<c:url value="/expedient/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="enableNotificar" ><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
+	<c:if test="${potModificar}">
+		<p style="text-align:right"><a href="<c:url value="/expedient/${expedientId}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="enableNotificar" ><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
 	</c:if>
 </script>

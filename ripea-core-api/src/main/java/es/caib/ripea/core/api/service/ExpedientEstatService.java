@@ -37,7 +37,7 @@ public interface ExpedientEstatService {
 	List<ExpedientEstatDto> findExpedientEstats(Long entitatId, Long expedientId, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto changeEstatOfExpedient(Long entitatId, Long expedientId, Long expedientEstatId, boolean checkPerMassiuAdmin);
+	ExpedientDto changeExpedientEstat(Long entitatId, Long expedientId, Long expedientEstatId, boolean checkPerMassiuAdmin);
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(Long entitatId, Long metaExpedientId);

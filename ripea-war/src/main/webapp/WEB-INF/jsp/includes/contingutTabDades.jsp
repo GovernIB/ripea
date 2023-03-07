@@ -50,7 +50,7 @@ $(document).ready(function() {
 	$('#dades').on('submit', 'form#nodeDades', function() {
 		showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
 		$.post(
-				'../ajax/contingutDada/${contingut.expedient ? contingut.id : contingut.expedientPare.id}/save',
+				'../ajax/contingutDada/${expedientId}/save',
 				$(this).serialize(),
 				function (data) {
 					if (data.estatOk) {
@@ -250,7 +250,7 @@ function setCheckboxTrue($checkbox)
 <c:choose>
 	<c:when test="${not empty metaDades}">
 		<form:form id="nodeDades" commandName="dadesCommand" cssClass="form-inline">
-			<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && !expedientTancat}">
+			<c:if test="${potModificar}">
 				<button type="submit" class="btn btn-default pull-right" style="margin-bottom: 6px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			</c:if>
 			<table class="table table-striped table-bordered" style="width:100%">
@@ -263,7 +263,7 @@ function setCheckboxTrue($checkbox)
 			<tbody>
 				<c:forEach var="metaDada" items="${metaDades}">
 					<c:set var="dadaValor"></c:set>
-					<c:forEach var="dada" items="${contingut.expedient ? contingut.dades : contingut.expedientPare.dades}">
+					<c:forEach var="dada" items="${expedient.dades}">
 						<c:if test="${dada.metaDada.codi == metaDada.codi}">
 							<c:set var="dadaValor">${dada.valorMostrar}</c:set>
 						</c:if>
@@ -275,7 +275,7 @@ function setCheckboxTrue($checkbox)
 						<td>${metaDada.nom}</td>
 						<td>
 							<c:choose>
-								<c:when test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && !expedientTancat}">
+								<c:when test="${potModificar}">
 									<div class="form-group ${metaDada.tipus == 'DOMINI' ? '' :''}" ${metaDada.tipus == 'DOMINI' ? 'style="width: 100%;margin-bottom: -10px;"' :''} <c:if test="${isMultiple}"> data-toggle="multifield" data-nou="true"</c:if>>
 										<label class="hidden" for="${metaDada.codi}"></label>
 										<div class="controls">
@@ -336,7 +336,7 @@ function setCheckboxTrue($checkbox)
 				</c:forEach>
 			</tbody>
 			</table>
-			<c:if test="${((expedientAgafatPerUsuariActual && potModificarContingut) || contingut.admin) && !expedientTancat}">
+			<c:if test="${potModificar}">
 				<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			</c:if>
 		</form:form>

@@ -4,14 +4,10 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 
-
+<%@ attribute name="contingutNavigationId" required="false" rtexprvalue="true"%>
 <%@ attribute name="contingut" required="true" rtexprvalue="true" type="java.lang.Object"%>
 <%@ attribute name="mostrarFillsFlat" required="true" rtexprvalue="true" type="java.lang.Boolean"%>
 <%@ attribute name="nodeco" required="false" rtexprvalue="true"%>
-<c:set var="expedientPare" value="${contingut.expedientPare}"/>
-<c:if test="${empty expedientPare and contingut.expedient}"><c:set var="expedientPare" value="${contingut}"/></c:if>
-<c:set var="expedientPareAgafatPerUsuariActual" value="${false}"/>
-<c:if test="${expedientPare.agafatPer.codi == pageContext.request.userPrincipal.name}"><c:set var="expedientPareAgafatPerUsuariActual" value="${true}"/></c:if>
 
 <c:set var="fills" value="${contingut.fillsHierarchical}"/>
 
@@ -27,7 +23,7 @@
 
 		<tr id="${fill.id}"
 			class="element-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
-			data-expedient-id="${expedientPare.id}" 
+			data-expedient-id="${expedient.id}" 
 			data-node="treetable-${fill.id}"
 			data-pnode="treetable-${contingut.id}">
 			
@@ -50,7 +46,7 @@
 			</c:if></td>
 
 			<%------------ Tipus -----------%>
-			<td width="25%"><c:if test="${not fill.carpeta}">
+			<td><c:if test="${not fill.carpeta}">
 					${fill.metaNode.nom}
 				</c:if></td>
 
@@ -62,10 +58,10 @@
 
 			<%------------ Accions -----------%>
 			<td><rip:blocContingutAccions className="botons-accions-element"
-					modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" /></td>
+					modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingutNavigationId}"/></td>
 
 			<%------------ sort ----------%>
-			<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+			<c:if test="${expedientAgafatPerUsuariActual && isOrdenacioPermesa}">
 				<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
 					class="fa fa-sort"></span></td>
 			</c:if>
@@ -73,6 +69,6 @@
 
 	</c:if>
 	
-	<rip:blocContingutTreeTableFills contingut="${fill}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}"/>	
+	<rip:blocContingutTreeTableFills contingut="${fill}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}" contingutNavigationId="${contingutNavigationId}"/>	
 	
 </c:forEach>

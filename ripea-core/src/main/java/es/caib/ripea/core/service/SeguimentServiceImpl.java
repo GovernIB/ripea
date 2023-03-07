@@ -208,14 +208,16 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		MetaExpedientEntity metaExpedientFiltre = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					filtre.getMetaExpedientId(),
 					true,
 					false,
 					false,
 					false,
-					false, null, null);
+					false, 
+					null, 
+					null);
 		}
 		
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(

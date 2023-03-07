@@ -32,6 +32,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected List<ContingutDto> fills;
 	
 	protected Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument;
+	protected Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat;
 	
 	protected List<ContingutDto> path;
 	protected ExpedientDto expedientPare;
@@ -211,6 +212,27 @@ public abstract class ContingutDto extends AuditoriaDto {
 
 	public boolean isReplicatDinsArxiu() {
 		return arxiuUuid != null;
+	}
+	
+	public Long getExpedientId() {
+		ExpedientDto expedient = getExpedientObject();
+		if (expedient != null) {
+			return expedient.getId();
+		} else {
+			return null;
+		}
+	}
+	
+	public ExpedientDto getExpedientObject() {
+		if (isExpedient()) {
+			return ((ExpedientDto) this);
+		} else {
+			if (expedientPare != null) {
+				return expedientPare;
+			} else {
+				return null;
+			}
+		}
 	}
 
 	public boolean isExpedient() {

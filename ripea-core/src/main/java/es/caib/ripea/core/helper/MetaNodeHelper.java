@@ -184,70 +184,8 @@ public class MetaNodeHelper {
 			
 		}
 	}
+	
+	
 
-	public void omplirPermisosPerMetaNode(
-			MetaNodeDto metaNode, String rolActual, Long nodeId) {
-		
-		try {
-			metaNode.setUsuariActualRead(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					true,
-					false,
-					false,
-					false,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualRead(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		
-		try {
-			metaNode.setUsuariActualWrite(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					false,
-					true,
-					false,
-					false,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualWrite(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		
-		try {
-			metaNode.setUsuariActualCreate(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					false,
-					false,
-					true,
-					false,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualCreate(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		
-		try {
-			metaNode.setUsuariActualDelete(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					false,
-					false,
-					false,
-					true,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualDelete(true);
-		} catch (PermissionDeniedException ex) {
-		}
-
-	}
 
 }

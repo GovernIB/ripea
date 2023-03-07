@@ -18,6 +18,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
@@ -26,6 +27,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
@@ -161,9 +163,10 @@ public class DocumentEntity extends NodeEntity {
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	
 	
-	
-	
-	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "expedient_estat_id")
+	@ForeignKey(name = "ipa_expestat_document_fk")
+	private ExpedientEstatEntity expedientEstatAdditional;
 	
 	
 	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
@@ -408,7 +411,8 @@ public class DocumentEntity extends NodeEntity {
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			ExpedientEntity expedient, 
-			DocumentFirmaTipusEnumDto documentFirmaTipus) {
+			DocumentFirmaTipusEnumDto documentFirmaTipus, 
+			ExpedientEstatEntity expedientEstatAdditional) {
 		return new Builder(
 				documentTipus,
 				estat,
@@ -426,7 +430,8 @@ public class DocumentEntity extends NodeEntity {
 				pare,
 				entitat,
 				expedient, 
-				documentFirmaTipus);
+				documentFirmaTipus, 
+				expedientEstatAdditional);
 	}
 	public static class Builder {
 		DocumentEntity built;
@@ -447,7 +452,8 @@ public class DocumentEntity extends NodeEntity {
 				ContingutEntity pare,
 				EntitatEntity entitat,
 				ExpedientEntity expedient, 
-				DocumentFirmaTipusEnumDto documentFirmaTipus) {
+				DocumentFirmaTipusEnumDto documentFirmaTipus, 
+				ExpedientEstatEntity expedientEstatAdditional) {
 			built = new DocumentEntity();
 			built.documentTipus = documentTipus;
 			built.estat = estat;
@@ -470,6 +476,7 @@ public class DocumentEntity extends NodeEntity {
 			built.versioCount = 0;
 			built.validacioFirmaCorrecte = true;
 			built.documentFirmaTipus = documentFirmaTipus;
+			built.expedientEstatAdditional = expedientEstatAdditional;
 			
 		}
 		public Builder ubicacio(String ubicacio) {
