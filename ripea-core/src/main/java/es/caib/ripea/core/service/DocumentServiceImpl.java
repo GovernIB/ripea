@@ -569,7 +569,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,
-			PinbalConsultaDto consulta) {
+			PinbalConsultaDto consulta, 
+			String rolActual) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(pareId));
 		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
@@ -578,7 +579,9 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false, 
-				false, true, null);
+				false, 
+				true, 
+				rolActual);
 		ExpedientEntity expedient = pare.getExpedientPare();
 		MetaDocumentEntity metaDocument = null;
 		if (metaDocumentId != null) {

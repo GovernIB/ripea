@@ -40,6 +40,7 @@ import es.caib.ripea.war.command.PinbalConsultaCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per a la gestió de peticions a PINBAL.
@@ -118,7 +119,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			command.setCodiPoblacioNaixament(command.getProvinciaNaixament() + command.getMunicipiNaixament());
 		}
 		try {
-			documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command));
+			documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command), RolHelper.getRolActual(request));
 			return getModalControllerReturnValueSuccess(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.ok");
 		} catch (Exception ex) {
 			logger.error("Error en la consulta PINBAL", ex);

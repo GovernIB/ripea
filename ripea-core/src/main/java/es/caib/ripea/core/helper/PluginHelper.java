@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 //import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
 import org.fundaciobit.plugins.certificate.InformacioCertificat;
@@ -329,6 +330,9 @@ public class PluginHelper {
 					pareCodi,
 					dataActualitzacio,
 					dataSincronitzacio);
+
+			removeUnitatsSubstitutedByItself(unitatsOrganitzatives);
+			
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'unitats organitzatives";
 			integracioHelper.addAccioError(IntegracioHelper.INTCODI_UNITATS, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
@@ -364,6 +368,28 @@ public class PluginHelper {
 		return unitatsOrganitzatives;
 
 
+	}
+	
+	/**
+	 * Remove from list unitats that are substituted by itself
+	 * for example if webservice returns two elements:
+	 * 
+	 * UnitatOrganitzativa(codi=A00000010, estat=E, historicosUO=[A00000010])
+	 * UnitatOrganitzativa(codi=A00000010, estat=V, historicosUO=null)
+	 * 
+	 * then remove the first one.
+	 * That way this transition can be treated by application the same way as transition CANVI EN ATRIBUTS
+	 */
+	private void removeUnitatsSubstitutedByItself(List<UnitatOrganitzativa> unitatsOrganitzatives) {
+		if (CollectionUtils.isNotEmpty(unitatsOrganitzatives)) {
+			Iterator<UnitatOrganitzativa> i = unitatsOrganitzatives.iterator();
+			while (i.hasNext()) {
+				UnitatOrganitzativa unitatOrganitzativa = i.next();
+				if (CollectionUtils.isNotEmpty(unitatOrganitzativa.getHistoricosUO()) && unitatOrganitzativa.getHistoricosUO().size() == 1 && unitatOrganitzativa.getHistoricosUO().get(0).equals(unitatOrganitzativa.getCodi())) {
+					i.remove();
+				}
+			}
+		}
 	}
 	
 	public ArbreDto<UnitatOrganitzativaDto> unitatsOrganitzativesFindArbreByPare(
