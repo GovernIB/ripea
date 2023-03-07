@@ -1076,7 +1076,8 @@ public class ExpedientHelper {
 			writer.flush();
 			return writer.toString();
 		} else {
-			return expedient.getCodi() + "/" + expedient.getSequencia() + "/" + expedient.getAny();
+			String separador = configHelper.getConfig("es.caib.ripea.numero.expedient.separador", "/");
+			return expedient.getCodi() + separador + expedient.getSequencia() + separador + expedient.getAny();
 		}
 	}
 
