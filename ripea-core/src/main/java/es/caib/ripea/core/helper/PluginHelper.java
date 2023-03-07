@@ -577,7 +577,8 @@ public class PluginHelper {
 										classificacio,
 										expedient.getEstat(),
 										interessats,
-										metaExpedient.getSerieDocumental()));
+										metaExpedient.getSerieDocumental(),
+										expedient.getNumero()));
 						Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(expedientCreat.getIdentificador(), null);
 						propagarMetadadesExpedient(expedientDetalls, expedient);
 						expedient.updateArxiu(expedientCreat.getIdentificador());
@@ -603,7 +604,8 @@ public class PluginHelper {
 								classificacio,
 								expedient.getEstat(),
 								interessats,
-								metaExpedient.getSerieDocumental()));
+								metaExpedient.getSerieDocumental(),
+								expedient.getNumero()));
 				expedient.updateArxiu(null);
 			}
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
@@ -3159,7 +3161,7 @@ public class PluginHelper {
 	}
 
 	private Expedient toArxiuExpedient(String identificador, String nom, String ntiIdentificador, List<String> ntiOrgans, Date ntiDataObertura, String ntiClassificacio,
-									   ExpedientEstatEnumDto ntiEstat, List<String> ntiInteressats, String serieDocumental) {
+									   ExpedientEstatEnumDto ntiEstat, List<String> ntiInteressats, String serieDocumental, String numeroExpedient) {
 
 		Expedient expedient = new Expedient();
 		expedient.setNom(nom);
@@ -3181,6 +3183,8 @@ public class PluginHelper {
 		metadades.setOrgans(ntiOrgans);
 		metadades.setInteressats(ntiInteressats);
 		metadades.setSerieDocumental(serieDocumental);
+		metadades.addMetadadaAddicional("numeroExpedient", numeroExpedient);
+		
 		expedient.setMetadades(metadades);
 		return expedient;
 	}
