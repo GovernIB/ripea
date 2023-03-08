@@ -3183,7 +3183,9 @@ public class PluginHelper {
 		metadades.setOrgans(ntiOrgans);
 		metadades.setInteressats(ntiInteressats);
 		metadades.setSerieDocumental(serieDocumental);
-		metadades.addMetadadaAddicional("numeroExpedient", numeroExpedient);
+		
+		if (isPropagarNumeroExpedientActiu())
+			metadades.addMetadadaAddicional("numeroExpedient", numeroExpedient);
 		
 		expedient.setMetadades(metadades);
 		return expedient;
@@ -4307,6 +4309,9 @@ public class PluginHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
 	}
 	
+	public boolean isPropagarNumeroExpedientActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.numero.expedient.propagar.arxiu");
+	}
 	
 	public void setArxiuPlugin(String entitatCodi, IArxiuPlugin arxiuPlugin) {
 		arxiuPlugins.put(entitatCodi, arxiuPlugin);
