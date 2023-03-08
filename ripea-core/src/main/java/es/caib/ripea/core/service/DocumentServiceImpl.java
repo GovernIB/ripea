@@ -348,7 +348,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -391,7 +391,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
@@ -449,7 +449,7 @@ public class DocumentServiceImpl implements DocumentService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndTipus(
 				entitat, 
 				expedient,
@@ -1021,7 +1021,6 @@ public class DocumentServiceImpl implements DocumentService {
 					false,
 					false,
 					false,
-					null, 
 					null);
 		}
 		MetaDocumentEntity metaDocument = null;

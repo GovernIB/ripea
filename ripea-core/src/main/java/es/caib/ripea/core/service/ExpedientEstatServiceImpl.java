@@ -170,8 +170,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
 		return conversioTipusHelper.convertirList(
 				expedientEstats,
@@ -248,7 +247,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false,
-				null, 
 				null);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, expedientId, ExpedientEstatEnumDto.OBERT);
 		ExpedientEstatEntity estat;
@@ -335,7 +333,6 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				true,
 				false,
 				false,
-				null, 
 				null);
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
 				expedient,
@@ -530,9 +527,9 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			int posicio) {
 		
 		int anteriorIndex = -1; 
-		for (ExpedientEstatEntity element: elements) {
-			if (element.getId().equals(elementToMove.getId())) {
-				anteriorIndex = element.getOrdre();
+		for (int i = 0; i < elements.size(); i++) {
+			if (elements.get(i).getId().equals(elementToMove.getId())) {
+				anteriorIndex = i;
 				break;
 			}
 		}

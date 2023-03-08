@@ -98,9 +98,9 @@ public class MetaNodeHelper {
 			int posicio) {
 		
 		int anteriorIndex = -1; 
-		for (MetaDadaEntity element: elements) {
-			if (element.getId().equals(elementToMove.getId())) {
-				anteriorIndex = element.getOrdre();
+		for (int i = 0; i < elements.size(); i++) {
+			if (elements.get(i).getId().equals(elementToMove.getId())) {
+				anteriorIndex = i;
 				break;
 			}
 		}

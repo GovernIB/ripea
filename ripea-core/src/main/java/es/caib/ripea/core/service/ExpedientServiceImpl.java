@@ -507,7 +507,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				null, 
 				null);
 
 		expedientHelper.updateNomExpedient(expedient, nom);
@@ -530,8 +529,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.OBERT);
 		expedientHelper.updateNomExpedient(expedient, nom);
 		expedientHelper.updateAnyExpedient(expedient, any);
@@ -555,7 +553,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 		return expedientHelper.toExpedientDto(expedient, true, null, false);
 	}
 	
@@ -573,7 +571,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false,
 					false,
-					null, null);
+					null);
 			expedients.add(expedientHelper.toExpedientDto(expedient, true, null, false));
 		}
 		return expedients;
@@ -614,7 +612,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				rolActual, null);
+				rolActual);
 		// truncam a 1024 caracters
 		if (text.length() > 1024)
 			text = text.substring(0, 1024);
@@ -637,7 +635,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 
 		List<ExpedientComentariEntity> expcoms = expedientComentariRepository.findByExpedientOrderByCreatedDateAsc(
 				expedient);
@@ -850,7 +848,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				null, 
 				null);
 		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 	}
@@ -869,7 +866,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		
 		expedientHelper.agafar(expedient, usuariCodi);
@@ -888,7 +884,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		
 
@@ -909,7 +904,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		expedientHelper.alliberar(expedient);
 	}
@@ -926,7 +920,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		expedientHelper.alliberar(expedient);
 	}
@@ -955,7 +948,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				null, null);
+				null);
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
 		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
@@ -1118,8 +1111,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		ExpedientEntity toRelate = entityComprovarHelper.comprovarExpedient(
 				relacionatId,
 				false,
@@ -1127,8 +1119,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 
 		boolean alreadyRelatedTo = false;
 		for (ExpedientEntity relacionatPer : toRelate.getRelacionatsAmb()) {
@@ -1182,8 +1173,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		ExpedientEntity relacionat = entityComprovarHelper.comprovarExpedient(
 				relacionatId,
 				false,
@@ -1191,8 +1181,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		boolean trobat = true;
 		if (expedient.getRelacionatsAmb().contains(relacionat)) {
 			expedient.removeRelacionat(relacionat);
@@ -1276,7 +1265,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		List<ExpedientEntity> relacionats = new ArrayList<ExpedientEntity>();
 		relacionats.addAll(expedient.getRelacionatsAmb());
@@ -1448,7 +1436,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false,
 					false,
-					null, 
 					null);
 			expedients.add(expedient);
 		}
@@ -1844,8 +1831,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						true,
 						false,
 						false,
-						rolActual, 
-						null);
+						rolActual);
 				expedientsToBeExluded.addAll(expedient.getRelacionatsAmb());
 				expedientsToBeExluded.addAll(expedient.getRelacionatsPer());
 				expedientsToBeExluded.add(expedient);
@@ -1911,7 +1897,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		Page<ExpedientEntity> paginaExpedientsRelacionats = null;
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
@@ -2021,7 +2006,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		CarpetaEntity expedientFillExists = carpetaRepository.findByPareAndExpedientRelacionatAndEsborrat(contingutPare, expedientFill, 0);
 		if (expedientFillExists != null) {

@@ -1112,7 +1112,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						false,
 						false,
 						false,
-						null, 
 						null);
 				
 				OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();

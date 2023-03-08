@@ -129,7 +129,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
@@ -390,7 +389,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
@@ -765,7 +764,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				true,
 				false,
 				false,
-				rolActual, null);
+				rolActual);
 
 		// truncam a 1024 caracters
 		if (text.length() > 1024)
@@ -793,7 +792,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				false,
-				null, null);
+				null);
 
 		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
 

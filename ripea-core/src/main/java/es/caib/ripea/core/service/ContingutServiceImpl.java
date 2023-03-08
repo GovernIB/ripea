@@ -792,8 +792,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				false,
 				false,
-				rolActual, 
-				organId);
+				rolActual);
 	
 	}
 	
@@ -1459,7 +1458,6 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false,
-					null, 
 					null);
 		}
 		MetaDocumentEntity metaDocument = null;
@@ -1541,7 +1539,6 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false,
-					null, 
 					null);
 		}
 		MetaDocumentEntity metaDocument = null;
@@ -1608,7 +1605,7 @@ public class ContingutServiceImpl implements ContingutService {
 					false,
 					false,
 					false,
-					null, null);
+					null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {

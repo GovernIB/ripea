@@ -580,7 +580,6 @@ public class EntityComprovarHelper {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		
 	}
@@ -592,8 +591,7 @@ public class EntityComprovarHelper {
 			boolean comprovarPermisWrite,
 			boolean comprovarPermisCreate,
 			boolean comprovarPermisDelete,
-			String rolActual, 
-			Long organId) {
+			String rolActual) {
 
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		if (expedient == null) {
@@ -625,14 +623,14 @@ public class EntityComprovarHelper {
 				comprovarPermisWrite = false;
 		}
 		comprovarPermisos(
-				expedient.getMetaExpedient().getId(),
+				null,
 				expedientId,
 				comprovarPermisRead,
 		        comprovarPermisWrite,
 		        comprovarPermisCreate,
 		        comprovarPermisDelete,
 		        rolActual, 
-		        organId);
+		        null);
 		return expedient;
 	}
 	
@@ -898,12 +896,13 @@ public class EntityComprovarHelper {
 			String permissionName,
 			String usuariCodi, 
 			String rolActual, 
-			Long organId) {
+			Long organChosenOnExpedientCreation) {//in order to check if is permited to create expedient (expedientId is still null then)
 		
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (expedientId != null) {
 			metaExpedient = expedientRepository.findOne(expedientId).getMetaExpedient();
+			metaExpedientId = metaExpedient.getId();
 		} else {
 			metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
 		}
@@ -945,8 +944,8 @@ public class EntityComprovarHelper {
 				List<OrganGestorEntity> organsGestors = new ArrayList<>();
 				if (expedientId != null) {
 					organsGestors = expedientOrganPareRepository.findOrganGestorByExpedientId(expedientId);
-				} else if (organId != null) {
-					OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organId);
+				} else if (organChosenOnExpedientCreation != null) {
+					OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organChosenOnExpedientCreation);
 					organsGestors = organGestorHelper.findPares(organGestorEntity, true);
 				} else {
 					OrganGestorEntity organGestorEntity = metaExpedient.getOrganGestor();
@@ -995,7 +994,7 @@ public class EntityComprovarHelper {
 				if (expedientId != null) {
 					orgId = expedientRepository.findOne(expedientId).getOrganGestor().getId();
 				} else {
-					orgId = organId;
+					orgId = organChosenOnExpedientCreation;
 				}
 				if (orgId != null) {
 					List<Long> organPathIds = organGestorHelper.findParesIds(orgId, true);

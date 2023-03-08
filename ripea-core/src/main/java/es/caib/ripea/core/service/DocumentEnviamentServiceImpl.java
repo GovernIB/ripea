@@ -162,7 +162,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				true,
 				false,
 				false,
-				null, 
 				null);
 		
 		return documentNotificacioHelper.findAmbId(entitatId, expedient, notificacioId);
@@ -391,7 +390,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
 
@@ -436,7 +434,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		
 		int count = 0;

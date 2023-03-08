@@ -489,7 +489,7 @@ public class ExpedientHelper {
 					false,
 					false,
 					false,
-					rolActual, null);
+					rolActual);
 			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 		}
 		

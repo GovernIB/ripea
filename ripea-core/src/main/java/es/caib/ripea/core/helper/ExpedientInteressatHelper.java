@@ -76,8 +76,7 @@ public class ExpedientInteressatHelper {
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),
 				permission.equals(PermissionEnumDto.DELETE),
-				rolActual, 
-				null);
+				rolActual);
 		
 		InteressatEntity interessatEntity = createDB(
 				entitatId,
@@ -123,8 +122,7 @@ public class ExpedientInteressatHelper {
 				permission.equals(PermissionEnumDto.WRITE),
 				permission.equals(PermissionEnumDto.CREATE),
 				permission.equals(PermissionEnumDto.DELETE),
-				rolActual, 
-				null);
+				rolActual);
 		
 		InteressatEntity representantEntity = createDB(
 				entitatId,
@@ -374,8 +372,7 @@ public class ExpedientInteressatHelper {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		InteressatEntity representat = null;
 		if (representatId != null) {
 			representat = interessatRepository.findOne(representatId);
@@ -495,8 +492,7 @@ public class ExpedientInteressatHelper {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			interessatRepository.delete(interessat);
@@ -543,8 +539,7 @@ public class ExpedientInteressatHelper {
 				true,
 				false,
 				false,
-				rolActual, 
-				null);
+				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
 			if (interessat.getRepresentant() != null && 

@@ -278,7 +278,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				false,
 				false,
-				null, 
 				null);
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
@@ -314,7 +313,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				false,
 				false,
 				false,
-				null, 
 				null);
 		return interessatRepository.countByExpedient(
 				expedient);

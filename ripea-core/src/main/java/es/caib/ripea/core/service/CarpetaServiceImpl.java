@@ -169,7 +169,6 @@ public class CarpetaServiceImpl implements CarpetaService {
 				false, 
 				false, 
 				false, 
-				null, 
 				null);
 		List<CarpetaEntity> carpetesEntity = carpetaRepository.findByPare(expedient);
 		for (CarpetaEntity carpetaEntity : carpetesEntity) {

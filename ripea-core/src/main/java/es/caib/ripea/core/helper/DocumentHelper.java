@@ -1049,7 +1049,6 @@ public class DocumentHelper {
 				false,
 				false,
 				false,
-				null, 
 				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentEntity> documentsChosen = new ArrayList<DocumentEntity>();

@@ -860,7 +860,7 @@ public class ContingutHelper {
 					true,
 					false,
 					false,
-					null, null);
+					null);
 			
 			dto.setUsuariActualWrite(true);
 		} catch (PermissionDeniedException ex) {
@@ -875,7 +875,7 @@ public class ContingutHelper {
 					false,
 					false,
 					true,
-					null, null);
+					null);
 			dto.setUsuariActualDelete(true);
 		} catch (PermissionDeniedException ex) {
 		}
@@ -1147,7 +1147,6 @@ public class ContingutHelper {
 					comprovarPermisWrite,
 					comprovarPermisCreate,
 					comprovarPermisDelete,
-					null, 
 					null);
 
 		}
@@ -1203,7 +1202,6 @@ public class ContingutHelper {
 					comprovarPermisWrite,
 					false,
 					false,
-					null, 
 					null);
 
 		}
@@ -1435,7 +1433,7 @@ public class ContingutHelper {
 							comprovarPermisWrite,
 							false,
 							false,
-							null, null);
+							null);
 
 				}
 			}
