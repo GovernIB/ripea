@@ -527,12 +527,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 									"document.controller.firma.passarela.final.ok"));
 				}
 			} else {
-				logger.error("Error firma passarela: " +  firmaStatus.getErrorMsg());
+				logger.error("Error firma passarela: " +  firmaStatus.getErrorMsg() + " " + status);
 				MissatgesHelper.error(
 						request,
 						getMessage(
 								request, 
-								"document.controller.firma.passarela.final.ok.statuserr"),
+								"document.controller.firma.passarela.final.ok.statuserr",
+								new Object[] {firmaStatus.getErrorMsg()}),
 						null);
 			}
 			break;

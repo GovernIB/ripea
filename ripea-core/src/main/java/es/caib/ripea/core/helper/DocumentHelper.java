@@ -515,7 +515,8 @@ public class DocumentHelper {
 			fitxer = getFitxerExisting(
 					documentEntity,
 					arxiuDocument);
-
+			if (! isEnviarContingutExistentActiu())
+				fitxer.setContingut(null);
 		}
 		return fitxer;
 	}
@@ -780,68 +781,74 @@ public class DocumentHelper {
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void actualitzarEstatADefinititu(Long documentId) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 
-		DocumentEntity documentEntity = documentRepository.findOne(documentId);		
-		
-		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
-				documentEntity,
-				null,
-				null,
-				true,
-				false);
-		
-		DocumentFirmaTipusEnumDto documentFirmaTipus = documentEntity.getDocumentFirmaTipus();
-		
-		FitxerDto fitxer = null;
-		List<ArxiuFirmaDto> firmes = null;
-		
-		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+		try {
+			organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 			
-			fitxer = getFitxerExisting(
+			DocumentEntity documentEntity = documentRepository.findOne(documentId);		
+			
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 					documentEntity,
-					arxiuDocument);
+					null,
+					null,
+					true,
+					false);
 			
-			firmes = validaFirmaDocument(
-					documentEntity, 
-					fitxer,
-					null, 
-					false, 
-					true);
+			DocumentFirmaTipusEnumDto documentFirmaTipus = documentEntity.getDocumentFirmaTipus();
 			
+			FitxerDto fitxer = null;
+			List<ArxiuFirmaDto> firmes = null;
 			
-		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
-			
-			fitxer = getFitxerExisting(
-					documentEntity,
-					arxiuDocument);
-			
-			byte[] firmaSeparada = null;
-			if (documentEntity.getArxiuUuidFirma() != null) {
-				firmaSeparada = pluginHelper.arxiuFirmaSeparadaConsultar(documentEntity);
-			} else {
-				throw new RuntimeException("Firma separada no existeix en arxiu");
+			if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+				
+				fitxer = getFitxerExisting(
+						documentEntity,
+						arxiuDocument);
+				
+				firmes = validaFirmaDocument(
+						documentEntity, 
+						fitxer,
+						null, 
+						false, 
+						true);
+				
+				
+			} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+				
+				fitxer = getFitxerExisting(
+						documentEntity,
+						arxiuDocument);
+				
+				byte[] firmaSeparada = null;
+				if (documentEntity.getArxiuUuidFirma() != null) {
+					firmaSeparada = pluginHelper.arxiuFirmaSeparadaConsultar(documentEntity);
+				} else {
+					throw new RuntimeException("Firma separada no existeix en arxiu");
+				}
+				
+				firmes = validaFirmaDocument(
+						documentEntity, 
+						fitxer,
+						firmaSeparada, 
+						false, 
+						true);
+				
+				fitxer = null; // if we pass fitxer not null to arxiuPropagarModificacio() ArxiuPluginCaib throws ArxiuValidacioException: No és possible marcar el document com a definitiu si es vol modificar el seu contingut.
+				
 			}
-			
-			firmes = validaFirmaDocument(
-					documentEntity, 
-					fitxer,
-					firmaSeparada, 
-					false, 
-					true);
-			
-			fitxer = null; // if we pass fitxer not null to arxiuPropagarModificacio() ArxiuPluginCaib throws ArxiuValidacioException: No és possible marcar el document com a definitiu si es vol modificar el seu contingut.
-			
-		}
 
-		contingutHelper.arxiuPropagarModificacio(
-				documentEntity,
-				fitxer,
-				documentFirmaTipus,
-				firmes,
-				ArxiuEstatEnumDto.DEFINITIU);
-		
-		documentEntity.setArxiuUuidFirma(null);
+			contingutHelper.arxiuPropagarModificacio(
+					documentEntity,
+					fitxer,
+					documentFirmaTipus,
+					firmes,
+					ArxiuEstatEnumDto.DEFINITIU);
+			
+			documentEntity.setArxiuUuidFirma(null);
+		} catch (Exception e) {
+			logger.error("Error al actualitzar estat de document a definititu, document id=" + documentId, e);
+			throw new RuntimeException("Error al actualitzar estat de document a definititu (document id=" + documentId + "): " + e.getMessage());
+		}
 	}
 	
 
@@ -1240,8 +1247,20 @@ public class DocumentHelper {
 						streamAnnex);
 				fitxer.setContingut(streamAnnex.toByteArray());
 				
+				DocumentFirmaTipusEnumDto documentFirmaTipus = documentEntity.getDocumentFirmaTipus();
+				
 				List<ArxiuFirmaDto> firmes = null;
-				if (documentEntity.getEstat() == DocumentEstatEnumDto.ADJUNT_FIRMAT) {
+				if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+					
+					firmes = validaFirmaDocument(
+							documentEntity, 
+							fitxer,
+							null, 
+							false, 
+							true);
+					
+				} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
+					
 					byte[] firmaSeparada = null;
 					if (documentEntity.getGesDocAdjuntFirmaId() != null) {
 						ByteArrayOutputStream streamAnnex1 = new ByteArrayOutputStream();
@@ -1260,16 +1279,6 @@ public class DocumentHelper {
 							false, 
 							true);
 				}
-				
-				DocumentFirmaTipusEnumDto documentFirmaTipus;
-				if (documentEntity.getEstat() != DocumentEstatEnumDto.ADJUNT_FIRMAT) {
-					documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
-				} else if (documentEntity.getGesDocAdjuntFirmaId() == null) {
-					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
-				} else {
-					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
-				}
-				
 		
 				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
 				
@@ -1413,6 +1422,9 @@ public class DocumentHelper {
 	}
 	public boolean isFirmatPujatManualmentDefinitu(){
 		return configHelper.getAsBoolean("es.caib.ripea.document.guardar.definitiu.arxiu");
+	}
+	public boolean isEnviarContingutExistentActiu(){
+		return configHelper.getAsBoolean("es.caib.ripea.document.enviar.contingut.existent");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
