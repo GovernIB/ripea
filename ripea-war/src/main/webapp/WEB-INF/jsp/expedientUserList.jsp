@@ -592,7 +592,7 @@ function hexToRgb(hex) {
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>	
+				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>	
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">

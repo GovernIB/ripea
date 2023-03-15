@@ -182,6 +182,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("nomCookieMeusExpedients", COOKIE_MEUS_EXPEDIENTS);
 		model.addAttribute("meusExpedients", meusExpedients);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
+		
+		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
+		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
+		
 		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
 			MissatgesHelper.warning(
 					request, 
