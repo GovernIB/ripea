@@ -515,7 +515,8 @@ public class DocumentHelper {
 			fitxer = getFitxerExisting(
 					documentEntity,
 					arxiuDocument);
-
+			if (! isEnviarContingutExistentActiu())
+				fitxer.setContingut(null);
 		}
 		return fitxer;
 	}
@@ -1421,6 +1422,9 @@ public class DocumentHelper {
 	}
 	public boolean isFirmatPujatManualmentDefinitu(){
 		return configHelper.getAsBoolean("es.caib.ripea.document.guardar.definitiu.arxiu");
+	}
+	public boolean isEnviarContingutExistentActiu(){
+		return configHelper.getAsBoolean("es.caib.ripea.document.enviar.contingut.existent");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);
