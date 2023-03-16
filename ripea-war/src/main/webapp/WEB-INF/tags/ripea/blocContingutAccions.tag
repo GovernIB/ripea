@@ -46,7 +46,7 @@
 		<c:choose>
 			<c:when test="${contingut.document && contingut.arxiuUuid==null}">
 				<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
-				<li class="disabledMsg" title="${expedientPare.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedientPare.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				<li class="disabledMsg" title="${expedient.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedient.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 			</c:when>
 			<c:when test="${contingut.document && contingut.gesDocFirmatId != null}">
 				<li><a href="<c:url value="/document/${contingut.id}/portafirmes/reintentarGuardarArxiu"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
@@ -323,7 +323,7 @@
 			</c:if>
 			<c:if test="${potModificar}">
 				<%---- Seguiment portafirmes ----%>
-				<c:if test="${(contingut.estat == 'FIRMA_PENDENT' || (contingut.estat == 'FIRMAT' && empty contingut.arxiuUuid)) && contingut.documentTipus == 'DIGITAL'}">
+				<c:if test="${contingut.estat == 'FIRMA_PENDENT' && contingut.documentTipus == 'DIGITAL'}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/portafirmes/info"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="contingut.boto.firma.portafirmes.info"/></a></li>

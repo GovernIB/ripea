@@ -1045,7 +1045,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		if (RolHelper.isAdminEntitat(rolActual)) {
 			organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
 		} else if (RolHelper.isAdminOrgan(rolActual)){
-			organsGestors = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
+			organsGestors = organGestorRepository.findDescendents(entitat, Arrays.asList(organActualId));
 			
 		} else {
 		

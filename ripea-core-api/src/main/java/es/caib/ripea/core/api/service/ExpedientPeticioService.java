@@ -103,4 +103,8 @@ public interface ExpedientPeticioService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public void retornarPendent(Long expedientPeticioId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void evictCountAnotacionsPendents(
+			Long entitatId);
  }

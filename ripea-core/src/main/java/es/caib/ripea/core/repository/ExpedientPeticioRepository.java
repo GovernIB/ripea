@@ -18,6 +18,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 
@@ -43,15 +44,16 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	
 	List<ExpedientPeticioEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 
+	
 	@Query("from" +
 			"    ExpedientPeticioEntity e " +
 			"where " +
 			"e.registre.entitat = :entitat " +
-			"and (:rolActual = 'IPA_ADMIN' or e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"and ((:rolActual = 'IPA_ADMIN' and e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((e.metaExpedient.organGestor is not null and e.metaExpedient in (:metaExpedientsPermesos)) or (e.metaExpedient.organGestor is null and :hasPermisAdminComu = true and e.registre.destiCodi in (:organsPermesos)))) " +
+			"	or (:rolActual = 'tothom' and e.metaExpedient in (:metaExpedientsPermesos))) " +	
 			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
-			"and (:esNullProcediment = true or lower(e.registre.procedimentCodi) like lower('%'||:procediment||'%')) " +
 			"and (:esNullNumero = true or lower(e.registre.identificador) like lower('%'||:numero||'%')) " +
-			"and (:esNullProcedimentCodi = true or lower(e.registre.procedimentCodi) like lower('%'||:procedimentCodi||'%')) " +
 			"and (:esNullExtracte = true or lower(e.registre.extracte) like lower('%'||:extracte||'%')) " +
 			"and (:esNullDestinacio = true or e.registre.destiCodi = :destinacio) " + 
 			"and (:esNullDataInicial = true or e.registre.data >= :dataInicial) " +
@@ -73,12 +75,10 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("entitat") EntitatEntity entitat,
 			@Param("rolActual") String rolActual,
 			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
+			@Param("organsPermesos") List<String> organsPermesos,
+			@Param("hasPermisAdminComu") boolean hasPermisAdminComu,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
-			@Param("esNullProcediment") boolean esNullProcediment,
-			@Param("procediment") String procediment,
-			@Param("esNullProcedimentCodi") boolean esNullProcedimentCodi,
-			@Param("procedimentCodi") String procedimentCodi,
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,
 			@Param("esNullExtracte") boolean esNullExtracte,
@@ -92,22 +92,31 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") String estat,
 			@Param("esNullAccio") boolean esNullAccio,
-			@Param("accio") ExpedientPeticioAccioEnumDto accio,
-			@Param("esNullInteressat") boolean esNullInteressat,
-			@Param("interessat") String interessat,
+			@Param("accio") ExpedientPeticioAccioEnumDto accio, 
+			@Param("esNullInteressat") boolean esNullInteressat, 
+			@Param("interessat") String interessat, 
 			Pageable pageable);
+	
+	
+
+
 
 	@Query(	"select " +
-			"    count(pet) " +
+			"    count(e) " +
 			"from " +
-			"    ExpedientPeticioEntity pet " +
+			"    ExpedientPeticioEntity e " +
 			"where " +
-			":entitatActual = pet.registre.entitat " +
-			"and (pet.metaExpedient in (:metaExpedientsPermesos)) " +
-			"and pet.estat='PENDENT' " )
+			":entitatActual = e.registre.entitat " +
+			"and ((:rolActual = 'IPA_ADMIN' and e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((e.metaExpedient.organGestor is not null and e.metaExpedient in (:metaExpedientsPermesos)) or (e.metaExpedient.organGestor is null and :hasPermisAdminComu = true and e.registre.destiCodi in (:organsPermesos)))) " +
+			"	or (:rolActual = 'tothom' and e.metaExpedient in (:metaExpedientsPermesos))) " +	
+			"and e.estat='PENDENT' " )
 	long countAnotacionsPendentsPerMetaExpedients(
 			@Param("entitatActual") EntitatEntity entitatActual,
-			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos);
+			@Param("rolActual") String rolActual,
+			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
+			@Param("organsPermesos") List<String> organsPermesos,
+			@Param("hasPermisAdminComu") boolean hasPermisAdminComu);
 	
 	
 	

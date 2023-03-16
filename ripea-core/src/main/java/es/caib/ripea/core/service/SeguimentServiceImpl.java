@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,10 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosPerAnotacions;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
@@ -81,6 +85,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Resource
+	private ExpedientPeticioHelper expedientPeticioHelper;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -220,37 +226,40 @@ public class SeguimentServiceImpl implements SeguimentService {
 					null);
 		}
 		
+		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
+				entitatId,
+				rolActual, 
+				null);
+		
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
 				rolActual,
-				null,
+				permisosPerAnotacions.getProcedimentsPermesos(),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,
-				true,
-				"",
-				true,
-				"",
-				filtre.getNumero() == null || filtre.getNumero().isEmpty(),
-				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
-				filtre.getExtracte() == null ||
-				filtre.getExtracte().isEmpty(),
-				filtre.getExtracte() != null ? filtre.getExtracte().trim() : "",
-				true,
-				"",
+				StringUtils.isEmpty(filtre.getNumero()),
+				StringUtils.trim(filtre.getNumero()),		
+				StringUtils.isEmpty(filtre.getExtracte()),
+				StringUtils.trim(filtre.getExtracte()),							
+				StringUtils.isEmpty(filtre.getDestinacioCodi()),
+				StringUtils.trim(filtre.getDestinacioCodi()),
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
 				DateHelper.toDateFinalDia(filtre.getDataFinal()),
 				false,
 				"PENDENT",
-				true,
-				null,
-				StringUtils.isEmpty(filtre.getInteressat()),
-				filtre.getInteressat(),
+				filtre.getAccioEnum() == null,
+				filtre.getAccioEnum(), 
+				StringUtils.isEmpty(filtre.getInteressat()), 
+				StringUtils.trim(filtre.getInteressat()), 
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						null));
 		
+
 		return paginacioHelper.toPaginaDto(paginaExpedientPeticios, ExpedientPeticioListDto.class);
 		
 	}

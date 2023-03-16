@@ -24,6 +24,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.PermisCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -47,6 +48,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private ExpedientPeticioService expedientPeticioService;
 
 	@RequestMapping(value = "/{metaExpedientId}/permis", method = RequestMethod.GET)
 	public String permis(
@@ -173,6 +176,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
+		
+		expedientPeticioService.evictCountAnotacionsPendents(entitatActual.getId());
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient/" + metaExpedientId + "/permis",
