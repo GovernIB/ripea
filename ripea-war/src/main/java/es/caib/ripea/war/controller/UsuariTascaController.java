@@ -507,10 +507,7 @@ public class UsuariTascaController extends BaseUserController {
 				fitxer.getContingut(),
 				response);
 
-		if (pareId != null)
-			return "redirect:../../contingut/" + pareId;
-		else
-			return "redirect:../../expedient";
+		return null;
 	}
 	
 	

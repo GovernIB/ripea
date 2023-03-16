@@ -1077,63 +1077,6 @@ $(document).ready(function() {
 		return content;
 	}
 
-	
-	function getDetallsSignants(idTbody, contingutId, header) {
-
-		idTbody.html("");
-		idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="<c:url value="/img/loading.gif"/>"/></td></tr>');
-		$.get("<c:url value="/contingut/document/"/>" + contingutId + "/mostraDetallSignants", function(json){
-			if (json.error) {
-				idTbody.html('<tr><td colspan="2" style="width:100%"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="contingut.document.info.firma.error"/>: ' + json.errorMsg + '</div></td></tr>');
-			} else {
-				idTbody.html("");
-				if(json.data != null && json.data.length > 0){
-					json.data.forEach(function(firma){
-						if(firma != null){
-							var firmaDataStr = "";
-							if(firma.responsableNom == null){
-								firma.responsableNom = "";
-							}
-							if(firma.responsableNif == null){
-								firma.responsableNif = "";
-							}
-							if(firma.data != null){
-								firmaDataStr = new Date(firma.data);
-							}
-							if(firma.emissorCertificat == null){
-								firma.emissorCertificat = "";
-							}
-							if (header){
-								idTbody.append('<tr><th style="padding-bottom: 2px;"><strong>'
-										+ '<u><spring:message code="contingut.document.info.firma"/></u>'
-										+ "</strong></th><tr>");
-							} 
-							idTbody.append(
-								  "<tr><th><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
-								+ "</strong></th><th>"
-								+ firma.responsableNom
-								+ "</th></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
-								+ "</strong></td><td>"
-								+ firma.responsableNif
-								+ "</td></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
-								+ "</strong></td><td>"
-								+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
-								+ "</td></tr><tr><td><strong>"
-								+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
-								+ "</strong></td><td>"
-								+ firma.emissorCertificat
-								+ "</td></tr>");
-						}
-					})
-				}
-			}
-			webutilRefreshMissatges();
-		});
-	}	
-
 
 	function returnEnviamentsStatusDiv(notificacioId) {
 	    var content = "";
@@ -1167,6 +1110,61 @@ $(document).ready(function() {
 
 
 
+function getDetallsSignants(idTbody, contingutId, header) {
+
+	idTbody.html("");
+	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="<c:url value="/img/loading.gif"/>"/></td></tr>');
+	$.get("<c:url value="/contingut/document/"/>" + contingutId + "/mostraDetallSignants", function(json){
+		if (json.error) {
+			idTbody.html('<tr><td colspan="2" style="width:100%"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="contingut.document.info.firma.error"/>: ' + json.errorMsg + '</div></td></tr>');
+		} else {
+			idTbody.html("");
+			if(json.data != null && json.data.length > 0){
+				json.data.forEach(function(firma){
+					if(firma != null){
+						var firmaDataStr = "";
+						if(firma.responsableNom == null){
+							firma.responsableNom = "";
+						}
+						if(firma.responsableNif == null){
+							firma.responsableNif = "";
+						}
+						if(firma.data != null){
+							firmaDataStr = new Date(firma.data);
+						}
+						if(firma.emissorCertificat == null){
+							firma.emissorCertificat = "";
+						}
+						if (header){
+							idTbody.append('<tr><th style="padding-bottom: 2px;"><strong>'
+									+ '<u><spring:message code="contingut.document.info.firma"/></u>'
+									+ "</strong></th><tr>");
+						} 
+						idTbody.append(
+							  "<tr><th><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
+							+ "</strong></th><th>"
+							+ firma.responsableNom
+							+ "</th></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
+							+ "</strong></td><td>"
+							+ firma.responsableNif
+							+ "</td></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
+							+ "</strong></td><td>"
+							+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
+							+ "</td></tr><tr><td><strong>"
+							+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
+							+ "</strong></td><td>"
+							+ firma.emissorCertificat
+							+ "</td></tr>");
+					}
+				})
+			}
+		}
+		webutilRefreshMissatges();
+	});
+}	
 
 </script>
 
