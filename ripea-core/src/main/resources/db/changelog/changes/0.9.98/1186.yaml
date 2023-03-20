@@ -25,5 +25,14 @@ databaseChangeLog:
         column:
           name: vista_actual
           type: varchar(64 ${varcharunit})
+    - addColumn:
+        columns:
+        - column:
+            name: ordre
+            type: int
+            defaultValueNumeric: 0   
+            constraints:
+                nullable: false         
+        tableName: ipa_metadocument
                   
 
