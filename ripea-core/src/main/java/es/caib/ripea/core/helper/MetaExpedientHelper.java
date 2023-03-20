@@ -596,26 +596,17 @@ public class MetaExpedientHelper {
 	}
 	
 	
+	public List<MetaExpedientEntity> findProcedimentsDeOrganIDeDescendentsDeOrgan(Long organId) {
 
-	public List<MetaExpedientEntity> findByOrganAmbFills(EntitatEntity entitat, Long organId) {
-		List<MetaExpedientEntity> procedimentsOrgan = null;
-		if (organId != null) {
-			OrganGestorEntity organGestor = organGestorRepository.findOne(organId);
-			List<OrganGestorEntity> organGestorAmbFills = organGestorRepository.findFills(entitat, Arrays.asList(organId));
-			
-			procedimentsOrgan = new ArrayList<>();
-			procedimentsOrgan.addAll(organGestor.getMetaExpedients());
-			
-			for (OrganGestorEntity organGestorEntity : organGestorAmbFills) {
-				procedimentsOrgan.addAll(organGestorEntity.getMetaExpedients());
-			}
-			
-			if (procedimentsOrgan.isEmpty()) {
-				procedimentsOrgan = null;
-			}
+		List<OrganGestorEntity> organAmbDescendents = organGestorRepository.findOrgansAmbDescendents(Arrays.asList(organId));
+		List<MetaExpedientEntity> procedimentsDeOrganIDeDescendentsDeOrgan = new ArrayList<>();
+		for (OrganGestorEntity organGestorEntity : organAmbDescendents) {
+			procedimentsDeOrganIDeDescendentsDeOrgan.addAll(organGestorEntity.getMetaExpedients());
 		}
-		return procedimentsOrgan;
+		return procedimentsDeOrganIDeDescendentsDeOrgan;
 	}
+	
+
 	
 	public List<Long> getIdsCreateWritePermesos(Long entitatId) {
 		

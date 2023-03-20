@@ -3292,10 +3292,9 @@ public class PluginHelper {
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
 			ArxiuFirmaDto primeraFirma = firmes.get(0);
 			fitxerNom = primeraFirma.getFitxerNom();
-		} else {
-			if (fitxer != null) {
-				fitxerNom = fitxer.getNom();
-			}
+		} 
+		if (fitxerNom == null && fitxer != null) {
+			fitxerNom = fitxer.getNom();
 		}
 		
 		extensio = DocumentExtensio.toEnum(getExtensio(fitxerNom));

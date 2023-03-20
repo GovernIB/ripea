@@ -223,5 +223,13 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 		delegate.retornarPendent(expedientPeticioId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void evictCountAnotacionsPendents(
+			Long entitatId) {
+		delegate.evictCountAnotacionsPendents(entitatId);
+		
+	}
+
 
 }

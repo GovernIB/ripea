@@ -3,8 +3,11 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
@@ -63,7 +67,10 @@ public class ExpedientPeticioHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
-	
+	@Resource
+	private OrganGestorHelper organGestorHelper;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	/*
 	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
 	 */
@@ -292,22 +299,27 @@ public class ExpedientPeticioHelper {
 		return exception;
 	}
 	
-	
-	
-	public List<MetaExpedientEntity> findMetaExpedientsPermesosPerAnotacions(EntitatEntity entitat, Long organActualId, String rolActual) {
-		List<MetaExpedientEntity> metaExpedientsPermesos = null;
+	public PermisosPerAnotacions findPermisosPerAnotacions(
+			Long entitatId,
+			String rolActual, 
+			Long organActualId) {
+		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();
+		
 		if (rolActual.equals("IPA_ADMIN")) {
-			metaExpedientsPermesos = metaExpedientRepository.findByEntitat(entitat);
+			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			metaExpedientsPermesos = metaExpedientHelper.findByOrganAmbFills(entitat, organActualId);
+			permisosPerAnotacionsDto.setAdminOrganHasPermisAdminComu(organGestorHelper.hasPermisAdminComu(organActualId));
+			permisosPerAnotacionsDto.setAdminOrganCodisOrganAmbDescendents(organGestorRepository.findCodisOrgansAmbDescendents(Arrays.asList(organActualId)));
+			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId));
 		} else if (rolActual.equals("tothom")) {
-			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId()); 
+			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.getCreateWritePermesos(entitatId));
 		}
-		if (metaExpedientsPermesos != null && metaExpedientsPermesos.isEmpty()) {
-			metaExpedientsPermesos = null;
-		}
-		return metaExpedientsPermesos;
+
+
+		return permisosPerAnotacionsDto;
+		
 	}
+	
 
 	private RegistreInteressatEntity crearInteressatEntity(
 			Interessat interessat,

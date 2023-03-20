@@ -69,6 +69,8 @@ import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PermisosPerAnotacions;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
@@ -115,8 +117,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Autowired
 	private CacheHelper cacheHelper;
 	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
 	private ConfigHelper configHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
@@ -126,6 +126,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private DocumentRepository documentRepository;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 
 	
 	@Transactional(readOnly = true)
@@ -156,7 +160,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("numero", new String[] { "codi", "any", "sequencia" });
 		ordenacioMap.put("registre.destiCodiINom", new String[] {"registre.destiCodi"});
-		Page<ExpedientPeticioEntity> paginaExpedientPeticios;
 
 		// enum with states accesibles from filter in the view (without create state)
 		ExpedientPeticioEstatViewEnumDto estatView = filtre.getEstat();
@@ -165,25 +168,26 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
-
-		List<MetaExpedientEntity> metaExpedientsPermesos = expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(entitat, organActualId, rolActual);
 		
-		paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
+		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
+				entitatId,
+				rolActual, 
+				organActualId);
+		
+		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
 				rolActual,
-				metaExpedientsPermesos,
+				permisosPerAnotacions.getProcedimentsPermesos(),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 				metaExpedient == null,
 				metaExpedient,
-				filtre.getProcediment() == null || filtre.getProcediment().isEmpty(),
-				filtre.getProcediment() != null ? filtre.getProcediment().trim() : "",
-				StringUtils.isEmpty(filtre.getProcedimentCodi()),
-				filtre.getProcedimentCodi(),
-				filtre.getNumero() == null || filtre.getNumero().isEmpty(),
-				filtre.getNumero() != null ? filtre.getNumero().trim() : "",
-				filtre.getExtracte() == null || filtre.getExtracte().isEmpty(),
-				filtre.getExtracte() != null ? filtre.getExtracte().trim() : "",
-				filtre.getDestinacioCodi() == null || filtre.getDestinacioCodi().isEmpty(),
-				filtre.getDestinacioCodi() != null ? filtre.getDestinacioCodi().trim() : "",
+				StringUtils.isEmpty(filtre.getNumero()),
+				StringUtils.trim(filtre.getNumero()),		
+				StringUtils.isEmpty(filtre.getExtracte()),
+				StringUtils.trim(filtre.getExtracte()),							
+				StringUtils.isEmpty(filtre.getDestinacioCodi()),
+				StringUtils.trim(filtre.getDestinacioCodi()),
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
@@ -191,14 +195,17 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				estatView == null,
 				estatView != null ? estatView.toString() : null,
 				filtre.getAccioEnum() == null,
-				filtre.getAccioEnum(),
-				StringUtils.isEmpty(filtre.getInteressat()),
-				filtre.getInteressat(),
+				filtre.getAccioEnum(), 
+				StringUtils.isEmpty(filtre.getInteressat()), 
+				StringUtils.trim(filtre.getInteressat()), 
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));
+		
 
-		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(paginaExpedientPeticios,
+
+		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(
+				paginaExpedientPeticios,
 				ExpedientPeticioListDto.class);
 
 		return result;
@@ -436,6 +443,14 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null)
 			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public void evictCountAnotacionsPendents(Long entitatId) {
+		EntitatEntity entitat = entitatRepository.findOne(entitatId);
+		cacheHelper.evictCountAnotacionsPendents(entitat);
 	}
 	
 	
@@ -684,19 +699,26 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("expedientCreatedDate", new String[] {"ep.expedient.createdDate"});
+		ordenacioMap.put("expedientCreatedDate", new String[] {"e.expedient.createdDate"});
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(entitat, organActualId, rolActual);
+		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
+				entitatId,
+				rolActual, 
+				organActualId);
 		
+
 		if (resultEnum == ResultEnumDto.PAGE) {
 			Page<RegistreAnnexEntity> pagina = registreAnnexRepository.findPendentsProcesar(
 					entitat,
-					metaExpedientsPermesos,
+					rolActual,
+					permisosPerAnotacions.getProcedimentsPermesos(),
+					permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+					permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					filtre.getNumero() == null,
@@ -717,7 +739,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			
 			List<Long> documentsIds = registreAnnexRepository.findIdsPendentsProcesar(
 					entitat,
-					metaExpedientsPermesos,
+					rolActual,
+					permisosPerAnotacions.getProcedimentsPermesos(),
+					permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+					permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 					filtre.getNom() == null,
 					filtre.getNom() != null ? filtre.getNom().trim() : "",
 					filtre.getNumero() == null,
@@ -826,12 +851,23 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				false,
 				true,
 				false);
+		
+		
+		List<MetaExpedientEntity> metaExpedientsPermesos = null;
+		if (rolActual.equals("IPA_ADMIN")) {
+			metaExpedientsPermesos = metaExpedientRepository.findByEntitat(entitat);
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			metaExpedientsPermesos = metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId);
+			if (organGestorHelper.hasPermisAdminComu(organActualId)) {
+				List<MetaExpedientEntity> procedimentsComuns = metaExpedientRepository.findProcedimentsComunsActive(entitat);
+				metaExpedientsPermesos.addAll(procedimentsComuns);
+			}
+		} else if (rolActual.equals("tothom")) {
+			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId()); 
+		}
 
 		return conversioTipusHelper.convertirList(
-				expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(
-						entitat,
-						organActualId,
-						rolActual),
+				metaExpedientsPermesos,
 				MetaExpedientDto.class);
 	}
 
