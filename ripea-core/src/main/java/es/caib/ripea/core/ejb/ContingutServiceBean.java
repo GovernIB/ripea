@@ -3,20 +3,35 @@
  */
 package es.caib.ripea.core.ejb;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ContingutService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import es.caib.ripea.core.api.dto.AlertaDto;
+import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
+import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutMovimentDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.ValidacioErrorDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ContingutService;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -338,8 +353,7 @@ public class ContingutServiceBean implements ContingutService {
 			boolean ambVersions,
 			boolean ambPermisos,
 			String rolActual,
-			Long organActualId,
-			boolean ambEntitat, 
+			boolean ambEntitat,
 			boolean ambMapPerTipusDocument, 
 			boolean ambMapPerEstat) {
 		return delegate.findAmbIdUser(
@@ -349,8 +363,7 @@ public class ContingutServiceBean implements ContingutService {
 				ambVersions,
 				ambPermisos,
 				rolActual,
-				organActualId,
-				ambEntitat, 
+				ambEntitat,
 				ambMapPerTipusDocument, 
 				ambMapPerEstat);
 	}
@@ -362,14 +375,14 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void checkIfPermittedAccess(
+	public void checkIfPermitted(
 			Long contingutId,
-			String rolActual,
-			Long organId) {
-		delegate.checkIfPermittedAccess(
+			String rolActual, 
+			PermissionEnumDto permission) {
+		delegate.checkIfPermitted(
 				contingutId,
-				rolActual,
-				organId);
+				rolActual, 
+				permission);
 		
 		
 	}

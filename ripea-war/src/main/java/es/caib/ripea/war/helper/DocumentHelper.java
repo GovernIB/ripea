@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,13 +20,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -47,13 +49,13 @@ public class DocumentHelper {
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 	
-	public void concatenarDocuments(
+	public DocumentGenericCommand concatenarDocuments(
 			Long entitatId,
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
-			DocumentGenericCommand command,
 			Map<String, Long> ordre) {
+		DocumentGenericCommand command = new DocumentGenericCommand();
 		MetaDocumentDto metaDocument = metaDocumentService.findByTipusGeneric(
 				entitatId, 
 				MetaDocumentTipusGenericEnumDto.NOTIFICACION);
@@ -65,23 +67,16 @@ public class DocumentHelper {
 		try {
 			for (Map.Entry<String, Long> entry : ordre.entrySet()) {
 				
-				ContingutDto contingut = contingutService.findAmbIdUser(
+				fitxer = documentService.descarregarImprimible(
 						entitatActual.getId(),
 						entry.getValue(),
-						true,
-						false, null, null);
-				if (contingut.isDocument() 
-						&& (((DocumentDto)contingut).isFirmat() || ((DocumentDto)contingut).isCustodiat() || (((DocumentDto)contingut).isDefinitiu()))) {
-					fitxer = documentService.descarregarImprimible(
-							entitatActual.getId(),
-							entry.getValue(),
-							null);
-					
-
-					PDDocument document = PDDocument.load(fitxer.getContingut());
-					PDFmerger.appendDocument(resultat, document);
-				} 
+						null);
+				
+				PDDocument document = PDDocument.load(fitxer.getContingut());
+				PDFmerger.appendDocument(resultat, document);
+				
 			}
+			
 			resultat.save(resultatOutputStream);
 			resultat.close();
 			
@@ -90,26 +85,32 @@ public class DocumentHelper {
 			command.setMetaNodeId(metaDocument.getId()); //Notificació
 			command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
 			command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
+			command.setNtiOrigen(metaDocument.getNtiOrigen());
 			command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
 			command.setFitxerNom(command.getNom() + ".pdf");
 			command.setFitxerContentType("application/pdf");
 			command.setFitxerContingut(resultatOutputStream.toByteArray());
-		} catch (IOException ex) {
+			
+
+		} catch (Exception ex) {
 			LOGGER.error(
 					"No s'ha pogut crear el document concatenat a partir del contingut seleccionat",
 					ex);
+			throw new RuntimeException(ex);
 		}
+		return command;
 	}
 	
-	public void generarFitxerZip(
+	public DocumentGenericCommand generarFitxerZip(
 			Long entitatId,
 			DocumentService documentService,
 			ContingutService contingutService,
 			EntitatDto entitatActual,
-			DocumentGenericCommand command,
 			Set<Long> docsIdx,
-			ByteArrayOutputStream baos) {
+			ByteArrayOutputStream baos,
+			HttpServletRequest request) {
 		
+		DocumentGenericCommand command = new DocumentGenericCommand();
 		MetaDocumentDto metaDocument = metaDocumentService.findByTipusGeneric(
 				entitatId, 
 				MetaDocumentTipusGenericEnumDto.NOTIFICACION);
@@ -124,18 +125,16 @@ public class DocumentHelper {
 			if (docsIdx != null) {
 				for (Long docId: docsIdx) {
 					FitxerDto fitxer = null;
-					ContingutDto contingutDoc = contingutService.findAmbIdUser(
-							entitatActual.getId(),
+					DocumentDto document = documentService.findAmbId(
 							docId,
-							true,
-							false, null, null);
-					if (contingutDoc instanceof DocumentDto)
+							RolHelper.getRolActual(request),
+							PermissionEnumDto.READ);
 						fitxer = documentService.descarregar(
 								entitatActual.getId(),
 								docId,
 								null);
 					try {
-						ZipEntry entry = new ZipEntry(revisarContingutNom(contingutDoc.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));
+						ZipEntry entry = new ZipEntry(revisarContingutNom(document.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));
 						entry.setSize(fitxer.getContingut().length);
 						zos.putNextEntry(entry);
 						zos.write(fitxer.getContingut());
@@ -148,24 +147,26 @@ public class DocumentHelper {
 				}
 				zos.close();
 	
-				if (command != null) {
-					reportContent = baos.toByteArray();
-					command.setNom("notificacio_" + randomUUID());
-					command.setData(new Date());
-					command.setMetaNodeId(metaDocument.getId()); //Notificació
-					command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
-					command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
-					command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
-					command.setFitxerNom(command.getNom() + ".zip");
-					command.setFitxerContentType("application/zip");
-					command.setFitxerContingut(reportContent);
-				}	
+				reportContent = baos.toByteArray();
+				command.setNom("notificacio_" + randomUUID());
+				command.setData(new Date());
+				command.setMetaNodeId(metaDocument.getId()); //Notificació
+				command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+				command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
+				command.setNtiOrigen(metaDocument.getNtiOrigen());
+				command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
+				command.setFitxerNom(command.getNom() + ".zip");
+				command.setFitxerContentType("application/zip");
+				command.setFitxerContingut(reportContent);
 			}		
+
 		} catch (IOException ex) {
 			LOGGER.error(
 					"No s'ha generar el fitxer zip a partir del contingut seleccionat",
 					ex);
 		}
+		
+		return command;
 	}
 	
 	private static String randomUUID() {

@@ -110,7 +110,7 @@ $(document).ready(function() {
         update: function (event, ui) {
         	var ordreId = $(this).sortable('serialize');
         	console.log(ordreId);
-            var multipleUrl = '<c:url value="/contingut/${contingut.id}/ordre"/>';
+            var multipleUrl = '<c:url value="/contingut/${expedientId}/ordre"/>';
             $.ajax({
                 type: "GET",
                 url: multipleUrl,
@@ -139,9 +139,8 @@ $(document).ready(function() {
 						</div>
 						<div class="caption">
 							<p class="text-center">
-								<c:if test="${document.node and not document.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
-								<c:if test="${document.document && document.estat == 'CUSTODIAT'}"><span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span></c:if>
-								<c:if test="${document.expedient && document.estat == 'TANCAT'}"><span class="fa fa-check-square text-success" title="<spring:message code="contingut.info.estat.tancat"/>"></span></c:if>
+								<c:if test="${not document.valid}"><span class="fa fa-exclamation-triangle text-warning" title="<spring:message code="contingut.icona.estat.invalid"/>"></span></c:if>
+								<span class="fa fa-bookmark" title="<spring:message code="contingut.info.estat.firmat"/>"></span>
 								${document.nom}
 							</p>
 						</div>
@@ -153,7 +152,7 @@ $(document).ready(function() {
 	<div class="contenidor-botons col-md-12 text-center">
 		<div class="btn-group">
 			<div id="descarregar-mult" class="btn-group">
-				<a href="<c:url value="/contingut/${contingut.id}/notificarForm"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"  data-missatge-loading="<spring:message code="concatenacio.pdf.modal.missatge"/>">
+				<a href="<c:url value="/contingut/${expedientId}/doCreateConcatenatedDocument"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default"  data-missatge-loading="<spring:message code="concatenacio.pdf.modal.missatge"/>">
 					<span class="fa fa-paperclip"></span>
 					<spring:message code="concatenacio.form.boto.concatenar"/>
 				</a>

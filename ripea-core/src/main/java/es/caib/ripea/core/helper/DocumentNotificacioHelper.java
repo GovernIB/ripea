@@ -89,7 +89,7 @@ public class DocumentNotificacioHelper {
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
 		
-		if (!documentEntity.isArxiuEstatDefinitu()) {
+		if (!documentEntity.isArxiuEstatDefinitu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}
 		
@@ -327,7 +327,7 @@ public class DocumentNotificacioHelper {
 			documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			logger.debug("[CERT] La certificació s'ha guardat correctament...");
 		} else {
-			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
+			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null); //  this is wrong, because it logs as rebutjada even if notification was accepted if property getPropertyGuardarCertificacioExpedient() is false
 		}
 		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
 		DocumentNotificacioEstatEnumDto estatDespres = documentEnviamentInteressatEntity.getNotificacio().getNotificacioEstat();

@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DadaDto;
@@ -63,6 +64,7 @@ import es.caib.ripea.core.api.dto.FitxerTemporalDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
@@ -77,6 +79,7 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
@@ -255,9 +258,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return createUpdateDocument(
 					request,
 					command,
-					null,
-					false,
-					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true, RolHelper.getRolActual(request), null);
+					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
+					RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
@@ -331,10 +333,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return createUpdateDocument(
 					request,
 					command,
-					null,
-					false,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
-					RolHelper.getRolActual(request), null);
+					RolHelper.getRolActual(request));
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
@@ -715,9 +715,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				documentService, 
 				contingutService,
 				entitatActual, 
-				null,
 				docsIdx,
-				baos);
+				baos,
+				request);
 		
 		reportContent = baos.toByteArray();
 		response.setHeader("Content-Disposition", "attachment; filename=" + expedient.getNom().replaceAll(" ", "_") + ".zip");
@@ -725,111 +725,112 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		response.getOutputStream().flush();
 	}
 	
-	@RequestMapping(value = "/{contingutId}/notificar", method = RequestMethod.GET)
-	public String concatenar(
+	@RequestMapping(value = "/{expedientId}/concatenarOGenerarZip", method = RequestMethod.GET)
+	public String concatenarOGenerarZip(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
+			@PathVariable Long expedientId,
 			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		Map<String, Long> ordre = new LinkedHashMap<String, Long>();
-		boolean totsFinals = true;
-		boolean totsDocumentsPdf = true;
-		boolean notificacioConcatenatEntregaPostal;
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
+			@SuppressWarnings("unchecked")
+			Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_SELECCIO);
+			
+			List<DocumentDto> documents = new ArrayList<DocumentDto>();
+			boolean totsDocumentsPdf = true;
+			for (Long docId: docsIdx) {
+				DocumentDto document = documentService.findAmbId(
+						docId,
+						RolHelper.getRolActual(request),
+						PermissionEnumDto.WRITE);
 
-		
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				false, null, null);
-		
-		List<DocumentDto> documents = new ArrayList<DocumentDto>();
-		@SuppressWarnings("unchecked")
-		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO);
-		
-		for (Long docId: docsIdx) {
-			DocumentDto document = null;
-			ContingutDto contingutDoc = contingutService.findAmbIdUser(
-					entitatActual.getId(),
-					docId,
-					true,
-					false, null, null);
-
-			document = (DocumentDto) contingutDoc;
-			//No es possible concatenar els documents que no són pdf
-			if (document.getFitxerContentType() != null && document.getFitxerContentType().equals("application/pdf")) {
-				if (contingutDoc instanceof DocumentDto 
-						&& (document.isFirmat() || document.isCustodiat() || document.isDefinitiu())
-						|| (document.getFitxerContentType() != null && document.getFitxerContentType().equals("application/pdf"))) {
+				
+				if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
+					throw new RuntimeException("El document amb nom '" + document.getNom() + "' no està firmat");
+				}
+				//No es possible concatenar els documents que no són pdf
+				if (Utils.isNotNullAndEqual(document.getFitxerContentType(), "application/pdf")) {
+					if (document.getArxiuEstat() == ArxiuEstatEnumDto.ESBORRANY) {
+						documentService.actualitzarEstatADefinititu(docId);
+					}
 					documents.add(document);
 				} else {
-					totsFinals = false;
-					break;
+					totsDocumentsPdf = false;
 				}
+			}
+
+			// ========================= CONCATENTAR ===================================
+			if (totsDocumentsPdf) {
+				
+				Map<String, Long> ordre = new LinkedHashMap<String, Long>();
+				if (docsIdx != null) {
+					for (Long id: docsIdx) {
+						ordre.put("document-" + id, id);
+					}
+				}
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_ORDRE,
+						ordre);
+				
+				
+				model.addAttribute("documents", documents);
+				model.addAttribute("expedientId", expedientId);
+				
+				MissatgesHelper.warning(
+						request, 
+						getMessage(
+								request, 
+								"contingut.document.form.titol.concatenacio.info"));
+				return "contingutConcatenacioForm";
+				
+			// ========================= GENERAR ZIP ===================================	
 			} else {
-				totsDocumentsPdf = false;
-				break;
-			}
-		}
-		
-		if (docsIdx != null) {
-			for (Long id: docsIdx) {
-				ordre.put("document-" + id, id);
-			}
-		}
+				
+				DocumentGenericCommand command = documentHelper.generarFitxerZip(
+						entitatActual.getId(),
+						documentService, 
+						contingutService,
+						entitatActual, 
+						docsIdx,
+						null,
+						request);
+				
+				DocumentDto document = documentService.create(
+						entitatActual.getId(),
+						expedientId,
+						DocumentGenericCommand.asDto(command),
+						false, 
+						RolHelper.getRolActual(request));
+				
 
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_ORDRE,
-				ordre);
-
-		if (totsDocumentsPdf && totsFinals) {
-			model.addAttribute("documents", documents);
-			model.addAttribute("contingut", contingut);
-			notificacioConcatenatEntregaPostal = true;
-			
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"contingut.document.form.titol.concatenacio.info"));
-			return "contingutConcatenacioForm";
-		} else {
-			DocumentGenericCommand command = new DocumentGenericCommand();
-			command.setPareId(contingutId);
-			notificacioConcatenatEntregaPostal = false;
-			
-			documentHelper.generarFitxerZip(
-					entitatActual.getId(),
-					documentService, 
-					contingutService,
-					entitatActual, 
-					command,
-					docsIdx,
-					null);
-			MissatgesHelper.warning(
-					request, 
-					getMessage(
-							request, 
-							"contingut.document.form.titol.compresio.info"));
-			return createUpdateDocument(
+				MissatgesHelper.warning(
+						request, 
+						getMessage(
+								request, 
+								"contingut.document.form.titol.compresio.info"));
+				
+				return "redirect:../../document/" + document.getId() + "/notificar";
+				
+			}
+		} catch (Exception e) {
+			logger.error("Error al concatenarOGenerarZip", e);
+			return getModalControllerReturnValueErrorMessageText(
 					request,
-					null,
-					command,
-					true,
-					false,
-					null,
-					notificacioConcatenatEntregaPostal);
+					"redirect:/contingut/" + expedientId,
+					e.getMessage(),
+					e);
 		}
 	}
 	
-	@RequestMapping(value = "/{pareId}/notificarForm", method = RequestMethod.GET)
+	@RequestMapping(value = "/{expedientId}/doCreateConcatenatedDocument", method = RequestMethod.GET)
 	public String concatenarDocuments(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable Long pareId,
+			@PathVariable Long expedientId,
 			Model model) throws IOException, ClassNotFoundException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
@@ -837,24 +838,24 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		Map<String, Long> ordre = (Map<String, Long>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_ORDRE);
-		DocumentGenericCommand command = new DocumentGenericCommand();
-		command.setPareId(pareId);
-		
-		documentHelper.concatenarDocuments(
-				entitatActual.getId(),
-				documentService, 
-				contingutService,
-				entitatActual, 
-				command,
-				ordre);
-		
+
 		try {
-			return createUpdateDocument(
-					request,
-					null,
-					command,
-					true,
-					false, null, null);
+			DocumentGenericCommand command = documentHelper.concatenarDocuments(
+					entitatActual.getId(),
+					documentService, 
+					contingutService,
+					entitatActual, 
+					ordre);
+			
+			DocumentDto document = documentService.create(
+					entitatActual.getId(),
+					expedientId,
+					DocumentGenericCommand.asDto(command),
+					false, 
+					RolHelper.getRolActual(request));
+			
+			return "redirect:../../document/" + document.getId() + "/notificar";
+	
 		} catch (Exception exception) {
 			return getModalControllerReturnValueErrorMessageText(
 					request, 
@@ -1224,77 +1225,45 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private String createUpdateDocument(
 			HttpServletRequest request,
 			DocumentCommand command,
-			DocumentGenericCommand commandGeneric,
-			boolean notificar,
-			boolean comprovarMetaExpedient, 
-			String rolActual,
-			Boolean notificacioConcatenatEntregaPostal) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+			boolean comprovarMetaExpedient,
+			String rolActual) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		//FitxerDto fitxer = null;
-		List<DadaDto> dades = new ArrayList<DadaDto>();
-		Map<String, Object> valors = new HashMap<String, Object>();
 
-		Long pareId = commandGeneric == null ? command.getPareId() : commandGeneric.getPareId();
-		if (commandGeneric == null ? command.getId() == null : commandGeneric.getId() == null) {
-			DocumentDto documentDto = commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric);
+		Long pareId = command.getPareId();
+		if (command.getId() == null) {
 			
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,
-					documentDto,
+					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
 					rolActual);
-			//Valor per defecte d'algunes metadades
-			List<MetaDadaDto> metadades = metaDadaService.findByNode(
-					entitatActual.getId(), 
-					document.getId());
-			for (MetaDadaDto metadada : metadades) {
-				DadaDto dada = new DadaDto();
-				dada.setMetaDada(metadada);
-				dades.add(dada);
-			}
-			Object dadesCommand = beanGeneratorHelper.generarCommandDadesNode(
-					entitatActual.getId(),
-					document.getId(),
-					dades);
-			for (DadaDto dada: dades) {
-				MetaDadaDto metaDada = metaDadaService.findById(
-						entitatActual.getId(), 
-						commandGeneric == null ? command.getMetaNodeId() : commandGeneric.getMetaNodeId(),
-						dada.getMetaDada().getId());
-				Object valor = PropertyUtils.getSimpleProperty(dadesCommand, metaDada.getCodi());
-				if (valor != null && (!(valor instanceof String) || !((String) valor).isEmpty())) {
-					valors.put(metaDada.getCodi(), valor);
-				}
-			}
-			contingutService.dadaSave(
-					entitatActual.getId(),
-					document.getId(),
-					valors);
 			
-			if (!notificar) {
-				if (document.getArxiuUuid() != null) {
-					return getModalControllerReturnValueSuccess(
-							request,
-							"redirect:../../contingut/" + pareId,
-							"document.controller.creat.ok");
-				} else {
-					return getModalControllerReturnValueWarning(
-							request,
-							"redirect:../../contingut/" + pareId,
-							"document.controller.creat.error.arxiu",
-							null);
-				}
-				
-				
+			crearDadesPerDefecteSiExisteixen(
+					entitatActual.getId(),
+					document.getId(),
+					command.getMetaNodeId());
+			
+
+			if (document.getArxiuUuid() != null) {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:../../contingut/" + pareId,
+						"document.controller.creat.ok");
 			} else {
-				modalUrlTancar();
-				return "redirect:../../document/" + document.getId() + "/notificar?" + notificacioConcatenatEntregaPostal;
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:../../contingut/" + pareId,
+						"document.controller.creat.error.arxiu",
+						null);
 			}
+				
+	
 		} else {
 			documentService.update(
 					entitatActual.getId(),
-					commandGeneric == null ? DocumentCommand.asDto(command) : DocumentGenericCommand.asDto(commandGeneric),
+					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
 					rolActual);
 			
@@ -1303,6 +1272,48 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					"redirect:../contingut/" + pareId,
 					"document.controller.modificat.ok");
 		}
+	}
+	
+	
+	private void crearDadesPerDefecteSiExisteixen(
+			Long entitatId,
+			Long documentId,
+			Long metaDocumentId) {
+		
+		try {
+			List<DadaDto> dades = new ArrayList<DadaDto>();
+			//Valor per defecte d'algunes metadades
+			List<MetaDadaDto> metadades = metaDadaService.findByNode(
+					entitatId, 
+					documentId);
+			for (MetaDadaDto metadada : metadades) {
+				DadaDto dada = new DadaDto();
+				dada.setMetaDada(metadada);
+				dades.add(dada);
+			}
+			Object dadesCommand = beanGeneratorHelper.generarCommandDadesNode(
+					entitatId,
+					documentId,
+					dades);
+			Map<String, Object> valors = new HashMap<String, Object>();
+			for (DadaDto dada: dades) {
+				MetaDadaDto metaDada = metaDadaService.findById(
+						entitatId, 
+						metaDocumentId,
+						dada.getMetaDada().getId());
+				Object valor = PropertyUtils.getSimpleProperty(dadesCommand, metaDada.getCodi());
+				if (valor != null && (!(valor instanceof String) || !((String) valor).isEmpty())) {
+					valors.put(metaDada.getCodi(), valor);
+				}
+			}
+			contingutService.dadaSave(
+					entitatId,
+					documentId,
+					valors);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 
 	

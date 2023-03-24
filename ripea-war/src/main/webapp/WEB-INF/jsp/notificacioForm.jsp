@@ -69,14 +69,8 @@ var interessatTipusEnum = [];
 </c:forEach>
 
 $(document).ready(function() {
-	let parentIframe = window.frameElement;
-	let idModal;
-	if (parentIframe != null)
-		idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
 	
-	$('form').on('submit', function(){
-		window.parent.addLoading(idModal);
-	});
+
 	
 	//select and checkbox elements dont have readonly attribute that allows elements to be greyed out but submitted
 	//in order to send disabled values in POST we need to enable them on submit

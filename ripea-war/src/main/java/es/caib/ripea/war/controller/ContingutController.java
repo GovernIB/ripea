@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NodeDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
@@ -70,7 +71,6 @@ import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.ExpedientHelper;
@@ -136,7 +136,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			long t1 = System.currentTimeMillis();
 		
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			contingutService.checkIfPermittedAccess(contingutId, RolHelper.getRolActual(request), EntitatHelper.getOrganGestorActualId(request));
+			contingutService.checkIfPermitted(contingutId, RolHelper.getRolActual(request), PermissionEnumDto.READ);
 			ContingutDto contingut = contingutService.findAmbIdUser(
 					entitatActual.getId(),
 					contingutId,
@@ -144,8 +144,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					true, 
 					true,
 					RolHelper.getRolActual(request), 
-					EntitatHelper.getOrganGestorActualId(request),
-					false, 
+					false,
 					expedientHelper.isVistaTreetablePerTipusDocuments(request), 
 					expedientHelper.isVistaTreetablePerEstats(request));
 

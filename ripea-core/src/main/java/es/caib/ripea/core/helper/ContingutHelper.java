@@ -60,6 +60,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaNodeDto;
 import es.caib.ripea.core.api.dto.NodeDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
@@ -1998,6 +1999,25 @@ public class ContingutHelper {
 		if (fContent.exists()) {
 			fContent.delete();
 		}
+	}
+	
+
+	public void checkIfPermitted(
+			Long contingutId,
+			String rolActual, 
+			PermissionEnumDto permission) {
+		
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		
+		entityComprovarHelper.comprovarExpedient(
+				contingut.getExpedientPare().getId(),
+				false,
+				permission == PermissionEnumDto.READ,
+				permission == PermissionEnumDto.WRITE,
+				permission == PermissionEnumDto.CREATE,
+				permission == PermissionEnumDto.DELETE,
+				rolActual);
+	
 	}
 	
 	

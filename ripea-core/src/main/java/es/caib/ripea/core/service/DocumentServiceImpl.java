@@ -24,6 +24,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -41,6 +42,7 @@ import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -1460,6 +1462,29 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 	}
 	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public DocumentDto findAmbId(
+			Long documentId, 
+			String rolActual, 
+			PermissionEnumDto permission) {
+		
+		if (permission != null) {
+			contingutHelper.checkIfPermitted(
+					documentId,
+					rolActual,
+					permission);
+		}
+		ContingutEntity contingut = documentRepository.findOne(documentId);
+		ContingutDto contingutDto = contingutHelper.toContingutDto(
+				contingut,
+				false,
+				false);
+		return (DocumentDto) contingutDto;
+	}
+	
 	private String changeExtensioToPdf(String nom) {
 		int indexPunt = nom.lastIndexOf(".");
 		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
@@ -1492,6 +1517,13 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(ex);
 		}
 	}	
+	
+	@Transactional
+	@Override
+	public void actualitzarEstatADefinititu(Long documentId) {
+		documentHelper.actualitzarEstatADefinititu(documentId);
+	}
+	
 	
 	@Transactional
 	@Override
