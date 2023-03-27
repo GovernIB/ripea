@@ -53,6 +53,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
 import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
@@ -755,42 +756,103 @@ public class MetaExpedientController extends BaseAdminController {
 			@PathVariable Long metaExpedientId,
 			Model model) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+			
+			MetaExpedientDto metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
+			ReglaDistribucioDto regla = metaExpedientService.consultarReglaDistribucio(metaExpedientId);
+			model.addAttribute("regla", regla);
+			model.addAttribute("metaExpedient", metaExpedient);
+		} catch (Exception e) {
+			logger.error("Error consultant estat de la regla en Distribució", e);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:/metaExpedient",
+					"metaexpedient.controller.regla.consulta.error",
+					new Object[] {ExceptionHelper.getRootCauseOrItself(e).getMessage()},
+					e);
+
+		}
 		
-		MetaExpedientDto metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
-		model.addAttribute("metaExpedient", metaExpedient);
 		return "metaExpedientReglaDetall";
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/reglaCrear", method = RequestMethod.GET)
-	public String reglaCrear(HttpServletRequest request, @PathVariable Long metaExpedientId) {
+	public String reglaCrear(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 
 		CrearReglaResponseDto crearReglaResponseDto = metaExpedientService.reintentarCreacioReglaDistribucio(
 				entitatActual.getId(),
 				metaExpedientId);
-
+		
+		String message = getMessage(
+				request, 
+				"metaexpedient.controller.regla.crear.result",
+				new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
 		if (crearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../metaExpedient",
-					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
+			
+			MissatgesHelper.success(
+					request, 
+					message);
 
 		} else if (crearReglaResponseDto.getStatus() == StatusEnumDto.WARNING) {
-			return getModalControllerReturnValueWarning(
-					request,
-					"redirect:../../metaExpedient",
-					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
+			
+			MissatgesHelper.warning(
+					request, 
+					message);
+			
+
 		} else {
-			return getModalControllerReturnValueError(
-					request,
-					"redirect:../../metaExpedient",
-					"metaexpedient.controller.regla.crear.result",
-					new Object[] { crearReglaResponseDto.getMsgEscapeXML() },
-					null);
+			MissatgesHelper.error(
+					request, 
+					message);
 		}
+		
+		MetaExpedientDto metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
+		ReglaDistribucioDto regla = metaExpedientService.consultarReglaDistribucio(metaExpedientId);
+		model.addAttribute("regla", regla);
+		model.addAttribute("metaExpedient", metaExpedient);
+		
+		return "metaExpedientReglaDetall";
+		
+	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/reglaActivar", method = RequestMethod.GET)
+	public String reglaActivar(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+
+		CrearReglaResponseDto crearReglaResponseDto = metaExpedientService.activarReglaDistribucio(
+				metaExpedientId);
+		
+		String message = getMessage(
+				request, 
+				"metaexpedient.controller.regla.crear.result",
+				new Object[] { crearReglaResponseDto.getMsgEscapeXML() });
+		if (crearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
+			
+			MissatgesHelper.success(
+					request, 
+					message);
+
+		} else if (crearReglaResponseDto.getStatus() == StatusEnumDto.WARNING) {
+			
+			MissatgesHelper.warning(
+					request, 
+					message);
+			
+
+		} else {
+			MissatgesHelper.error(
+					request, 
+					message);
+		}
+		
+		MetaExpedientDto metaExpedient = metaExpedientService.findById(entitatActual.getId(), metaExpedientId);
+		ReglaDistribucioDto regla = metaExpedientService.consultarReglaDistribucio(metaExpedientId);
+		model.addAttribute("regla", regla);
+		model.addAttribute("metaExpedient", metaExpedient);
+		
+		return "metaExpedientReglaDetall";
 		
 	}
 	

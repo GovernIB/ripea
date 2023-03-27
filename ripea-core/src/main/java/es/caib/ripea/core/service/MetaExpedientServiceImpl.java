@@ -12,6 +12,8 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
 import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -53,6 +56,8 @@ import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -75,9 +80,11 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DistribucioReglaHelper;
 import es.caib.ripea.core.helper.DominiHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
 import es.caib.ripea.core.helper.ExpedientEstatHelper;
 import es.caib.ripea.core.helper.GrupHelper;
 import es.caib.ripea.core.helper.MessageHelper;
@@ -171,6 +178,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private HistoricUsuariRepository historicUsuariRepository;
 	@Autowired
 	private EmailHelper emailHelper;
+	@Autowired
+	private DistribucioReglaHelper distribucioReglaHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 //	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
@@ -555,6 +564,16 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			}
 		}
 		return resposta;
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public ReglaDistribucioDto consultarReglaDistribucio(Long metaExpedientId) {
+
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(metaExpedientId);
+		
+		return distribucioReglaHelper.consultarRegla(metaExpedient.getClassificacioSia());
 	}
 	
 	@Transactional(readOnly = true)
@@ -1343,6 +1362,37 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		return metaExpedientHelper.crearReglaDistribucio(metaExpedientId);
 	}
+	
+	
+	@Transactional
+	@Override
+	public CrearReglaResponseDto activarReglaDistribucio(Long metaExpedientId) {
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
+		metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
+
+		try {
+
+			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.activarRegla(
+					metaExpedient.getClassificacioSia());
+
+			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
+				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
+			} else {
+				metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(rearReglaResponseDto.getMsg(), 1024));
+			}
+
+			return rearReglaResponseDto;
+
+		} catch (Exception e) {
+			logger.error("Error al crear regla en distribucio ", e);
+			metaExpedient.updateCrearReglaDistribucioError(StringUtils.abbreviate(e.getMessage() + ": " + ExceptionUtils.getStackTrace(e), 1024));
+
+			return new CrearReglaResponseDto(StatusEnumDto.ERROR,
+					ExceptionHelper.getRootCauseOrItself(e).getMessage());
+		}
+	}
+	
+	
 
     @Override
     public boolean isUpdatingProcediments(EntitatDto entitatDto) {

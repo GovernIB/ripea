@@ -580,6 +580,14 @@ public interface MetaExpedientService {
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	void actualitzaProcediments(EntitatDto entitat, Locale locale);
+	
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	public ReglaDistribucioDto consultarReglaDistribucio(
+			Long metaExpedientId);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
+	public CrearReglaResponseDto activarReglaDistribucio(
+			Long metaExpedientId);
 
 //	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 }

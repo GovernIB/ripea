@@ -1,6 +1,7 @@
 package es.caib.ripea.core.api.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -35,6 +36,10 @@ public class Utils {
 		return object1 != null && object2 != null && object1.equals(object2);
 	}
 	
+	
+    public static boolean isNotEmpty(final Collection<?> coll) {
+       return CollectionUtils.isNotEmpty(coll);
+    }
 	
 	/**
 	 * Hibernate doesn't support empty collection as parameter for "IN" operator [WHERE column_name IN ()]
