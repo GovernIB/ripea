@@ -36,7 +36,10 @@ public class MetaDadaDto implements Serializable {
 	private String valorString;
 	
 	private boolean noAplica;
-
+	
+	private boolean enviable;
+	private String metadadaArxiu;
+	
 	public Long getValorSencer() {
 		return valorSencer;
 	}
@@ -146,6 +149,18 @@ public class MetaDadaDto implements Serializable {
 	}
 	public void setNoAplica(boolean noAplica) {
 		this.noAplica = noAplica;
+	}
+	public boolean isEnviable() {
+		return enviable;
+	}
+	public void setEnviable(boolean enviable) {
+		this.enviable = enviable;
+	}
+	public String getMetadadaArxiu() {
+		return metadadaArxiu;
+	}
+	public void setMetadadaArxiu(String metadadaArxiu) {
+		this.metadadaArxiu = metadadaArxiu;
 	}
 	@Override
 	public String toString() {

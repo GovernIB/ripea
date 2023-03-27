@@ -40,6 +40,7 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -69,7 +70,9 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	private DominiService dominiService;
 	@Autowired
 	private ExpedientService expedientService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -192,6 +195,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 				model.addAttribute("isRolActualRevisor", true);
 			}
 		}
+		model.addAttribute("isMarcarEnviableArxiuActiu", isMarcarEnviableArxiuActiu());
+		
 		return "metaDadaForm";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.POST)
@@ -208,6 +213,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("existContingut",  expedientService.countByMetaExpedient(entitatActual.getId(), metaExpedientId) != 0);
+			model.addAttribute("isMarcarEnviableArxiuActiu", isMarcarEnviableArxiuActiu());
 			return "metaDadaForm";
 		}
 
@@ -407,6 +413,10 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
+	}
+	
+	private boolean isMarcarEnviableArxiuActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.propagar.metadades"));
 	}
 
 	

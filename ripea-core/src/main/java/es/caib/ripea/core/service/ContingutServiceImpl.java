@@ -50,20 +50,24 @@ import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DominiDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -80,6 +84,7 @@ import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ContingutsOrfesHelper;
@@ -153,8 +158,10 @@ public class ContingutServiceImpl implements ContingutService {
 	private ContingutsOrfesHelper contingutRepositoryHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-
-
+	@Autowired
+	private DominiService dominiService;
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Transactional
 	@Override
@@ -177,6 +184,14 @@ public class ContingutServiceImpl implements ContingutService {
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {
 				dadaRepository.delete(dada);
+
+				MetaDadaEntity metaDada = dada.getMetaDada();
+				if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {
+					// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
+					if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+						pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, "");
+					}
+				}
 			}
 		}
 		// Modifica les dades existents
@@ -184,7 +199,8 @@ public class ContingutServiceImpl implements ContingutService {
 			nodeDadaGuardar(
 					node,
 					dadaCodi,
-					valors.get(dadaCodi));
+					valors.get(dadaCodi),
+					entitatId);
 		}
 		cacheHelper.evictErrorsValidacioPerNode(node);
 	}
@@ -1945,7 +1961,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private void nodeDadaGuardar(
 			NodeEntity node,
 			String dadaCodi,
-			Object dadaValor) {
+			Object dadaValor,
+			Long entitatId) {
 		MetaDadaEntity metaDada = metaDadaRepository.findByMetaNodeAndCodi(
 				node.getMetaNode(),
 				dadaCodi);
@@ -2006,6 +2023,18 @@ public class ContingutServiceImpl implements ContingutService {
 						false,
 						false);
 			}
+			
+			if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {
+				// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
+				if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+					DominiDto domini = dominiService.findByCodiAndEntitat(metaDada.getCodi(), entitatId);
+					
+					ResultatConsultaDto resultat = dominiService.getSelectedDomini(entitatId, domini, dada.getValorComString());
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, resultat.getText());
+				} else {
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, dada.getValorComString());
+				}
+			}
 		}
 	}
 
@@ -2045,6 +2074,10 @@ public class ContingutServiceImpl implements ContingutService {
 		return result;
     }
 
+	public boolean isPropagarMetadadesActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
+	}
+	
     private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 
 }

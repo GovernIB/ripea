@@ -65,6 +65,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuOperacioEnumDto;
+import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
@@ -110,6 +111,7 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
@@ -121,6 +123,7 @@ import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -608,6 +611,41 @@ public class PluginHelper {
 								expedient.getNumero()));
 				expedient.updateArxiu(null);
 			}
+			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
+		}
+	}
+	
+	public void arxiuExpedientMetadadesActualitzar(ExpedientEntity expedient, MetaDadaEntity metaDada, String valor) {
+		String accioDescripcio = "Actualització de les meta-dades d'un expedient";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("id", expedient.getId().toString());
+		accioParams.put("títol", expedient.getNom());
+		accioParams.put("metaDada", metaDada.getNom());
+		accioParams.put("dadaValor", valor);
+		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
+		accioParams.put("tipus", metaExpedient.getNom());
+		accioParams.put("estat", expedient.getEstat().name());
+		long t0 = System.currentTimeMillis();
+		try {
+			List<String> interessats = new ArrayList<String>();
+			for (InteressatEntity interessat: expedient.getInteressatsORepresentants()) {
+				if (interessat.getDocumentNum() != null) {
+					interessats.add(interessat.getDocumentNum());
+				}
+			}
+			
+			getArxiuPlugin().expedientModificar(
+				toArxiuExpedient(
+							expedient.getArxiuUuid(), 
+							expedient.getNom(), 
+							metaDada, 
+							valor, 
+							interessats));
+			expedient.updateArxiu(null);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -3158,6 +3196,22 @@ public class PluginHelper {
 
 	private Long toLongValue(String text) {
 		return text == null || text.isEmpty() ? null : Long.parseLong(text);
+	}
+	
+	private Expedient toArxiuExpedient(String identificador, String nom, MetaDadaEntity metaDada, Object valor, List<String> ntiInteressats) {
+		Expedient expedient = new Expedient();
+		expedient.setIdentificador(identificador);
+		expedient.setNom(nom);
+		
+		ExpedientMetadades metadades = new ExpedientMetadades();
+		metadades.setInteressats(ntiInteressats);
+		Map<String, Object> metadadesValors = new HashMap<String, Object>();
+		metadadesValors.put(metaDada.getMetadadaArxiu(), valor);
+		metadades.addMetadadaAddicional("metadades_expedient", metadadesValors);
+		
+		expedient.setMetadades(metadades);
+		
+		return expedient;
 	}
 
 	private Expedient toArxiuExpedient(String identificador, String nom, String ntiIdentificador, List<String> ntiOrgans, Date ntiDataObertura, String ntiClassificacio,
