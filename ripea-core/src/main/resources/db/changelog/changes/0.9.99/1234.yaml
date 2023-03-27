@@ -7,6 +7,14 @@ databaseChangeLog:
       name: booleanFalse
       value: false
       dbms: postgresql
+  - property:
+      name: varcharUnit
+      value: CHAR
+      dbms: oracle
+  - property:
+      name: varcharUnit
+      value: ''
+      dbms: postgresql
   - changeSet:
       id: 1679321539857-1
       author: limit
@@ -45,3 +53,9 @@ databaseChangeLog:
                   name: enviable
                   type: BOOLEAN
                   defaultValue: ${booleanFalse}
+        - addColumn:
+            tableName: ipa_metadada
+            columns:
+              - column:
+                  name: metadada_arxiu
+                  type: varchar(255 ${varcharUnit})
