@@ -13,7 +13,6 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.plugin.helper.RestClient;
 
 
 public class ReglesRestClient extends RestClient{
