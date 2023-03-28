@@ -836,7 +836,7 @@ public class PluginHelper {
 			throw new RuntimeException("Mock excepcion al actualitzar document al arxiu");
 		}
 
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				document, 
 				"Actualització de les dades d'un document");
 		
@@ -903,7 +903,7 @@ public class PluginHelper {
 			throw new RuntimeException("Mock excepcion al actualitzar firma al arxiu");
 		}
 		
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				document,
 				"Actualització de les dades d'una firma separada del document esboranny");
 		
@@ -972,6 +972,54 @@ public class PluginHelper {
 				errorDescripcio,
 				ex);
 	}
+	
+	
+	private IntegracioAccioDto getIntegracioAccio(
+			String accioDescripcio,
+			Map<String, String> accioParams,
+			String integracioCodi,
+			IntegracioAccioTipusEnumDto integracioAccioTipus) {
+		
+		IntegracioAccioDto integracioAccio = new IntegracioAccioDto(
+				accioDescripcio,
+				accioParams,
+				System.currentTimeMillis());
+		
+		integracioAccio.setTipus(integracioAccioTipus);
+		integracioAccio.setIntegracio(integracioHelper.novaIntegracio(integracioCodi));
+		
+		return integracioAccio;
+	}
+	
+	
+	private void accioOk(
+			IntegracioAccioDto integracioAccio) {
+		integracioHelper.addAccioOk(
+				integracioAccio.getIntegracio().getCodi(),
+				integracioAccio.getDescripcio(),
+				integracioAccio.getParametres(),
+				integracioAccio.getTipus(),
+				System.currentTimeMillis() - integracioAccio.getTempsInici());
+	}
+	
+	private SistemaExternException accioError(
+			String errorDescripcio,
+			IntegracioAccioDto integracioAccio,
+			Exception ex) {
+		integracioHelper.addAccioError(
+				integracioAccio.getIntegracio().getCodi(),
+				integracioAccio.getDescripcio(),
+				integracioAccio.getParametres(),
+				integracioAccio.getTipus(),
+				System.currentTimeMillis() - integracioAccio.getTempsInici(),
+				errorDescripcio,
+				ex);
+		return new SistemaExternException(
+				integracioAccio.getIntegracio().getCodi(),
+				errorDescripcio,
+				ex);
+	}
+	
 	
 	
 	private ContingutEntity getContingutPare(DocumentEntity document){
@@ -1105,7 +1153,7 @@ public class PluginHelper {
 	
 	
 	
-	private IntegracioAccioDto getIntegracioAccio(
+	private IntegracioAccioDto getIntegracioAccioArxiu(
 			DocumentEntity document, 
 			String accioDescripcio) {
 		
@@ -1129,7 +1177,7 @@ public class PluginHelper {
 	}
 	
 	
-	private IntegracioAccioDto getIntegracioAccio(
+	private IntegracioAccioDto getIntegracioAccioArxiu(
 			String uuid, 
 			String accioDescripcio) {
 		
@@ -1167,7 +1215,7 @@ public class PluginHelper {
 	public Document arxiuDocumentConsultar(String arxiuUuid) {
 
 		
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				arxiuUuid,
 				"Consulta d'un document");
 
@@ -1191,7 +1239,7 @@ public class PluginHelper {
 	
 	public void arxiuDocumentEsborrar(String arxiuUuid) {
 
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				arxiuUuid,
 				"Eliminació d'un document");
 		try {
@@ -1315,7 +1363,7 @@ public class PluginHelper {
 	
 	public byte[] arxiuFirmaSeparadaConsultar(DocumentEntity document) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
-		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				document,
 				"Consulta d'una firma separada del document esboranny");
 
@@ -2922,26 +2970,25 @@ public class PluginHelper {
 	
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
+		
 		ConfigHelper.setEntitat(conversioTipusHelper.convertir(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat(), EntitatDto.class));
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
 		
-		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		RespostaConsultaEstatEnviament resposta = null;
-		String accioDescripcio = "Consulta d'estat d'una notificació electrònica";
-		Map<String, String> accioParams = getAccioParams(documentEnviamentInteressatEntity);
-		long t0 = System.currentTimeMillis();
+		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+				"Consulta d'estat d'una notificació electrònica",
+				getAccioParams(documentEnviamentInteressatEntity),
+				IntegracioHelper.INTCODI_NOTIFICACIO,
+				IntegracioAccioTipusEnumDto.RECEPCIO);
+
 		try {
-			resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
-			String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
-			if (!getPropertyGuardarCertificacioExpedient() && resposta.getCertificacioData() != null) {
-				byte[] certificacio = resposta.getCertificacioContingut();
-				if (gestioDocumentalId != null && documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
-					gestioDocumentalDelete(notificacio.getEnviamentCertificacioArxiuId(), GESDOC_AGRUPACIO_CERTIFICACIONS);
-				}
-				if (gestioDocumentalId == null || documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
-					gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
-				}
-			}
+			
+			// ====================================== CONSULTAR ENVIAMENT ==================================================
+			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
+			
+			guardarCertificacio(
+					documentEnviamentInteressatEntity,
+					resposta);
+			
 			documentEnviamentInteressatEntity.updateEnviamentEstat(
 					resposta.getEstat(),
 					resposta.getEstatData(),
@@ -2951,20 +2998,50 @@ public class PluginHelper {
 					resposta.isError(),
 					resposta.getErrorDescripcio());
 
-			actualitzarDadesRegistre(documentEnviamentInteressatEntity);
+			actualitzarRegistreInfo(documentEnviamentInteressatEntity);
+			
+			// ====================================== CONSULTAR NOTIFICACIO ==================================================
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(documentEnviamentInteressatEntity.getNotificacio().getEnviamentIdentificador());
-			notificacio.updateNotificacioEstat(respostaNotificioEstat.getEstat(), resposta.getEstatData(), respostaNotificioEstat.isError(),
-												respostaNotificioEstat.getErrorDescripcio(), gestioDocumentalId);
-			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_NOTIFICACIO, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
+			DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+			notificacio.updateNotificacioEstat(
+					respostaNotificioEstat.getEstat(),
+					resposta.getEstatData(),
+					respostaNotificioEstat.isError(),
+					respostaNotificioEstat.getErrorDescripcio(),
+					respostaNotificioEstat.getDataEnviada(), 
+					respostaNotificioEstat.getDataFinalitzada());
+			
+			accioOk(integracioAccio);
+			return resposta;
+			
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de notificacions";
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_NOTIFICACIO, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.RECEPCIO, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
+			throw accioError(
+					"Error al accedir al plugin de notificacions",
+					integracioAccio,
+					ex);
 		}
-		return resposta;
+	}
+	
+	public void guardarCertificacio(
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
+			RespostaConsultaEstatEnviament resposta) {
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		
+		String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
+		if (!getPropertyGuardarCertificacioExpedient() && resposta.getCertificacioData() != null) {
+			byte[] certificacio = resposta.getCertificacioContingut();
+			if (gestioDocumentalId != null && documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+				gestioDocumentalDelete(notificacio.getEnviamentCertificacioArxiuId(), GESDOC_AGRUPACIO_CERTIFICACIONS);
+			}
+			if (gestioDocumentalId == null || documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+				gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
+			}
+		}
+		notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
+		
 	}
 
-	public void actualitzarDadesRegistre(DocumentEnviamentInteressatEntity enviament) {
+	public void actualitzarRegistreInfo(DocumentEnviamentInteressatEntity enviament) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(enviament.getNotificacio().getExpedient().getId()));
 		

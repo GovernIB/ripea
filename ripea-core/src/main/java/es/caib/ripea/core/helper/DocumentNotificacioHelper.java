@@ -156,7 +156,7 @@ public class DocumentNotificacioHelper {
 					for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
 						if(documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
 							documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-							pluginHelper.actualitzarDadesRegistre(documentEnviamentInteressat);
+							pluginHelper.actualitzarRegistreInfo(documentEnviamentInteressat);
 						}
 					}
 				}

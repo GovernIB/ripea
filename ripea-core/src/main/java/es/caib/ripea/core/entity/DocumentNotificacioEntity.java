@@ -75,6 +75,14 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@JoinColumn(name = "not_emisor_id")
 	private OrganGestorEntity emisor;
 	
+	
+	@Column(name = "not_data_enviada")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataEnviada;
+	@Column(name = "not_data_finalitzada")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataFinalitzada;
+	
 	@OneToMany(
 			mappedBy = "notificacio",
 			fetch = FetchType.LAZY,
@@ -121,13 +129,17 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 			Date estatData,
 			boolean error,
 			String errorDescripcio,
-			String enviamentCertificacioArxiuId) {
-		this.enviamentCertificacioArxiuId = enviamentCertificacioArxiuId;
+			Date dataEnviada, 
+			Date dataFinalitzada) {
 		this.error = error;
 		this.errorDescripcio = errorDescripcio;
 		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
 		this.processatData = estatData;
+		this.dataEnviada = dataEnviada;
+		this.dataFinalitzada = dataFinalitzada;
 	}
+	
+	
 	
 	public void updateNotificacioInfoRegistre(
 			Date registreData,

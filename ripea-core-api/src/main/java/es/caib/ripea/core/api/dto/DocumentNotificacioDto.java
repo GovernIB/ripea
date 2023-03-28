@@ -42,6 +42,8 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private boolean ambRegistres;
 	private OrganGestorDto emisor;
 	
+	private Date dataEnviada;
+	private Date dataFinalitzada;
 	
 	@Override
 	public String getDestinatari() {

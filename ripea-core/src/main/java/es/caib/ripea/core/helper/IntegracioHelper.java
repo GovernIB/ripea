@@ -222,7 +222,7 @@ public class IntegracioHelper {
 		}
 	}
 
-	private IntegracioDto novaIntegracio(String codi) {
+	public IntegracioDto novaIntegracio(String codi) {
 
 		IntegracioDto integracio = new IntegracioDto();
 		integracio.setCodi(codi);

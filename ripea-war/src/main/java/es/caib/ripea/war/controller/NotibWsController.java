@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import es.caib.notib.domini.NotificacioCanviClient;
+import es.caib.notib.client.domini.NotificacioCanviClient;
 import es.caib.ripea.core.api.service.DocumentService;
 
 

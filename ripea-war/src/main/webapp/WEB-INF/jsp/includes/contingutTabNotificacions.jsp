@@ -175,14 +175,8 @@ $(document).ready(function() {
 				</script>
 			</th>
 			<th data-col-name="createdDate" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.creadael"/></th>
-			<th data-col-name="processatDataString" data-orderable="false" data-template="#cellProcessatDataTemplate" width="20%">
-				<spring:message code="contingut.enviament.columna.dataFinalitzada"/>
-				<script id="cellProcessatDataTemplate" type="text/x-jsrender">
-					{{if notificacioEstat == 'FINALITZADA' or notificacioEstat == 'PROCESSADA'}}
-						{{:processatDataString}}
-					{{/if}}
-				</script>										
-			</th>
+			<th data-col-name="dataEnviada" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.enviadael"/></th>
+			<th data-col-name="dataFinalitzada" data-converter="datetime" data-orderable="false" width="20%"><spring:message code="contingut.enviament.columna.dataFinalitzada"/></th>
 			<th data-col-name="assumpte" data-orderable="false" width="25%"><spring:message code="contingut.enviament.columna.concepte"/></th>
 			<th data-col-name="destinatari" data-orderable="false" data-visible="false" width="20%">
 				<spring:message code="contingut.enviament.columna.destinatari"/>

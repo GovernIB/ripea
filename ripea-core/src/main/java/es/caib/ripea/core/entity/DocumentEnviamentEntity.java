@@ -45,7 +45,7 @@ import lombok.Getter;
 @Table( name = "ipa_document_enviament")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @EntityListeners(AuditingEntityListener.class)
-public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> {
+public abstract class DocumentEnviamentEntity extends RipeaAuditable<Long> { //TODO: shouldn't be one table, brings confusion
 
 	@Column(name = "estat", nullable = false)
 	@Enumerated(EnumType.STRING)
