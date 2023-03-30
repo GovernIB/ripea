@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -476,5 +477,27 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.findAmbId(documentId, rolActual, permission);
 	}
 
+	@Override
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres) {
+		delegate.portafirmesCallbackIntegracioOk(
+				descripcio,
+				parametres);
+
+	}
+
+	@Override
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable) {
+		delegate.portafirmesCallbackIntegracioError(
+				descripcio,
+				parametres,
+				errorDescripcio,
+				throwable);
+	}
 
 }

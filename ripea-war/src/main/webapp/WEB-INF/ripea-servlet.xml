@@ -39,6 +39,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.MetaExpedientInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -54,6 +55,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AplicacioInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -69,6 +71,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.SessioInterceptor"/>
 		</mvc:interceptor>
@@ -84,6 +87,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.LlistaEntitatsInterceptor"/>
 		</mvc:interceptor>
@@ -99,6 +103,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.LlistaRolsInterceptor"/>
 		</mvc:interceptor>
@@ -115,6 +120,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.ModalInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -130,6 +136,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.NodecoInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -145,6 +152,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AjaxInterceptor"/>
 		</mvc:interceptor>
 		<mvc:interceptor>
@@ -160,6 +168,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<mvc:exclude-mapping path="/error"/>
 			<bean class="es.caib.ripea.war.interceptor.ExpedientsInterceptor"/>
 		</mvc:interceptor>	
@@ -176,6 +185,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.TasquesPendentsInterceptor"/>
 		</mvc:interceptor>	
 		<mvc:interceptor>
@@ -191,6 +201,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AnotacionsPendentsInterceptor"/>
 		</mvc:interceptor>	
 		<mvc:interceptor>
@@ -205,6 +216,7 @@
 			<mvc:exclude-mapping path="/**/selection/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
 			<mvc:exclude-mapping path="/**/rest/notib/**"/>
+			<mvc:exclude-mapping path="/rest/portafib/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AvisosInterceptor"/>
 		</mvc:interceptor>		
 		

@@ -128,7 +128,8 @@
 			<url-pattern>/ws/portafibCallback</url-pattern>
 			<url-pattern>/ws/bantel</url-pattern>
 			<url-pattern>/rest/notib</url-pattern>
-			<url-pattern>/rest/notib/notificaCanvi</url-pattern>
+			<url-pattern>/rest/notib/notificaCanvi</url-pattern>		
+			<url-pattern>/rest/portafib/v1/event</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 

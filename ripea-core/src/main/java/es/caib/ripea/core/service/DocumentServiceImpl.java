@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -35,6 +36,7 @@ import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
@@ -92,6 +94,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentNotificacioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -163,6 +166,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 	
 	@Transactional
@@ -845,6 +850,26 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "callbackEstat=" + callbackEstat + ")");
 		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId, name);
 	}
+	
+	@Transactional
+	@Override
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres) {
+
+		integracioHelper.addAccioOk(IntegracioHelper.INTCODI_CALLBACK, descripcio, parametres, IntegracioAccioTipusEnumDto.RECEPCIO, 0);
+	}
+	
+	@Transactional
+	@Override
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable) {
+
+		integracioHelper.addAccioError(IntegracioHelper.INTCODI_CALLBACK, descripcio, parametres, IntegracioAccioTipusEnumDto.RECEPCIO, 0, errorDescripcio, throwable);
+	}
 
 
 	
@@ -1517,6 +1542,9 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(ex);
 		}
 	}	
+	
+	
+	
 	
 	@Transactional
 	@Override
