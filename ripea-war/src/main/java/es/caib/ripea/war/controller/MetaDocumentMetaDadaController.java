@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,10 +30,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -40,6 +43,8 @@ import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -63,6 +68,8 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(value = "/{metaDocumentId}/metaDada", method = RequestMethod.GET)
 	public String get(HttpServletRequest request, @PathVariable Long metaDocumentId, Model model) {
@@ -145,6 +152,11 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 				}
 			}
 		}
+		List<HtmlOption> tipus = EnumHelper.getOptionsForEnum(MetaDadaTipusEnumDto.class, "meta.dada.tipus.enum.");
+		if (!aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis")) {
+			tipus.remove(new HtmlOption("DOMINI", null));
+		}
+		model.addAttribute("tipus", tipus);
 
 		return "metaDadaForm";
 	}

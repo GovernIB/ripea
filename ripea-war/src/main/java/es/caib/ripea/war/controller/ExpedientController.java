@@ -183,6 +183,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("meusExpedients", meusExpedients);
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		
+		model.addAttribute("isDominisEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis"));
+		
 		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
 		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
 		

@@ -49,6 +49,8 @@ import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -196,6 +198,12 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			}
 		}
 		model.addAttribute("isMarcarEnviableArxiuActiu", isMarcarEnviableArxiuActiu());
+		
+		List<HtmlOption> tipus = EnumHelper.getOptionsForEnum(MetaDadaTipusEnumDto.class, "meta.dada.tipus.enum.");
+		if (!aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis")) {
+			tipus.remove(new HtmlOption("DOMINI", null));
+		}		
+		model.addAttribute("tipus", tipus);
 		
 		return "metaDadaForm";
 	}

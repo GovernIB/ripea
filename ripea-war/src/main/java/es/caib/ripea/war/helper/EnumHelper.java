@@ -96,6 +96,23 @@ public class EnumHelper {
 		public void setText(String text) {
 			this.text = text;
 		}
+		
+		
+	    @Override
+	    public boolean equals(Object obj) {
+	        if (obj == null) {
+	            return false;
+	        }
+	        if (obj.getClass() != this.getClass()) {
+	            return false;
+	        }
+	        final HtmlOption other = (HtmlOption) obj;
+	        if ((this.value == null) ? (other.value != null) : !this.value.equals(other.value)) {
+	            return false;
+	        }
+	        return true;
+	    }
 	}
+
 
 }
