@@ -32,6 +32,7 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	private String codi;
 	@JsonProperty("denominacion")
 	private String denominacio;
+	private String denominacioCooficial;
 	private String nifCif;
 	private String nivellAdministracio;
 	private String tipusEntitatPublica;
@@ -68,12 +69,14 @@ public class UnitatOrganitzativa implements Serializable, Comparable<UnitatOrgan
 	public UnitatOrganitzativa(
 			String codi,
 			String denominacio,
+			String denominacioCooficial,
 			String codiUnitatSuperior,
 			String codiUnitatArrel,
-			String estat,
+			String estat, 
 			List<String> historicosUO) {
 		this.codi = codi;
 		this.denominacio = denominacio;
+		this.denominacioCooficial = denominacioCooficial;
 		this.codiUnitatSuperior = codiUnitatSuperior;
 		this.codiUnitatArrel = codiUnitatArrel;
 		this.estat = estat;

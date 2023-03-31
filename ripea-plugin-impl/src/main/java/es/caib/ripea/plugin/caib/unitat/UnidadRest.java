@@ -1,19 +1,14 @@
 package es.caib.ripea.plugin.caib.unitat;
 
 import es.caib.dir3caib.ws.api.unidad.UnidadTF;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter @Setter
 public class UnidadRest extends UnidadTF{
 
-	protected String nifCif;
+	private String nifCif;
+	private String denominacionCooficial;
 
-	public String getNifCif() {
-		return nifCif;
-	}
 
-	public void setNifCif(
-			String nifCif) {
-		this.nifCif = nifCif;
-	}
-	
-	
 }

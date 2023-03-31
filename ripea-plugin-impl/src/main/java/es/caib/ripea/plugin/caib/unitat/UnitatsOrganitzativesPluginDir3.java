@@ -298,6 +298,7 @@ public class UnitatsOrganitzativesPluginDir3 extends RipeaAbstractPluginProperti
         UnitatOrganitzativa unitat = UnitatOrganitzativa.builder()
                 .codi(unidad.getCodigo())
                 .denominacio(unidad.getDenominacion())
+                .denominacioCooficial(unidad.getDenominacionCooficial())
                 .nifCif(unidad.getCodigo())
                 .dataCreacioOficial(unidad.getFechaAltaOficial())
                 .estat(unidad.getCodigoEstadoEntidad())

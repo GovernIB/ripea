@@ -10,16 +10,19 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import es.caib.ripea.core.api.utils.Utils;
+
 /**
  * Informació d'una unitat organitzativa.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter @Setter
+@Setter
 public class UnitatOrganitzativaDto implements Serializable {
 
 	private String codi;
 	private String denominacio;
+	private String denominacioCooficial;
 	private String oldDenominacio;
 	private String nifCif;
 	private String codiUnitatSuperior;
@@ -47,9 +50,110 @@ public class UnitatOrganitzativaDto implements Serializable {
 	private Boolean ambOficinaSir;
 	
 	public String getNom() {
-		return this.denominacio + " (" + this.codi + ")";
+		return this.getDenominacioCooficial() + " (" + this.codi + ")";
 	}
 	
+	public String getDenominacioCooficial() {
+		return Utils.isNotEmpty(denominacioCooficial) ? denominacioCooficial : denominacio;
+	}
+
+	
+	
+	
+	public String getCodi() {
+		return codi;
+	}
+
+	public String getDenominacio() {
+		return denominacio;
+	}
+
+	public String getOldDenominacio() {
+		return oldDenominacio;
+	}
+
+	public String getNifCif() {
+		return nifCif;
+	}
+
+	public String getCodiUnitatSuperior() {
+		return codiUnitatSuperior;
+	}
+
+	public String getCodiUnitatArrel() {
+		return codiUnitatArrel;
+	}
+
+	public Date getDataCreacioOficial() {
+		return dataCreacioOficial;
+	}
+
+	public Date getDataSupressioOficial() {
+		return dataSupressioOficial;
+	}
+
+	public Date getDataExtincioFuncional() {
+		return dataExtincioFuncional;
+	}
+
+	public Date getDataAnulacio() {
+		return dataAnulacio;
+	}
+
+	public String getEstat() {
+		return estat;
+	}
+
+	public String getCodiPais() {
+		return codiPais;
+	}
+
+	public String getCodiComunitat() {
+		return codiComunitat;
+	}
+
+	public String getCodiProvincia() {
+		return codiProvincia;
+	}
+
+	public String getCodiPostal() {
+		return codiPostal;
+	}
+
+	public String getNomLocalitat() {
+		return nomLocalitat;
+	}
+
+	public String getLocalitat() {
+		return localitat;
+	}
+
+	public String getAdressa() {
+		return adressa;
+	}
+
+	public Long getTipusVia() {
+		return tipusVia;
+	}
+
+	public String getNomVia() {
+		return nomVia;
+	}
+
+	public String getNumVia() {
+		return numVia;
+	}
+
+	public List<UnitatOrganitzativaDto> getLastHistoricosUnitats() {
+		return lastHistoricosUnitats;
+	}
+
+	public Boolean getAmbOficinaSir() {
+		return ambOficinaSir;
+	}
+
+
+
 	private static final long serialVersionUID = -5602898182576627524L;
 
 }
