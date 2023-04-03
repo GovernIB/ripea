@@ -169,35 +169,55 @@ function enableNotificar() {
 					{{/if}}													
 				</script>										
 			</th>
-			<c:if test="${potModificar}">
-			<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
-				<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
-					<div class="dropdown">
-						<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
-						<ul class="dropdown-menu">
-							{{if (!arxiuPropagat || !representantArxiuPropagat)}}
-								{{if !expedientArxiuPropagat}}
-									<li class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-								{{else}}
-									<li><a href="<c:url value="/expedient/${expedientId}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-								{{/if}}
-							{{/if}}	
-							<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="false" class="btnModificarInteressat"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-							<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="false" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
-							{{if tipus != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>'}}
-								<li class="divider" role="separator"></li>
-								{{if representantId}}
-									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.modificar.prepresentant"/></a></li>
-									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.representant"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.borrar.representant"/></a></li>
-								{{else}}
-									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/new"/>" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.nou.prepresentant"/></a></li>														
-								{{/if}}
-							{{/if}}
-						</ul>
-					</div>
-				</script>
-			</th>
-			</c:if>
+			<c:choose>
+				<c:when test="${potModificar}">
+					<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
+						<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									{{if (!arxiuPropagat || !representantArxiuPropagat)}}
+										{{if !expedientArxiuPropagat}}
+											<li class="disabledMsg" title="<spring:message code="disabled.button.primerGuardarExpedientArxiu"/>"><a class="disabled"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+										{{else}}
+											<li><a href="<c:url value="/expedient/${expedientId}/guardarInteressatsArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+										{{/if}}
+									{{/if}}	
+									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}?potModificar=true"/>" data-toggle="modal" data-refresh-pagina="false"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
+									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/delete"/>" data-toggle="ajax" data-refresh-pagina="false" data-confirm="<spring:message code="contingut.confirmacio.esborrar.interessat"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+									{{if tipus != 'ADMINISTRACIO'}}
+										<li class="divider" role="separator"></li>
+										{{if representantId}}
+											<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.modificar.prepresentant"/></a></li>
+											<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.representant"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.borrar.representant"/></a></li>
+										{{else}}
+											<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/new"/>" data-toggle="modal"><span class="fa fa-plus"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.nou.prepresentant"/></a></li>														
+										{{/if}}
+									{{/if}}
+								</ul>
+							</div>
+						</script>
+					</th>				
+				</c:when>
+				<c:otherwise>
+					<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatTemplate" width="10%">
+						<script id="cellAccionsInteressatTemplate" type="text/x-jsrender">
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">	
+									<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}?potModificar=false"/>" data-toggle="modal" data-refresh-pagina="false"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+									{{if tipus != 'ADMINISTRACIO' && representantId}}
+										<li class="divider" role="separator"></li>
+											<li><a href="<c:url value="/expedient/${expedientId}/interessat/{{:id}}/representant/{{:representantId}}?potModificar=false"/>" data-toggle="modal"><span class="fa fa-search"></span>&nbsp;&nbsp;<spring:message code="contingut.interessat.detalls.prepresentant"/></a></li>
+									{{/if}}
+								</ul>
+							</div>
+						</script>
+					</th>				
+				</c:otherwise>
+			</c:choose>
+
+			
 		</tr>
 	</thead>
 </table>

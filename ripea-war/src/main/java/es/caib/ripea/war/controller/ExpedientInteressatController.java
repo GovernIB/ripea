@@ -81,6 +81,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@PathVariable Long interessatId,
+			@RequestParam(value = "potModificar", required = false) Boolean potModificar,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		InteressatDto interessatDto = expedientInteressatService.findById(interessatId, false); 
@@ -103,6 +104,9 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			}
 			model.addAttribute("unitatsOrganitzatives", unitats);
 		}
+		
+		model.addAttribute("potModificar", potModificar);
+		
 		return "expedientInteressatForm";
 	}
 	
@@ -246,6 +250,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long expedientId,
 			@PathVariable Long interessatId,
 			@PathVariable Long representantId,
+			@RequestParam(value = "potModificar", required = false) Boolean potModificar,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		InteressatDto representantDto = expedientInteressatService.findRepresentantById(
@@ -262,6 +267,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		if (representantDto.getProvincia() != null) {
 			model.addAttribute("municipis", dadesExternesService.findMunicipisPerProvincia(representantDto.getProvincia()));
 		}
+		model.addAttribute("potModificar", potModificar);
 		return "expedientInteressatForm";
 	}
 	
