@@ -158,6 +158,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.getIdioma());
 		usuari.updateRebreEmailsAgrupats(dto.isRebreEmailsAgrupats());
 		
+		usuari.setEmailAlternatiu(dto.getEmailAlternatiu());
+		
 		return toUsuariDtoAmbRols(usuari);
 	}
 
@@ -187,7 +189,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		UsuariDto usuariDto = null;
 		try {
 			usuariDto = conversioTipusHelper.convertir(
-					usuariHelper.getUsuariByCodiDades(codi),
+					usuariHelper.getUsuariByCodiDades(codi, true, true),
 					UsuariDto.class);
 		} catch (NotFoundException ex) {
 			logger.error("No s'ha trobat cap usuari amb el codi " + codi + ". Procedim a cercar si és un càrrec.");
@@ -213,7 +215,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		logger.debug("Obtenint usuari amb codi (codi=" + codi + ")");
 		UsuariDto usuariDto = null;
 		usuariDto = conversioTipusHelper.convertir(
-				usuariHelper.getUsuariByCodiDades(codi),
+				usuariHelper.getUsuariByCodiDades(codi, true, true),
 				UsuariDto.class);
 
 		return usuariDto;

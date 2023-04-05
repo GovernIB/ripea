@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -79,43 +80,58 @@ public class EmailHelper {
 			ContingutEntity contingut,
 			UsuariEntity usuariOriginal,
 			UsuariEntity usuariNou) {
+			
+		String tipus = "desconegut";
+		if (contingut instanceof ExpedientEntity) {
+			tipus = "expedient";
+		} else if (contingut instanceof DocumentEntity) {
+			tipus = "document";
+		} else if (contingut instanceof CarpetaEntity) {
+			tipus = "carpeta";
+		}
+		String subject = PREFIX_RIPEA + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom();
+		String text = 
+				"Informació de l'element de l'escriptori:\n" +
+				"\tEntitat: " + contingut.getEntitat().getNom() + "\n" +
+				"\tTipus: " + tipus + "\n" +
+				"\tNom: " + contingut.getNom() + "\n\n" + 
+				"\tPersona que ho ha agafat: " + usuariNou.getNom() + "(" + usuariNou.getCodi() + ").";
 		
-		if (usuariOriginal.getEmail() != null) {
-			
-			String from = getRemitent();
-			String to = usuariOriginal.getEmail();
-			String tipus = "desconegut";
-			if (contingut instanceof ExpedientEntity) {
-				tipus = "expedient";
-			} else if (contingut instanceof DocumentEntity) {
-				tipus = "document";
-			} else if (contingut instanceof CarpetaEntity) {
-				tipus = "carpeta";
-			}
-			String subject = PREFIX_RIPEA + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom();
-			String text = 
-					"Informació de l'element de l'escriptori:\n" +
-					"\tEntitat: " + contingut.getEntitat().getNom() + "\n" +
-					"\tTipus: " + tipus + "\n" +
-					"\tNom: " + contingut.getNom() + "\n\n" + 
-					"\tPersona que ho ha agafat: " + usuariNou.getNom() + "(" + usuariNou.getCodi() + ").";
-			
 
-			
-			if (usuariOriginal.isRebreEmailsAgrupats()) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						to,
-						subject,
-						text,
-						EventTipusEnumDto.AGAFAT_ALTRE_USUARI)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-				
-			} else {
-				
-				logger.debug("Enviant correu electrònic per a contingut agafat per altre usuari (" +
-						"contingutId=" + contingut.getId() + ")");
+		sendOrSaveEmail(
+				usuariOriginal.getCodi(),
+				subject,
+				text,
+				EventTipusEnumDto.AGAFAT_ALTRE_USUARI);
+		
+		
+	}
+
+
+	public void execucioMassivaFinalitzada(
+			ExecucioMassivaEntity em) {
+		
+		logger.debug("Enviant correu electrònic per a execució massiva finalitzada (" + 
+			"execucioMassivaId=" + em.getId() + ")");
+
+		String from = getRemitent();		
+		String subject = PREFIX_RIPEA + " Execucio massiva finalitzada: " + em.getTipus();
+		String text = 
+				"Execució massiva finalitzada:\n" +
+				"\tId: " + em.getId() + "\n" +
+				"\tTipus: " + em.getTipus() + "\n" +
+				"\tData Inici: " + em.getDataInici() + "\n" +
+				"\tData Fi: " + em.getDataFi() + "\n" +
+				"\tContinguts: " + em.getContinguts().size() + "\n";
+
+		UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(
+				em.getCreatedBy().getCodi(),
+				false,
+				false);
+		
+		if (usuari != null) {
+			String to = getEmail(usuari);
+			if (Utils.isNotEmpty(to)) {
 				SimpleMailMessage missatge = new SimpleMailMessage();
 				missatge.setFrom(from);
 				missatge.setTo(to);
@@ -124,30 +140,9 @@ public class EmailHelper {
 				mailSender.send(missatge);
 			}
 		}
-		
-	}
-
-	public void execucioMassivaFinalitzada(
-			ExecucioMassivaEntity em) {
-		logger.debug("Enviant correu electrònic per a execució massiva finalitzada (" + 
-			"execucioMassivaId=" + em.getId() + ")");
-		SimpleMailMessage missatge = new SimpleMailMessage();
-		if (emplenarDestinatariAmbUsuari(
-				missatge,
-				em.getCreatedBy().getCodi())) {
-			missatge.setFrom(getRemitent());
-			missatge.setSubject(PREFIX_RIPEA + " Execucio massiva finalitzada: " + em.getTipus());
-			missatge.setText(
-					"Execució massiva finalitzada:\n" +
-					"\tId: " + em.getId() + "\n" +
-					"\tTipus: " + em.getTipus() + "\n" +
-					"\tData Inici: " + em.getDataInici() + "\n" +
-					"\tData Fi: " + em.getDataFi() + "\n" +
-					"\tContinguts: " + em.getContinguts().size() + "\n");
-			mailSender.send(missatge);
-		}
 	}
 	
+
 	
 	public void canviEstatRevisioMetaExpedient(
 			MetaExpedientEntity metaExpedientEntity, 
@@ -159,12 +154,7 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
-			if (usuari.isRebreEmailsAgrupats()) {
-				emailsAgrupats.add(dadesUsuari.getEmail());
-			} else {
-				emailsNoAgrupats.add(dadesUsuari.getEmail());
-			}
+			addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats);
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -174,21 +164,15 @@ public class EmailHelper {
 					EntitatEntity.class,
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
-			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
-			if (granted && usuari != null) {
-				if (usuari.isRebreEmailsAgrupats()) {
-					emailsAgrupats.add(dadesUsuari.getEmail());
-				} else {
-					emailsNoAgrupats.add(dadesUsuari.getEmail());
-				}
+
+			if (granted) {
+				addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats);
 			}
 		}
 		
 		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
 		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
 		
-		
-		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
@@ -201,32 +185,14 @@ public class EmailHelper {
 						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
 						comentari ;
 		
-		if (!emailsNoAgrupats.isEmpty()) {
-
-			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setBcc(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
-		
-		if (!emailsAgrupats.isEmpty()) {
-			
-			for (String email : emailsAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						email,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
+		sendOrSaveEmail(
+				emailsNoAgrupats,
+				emailsAgrupats,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_REVISIO);
 	}
+	
 	
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -242,14 +208,9 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
-			if (usuari.isRebreEmailsAgrupats()) {
-				emailsAgrupats.add(dadesUsuari.getEmail());
-			} else {
-				emailsNoAgrupats.add(dadesUsuari.getEmail());
-			}
+			addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats);
 		}
-		logger.info("comentari mail IPA_REVISIO time: " + (System.currentTimeMillis() - t0) + " ms");
+		logger.debug("comentari mail IPA_REVISIO time: " + (System.currentTimeMillis() - t0) + " ms");
 		
 		long t1 = System.currentTimeMillis();
 		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -259,16 +220,11 @@ public class EmailHelper {
 					EntitatEntity.class,
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
-			UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
-			if (granted && usuari != null) {
-				if (usuari.isRebreEmailsAgrupats()) {
-					emailsAgrupats.add(dadesUsuari.getEmail());
-				} else {
-					emailsNoAgrupats.add(dadesUsuari.getEmail());
-				}
+			if (granted) {
+				addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats);
 			}
 		}
-		logger.info("comentari mail IPA_ADMIN time: " + (System.currentTimeMillis() - t1) + " ms");
+		logger.debug("comentari mail IPA_ADMIN time: " + (System.currentTimeMillis() - t1) + " ms");
 		
 		long t2 = System.currentTimeMillis();
 		OrganGestorEntity organGestor = metaExpedientEntity.getOrganGestor();
@@ -282,13 +238,8 @@ public class EmailHelper {
 							OrganGestorEntity.class,
 							new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU},
 							dadesUsuari.getCodi());
-					UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
-					if (granted && usuari != null) {
-						if (usuari.isRebreEmailsAgrupats()) {
-							emailsAgrupats.add(dadesUsuari.getEmail());
-						} else {
-							emailsNoAgrupats.add(dadesUsuari.getEmail());
-						}
+					if (granted) {
+						addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats);
 					}
 				}
 			}
@@ -300,22 +251,16 @@ public class EmailHelper {
 						OrganGestorEntity.class,
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						dadesUsuari.getCodi());
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuari.getCodi());
-				if (granted && usuari != null) {
-					if (usuari.isRebreEmailsAgrupats()) {
-						emailsAgrupats.add(dadesUsuari.getEmail());
-					} else {
-						emailsNoAgrupats.add(dadesUsuari.getEmail());
-					}
+				if (granted) {
+					addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats);
 				}
 			}
 		}
 		
-		logger.info("comentari mail IPA_ORGAN_ADMIN time: " + (System.currentTimeMillis() - t2) + " ms");
+		logger.debug("comentari mail IPA_ORGAN_ADMIN time: " + (System.currentTimeMillis() - t2) + " ms");
 		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
 		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
 		
-		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Nou comentari per procediment";
 		String text = 
 				"Informació del procediment:\n" +
@@ -323,38 +268,19 @@ public class EmailHelper {
 						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Comentari: \n\t" + comentari.replace("\n", "\n\t") + "\n" +
 						"Usuari: " + metaExpComnt.getCreatedBy().getNom();
-		if (!emailsNoAgrupats.isEmpty()) {
-			
-			long t3 = System.currentTimeMillis();
-
-			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setBcc(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-			logger.info("comentari mail sendNoAgrupats time: " + (System.currentTimeMillis() - t3) + " ms");
-		}
 		
-		if (!emailsAgrupats.isEmpty()) {
-			long t3 = System.currentTimeMillis();
-			
-			for (String email : emailsAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						email,
-						subject,
-						text,
-						EventTipusEnumDto.PROCEDIMENT_COMENTARI)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-			logger.info("comentari mail sendAgrupats time: " + (System.currentTimeMillis() - t3) + " ms");
-		}
+		sendOrSaveEmail(
+				emailsNoAgrupats,
+				emailsAgrupats,
+				subject,
+				text,
+				EventTipusEnumDto.PROCEDIMENT_COMENTARI);
+		
 		metaExpComnt.updateEmailEnviat(true);
 	}
+	
+	
+	
 	
 	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(
 			MetaExpedientEntity metaExpedientEntity, 
@@ -365,23 +291,11 @@ public class EmailHelper {
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
 		
-		DadesUsuari dadesUsuariOrganAdmin = pluginHelper.dadesUsuariFindAmbCodi(organAdminCreador.getCodi());
-	
-		UsuariEntity usuari = usuariHelper.getUsuariByCodi(dadesUsuariOrganAdmin.getCodi());
-
-		if (usuari != null) {
-			if (usuari.isRebreEmailsAgrupats()) {
-				emailsAgrupats.add(dadesUsuariOrganAdmin.getEmail());
-			} else {
-				emailsNoAgrupats.add(dadesUsuariOrganAdmin.getEmail());
-			}
-		}
+		addDestinatari(organAdminCreador.getCodi(), emailsNoAgrupats, emailsAgrupats);
 	
 		emailsNoAgrupats = new ArrayList<>(new HashSet<>(emailsNoAgrupats));
 		emailsAgrupats = new ArrayList<>(new HashSet<>(emailsAgrupats));
 		
-		
-		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
@@ -393,32 +307,13 @@ public class EmailHelper {
 						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
 						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
 						comentari ;
-		
-		if (!emailsNoAgrupats.isEmpty()) {
 
-			String[] to = emailsNoAgrupats.toArray(new String[emailsNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setBcc(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
-		
-		if (!emailsAgrupats.isEmpty()) {
-			
-			for (String email : emailsAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						email,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_REVISIO)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
+		sendOrSaveEmail(
+				emailsNoAgrupats,
+				emailsAgrupats,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_REVISIO);
 	}
 
 	public void canviEstatDocumentPortafirmes(
@@ -429,14 +324,7 @@ public class EmailHelper {
 		DocumentEntity document = documentPortafirmes.getDocument();
 		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
-		Set<DadesUsuari> responsables = getGestors(
-				false,
-				false,
-				expedient,
-				enviamentCreatedByCodi,
-				null);
-		
-		String from = getRemitent();
+
 		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes";
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String rebutjMotiu = "";
@@ -462,43 +350,19 @@ public class EmailHelper {
 						getEnllacExpedient(expedient.getId());
 						
 		
-		List<String> destinatarisAgrupats = new ArrayList<String>();
-		List<String> destinatarisNoAgrupats = new ArrayList<String>();
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				enviamentCreatedByCodi,
+				null);
+
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES);
 		
-		for (DadesUsuari responsable : responsables) {
-			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
-				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
-					destinatarisAgrupats.add(responsable.getEmail());
-				} else {
-					destinatarisNoAgrupats.add(responsable.getEmail());
-				}
-			}
-		}
-		
-		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
-			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setTo(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
-		
-		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
-			for (String dest : destinatarisAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						dest,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
 	}
 	
 	public void canviEstatDocumentViaFirma(
@@ -509,14 +373,7 @@ public class EmailHelper {
 		DocumentEntity document = documentViaFirma.getDocument();
 		String enviamentCreatedByCodi = documentViaFirma.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
-		Set<DadesUsuari> responsables = getGestors(
-				false,
-				false,
-				expedient,
-				enviamentCreatedByCodi,
-				null);
 		
-		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a ViaFirma";
 		String estat = (documentViaFirma.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentViaFirma.getEstat().toString();
 
@@ -531,44 +388,20 @@ public class EmailHelper {
 						"Estat del document:" + estat + "\n" +
 						getEnllacExpedient(expedient.getId());
 						
+
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				enviamentCreatedByCodi,
+				null);
+
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA);
 		
-		List<String> destinatarisAgrupats = new ArrayList<String>();
-		List<String> destinatarisNoAgrupats = new ArrayList<String>();
-		
-		for (DadesUsuari responsable : responsables) {
-			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
-				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
-					destinatarisAgrupats.add(responsable.getEmail());
-				} else {
-					destinatarisNoAgrupats.add(responsable.getEmail());
-				}
-			}
-		}
-		
-		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
-			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setTo(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
-		
-		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
-			for (String dest : destinatarisAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						dest,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
 	}
 	
 
@@ -577,17 +410,11 @@ public class EmailHelper {
 			DocumentEnviamentEstatEnumDto estatAnterior) {
 		logger.debug("Enviant correu electrònic per a canvi d'estat de notificació (" +
 			"documentNotificacioId=" + documentNotificacio.getId() + ")");
+		
 		DocumentEntity document = documentNotificacio.getDocument();
 		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
-		Set<DadesUsuari> responsables = getGestors(
-				false,
-				false,
-				expedient,
-				notificacioCreatedByCodi,
-				null);
-		
-		String from = getRemitent();
+
 		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
 		String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
 		String text = 
@@ -602,44 +429,26 @@ public class EmailHelper {
 				"Estat actual:" + estat + "\n" + 
 				getEnllacExpedient(expedient.getId());
 		
-		List<String> destinatarisAgrupats = new ArrayList<String>();
-		List<String> destinatarisNoAgrupats = new ArrayList<String>();
 		
-		for (DadesUsuari responsable : responsables) {
-			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
-				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
-					destinatarisAgrupats.add(responsable.getEmail());
-				} else {
-					destinatarisNoAgrupats.add(responsable.getEmail());
-				}
-			}
-		}
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				notificacioCreatedByCodi,
+				null);
 		
-		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
-			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setTo(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO);
 		
-		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
-			for (String dest : destinatarisAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						dest,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
+
 	}
+	
+
+	
+	
 	
 	public void canviEstatNotificacio(
 			DocumentNotificacioEntity documentNotificacio,
@@ -650,14 +459,8 @@ public class EmailHelper {
 		DocumentEntity document = documentNotificacio.getDocument();
 		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
-		Set<DadesUsuari> responsables = getGestors(
-				false,
-				false,
-				expedient,
-				notificacioCreatedByCodi,
-				null);
+
 		
-		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
 		String estat = documentNotificacio.getNotificacioEstat() != null ? documentNotificacio.getNotificacioEstat().toString() : "";
 		String text = 
@@ -672,43 +475,20 @@ public class EmailHelper {
 				"Estat actual:" + estat + "\n" +
 				getEnllacExpedient(expedient.getId());
 		
-		List<String> destinatarisAgrupats = new ArrayList<String>();
-		List<String> destinatarisNoAgrupats = new ArrayList<String>();
+
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				notificacioCreatedByCodi,
+				null);
 		
-		for (DadesUsuari responsable : responsables) {
-			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
-				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
-					destinatarisAgrupats.add(responsable.getEmail());
-				} else {
-					destinatarisNoAgrupats.add(responsable.getEmail());
-				}
-			}
-		}
 		
-		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
-			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setTo(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
-		
-		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
-			for (String dest : destinatarisAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						dest,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_NOTIFICACIO);
 	}
 	
 	
@@ -834,8 +614,6 @@ public class EmailHelper {
 		logger.debug("Enviant correu electrònic per a canvis de tasca (" +
 			"tascaId=" + expedientTascaEntity.getId() + ")");
 		
-
-		String from = getRemitent();
 		String subject;
 		String text;
 		String comentari = expedientTascaEntity.getTextLastComentari();
@@ -871,43 +649,11 @@ public class EmailHelper {
 		}
 		
 		
-		List<String> destinatarisAgrupats = new ArrayList<String>();
-		List<String> destinatarisNoAgrupats = new ArrayList<String>();
-		
-		for (DadesUsuari responsable : responsables) {
-			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
-				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
-					destinatarisAgrupats.add(responsable.getEmail());
-				} else {
-					destinatarisNoAgrupats.add(responsable.getEmail());
-				}
-			}
-		}
-		
-		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
-			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
-			SimpleMailMessage missatge = new SimpleMailMessage();
-			missatge.setFrom(from);
-			missatge.setTo(to);
-			missatge.setSubject(subject);
-			missatge.setText(text);
-			logger.debug(missatge.toString());
-			mailSender.send(missatge);
-		}
-		
-		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
-			for (String dest : destinatarisAgrupats) {
-				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
-						from,
-						dest,
-						subject,
-						text,
-						EventTipusEnumDto.CANVI_ESTAT_TASCA)
-						.build();
-				emailPendentEnviarRepository.save(enitity);
-			}
-		}
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_ESTAT_TASCA);
 
 	}
 	
@@ -917,7 +663,6 @@ public class EmailHelper {
 		logger.debug("Enviant correu electrònic per a reassignar responsable de tasca (" +
 				"tascaId=" + expedientTascaEntity.getId() + ")");
 		
-		String from = getRemitent();
 		String subject = PREFIX_RIPEA + " Canvi de responsable de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 		String text = 			
 					"S'ha modificat el responsable de la tasca a RIPEA:\n" +
@@ -926,57 +671,116 @@ public class EmailHelper {
 							"\tResponsable:" + expedientTascaEntity.getResponsables().get(0).getNom() + " (" +
 							expedientTascaEntity.getResponsables().get(0).getCodi() + ")";
 		
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANVI_RESPONSABLES_TASCA);
+
+	}
+	
+	
+	private void sendOrSaveEmail(
+			String codi,
+			String subject,
+			String text,
+			EventTipusEnumDto eventTipus) {
+		
+		List<String> destinatarisAgrupats = new ArrayList<String>();
+		List<String> destinatarisNoAgrupats = new ArrayList<String>();
+		
+		addDestinatari(codi, destinatarisNoAgrupats, destinatarisAgrupats);
+		
+		sendOrSaveEmail(
+				destinatarisNoAgrupats,
+				destinatarisAgrupats,
+				subject,
+				text,
+				eventTipus);
+		
+	}
+	
+	
+	private void sendOrSaveEmail(
+			Set<DadesUsuari> responsables,
+			String subject,
+			String text,
+			EventTipusEnumDto eventTipus) {
+		
 		List<String> destinatarisAgrupats = new ArrayList<String>();
 		List<String> destinatarisNoAgrupats = new ArrayList<String>();
 		
 		for (DadesUsuari responsable : responsables) {
-			if (responsable != null && (responsable.getEmail() != null && !responsable.getEmail().isEmpty())) {
-				UsuariEntity usuari = usuariHelper.getUsuariByCodi(responsable.getCodi());
-				if (usuari != null && usuari.isRebreEmailsAgrupats()) {
-					destinatarisAgrupats.add(responsable.getEmail());
-				} else {
-					destinatarisNoAgrupats.add(responsable.getEmail());
-				}
-			}
+			addDestinatari(responsable.getCodi(), destinatarisNoAgrupats, destinatarisAgrupats);
 		}
 		
-		if (destinatarisNoAgrupats != null && !destinatarisNoAgrupats.isEmpty()) {
+		sendOrSaveEmail(
+				destinatarisNoAgrupats,
+				destinatarisAgrupats,
+				subject,
+				text,
+				eventTipus);
+		
+	}
+	
+	private void sendOrSaveEmail(
+			List<String> destinatarisNoAgrupats,
+			List<String> destinatarisAgrupats,
+			String subject,
+			String text,
+			EventTipusEnumDto eventTipus) {
+		
+		String from = getRemitent();
+
+		if (Utils.isNotEmpty(destinatarisNoAgrupats)) {
 			String[] to = destinatarisNoAgrupats.toArray(new String[destinatarisNoAgrupats.size()]);
 			SimpleMailMessage missatge = new SimpleMailMessage();
 			missatge.setFrom(from);
-			missatge.setTo(to);
+			
+			if (eventTipus == EventTipusEnumDto.CANVI_ESTAT_REVISIO || eventTipus == EventTipusEnumDto.PROCEDIMENT_COMENTARI ||  eventTipus == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
+				missatge.setBcc(to);
+			} else {
+				missatge.setTo(to);
+			}
+
 			missatge.setSubject(subject);
 			missatge.setText(text);
-			logger.debug(missatge.toString());
 			mailSender.send(missatge);
 		}
 		
-		if (destinatarisAgrupats != null && !destinatarisAgrupats.isEmpty()) {
+		if (Utils.isNotEmpty(destinatarisAgrupats)) {
 			for (String dest : destinatarisAgrupats) {
 				EmailPendentEnviarEntity enitity = EmailPendentEnviarEntity.getBuilder(
 						from,
 						dest,
 						subject,
 						text,
-						EventTipusEnumDto.CANVI_RESPONSABLES_TASCA)
+						eventTipus)
 						.build();
 				emailPendentEnviarRepository.save(enitity);
 			}
 		}
-
 	}
-
-	private boolean emplenarDestinatariAmbUsuari(
-			MailMessage mailMessage,
-			String usuariCodi) {
-		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
-		if (dadesUsuari != null && dadesUsuari.getEmail() != null) {
-			mailMessage.setTo(dadesUsuari.getEmail());
-			return true;
-		} else {
-			return false;
+	
+	private void addDestinatari(String codi, List<String> emailsNoAgrupats, List<String> emailsAgrupats) {
+		UsuariEntity usuari = usuariHelper.getUsuariByCodiDades(codi, false, false);
+		if (usuari != null) {
+			String email = getEmail(usuari);
+			if (Utils.isNotEmpty(email)) {
+				if (usuari.isRebreEmailsAgrupats()) {
+					emailsAgrupats.add(email);
+				} else {
+					emailsNoAgrupats.add(email);
+				}
+			}
 		}
 	}
+
+	
+	private String getEmail(UsuariEntity usuari) {
+		return Utils.isNotEmpty(usuari.getEmailAlternatiu()) ? usuari.getEmailAlternatiu() : usuari.getEmail();
+	}
+
 
 	private String getRemitent() {
 		return configHelper.getConfig("es.caib.ripea.email.remitent");

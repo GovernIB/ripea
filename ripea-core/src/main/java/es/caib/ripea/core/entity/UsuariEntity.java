@@ -42,6 +42,8 @@ public class UsuariEntity implements Serializable {
 	private String nif;
 	@Column(name = "email", length = 200)
 	private String email;
+	@Column(name = "email_alternatiu", length = 200)
+	private String emailAlternatiu;
 	@Column(name="idioma", length = 2)
 	private String idioma;
 	@Column(name = "inicialitzat")
@@ -121,6 +123,12 @@ public class UsuariEntity implements Serializable {
 		this.idioma = idioma;
 	}
 
+	public String getEmailAlternatiu() {
+		return emailAlternatiu;
+	}
+	public void setEmailAlternatiu(String emailAlternatiu) {
+		this.emailAlternatiu = emailAlternatiu;
+	}
 	public void updateRolActual(String rolActual) {
 		this.rolActual = rolActual;
 	}

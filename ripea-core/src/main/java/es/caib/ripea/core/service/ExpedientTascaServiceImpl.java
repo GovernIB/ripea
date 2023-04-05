@@ -293,7 +293,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				")");
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName());
+		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
 		ExpedientTascaEntity tasca = tascaHelper.comprovarTasca(tascaId);
 		TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
 		
@@ -336,7 +336,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi: responsablesCodi) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi);
+			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
 			responsables.add(responsable);
 		}
 		
@@ -394,7 +394,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		MetaExpedientTascaEntity metaExpedientTascaEntity = metaExpedientTascaRepository.findOne(expedientTasca.getMetaExpedientTascaId());
 		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 		for (String responsableCodi: expedientTasca.getResponsablesCodi()) {
-			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi);
+			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
 			responsables.add(responsable);
 		}
 
@@ -474,7 +474,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		if (expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			expedientTascaEntity.updateEstat(TascaEstatEnumDto.INICIADA);
-			UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName());
+			UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
 			expedientTascaEntity.updateResponsableActual(responsableActual);
 		}
 

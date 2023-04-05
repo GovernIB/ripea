@@ -15,7 +15,6 @@
 	<rip:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
-	$("#rols").prop("disabled", true);
 });
 </script>
 </head>
@@ -23,10 +22,12 @@ $(document).ready(function() {
 	<c:set var="formAction"><rip:modalUrl value="/usuari/configuracio"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="usuariCommand" role="form">
 		<form:hidden path="codi"/>
-		<rip:inputText name="nom" textKey="usuari.form.camp.nom" disabled="true"/>
-		<rip:inputText name="nif" textKey="usuari.form.camp.nif" disabled="true"/>
-		<rip:inputText name="email" textKey="usuari.form.camp.email" disabled="true"/>
+		<rip:inputText name="nom" textKey="usuari.form.camp.nom" readonly="true"/>
+		<rip:inputText name="nif" textKey="usuari.form.camp.nif" readonly="true"/>
+		<rip:inputText name="email" textKey="usuari.form.camp.email" readonly="true"/>
+		<rip:inputText name="emailAlternatiu" textKey="usuari.form.camp.email.alternatiu"/>
 		<rip:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
+		<form:hidden path="rols"/>
 		<rip:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
 		<rip:inputCheckbox name="rebreEmailsAgrupats" textKey="usuari.form.camp.rebre.emails.agrupats"/>
 		<div id="modal-botons">
