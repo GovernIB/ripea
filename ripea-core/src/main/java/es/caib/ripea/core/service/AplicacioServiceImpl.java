@@ -154,11 +154,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public UsuariDto updateUsuariActual(UsuariDto dto) {
 		logger.debug("Actualitzant configuració de usuari actual");
 		UsuariEntity usuari = usuariRepository.findOne(dto.getCodi());
-		usuari.update(
-				dto.getIdioma());
-		usuari.updateRebreEmailsAgrupats(dto.isRebreEmailsAgrupats());
 		
-		usuari.setEmailAlternatiu(dto.getEmailAlternatiu());
+		usuari.update(
+				dto.getEmailAlternatiu(),
+				dto.getIdioma(),
+				dto.isRebreEmailsAgrupats(),
+				dto.isRebreAvisosNovesAnotacions());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}

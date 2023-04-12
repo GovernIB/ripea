@@ -263,6 +263,10 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			return false;
 		}
 	}
+	
+    public String getCodiSiaINom() {
+    	return classificacioSia + " - " + nom;
+    }
     
 	@Override
 	public boolean equals(Object obj) {

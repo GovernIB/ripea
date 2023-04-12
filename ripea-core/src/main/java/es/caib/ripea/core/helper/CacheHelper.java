@@ -137,7 +137,8 @@ public class CacheHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private ExpedientPeticioHelper expedientPeticioHelper;
-
+	@Autowired
+	private ConfigHelper configHelper;
 
 	@Autowired
 	public void setPluginHelper(PluginHelper pluginHelper) {
@@ -680,6 +681,21 @@ public class CacheHelper {
 	@Cacheable(value = "mostrarLogsIntegracio")
 	public boolean mostrarLogsIntegracio() {
 		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.integracio");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@CacheEvict(value = "mostrarLogsEmail")
+	public void evictMostrarLogsEmail() {
+	}
+	
+	@Cacheable(value = "mostrarLogsEmail")
+	public boolean mostrarLogsEmail() {
+		
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.email");
 		if (prop != null && prop.equals("true")) {
 			return true;
 		} else {

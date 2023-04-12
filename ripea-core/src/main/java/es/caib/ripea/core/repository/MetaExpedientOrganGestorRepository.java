@@ -25,6 +25,10 @@ public interface MetaExpedientOrganGestorRepository extends JpaRepository<MetaEx
 	MetaExpedientOrganGestorEntity findByMetaExpedientAndOrganGestor(
 			MetaExpedientEntity metaExpedient,
 			OrganGestorEntity organGestor);
+	
+	MetaExpedientOrganGestorEntity findByMetaExpedientIdAndOrganGestorId(
+			Long metaExpedientId,
+			Long organGestorId);
 
 	List<MetaExpedientOrganGestorEntity> findByMetaExpedient(MetaExpedientEntity metaExpedient);
 	

@@ -219,6 +219,10 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
         }
     }
     
+    public String getCodiINom() {
+    	return codi + " - " + nom;
+    }
+    
     
     
     private static final long serialVersionUID = 458331024861203562L;

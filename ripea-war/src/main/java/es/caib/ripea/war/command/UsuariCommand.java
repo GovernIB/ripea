@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
 
 
 /**
@@ -17,6 +18,7 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter 
 public class UsuariCommand implements Serializable {
 
 	private String codi;
@@ -27,52 +29,32 @@ public class UsuariCommand implements Serializable {
 	private String idioma;
 	private String[] rols;
 	private boolean rebreEmailsAgrupats;
+	private boolean rebreAvisosNovesAnotacions;
 	
-	public boolean isRebreEmailsAgrupats() {
-		return rebreEmailsAgrupats;
+	
+	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
+		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
 	}
-	public void setRebreEmailsAgrupats(
-			boolean rebreEmailsAgrupats) {
+	public void setRebreEmailsAgrupats(boolean rebreEmailsAgrupats) {
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 	}
-	public String getCodi() {
-		return codi;
-	}
 	public void setCodi(String codi) {
-		this.codi = codi != null ? codi.trim() : null;
-	}
-	public String getNom() {
-		return nom;
+		this.codi = StringUtils.trim(codi);
 	}
 	public void setNom(String nom) {
-		this.nom = nom != null ? nom.trim() : null;
-	}
-	public String getNif() {
-		return nif;
+		this.nom = StringUtils.trim(nom);
 	}
 	public void setNif(String nif) {
-		this.nif = nif != null ? nif.trim() : null;
-	}
-	public String getEmail() {
-		return email;
+		this.nif = StringUtils.trim(nif);
 	}
 	public void setEmail(String email) {
-		this.email = email != null ? email.trim() : null;
-	}
-	public String getIdioma() {
-		return idioma;
+		this.email = StringUtils.trim(email);
 	}
 	public void setIdioma(String idioma) {
-		this.idioma = idioma != null ? idioma.trim() : null;
-	}
-	public String[] getRols() {
-		return rols;
+		this.idioma = StringUtils.trim(idioma);
 	}
 	public void setRols(String[] rols) {
 		this.rols = rols;
-	}
-	public String getEmailAlternatiu() {
-		return emailAlternatiu;
 	}
 	public void setEmailAlternatiu(String emailAlternatiu) {
 		this.emailAlternatiu = StringUtils.trim(emailAlternatiu);
@@ -92,6 +74,7 @@ public class UsuariCommand implements Serializable {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
 	private static final long serialVersionUID = -139254994389509932L;
 
 }
