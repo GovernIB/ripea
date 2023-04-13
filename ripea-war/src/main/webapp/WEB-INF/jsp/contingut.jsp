@@ -415,7 +415,35 @@ $(document).ready(function() {
 });//################################################## document ready END ##############################################################
 
 
-
+function urlInstruccio(idExpedient) {
+	$.ajax({
+		url: '<c:url value="/contingut/' + idExpedient + '/url"/>',
+	    type: "GET",
+	    contentType: "application/json",
+	    success: function (data) {
+	    	var urls = '';
+	    	data.forEach(function(url) {
+	    		urls += url + '\n';
+	    	});
+	    	// Versió antiga navegadors
+	    	var tmpElement = document.createElement("textarea");
+	    	tmpElement.value = urls;
+	    	tmpElement.setAttribute("readonly", "");
+	    	tmpElement.style.position = "absolute";
+	    	tmpElement.style.left = "-9999px";
+            document.body.appendChild(tmpElement);
+            
+            tmpElement.select();
+            document.execCommand("copy");
+            document.body.removeChild(tmpElement);
+            
+            // Versio nova
+            navigator.clipboard.writeText(urls);
+           
+            document.location.reload()
+	    }
+	});
+}
 
 
 

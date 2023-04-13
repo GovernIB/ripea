@@ -167,11 +167,10 @@ $(document).ready(function(){
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title"><strong><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</strong></h3>
+							<!-- DO NOT DELETE, remove "display: none" to manually refresh state from Notib -->	
+								<a href="<c:url value="/document/notificacio/actualitzarEstat/${notificacio.enviamentIdentificador}/${enviament.enviamentReferencia}"/>" class="btn btn-default btn-sm pull-right" style="display: none"><span class="fa fa-refresh"></span></a>
+							<!-- /DO NOT DELETE -->									
 						</div>
-						
-						<!-- DO NOT DELETE, uncomment to manually refresh state from Notib
-						<a href="<c:url value="/document/notificacio/actualitzarEstat/${notificacio.enviamentIdentificador}/${enviament.enviamentReferencia}"/>" class="btn btn-default btn-sm pull-right"><span class="fa fa-refresh"></span></a>
-						-->
 						<table class="table table-bordered" width="100%">
 						  <!------- INTERESSAT ------->							
 						  <tr>

@@ -306,7 +306,8 @@ public class ExpedientPeticioHelper {
 		PermisosPerAnotacions permisosPerAnotacionsDto = new PermisosPerAnotacions();
 		
 		if (rolActual.equals("IPA_ADMIN")) {
-			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
+			// in this case all annotations of entitat are permitted, it is not equal to annotations belonging to any procediment of entitat because some of the annotations might not have procediment assigned
+			// so this is wrong -> permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			permisosPerAnotacionsDto.setAdminOrganHasPermisAdminComu(organGestorHelper.hasPermisAdminComu(organActualId));
 			permisosPerAnotacionsDto.setAdminOrganCodisOrganAmbDescendents(organGestorRepository.findCodisOrgansAmbDescendents(Arrays.asList(organActualId)));

@@ -59,6 +59,10 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	private MetaNodeEntity metaNode;
 	@Column(name = "no_aplica")
 	private boolean noAplica;
+	@Column(name = "enviable")
+	private boolean enviable;
+	@Column(name = "metadada_arxiu")
+	private String metadadaArxiu;
 	
 	@Version
 	private long version = 0;
@@ -99,6 +103,12 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 	public boolean isNoAplica() {
 		return noAplica;
 	}
+	public boolean isEnviable() {
+		return enviable;
+	}
+	public String getMetadadaArxiu() {
+		return metadadaArxiu;
+	}
 	
 	public void update(
 			String codi,
@@ -108,7 +118,9 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			Object valor,
 			String descripcio,
 			boolean readOnly,
-			boolean noAplica) {
+			boolean noAplica,
+			boolean enviable,
+			String metadadaArxiu) {
 		this.codi = codi;
 		this.nom = nom;
 		this.tipus = tipus;
@@ -117,6 +129,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 		this.descripcio = descripcio;
 		this.readOnly = readOnly;
 		this.noAplica = noAplica;
+		this.enviable = enviable;
+		this.metadadaArxiu = metadadaArxiu;
 	}
 	public void update(
 			String codi,
@@ -146,7 +160,9 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			boolean readOnly,
 			int ordre,
 			MetaNodeEntity metaNode,
-			boolean noAplica) {
+			boolean noAplica,
+			boolean enviable,
+			String metadadaArxiu) {
 		return new Builder(
 				codi,
 				nom,
@@ -156,7 +172,9 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				readOnly,
 				ordre,
 				metaNode,
-				noAplica);
+				noAplica,
+				enviable,
+				metadadaArxiu);
 	}
 	public static class Builder {
 		MetaDadaEntity built;
@@ -169,7 +187,9 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 				boolean readOnly,
 				int ordre,
 				MetaNodeEntity metaNode,
-				boolean noAplica) {
+				boolean noAplica,
+				boolean enviable,
+				String metadadaArxiu) {
 			built = new MetaDadaEntity();
 			built.codi = codi;
 			built.nom = nom;
@@ -181,6 +201,8 @@ public class MetaDadaEntity extends RipeaAuditable<Long> {
 			built.metaNode = metaNode;
 			built.activa = true;
 			built.noAplica = noAplica;
+			built.enviable = enviable;
+			built.metadadaArxiu = metadadaArxiu;
 		}
 		public Builder descripcio(String descripcio) {
 			built.descripcio = descripcio;

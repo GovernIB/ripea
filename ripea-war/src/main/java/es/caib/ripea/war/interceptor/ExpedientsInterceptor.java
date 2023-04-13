@@ -42,6 +42,9 @@ public class ExpedientsInterceptor extends HandlerInterceptorAdapter {
 		ExpedientHelper.setUrlValidacioDefinida(
 				request, 
 				aplicacioService);
+		ExpedientHelper.setUrlsInstruccioActiu(
+				request, 
+				aplicacioService);
 		return true;
 	}
 

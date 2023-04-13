@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -89,7 +90,7 @@ public class DocumentNotificacioHelper {
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
 		
-		if (!documentEntity.isArxiuEstatDefinitu()) {
+		if (!documentEntity.isArxiuEstatDefinitu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}
 		
@@ -156,7 +157,7 @@ public class DocumentNotificacioHelper {
 					for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
 						if(documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
 							documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-							pluginHelper.actualitzarDadesRegistre(documentEnviamentInteressat);
+							pluginHelper.actualitzarRegistreInfo(documentEnviamentInteressat);
 						}
 					}
 				}
@@ -327,7 +328,7 @@ public class DocumentNotificacioHelper {
 			documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			logger.debug("[CERT] La certificació s'ha guardat correctament...");
 		} else {
-			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
+			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null); //  this is wrong, because it logs as rebutjada even if notification was accepted if property getPropertyGuardarCertificacioExpedient() is false
 		}
 		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
 		DocumentNotificacioEstatEnumDto estatDespres = documentEnviamentInteressatEntity.getNotificacio().getNotificacioEstat();
@@ -419,7 +420,7 @@ public class DocumentNotificacioHelper {
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA || document.getArxiuUuid() == null)) {
+		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getArxiuEstat() == ArxiuEstatEnumDto.DEFINITIU)) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

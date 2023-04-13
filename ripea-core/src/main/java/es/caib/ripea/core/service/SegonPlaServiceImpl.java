@@ -162,6 +162,14 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
 					if (entitatAnotacio != null)
 						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+					
+					
+					try {
+						emailHelper.novaAnotacioPendent(expedientPeticioEntity.getId());
+					} catch (Exception e) {
+						logger.error("Error al enviar email per nova anotació pendent", e);
+					}
+					
 
 				} catch (Throwable e) {
 
@@ -338,6 +346,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Canvi d'estat de revisio de procediments";
 			} else if(entry.getKey() == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
 				header = "Nous comentaris per procediments";
+			} else if (entry.getKey() == EventTipusEnumDto.NOVA_ANOTACIO) {
+				header = "Noves anotacions pednents";
 			}
 			
 			text += header + "\n";

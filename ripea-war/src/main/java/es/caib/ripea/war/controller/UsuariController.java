@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.regex.Pattern;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,7 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.UsuariCommand;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
@@ -63,7 +66,25 @@ public class UsuariController  extends BaseAdminController {
 			@Valid UsuariCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		 
+		String emailRegexPatternRFC5322 = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+		if (Utils.isNotEmpty(command.getEmailAlternatiu())) {
+			boolean isValidEmail = Pattern.compile(emailRegexPatternRFC5322)
+		      .matcher(command.getEmailAlternatiu())
+		      .matches();
+			if (!isValidEmail) {
+				bindingResult.rejectValue("emailAlternatiu", "Pattern");
+			}
+		}
+		
 		if (bindingResult.hasErrors()) {
+			
+			model.addAttribute(
+					"idiomaEnumOptions",
+					EnumHelper.getOptionsForEnum(
+							IdiomaEnumDto.class,
+							"usuari.form.camp.idioma.enum."));
+			
 			return "usuariForm";
 		}
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));

@@ -10,6 +10,7 @@
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="exemple" required="false" rtexprvalue="true"%>
+<%@ attribute name="exempleLabel" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
 <%@ attribute name="showsize" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
@@ -59,7 +60,7 @@ $(document).ready(function() {
 			</p>
 		</c:if>
 		<c:if test="${not empty exemple}">
-			<a class="btn btn-default btn-xs exemple_boto"  onclick="webutilMostrarExemple(this)"><spring:message code="domini.exemple.boto"/></a>
+			<a class="btn btn-default btn-xs exemple_boto"  onclick="webutilMostrarExemple(this)"><spring:message code="${exempleLabel}"/></a>
 			<div class="exemple">
 				<pre><spring:message code="${exemple}"/></pre>
 			</div>

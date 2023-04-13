@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -24,6 +25,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -461,5 +463,41 @@ public class DocumentServiceBean implements DocumentService {
 				expedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void actualitzarEstatADefinititu(
+			Long documentId) {
+		delegate.actualitzarEstatADefinititu(documentId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public DocumentDto findAmbId(
+			Long documentId, String rolActual, PermissionEnumDto permission) {
+		return delegate.findAmbId(documentId, rolActual, permission);
+	}
+
+	@Override
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres) {
+		delegate.portafirmesCallbackIntegracioOk(
+				descripcio,
+				parametres);
+
+	}
+
+	@Override
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable) {
+		delegate.portafirmesCallbackIntegracioError(
+				descripcio,
+				parametres,
+				errorDescripcio,
+				throwable);
+	}
 
 }

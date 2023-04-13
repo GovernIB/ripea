@@ -4,6 +4,7 @@
 package es.caib.ripea.core.api.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -19,6 +20,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -684,6 +686,24 @@ public interface DocumentService {
 	public List<DocumentDto> findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 			Long entitatId,
 			Long expedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void actualitzarEstatADefinititu(
+			Long documentId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public DocumentDto findAmbId(
+			Long documentId, String rolActual, PermissionEnumDto permission);
+
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres);
+
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable);
 
 	
 

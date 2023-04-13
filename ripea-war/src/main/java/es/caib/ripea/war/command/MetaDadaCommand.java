@@ -20,6 +20,7 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDadaNoRepetit;
 import es.caib.ripea.war.validation.CodiMetaDadaNomValid;
+import es.caib.ripea.war.validation.ValorMetaDadaArxiu;
 import lombok.Getter;
 
 /**
@@ -28,6 +29,7 @@ import lombok.Getter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
+@ValorMetaDadaArxiu
 @CodiMetaDadaNomValid
 @CodiMetaDadaNoRepetit(
 		campId = "id",
@@ -61,6 +63,9 @@ public class MetaDadaCommand {
 	private String valorString;
 	
 	private boolean noAplica;
+	
+	private boolean enviable;
+	private String metadadaArxiu;
 	
 	public static List<MetaDadaCommand> toMetaDadaCommands(
 			List<MetaDadaDto> dtos) {
@@ -136,5 +141,11 @@ public class MetaDadaCommand {
 	}
 	public void setNoAplica(boolean noAplica) {
 		this.noAplica = noAplica;
+	}
+	public void setEnviable(boolean enviable) {
+		this.enviable = enviable;
+	}
+	public void setMetadadaArxiu(String metadadaArxiu) {
+		this.metadadaArxiu = metadadaArxiu;
 	}
 }

@@ -49,6 +49,7 @@ public class SessioHelper {
 			request.getSession().setAttribute("SessionHelper.capsaleraColorLletra", aplicacioService.propertyFindByNom("es.caib.ripea.capsalera.color.lletra"));
 			request.getSession().setAttribute("SessionHelper.isTipusDocumentsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.tipusdocument", false));
 			request.getSession().setAttribute("SessionHelper.isDocumentsGeneralsEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.documentsgenerals", false));
+			request.getSession().setAttribute("SessionHelper.isDominisEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis"));
 			request.getSession().setAttribute(SESSION_ATTRIBUTE_IDIOMA_USUARI, idioma_usuari);
 			EntitatDto entitat = EntitatHelper.getEntitatActual(request, entitatService);
 			aplicacioService.actualitzarEntiatThreadLocal(entitat);

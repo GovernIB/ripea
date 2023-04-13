@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.war.command.DocumentGenericCommand.ConcatenarDigital;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.NomDocumentNoRepetit;
@@ -39,9 +40,16 @@ public class DocumentGenericCommand extends ContenidorCommand {
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	@Size(groups = {ConcatenarDigital.class}, max=48)
 	private String ntiIdDocumentoOrigen;
+	private NtiOrigenEnumDto ntiOrigen;
 
 
-
+	public NtiOrigenEnumDto getNtiOrigen() {
+		return ntiOrigen;
+	}
+	public void setNtiOrigen(
+			NtiOrigenEnumDto ntiOrigen) {
+		this.ntiOrigen = ntiOrigen;
+	}
 	public DocumentTipusEnumDto getDocumentTipus() {
 		return documentTipus;
 	}

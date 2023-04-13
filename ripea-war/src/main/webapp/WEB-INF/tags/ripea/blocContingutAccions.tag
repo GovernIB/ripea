@@ -204,11 +204,23 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
-				<c:if test="${(contingut.custodiat or contingut.firmaParcial) and !isTasca}">
-					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
-				</c:if>
-				<c:if test="${!contingut.custodiat and !isTasca and contingut.pdf and imprimibleNoFirmats}">
-					<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
+				<c:if test="${!isTasca and ((contingut.arxiuEstatDefinitu or contingut.firmaParcial) or (imprimibleNoFirmats and contingut.pdf))}">
+					<c:choose>
+						<c:when test="${contingut.fitxerExtension!='xsig'}">
+							<li>
+							<a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregarImprimible"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/></a></li>
+						</c:when>
+						<c:otherwise>
+							<c:choose>
+								<c:when test="${contingut.fitxerExtension=='xsig'}">
+									<li class="disabledMsg" title="<spring:message code="contingut.document.descarregar.imprimible.desactivat.msg.xml"/>"><a class="disabled"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/>...</a></li>
+								</c:when>																								
+								<c:otherwise>
+									<li class="disabled"><a href="#"/><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregarImprimible"/>...</a></li>
+								</c:otherwise>
+							</c:choose>
+						</c:otherwise>
+					</c:choose>			
 				</c:if>
 				<%---- Descarregar ----%>
 				<c:choose>
@@ -346,6 +358,10 @@
 					<li><a href="<c:url value="/document/${contingut.id}/convertir"/>" data-refresh-pagina="true" data-confirm="${definitiuConfirmacioMsg}"><span class="fa fa-check-square"></span>&nbsp;<spring:message code="contingut.boto.definitiu"/></a></li>
 				</c:if>
 			</c:if>
+		</c:if>
+		<%---- URLs instrucció ----%>
+		<c:if test="${!isTasca && contingut.expedient && isGenerarUrlsInstruccioActiu}">
+			<li><a href="#" onclick="urlInstruccio(${contingut.id})"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.url"/></a></li>
 		</c:if>
 		<%---- Histï¿½ric d'accions ----%>
 		<c:if test="${!isTasca}">

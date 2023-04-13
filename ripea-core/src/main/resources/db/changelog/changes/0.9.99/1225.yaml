@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1680014851572-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_document_enviament
+            columns:
+              - column:
+                  name: not_data_enviada
+                  type: timestamp
+              - column:
+                  name: not_data_finalitzada
+                  type: timestamp                  

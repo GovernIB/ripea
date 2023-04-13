@@ -21,12 +21,22 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto.class, "interessat.idioma.enum."));
 %>
 
+<c:set var="potModificar">${potModificar == null || potModificar == true ? true : false}</c:set>
+
+
 <c:set var="titol">
 	<c:choose>
 		<c:when test="${esRepresentant}">
 			<c:choose>
 				<c:when test="${not empty interessatCommand.id}">
-					<spring:message code="representant.form.edit.titol" />
+					<c:choose>
+						<c:when test="${potModificar}">
+							<spring:message code="representant.form.edit.titol" />
+						</c:when>
+						<c:otherwise>
+							<spring:message code="representant.form.detalls.titol" />
+						</c:otherwise>
+					</c:choose>
 				</c:when>
 				<c:otherwise>
 					<spring:message code="representant.form.titol" />
@@ -36,7 +46,14 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		<c:otherwise>
 			<c:choose>
 				<c:when test="${not empty interessatCommand.id}">
-					<spring:message code="interessat.form.edit.titol" />
+					<c:choose>
+						<c:when test="${potModificar}">
+							<spring:message code="interessat.form.edit.titol" />
+						</c:when>
+						<c:otherwise>
+							<spring:message code="interessat.form.detalls.titol" />
+						</c:otherwise>
+					</c:choose>
 				</c:when>
 				<c:otherwise>
 					<spring:message code="interessat.form.titol" />
@@ -45,6 +62,8 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		</c:otherwise>
 	</c:choose>
 </c:set>
+
+
 <html>
 <head>
 <title>${titol}</title>
@@ -108,7 +127,9 @@ body.loading .rmodal {
 	border-bottom: 1px solid #DDD;
 }
 </style>
+
 <script type="text/javascript">
+
 var interessatNoms = [];
 var interessatLlinatges = [];
 <c:forEach var="interessat" items="${interessats}">
@@ -117,6 +138,7 @@ interessatNoms['${interessat.id}'] = "${interessat.nom}";
 	interessatLlinatges['${interessat.id}'] = "${interessat.llinatges}";
 </c:if>
 </c:forEach>
+
 $(document).ready(function() {
 	var munOrgan = '';
 	var netejar = <c:out value="${empty interessatCommand.id and empty netejar}"/>;
@@ -132,6 +154,7 @@ $(document).ready(function() {
 		$('form input').removeAttr('disabled');
 		return true;
 	});
+	
  	$('select#tipus').change(function() {
  		munOrgan = '';
 		$('#pais').prop("disabled", false);
@@ -206,14 +229,15 @@ $(document).ready(function() {
  		}
  		canviVisibilitat(tipusInt);
  	});
- 	if ($("#id").val() != '') {
-		$('select#tipus').prop( "disabled", true );
-	}
+	$('select#tipus').change();
+		 	
+	
  	$('input#documentNum').on('keydown', function(evt) {
 		$(this).val(function (_, val) {
 			return val.toUpperCase();
 		});
 	});
+	
  	$('select#organCodi').change(function() {
  		munOrgan = '';
  	 	if ($(this).val() != "") {
@@ -247,6 +271,7 @@ $(document).ready(function() {
  	 		$('#documentNum').val("");
  	 	}
  	});
+ 	 	 	
  	$('select#pais').change(function() {
  		if ($(this).val() == '724') {
  	 		if ($('select#tipus').val() != '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO%>') {
@@ -265,6 +290,7 @@ $(document).ready(function() {
 			$('#municipi').prop("disabled", true);
 		}
  	});
+ 	
  	$('select#provincia').change(function(valor) {
  		if ($(this).val() != '') {
  			$.ajax({
@@ -299,6 +325,7 @@ $(document).ready(function() {
  	 		$('#municipi').select2(select2Options);
  	 	}
  	});
+ 	 	 	
 	$('select#filtreComunitat').change(function(valor) {
 		var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
  		if ($(this).val() != '') {
@@ -333,6 +360,7 @@ $(document).ready(function() {
  		$('#filtreLocalitat').select2("destroy");
 	 	$('#filtreLocalitat').select2(select2Options);
  	});
+	 	
 	$('select#filtreProvincia').change(function(valor) {
  		if ($(this).val() != '') {
  			$.ajax({
@@ -366,6 +394,7 @@ $(document).ready(function() {
  	 		$('#filtreLocalitat').select2(select2Options);
  	 	}
  	});
+ 	 	 	
 	$('#filtre-btn').click(function(){
 		var cod = $('#filtreCodiDir3').val();
 		var den = $('#filtreDenominacio').val();
@@ -408,6 +437,7 @@ $(document).ready(function() {
 			}
 		});
 	});
+				
 	$('#btnSave').click(function(){
 		$('#tipus').prop( "disabled", false );
 		$('#pais').prop("disabled", false);
@@ -419,7 +449,9 @@ $(document).ready(function() {
 		$('#documentNum').prop("readonly", false);
 		$('#interessatform').submit();
 	});
-	$('select#tipus').change();
+
+
+
 
 
 	<c:if test="${!esRepresentant && dehActiu}">
@@ -443,6 +475,13 @@ $(document).ready(function() {
 				$('#entregaDeh').removeAttr('disabled');
 			}
 			webutilModalAdjustHeight();
+
+			<c:if test="${!potModificar}">
+				$('#entregaDeh').prop( "disabled", true );
+				$('#entregaDehObligat').prop( "disabled", true );
+			</c:if>
+		
+			
 		});			
 		$('input[type=checkbox][name=entregaDehObligat').trigger('change');	
 	</c:if>
@@ -482,6 +521,21 @@ function canviVisibilitat(tipus) {
 	$("label[for='municipi']").text("<spring:message code="interessat.form.camp.municipi"/>")
 	$("label[for='adresa']").text("<spring:message code="interessat.form.camp.adresa"/>")
 	$("label[for='codiPostal']").text("<spring:message code="interessat.form.camp.codiPostal"/>")
+
+
+	<c:if test="${!potModificar}">
+		$('#organCodi').prop( "disabled", true );
+		$('#nom').prop( "disabled", true );
+		$('#llinatge1').prop( "disabled", true );
+		$('#llinatge2').prop( "disabled", true );
+		$('#pais').prop( "disabled", true );
+		$('#provincia').prop( "disabled", true );
+		$('#municipi').prop( "disabled", true );	
+		$('#documentTipus').prop("disabled", true);
+		$('#raoSocial').prop("disabled", true);
+			
+	</c:if>
+	
 }
 </script>
 </head>
@@ -501,17 +555,19 @@ function canviVisibilitat(tipus) {
 		</c:otherwise>
 	</c:choose>
 
-	<form:form id="interessatform" action="${formAction}" method="post"
+	<form:form 
+		id="interessatform" action="${formAction}" method="post"
 		cssClass="form-horizontal" commandName="interessatCommand">
 		<form:hidden path="entitatId" />
 		<form:hidden path="id" />
 		<form:hidden path="expedientId" />
 		<input type="hidden" id="id" />
-		<!-- FILA: Tipus d'interessat -->
+		
+		<!-- Tipus d'interessat -->
 		<rip:inputSelect name="tipus" textKey="interessat.form.camp.tipus"
 			optionItems="${tipusEnumOptions}" optionTextKeyAttribute="text"
-			optionValueAttribute="value" labelSize="2" />
-		<!-- FILA: Administració -->
+			optionValueAttribute="value" labelSize="2" disabled="${!potModificar || not empty id}"/>
+			
 		<!-- Filtre de administració -->
 		<div class="row ">
 			<div id="organ-filtre" class="col-xs-10 collapse pull-right">
@@ -572,139 +628,154 @@ function canviVisibilitat(tipus) {
 				</div>
 			</div>
 		</div>
-		<!-- Selector d'administració i botó per obrir filtre -->
-		<!-- 		<div class="row"> -->
+		<!--Selector d'administració i botó per obrir filtre -->
 		<div class="col-xs-11 organ">
 			<rip:inputSelect name="organCodi"
 				textKey="interessat.form.camp.organCodi"
 				optionItems="${unitatsOrganitzatives}"
 				optionTextAttribute="denominacio" optionValueAttribute="codi"
 				emptyOption="true" required="true" optionMinimumResultsForSearch="6"
-				labelSize="2" />
+				labelSize="2" disabled="${!potModificar}"/>
 		</div>
-		<div class="col-xs-1 organ-btn">
-			<button type="button" class="btn btn-default" data-toggle="collapse"
-				data-target="#organ-filtre">
-				<span class="fa fa-bars"></span>
-			</button>
-		</div>
+		<c:if test="${potModificar}">
+			<div class="col-xs-1 organ-btn">
+				<button type="button" class="btn btn-default" data-toggle="collapse"
+					data-target="#organ-filtre">
+					<span class="fa fa-bars"></span>
+				</button>
+			</div>
+		</c:if>
 		<form:hidden path="ambOficinaSir"/>
-		<!-- 		</div> -->
-		<!-- FILA: Document interessat -->
+		
 		<div class="row">
+			<!-- Tipus de document -->
 			<div class="col-xs-6">
 				<rip:inputSelect name="documentTipus"
 					textKey="interessat.form.camp.document.tipus"
 					optionItems="${documentTipusEnumOptions}"
-					optionTextKeyAttribute="text" optionValueAttribute="value" />
+					optionTextKeyAttribute="text" optionValueAttribute="value" disabled="${!potModificar}"/>
 			</div>
+			<!-- Número de document -->
 			<div class="col-xs-6">
-				<rip:inputText name="documentNum"
-					textKey="interessat.form.camp.document.numero" required="true" />
+				<rip:inputText name="documentNum" textKey="interessat.form.camp.document.numero" required="true" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		<!-- FILA: Nom interessat -->
+		
+		<!-- Nom --> 
 		<rip:inputText name="nom" textKey="interessat.form.camp.nom"
-			required="true" labelSize="2" />
-		<!-- FILA: Llinatges interessat -->
+			required="true" labelSize="2" disabled="${!potModificar}"/>
+
 		<div class="row">
+			<!-- Llinatge1 -->
 			<div class="col-xs-6">
 				<rip:inputText name="llinatge1"
-					textKey="interessat.form.camp.llinatge1" required="true" />
+					textKey="interessat.form.camp.llinatge1" required="true" disabled="${!potModificar}"/>
 			</div>
+			<!-- Llinatge2 -->
 			<div class="col-xs-6">
 				<rip:inputText name="llinatge2"
-					textKey="interessat.form.camp.llinatge2" />
+					textKey="interessat.form.camp.llinatge2" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		<!-- FILA: Raó social -->
+		<!-- Raó social -->
 		<rip:inputText name="raoSocial"
 			textKey="interessat.form.camp.raoSocial" required="true"
-			labelSize="2" />
-		<!-- FILA: País i província -->
+			labelSize="2" disabled="${!potModificar}"/>
+		
 		<div class="row">
+			<!-- País -->
 			<div class="col-xs-6">
 				<rip:inputSelect name="pais" textKey="interessat.form.camp.pais"
 					optionItems="${paisos}" optionTextAttribute="nom"
 					optionValueAttribute="codi" emptyOption="true"
-					optionMinimumResultsForSearch="6" />
+					optionMinimumResultsForSearch="6" disabled="${!potModificar}"/>
 			</div>
+			<!-- Província -->
 			<div class="col-xs-6">
 				<rip:inputSelect name="provincia"
 					textKey="interessat.form.camp.provincia"
 					optionItems="${provincies}" optionTextAttribute="nom"
 					optionValueAttribute="codi" emptyOption="true"
-					optionMinimumResultsForSearch="6" />
+					optionMinimumResultsForSearch="6" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		<!-- FILA: Municipi i codi postal -->
+		
 		<div class="row">
+			<!-- Municipi -->
 			<div class="col-xs-6">
 				<rip:inputSelect name="municipi"
 					textKey="interessat.form.camp.municipi" optionItems="${municipis}"
 					optionTextAttribute="nom" optionValueAttribute="codi"
-					emptyOption="true" optionMinimumResultsForSearch="6" />
+					emptyOption="true" optionMinimumResultsForSearch="6" disabled="${!potModificar}"/>
 			</div>
-			<%-- 			<div class="col-xs-6"><rip:inputText name="municipi" textKey="interessat.form.camp.municipi" required="true"/></div> --%>
+			<!-- Codi postal -->
 			<div class="col-xs-6">
 				<rip:inputText name="codiPostal"
-					textKey="interessat.form.camp.codiPostal" />
+					textKey="interessat.form.camp.codiPostal" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		<!-- FILA: Adressa -->
+		
+		<!-- Adressa -->
 		<rip:inputTextarea name="adresa" textKey="interessat.form.camp.adresa"
-			labelSize="2" />
-		<!-- FILA: Correu electrònic i telèfon -->
+			labelSize="2" disabled="${!potModificar}"/>
+		
 		<div class="row">
+			<!-- Correu electrònic -->
 			<div class="col-xs-6">
-				<rip:inputText name="email" textKey="interessat.form.camp.email" />
+				<rip:inputText name="email" textKey="interessat.form.camp.email" disabled="${!potModificar}"/>
 			</div>
+			<!-- Telèfon -->
 			<div class="col-xs-6">
-				<rip:inputText name="telefon" textKey="interessat.form.camp.telefon" />
+				<rip:inputText name="telefon" textKey="interessat.form.camp.telefon" disabled="${!potModificar}"/>
 			</div>
 		</div>
-		<!-- FILA: Observacions -->
+		
+		<!-- Observacions -->
 		<rip:inputTextarea name="observacions"
-			textKey="interessat.form.camp.observacions" labelSize="2" />
-		<!-- FILA: Notificació (idioma i autorització) -->
+			textKey="interessat.form.camp.observacions" labelSize="2" disabled="${!potModificar}"/>
+			
+		<!-- Idioma preferent -->
 		<div class="row">
 			<div class="col-xs-6">
-				<rip:inputSelect name="preferenciaIdioma"
+				<rip:inputSelect 
+					name="preferenciaIdioma"
 					textKey="interessat.form.camp.idioma"
-					optionItems="${idiomaEnumOptions}" optionTextKeyAttribute="text"
-					optionValueAttribute="value" />
+					optionItems="${idiomaEnumOptions}" 
+					optionTextKeyAttribute="text"
+					optionValueAttribute="value" 
+					disabled="${!potModificar}"/>
 			</div>
-			<%-- 			<div class="col-xs-6"><rip:inputCheckbox name="notificacioAutoritzat" textKey="interessat.form.camp.autoritzat" labelSize="10"/></div> --%>
 		</div>
 		<c:if test="${!esRepresentant && dehActiu}">
+			<!-- Entrega a la Direcció Electrònica Hablitada (DEH) -->
 			<div class="row">
 				<div class="col-xs-6" style="float: right;">
 					<rip:inputCheckbox name="entregaDeh"
-						textKey="interessat.form.camp.entregaDeh" labelSize="10" />
+						textKey="interessat.form.camp.entregaDeh" labelSize="10" disabled="${!potModificar}"/>
 				</div>
 			</div>
+			
+			<!-- Obligat -->
 			<div class="row" class="hidden">
 				<div class="col-xs-6" style="float: right;"
 					id="entregaDehObligatDiv">
 					<rip:inputCheckbox name="entregaDehObligat"
-						textKey="interessat.form.camp.entregaDehObligat" labelSize="10" />
+						textKey="interessat.form.camp.entregaDehObligat" labelSize="10" disabled="${!potModificar}"/>
 				</div>
 			</div>
-			<!-- 			<div class="row" class="hidden">		 -->
-			<%-- 				<div class="col-xs-6" style="float: right;"><rip:inputCheckbox name="incapacitat" textKey="interessat.form.camp.incapacitat" labelSize="10"/></div> --%>
-			<!-- 			</div> -->
 		</c:if>
 
 
-
 		<div id="modal-botons" class="well">
-			<button id="btnSave" type="button" class="btn btn-success">
-				<span class="fa fa-save"></span>
-				<spring:message code="comu.boto.guardar" />
-			</button>
-			<a href="<c:url value="/contingut/${expedientId}"/>"
-				class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message
-					code="comu.boto.cancelar" /></a>
+			<c:if test="${potModificar}">
+				<button id="btnSave" type="button" class="btn btn-success">
+					<span class="fa fa-save"></span>
+					<spring:message code="comu.boto.guardar" />
+				</button>			
+			</c:if>
+			<a href="<c:url value="/contingut/${expedientId}"/>" class="btn btn-default" data-modal-cancel="true">
+				<spring:message code="comu.boto.${potModificar ? 'cancelar' : 'tancar'}" />
+			</a>
 		</div>
 	</form:form>
 

@@ -31,7 +31,10 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     private String codi;
 
     @Column(name = "nom", length = 1000)
-    private String nom;
+    private String nom; // nomCatala
+    
+    @Column(name = "nom_es", length = 1000)
+    private String nomEspanyol;
 
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "entitat_id")
@@ -134,6 +137,10 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
             built.nom = nom;
             return this;
         }
+        public Builder nomEspanyol(String nomEspanyol) {
+            built.nomEspanyol = nomEspanyol;
+            return this;
+        }        
         public Builder entitat(EntitatEntity entitat) {
             built.entitat = entitat;
             return this;
@@ -184,15 +191,22 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 
     public void update(
             String nom,
+            String nomEspanyol,
             String estat,
             OrganGestorEntity pare,
             String cif) {
         this.nom = nom;
+		this.nomEspanyol = nomEspanyol;
         this.estat = getEstat(estat);
         this.pare = pare;
         this.gestioDirect = false;
         this.cif = cif;
     }
+    
+	public void updateNomCatala(
+			String nom) {
+		this.nom = nom;
+	}
 
     public static OrganEstatEnumDto getEstat(String estat) {
         switch (estat) {
@@ -203,6 +217,10 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
             default:
                 return OrganEstatEnumDto.V;
         }
+    }
+    
+    public String getCodiINom() {
+    	return codi + " - " + nom;
     }
     
     

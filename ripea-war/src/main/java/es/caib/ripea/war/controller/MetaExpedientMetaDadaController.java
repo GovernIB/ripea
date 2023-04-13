@@ -40,6 +40,7 @@ import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.ResultatDominiDto;
 import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DominiService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDadaService;
@@ -48,6 +49,8 @@ import es.caib.ripea.war.command.MetaDadaCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -69,7 +72,9 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 	private DominiService dominiService;
 	@Autowired
 	private ExpedientService expedientService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -192,6 +197,14 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 				model.addAttribute("isRolActualRevisor", true);
 			}
 		}
+		model.addAttribute("isMarcarEnviableArxiuActiu", isMarcarEnviableArxiuActiu());
+		
+		List<HtmlOption> tipus = EnumHelper.getOptionsForEnum(MetaDadaTipusEnumDto.class, "meta.dada.tipus.enum.");
+		if (!aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis")) {
+			tipus.remove(new HtmlOption("DOMINI", null));
+		}		
+		model.addAttribute("tipus", tipus);
+		
 		return "metaDadaForm";
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDada", method = RequestMethod.POST)
@@ -208,6 +221,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("existContingut",  expedientService.countByMetaExpedient(entitatActual.getId(), metaExpedientId) != 0);
+			model.addAttribute("isMarcarEnviableArxiuActiu", isMarcarEnviableArxiuActiu());
 			return "metaDadaForm";
 		}
 
@@ -407,6 +421,10 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		List<DominiDto> dominis = dominiService.findByEntitat(entitatActual.getId());
 		return dominis;
+	}
+	
+	private boolean isMarcarEnviableArxiuActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.propagar.metadades"));
 	}
 
 	

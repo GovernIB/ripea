@@ -261,8 +261,8 @@
 									<span class="label bg-success border-green overflow-ellipsis create-label"></span>
 									<div class="branch lv1">
 										<div class="entry sole">
-											<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacio}">
-													${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacio}
+											<span class="label bg-success border-green overflow-ellipsis" title="${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacioCooficial}">
+													${unitatVigentFirstSincro.codi} - ${unitatVigentFirstSincro.denominacioCooficial}
 											</span>
 										</div>
 									</div>
@@ -300,15 +300,15 @@
 							<div class=horizontal-left>
 								<div id="wrapper">
 									<span class="label bg-danger border-red overflow-ellipsis"
-										title="${key.codi} - ${key.denominacio}"> ${key.codi} -
-										${key.denominacio} </span>
+										title="${key.codi} - ${key.denominacioCooficial}"> ${key.codi} -
+										${key.denominacioCooficial} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
 											<div class="entry">
 												<span
 													class="label bg-success border-green overflow-ellipsis"
-													title="${value.codi} - ${value.denominacio}">${value.codi}
-													- ${value.denominacio}</span>
+													title="${value.codi} - ${value.denominacioCooficial}">${value.codi}
+													- ${value.denominacioCooficial}</span>
 											</div>
 										</c:forEach>
 									</div>
@@ -334,14 +334,14 @@
 								<div id="wrapper">
 									<span
 										class="label bg-success border-green right-postion-20 overflow-ellipsis"
-										title="${key.codi} - ${key.denominacio}"> ${key.codi} -
-										${key.denominacio} </span>
+										title="${key.codi} - ${key.denominacioCooficial}"> ${key.codi} -
+										${key.denominacioCooficial} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
 											<div class="entry">
 												<span class="label bg-danger border-red overflow-ellipsis"
-													title="${value.codi} - ${value.denominacio}">
-													${value.codi} - ${value.denominacio} </span>
+													title="${value.codi} - ${value.denominacioCooficial}">
+													${value.codi} - ${value.denominacioCooficial} </span>
 											</div>
 										</c:forEach>
 									</div>
@@ -367,14 +367,14 @@
 								<div id="wrapper">
 									<span
 										class="label bg-success border-green right-postion-20 overflow-ellipsis"
-										title="${key.codi} - ${key.denominacio}"> ${key.codi} -
-										${key.denominacio} </span>
+										title="${key.codi} - ${key.denominacioCooficial}"> ${key.codi} -
+										${key.denominacioCooficial} </span>
 									<div class="branch lv1">
 										<c:forEach var="value" items="${values}">
 											<div class="entry sole">
 												<span class="label bg-danger border-red overflow-ellipsis"
-													title="${value.codi} - ${value.denominacio}">
-													${value.codi} - ${value.denominacio} </span>
+													title="${value.codi} - ${value.denominacioCooficial}">
+													${value.codi} - ${value.denominacioCooficial} </span>
 											</div>
 										</c:forEach>
 									</div>
@@ -401,8 +401,8 @@
 									</span>
 									<div class="branch lv1">
 										<div class="entry sole">
-											<span class="label bg-warning border-yellow overflow-ellipsis" title="${unitatVigent.codi} - ${unitatVigent.denominacio}">
-												${unitatVigent.codi} - ${unitatVigent.denominacio}
+											<span class="label bg-warning border-yellow overflow-ellipsis" title="${unitatVigent.codi} - ${unitatVigent.denominacioCooficial}">
+												${unitatVigent.codi} - ${unitatVigent.denominacioCooficial}
 											</span>
 										</div>
 									</div>
@@ -427,8 +427,8 @@
 									<span class="label bg-success border-green overflow-ellipsis create-label"></span>
 									<div class="branch lv1">
 										<div class="entry sole">
-											<span class="label bg-success border-green overflow-ellipsis" title="${unitatNew.codi} - ${unitatNew.denominacio}">
-												${unitatNew.codi} - ${unitatNew.denominacio}
+											<span class="label bg-success border-green overflow-ellipsis" title="${unitatNew.codi} - ${unitatNew.denominacioCooficial}">
+												${unitatNew.codi} - ${unitatNew.denominacioCooficial}
 											</span>
 										</div>
 									</div>
@@ -449,8 +449,8 @@
 						<c:forEach var="unitatExtingida" items="${unitatsExtingides}">
 							<div class=horizontal-left>
 								<div id="wrapper">
-									<span class="label bg-danger border-red right-postion-20 overflow-ellipsis" title="${unitatExtingida.codi} - ${unitatExtingida.denominacio}">
-										${unitatExtingida.codi} - ${unitatExtingida.denominacio}
+									<span class="label bg-danger border-red right-postion-20 overflow-ellipsis" title="${unitatExtingida.codi} - ${unitatExtingida.denominacioCooficial}">
+										${unitatExtingida.codi} - ${unitatExtingida.denominacioCooficial}
 									</span>
 									<div class="branch lv1">
 										<div class="entry sole remove">

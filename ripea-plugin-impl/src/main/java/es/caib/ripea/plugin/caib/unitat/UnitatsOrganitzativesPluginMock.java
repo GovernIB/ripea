@@ -77,54 +77,56 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 		if (dataActualitzacio == null && dataSincronitzacio == null) {
 			
 			//NEW
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_ARREL, name(CODI_UNITAT_ARREL), null, null,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_SUPERIOR, name(CODI_UNITAT_SUPERIOR), CODI_UNITAT_ARREL, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_ARREL, name(CODI_UNITAT_ARREL), null, null, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_SUPERIOR, name(CODI_UNITAT_SUPERIOR), CODI_UNITAT_ARREL, CODI_UNITAT_ARREL, "V", null));
 			
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, name(CODI_UNITAT_TO_SPLIT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_MERGE1, name(CODI_UNITAT_TO_MERGE1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_MERGE2, name(CODI_UNITAT_TO_MERGE2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, name(CODI_UNITAT_TO_SUBSTITUTE), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, name(CODI_UNITAT_TO_CUMULATIVE_CHANGES), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_EXTINCT, name(CODI_UNITAT_EXTINCT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_MERGE1, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_MERGE2, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_EXTINCT, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, "V", null));
 			
+
 			ProcedimentPluginMock.secondSyncronization = false;
 
 		} else {
 			
+			
 			//SPLIT
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, name(CODI_UNITAT_TO_SPLIT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_SPLITTED1, CODI_UNITAT_SPLITTED2))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_SPLITTED1, name(CODI_UNITAT_SPLITTED1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_SPLITTED2, name(CODI_UNITAT_SPLITTED2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, "E", Arrays.asList(CODI_UNITAT_SPLITTED1, CODI_UNITAT_SPLITTED2)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_SPLITTED1, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_SPLITTED2, "V", null));
 			
 			//MERGE
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_MERGE1, name(CODI_UNITAT_TO_MERGE1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_MERGED))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_MERGE2, name(CODI_UNITAT_TO_MERGE2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_MERGED))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_MERGED, name(CODI_UNITAT_MERGED), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_MERGE1, "E", Arrays.asList(CODI_UNITAT_MERGED)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_MERGE2, "E", Arrays.asList(CODI_UNITAT_MERGED)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_MERGED, "V", null));
 			
 			//SUBSTITUTION
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, name(CODI_UNITAT_TO_SUBSTITUTE), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_SUBSTITUTED))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_SUBSTITUTED, name(CODI_UNITAT_SUBSTITUTED), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, "E", Arrays.asList(CODI_UNITAT_SUBSTITUTED)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_SUBSTITUTED, "V", null));
 			
 			//CUMULATIVE CHANGES
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, name(CODI_UNITAT_TO_CUMULATIVE_CHANGES), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_CUMULATIVE_CHANGES1))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_CUMULATIVE_CHANGES1, name(CODI_UNITAT_CUMULATIVE_CHANGES1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_CUMULATIVE_CHANGES2))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_CUMULATIVE_CHANGES2, name(CODI_UNITAT_CUMULATIVE_CHANGES2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_CUMULATIVE_CHANGES, "E", Arrays.asList(CODI_UNITAT_CUMULATIVE_CHANGES1)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_CUMULATIVE_CHANGES1, "E", Arrays.asList(CODI_UNITAT_CUMULATIVE_CHANGES2)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_CUMULATIVE_CHANGES2, "V", null));
 
 			//CANVI EN ATRIBUTS
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED) + " changed", CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", new ArrayList<String>()));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, name(CODI_UNITAT_PROPS_CHANGED) + " changed", CODI_UNITAT_SUPERIOR,CODI_UNITAT_ARREL, "V", null));
 			
 			//NEW
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_NEW1, name(CODI_UNITAT_NEW1), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_NEW2, name(CODI_UNITAT_NEW2), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_NEW1, "V", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_NEW2, "V", null));
 			
 			//EXTINCT
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_EXTINCT, name(CODI_UNITAT_EXTINCT), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", null));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_EXTINCT, "E", null));
 			
 			//SUBSTITUTION BY ITSLEF
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF), CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"E", new ArrayList<>(Arrays.asList(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF))));
-			unitats.add(new UnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF) + " substituted", CODI_UNITAT_SUPERIOR, CODI_UNITAT_ARREL,"V", null));			
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, "E", Arrays.asList(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF) + " substituted", CODI_UNITAT_SUPERIOR,CODI_UNITAT_ARREL, "V", null));			
 			
 			ProcedimentPluginMock.secondSyncronization = true;
 
@@ -224,7 +226,41 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 		
 		return "Unitat amb codi " + name + additonal;
 	}
-
+	
+	public String nameCatalan(String name) {
+		return name(name) + " [catalan]";
+	}
+	
+	private UnitatOrganitzativa getUnitatOrganitzativa(
+			String codi,
+			String estat,
+			List<String> historicosUO) {
+		return new UnitatOrganitzativa(
+				codi,
+				name(codi),
+				nameCatalan(codi),
+				CODI_UNITAT_SUPERIOR,
+				CODI_UNITAT_ARREL,
+				estat,
+				historicosUO);
+	}
+	
+	private UnitatOrganitzativa getUnitatOrganitzativa(
+			String codi,
+			String denominacio,
+			String codiUnitatSuperior,
+			String codiUnitatArrel,
+			String estat, 
+			List<String> historicosUO) {
+		return new UnitatOrganitzativa(
+				codi,
+				denominacio,
+				nameCatalan(codi),
+				codiUnitatSuperior,
+				codiUnitatArrel,
+				estat,
+				historicosUO);
+	}
 
 	public UnitatsOrganitzativesPluginMock() {
 		super();

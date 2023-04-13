@@ -11,6 +11,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.helper.RestClient;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,8 +49,12 @@ public class UnitatsOrganitzativesRestClient extends RestClient{
 			
 			MultivaluedMap<String, String> params = new MultivaluedMapImpl();
 			params.add("codigo", codigo); 
-			params.add("fechaActualizacion", fechaActualizacion);
-			params.add("fechaSincronizacion", fechaSincronizacion);
+			if (Utils.isNotEmpty(fechaActualizacion)) {
+				params.add("fechaActualizacion", fechaActualizacion);
+			}
+			if (Utils.isNotEmpty(fechaSincronizacion)) {
+				params.add("fechaSincronizacion", fechaSincronizacion);
+			}
 			params.add("denominacionCooficial", "false");
 			
 			String urlAmbMetode = baseUrl + "rest/unidades/obtenerArbolUnidades";

@@ -1318,6 +1318,9 @@ function getDetallsSignants(idTbody, contingutId, header) {
 			<c:if test="${isTasca}">
 				<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
 			</c:if>
+			
+			
+			
 			<c:if test="${vistaIcones}">
 				<%---- Habilitar selecció múltiple ----%>
 				<div class="btn-group">
@@ -1344,32 +1347,33 @@ function getDetallsSignants(idTbody, contingutId, header) {
 			</div>
 			<c:if test="${(expedientAgafatPerUsuariActual or contingut.admin) and expedientObert}">
 				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
+				
+				
+				
 				<%---- Button notificar mult ----%>
 				<div class="btn-group">
 					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
-						<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult maximized hidden" data-toggle="modal" data-maximized="true">
-							<span class="fa fa-envelope-o"></span>
-							
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default maximized hidden" data-toggle="modal" data-maximized="true">
+							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a> 
-						<a href="<c:url value="/contingut/${contingut.id}/notificar"/>" class="btn btn-default con-mult nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>">
-							<span class="fa fa-envelope-o"></span>
-							
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>">
+							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a>
 					</div>
-					<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
-						<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
-							<span class="fa fa-check-square"></span>
-							
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</a> 
-						<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
-							<span class="fa fa-check-square"></span>
-							
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</a>
-					</div>
+					<c:if test="${convertirDefinitiu}">
+						<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
+							<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
+								<span class="fa fa-check-square"></span>
+								
+								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+							</a> 
+							<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
+								<span class="fa fa-check-square"></span>
+								
+								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+							</a>
+						</div>
+					</c:if>
 					<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
 						<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" class="btn btn-default con-mult">
 							<span class="fa fa-arrows"></span>

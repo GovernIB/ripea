@@ -3,33 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.plugins.arxiu.api.DocumentMetadades;
-import es.caib.plugins.arxiu.api.ExpedientMetadades;
-import es.caib.plugins.arxiu.api.Firma;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.helper.*;
-import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.repository.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -41,6 +14,101 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentEstat;
+import es.caib.plugins.arxiu.api.DocumentMetadades;
+import es.caib.plugins.arxiu.api.ExpedientMetadades;
+import es.caib.plugins.arxiu.api.Firma;
+import es.caib.ripea.core.api.dto.AlertaDto;
+import es.caib.ripea.core.api.dto.ArxiuContingutDto;
+import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
+import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
+import es.caib.ripea.core.api.dto.ContingutMovimentDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.dto.ResultatConsultaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.dto.ValidacioErrorDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DominiService;
+import es.caib.ripea.core.entity.AlertaEntity;
+import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.ContingutMovimentEntity;
+import es.caib.ripea.core.entity.DadaEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.TipusDocumentalEntity;
+import es.caib.ripea.core.entity.URLInstruccionEntity;
+import es.caib.ripea.core.helper.ArxiuConversions;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ContingutHelper;
+import es.caib.ripea.core.helper.ContingutLogHelper;
+import es.caib.ripea.core.helper.ContingutsOrfesHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
+import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaDadaRepository;
+import es.caib.ripea.core.repository.MetaNodeRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
+import es.caib.ripea.core.repository.URLInstruccionRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -92,9 +160,13 @@ public class ContingutServiceImpl implements ContingutService {
 	private ContingutsOrfesHelper contingutRepositoryHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
-
-
-
+	@Autowired
+	private DominiService dominiService;
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private URLInstruccionRepository urlInstruccionRepository;
+	
 	@Transactional
 	@Override
 	public void dadaSave(
@@ -116,6 +188,14 @@ public class ContingutServiceImpl implements ContingutService {
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {
 				dadaRepository.delete(dada);
+
+				MetaDadaEntity metaDada = dada.getMetaDada();
+				if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {
+					// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
+					if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+						pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, "");
+					}
+				}
 			}
 		}
 		// Modifica les dades existents
@@ -123,7 +203,8 @@ public class ContingutServiceImpl implements ContingutService {
 			nodeDadaGuardar(
 					node,
 					dadaCodi,
-					valors.get(dadaCodi));
+					valors.get(dadaCodi),
+					entitatId);
 		}
 		cacheHelper.evictErrorsValidacioPerNode(node);
 	}
@@ -675,8 +756,7 @@ public class ContingutServiceImpl implements ContingutService {
 				ambVersions,
 				ambPermisos,
 				rolActual,
-				organActualId,
-				true, 
+				true,
 				false, 
 				false);
 
@@ -707,8 +787,7 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambVersions,
 			boolean ambPermisos, 
 			String rolActual, 
-			Long organActualId,
-			boolean ambEntitat, 
+			boolean ambEntitat,
 			boolean ambMapPerTipusDocument, 
 			boolean ambMapPerEstat) {
 		
@@ -778,22 +857,16 @@ public class ContingutServiceImpl implements ContingutService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public void checkIfPermittedAccess(
+	public void checkIfPermitted(
 			Long contingutId,
 			String rolActual, 
-			Long organId) {
+			PermissionEnumDto permission) {
 		
-		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		contingutHelper.checkIfPermitted(
+				contingutId,
+				rolActual,
+				permission);
 		
-		entityComprovarHelper.comprovarExpedient(
-				contingut.getExpedientPare().getId(),
-				false,
-				true,
-				false,
-				false,
-				false,
-				rolActual);
-	
 	}
 	
 	
@@ -1892,7 +1965,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private void nodeDadaGuardar(
 			NodeEntity node,
 			String dadaCodi,
-			Object dadaValor) {
+			Object dadaValor,
+			Long entitatId) {
 		MetaDadaEntity metaDada = metaDadaRepository.findByMetaNodeAndCodi(
 				node.getMetaNode(),
 				dadaCodi);
@@ -1953,6 +2027,18 @@ public class ContingutServiceImpl implements ContingutService {
 						false,
 						false);
 			}
+			
+			if (node instanceof ExpedientEntity && isPropagarMetadadesActiu() && metaDada.isEnviable()) {
+				// Obtenir nom domini per guardar a l'arxiu per metadades 'enviables'
+				if (metaDada.getTipus().equals(MetaDadaTipusEnumDto.DOMINI)) {
+					DominiDto domini = dominiService.findByCodiAndEntitat(metaDada.getCodi(), entitatId);
+					
+					ResultatConsultaDto resultat = dominiService.getSelectedDomini(entitatId, domini, dada.getValorComString());
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, resultat.getText());
+				} else {
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, dada.getValorComString());
+				}
+			}
 		}
 	}
 
@@ -1991,7 +2077,51 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return result;
     }
+    
+	@Override
+	public List<String> obtenerURLsInstruccio(
+			Long entitatId, 
+			Long contingutId) {
+		logger.debug("Generant URLs instrucció ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, false, false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		List<String> urls = new ArrayList<String>();
+		if (contingut instanceof ExpedientEntity) {
+			ExpedientEntity expedient = (ExpedientEntity)contingut;
+			List<URLInstruccionEntity> URLsInstruccio = urlInstruccionRepository.findByEntitat(entitat);
 
+			String eni = expedient.getNtiIdentificador();
+			for (URLInstruccionEntity urlInstruccio: URLsInstruccio) {
+				String url = urlInstruccio.getUrl();
+ 				if (url.contains("[ENI]") && eni != null && ! eni.isEmpty()) {
+					urls.add(url.replaceAll("\\[ENI\\]", eni));
+				}
+			}
+			
+			// CSV
+//			if (! urlCSV.isEmpty()) {
+//				es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
+//				Object csv = arxiuExpedient.getMetadades().getMetadadaAddicional("csv");
+//				if (csv != null) {
+//					urls.add(urlCSV.replaceAll("\\[CSV\\]", (String)csv));
+//				}
+//			}
+		}
+		return urls;
+	}
+
+	public boolean isPropagarMetadadesActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
+	}
+	
     private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);
 
 }

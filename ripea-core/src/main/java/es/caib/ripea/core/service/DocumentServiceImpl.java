@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -24,6 +25,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -34,6 +36,7 @@ import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
@@ -41,6 +44,7 @@ import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -90,6 +94,7 @@ import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentNotificacioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -161,6 +166,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private IntegracioHelper integracioHelper;
 
 	
 	@Transactional
@@ -843,6 +850,26 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "callbackEstat=" + callbackEstat + ")");
 		return firmaPortafirmesHelper.portafirmesCallback(portafirmesId, callbackEstat, motiuRebuig, administrationId, name);
 	}
+	
+	@Transactional
+	@Override
+	public void portafirmesCallbackIntegracioOk(
+			String descripcio,
+			Map<String, String> parametres) {
+
+		integracioHelper.addAccioOk(IntegracioHelper.INTCODI_CALLBACK, descripcio, parametres, IntegracioAccioTipusEnumDto.RECEPCIO, 0);
+	}
+	
+	@Transactional
+	@Override
+	public void portafirmesCallbackIntegracioError(
+			String descripcio,
+			Map<String, String> parametres,
+			String errorDescripcio,
+			Throwable throwable) {
+
+		integracioHelper.addAccioError(IntegracioHelper.INTCODI_CALLBACK, descripcio, parametres, IntegracioAccioTipusEnumDto.RECEPCIO, 0, errorDescripcio, throwable);
+	}
 
 
 	
@@ -1460,6 +1487,29 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 	}
 	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public DocumentDto findAmbId(
+			Long documentId, 
+			String rolActual, 
+			PermissionEnumDto permission) {
+		
+		if (permission != null) {
+			contingutHelper.checkIfPermitted(
+					documentId,
+					rolActual,
+					permission);
+		}
+		ContingutEntity contingut = documentRepository.findOne(documentId);
+		ContingutDto contingutDto = contingutHelper.toContingutDto(
+				contingut,
+				false,
+				false);
+		return (DocumentDto) contingutDto;
+	}
+	
 	private String changeExtensioToPdf(String nom) {
 		int indexPunt = nom.lastIndexOf(".");
 		if (indexPunt != -1 && indexPunt < nom.length() - 1) {
@@ -1492,6 +1542,16 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(ex);
 		}
 	}	
+	
+	
+	
+	
+	@Transactional
+	@Override
+	public void actualitzarEstatADefinititu(Long documentId) {
+		documentHelper.actualitzarEstatADefinititu(documentId);
+	}
+	
 	
 	@Transactional
 	@Override

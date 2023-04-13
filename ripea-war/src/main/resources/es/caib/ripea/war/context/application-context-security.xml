@@ -11,6 +11,7 @@
 
 	<sec:http pattern="/rest/notib**" security="none"/>
 	<sec:http pattern="/rest/notib/**" security="none"/>
+	<sec:http pattern="/rest/portafib/**" security="none"/>	
 	<sec:http create-session="never" use-expressions="true" auto-config="true" entry-point-ref="preAuthenticatedProcessingFilterEntryPoint">
 		<sec:intercept-url pattern="/error" access="isAnonymous()"/>
 		<sec:intercept-url pattern="/ws/MCGDws*" access="isAnonymous()"/>

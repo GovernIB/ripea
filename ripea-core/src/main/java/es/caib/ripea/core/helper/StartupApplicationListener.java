@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.entity.ProcesosInicialsEntity;
+import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
@@ -40,6 +41,14 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private ApplicationHelper applicationHelper;
     @Autowired
     private HistoricHelper historicHelper;
+    @Autowired
+    private PluginHelper pluginHelper;
+    @Autowired
+    private EntitatRepository entitatRepository;
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
+    @Autowired
+    private OrganGestorHelper organGestorHelper;
 
     public static int counter = 0;
 
@@ -72,6 +81,9 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                         case GENERAR_MISSING_HISTORICS:
                         	generateMissingHistorics();
                           break;            
+                        case ORGANS_DESCARREGAR_NOM_CATALA:
+                            organsDescarregarNomCatala();
+                          break;                              
                         default:
                             log.error("Procés inicial no definit");
                             break;
@@ -82,7 +94,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                 // ===================================================== EXECUTE PROCESS ON EVERY STARTUP OF APPLICATION ==================================
                 configService.crearPropietatsConfigPerEntitats();
                 configService.actualitzarPropietatsJBossBdd();
-                
+
                 
                 
             } catch (Exception ex) {
@@ -175,6 +187,15 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 		
     }
     
+	
+    private void organsDescarregarNomCatala(){
+    	try {
+			organGestorHelper.organsDescarregarNomCatala();
+		} catch (Exception e) {
+			log.error("Error al descarregar noms catalans", e);
+		}
+    }
+	
     
     private void generateNumeroAllExpedients(){
     	

@@ -19,4 +19,7 @@ public class RespostaConsultaEstatNotificacio {
 	private boolean error;
 	private Date errorData;
 	private String errorDescripcio;
+	
+	private Date dataEnviada;
+	private Date dataFinalitzada;
 }

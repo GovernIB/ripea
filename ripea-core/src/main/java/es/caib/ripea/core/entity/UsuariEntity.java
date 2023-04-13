@@ -23,12 +23,14 @@ import javax.persistence.Version;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
+import lombok.Getter;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
 @Entity
 @Table(name = "ipa_usuari")
 public class UsuariEntity implements Serializable {
@@ -42,6 +44,8 @@ public class UsuariEntity implements Serializable {
 	private String nif;
 	@Column(name = "email", length = 200)
 	private String email;
+	@Column(name = "email_alternatiu", length = 200)
+	private String emailAlternatiu;
 	@Column(name="idioma", length = 2)
 	private String idioma;
 	@Column(name = "inicialitzat")
@@ -69,6 +73,8 @@ public class UsuariEntity implements Serializable {
 	@Column(name = "emails_agrupats")
 	private boolean rebreEmailsAgrupats = true;
 
+	@Column(name = "avisos_noves_anotacions")
+	private boolean rebreAvisosNovesAnotacions;
 
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
@@ -76,36 +82,21 @@ public class UsuariEntity implements Serializable {
 	public void updateVistaActual(ContingutVistaEnumDto vistaActual) {
 		this.vistaActual = vistaActual;
 	}
-	public boolean isRebreEmailsAgrupats() {
-		return rebreEmailsAgrupats;
-	}
-	public void updateRebreEmailsAgrupats(boolean rebreEmailsAgrupats) {
+
+	
+	public void update(
+			String emailAlternatiu,
+			String idioma,
+			boolean rebreEmailsAgrupats,
+			boolean rebreAvisosNovesAnotacions) {
+		this.emailAlternatiu = emailAlternatiu;
+		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
+		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
+
 	}
-	public String getCodi() {
-		return codi;
-	}
-	public String getNom() {
-		return nom;
-	}
-	public String getNif() {
-		return nif;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public String getIdioma() {
-		return idioma;
-	}
-	public boolean isInicialitzat() {
-		return inicialitzat;
-	}
-	public Set<ViaFirmaUsuariEntity> getViaFirmaUsuaris() {
-		return viaFirmaUsuaris;
-	}
-	public String getRolActual() {
-		return rolActual;
-	}
+	
+
 	public void update(
 			String nom,
 			String nif,
@@ -116,10 +107,6 @@ public class UsuariEntity implements Serializable {
 		this.inicialitzat = true;
 	}
 	
-	public void update(
-			String idioma) {
-		this.idioma = idioma;
-	}
 
 	public void updateRolActual(String rolActual) {
 		this.rolActual = rolActual;
@@ -205,6 +192,7 @@ public class UsuariEntity implements Serializable {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
+
 
 	private static final long serialVersionUID = -6657066865382086237L;
 

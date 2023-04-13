@@ -5,18 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<%
-pageContext.setAttribute(
-		"dadesUsuariActual",
-		es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
-pageContext.setAttribute(
-		"isRolActualAdministrador",
-		es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request),
-		PageContext.SESSION_SCOPE);
-pageContext.setAttribute(
-			"isRolActualAdministradorOrgan",
-			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
-%>
 
 <c:set var="titol">
 	<spring:message code="expedient.peticio.form.acceptar.titol" />
@@ -52,7 +40,7 @@ function refrescarOrgan() {
 	if (organ) {
 		$('#organFixed').show();
 		$('#organSelect').hide();
-		$('#organFixedNom').text(organ.nom);
+		$('#organFixedNom').text(organ.codi + ' - ' + organ.nom);
 		$('#organFixedNom').after($('<input>').attr({
 		    type: 'hidden',
 		    name: 'organGestorId',
@@ -69,7 +57,7 @@ function refrescarOrgan() {
 				if (organs && organs.length > 0) {
 					$.each(organs, function(i, organ) {
 						const selected = (organ.id == organGestorId) ? ' selected' : '';
-						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.nom + '</option>');
+						selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.codi + ' - ' + organ.nom + '</option>');
 					});
 				}
 				selOrgans.select2({

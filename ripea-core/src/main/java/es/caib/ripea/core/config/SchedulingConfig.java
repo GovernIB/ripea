@@ -187,7 +187,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         
         
         
-        // Enviament de correus electrònics per comentaris als responsables dels procediments
+        // Enviament de correus electrònics per comentaris als responsables dels procediments (is in background because it takes long time to calculate destinataris)
         /////////////////////////////////////////////////////////////////////////
         taskRegistrar.addTriggerTask(
                 new Runnable() {

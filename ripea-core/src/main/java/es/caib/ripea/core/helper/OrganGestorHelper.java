@@ -25,10 +25,12 @@ import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.AvisEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -82,6 +84,8 @@ public class OrganGestorHelper {
 	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
+    @Autowired
+    private ConversioTipusHelper conversioTipusHelper;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
 
@@ -526,6 +530,22 @@ public class OrganGestorHelper {
 		return organCodi;
 	}
 	
+	@Transactional
+	public void organsDescarregarNomCatala() {
+    	List<EntitatEntity> entitats = entitatRepository.findAll();
+    	for (EntitatEntity entitat : entitats) {
+    		
+    		ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+    		List<UnitatOrganitzativa> unitatsWs = pluginHelper.unitatsOrganitzativesFindByPare(entitat.getUnitatArrel(), null, null);
+    		for (UnitatOrganitzativa unitatOrganitzativa : unitatsWs) {
+    			OrganGestorEntity organ = organGestorRepository.findByCodi(unitatOrganitzativa.getCodi());
+				if (organ != null && Utils.isNotEmpty(unitatOrganitzativa.getDenominacioCooficial())) {
+					organ.updateNomCatala(unitatOrganitzativa.getDenominacioCooficial());
+				} 
+			}
+		}
+    }
+	
 
 	private String organsToCodiList(List<OrganGestorEntity> organs) {
 		String text = "";
@@ -549,11 +569,19 @@ public class OrganGestorHelper {
 			// if not it creates a new one
 			if (unitat == null) {
 				logger.info("Unitat WS:" + unitatWS + "\n\t Unitat DB no existe");
-				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ.crear", unitatWS.getCodi())).isIsNew(true).codiOrgan(unitatWS.getCodi()).nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
+				
+				infoBuilder
+					.infoTitol(msg("unitat.synchronize.titol.organ.crear", unitatWS.getCodi()))
+					.isIsNew(true)
+					.codiOrgan(unitatWS.getCodi())
+					.nomNou(Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio())
+					.estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
+				
 				// Venen les unitats ordenades, primer el pare i després els fills?
 				unitat = OrganGestorEntity.getBuilder(unitatWS.getCodi())
 						.entitat(entitat)
-						.nom(unitatWS.getDenominacio())
+						.nomEspanyol(unitatWS.getDenominacio())
+						.nom(Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio())
 						.pare(organPare)
 						.estat(unitatWS.getEstat())
 						.gestioDirect(false)
@@ -571,10 +599,21 @@ public class OrganGestorHelper {
 				}
 			} else {
 				logger.info("Unitat WS:" + unitatWS + "\n\t Unitat DB: " + unitat);
-				infoBuilder.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi())).isIsNew(false).codiOrgan(unitatWS.getCodi())
-						.nomAntic(unitat.getNom()).estatAntic(unitat.getEstat())
-						.nomNou(unitatWS.getDenominacio()).estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
-				unitat.update(unitatWS.getDenominacio(), unitatWS.getEstat(), organPare, unitatWS.getNifCif());
+				infoBuilder
+						.infoTitol(msg("unitat.synchronize.titol.organ", unitatWS.getCodi()))
+						.isIsNew(false)
+						.codiOrgan(unitatWS.getCodi())
+						.nomAntic(unitat.getNom())
+						.estatAntic(unitat.getEstat())
+						.nomNou(Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio())
+						.estatNou(OrganGestorEntity.getEstat(unitatWS.getEstat()));
+				
+				unitat.update(
+						Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio(),
+						unitatWS.getDenominacio(),
+						unitatWS.getEstat(),
+						organPare,
+						unitatWS.getNifCif());
 			}
 
 			// Si el pare encara no existeix ho ficam en un mapa de pendents

@@ -181,8 +181,20 @@ $(document).ready(function() {
 	});
 
 		
+	$('#metadadaArxiu').closest('.form-group').hide();
+	
+	$('#enviable').change(function() {
+		var isEnviable = $(this).prop('checked');
+		
+		if (isEnviable) {
+			$('#metadadaArxiu').closest('.form-group').show();
+		} else {
+			$('#metadadaArxiu').closest('.form-group').hide();
+		}
+	});
 
-
+	$('#enviable').trigger('change');
+	
 	$('select#domini').change(function() {
 		var dominiCodiSelected = $(this).val();		
 		var dominiNomSelected = $(this).text();
@@ -203,7 +215,7 @@ $(document).ready(function() {
 		<form:hidden path="metaNodeId"/>
 		<rip:inputText name="codi" textKey="metadada.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
 		<rip:inputText name="nom" textKey="metadada.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
-		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionEnum="MetaDadaTipusEnumDto" disabled="${bloquejarCamps || (metaDadaCommand.id!=null && existContingut)}"/>
+		<rip:inputSelect name="tipus" textKey="metadada.form.camp.tipus" optionItems="${tipus}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps || (metaDadaCommand.id!=null && existContingut)}"/>
 		<form:hidden path="tipus" id="tipushidden"/>
 		<rip:inputSelect name="multiplicitat" textKey="metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto" disabled="${bloquejarCamps}"/>
 		
@@ -289,6 +301,12 @@ $(document).ready(function() {
 		<rip:inputSelect name="domini" textKey="metadada.form.camp.domini" disabled="${bloquejarCamps}"/>
 		<rip:inputCheckbox name="noAplica" textKey="metadada.form.camp.noaplica"/>
 		
+		<c:if test="${isMarcarEnviableArxiuActiu}">
+			<rip:inputCheckbox name="enviable" textKey="metadada.form.camp.enviable"/>
+			
+			<rip:inputText name="metadadaArxiu" textKey="metadada.form.camp.metadada.arxiu" required="true"/>
+		</c:if>
+
 		<rip:inputTextarea name="descripcio" textKey="metadada.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 		<div id="modal-botons">
 			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button></c:if>

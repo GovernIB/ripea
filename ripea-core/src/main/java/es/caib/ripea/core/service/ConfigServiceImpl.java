@@ -26,6 +26,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.entity.config.ConfigGroupEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -61,6 +62,8 @@ public class ConfigServiceImpl implements ConfigService {
     private OrganGestorRepository organGestorRepository;
     @Autowired
     private PaginacioHelper paginacioHelper;
+    @Autowired
+    private CacheHelper cacheHelper;
 
     @Override
     @Transactional
@@ -71,6 +74,8 @@ public class ConfigServiceImpl implements ConfigService {
 //        pluginHelper.reloadProperties(configEntity.getGroupCode());
         pluginHelper.resetPlugins();
        // cacheHelper.clearAllCaches();
+        
+        cacheHelper.evictMostrarLogsEmail();
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
     

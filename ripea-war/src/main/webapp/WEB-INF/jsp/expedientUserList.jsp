@@ -491,14 +491,14 @@ function hexToRgb(hex) {
 		
 		<div class="row">
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
-			<div class="col-md-3">
-			<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
-				<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
-			</div>
-			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
-			</div>
-			
+			<c:if test="${isDominisEnabled}">
+				<div class="col-md-3">
+					<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
+				</div>
+				<div class="col-md-3">
+					<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+				</div>
+			</c:if>
 			<c:choose>
 			 	<c:when test="${rolActual!='tothom'}">
 					<div class="col-md-3">
@@ -592,7 +592,7 @@ function hexToRgb(hex) {
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
-				<th data-col-name="numero"><spring:message code="expedient.list.user.columna.numero"/></th>	
+				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>	
 				<th data-col-name="nom" data-template="#cellNomTemplate" width="30%">
 					<spring:message code="expedient.list.user.columna.titol"/>
 					<script id="cellNomTemplate" type="text/x-jsrender">

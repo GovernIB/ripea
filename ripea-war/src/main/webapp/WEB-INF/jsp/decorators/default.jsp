@@ -79,6 +79,9 @@
 	pageContext.setAttribute(
 			"organsNoSincronitzats",
 			es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
+	pageContext.setAttribute(
+			"isUrlsInstruccioActiu",
+			es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
 
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
@@ -360,9 +363,14 @@ body {
 								<c:if test="${sessionScope['SessionHelper.isTipusDocumentsEnabled']!=null  && sessionScope['SessionHelper.isTipusDocumentsEnabled']}">
 									<li><a href="<c:url value="/tipusDocumental"/>"><spring:message code="decorator.menu.tipusdocumental"/></a></li>
 								</c:if>
-								<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
+								<c:if test="${sessionScope['SessionHelper.isDominisEnabled']!=null  && sessionScope['SessionHelper.isDominisEnabled']}">
+									<li><a href="<c:url value="/domini"/>"><spring:message code="decorator.menu.domini"/></a></li>
+								</c:if>								
 								<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 								<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
+								<c:if test="${isUrlsInstruccioActiu}">
+									<li><a href="<c:url value="/urlInstruccio"/>"><spring:message code="decorator.menu.urlinstruccio"/></a></li>
+								</c:if>
 								<li class="divider"></li>
 								<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 <%-- 										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li> --%>

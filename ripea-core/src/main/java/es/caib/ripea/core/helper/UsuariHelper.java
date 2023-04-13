@@ -93,7 +93,7 @@ public class UsuariHelper {
 					"usuariCodi=" + auth.getName() + ")");
 			// Primer cream l'usuari amb dades fictícies i després l'actualitzam.
 			// Així evitam possibles bucles infinits a l'hora de guardar registre
-			// de les peticions al plugin d'usuaris.
+			// de les peticions al plugin d'usuaris. <-- can't understand why doing it this way would prevent any infinite loops TODO: think if it can be removed and if can use method getUsuariByCodiDades() instead
 			usuari = usuariRepository.save(
 					UsuariEntity.getBuilder(
 							auth.getName(),
@@ -126,7 +126,7 @@ public class UsuariHelper {
 					"usuariCodi=" + codi + ")");
 			// Primer cream l'usuari amb dades fictícies i després l'actualitzam.
 			// Així evitam possibles bucles infinits a l'hora de guardar registre
-			// de les peticions al plugin d'usuaris.
+			// de les peticions al plugin d'usuaris. <-- can't understand why doing it this way would prevent any infinite loops TODO: think if it can be removed and if can use method getUsuariByCodiDades() instead
 			usuari = usuariRepository.save(
 					UsuariEntity.getBuilder(
 							codi,
@@ -150,45 +150,42 @@ public class UsuariHelper {
 		return usuari;
 	}
 	
-	public UsuariEntity getUsuariByCodiDades(String usuariCodi) {
 
-		logger.debug("Cercant d’usuari a la base de dades (usuariCodi=" + usuariCodi + ")");
+	
+	public UsuariEntity getUsuariByCodiDades(
+			String usuariCodi,
+			boolean checkAlsoByNif,
+			boolean throwException) {
+		
+		DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
+		if (dadesUsuari == null) {
+			if (throwException) {
+				throw new NotFoundException(
+						usuariCodi,
+						DadesUsuari.class);
+			} else {
+				return null;
+			}
+		}
+		
 		UsuariEntity usuari = usuariRepository.findOne(usuariCodi);
 		
-		if (usuari == null)
+		if (usuari == null && checkAlsoByNif)
 			usuari = usuariRepository.findByNif(usuariCodi);
-			
+		
 		if (usuari == null) {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + usuariCodi + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
-			if (dadesUsuari != null) {
-				usuari = usuariRepository.save(
-						UsuariEntity.getBuilder(
-								dadesUsuari.getCodi(),
-								dadesUsuari.getNom(),
-								dadesUsuari.getNif(),
-								dadesUsuari.getEmail(),
-								getIdiomaPerDefecte()).build());
-			} else {
-				throw new NotFoundException(
-						usuariCodi,
-						DadesUsuari.class);
-			}
+			usuari = usuariRepository.save(
+					UsuariEntity.getBuilder(
+							dadesUsuari.getCodi(),
+							dadesUsuari.getNom(),
+							dadesUsuari.getNif(),
+							dadesUsuari.getEmail(),
+							getIdiomaPerDefecte()).build());
 		} else {
-			logger.debug("Consultant plugin de dades d'usuari (" +
-					"usuariCodi=" + usuariCodi + ")");
-			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(usuariCodi);
-			if (dadesUsuari != null) {
-				usuari.update(
-						dadesUsuari.getNom(),
-						dadesUsuari.getNif(),
-						dadesUsuari.getEmail());
-			} else {
-				throw new NotFoundException(
-						usuariCodi,
-						DadesUsuari.class);
-			}
+			usuari.update(
+					dadesUsuari.getNom(),
+					dadesUsuari.getNif(),
+					dadesUsuari.getEmail());
 		}
 		
 		return usuari;

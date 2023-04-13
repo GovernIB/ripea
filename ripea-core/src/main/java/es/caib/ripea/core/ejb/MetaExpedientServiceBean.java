@@ -468,6 +468,20 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 		delegate.actualitzaProcediments(entitat, locale);
 	}
 
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public ReglaDistribucioDto consultarReglaDistribucio(
+			Long metaExpedientId) {
+		return delegate.consultarReglaDistribucio(metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
+	public CrearReglaResponseDto activarReglaDistribucio(
+			Long metaExpedientId) {
+		return delegate.activarReglaDistribucio(metaExpedientId);
+	}
+
 //    @Override
 //    public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
 //        return delegate.getMetaExpedientsAmbOrganNoSincronitzat(entitatId);

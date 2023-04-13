@@ -322,6 +322,8 @@ public class EntityComprovarHelper {
 	}
 	
 	
+	
+
 
 	
 	public MetaExpedientEntity comprovarMetaExpedient(Long entitatId, Long metaExpedientId) {
@@ -354,6 +356,22 @@ public class EntityComprovarHelper {
 			throw new ValidationException(metaExpedientId, MetaExpedientEntity.class,
 			        "L'entitat especificada (id=" + entitat.getId()
 			                + ") no coincideix amb l'entitat del meta-expedient");
+		}
+		return metaExpedient;
+	}
+	
+	
+	public MetaExpedientEntity comprovarMetaExpedient(Long metaExpedientId) {
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
+		if (metaExpedient == null) {
+			throw new NotFoundException(metaExpedientId, MetaExpedientEntity.class);
+		}
+		if (HibernateHelper.isProxy(metaExpedient)) {
+			metaExpedient = HibernateHelper.deproxy(metaExpedient);
+		}
+		EntitatEntity metaExpedientEntitat = metaExpedient.getEntitat();
+		if (HibernateHelper.isProxy(metaExpedientEntitat)) {
+			metaExpedientEntitat = HibernateHelper.deproxy(metaExpedient.getEntitat());
 		}
 		return metaExpedient;
 	}
