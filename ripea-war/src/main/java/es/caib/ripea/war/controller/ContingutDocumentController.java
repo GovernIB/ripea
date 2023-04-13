@@ -717,7 +717,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual, 
 				docsIdx,
 				baos,
-				request);
+				request, null);
 		
 		reportContent = baos.toByteArray();
 		response.setHeader("Content-Disposition", "attachment; filename=" + expedient.getNom().replaceAll(" ", "_") + ".zip");
@@ -725,11 +725,79 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		response.getOutputStream().flush();
 	}
 	
+	
+	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.GET)
+	public String chooseTipusDocument(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			model.addAttribute(new DocumentCommand());
+			model.addAttribute(
+					"metaDocuments",
+					metaDocumentService.findActiusPerCreacio(
+							entitatActual.getId(),
+							expedientId, 
+							null,
+							false));
+			model.addAttribute("expedientId", expedientId);
+			
+			return "notificarMultipleDocuemntTipusForm";
+				
+		
+		} catch (Exception e) {
+			logger.error("Error al chooseTipusDocument", e);
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:/contingut/" + expedientId,
+					e.getMessage(),
+					e);
+		}
+	}
+	
+
+	
+	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.POST)
+	public String chooseTipusDocumentPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			DocumentCommand command,
+			BindingResult bindingResult,
+			Model model) {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (command.getMetaNodeId() == null) {
+			bindingResult.rejectValue("metaNodeId", "NotNull");
+		}
+
+		
+		if (bindingResult.hasErrors()) {
+			model.addAttribute(
+					"metaDocuments",
+					metaDocumentService.findActiusPerCreacio(
+							entitatActual.getId(),
+							expedientId, 
+							null,
+							false));
+			model.addAttribute("expedientId", expedientId);
+			return "notificarMultipleDocuemntTipusForm";
+		}
+
+		
+		return concatenarOGenerarZip(request, expedientId, command.getMetaNodeId(), model);
+
+	}
+	
+	
 	@RequestMapping(value = "/{expedientId}/concatenarOGenerarZip", method = RequestMethod.GET)
 	public String concatenarOGenerarZip(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
-			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+			Long metaDocumentId,
+			Model model) {
 		
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -763,7 +831,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			}
 
 			// ========================= CONCATENTAR ===================================
-			if (totsDocumentsPdf) {
+			if (totsDocumentsPdf && Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar"))) {
 				
 				Map<String, Long> ordre = new LinkedHashMap<String, Long>();
 				if (docsIdx != null) {
@@ -797,7 +865,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						entitatActual, 
 						docsIdx,
 						null,
-						request);
+						request, 
+						metaDocumentId);
 				
 				DocumentDto document = documentService.create(
 						entitatActual.getId(),

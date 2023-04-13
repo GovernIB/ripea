@@ -108,12 +108,20 @@ public class DocumentHelper {
 			EntitatDto entitatActual,
 			Set<Long> docsIdx,
 			ByteArrayOutputStream baos,
-			HttpServletRequest request) {
+			HttpServletRequest request,
+			Long metaDocumentId) {
 		
 		DocumentGenericCommand command = new DocumentGenericCommand();
-		MetaDocumentDto metaDocument = metaDocumentService.findByTipusGeneric(
-				entitatId, 
-				MetaDocumentTipusGenericEnumDto.NOTIFICACION);
+		
+		MetaDocumentDto metaDocument = null;
+		if (metaDocumentId != null) {
+			metaDocument = metaDocumentService.findById(entitatId, metaDocumentId);
+		} else {
+			metaDocument = metaDocumentService.findByTipusGeneric(
+					entitatId, 
+					MetaDocumentTipusGenericEnumDto.NOTIFICACION);
+		}
+
 		
 		byte[] reportContent = null;
 		
@@ -154,7 +162,7 @@ public class DocumentHelper {
 				command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
 				command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
 				command.setNtiOrigen(metaDocument.getNtiOrigen());
-				command.setDocumentTipus(DocumentTipusEnumDto.VIRTUAL);
+				command.setDocumentTipus(metaDocumentId != null ? DocumentTipusEnumDto.DIGITAL : DocumentTipusEnumDto.VIRTUAL);
 				command.setFitxerNom(command.getNom() + ".zip");
 				command.setFitxerContentType("application/zip");
 				command.setFitxerContingut(reportContent);
