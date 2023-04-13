@@ -109,7 +109,7 @@ public class URLInstruccioController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:urlInstruccio",
-					"avis.controller.modificat.ok");
+					"url.instruccio.controller.modificat.ok");
 		} else {
 			urlInstruccioService.create(
 					entitatActual.getId(),
@@ -117,7 +117,7 @@ public class URLInstruccioController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:urlInstruccio",
-					"avis.controller.creat.ok");
+					"url.instruccio.controller.creat.ok");
 		}
 	}
 
@@ -155,7 +155,7 @@ public class URLInstruccioController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../urlInstruccio",
-				"avis.controller.esborrat.ok");
+				"url.instruccio.controller.esborrat.ok");
 	}
 	
 	private URLInstruccioFiltreCommand getFiltreCommand(
