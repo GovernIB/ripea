@@ -263,6 +263,8 @@
 			<mvc:mapping path="/seguimentTasques/**"/>
 			<mvc:mapping path="/seguimentExpedientsPendents**"/>
 			<mvc:mapping path="/seguimentExpedientsPendents/**"/>
+			<mvc:mapping path="/urlInstruccio**"/>
+			<mvc:mapping path="/urlInstruccio/**"/>
 			<mvc:exclude-mapping path="/metaExpedientRevisio**"/>
 			<mvc:exclude-mapping path="/metaExpedientRevisio/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatInterceptor"/>
@@ -273,6 +275,13 @@
 			<mvc:mapping path="/metaExpedientRevisio**"/>
 			<mvc:mapping path="/metaExpedientRevisio/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatORevisorInterceptor"/>
+		</mvc:interceptor>
+		
+		<!-- Rutes només accessibles amb la propietat es.caib.ripea.expedient.generar.urls.instruccio -->
+		<mvc:interceptor>
+			<mvc:mapping path="/urlInstruccio**"/>
+			<mvc:mapping path="/urlInstruccio/**"/>
+			<bean class="es.caib.ripea.war.interceptor.AccesURLsInstruccioInterceptor"/>
 		</mvc:interceptor>
 		
 		<!-- Rutes només accessibles amb el rol de superusuari -->

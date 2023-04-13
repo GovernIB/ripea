@@ -136,4 +136,8 @@
 			id="segonPlaService"
 			jndi-name="ripea/SegonPlaServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.SegonPlaService"/>
+	<jee:local-slsb
+			id="urlInstruccioService"
+			jndi-name="ripea/URLInstruccioServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.URLInstruccioService"/>
 </beans>

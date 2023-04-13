@@ -359,6 +359,10 @@
 				</c:if>
 			</c:if>
 		</c:if>
+		<%---- URLs instrucció ----%>
+		<c:if test="${!isTasca && contingut.expedient && isGenerarUrlsInstruccioActiu}">
+			<li><a href="#" onclick="urlInstruccio(${contingut.id})"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.url"/></a></li>
+		</c:if>
 		<%---- Histï¿½ric d'accions ----%>
 		<c:if test="${!isTasca}">
 			<c:if test="${mostrarSeparador}">

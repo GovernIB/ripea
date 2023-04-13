@@ -387,4 +387,10 @@ public class ContingutServiceBean implements ContingutService {
 		
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<String> obtenerURLsInstruccio(Long entitatId, Long contingutId) {
+		return delegate.obtenerURLsInstruccio(entitatId, contingutId);
+	}
+
 }

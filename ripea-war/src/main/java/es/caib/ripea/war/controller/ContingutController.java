@@ -171,7 +171,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isImportacioRelacionatsActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.importacio.expedient.relacionat.activa")));
 			model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.esborrar.finals", true));
 			model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.logiques")));
-			
+			model.addAttribute("isGenerarUrlsInstruccioActiu", isGenerarUrlsInstruccioActiu());
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
 				isEntitatUserAdminOrOrgan = true;
@@ -664,6 +664,31 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				interessats);
 	}
 
+	@RequestMapping(value = "/contingut/{contingutId}/url", method = RequestMethod.GET)
+	@ResponseBody
+	public List<String> urlInstruccio(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		if (! isGenerarUrlsInstruccioActiu())
+			throw new SecurityException("Es necessari activar la propietat 'es.caib.ripea.expedient.generar.urls.instruccio' per accedir a la gestió d'URLs d'instrucció");
+		
+		List<String> urls = contingutService.obtenerURLsInstruccio(entitatActual.getId(), contingutId);
+		
+		if (! urls.isEmpty())
+			MissatgesHelper.success(
+					request,
+					getMessage(request, "url.instruccio.url.copiat.ok"));
+		
+		return urls;
+	}
+
+	private boolean isGenerarUrlsInstruccioActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.generar.urls.instruccio"));
+	}
+	
 	@RequestMapping(value = "/contingut/{contingutId}/log", method = RequestMethod.GET)
 	public String log(
 			HttpServletRequest request,

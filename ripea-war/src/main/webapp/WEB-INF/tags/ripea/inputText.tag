@@ -13,6 +13,7 @@
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="tooltip" required="false" rtexprvalue="true"%>
 <%@ attribute name="tooltipMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="button" required="false" rtexprvalue="true"%>
@@ -20,6 +21,8 @@
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
+<%@ attribute name="exemple" required="false" rtexprvalue="true"%>
+<%@ attribute name="exempleLabel" required="false" rtexprvalue="true"%>
 
 <c:set var="campPath" value="${name}"/>
 <c:set var="campId" value="${campPath}"/><c:if test="${not empty id}"><c:set var="campId" value="${id}"/></c:if>
@@ -27,7 +30,7 @@
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}"> *</c:if></c:set>
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
-<c:set var="campInputSize">${12 - campLabelSize}</c:set>
+<c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
 <c:set var="myReadonly">
 	<c:choose>
 		<c:when test="${empty readonly}">false</c:when>
@@ -66,6 +69,12 @@
 			
 			<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 			<c:if test="${not empty comment}"><p class="comentari col-xs-${12 - labelSize} col-xs-offset-${labelSize}"><spring:message code="${comment}"/></p></c:if>
+			<c:if test="${not empty exemple}">
+				<a class="btn btn-default btn-xs exemple_boto"  onclick="webutilMostrarExemple(this)"><spring:message code="${exempleLabel}"/></a>
+				<div class="exemple">
+					<pre><spring:message code="${exemple}"/></pre>
+				</div>
+			</c:if>
 		</div>
 	</c:when>
 	<c:otherwise>
@@ -75,6 +84,12 @@
 			<button class="btn btn-outline-secondary" type="button">Button</button>
 		</c:if>
 		<c:if test="${not empty comment}"><p class="comentari col-xs-${12 - labelSize} col-xs-offset-${labelSize}"><spring:message code="${comment}"/></p></c:if>
+		<c:if test="${not empty exemple}">
+			<a class="btn btn-default btn-xs exemple_boto"  onclick="webutilMostrarExemple(this)"><spring:message code="${exempleLabel}"/></a>
+			<div class="exemple">
+				<pre><spring:message code="${exemple}"/></pre>
+			</div>
+		</c:if>
 	</c:otherwise>
 </c:choose>
 </div>

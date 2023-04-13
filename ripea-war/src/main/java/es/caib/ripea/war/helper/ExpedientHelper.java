@@ -31,7 +31,7 @@ public class ExpedientHelper {
 	private static final String REQUEST_PARAMETER_STATISTICS_EXPEDIENTS = "ExpedientHelper.teAccesEstadistiques";
 	private static final String SESSION_CONVERSIO_DEFINITIU_ACTIVA = "ExpedientHelper.isConversioDefinitiuActiva";
 	private static final String SESSION_URL_VALIDACIO = "ExpedientHelper.isUrlValidacioDefinida";
-	
+	private static final String SESSION_URLS_INSTRUCCIO = "ExpedientHelper.isUrlsInstruccioActiu";
 
 	@Autowired
 	private ExpedientService expedientService;
@@ -134,7 +134,18 @@ public class ExpedientHelper {
 				isUrlValidacioDefinida);
 	}
 	
+	public static Boolean isUrlsInstruccioActiu(HttpServletRequest request) {
+		return (Boolean)request.getSession().getAttribute(SESSION_URLS_INSTRUCCIO);
+	}
 	
+	public static void setUrlsInstruccioActiu(
+			HttpServletRequest request,
+			AplicacioService aplicacioService) {
+		boolean isUrlsInstruccioActiu = Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.generar.urls.instruccio"));
+		request.getSession().setAttribute(
+				SESSION_URLS_INSTRUCCIO,
+				isUrlsInstruccioActiu);
+	}
 	
 	public ContingutVistaEnumDto getVistaActiva(HttpServletRequest request) {
 		

@@ -79,6 +79,9 @@
 	pageContext.setAttribute(
 			"organsNoSincronitzats",
 			es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
+	pageContext.setAttribute(
+			"isUrlsInstruccioActiu",
+			es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
 
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
@@ -365,6 +368,9 @@ body {
 								</c:if>								
 								<li><a href="<c:url value="/grup"/>"><spring:message code="decorator.menu.grups"/></a></li>
 								<li><a href="<c:url value="/organgestor"/>"><spring:message code="decorator.menu.organgestor"/></a></li>
+								<c:if test="${isUrlsInstruccioActiu}">
+									<li><a href="<c:url value="/urlInstruccio"/>"><spring:message code="decorator.menu.urlinstruccio"/></a></li>
+								</c:if>
 								<li class="divider"></li>
 								<li><a href="<c:url value="/permis"/>"><spring:message code="decorator.menu.permisos.entitat"/></a></li>
 <%-- 										<li><a href="<c:url value="/organgestor/permis"/>"><spring:message code="decorator.menu.permisos.organgestor"/></a></li> --%>

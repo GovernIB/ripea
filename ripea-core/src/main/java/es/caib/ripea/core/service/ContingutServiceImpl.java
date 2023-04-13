@@ -82,6 +82,7 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
+import es.caib.ripea.core.entity.URLInstruccionEntity;
 import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
@@ -106,6 +107,7 @@ import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
+import es.caib.ripea.core.repository.URLInstruccionRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
@@ -162,7 +164,9 @@ public class ContingutServiceImpl implements ContingutService {
 	private DominiService dominiService;
 	@Autowired
 	private ConfigHelper configHelper;
-
+	@Autowired
+	private URLInstruccionRepository urlInstruccionRepository;
+	
 	@Transactional
 	@Override
 	public void dadaSave(
@@ -2073,6 +2077,46 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return result;
     }
+    
+	@Override
+	public List<String> obtenerURLsInstruccio(
+			Long entitatId, 
+			Long contingutId) {
+		logger.debug("Generant URLs instrucció ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, false, false);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		List<String> urls = new ArrayList<String>();
+		if (contingut instanceof ExpedientEntity) {
+			ExpedientEntity expedient = (ExpedientEntity)contingut;
+			List<URLInstruccionEntity> URLsInstruccio = urlInstruccionRepository.findByEntitat(entitat);
+
+			String eni = expedient.getNtiIdentificador();
+			for (URLInstruccionEntity urlInstruccio: URLsInstruccio) {
+				String url = urlInstruccio.getUrl();
+ 				if (url.contains("[ENI]") && eni != null && ! eni.isEmpty()) {
+					urls.add(url.replaceAll("\\[ENI\\]", eni));
+				}
+			}
+			
+			// CSV
+//			if (! urlCSV.isEmpty()) {
+//				es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
+//				Object csv = arxiuExpedient.getMetadades().getMetadadaAddicional("csv");
+//				if (csv != null) {
+//					urls.add(urlCSV.replaceAll("\\[CSV\\]", (String)csv));
+//				}
+//			}
+		}
+		return urls;
+	}
 
 	public boolean isPropagarMetadadesActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
