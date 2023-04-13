@@ -30,6 +30,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
 	
+	List<MetaExpedientEntity> findByEntitatId(Long entitatId);
+	
 	@Query( "select " +
 			"	me.id " +
 			"from " +
@@ -248,6 +250,17 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and me.organGestor is null " +
 			"and me.actiu = true")
 	List<Long> findProcedimentsComunsActiveIds(
+			@Param("entitat") EntitatEntity entitat);
+	
+	@Query( "select " +
+			"   me " +
+			"from " +
+			"    MetaExpedientEntity me " +
+			"where " +
+			"    me.entitat = :entitat " +
+			"and me.organGestor is null " +
+			"and me.actiu = true")
+	List<MetaExpedientEntity> findProcedimentsComunsActive(
 			@Param("entitat") EntitatEntity entitat);
 
 	@Query(	"from" +

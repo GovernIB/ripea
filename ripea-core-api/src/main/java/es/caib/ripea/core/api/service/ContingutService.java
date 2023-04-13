@@ -20,24 +20,7 @@ import java.util.Map;
  */
 public interface ContingutService {
 
-	/**
-	 * Canvia el nom del contingut.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contingut.
-	 * @param contingutId
-	 *            Atribut id del contingut del qual es vol consultar el contingut.
-	 * @param nom
-	 *            El nom que es vol posar al contingut.
-	 * @return El contingut modificat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public ContingutDto rename(
-			Long entitatId,
-			Long contingutId,
-			String nom) throws NotFoundException;
+
 
 	/**
 	 * Modifica els valors de les dades d'un node.
@@ -240,8 +223,6 @@ public interface ContingutService {
 	 *            Atribut id de l'entitat a la qual pertany el contingut.
 	 * @param contingutId
 	 *            Atribut id del contingut del qual es vol consultar el contingut.
-	 * @param ambFills
-	 *            Indica si la resposta ha d'incloure els fills del contingut.
 	 * @return El contingut amb l'id especificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -249,8 +230,7 @@ public interface ContingutService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public ContingutDto findAmbIdAdmin(
 			Long entitatId,
-			Long contingutId,
-			boolean ambFills) throws NotFoundException;
+			Long contingutId) throws NotFoundException;
 
 	/**
 	 * Obté la informació s'un contingut juntament el seu contingut donat el path.
@@ -425,35 +405,6 @@ public interface ContingutService {
 
 
 	/**
-	 * Obté una llista dels continguts esborrats permetent especificar dades
-	 * per al seu filtratge.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat.
-	 * @param nom
-	 *            Nom per a filtrar la llista d'elements esborrats.
-	 * @param usuariCodi
-	 *            Usuari per a filtrar la llista d'elements esborrats.
-	 * @param dataInici
-	 *            Data d'inici per a filtrar la llista d'elements esborrats.
-	 * @param dataFi
-	 *            Data de fi per a filtrar la llista d'elements esborrats.
-	 * @param paginacioParams
-	 *            Paràmetres per a dur a terme la paginació del resultats.
-	 * @return Una pàgina amb els continguts trobats.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<ContingutDto> findEsborrats(
-			Long entitatId,
-			String nom,
-			String usuariCodi,
-			Date dataInici,
-			Date dataFi,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
-
-	/**
 	 * Obté la informació del contingut emmagatzemada a l'arxiu digital.
 	 * 
 	 * @param entitatId
@@ -581,5 +532,12 @@ public interface ContingutService {
 			boolean ambPermisos,
 			String rolActual,
 			Long organActualId,
-			boolean ambEntitat);
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument, boolean ambMapPerEstat);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void checkIfPermittedAccess(
+			Long contingutId,
+			String rolActual,
+			Long organId);
 }

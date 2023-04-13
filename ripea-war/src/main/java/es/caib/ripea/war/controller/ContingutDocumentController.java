@@ -356,11 +356,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		try {
-			documentService.updateTipusDocumental(
+			documentService.updateTipusDocument(
 					entitatActual.getId(), 
 					contingutId, 
 					tipusDocumentId, 
-					false);
+					false, 
+					null, 
+					null);
 			return new JsonResponse(new Boolean(true));
 			
 		} catch (Exception e) {
@@ -368,6 +370,52 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return new JsonResponse(true, e.getMessage());
 		}
 		
+	}
+	
+	
+	@RequestMapping(value = "/{isTasca}/{id}/updateTipusDocumentDragDrop/{documentId}/{tipusDocumentId}", method = RequestMethod.GET)
+	public String updateTipusDocumentDragDrop(
+			HttpServletRequest request,
+			@PathVariable boolean isTasca,
+			@PathVariable Long id,
+			@PathVariable Long documentId,
+			@PathVariable Long tipusDocumentId,
+			Model model) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		String url;
+		if (isTasca) {
+			url = "redirect:/usuariTasca/" + id + "/tramitar";
+		} else {
+			url = "redirect:/contingut/" + id;
+		}
+	
+		
+		try {
+			documentService.updateTipusDocument(
+					entitatActual.getId(), 
+					documentId, 
+					tipusDocumentId, 
+					false, 
+					isTasca ? id : null, 
+					RolHelper.getRolActual(request));
+
+
+			return getAjaxControllerReturnValueSuccess(
+					request,
+					url,
+					"contingut.controller.element.canviar.tipus.document.ok");
+			
+			
+		} catch (Exception e) {
+			logger.error("Error actualitzant el document amb el nou tipus de document", e);
+			return getAjaxControllerReturnValueErrorMessage(
+					request,
+					url,
+					"contingut.controller.element.canviar.tipus.document.error",
+					e);
+			
+		}
 	}
 
 	
@@ -948,7 +996,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (docsIdx != null) {
 			List<Long> docsIdxList = Arrays.asList(docsIdx);
 			for (Long id: seleccio) {
-				if (!docsIdxList.contains(id))
+				if (docsIdxList.contains(id))
 					idxRemove.add(id);
 			}
 		} else {

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.97.2</version>
+		<version>0.9.98</version>
 	</parent>
 	<artifactId>ripea-lib-common</artifactId>
 	<packaging>pom</packaging>

@@ -577,7 +577,8 @@ public class PluginHelper {
 										classificacio,
 										expedient.getEstat(),
 										interessats,
-										metaExpedient.getSerieDocumental()));
+										metaExpedient.getSerieDocumental(),
+										expedient.getNumero()));
 						Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(expedientCreat.getIdentificador(), null);
 						propagarMetadadesExpedient(expedientDetalls, expedient);
 						expedient.updateArxiu(expedientCreat.getIdentificador());
@@ -603,7 +604,8 @@ public class PluginHelper {
 								classificacio,
 								expedient.getEstat(),
 								interessats,
-								metaExpedient.getSerieDocumental()));
+								metaExpedient.getSerieDocumental(),
+								expedient.getNumero()));
 				expedient.updateArxiu(null);
 			}
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
@@ -1434,7 +1436,7 @@ public class PluginHelper {
 			if (nouDocumentArxiu != null) {
 				return nouDocumentArxiu.getIdentificador();
 			} else {
-				return null;
+			return null;
 			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
@@ -1490,6 +1492,11 @@ public class PluginHelper {
 	public void arxiuCarpetaActualitzar(CarpetaEntity carpeta, ContingutEntity contingutPare) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(carpeta.getId()));
+		
+		boolean throwExceptionCarpetaArxiu = false;
+		if (throwExceptionCarpetaArxiu) { // throwExceptionCarpetaArxiu = true;
+			throw new RuntimeException("Mock excepcion al actualitzar carpeta al arxiu");
+		}
 		
 		String accioDescripcio = "Actualització de les dades d'una carpeta";
 		Map<String, String> accioParams = new HashMap<String, String>();
@@ -3154,7 +3161,7 @@ public class PluginHelper {
 	}
 
 	private Expedient toArxiuExpedient(String identificador, String nom, String ntiIdentificador, List<String> ntiOrgans, Date ntiDataObertura, String ntiClassificacio,
-									   ExpedientEstatEnumDto ntiEstat, List<String> ntiInteressats, String serieDocumental) {
+									   ExpedientEstatEnumDto ntiEstat, List<String> ntiInteressats, String serieDocumental, String numeroExpedient) {
 
 		Expedient expedient = new Expedient();
 		expedient.setNom(nom);
@@ -3176,6 +3183,10 @@ public class PluginHelper {
 		metadades.setOrgans(ntiOrgans);
 		metadades.setInteressats(ntiInteressats);
 		metadades.setSerieDocumental(serieDocumental);
+		
+		if (isPropagarNumeroExpedientActiu())
+			metadades.addMetadadaAddicional("numeroExpedient", numeroExpedient);
+		
 		expedient.setMetadades(metadades);
 		return expedient;
 	}
@@ -3202,7 +3213,7 @@ public class PluginHelper {
 
 		String documentNomInArxiu = documentEntity.getNom();
 		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
-			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), contingutPare.getArxiuUuid());
+			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), documentEntity.getExpedient().getArxiuUuid());
 		}
 		documentArxiu.setNom(documentNomInArxiu);
 		documentArxiu.setDescripcio(documentEntity.getDescripcio());
@@ -4297,6 +4308,9 @@ public class PluginHelper {
 		return configHelper.getAsBoolean("es.caib.ripea.carpetes.logiques");
 	}
 	
+	public boolean isPropagarNumeroExpedientActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.numero.expedient.propagar.arxiu");
+	}
 	
 	public void setArxiuPlugin(String entitatCodi, IArxiuPlugin arxiuPlugin) {
 		arxiuPlugins.put(entitatCodi, arxiuPlugin);

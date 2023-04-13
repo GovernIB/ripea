@@ -270,4 +270,17 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				metaExpedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void moveTo(
+			Long entitatId,
+			Long metaDocumentId,
+			int posicio) throws NotFoundException {
+		delegate.moveTo(
+				entitatId,
+				metaDocumentId,
+				posicio);
+		
+	}
+
 }

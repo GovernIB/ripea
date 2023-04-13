@@ -229,3 +229,7 @@ delete from ipa_config where entitat_codi is not null and key like '%'||'segonpl
 -- Changeset db/changelog/changes/0.9.97/1208.yaml::1670837833869-1::limit
 ALTER TABLE ipa_metadada ADD no_aplica BOOLEAN DEFAULT FALSE;
 
+-- Changeset db/changelog/changes/0.9.97/1234.yaml::1678274802658-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.plugin.arxiu.caib.debug', '', 'Nivell de logs', 'ARXIU', '30', '0', 'TEXT', '1');
+
+

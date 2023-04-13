@@ -163,13 +163,13 @@ public class CarpetaServiceImpl implements CarpetaService {
 				+ "expedientId=" + expedientId + ")");
 		List<CarpetaDto> carpetes = new ArrayList<CarpetaDto>();
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId, 
 				expedientId, 
 				true, 
 				true, 
 				false, 
 				false, 
-				false, false, null);
+				false, 
+				null);
 		List<CarpetaEntity> carpetesEntity = carpetaRepository.findByPare(expedient);
 		for (CarpetaEntity carpetaEntity : carpetesEntity) {
 			carpetes.add(carpetaHelper.toCarpetaDto(carpetaEntity));

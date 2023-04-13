@@ -545,7 +545,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			resposta.setNumComentaris(metaExpedient.getComentaris().size());
 			
@@ -580,7 +579,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			
 			if (metaExpedient.getOrganGestor() != null) {
@@ -601,11 +599,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findByEntitatAndCodi(entitat, codi);
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
-		if (resposta != null) {
-			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
-			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
-		}
+
 		return resposta;
 	}
 
@@ -979,7 +973,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		boolean permitted = true;
 		try {
-			entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+			entityComprovarHelper.comprovarMetaExpedient(
 					entitat,
 					metaExpedientId,
 					permission == PermissionEnumDto.READ,

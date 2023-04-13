@@ -58,7 +58,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -657,9 +656,18 @@ public class CacheHelper {
 	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {
 		logger.debug("Consulta anotacions pendents de processar");
 		
-		List<MetaExpedientEntity> metaExpedientsPermesos = expedientPeticioHelper.findMetaExpedientsPermesosPerAnotacions(entitat, organActualId, rolActual);
+		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
+				entitat.getId(),
+				rolActual,
+				organActualId);
 
-		return expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(entitat, metaExpedientsPermesos);
+		return expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(
+				entitat,
+				rolActual,
+				permisosPerAnotacions.getProcedimentsPermesos(),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+				permisosPerAnotacions.isAdminOrganHasPermisAdminComu());
+		
 		
 	}
 	

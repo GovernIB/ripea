@@ -422,5 +422,11 @@ public interface MetaDocumentService {
 			Long entitatId,
 			Long metaExpedientId) throws NotFoundException;
 
+	@PreAuthorize("hasRole('tothom')")
+	public void moveTo(
+			Long entitatId,
+			Long metaDocumentId,
+			int posicio) throws NotFoundException;
+
 
 }

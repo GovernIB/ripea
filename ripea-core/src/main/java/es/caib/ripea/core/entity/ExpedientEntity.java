@@ -145,7 +145,7 @@ public class ExpedientEntity extends NodeEntity {
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_estat_id")
 	@ForeignKey(name = "ipa_expestat_expedient_fk")
-	private ExpedientEstatEntity expedientEstat;
+	private ExpedientEstatEntity estatAdditional;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -220,8 +220,8 @@ public class ExpedientEntity extends NodeEntity {
 	public String getCodi() {
 		return codi;
 	}
-	public ExpedientEstatEntity getExpedientEstat() {
-		return expedientEstat;
+	public ExpedientEstatEntity getEstatAdditional() {
+		return estatAdditional;
 	}
 	public String getNtiVersion() {
 		return ntiVersion;
@@ -322,9 +322,9 @@ public class ExpedientEntity extends NodeEntity {
 		if (ExpedientEstatEnumDto.TANCAT.equals(estat))
 			this.tancatData = new Date();
 	}
-	public void updateExpedientEstat(
-			ExpedientEstatEntity expedientEstat) {
-		this.expedientEstat = expedientEstat;
+	public void updateEstatAdditional(
+			ExpedientEstatEntity estatAdditional) {
+		this.estatAdditional = estatAdditional;
 	}
 	
 	public void updateAgafatPer(

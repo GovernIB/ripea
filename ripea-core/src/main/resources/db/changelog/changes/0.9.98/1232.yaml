@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1678274802658-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.numero.expedient.propagar.arxiu
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Propagar el número d'expedient a l'arxiu
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 30
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1

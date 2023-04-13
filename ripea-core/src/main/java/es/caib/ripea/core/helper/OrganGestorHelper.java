@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,7 @@ import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
 @Component
@@ -407,7 +409,7 @@ public class OrganGestorHelper {
 		progres.setProgres(22);
 
 		// Definint tipus de transició
-		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));
+		obsoleteUnitats.addAll(organGestorRepository.findByEntitatNoVigent(entitat));//TODO: should only take unitats obsolets in last sincronization (should be taken from unitatsWs), now it takes from DB so it takes all obsoletes (even from previous syncronizations) 
 		
 		nombreUnitatsProcessades = 0;
 		nombreUnitatsTotal = obsoleteUnitats.size();
@@ -467,6 +469,16 @@ public class OrganGestorHelper {
 			ConfigHelper.setOrganCodi(organCodi);
 		}
 	}
+	
+	public boolean hasPermisAdminComu(Long organId) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		boolean hasPermisAdminComu = permisosHelper.isGrantedAll(
+				organId,
+				OrganGestorEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU },
+				auth);
+		return hasPermisAdminComu;
+	}
 
 	
 	@Transactional
@@ -476,7 +488,8 @@ public class OrganGestorHelper {
 //			return null;
 //		} else {
 			ContingutEntity contingut = contingutRepository.findOne(contingutId);
-			return contingut.getExpedientPare().getOrganGestor().getCodi();
+			ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+			return deproxied.getExpedientPare().getOrganGestor().getCodi();
 //		}
 
 	}

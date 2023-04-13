@@ -1045,7 +1045,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		if (RolHelper.isAdminEntitat(rolActual)) {
 			organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
 		} else if (RolHelper.isAdminOrgan(rolActual)){
-			organsGestors = organGestorRepository.findFills(entitat, Arrays.asList(organActualId));
+			organsGestors = organGestorRepository.findDescendents(entitat, Arrays.asList(organActualId));
 			
 		} else {
 		
@@ -1106,14 +1106,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			// if we modify expedient we have to insure that we can still see its organ in dropdown even if permissions were removed 
 			if (expedientId != null) {
 				ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
-						entitatId,
 						expedientId,
 						false,
 						false,
 						false,
 						false,
 						false,
-						false, null);
+						null);
 				
 				OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
 				

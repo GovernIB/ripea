@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -29,6 +30,10 @@ public abstract class ContingutDto extends AuditoriaDto {
 	protected Long id;
 	protected String nom;
 	protected List<ContingutDto> fills;
+	
+	protected Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument;
+	protected Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat;
+	
 	protected List<ContingutDto> path;
 	protected ExpedientDto expedientPare;
 	protected EntitatDto entitat;
@@ -207,6 +212,27 @@ public abstract class ContingutDto extends AuditoriaDto {
 
 	public boolean isReplicatDinsArxiu() {
 		return arxiuUuid != null;
+	}
+	
+	public Long getExpedientId() {
+		ExpedientDto expedient = getExpedientObject();
+		if (expedient != null) {
+			return expedient.getId();
+		} else {
+			return null;
+		}
+	}
+	
+	public ExpedientDto getExpedientObject() {
+		if (isExpedient()) {
+			return ((ExpedientDto) this);
+		} else {
+			if (expedientPare != null) {
+				return expedientPare;
+			} else {
+				return null;
+			}
+		}
 	}
 
 	public boolean isExpedient() {

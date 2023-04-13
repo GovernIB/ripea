@@ -3,26 +3,21 @@
  */
 package es.caib.ripea.core.helper;
 
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfDictionary;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfReader;
-import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ContingutArxiu;
-import es.caib.plugins.arxiu.api.Document;
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
-import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
-import es.caib.ripea.core.api.exception.PermissionDeniedException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.registre.RegistreInteressat;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
-import es.caib.ripea.core.repository.*;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
-import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -36,20 +31,85 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.lowagie.text.pdf.AcroFields;
+import com.lowagie.text.pdf.PdfDictionary;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
+
+import es.caib.plugins.arxiu.api.Carpeta;
+import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.Document;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.DadaDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentVersioDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaNodeDto;
+import es.caib.ripea.core.api.dto.NodeDto;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.registre.RegistreInteressat;
+import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.ContingutMovimentEntity;
+import es.caib.ripea.core.entity.DadaEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
+import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
+import es.caib.ripea.core.entity.TipusDocumentalEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.CarpetaRepository;
+import es.caib.ripea.core.repository.ContingutMovimentRepository;
+import es.caib.ripea.core.repository.ContingutRepository;
+import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
+import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
+import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
+import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 
 /**
  * Utilitat per a gestionar contenidors.
@@ -119,54 +179,34 @@ public class ContingutHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private ExpedientInteressatHelper expedientInteressatHelper;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
 
 
 
 	public ContingutDto toContingutDto(
-			ContingutEntity contingut) {
+			ContingutEntity contingut, 
+			boolean ambPath, 
+			boolean pathNomesFinsExpedientArrel) {
 		return toContingutDto(
 				contingut,
 				false,
 				false,
 				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
-	}
-	
-	public ContingutDto toContingutDto(
-			ContingutEntity contingut,
-			boolean ambPermisos,
-			boolean ambFills,
-			boolean filtrarFillsSegonsPermisRead,
-			boolean ambDades,
-			boolean ambPath,
-			boolean pathNomesFinsExpedientArrel,
-			boolean ambVersions,
-			String rolActual,
-			boolean onlyForList,
-			Long organActualId, 
-			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare) {
-		
-		return toContingutDto(
-				contingut,
-				ambPermisos,
-				ambFills,
-				filtrarFillsSegonsPermisRead,
-				ambDades,
 				ambPath,
 				pathNomesFinsExpedientArrel,
-				ambVersions,
-				rolActual,
-				onlyForList,
-				organActualId,
-				onlyFirstDescendant,
-				level,
-				expedientDto,
-				pathDto,
-				ambExpedientPare,
-				true);
+				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				false,
+				false,
+				false, 
+				false);
 	}
 	
 	
@@ -174,15 +214,21 @@ public class ContingutHelper {
 			ContingutEntity contingut,
 			boolean ambPermisos,
 			boolean ambFills,
-			boolean filtrarFillsSegonsPermisRead,
 			boolean ambDades,
 			boolean ambPath,
 			boolean pathNomesFinsExpedientArrel,
 			boolean ambVersions,
 			String rolActual,
 			boolean onlyForList,
-			Long organActualId, 
-			boolean onlyFirstDescendant, int level, ExpedientDto expedientDto, List<ContingutDto> pathDto, boolean ambExpedientPare, boolean ambEntitat) {
+			Long organActualId,
+			boolean onlyFirstDescendant, 
+			int level, 
+			ExpedientDto expedientDto, 
+			List<ContingutDto> pathDto, 
+			boolean ambExpedientPare, 
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument, 
+			boolean ambMapPerEstat) {
 		level++;
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		ContingutDto resposta = null;
@@ -208,45 +254,13 @@ public class ContingutHelper {
 					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
 
 			// expedient estat
-			if (expedient.getExpedientEstat() != null) {
+			if (expedient.getEstatAdditional() != null) {
 				dto.setExpedientEstat(conversioTipusHelper.convertir(
-						expedient.getExpedientEstat(),
+						expedient.getEstatAdditional(),
 						ExpedientEstatDto.class));
 			}
-			long t10 = System.currentTimeMillis();
-			try {
-				dto.setUsuariActualWrite(false);
-				entityComprovarHelper.comprovarPermisosMetaNode(
-						expedient.getMetaNode(),
-						expedient.getId(),
-						false,
-						true,
-						false,
-						false,
-						false,
-						rolActual,
-						null);
-				dto.setUsuariActualWrite(true);
-			} catch (PermissionDeniedException ex) {
-			}
-
-			try {
-				dto.setUsuariActualDelete(false);
-				entityComprovarHelper.comprovarPermisosMetaNode(
-						expedient.getMetaNode(),
-						expedient.getId(),
-						false,
-						false,
-						false,
-						true,
-						false,
-						rolActual,
-						null);
-				dto.setUsuariActualDelete(true);
-			} catch (PermissionDeniedException ex) {
-			}
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
+			
+			omplirPermisosPerExpedient(dto, rolActual, contingut.getId());
 
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
@@ -297,12 +311,12 @@ public class ContingutHelper {
 								DocumentEstatEnumDto.CUSTODIAT) > 0);
 				dto.setHasAllDocumentsDefinitiu(documentRepository.hasAllDocumentsDefinitiu(expedient));
 				// expedient estat
-				if (expedient.getExpedientEstat() != null) {
-					ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getExpedientEstat().getMetaExpedient(), expedient.getExpedientEstat().getOrdre()+1);
+				if (expedient.getEstatAdditional() != null) {
+					ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getEstatAdditional().getMetaExpedient(), expedient.getEstatAdditional().getOrdre()+1);
 					if (estat != null) {
 						dto.setExpedientEstatNextInOrder(estat.getId());
 					} else {//if there is no estat with higher order, choose previous
-						dto.setExpedientEstatNextInOrder(expedient.getExpedientEstat().getId());
+						dto.setExpedientEstatNextInOrder(expedient.getEstatAdditional().getId());
 					}
 				}
 
@@ -313,8 +327,123 @@ public class ContingutHelper {
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
 						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
-			}
+			
+			
+			
+				if (ambMapPerTipusDocument) {
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerTipusDocument start (" + contingut.getId() + ")");
+					long t2 = System.currentTimeMillis();
 
+					Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new LinkedHashMap<MetaDocumentDto, List<ContingutDto>>();
+
+					List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
+					
+					for (MetaDocumentEntity metaDocument : metaDocuments) {
+						
+						List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
+								expedient,
+								metaDocument,
+								0);
+						
+						MetaDocumentDto metaDocumentDto = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
+						
+						
+						List<ContingutDto> docsDtos = new ArrayList<ContingutDto>(); 
+						if (CollectionUtils.isNotEmpty(documents)) {
+							for (DocumentEntity document : documents) {
+								
+								docsDtos.add(
+										toContingutDto(
+												document,
+												ambPermisos,
+												false,
+												false,
+												ambPath,
+												false,
+												false,
+												rolActual,
+												onlyForList,
+												organActualId,
+												onlyFirstDescendant,
+												level,
+												null,
+												null,
+												ambExpedientPare,
+												ambEntitat,
+												false,
+												ambMapPerEstat));
+								
+							}
+						} 
+						mapPerTipusDocument.put(metaDocumentDto, docsDtos);
+						
+					}
+					dto.setMapPerTipusDocument(mapPerTipusDocument);
+					
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerTipusDocument end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				}		
+				if (ambMapPerEstat) {
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerEstat start (" + contingut.getId() + ")");
+					long t2 = System.currentTimeMillis();
+
+					Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat = new LinkedHashMap<ExpedientEstatDto, List<ContingutDto>>();
+
+					List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
+					
+					for (ExpedientEstatEntity expedientEstat : expedientEstats) {
+						
+						List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalAndEsborrat(
+								expedient,
+								expedientEstat,
+								0);
+						
+						ExpedientEstatDto expedientEstatDto = conversioTipusHelper.convertir(expedientEstat, ExpedientEstatDto.class);
+						
+						
+						List<ContingutDto> docsDtos = new ArrayList<ContingutDto>(); 
+						if (CollectionUtils.isNotEmpty(documents)) {
+							for (DocumentEntity document : documents) {
+								
+								docsDtos.add(
+										toContingutDto(
+												document,
+												ambPermisos,
+												false,
+												false,
+												ambPath,
+												false,
+												false,
+												rolActual,
+												onlyForList,
+												organActualId,
+												onlyFirstDescendant,
+												level,
+												null,
+												null,
+												ambExpedientPare,
+												ambEntitat,
+												false,
+												false));
+								
+								
+							}
+						} 
+						mapPerEstat.put(expedientEstatDto, docsDtos);
+						
+					}
+					dto.setMapPerEstat(mapPerEstat);
+					
+					if (cacheHelper.mostrarLogsRendiment())
+						logger.info("ambMapPerEstat end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+				}	
+				
+
+				
+			}
+			
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 
@@ -448,7 +577,17 @@ public class ContingutHelper {
 								false,
 								false,
 								false,
-								false, null, true, null, onlyFirstDescendant, level, null, null, ambExpedientPare, ambEntitat));
+								null,
+								true,
+								null,
+								onlyFirstDescendant,
+								level,
+								null,
+								null,
+								ambExpedientPare,
+								ambEntitat,
+								ambMapPerTipusDocument,
+								ambMapPerEstat));
 			
 			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
@@ -527,15 +666,6 @@ public class ContingutHelper {
 					logger.info("propertiesContingut5 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 			}
 
-			if (ambPermisos && metaNode != null) {
-				long t2 = System.currentTimeMillis();
-				// Omple els permisos
-				metaNodeHelper.omplirPermisosPerMetaNode(metaNode, rolActual, contingut.getId());
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambPermisosmetaNode time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-				
-			}
-
 			if (ambPermisos) {
 				
 				long t2 = System.currentTimeMillis();
@@ -594,7 +724,6 @@ public class ContingutHelper {
 								contingut.getExpedient(),
 								ambPermisos,
 								false,
-								false,
 								true,
 								false,
 								false,
@@ -605,9 +734,11 @@ public class ContingutHelper {
 								onlyFirstDescendant,
 								level,
 								null,
-								null, 
+								null,
 								ambExpedientPare, 
-								ambEntitat);
+								ambEntitat, 
+								ambMapPerTipusDocument, 
+								ambMapPerEstat);
 						if (cacheHelper.mostrarLogsRendiment())
 							logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 					}
@@ -668,24 +799,6 @@ public class ContingutHelper {
 
 				fills.addAll(fillsOrder1);
 				fills.addAll(fillsOrder2);
-
-				if (filtrarFillsSegonsPermisRead) {
-					// Filtra els fills que no tenen permis de lectura
-					Iterator<ContingutEntity> it = fills.iterator();
-					while (it.hasNext()) {
-						ContingutEntity c = it.next();
-						if (c instanceof ExpedientEntity) {
-							ExpedientEntity n = (ExpedientEntity)c;
-							if (n.getMetaNode() != null && !permisosHelper.isGrantedAll(
-									n.getMetaNode().getId(),
-									MetaNodeEntity.class,
-									new Permission[] {ExtendedPermission.READ},
-									auth)) {
-								it.remove();
-							}
-						}
-					}
-				}
 				
 				List<ContingutDto> fillsDtos = new ArrayList<ContingutDto>();
 				for (ContingutEntity fill: fills) {
@@ -695,10 +808,20 @@ public class ContingutHelper {
 								ambPermisos,
 								onlyFirstDescendant ? false : true,
 								false,
-								false,
 								ambPath,
 								false,
-								false, rolActual, onlyForList, organActualId, onlyFirstDescendant, level, expedientCalculat, pathCalculatPerFills, ambExpedientPare, ambEntitat);
+								false,
+								rolActual,
+								onlyForList,
+								organActualId,
+								onlyFirstDescendant,
+								level,
+								expedientCalculat,
+								pathCalculatPerFills,
+								ambExpedientPare,
+								ambEntitat,
+								ambMapPerTipusDocument,
+								ambMapPerEstat);
 						// Configura el pare de cada fill
 						fillsDtos.add(fillDto);
 					}
@@ -716,6 +839,52 @@ public class ContingutHelper {
 			logger.info("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + level + "): "+ (System.currentTimeMillis() - t3) + " ms");
 		return resposta;
 	}
+	
+	
+	
+	public void omplirPermisosPerExpedient(
+			ExpedientDto dto, 
+			String rolActual, 
+			Long expedientId) {
+
+		
+		long t10 = System.currentTimeMillis();
+		try {
+			dto.setUsuariActualWrite(false);
+			
+			
+			entityComprovarHelper.comprovarExpedient(
+					expedientId,
+					false,
+					false,
+					true,
+					false,
+					false,
+					null);
+			
+			dto.setUsuariActualWrite(true);
+		} catch (PermissionDeniedException ex) {
+		}
+
+		try {
+			dto.setUsuariActualDelete(false);
+			entityComprovarHelper.comprovarExpedient(
+					expedientId,
+					false,
+					false,
+					false,
+					false,
+					true,
+					null);
+			dto.setUsuariActualDelete(true);
+		} catch (PermissionDeniedException ex) {
+		}
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
+	
+
+	}
+	
 	
 	public ContingutDto toContingutDtoSimplificat(ContingutEntity contingut, boolean nomesFinsExpedientArrel, List<ContingutDto> pathDto) {
 		ContingutDto resposta = null;		
@@ -964,19 +1133,22 @@ public class ContingutHelper {
 			ExpedientEntity expedientEntity = (ExpedientEntity)contingut;
 			if (comprovarPermisWrite) {
 				// if expedient estat has write permissions don't need to check metaExpedient permissions
-				if (comprovarPermisWrite && expedientEntity.getExpedientEstat() != null) {
-					if (hasEstatPermissons(expedientEntity.getExpedientEstat().getId()))
+				if (comprovarPermisWrite && expedientEntity.getEstatAdditional() != null) {
+					if (hasEstatPermissons(expedientEntity.getEstatAdditional().getId()))
 						comprovarPermisWrite = false;
 				}
 			}
-			comprovarPermisosExpedient(
-					expedientEntity,
+			
+			
+			entityComprovarHelper.comprovarExpedient(
+					expedientEntity.getId(),
+					false,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					comprovarPermisCreate,
 					comprovarPermisDelete,
-					checkPerMassiuAdmin,
-					rolActual);
+					null);
+
 		}
 		return contingut;
 	}
@@ -1022,16 +1194,33 @@ public class ContingutHelper {
 				false,
 				false, null);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
-			comprovarPermisosExpedient(
-					(ExpedientEntity)contingut,
+			
+			entityComprovarHelper.comprovarExpedient(
+					contingut.getId(),
+					false,
 					comprovarPermisRead,
 					comprovarPermisWrite,
 					false,
-					false, false, null);
+					false,
+					null);
+
 		}
 		return contingut;
 	}
 
+	
+	public DocumentEntity comprovarDocumentPerTasca(
+			Long entitatId,
+			Long tascaId,
+			Long documentId) {
+
+		
+		comprovarContingutPertanyTascaAccesible(entitatId, tascaId, documentId);
+		DocumentEntity document = documentRepository.findOne(
+				documentId);
+
+		return document;
+	}
 
 	public ContingutEntity comprovarContingutPertanyTascaAccesible(
 			Long entitatId,
@@ -1088,14 +1277,7 @@ public class ContingutHelper {
 				+ "contingutId=" + contingut.getId() + ")");
 
 		ContingutDto dto = toContingutDto(
-				contingut,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingut, false, false);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1201,33 +1383,6 @@ public class ContingutHelper {
 	}
 
 
-	private void comprovarPermisosExpedient(
-			ExpedientEntity expedient,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete,
-			boolean checkPerMassiuAdmin,
-			String rolActual) {
-		if (expedient.getMetaNode() != null) {
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					expedient.getMetaNode(),
-					expedient.getId(),
-					comprovarPermisRead,
-					comprovarPermisWrite,
-					comprovarPermisCreate,
-					comprovarPermisDelete,
-					checkPerMassiuAdmin,
-					rolActual,
-					null);
-		} else {
-			throw new ValidationException(
-					expedient.getId(),
-					ContingutEntity.class,
-					"L'expedient no te meta-node associat (expedientId=" + expedient.getId() + ")");
-		}
-	}
-
 	public ExpedientEntity getExpedientSuperior(
 			ContingutEntity contingut,
 			boolean incloureActual,
@@ -1254,7 +1409,7 @@ public class ContingutHelper {
 		}
 		if (expedient != null) {
 			if (comprovarPermisRead) {
-				entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+				entityComprovarHelper.comprovarMetaExpedient(
 						expedient.getEntitat(),
 						expedient.getMetaExpedient().getId(),
 						true,
@@ -1268,16 +1423,17 @@ public class ContingutHelper {
 			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
 
 				// if user has write permissions to expedient estat don't need to check metaExpedient permissions
-				if (expedient.getExpedientEstat() == null || !hasEstatPermissons(expedient.getExpedientEstat().getId())) {
+				if (expedient.getEstatAdditional() == null || !hasEstatPermissons(expedient.getEstatAdditional().getId())) {
 
-					comprovarPermisosExpedient(
-							expedient,
-							false,
-							true,
-							false,
+					
+					entityComprovarHelper.comprovarExpedient(
+							expedient.getId(),
 							false,
 							false,
-							rolActual);
+							comprovarPermisWrite,
+							false,
+							false,
+							null);
 
 				}
 			}
@@ -1510,7 +1666,9 @@ public class ContingutHelper {
 			CarpetaEntity carpeta,
 			boolean fromAnotacio) {
 
-		boolean utilitzarCarpetesEnArxiu = fromAnotacio && !isCarpetaLogica();
+		boolean forceUtilitzarCarpetesArxiu = PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.propagar.carpetes.arxiu", false);
+
+		boolean utilitzarCarpetesEnArxiu = (fromAnotacio && !isCarpetaLogica()) || forceUtilitzarCarpetesArxiu;
 		
 		if (utilitzarCarpetesEnArxiu) {
 				pluginHelper.arxiuCarpetaActualitzar( 
@@ -1661,15 +1819,25 @@ public class ContingutHelper {
 					expedientArrelTrobat = true;
 				if (expedientArrelTrobat) {
 					pathDto.add(
-						toContingutDto(
-								contingutPath,
-								ambPermisos,
-								false,
-								false,
-								false,
-								false,
-								false,
-								false, null, false, null, false, level, null, null, false, false));
+							toContingutDto(
+									contingutPath,
+									ambPermisos,
+									false,
+									false,
+									false,
+									false,
+									false,
+									null,
+									false,
+									null,
+									false,
+									level,
+									null,
+									null,
+									false,
+									false,
+									false,
+									false));
 				}
 			}
 		}

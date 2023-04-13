@@ -123,7 +123,7 @@ public class ExpedientHelper2 {
 	public void closeExpedientDbAndArxiu(Long expedientId, String motiu) {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
-		expedient.updateExpedientEstat(null);
+		expedient.updateEstatAdditional(null);
 		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
 
 		pluginHelper.arxiuExpedientTancar(expedient);

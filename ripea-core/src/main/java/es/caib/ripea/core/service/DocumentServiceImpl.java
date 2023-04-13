@@ -221,7 +221,7 @@ public class DocumentServiceImpl implements DocumentService {
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentDto.getId() + ", " +
 				"document=" + documentDto + ")");
-		DocumentEntity documentEntity = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity documentEntity = documentHelper.comprovarDocument(
 				entitatId,
 				documentDto.getId(),
 				false,
@@ -273,40 +273,46 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	@Transactional
 	@Override
-	public boolean updateTipusDocumental(
+	public boolean updateTipusDocument(
 			Long entitatId,
 			Long documentId,
 			Long tipusDocumentId,
-			boolean comprovarMetaExpedient) {
+			boolean comprovarMetaExpedient, 
+			Long tascaId, 
+			String rolActual) {
 		logger.debug("Actualitzant el tipus de document del document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentId + ", " +
 				"tipusDocument=" + tipusDocumentId + ")");
-		DocumentEntity documentEntity = documentHelper.comprovarDocumentDinsExpedientModificable(
-				entitatId,
-				documentId,
-				false,
-				true,
-				false,
-				false, false, null);
-		ContingutEntity pare = null;
-		if (documentEntity.getPareId() != null) {
-			contingutHelper.comprovarContingutDinsExpedientModificable(
+		DocumentEntity document = null;
+		
+		if (tascaId != null) {
+			document = contingutHelper.comprovarDocumentPerTasca(
 					entitatId,
-					documentEntity.getPareId(),
+					tascaId,
+					documentId);
+		} else {
+			document = documentHelper.comprovarDocument(
+					entitatId,
+					documentId,
 					false,
-					false,
+					true,
 					false,
 					false, 
-					false, true, null);	
-		} 
+					false, 
+					rolActual);
+		}
+
 		
-		if (! checkCarpetaUniqueContraint(documentEntity.getNom(), pare, entitatId)) {
+		if (!checkCarpetaUniqueContraint(
+				document.getNom(),
+				null,
+				entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
 		return documentHelper.updateTipusDocumentDocument(
 				entitatId,
-				documentEntity,
+				document,
 				tipusDocumentId,
 				comprovarMetaExpedient);
 	}
@@ -336,18 +342,18 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				false,
 				false,
-				false, false, null);
+				false,
+				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
 			dtos.add(
-					(DocumentDto)contingutHelper.toContingutDto(document));
+					(DocumentDto)contingutHelper.toContingutDto(document, false, false));
 		}
 		return dtos;
 	}
@@ -379,18 +385,18 @@ public class DocumentServiceImpl implements DocumentService {
 				"expedientId=" + expedientId + ", " +
 				"estat=" + estat + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				false,
 				false,
-				false, false, null);
+				false,
+				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
 			dtos.add(
-					(DocumentDto)contingutHelper.toContingutDto(document));
+					(DocumentDto)contingutHelper.toContingutDto(document, false, false));
 		}
 		return dtos;
 	}
@@ -409,7 +415,7 @@ public class DocumentServiceImpl implements DocumentService {
 		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
 		for (DocumentEntity document: documents) {
 			dtos.add(
-					(DocumentDto)contingutHelper.toContingutDto(document));
+					(DocumentDto)contingutHelper.toContingutDto(document, false, false));
 		}
 		
 		return dtos;
@@ -437,13 +443,13 @@ public class DocumentServiceImpl implements DocumentService {
 				false, 
 				true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				false,
 				false,
-				false, false, null);
+				false,
+				null);
 		List<DocumentEntity> documents = documentRepository.findByExpedientAndTipus(
 				entitat, 
 				expedient,
@@ -743,7 +749,7 @@ public class DocumentServiceImpl implements DocumentService {
 				"id=" + id + ", " +
 				"assumpte=" + assumpte + ", " +
 				"prioritat=" + prioritat + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocument(
 				entitatId,
 				id,
 				false,
@@ -787,7 +793,7 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocument(
 				entitatId,
 				id,
 				false,
@@ -851,7 +857,7 @@ public class DocumentServiceImpl implements DocumentService {
 				+ "id=" + id
 				+ "rolActual=" + rolActual +")");
 
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocument(
 				entitatId,
 				id,
 				false,
@@ -973,13 +979,8 @@ public class DocumentServiceImpl implements DocumentService {
 						public DocumentDto convert(DocumentEntity source) {
 							DocumentDto dto = (DocumentDto)contingutHelper.toContingutDto(
 									source,
-									false,
-									false,
-									false,
-									false,
 									true,
-									true,
-									false, null, false, null, false, 0, null, null, true);
+									true);
 							return dto;
 						}
 					});
@@ -1014,14 +1015,13 @@ public class DocumentServiceImpl implements DocumentService {
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
-					entitat.getId(),
 					filtre.getExpedientId(),
 					false,
 					false,
 					false,
 					false,
-					false, 
-					checkPerMassiuAdmin, null);
+					false,
+					null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1068,7 +1068,7 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Reintentant processament d'enviament a viaFirma amb error ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocument(
 				entitatId,
 				id,
 				false,
@@ -1107,13 +1107,15 @@ public class DocumentServiceImpl implements DocumentService {
 		try {
 			UsuariEntity usuari = usuariRepository.findByCodi(usuariActual.getCodi());
 			
-			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+			DocumentEntity document = documentHelper.comprovarDocument(
 					entitatId,
 					documentId,
 					false,
 					true,
 					false,
-					false, false, null);
+					false, 
+					false, 
+					null);
 			if (!DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus())) {
 				throw new ValidationException(
 						document.getId(),
@@ -1199,13 +1201,15 @@ public class DocumentServiceImpl implements DocumentService {
 		logger.debug("Enviant document a viaFirma (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+		DocumentEntity document = documentHelper.comprovarDocument(
 				entitatId,
 				id,
 				false,
 				true,
 				false,
-				false, false, null);
+				false, 
+				false, 
+				null);
 		List<DocumentViaFirmaEntity> enviamentsPendents = documentViaFirmaRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {DocumentEnviamentEstatEnumDto.ENVIAT});
@@ -1431,7 +1435,7 @@ public class DocumentServiceImpl implements DocumentService {
 					ex);
 		}
 		if (objecte != null) {
-			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientModificable(
+			DocumentEntity document = documentHelper.comprovarDocument(
 					objecte.getEntitatId(),
 					objecte.getDocumentId(),
 					false,
@@ -1558,15 +1562,25 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	private DocumentDto toDocumentDto(
 			DocumentEntity document) {
-		return (DocumentDto)contingutHelper.toContingutDto(
+		return (DocumentDto) contingutHelper.toContingutDto(
 				document,
 				false,
 				false,
 				false,
+				true,
+				true,
 				false,
+				null,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
 				true,
 				true,
-				false, null, false, null, false, 0, null, null, true);
+				false,
+				false);
 	}
 	
 

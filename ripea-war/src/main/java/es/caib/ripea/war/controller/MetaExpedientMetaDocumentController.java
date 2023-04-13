@@ -130,7 +130,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				metaDocumentService.findByMetaExpedient(
 						entitatActual.getId(),
 						metaExpedientId,
-						DatatablesHelper.getPaginacioDtoFromRequest(request)));
+						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+				"id");
 		return dtr;
 	}
 
@@ -288,6 +289,29 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		}
 		
 	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/move/{posicio}", method = RequestMethod.GET)
+	public String move(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable Long metaDocumentId,
+			@PathVariable int posicio) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		
+		metaDocumentService.moveTo(
+				entitatActual.getId(),
+				metaDocumentId,
+				posicio);
+		
+
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:metaExpedientMetaDocument",
+				null);
+	}
+	
+	
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long metaExpedientId, @PathVariable Long metaDocumentId) {

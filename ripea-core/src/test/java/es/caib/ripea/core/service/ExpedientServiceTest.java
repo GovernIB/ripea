@@ -422,7 +422,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						ExpedientEstatDto estatCreat = estats1.get(0);
 						assertEquals(estatPerCrear.getCodi(), estatCreat.getCodi());
 						assertEquals(estatPerCrear.getNom(), estatCreat.getNom());
-						ExpedientDto expedientAmbEstat = expedientEstatService.changeEstatOfExpedient(
+						ExpedientDto expedientAmbEstat = expedientEstatService.changeExpedientEstat(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								estatCreat.getId(), 

@@ -1,0 +1,38 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1677771425170-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: expedient_estat_id
+            type: number(19)
+            constraints:
+                foreignKeyName: ipa_expestat_document_fk
+                references: ipa_expedient_estat(id)            
+        tableName: ipa_document
+    - addColumn:
+        tableName: ipa_usuari
+        column:
+          name: vista_actual
+          type: varchar(64 ${varcharunit})
+    - addColumn:
+        columns:
+        - column:
+            name: ordre
+            type: int
+            defaultValueNumeric: 0   
+            constraints:
+                nullable: false         
+        tableName: ipa_metadocument
+                  
+

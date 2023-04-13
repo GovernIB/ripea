@@ -127,15 +127,8 @@ public class CarpetaHelper {
 
 	public CarpetaDto toCarpetaDto(
 			CarpetaEntity carpeta) {
-		return (CarpetaDto)contingutHelper.toContingutDto(
-				carpeta,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+		return (CarpetaDto) contingutHelper.toContingutDto(
+				carpeta, false, false);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);

@@ -161,6 +161,27 @@ public interface ContingutLogRepository extends JpaRepository<ContingutLogEntity
         List<ContingutLogCountAggregation<MetaExpedientEntity>> findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
                 @Param("createdDateIni") Date createdDateIni,
                 @Param("createdDateEnd") Date createdDateEnd);
+	
+	
+	@Query( "select   " +
+            "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +
+            "	     e.metaExpedient, " +
+			"	     e.metaExpedient, " +
+            "        log.objecteLogTipus, " +
+            "        count(log) " +
+            "    ) " +
+            "from     " +
+            "    ContingutLogEntity log, DocumentEntity d JOIN d.expedient e " +
+            "where " +
+            "         log.contingutId = d.id " +
+            "     and log.objecteTipus = es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto.NOTIFICACIO " +
+            "     and log.createdDate >= :createdDateIni " +
+            "     and log.createdDate <= :createdDateEnd " +
+            "group by" +
+            "     e.metaExpedient, log.objecteLogTipus")
+        List<ContingutLogCountAggregation<MetaExpedientEntity>> findLogsNotificacioBetweenCreatedDateGroupByMetaExpedient(
+                @Param("createdDateIni") Date createdDateIni,
+                @Param("createdDateEnd") Date createdDateEnd);
 
 
 

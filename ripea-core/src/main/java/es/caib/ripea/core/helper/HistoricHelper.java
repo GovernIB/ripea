@@ -203,10 +203,10 @@ public class HistoricHelper {
 
 
 		
-		List<ContingutLogCountAggregation<MetaExpedientEntity>> countsSignats = contingutLogRepository.findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
+		List<ContingutLogCountAggregation<MetaExpedientEntity>> countAggregation1 = contingutLogRepository.findLogsDocumentBetweenCreatedDateGroupByMetaExpedient(
 				startDate,
 				endDate);
-		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countsSignats) {
+		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countAggregation1) {
 			HistoricExpedientEntity historic = mapExpedients.getHistoric(
 					count.getMetaExpedient().getId(),
 					startDate,
@@ -215,14 +215,29 @@ public class HistoricHelper {
 			case DOC_FIRMAT:
 				historic.setNumDocsSignats(count.getCount());
 				break;
+			default:
+				break;
+			}
+		}
+		
+		List<ContingutLogCountAggregation<MetaExpedientEntity>> countAggregation2 = contingutLogRepository.findLogsNotificacioBetweenCreatedDateGroupByMetaExpedient(
+				startDate,
+				endDate);
+		for (ContingutLogCountAggregation<MetaExpedientEntity> count : countAggregation2) {
+			HistoricExpedientEntity historic = mapExpedients.getHistoric(
+					count.getMetaExpedient().getId(),
+					startDate,
+					count.getMetaExpedient());
+			switch (count.getTipus()) {
 			case NOTIFICACIO_CERTIFICADA:
 				historic.setNumDocsNotificats(count.getCount());
 				break;
 			default:
 				break;
 			}
-
 		}
+		
+		
 //		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+------------------+---------------------+		+----------+--------------+-------------+-------------------+
 //		| METAEXPEDIENT | NUM_CREATS | NUM_OBERTS   | NUM_TANCATS | NUM_CREATS_TOTAL | NUM_OBERTS_TOTAL   | NUM_TANCATS_TOTAL | NUM_DOCS_FIRMATS | NUM_DOCS_NOTIFICATS |		| ENTITAT  | ORGANGESTOR  | DATE        | TIPUS_LOG 		|
 //		+---------------+------------+--------------+-------------+------------------+--------------------+-------------------+------------------+---------------------+		+----------+--------------+-------------+-------------------+

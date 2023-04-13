@@ -10,6 +10,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -19,6 +21,8 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
@@ -54,6 +58,10 @@ public class UsuariEntity implements Serializable {
 	@Column(name="rol_actual", length = 64)
 	private String rolActual;
 	
+	@Column(name="vista_actual", length = 64)
+	@Enumerated(EnumType.STRING)
+	private ContingutVistaEnumDto vistaActual;
+	
 	@Version
 	private long version = 0;
 	
@@ -62,6 +70,12 @@ public class UsuariEntity implements Serializable {
 	private boolean rebreEmailsAgrupats = true;
 
 
+	public ContingutVistaEnumDto getVistaActual() {
+		return vistaActual;
+	}
+	public void updateVistaActual(ContingutVistaEnumDto vistaActual) {
+		this.vistaActual = vistaActual;
+	}
 	public boolean isRebreEmailsAgrupats() {
 		return rebreEmailsAgrupats;
 	}

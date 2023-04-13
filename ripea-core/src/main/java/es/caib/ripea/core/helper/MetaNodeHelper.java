@@ -86,20 +86,33 @@ public class MetaNodeHelper {
 			MetaDadaEntity metaDada,
 			int posicio) {
 		List<MetaDadaEntity> metaNodeMetaDades = metaDadaRepository.findByMetaNodeOrderByOrdreAsc(metaNode);
-		int indexOrigen = -1;
-		for (MetaDadaEntity md: metaNodeMetaDades) {
-			if (md.getId().equals(metaDada.getId())) {
-				indexOrigen = md.getOrdre();
+		moveTo(
+				metaDada,
+				metaNodeMetaDades,
+				posicio);
+	}
+	
+	public void moveTo(
+			MetaDadaEntity elementToMove,
+			List<MetaDadaEntity> elements,
+			int posicio) {
+		
+		int anteriorIndex = -1; 
+		for (int i = 0; i < elements.size(); i++) {
+			if (elements.get(i).getId().equals(elementToMove.getId())) {
+				anteriorIndex = i;
 				break;
 			}
 		}
-		metaNodeMetaDades.add(
+		elements.add(
 				posicio,
-				metaNodeMetaDades.remove(indexOrigen));
-		for (int i = 0; i < metaNodeMetaDades.size(); i++) {
-			metaNodeMetaDades.get(i).updateOrdre(i);
+				elements.remove(anteriorIndex));
+		for (int i = 0; i < elements.size(); i++) {
+			elements.get(i).updateOrdre(i);
 		}
 	}
+	
+	
 
 	public void reordenarMetaDades(
 			MetaNodeEntity metaNode) {
@@ -171,70 +184,8 @@ public class MetaNodeHelper {
 			
 		}
 	}
+	
+	
 
-	public void omplirPermisosPerMetaNode(
-			MetaNodeDto metaNode, String rolActual, Long nodeId) {
-		
-		try {
-			metaNode.setUsuariActualRead(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					true,
-					false,
-					false,
-					false,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualRead(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		
-		try {
-			metaNode.setUsuariActualWrite(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					false,
-					true,
-					false,
-					false,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualWrite(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		
-		try {
-			metaNode.setUsuariActualCreate(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					false,
-					false,
-					true,
-					false,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualCreate(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		
-		try {
-			metaNode.setUsuariActualDelete(false);
-			entityComprovarHelper.comprovarPermisosMetaNode(
-					metaNode.getId(),
-					nodeId,
-					false,
-					false,
-					false,
-					true,
-					false, 
-					rolActual);
-			metaNode.setUsuariActualDelete(true);
-		} catch (PermissionDeniedException ex) {
-		}
-
-	}
 
 }

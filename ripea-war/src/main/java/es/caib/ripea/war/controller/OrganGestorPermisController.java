@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.OrganGestorFiltreCommand;
 import es.caib.ripea.war.command.PermisOrganGestorCommand;
@@ -46,6 +47,9 @@ public class OrganGestorPermisController extends BaseAdminController {
 
 	@Autowired
 	private OrganGestorService organGestorService;
+	
+	@Autowired
+	private ExpedientPeticioService expedientPeticioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String permisos(
@@ -114,15 +118,6 @@ public class OrganGestorPermisController extends BaseAdminController {
 			Model model) {
 		command.setOrganGestorId(organId);
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-
-		if (command.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
-			organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), command.getPrincipalNom());
-		} else {
-			List<String> usuaris = aplicacioService.findUsuarisCodisAmbRol(command.getPrincipalNom());
-			for (String usuari : usuaris) {
-				organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), usuari);
-			}
-		}
 		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("organsGestors", organGestorService.findByEntitat(entitat.getId()));
@@ -133,6 +128,19 @@ public class OrganGestorPermisController extends BaseAdminController {
 				command.getOrganGestorId(),
 				PermisOrganGestorCommand.asDto(command),
 				entitat.getId());
+		
+		
+		
+		if (command.getPrincipalTipus() == PrincipalTipusEnumDto.USUARI) {
+			organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), command.getPrincipalNom());
+		} else {
+			List<String> usuaris = aplicacioService.findUsuarisCodisAmbRol(command.getPrincipalNom());
+			for (String usuari : usuaris) {
+				organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), usuari);
+			}
+		}
+		expedientPeticioService.evictCountAnotacionsPendents(entitat.getId());
+		
 		if (command.getId() == null) {
 			return getModalControllerReturnValueSuccess(
 					request,

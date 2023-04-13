@@ -156,13 +156,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"expedientId=" + expedientId + ", " +
 				"notificacioId=" + notificacioId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				false,
 				true,
 				false,
-				false, false, null);
+				false,
+				null);
 		
 		return documentNotificacioHelper.findAmbId(entitatId, expedient, notificacioId);
 	}
@@ -384,13 +384,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				true,
 				false,
 				false,
-				false, false, null);
+				false,
+				null);
 		List<DocumentEnviamentDto> resposta = new ArrayList<DocumentEnviamentDto>();
 
 		if (documentEnviamentTipus == DocumentEnviamentTipusEnumDto.NOTIFICACIO) {
@@ -428,14 +428,12 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				true,
 				false,
 				false,
-				false, 
-				false, 
+				false,
 				null);
 		
 		int count = 0;

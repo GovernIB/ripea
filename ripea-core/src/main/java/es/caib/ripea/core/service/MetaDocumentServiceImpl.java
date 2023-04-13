@@ -143,7 +143,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos()).
+				metaDocument.getPinbalServeiDocsPermesos(), 
+				0).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
@@ -369,6 +370,49 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument,
 				MetaDocumentDto.class);
 	}
+	
+	
+	@Override
+	@Transactional
+	public void moveTo(
+			Long entitatId,
+			Long metaDocumentId,
+			int posicio) throws NotFoundException {
+
+		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(metaDocumentId);
+		
+		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientOrderByOrdreAsc(metaDocument.getMetaExpedient());
+		moveTo(
+				metaDocument,
+				metaDocuments,
+				posicio);
+	}
+	
+	public void moveTo(
+			MetaDocumentEntity elementToMove,
+			List<MetaDocumentEntity> elements,
+			int posicio) {
+		
+		int anteriorIndex = -1; 
+		for (int i = 0; i < elements.size(); i++) {
+			if (elements.get(i).getId().equals(elementToMove.getId())) {
+				anteriorIndex = i;
+				break;
+			}
+		}
+		elements.add(
+				posicio,
+				elements.remove(anteriorIndex));
+		for (int i = 0; i < elements.size(); i++) {
+			elements.get(i).updateOrdre(i);
+		}
+	}
+	
+	
+
+
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -396,7 +440,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 		}
 		return resposta;
 	}
@@ -426,7 +469,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
 			resposta.setMetaExpedientId(metaDocument.getMetaExpedient() != null ? metaDocument.getMetaExpedient().getId() : null);
 		}
 		return resposta;
@@ -467,10 +509,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
 										entity,
 										MetaDocumentDto.class);
-		if (resposta != null) {
-			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			metaNodeHelper.omplirPermisosPerMetaNode(resposta, null, null);
-		}
+
 		return resposta;
 	}
 

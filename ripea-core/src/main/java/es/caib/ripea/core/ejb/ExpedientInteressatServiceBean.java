@@ -64,7 +64,7 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 	@Override
 	@RolesAllowed("tothom")
 	public void delete(Long entitatId, Long expedientId, Long interessatId, String rolActual) {
-		delegate.delete(entitatId, expedientId, interessatId, null);
+		delegate.delete(entitatId, expedientId, interessatId, rolActual);
 	}
 
 	@Override

@@ -656,14 +656,18 @@ public interface DocumentService {
 	 * 			Id del nou tipus de document
 	 * @param comprovarMetaExpedient
 	 * 			Comprovar permisos metaExpedient
+	 * @param tascaId TODO
+	 * @param rolActual TODO
 	 * @return true si s'ha actualitzat
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public boolean updateTipusDocumental(
+	public boolean updateTipusDocument(
 			Long entitatId, 
 			Long documentId, 
 			Long tipusDocumentId,
-			boolean comprovarMetaExpedient);
+			boolean comprovarMetaExpedient, 
+			Long tascaId, 
+			String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId);

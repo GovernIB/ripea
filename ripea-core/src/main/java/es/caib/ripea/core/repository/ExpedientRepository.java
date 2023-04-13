@@ -105,8 +105,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.expedientEstat is null or :esNullMetaNode = true))) " +
-			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
+			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaNode = true))) " +
+			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
 			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " +
@@ -198,8 +198,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) " +
 			"and (:esNullTancatInici = true or e.createdDate >= :tancatInici) " +
 			"and (:esNullTancatFi = true or e.createdDate <= :tancatFi) " +
-			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.expedientEstat is null or :esNullMetaNode = true))) " +
-			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
+			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaNode = true))) " +
+			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
 			"and (:esNullAgafatPer = true or e.agafatPer = :agafatPer) " +
 			"and (:esNullTipusId = true or e.metaNode.id = :tipusId) " +
 			"and (:esNullExpedientsToBeExcluded = true or e not in (:expedientsToBeExluded)) " +
@@ -274,7 +274,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:esNullNumero = true or lower(e.numero) like lower('%'||:numero||'%')) " +
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullEstatEnum = true or e.estat = :estatEnum) " +
-			"and (:esNullEstat = true or e.expedientEstat = :estat) " +
+			"and (:esNullEstat = true or e.estatAdditional = :estat) " +
 			"and (e.id in (:expedientsRelacionatsIdx)) ")
 	Page<ExpedientEntity> findExpedientsRelacionatsByIdIn(
 			@Param("entitat") EntitatEntity entitat,

@@ -32,12 +32,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
+import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
@@ -71,6 +73,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.ExpedientHelper;
 import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
@@ -87,8 +90,6 @@ import es.caib.ripea.war.helper.SessioHelper;
 @Controller
 public class ContingutController extends BaseUserOAdminOOrganController {
 
-	private static final String CONTENIDOR_VISTA_ICONES = "icones";
-	private static final String CONTENIDOR_VISTA_LLISTAT = "llistat";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutDocumentController.session.seleccio";
 	
 	@Autowired
@@ -115,6 +116,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	private DocumentService documentService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private ExpedientHelper expedientHelper;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
@@ -133,6 +136,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			long t1 = System.currentTimeMillis();
 		
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			contingutService.checkIfPermittedAccess(contingutId, RolHelper.getRolActual(request), EntitatHelper.getOrganGestorActualId(request));
 			ContingutDto contingut = contingutService.findAmbIdUser(
 					entitatActual.getId(),
 					contingutId,
@@ -141,7 +145,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					true,
 					RolHelper.getRolActual(request), 
 					EntitatHelper.getOrganGestorActualId(request),
-					false);
+					false, 
+					expedientHelper.isVistaTreetablePerTipusDocuments(request), 
+					expedientHelper.isVistaTreetablePerEstats(request));
 
 			omplirModelPerMostrarContingut(
 					request,
@@ -149,7 +155,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingut,
 					SessioHelper.desmarcarLlegit(request),
 					model);
-			model.addAttribute("isContingutDetail", false);
 			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
 			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
 			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
@@ -241,6 +246,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
+			@RequestParam(value = "contingutNavigationId", required = false) Long contingutNavigationId,
 			Model model) throws IOException {
 
 		String url = "";
@@ -257,7 +263,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				url = "redirect:../../expedient";
 			} else {
 				url = "redirect:../../contingut/" +
-						contingut.getPare().getId();
+						(contingutNavigationId != null ? contingutNavigationId : contingut.getPare().getId());
 			}
 			
 			contingutService.deleteReversible(
@@ -298,11 +304,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			seleccio.remove(id);
 		}
 	}
-
-	@RequestMapping(value = "/contingut/{contingutId}/canviVista/icones", method = RequestMethod.GET)
-	public String canviVistaLlistat(
+	
+	
+	@RequestMapping(value = "/contingut/{isTasca}/{id}/canviVista/{vista}", method = RequestMethod.GET)
+	public String canviVista(
 			HttpServletRequest request,
-			@PathVariable Long contingutId,
+			@PathVariable boolean isTasca,
+			@PathVariable Long id,
+			@PathVariable ContingutVistaEnumDto vista,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = new HashSet<Long>();
@@ -310,28 +319,20 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				SESSION_ATTRIBUTE_SELECCIO,
 				seleccio);
+		expedientService.setVistaUsuariActual(vista);
+		
 		SessioHelper.updateContenidorVista(
 				request,
-				CONTENIDOR_VISTA_ICONES);
-		return "redirect:../../" + contingutId;
-	}
+				vista);
+		if (isTasca) {
+			return "redirect:/usuariTasca/" + id + "/tramitar";
+		} else {
+			return "redirect:/contingut/" + id;
+		}
+		
 
-	@RequestMapping(value = "/contingut/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
-	public String canviVistaIcones(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		Set<Long> seleccio = new HashSet<Long>();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO,
-				seleccio);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_LLISTAT);
-		return "redirect:../../" + contingutId;
 	}
+	
 
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.GET)
 	public String moureForm(
@@ -422,15 +423,25 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false, null, null);
-		contingutService.move(
-				entitatActual.getId(),
-				contingutOrigenId,
-				contingutDestiId, 
-				RolHelper.getRolActual(request));
+				false, 
+				null, 
+				null);
+		
+		boolean isTheSame = false;
+		if (contingutOrigen.getPare().getId().equals(contingutDestiId)) {
+			isTheSame = true;
+		}
+		if (!isTheSame) {
+			contingutService.move(
+					entitatActual.getId(),
+					contingutOrigenId,
+					contingutDestiId, 
+					RolHelper.getRolActual(request));
+		}
+
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:../../" + contingutOrigen.getPare().getId(),
+				"redirect:../../" + contingutOrigen.getExpedientPare().getId(),
 				"contingut.controller.element.mogut.ok");
 	}
 	
@@ -549,11 +560,13 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					request,
 					SESSION_ATTRIBUTE_SELECCIO);
 			for (Long contingutId: docsIdx) {
-				documentService.updateTipusDocumental(
+				documentService.updateTipusDocument(
 						entitatActual.getId(), 
 						contingutId, 
 						tipusDocumentId, 
-						false);
+						false, 
+						null, 
+						null);
 			}
 			return new JsonResponse(new Boolean(true));
 			
@@ -775,31 +788,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	}
 
 
-
-	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/icones", method = RequestMethod.GET)
-	public String contingutDetailCanviVistaIcones(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_ICONES);
-		return "redirect:../../" + contingutId;
-	}
-
-	@RequestMapping(value = "/contingutDetail/{contingutId}/canviVista/llistat", method = RequestMethod.GET)
-	public String contingutDetailCanviVistaLlistat(
-			HttpServletRequest request,
-			@PathVariable Long contingutId,
-			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		SessioHelper.updateContenidorVista(
-				request,
-				CONTENIDOR_VISTA_LLISTAT);
-		return "redirect:../../" + contingutId;
-	}
-
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(
@@ -808,7 +796,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
-
 
 
 	public void omplirModelPerMostrarContingut(
@@ -868,15 +855,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 							((NodeDto)contingut).getDades()));
 		} 
 
-		String contingutVista = SessioHelper.getContenidorVista(request);
-		if (contingutVista == null)
-			contingutVista = CONTENIDOR_VISTA_LLISTAT;
-		model.addAttribute(
-				"vistaIcones",
-				new Boolean(CONTENIDOR_VISTA_ICONES.equals(contingutVista)));
-		model.addAttribute(
-				"vistaLlistat",
-				new Boolean(CONTENIDOR_VISTA_LLISTAT.equals(contingutVista)));
+		expedientHelper.omplirVistaActiva(request, model);
+		
 		model.addAttribute(
 				"registreTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(

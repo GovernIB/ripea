@@ -257,7 +257,7 @@ public class ExpedientHelper {
 		}
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,
 				false,
@@ -322,7 +322,7 @@ public class ExpedientHelper {
 		}
 		// set inicial estat if exists
 		if (estatInicial != null) {
-			expedient.updateExpedientEstat(estatInicial);
+			expedient.updateEstatAdditional(estatInicial);
 			// if estat has usuari responsable agafar expedient by this user
 			if (estatInicial.getResponsableCodi() != null) {
 				agafar(expedient, estatInicial.getResponsableCodi());
@@ -483,14 +483,12 @@ public class ExpedientHelper {
 		
 		if (agafarExpedient) {
 			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-					entitatId,
 					expedientId,
 					false,
 					true,
 					false,
 					false,
-					false, 
-					false, 
+					false,
 					rolActual);
 			agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 		}
@@ -615,7 +613,8 @@ public class ExpedientHelper {
 					registreAnnexEntity.isValidacioFirmaCorrecte(),
 					registreAnnexEntity.getValidacioFirmaErrorMsg(),
 					registreAnnexEntity.getAnnexArxiuEstat(), 
-					documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()));
+					documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()), 
+					expedientEntity.getEstatAdditional());
 			FitxerDto fitxer = new FitxerDto();
 			fitxer.setNom(documentDto.getFitxerNom());
 			fitxer.setContentType(documentDto.getFitxerContentType());
@@ -807,7 +806,8 @@ public class ExpedientHelper {
 				documentDto.getUbicacio(),
 				documentDto.getNtiIdDocumentoOrigen(),
 				null, 
-				documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()));
+				documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()), 
+				expedientEntity.getEstatAdditional());
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(documentDto.getFitxerNom());
 		fitxer.setContentType(documentDto.getFitxerContentType());
@@ -966,7 +966,7 @@ public class ExpedientHelper {
 				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
 						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + "organId=" + organId + "rolActual=" + rolActual + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedientPerExpedient(
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
 				entitat,
 				metaExpedientId,
 				false,
@@ -998,17 +998,25 @@ public class ExpedientHelper {
 
 	@Transactional(readOnly = true)
 	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {
-		ExpedientDto expedientDto = (ExpedientDto)contingutHelper.toContingutDto(
+		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
 				expedient,
 				ambPathIPermisos,
-				false,
 				false,
 				false,
 				ambPathIPermisos,
 				false,
 				false,
 				rolActual,
-				onlyForList, null, false, 0, null, null, true);
+				onlyForList,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				true,
+				false,
+				false);
 		return expedientDto;
 	}
 	
@@ -1068,7 +1076,8 @@ public class ExpedientHelper {
 			writer.flush();
 			return writer.toString();
 		} else {
-			return expedient.getCodi() + "/" + expedient.getSequencia() + "/" + expedient.getAny();
+			String separador = configHelper.getConfig("es.caib.ripea.numero.expedient.separador", "/");
+			return expedient.getCodi() + separador + expedient.getSequencia() + separador + expedient.getAny();
 		}
 	}
 
@@ -1079,18 +1088,6 @@ public class ExpedientHelper {
 		expedientEntity.updateNumero(numero);
 	}
 	
-
-	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos) {
-		return (ExpedientDto)contingutHelper.toContingutDto(
-				expedient,
-				ambPathIPermisos,
-				false,
-				false,
-				false,
-				ambPathIPermisos,
-				false,
-				false, null, false, null, false, 0, null, null, true);
-	}
 
 
 	public ExpedientDto toExpedientDto(ExpedientEntity entity) {
@@ -1110,9 +1107,9 @@ public class ExpedientHelper {
 		dto.setEstat(entity.getEstat());
 		dto.setAgafatPer(conversioTipusHelper.convertir(entity.getAgafatPer(),UsuariDto.class));
 		// expedient estat
-		if (entity.getExpedientEstat() != null) {
+		if (entity.getEstatAdditional() != null) {
 			dto.setExpedientEstat(conversioTipusHelper.convertir(
-					entity.getExpedientEstat(),
+					entity.getEstatAdditional(),
 					ExpedientEstatDto.class));
 		}
 

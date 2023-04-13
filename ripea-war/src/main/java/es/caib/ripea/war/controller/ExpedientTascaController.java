@@ -116,7 +116,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarEstat(expedientTascaId, TascaEstatEnumDto.CANCELLADA, null);
+		expedientTascaService.canviarTascaEstat(expedientTascaId, TascaEstatEnumDto.CANCELLADA, null);
 		
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(

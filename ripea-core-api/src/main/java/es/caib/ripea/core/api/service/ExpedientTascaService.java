@@ -117,7 +117,7 @@ public interface ExpedientTascaService {
 	public void enviarEmailCrearTasca(
 			Long expedientTascaId);
 
-	public ExpedientTascaDto canviarEstat(Long expedientTascaId,
+	public ExpedientTascaDto canviarTascaEstat(Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
 			String motiu);
 	

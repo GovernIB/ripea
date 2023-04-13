@@ -7,6 +7,7 @@ import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.io.IOException;
@@ -557,5 +558,12 @@ public interface ExpedientService {
 	public long countByMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public ContingutVistaEnumDto getVistaUsuariActual();
+
+	@PreAuthorize("hasRole('tothom')")
+	public void setVistaUsuariActual(
+			es.caib.ripea.core.api.dto.ContingutVistaEnumDto vistaActual);
 
 }

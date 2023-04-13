@@ -128,8 +128,7 @@ public class ContingutAdminController extends BaseAdminController {
 				"contingut",
 				contingutService.findAmbIdAdmin(
 						entitatActual.getId(),
-						contingutId,
-						true));
+						contingutId));
 		return "contingutAdminInfo";
 	}
 
@@ -143,8 +142,7 @@ public class ContingutAdminController extends BaseAdminController {
 				"contingut",
 				contingutService.findAmbIdAdmin(
 						entitatActual.getId(),
-						contingutId,
-						true));
+						contingutId));
 		model.addAttribute(
 				"logs",
 				contingutService.findLogsPerContingutAdmin(

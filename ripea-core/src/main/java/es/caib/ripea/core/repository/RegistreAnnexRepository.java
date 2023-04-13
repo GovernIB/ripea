@@ -53,21 +53,26 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 	@Query(	"select " +
 			"    a " +
 			"from " +
-			"    RegistreAnnexEntity a left join a.registre.expedientPeticions ep " +
+			"    RegistreAnnexEntity a left join a.registre.expedientPeticions e " +
 			"where " +
 			"    a.registre.entitat = :entitat " +
-			"and ep.expedient.metaExpedient in :metaExpedientsPermesos " +
-			"and ep.expedient is not null " +
-			"and ep.expedient.esborrat = 0 " +
+			"and ((:rolActual = 'IPA_ADMIN' and e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((e.metaExpedient.organGestor is not null and e.metaExpedient in (:metaExpedientsPermesos)) or (e.metaExpedient.organGestor is null and :hasPermisAdminComu = true and e.registre.destiCodi in (:organsPermesos)))) " +
+			"	or (:rolActual = 'tothom' and e.metaExpedient in (:metaExpedientsPermesos))) " +				
+			"and e.expedient is not null " +
+			"and e.expedient.esborrat = 0 " +
 			"and (a.document is null) " +
-			"and (:esNullMetaExpedient = true or ep.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullMetaExpedient = true or e.expedient.metaExpedient = :metaExpedient) " +
 			"and (:esNullNom = true or lower(a.titol) like lower('%'||:nom||'%')) " +
 			"and (:esNullNumero = true or lower(a.registre.identificador) like lower('%'||:numero||'%')) " +
-			"and (:esNullDataInici = true or ep.expedient.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) ")
+			"and (:esNullDataInici = true or e.expedient.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.expedient.createdDate <= :dataFi) ")
 	public Page<RegistreAnnexEntity> findPendentsProcesar(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("rolActual") String rolActual,
 			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
+			@Param("organsPermesos") List<String> organsPermesos,
+			@Param("hasPermisAdminComu") boolean hasPermisAdminComu,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullNumero") boolean esNullNumero,
@@ -86,21 +91,26 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 	@Query(	"select " +
 			"    a.id " +
 			"from " +
-			"    RegistreAnnexEntity a left join a.registre.expedientPeticions ep " +
+			"    RegistreAnnexEntity a left join a.registre.expedientPeticions e " +
 			"where " +
 			"    a.registre.entitat = :entitat " +
-			"and ep.expedient.metaExpedient in :metaExpedientsPermesos " +
-			"and ep.expedient is not null " +
-			"and ep.expedient.esborrat = 0 " +
+			"and ((:rolActual = 'IPA_ADMIN' and e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((e.metaExpedient.organGestor is not null and e.metaExpedient in (:metaExpedientsPermesos)) or (e.metaExpedient.organGestor is null and :hasPermisAdminComu = true and e.registre.destiCodi in (:organsPermesos)))) " +
+			"	or (:rolActual = 'tothom' and e.metaExpedient in (:metaExpedientsPermesos))) " +	
+			"and e.expedient is not null " +
+			"and e.expedient.esborrat = 0 " +
 			"and (a.document is null) " +
-			"and (:esNullMetaExpedient = true or ep.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullMetaExpedient = true or e.expedient.metaExpedient = :metaExpedient) " +
 			"and (:esNullNom = true or lower(a.titol) like lower('%'||:nom||'%')) " +
 			"and (:esNullNumero = true or lower(a.registre.identificador) like lower('%'||:numero||'%')) " +
-			"and (:esNullDataInici = true or ep.expedient.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or ep.expedient.createdDate <= :dataFi) ")
+			"and (:esNullDataInici = true or e.expedient.createdDate >= :dataInici) " +
+			"and (:esNullDataFi = true or e.expedient.createdDate <= :dataFi) ")
 	public List<Long> findIdsPendentsProcesar(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("rolActual") String rolActual,
 			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
+			@Param("organsPermesos") List<String> organsPermesos,
+			@Param("hasPermisAdminComu") boolean hasPermisAdminComu,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullNumero") boolean esNullNumero,

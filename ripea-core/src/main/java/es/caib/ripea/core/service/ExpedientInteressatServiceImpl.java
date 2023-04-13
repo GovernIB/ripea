@@ -272,13 +272,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				true,
 				false,
 				false,
-				false, false, null);
+				false,
+				null);
 		
 		List<InteressatEntity> interessats = new ArrayList<>();
 		if (nomesAmbNotificacioActiva) {
@@ -307,13 +307,13 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				entitatId,
 				expedientId,
 				false,
 				true,
 				false,
 				false,
-				false, false, null);
+				false,
+				null);
 		return interessatRepository.countByExpedient(
 				expedient);
 	}

@@ -8,6 +8,7 @@
 			refreshDatatable: false,
 			refreshPagina: false,
 			refreshTancar: false,
+			funcToCallOnTancar: null,			
 			elementBotons: "#modal-botons",
 			elementForm: "#modal-form",
 			elementTancarData: "modal-cancel",
@@ -88,7 +89,8 @@
 								dataTableId: dataTableId,
 								elementRetorn: plugin.settings.elementRetorn,
 								segonaModal: plugin.settings.segonaModal,
-								height: plugin.settings.height
+								height: plugin.settings.height,
+								funcToCallOnTancar: plugin.settings.funcToCallOnTancar
 							});
 							
 						} else {
@@ -105,7 +107,8 @@
 								dataTableId: dataTableId,
 								elementRetorn: plugin.settings.elementRetorn,
 								segonaModal: plugin.settings.segonaModal,
-								height: plugin.settings.height
+								height: plugin.settings.height,
+								funcToCallOnTancar: plugin.settings.funcToCallOnTancar
 							});
 						}
 						$('#' + modalDivId).data('elementRetorn', plugin.settings.elementRetorn);
@@ -252,6 +255,11 @@
 							if (settings.refreshPagina) {
 								window.location.reload(true);
 							}
+							if (settings.funcToCallOnTancar) {
+								window[settings.funcToCallOnTancar]();
+							}
+							
+							
 						}
 					}
 				});

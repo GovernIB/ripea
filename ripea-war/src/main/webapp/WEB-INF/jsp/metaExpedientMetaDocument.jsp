@@ -12,9 +12,22 @@
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
+	<script src="<c:url value="/webjars/Sortable/1.4.2/Sortable.min.js"/>"></script>	
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#metadocuments').on('dragupdate.dataTable', function (event, itemId, index) {
+				$.ajax({
+					url: "<c:url value="/ajax/metaExpedient/"/>" + ${metaExpedient.id} + "/metaDocument/" + itemId + "/move/" + index,
+					async: false
+				});
+			});
+		});
+	</script>
+	
 </head>
 <body>
 	<c:if test="${!esRevisor && !bloquejarCamps}">
@@ -23,45 +36,46 @@
 		</div>
 	</c:if>
 	
+	
+	
 	<table
 		id="metadocuments"
 		data-toggle="datatable"
 		data-url="<c:url value="metaDocument/datatable"/>"
 		data-info-type="search"
-		data-default-order="2"
-		data-default-dir="asc"
+		${!esRevisor ? 'data-drag-enabled="true"' : ''}
 		class="table table-striped table-bordered"
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="id" data-visible="false" width="4%">#</th>
-				<th data-col-name="codi"><spring:message code="metadocument.list.columna.codi"/></th>
-				<th data-col-name="nom"><spring:message code="metadocument.list.columna.nom"/></th>
-				<th data-col-name="actiu" data-template="#cellActiuTemplate">
+				<th data-col-name="ordre" data-visible="false"></th>
+				<th data-col-name="codi" data-orderable="false"><spring:message code="metadocument.list.columna.codi"/></th>
+				<th data-col-name="nom" data-orderable="false"><spring:message code="metadocument.list.columna.nom"/></th>
+				<th data-col-name="actiu" data-orderable="false" data-template="#cellActiuTemplate">
 					<spring:message code="metadocument.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
 						{{if actiu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="perDefecte" data-template="#cellPerDefecteTemplate">
+				<th data-col-name="perDefecte" data-orderable="false" data-template="#cellPerDefecteTemplate">
 					<spring:message code="metadocument.list.columna.perdefecte"/>
 					<script id="cellPerDefecteTemplate" type="text/x-jsrender">
 						{{if perDefecte}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="firmaPortafirmesActiva" data-template="#cellFirmaPortafirmesActivaTemplate">
+				<th data-col-name="firmaPortafirmesActiva" data-orderable="false" data-template="#cellFirmaPortafirmesActivaTemplate">
 					<spring:message code="metadocument.list.columna.firmaPortafirmesActiva"/>
 					<script id="cellFirmaPortafirmesActivaTemplate" type="text/x-jsrender">
 						{{if firmaPortafirmesActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="firmaPassarelaActiva" data-template="#cellFirmaPassarelaActivaTemplate">
+				<th data-col-name="firmaPassarelaActiva" data-orderable="false" data-template="#cellFirmaPassarelaActivaTemplate">
 					<spring:message code="metadocument.list.columna.firmaPassarelaActiva"/>
 					<script id="cellFirmaPassarelaActivaTemplate" type="text/x-jsrender">
 						{{if firmaPassarelaActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="pinbalActiu" data-template="#cellPinbalActiuTemplate">
+				<th data-col-name="pinbalActiu" data-orderable="false" data-template="#cellPinbalActiuTemplate">
 					<spring:message code="metadocument.list.columna.pinbalActiu"/>
 					<script id="cellPinbalActiuTemplate" type="text/x-jsrender">
 						{{if pinbalActiu}}<span class="fa fa-check"></span>{{/if}}

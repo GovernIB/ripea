@@ -213,3 +213,6 @@ update ipa_config set configurable = 0, configurable_entitat_actiu = 0 where key
 
 delete from ipa_config where entitat_codi is not null and key like '%'||'segonpla.guardar.arxiu.max.reintents.interessats';
 
+-- Changeset db/changelog/changes/0.9.97/1234.yaml::1678274802658-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.plugin.arxiu.caib.debug', '', 'Nivell de logs', 'ARXIU', '30', '0', 'TEXT', '1');
+

@@ -69,7 +69,8 @@ public class TestHelper {
 				"ntiTipoDocumental",
 				false,
 				"Finalitat test",
-				null).build();
+				null, 
+				0).build();
 		
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				DocumentTipusEnumDto.DIGITAL,
@@ -87,7 +88,7 @@ public class TestHelper {
 				metaDocumentEntity,
 				expedientEntity,
 				new EntitatEntity(),
-				expedientEntity, null).
+				expedientEntity, null, null).
 				build();
 		
 		
@@ -140,7 +141,8 @@ public class TestHelper {
 				"ntiTipoDocumental",
 				false,
 				"Finalitat test",
-				null).build();
+				null, 
+				0).build();
 		
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
 				DocumentTipusEnumDto.DIGITAL,
@@ -158,7 +160,7 @@ public class TestHelper {
 				metaDocumentEntity,
 				expedientEntity,
 				new EntitatEntity(),
-				expedientEntity, null).
+				expedientEntity, null, null).
 				build();
 		
 		

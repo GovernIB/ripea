@@ -93,46 +93,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
 
-	@Transactional
-	@Override
-	public ContingutDto rename(
-			Long entitatId,
-			Long contingutId,
-			String nom) {
-		logger.debug("Canviant el nom del contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ", "
-				+ "nom=" + nom + ")");
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutId,
-				false,
-				true,
-				false,
-				false, false, true, null);
-		contingutHelper.comprovarNomValid(
-				contingut.getPare(),
-				nom,
-				contingutId,
-				ContingutEntity.class);
-		contingut.update(nom);
-		contingutLogHelper.log(
-				contingut,
-				LogTipusEnumDto.MODIFICACIO,
-				nom,
-				null,
-				true,
-				true);
-		return contingutHelper.toContingutDto(
-				contingut,
-				true,
-				true,
-				true,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
-	}
+
 
 	@Transactional
 	@Override
@@ -219,14 +180,7 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutId);
 		// No es comproven permisos perquè això només ho pot fer l'administrador
 		ContingutDto dto = contingutHelper.toContingutDto(
-				contingut,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingut, false, false);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -302,14 +256,7 @@ public class ContingutServiceImpl implements ContingutService {
 		// Recupera el contingut esborrat
 		contingut.updateEsborrat(0);
 		ContingutDto dto = contingutHelper.toContingutDto(
-				contingut,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingut, false, false);
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -423,7 +370,7 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				true, rolActual);
 		// Comprova el tipus del contingut que es vol moure
-		if ((contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) && !(contingutOrigen instanceof DocumentEntity)) {
+		if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
 			throw new ValidationException(
 					contingutOrigenId,
 					contingutOrigen.getClass(),
@@ -480,14 +427,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 		ContingutDto dto = contingutHelper.toContingutDto(
-				contingutOrigen,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingutOrigen, false, false);
 		
 		
 		if (contingutOrigen instanceof DocumentEntity){
@@ -593,14 +533,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 		ContingutDto dto = contingutHelper.toContingutDto(
-				contingutOrigen,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingutOrigen, false, false);
 		contingutHelper.arxiuPropagarCopia(
 				contingutOrigen,
 				contingutDesti);
@@ -699,14 +632,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				true);
 		ContingutDto dto = contingutHelper.toContingutDto(
-				contingutOrigen,
-				true,
-				false,
-				false,
-				false,
-				false,
-				false,
-				false, null, false, null, false, 0, null, null, true);
+				contingutOrigen, false, false);
 		return dto;
 	}
 
@@ -717,14 +643,16 @@ public class ContingutServiceImpl implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions, 
-			String rolActual, Long organActualId) {
+			String rolActual, 
+			Long organActualId) {
 		return findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions,
 				true, 
-				rolActual, null);
+				rolActual, 
+				organActualId);
 	}
 	
 	
@@ -748,7 +676,9 @@ public class ContingutServiceImpl implements ContingutService {
 				ambPermisos,
 				rolActual,
 				organActualId,
-				true);
+				true, 
+				false, 
+				false);
 
 	}
 	
@@ -778,7 +708,9 @@ public class ContingutServiceImpl implements ContingutService {
 			boolean ambPermisos, 
 			String rolActual, 
 			Long organActualId,
-			boolean ambEntitat) {
+			boolean ambEntitat, 
+			boolean ambMapPerTipusDocument, 
+			boolean ambMapPerEstat) {
 		
 		long t2 = System.currentTimeMillis();
 		logger.debug("Obtenint contingut amb id per usuari ("
@@ -819,12 +751,21 @@ public class ContingutServiceImpl implements ContingutService {
 				contingut,
 				ambPermisos,
 				ambFills,
-				ambFills,
 				true,
 				true,
 				true,
-				ambVersions, 
-				rolActual, false, null, true, 0, null, null, true, ambEntitat);
+				ambVersions,
+				rolActual,
+				false,
+				null,
+				false,
+				0,
+				null,
+				null,
+				true,
+				ambEntitat,
+				ambMapPerTipusDocument,
+				ambMapPerEstat);
 		dto.setAlerta(alertaRepository.countByLlegidaAndContingutId(
 				false,
 				dto.getId()) > 0);
@@ -833,6 +774,28 @@ public class ContingutServiceImpl implements ContingutService {
 			logger.info("findAmbIdUser time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		return dto;
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public void checkIfPermittedAccess(
+			Long contingutId,
+			String rolActual, 
+			Long organId) {
+		
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		
+		entityComprovarHelper.comprovarExpedient(
+				contingut.getExpedientPare().getId(),
+				false,
+				true,
+				false,
+				false,
+				false,
+				rolActual);
+	
+	}
+	
 	
 	
 	@Transactional(readOnly = true)
@@ -850,12 +813,10 @@ public class ContingutServiceImpl implements ContingutService {
 	@Override
 	public ContingutDto findAmbIdAdmin(
 			Long entitatId,
-			Long contingutId,
-			boolean ambFills) {
+			Long contingutId) {
 		logger.debug("Obtenint contingut amb id per admin ("
 				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingutId + ", "
-				+ "ambFills=" + ambFills + ")");
+				+ "contingutId=" + contingutId + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
@@ -866,13 +827,8 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutId);
 		return contingutHelper.toContingutDto(
 				contingut,
-				true,
-				ambFills,
-				ambFills,
-				true,
-				true,
-				false,
-				true, null, false, null, false, 0, null, null, true);
+				false, 
+				false);
 	}
 
 	@Transactional(readOnly = true)
@@ -1150,77 +1106,13 @@ public class ContingutServiceImpl implements ContingutService {
 					public ContingutDto convert(ContingutEntity source) {
 						return contingutHelper.toContingutDto(
 								source,
-								false,
-								false,
-								false,
-								false,
-								true,
-								false,
-								false, null, false, null, false, 0, null, null, true);
+								true, 
+								false);
 					}
 				});
 	}
 
 
-
-	@Transactional(readOnly = true)
-	@Override
-	public PaginaDto<ContingutDto> findEsborrats(
-			Long entitatId,
-			String nom,
-			String usuariCodi,
-			Date dataInici,
-			Date dataFi,
-			PaginacioParamsDto paginacioParams) {
-		logger.debug("Obtenint elements esborrats ("
-				+ "entitatId=" + entitatId + ", "
-				+ "nom=" + nom + ", "
-				+ "usuariCodi=" + usuariCodi + ", "
-				+ "dataInici=" + dataInici + ", "
-				+ "dataFi=" + dataFi + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				false,
-				true,
-				false, false, false);
-		UsuariEntity usuari = null;
-		if (usuariCodi != null && !usuariCodi.isEmpty()) {
-			usuari = usuariRepository.findOne(usuariCodi);
-			if (usuari == null) {
-				logger.error("No s'ha trobat l'usuari (codi=" + usuariCodi + ")");
-				throw new NotFoundException(
-						usuariCodi,
-						UsuariEntity.class);
-			}
-		}
-		return paginacioHelper.toPaginaDto(
-				contingutRepository.findEsborratsByFiltrePaginat(
-						entitat,
-						(nom == null),
-						(nom != null) ? '%' + nom + '%' : nom,
-						(usuari == null),
-						usuari,
-						(dataInici == null),
-						DateHelper.toDateInicialDia(dataInici),
-						(dataFi == null),
-						DateHelper.toDateFinalDia(dataFi),
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
-				ContingutDto.class,
-				new Converter<ContingutEntity, ContingutDto>() {
-					@Override
-					public ContingutDto convert(ContingutEntity source) {
-						return contingutHelper.toContingutDto(
-								source,
-								false,
-								false,
-								false,
-								false,
-								false,
-								false,
-								false, null, false, null, false, 0, null, null, true);
-					}
-				});
-	}
 
 	@SuppressWarnings("incomplete-switch")
 	@Transactional(readOnly = true)
@@ -1560,14 +1452,13 @@ public class ContingutServiceImpl implements ContingutService {
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
-					entitat.getId(),
 					filtre.getExpedientId(),
 					false,
 					false,
 					false,
 					false,
-					false, 
-					checkPerMassiuAdmin, null);
+					false,
+					null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1607,13 +1498,8 @@ public class ContingutServiceImpl implements ContingutService {
 						public DocumentDto convert(DocumentEntity source) {
 							DocumentDto dto = (DocumentDto)contingutHelper.toContingutDto(
 									source,
-									false,
-									false,
-									false,
-									false,
 									true,
-									true,
-									false, null, false, null, false, 0, null, null, true);
+									true);
 							return dto;
 						}
 					});
@@ -1647,14 +1533,13 @@ public class ContingutServiceImpl implements ContingutService {
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
-					entitat.getId(),
 					filtre.getExpedientId(),
 					false,
 					false,
 					false,
 					false,
-					false, 
-					checkPerMassiuAdmin, null);
+					false,
+					null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1714,14 +1599,13 @@ public class ContingutServiceImpl implements ContingutService {
 		ExpedientEntity expedient = null;
 		if (filtre.getExpedientId() != null) {
 			expedient = entityComprovarHelper.comprovarExpedient(
-					entitat.getId(),
 					filtre.getExpedientId(),
 					false,
 					false,
 					false,
 					false,
-					false, 
-					checkPerMassiuAdmin, null);
+					false,
+					null);
 		}
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
@@ -1761,13 +1645,8 @@ public class ContingutServiceImpl implements ContingutService {
 						public DocumentDto convert(DocumentEntity source) {
 							DocumentDto dto = (DocumentDto)contingutHelper.toContingutDto(
 									source,
-									false,
-									false,
-									false,
-									false,
 									true,
-									true,
-									false, null, false, null, false, 0, null, null, true);
+									true);
 							return dto;
 						}
 					});
@@ -1911,7 +1790,8 @@ public class ContingutServiceImpl implements ContingutService {
 					documentOrigen.getUbicacio(),
 					documentOrigen.getNtiIdDocumentoOrigen(),
 					null, 
-					documentOrigen.getDocumentFirmaTipus());
+					documentOrigen.getDocumentFirmaTipus(), 
+					documentOrigen.getExpedientEstatAdditional());
 		}
 		if (creat != null) {
 			if (creat instanceof NodeEntity) {
@@ -1967,7 +1847,8 @@ public class ContingutServiceImpl implements ContingutService {
 					documentOrigen.getUbicacio(),
 					uuidDocumentoOrigen,
 					null, 
-					documentOrigen.getDocumentFirmaTipus());
+					documentOrigen.getDocumentFirmaTipus(), 
+					documentOrigen.getExpedientEstatAdditional());
 		}
 		if (creat != null) {
 			if (creat instanceof DocumentEntity) {

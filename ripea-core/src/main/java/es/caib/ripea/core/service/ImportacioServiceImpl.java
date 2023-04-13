@@ -200,13 +200,13 @@ public class ImportacioServiceImpl implements ImportacioService {
 			Document documentArxiu,
 			ContingutEntity contenidor,
 			ContingutEntity pareActual,
-			ExpedientEntity expedientSuperior,
+			ExpedientEntity expedient,
 			FitxerDto fitxer,
 			boolean usingNumeroRegistre,
 			String codiEniOrigen) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientSuperior.getId()));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		// TIPUS DE DOCUMENT PER DEFECTE
-		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedientSuperior.getMetaExpedient());
+		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedient.getMetaExpedient());
 		
 		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnum = ArxiuConversions.getNtiTipoFirma(documentArxiu);
 		
@@ -224,11 +224,12 @@ public class ImportacioServiceImpl implements ImportacioService {
 				metaDocument, //metaDocumentEntity
 				contenidor,
 				pareActual.getEntitat(),
-				expedientSuperior,
+				expedient,
 				null,
-				expedientSuperior.getArxiuUuid(),
+				expedient.getArxiuUuid(),
 				null, 
-				documentHelper.getDocumentFirmaTipus(documentNtiTipoFirmaEnum));
+				documentHelper.getDocumentFirmaTipus(documentNtiTipoFirmaEnum), 
+				expedient.getEstatAdditional());
 		if (fitxer != null) {
 			entity.updateFitxer(
 					fitxer.getNom(),
@@ -246,7 +247,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 
 		// MOU/COPIA EL DOCUMENT
 		documentArxiu = pluginHelper.importarDocument(
-				expedientSuperior.getArxiuUuid(),
+				expedient.getArxiuUuid(),
 				documentArxiu.getIdentificador(),
 				usingNumeroRegistre);
 		

@@ -198,9 +198,46 @@ public interface OrganGestorRepository extends JpaRepository<OrganGestorEntity, 
 			"     or pare2.id in (:pareIds) " +
 			"     or pare3.id in (:pareIds) " +
 			"     or pare4.id in (:pareIds))")
-	public List<OrganGestorEntity> findFills(
+	public List<OrganGestorEntity> findDescendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("pareIds") List<Long> pareIds);
+	
+	
+	@Query("select " +
+			"    og " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"     og.id in (:organsIds) " +			
+			"     or pare1.id in (:organsIds) " +
+			"     or pare2.id in (:organsIds) " +
+			"     or pare3.id in (:organsIds) " +
+			"     or pare4.id in (:organsIds)")
+	public List<OrganGestorEntity> findOrgansAmbDescendents(
+			@Param("organsIds") List<Long> organsIds);
+	
+	@Query("select " +
+			"    og.codi " +
+			"from " +
+			"    OrganGestorEntity og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"     og.id in (:organsIds) " +			
+			"     or pare1.id in (:organsIds) " +
+			"     or pare2.id in (:organsIds) " +
+			"     or pare3.id in (:organsIds) " +
+			"     or pare4.id in (:organsIds)")
+	public List<String> findCodisOrgansAmbDescendents(
+			@Param("organsIds") List<Long> organsIds);
+	
+	
 
 	@Query("from " +
 			"    OrganGestorEntity og " +
