@@ -13,10 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class Utils {
 
 	
-	public static List<Long> geValueOrNull(List<Long> objects) { //TODO: remove and use getNullIfEmpty() instead
-		return objects == null || objects.isEmpty() ? null : objects;
-	}
-	
 	public static List<String> getRolsCurrentUser() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		List<String> rolsCurrentUser = new ArrayList<String>();
@@ -29,8 +25,9 @@ public class Utils {
 		return rolsCurrentUser;
 	}
 	
-	public static String getTrimOrNull(String value) { // TODO: remove and replace by StringUtils.trim()
-		return value == null || value.isEmpty() ? null : value.trim();
+	
+	public static String trim(String value) { 
+		return StringUtils.trim(value);
 	}
 	
 	public static boolean isNotNullAndEqual(String object1, String object2) {

@@ -13,19 +13,19 @@ public class PermisosPerExpedientsDto  {
 	List<Long> idsProcedimentsComuns;
 	
 	public List<Long> getIdsMetaExpedientsPermesos() {
-		return Utils.geValueOrNull(idsMetaExpedientsPermesos) ;
+		return Utils.getNullIfEmpty(idsMetaExpedientsPermesos) ;
 	}
 	public List<Long> getIdsOrgansPermesos() {
-		return Utils.geValueOrNull(idsOrgansPermesos);
+		return Utils.getNullIfEmpty(idsOrgansPermesos);
 	}
 	public List<Long> getIdsMetaExpedientOrganPairsPermesos() {
-		return Utils.geValueOrNull(idsMetaExpedientOrganPairsPermesos);
+		return Utils.getNullIfEmpty(idsMetaExpedientOrganPairsPermesos);
 	}
 	public List<Long> getIdsOrgansAmbProcedimentsComunsPermesos() {
-		return Utils.geValueOrNull(idsOrgansAmbProcedimentsComunsPermesos);
+		return Utils.getNullIfEmpty(idsOrgansAmbProcedimentsComunsPermesos);
 	}
 	public List<Long> getIdsProcedimentsComuns() {
-		return Utils.geValueOrNull(idsProcedimentsComuns);
+		return Utils.getNullIfEmpty(idsProcedimentsComuns);
 	}
 	
 	

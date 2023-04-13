@@ -57,7 +57,7 @@ public class ExpedientFiltreCalculat implements Serializable {
 	}
 
 	public List<Long> getIdsMetaExpedientsDomini() {
-		return Utils.geValueOrNull(idsMetaExpedientsDomini);
+		return Utils.getNullIfEmpty(idsMetaExpedientsDomini);
 	}
 
 

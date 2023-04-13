@@ -65,10 +65,10 @@ public class ExpedientFiltreCommand {
 		this.metaExpedientId = metaExpedientId;
 	}
 	public void setMetaExpedientDominiCodi(String metaExpedientDominiCodi) {
-		this.metaExpedientDominiCodi = Utils.getTrimOrNull(metaExpedientDominiCodi);
+		this.metaExpedientDominiCodi = Utils.trim(metaExpedientDominiCodi);
 	}
 	public void setNom(String nom) {
-		this.nom = Utils.getTrimOrNull(nom);
+		this.nom = Utils.trim(nom);
 	}
 	public void setDataCreacioInici(Date dataCreacioInici) {
 		this.dataCreacioInici = dataCreacioInici;
@@ -77,7 +77,7 @@ public class ExpedientFiltreCommand {
 		this.dataCreacioFi = dataCreacioFi;
 	}
 	public void setNumero(String numero) {
-		this.numero = Utils.getTrimOrNull(numero);
+		this.numero = Utils.trim(numero);
 	}
 	public void setExpedientEstatId(Long expedientEstatId) {
 		this.expedientEstatId = expedientEstatId;
@@ -95,13 +95,13 @@ public class ExpedientFiltreCommand {
 		this.tipusId = tipusId;
 	}
 	public void setInteressat(String interessat) {
-		this.interessat = Utils.getTrimOrNull(interessat);
+		this.interessat = Utils.trim(interessat);
 	}
 	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
-		this.metaExpedientDominiValor = Utils.getTrimOrNull(nom);
+		this.metaExpedientDominiValor = Utils.trim(nom);
 	}
 	public void setAgafatPer(String agafatPer) {
-		this.agafatPer = Utils.getTrimOrNull(agafatPer);
+		this.agafatPer = Utils.trim(agafatPer);
 	}
 
 }

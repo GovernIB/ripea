@@ -6,9 +6,9 @@ package es.caib.ripea.war.command;
 import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang3.StringUtils;
 
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 
@@ -39,25 +39,25 @@ public class UsuariCommand implements Serializable {
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 	}
 	public void setCodi(String codi) {
-		this.codi = StringUtils.trim(codi);
+		this.codi = Utils.trim(codi);
 	}
 	public void setNom(String nom) {
-		this.nom = StringUtils.trim(nom);
+		this.nom = Utils.trim(nom);
 	}
 	public void setNif(String nif) {
-		this.nif = StringUtils.trim(nif);
+		this.nif = Utils.trim(nif);
 	}
 	public void setEmail(String email) {
-		this.email = StringUtils.trim(email);
+		this.email = Utils.trim(email);
 	}
 	public void setIdioma(String idioma) {
-		this.idioma = StringUtils.trim(idioma);
+		this.idioma = Utils.trim(idioma);
 	}
 	public void setRols(String[] rols) {
 		this.rols = rols;
 	}
 	public void setEmailAlternatiu(String emailAlternatiu) {
-		this.emailAlternatiu = StringUtils.trim(emailAlternatiu);
+		this.emailAlternatiu = Utils.trim(emailAlternatiu);
 	}
 	public static UsuariCommand asCommand(UsuariDto dto) {
 		return ConversioTipusHelper.convertir(
