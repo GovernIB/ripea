@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -419,7 +420,7 @@ public class DocumentNotificacioHelper {
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA || document.getArxiuUuid() == null)) {
+		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getArxiuEstat() == ArxiuEstatEnumDto.DEFINITIU)) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

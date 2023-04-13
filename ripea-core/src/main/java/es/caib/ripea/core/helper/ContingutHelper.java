@@ -1873,10 +1873,15 @@ public class ContingutHelper {
 				exportar);
 
 		FitxerDto fitxer = new FitxerDto();
-		if (expedients.size() > 1)
+		if (expedients.size() > 1) {
 			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".pdf");
-		else
-			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedients.get(0).getNom() + ".pdf");
+		} else {
+			String expedientNom = expedients.get(0).getNom();
+			if (expedientNom.contains("\"")) {
+				expedientNom = "\"" + expedientNom.replace("\"", "\\\"") + "\"";
+			}
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedientNom + ".pdf");
+		}
 		fitxer.setContentType("application/pdf");
 		if (indexGenerated != null)
 			fitxer.setContingut(indexGenerated);
