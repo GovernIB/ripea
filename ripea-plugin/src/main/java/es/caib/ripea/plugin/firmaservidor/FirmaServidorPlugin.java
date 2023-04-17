@@ -13,7 +13,8 @@ public interface FirmaServidorPlugin {
 			String nom,
 			String motiu,
 			byte[] contingut,
-			String idioma) throws SistemaExternException;
+			String idioma, 
+			String contentType) throws SistemaExternException;
 
 	public static enum TipusFirma {
 		PADES,

@@ -78,10 +78,6 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 			document.updateDocumentFirmaTipus(documentFirmaTipus);
 			
 			if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
-//				FitxerDto fitxerNou = new FitxerDto(
-//						firma.getNom(),
-//						firma.getMime(),
-//						firma.getContingut());
 
 				contingutHelper.arxiuPropagarModificacio(
 						document,
@@ -93,7 +89,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 			} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA){ 
 				contingutHelper.arxiuPropagarModificacio(
 						document,
-						fitxer,
+						null, // if we pass fitxer not null to arxiuPropagarModificacio() ArxiuPluginCaib throws ArxiuValidacioException: No és possible marcar el document com a definitiu si es vol modificar el seu contingut.
 						documentFirmaTipus,
 						Arrays.asList(arxiuFirma),
 						arxiuEstat);
@@ -195,7 +191,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 			}
 
 		} else {
-			throw new RuntimeException("Only removing signatures of pdf supported");
+			throw new RuntimeException("L'eliminació de la firma invàlida només està suportada pels fitxers pdf");
 		}
 
 	}

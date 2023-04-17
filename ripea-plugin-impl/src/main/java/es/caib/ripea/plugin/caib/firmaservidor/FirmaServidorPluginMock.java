@@ -33,7 +33,8 @@ public class FirmaServidorPluginMock extends RipeaAbstractPluginProperties imple
 			String nom,
 			String motiu,
 			byte[] contingut,
-			String idioma) throws SistemaExternException {
+			String idioma, 
+			String contentType) throws SistemaExternException {
 		if (motiu != null && "e".equals(motiu)) {
 			// Cas per provocar una excepció
 			String errMsg = "Excepció provocada per paràmetre a SignaturaPluginMock";

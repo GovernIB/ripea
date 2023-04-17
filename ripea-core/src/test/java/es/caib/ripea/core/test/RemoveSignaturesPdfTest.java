@@ -57,7 +57,7 @@ public class RemoveSignaturesPdfTest {
 		}
 
 		FirmaSimpleServidorPluginPortafib firmaSimpleServidorPluginPortafib = new FirmaSimpleServidorPluginPortafib("es.caib.ripea.", PropertiesHelper.getProperties());
-		SignaturaResposta signaturaResposta = firmaSimpleServidorPluginPortafib.firmar("name.pdf", "123", content, "ca");
+		SignaturaResposta signaturaResposta = firmaSimpleServidorPluginPortafib.firmar("name.pdf", "123", content, "ca", null);
 		byte[] fileSigned = signaturaResposta.getContingut();
 		if (writeInDisk) {
 			Path path1 = Paths.get(System.getProperty("user.home") + "\\Desktop\\signedAfterSignatureRemoved" + FILE_NUMBER + ".pdf");

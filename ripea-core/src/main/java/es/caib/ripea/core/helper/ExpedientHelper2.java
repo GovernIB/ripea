@@ -114,6 +114,11 @@ public class ExpedientHelper2 {
 		docsToDelete.addAll(documentRepository.findDeleted(expedientId));
 		
 		for (DocumentEntity docToDelete : docsToDelete) {
+			
+			if (CollectionUtils.isNotEmpty(docToDelete.getAnnexos())) {
+				throw new ValidationException("No está permitido esborrar documents procedents d'anotacions");
+			}
+			
 			documentHelper.deleteDefinitiu(docToDelete);
 		}
 

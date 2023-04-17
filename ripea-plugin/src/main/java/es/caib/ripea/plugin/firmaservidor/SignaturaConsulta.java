@@ -12,6 +12,6 @@ public class SignaturaConsulta {
     private String motiu;
     private FirmaServidorPlugin.TipusFirma tipusFirma;
     private byte[] contingut;
-    private TipusMime mime;
+    private String contentType;
     private String tipusDocumental;
 }
