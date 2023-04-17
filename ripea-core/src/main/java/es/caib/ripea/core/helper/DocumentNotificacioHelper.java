@@ -90,7 +90,7 @@ public class DocumentNotificacioHelper {
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
 		
-		if (!documentEntity.isArxiuEstatDefinitu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL) {
+		if (!documentEntity.isArxiuEstatDefinitiu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}
 		

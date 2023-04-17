@@ -366,7 +366,7 @@ public class DocumentEntity extends NodeEntity {
 		return "";
 	}
 
-	public boolean isArxiuEstatDefinitu() {
+	public boolean isArxiuEstatDefinitiu() {
 		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
 	}
 	
