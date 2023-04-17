@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>es.caib.ripea</groupId>
 	<artifactId>ripea</artifactId>
-	<version>0.9.98.1</version>
+	<version>0.9.98.2</version>
 	<packaging>pom</packaging>
 	<properties>
 		<github.global.server>github</github.global.server>
