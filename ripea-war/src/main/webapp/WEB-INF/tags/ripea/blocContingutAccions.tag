@@ -79,14 +79,13 @@
 		<c:if test="${potModificar}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
-			<c:set var="isPermesEsborrarFinalsVar" value="${contingut.document && ((isPermesEsborrarFinals && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'DEFINITIU' || contingut.documentTipus == 'IMPORTAT')) || (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMA_PARCIAL'))}"/>
 			<c:choose>
 				<c:when test="${contingut.expedient && contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 				
-				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitu || isPermesModificarCustodiatsVar) && expedientObert}">
+				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitiu || isPermesModificarCustodiatsVar) && expedientObert}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
@@ -184,7 +183,8 @@
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.node"/></c:set>
 				</c:otherwise>
 			</c:choose>
-			<c:if test="${(!contingut.document && !contingut.conteDocumentsDefinitius) || isPermesEsborrarFinalsVar || contingut.carpeta}">
+			
+			<c:if test="${(contingut.document && !contingut.documentDeAnotacio && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) || contingut.carpeta || (contingut.expedient && !contingut.conteDocumentsDefinitius)}">
 				<c:choose>
 					<c:when test="${isTasca}">
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>

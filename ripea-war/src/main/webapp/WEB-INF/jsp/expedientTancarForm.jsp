@@ -56,7 +56,16 @@
 						<td>${esborrany.metaNode.nom}</td>
 						<td><fmt:formatDate value="${esborrany.createdDate}" pattern="dd/MM/yyyy HH:mm"/></td>
 						<td>${esborrany.createdBy.nom}</td>
-						<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}"/></td>
+						<c:choose>
+							<c:when test="${esborrany.documentDeAnotacio}">
+								<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" checked="checked" disabled="true"/></td>
+								<input type="hidden" name="documentsPerFirmar" value="${esborrany.id}">
+							</c:when>
+							<c:otherwise>
+								<td><form:checkbox path="documentsPerFirmar" value="${esborrany.id}" /></td>
+							</c:otherwise>
+						</c:choose>
+						
 					</tr>
 				</c:forEach>
 			</tbody>

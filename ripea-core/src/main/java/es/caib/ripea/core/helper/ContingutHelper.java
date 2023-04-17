@@ -535,6 +535,7 @@ public class ContingutHelper {
 					dto.setPendentMoverArxiu(true);
 				}
 				dto.setAnnexId(annex.getId());
+				dto.setDocumentDeAnotacio(true);
 			}
 
 			metaNode = conversioTipusHelper.convertir(
@@ -551,6 +552,7 @@ public class ContingutHelper {
 			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
 			dto.setEstat(document.getEstat());
 			dto.setArxiuEstat(document.getArxiuEstat());
+			dto.setArxiuEstatDefinitiu(document.isArxiuEstatDefinitiu());
 			dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
 			
 			resposta = dto;
@@ -1342,7 +1344,7 @@ public class ContingutHelper {
 			}
 		} else if (deproxied instanceof DocumentEntity) {
 			DocumentEntity document = (DocumentEntity)deproxied;
-			conteDefinitius = document.isArxiuEstatDefinitu();
+			conteDefinitius = document.isArxiuEstatDefinitiu();
 		}
 		return conteDefinitius;
 	}

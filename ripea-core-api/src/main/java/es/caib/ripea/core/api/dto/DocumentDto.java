@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Informació d'un document.
@@ -78,9 +78,9 @@ public class DocumentDto extends NodeDto {
 	
 	private DocumentFirmaTipusEnumDto documentFirmaTipus;
 	
-	public boolean isArxiuEstatDefinitu() {
-		return arxiuEstat != null && arxiuEstat == ArxiuEstatEnumDto.DEFINITIU;
-	}
+	private boolean arxiuEstatDefinitiu;
+	private boolean documentDeAnotacio;
+	
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {
