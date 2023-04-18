@@ -821,14 +821,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					throw new RuntimeException("El document amb nom '" + document.getNom() + "' no està firmat");
 				}
 				//No es possible concatenar els documents que no són pdf
-				if (Utils.notEquals(document.getFitxerContentType(), "application/pdf")) {
+				if (Utils.equals(document.getFitxerContentType(), "application/pdf")) {
 					if (document.getArxiuEstat() == ArxiuEstatEnumDto.ESBORRANY) {
 						documentService.actualitzarEstatADefinititu(docId);
 					}
-					documents.add(document);
 				} else {
 					totsDocumentsPdf = false;
 				}
+				documents.add(document);
 			}
 
 			// ========================= CONCATENTAR ===================================

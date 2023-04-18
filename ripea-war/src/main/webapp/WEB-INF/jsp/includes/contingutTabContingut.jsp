@@ -922,7 +922,7 @@ $(document).ready(function() {
 	}
 
 	function enableDisableMultipleButtons(docsIdx) {
-		var isTotPdfFirmat = true;
+		var isTotFirmat = true;
 		var isTotPdf = true;
 		var isTotDocAdjuntGuardatEnArxiu = true;
 	
@@ -948,7 +948,7 @@ $(document).ready(function() {
 						}
 						
 						if (!isFirmatCurrentDocument) {
-							isTotPdfFirmat = false;
+							isTotFirmat = false;
 							return false;
 						}
 						if (!isPdfCurrentDocument) {
@@ -971,7 +971,7 @@ $(document).ready(function() {
 						}
 						
 						if (!isFirmatCurrentDocument) {
-							isTotPdfFirmat = false;
+							isTotFirmat = false;
 							return false;
 						}
 						if (!isPdfCurrentDocument) {
@@ -980,14 +980,15 @@ $(document).ready(function() {
 					}
 				});
 			}		
+
 	
 		
-		if (isTotPdfFirmat && isTotPdf) {
+		if (isTotFirmat && isTotPdf && ${isConcatentarMultiplePDFs}) {
 			$('.nomaximized').addClass('hidden'); //zip
 			$('.maximized').removeClass('hidden'); //concatenació
 			$('#notificar-mult').removeClass("disabled");
 			$('#definitiu-mult').addClass("disabled");
-		} else if (isTotPdfFirmat && !isTotPdf) {
+		} else if (isTotFirmat) {
 			$('.nomaximized').removeClass('hidden'); //zip
 			$('.maximized').addClass('hidden'); //concatenació
 			$('#notificar-mult').removeClass("disabled");
@@ -1353,10 +1354,10 @@ function getDetallsSignants(idTbody, contingutId, header) {
 				<%---- Button notificar mult ----%>
 				<div class="btn-group">
 					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
-						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default maximized hidden" data-toggle="modal" data-maximized="true">
+						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default maximized hidden" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
 							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a> 
-						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>">
+						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>" data-refresh-pagina="true">
 							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a>
 					</div>
