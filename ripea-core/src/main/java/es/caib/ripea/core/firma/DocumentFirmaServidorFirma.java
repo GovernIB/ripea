@@ -48,6 +48,13 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public ArxiuFirmaDto firmar(Long documentId, String motiu) {
 
+		return doFirmar(documentId, motiu);
+
+	}
+	
+	
+	public ArxiuFirmaDto doFirmar(Long documentId, String motiu) {
+
 		DocumentEntity document = documentRepository.getOne(documentId);
 		if (document != null) {
 			FitxerDto fitxer = documentHelper.getFitxerAssociat(document, null);

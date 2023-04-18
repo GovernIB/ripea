@@ -420,7 +420,7 @@ public class DocumentNotificacioHelper {
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getArxiuEstat() == ArxiuEstatEnumDto.DEFINITIU)) {
+		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !document.isArxiuEstatDefinitiu()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

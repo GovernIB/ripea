@@ -66,7 +66,6 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -85,6 +84,7 @@ import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -168,7 +168,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-
+	@Autowired
+	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 	
 	@Transactional
 	@Override
@@ -177,7 +178,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual) {
+			String rolActual, 
+			boolean firmarEnServidor) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
@@ -209,12 +211,18 @@ public class DocumentServiceImpl implements DocumentService {
 					ExpedientEntity.class,
 					"No es pot crear un document sense un meta-document associat");
 		}
-		return documentHelper.crearDocument(
+		DocumentDto documentDto = documentHelper.crearDocument(
 				document,
 				pare,
 				expedient,
 				metaDocument,
 				true);
+		
+		if (firmarEnServidor) {
+			documentFirmaServidorFirma.doFirmar(documentDto.getId(), "Firma de document zip generat per notificar múltiples documents");
+		}
+		
+		return documentDto;
 	}
 
 	@Transactional

@@ -1594,7 +1594,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				entitatId,
 				rolActual);
 			
-		List<String> rolsCurrentUser = Utils.getRolsCurrentUser();
+		List<String> rolsCurrentUser = RolHelper.getRolsCurrentUser();
 
 		
 		if (resultEnum == ResultEnumDto.PAGE) {

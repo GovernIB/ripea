@@ -204,7 +204,7 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
-				<c:if test="${!isTasca and ((contingut.arxiuEstatDefinitu or contingut.firmaParcial) or (imprimibleNoFirmats and contingut.pdf))}">
+				<c:if test="${!isTasca and ((contingut.arxiuEstatDefinitiu or contingut.firmaParcial) or (imprimibleNoFirmats and contingut.pdf))}">
 					<c:choose>
 						<c:when test="${contingut.fitxerExtension!='xsig'}">
 							<li>
@@ -359,7 +359,7 @@
 				</c:if>
 			</c:if>
 		</c:if>
-		<%---- URLs instrucció ----%>
+		<%---- URLs instrucciï¿½ ----%>
 		<c:if test="${!isTasca && contingut.expedient && isGenerarUrlsInstruccioActiu}">
 			<li><a href="#" onclick="urlInstruccio(${contingut.id})"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.url"/></a></li>
 		</c:if>

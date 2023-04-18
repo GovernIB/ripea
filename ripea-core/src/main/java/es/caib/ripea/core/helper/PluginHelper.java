@@ -65,7 +65,6 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuOperacioEnumDto;
-import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
@@ -109,9 +108,9 @@ import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
@@ -2855,7 +2854,8 @@ public class PluginHelper {
 					notificacio.setCaducitat(cal.getTime());
 				}
 			}
-			if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+			
+			if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) || Utils.notEquals(documentEntity.getFitxerContentType(), "application/pdf")) {
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
 				notificacio.setDocumentArxiuNom(fitxer.getNom());
 				notificacio.setDocumentArxiuContingut(fitxer.getContingut());

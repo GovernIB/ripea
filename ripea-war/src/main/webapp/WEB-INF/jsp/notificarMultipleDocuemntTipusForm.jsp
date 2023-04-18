@@ -6,7 +6,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 
-<c:set var="titol"><spring:message code="entitat.form.titol.crear"/></c:set>
+<c:set var="titol"><spring:message code="contingut.document.form.titol.generar"/></c:set>
 
 <html>
 <head>
@@ -19,12 +19,42 @@
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+
+<script>
+
+
+$(document).ready(function() {
+
+
+	// METADOCUMENT CHANGE
+	$('#metaNodeId').on('change', function() {
+		if ($(this).val()) {
+			$.get('<c:url value="/modal/contingut/${expedientId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
+			.done(function(data) {			
+				$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+				$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+			})
+		} else {
+			$('#ntiOrigen').val('').trigger('change');
+			$('#ntiEstadoElaboracion').val('').trigger('change');
+		}
+	});
+	
+});
+
+</script>	
+	
+	
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
 	<form:form action="" method="post" cssClass="form-horizontal" commandName="documentCommand">
 	
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
+		<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionEnum="NtiOrigenEnumDto" required="true"/>
+		<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" required="true" optionEnum="DocumentNtiEstadoElaboracionEnumDto"/>
+	
 		
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

@@ -139,6 +139,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	@Autowired
 	private OrganGestorService organGestorService;
 	
+	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -820,7 +821,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					throw new RuntimeException("El document amb nom '" + document.getNom() + "' no està firmat");
 				}
 				//No es possible concatenar els documents que no són pdf
-				if (Utils.isNotNullAndEqual(document.getFitxerContentType(), "application/pdf")) {
+				if (Utils.notEquals(document.getFitxerContentType(), "application/pdf")) {
 					if (document.getArxiuEstat() == ArxiuEstatEnumDto.ESBORRANY) {
 						documentService.actualitzarEstatADefinititu(docId);
 					}
@@ -873,14 +874,24 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						expedientId,
 						DocumentGenericCommand.asDto(command),
 						false, 
-						RolHelper.getRolActual(request));
-				
+						RolHelper.getRolActual(request), 
+						metaDocumentId != null ? true : false);
 
-				MissatgesHelper.warning(
-						request, 
-						getMessage(
-								request, 
-								"contingut.document.form.titol.compresio.info"));
+				if (metaDocumentId != null) {
+					
+					MissatgesHelper.warning(
+							request, 
+							getMessage(
+									request, 
+									"contingut.document.form.titol.zip.generat"));
+				} else {
+					MissatgesHelper.warning(
+							request, 
+							getMessage(
+									request, 
+									"contingut.document.form.titol.compresio.info"));
+				}
+
 				
 				return "redirect:../../document/" + document.getId() + "/notificar";
 				
@@ -921,7 +932,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					expedientId,
 					DocumentGenericCommand.asDto(command),
 					false, 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					false);
 			
 			return "redirect:../../document/" + document.getId() + "/notificar";
 	
@@ -1307,7 +1319,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
-					rolActual);
+					rolActual, 
+					false);
 			
 			crearDadesPerDefecteSiExisteixen(
 					entitatActual.getId(),

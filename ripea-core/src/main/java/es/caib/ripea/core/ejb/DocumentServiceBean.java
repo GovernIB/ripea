@@ -61,13 +61,16 @@ public class DocumentServiceBean implements DocumentService {
 			Long entitatId,
 			Long contenidorId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient, String rolActual) {
+			boolean comprovarMetaExpedient, 
+			String rolActual, 
+			boolean firmarEnServidor) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
 				document,
 				comprovarMetaExpedient, 
-				rolActual);
+				rolActual, 
+				firmarEnServidor);
 	}
 
 	@Override
