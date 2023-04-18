@@ -230,6 +230,7 @@ public class HistoricHelper {
 					count.getMetaExpedient());
 			switch (count.getTipus()) {
 			case NOTIFICACIO_CERTIFICADA:
+			case NOTIFICACIO_REBUTJADA:
 				historic.setNumDocsNotificats(count.getCount());
 				break;
 			default:

@@ -2911,12 +2911,12 @@ public class PluginHelper {
 				enviament.setEntregaPostalLinea1(interessatPerAdresa.getAdresa() + ", " + interessatPerAdresa.getCodiPostal() + ", " + municipi.getNom());
 				enviament.setEntregaPostalLinea2(provincia.getNom() + ", " + pais.getNom());
 			}
-			// ########## ENVIAMENT DEH  ###############
-			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh()) {
+			// ########## ENVIAMENT DEH  ############### 
+			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(configHelper.getConfig("es.caib.ripea.notificacio.enviament.deh.activa"))) {
 				enviament.setEntregaDehActiva(true);
 				enviament.setEntregaDehObligat(interessat.getEntregaDehObligat());
 				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacioSia());
-				enviament.setEntregaNif(usuari.getNif());
+				enviament.setEntregaNif(interessat.getDocumentNum());
 			}
 			enviaments.add(enviament);
 			notificacio.setEnviaments(enviaments);
