@@ -366,14 +366,11 @@ public class PermisosHelper {
 	
 	public boolean isGrantedAny(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, String usuariCodi) {
 		boolean[] granted = verificarPermisos(objectIdentifier, clazz, permissions, usuariCodi);
-		boolean result = true;
 		for (int i = 0; i < granted.length; i++) {
-			if (!granted[i]) {
-				result = false;
-				break;
-			}
+			if (granted[i])
+				return true;
 		}
-		return result;
+		return false;
 	}
 	
 	

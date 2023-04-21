@@ -38,6 +38,7 @@ import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -367,7 +368,7 @@ public class EmailHelper {
 				// 1. Permission on procediment of anotacion (procediments no comuns)
 				boolean grantedProc = permisosHelper.isGrantedAny(
 						metaExpedient.getId(),
-						MetaExpedientEntity.class,
+						MetaNodeEntity.class,
 						new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
 						dadesUsuari.getCodi());
 				if (grantedProc) {
@@ -929,7 +930,7 @@ public class EmailHelper {
 			SimpleMailMessage missatge = new SimpleMailMessage();
 			missatge.setFrom(from);
 			
-			if (eventTipus == EventTipusEnumDto.CANVI_ESTAT_REVISIO || eventTipus == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
+			if (eventTipus == EventTipusEnumDto.CANVI_ESTAT_REVISIO || eventTipus == EventTipusEnumDto.PROCEDIMENT_COMENTARI || eventTipus == EventTipusEnumDto.NOVA_ANOTACIO) {
 				missatge.setBcc(to);
 			} else {
 				missatge.setTo(to);
