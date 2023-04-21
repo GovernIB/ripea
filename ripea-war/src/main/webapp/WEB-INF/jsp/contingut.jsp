@@ -284,6 +284,17 @@ body.loading .rmodal {
 	border-color: #ff8d30;
 }
 
+.dropdown-submenu-right {
+	position: absolute;
+  	left: 100%; /* Alinear el submenú a la derecha */
+  	top: 0;
+  	display: none;
+  	min-width: 200px;
+}
+
+.dropdown-submenu-right > li {
+  	position: relative;
+}
 
 </style>
 
@@ -309,6 +320,34 @@ var notificacioEstatText = new Array();
 //################################################## document ready START ##############################################################
 $(document).ready(function() {
 
+	$('.dropdown-submenu > a').on('click', function(e) {
+		e.preventDefault();
+	    e.stopPropagation();
+	    $(this).next('ul.dropdown-menu').toggle();
+	});
+	
+	$('ul.dropdown-menu ul.dropdown-menu li').on('click', function() {
+		// Ocultar el submenú
+	  	$(this).closest('.dropdown-menu').hide();
+	});
+	
+	$('#urlInstruccio').on('click', function() {
+		$(this).next('ul.dropdown-menu').empty().append('<span class="loading"></span>');
+		
+		$.ajax({
+			url: '<c:url value="/urlInstruccio/list/"/>',
+		    type: "GET",
+		    contentType: "application/json",
+		    success: function (urls) {
+		    	$('#urlInstruccio').next('ul.dropdown-menu').find('.loading').remove();
+		    	
+		    	urls.forEach(function(url) {
+		    		$('#urlInstruccio').next('ul.dropdown-menu').append('<li><a href="#" onclick="urlInstruccio(${contingut.id},' + url.id + ')">' + url.nom + '</a></li>');
+		    	});
+		    }
+		});
+	});
+	
 	$('.nav-tabs a[href$="#interessats"]').on('click', function() {
 		$('#taulaInteressats').webutilDatatable();
 	});
@@ -415,19 +454,15 @@ $(document).ready(function() {
 });//################################################## document ready END ##############################################################
 
 
-function urlInstruccio(idExpedient) {
+function urlInstruccio(contingutId, urlInstruccioId) {
 	$.ajax({
-		url: '<c:url value="/contingut/' + idExpedient + '/url"/>',
+		url: '<c:url value="/contingut/' + contingutId + '/' + urlInstruccioId + '/valor"/>',
 	    type: "GET",
 	    contentType: "application/json",
 	    success: function (data) {
-	    	var urls = '';
-	    	data.forEach(function(url) {
-	    		urls += url + '\n';
-	    	});
 	    	// Versió antiga navegadors
 	    	var tmpElement = document.createElement("textarea");
-	    	tmpElement.value = urls;
+	    	tmpElement.value = data;
 	    	tmpElement.setAttribute("readonly", "");
 	    	tmpElement.style.position = "absolute";
 	    	tmpElement.style.left = "-9999px";
@@ -438,7 +473,7 @@ function urlInstruccio(idExpedient) {
             document.body.removeChild(tmpElement);
             
             // Versio nova
-            navigator.clipboard.writeText(urls);
+            navigator.clipboard.writeText(data);
            
             document.location.reload()
 	    }

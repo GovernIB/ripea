@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,15 +15,17 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.URLInstruccioFiltreDto;
-import es.caib.ripea.core.api.dto.URLInstruccionDto;
+import es.caib.ripea.core.api.dto.URLInstruccioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.URLInstruccioService;
+import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.URLInstruccionEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.URLInstruccioEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.repository.URLInstruccionRepository;
+import es.caib.ripea.core.repository.URLInstruccioRepository;
 
 /**
  * Implementació del servei de gestió de urls d'instrucció.
@@ -33,7 +36,7 @@ import es.caib.ripea.core.repository.URLInstruccionRepository;
 public class URLInstruccioServiceImpl implements URLInstruccioService {
 
 	@Autowired
-	private URLInstruccionRepository urlInstruccionRepository;
+	private URLInstruccioRepository urlInstruccionRepository;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -43,9 +46,9 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 	
 	@Transactional
 	@Override
-	public URLInstruccionDto create(
+	public URLInstruccioDto create(
 			Long entitatId,
-			URLInstruccionDto url) throws NotFoundException {
+			URLInstruccioDto url) throws NotFoundException {
 		logger.debug("Creant una nova url (" +
 				"url=" + url + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -56,7 +59,7 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 				false, 
 				true);
 		
-		URLInstruccionEntity entity = URLInstruccionEntity.getBuilder(
+		URLInstruccioEntity entity = URLInstruccioEntity.getBuilder(
 				url.getCodi(), 
 				url.getNom(), 
 				url.getDescripcio(), 
@@ -64,18 +67,18 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 				entitat).build();
 		return conversioTipusHelper.convertir(
 				urlInstruccionRepository.save(entity), 
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 	}
 
 	@Transactional
 	@Override
-	public URLInstruccionDto update(
+	public URLInstruccioDto update(
 			Long entitatId, 
-			URLInstruccionDto url) throws NotFoundException {
+			URLInstruccioDto url) throws NotFoundException {
 		logger.debug("Actualitzant url existent (" +
 				"url=" + url + ")");
 
-		URLInstruccionEntity entity = urlInstruccionRepository.findOne(url.getId());
+		URLInstruccioEntity entity = urlInstruccionRepository.findOne(url.getId());
 		entity.update(
 				url.getCodi(),
 				url.getNom(),
@@ -83,46 +86,46 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 				url.getUrl());
 		return conversioTipusHelper.convertir(
 				entity,
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 	}
 
 	@Transactional
 	@Override
-	public URLInstruccionDto delete(Long entitatId, Long id) throws NotFoundException {
+	public URLInstruccioDto delete(Long entitatId, Long id) throws NotFoundException {
 		logger.debug("Esborrant url (" +
 				"id=" + id +  ")");
 		
-		URLInstruccionEntity entity = urlInstruccionRepository.findOne(id);
+		URLInstruccioEntity entity = urlInstruccionRepository.findOne(id);
 		urlInstruccionRepository.delete(entity);
 
 		return conversioTipusHelper.convertir(
 				entity,
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public URLInstruccionDto findById(Long entitatId, Long id) throws NotFoundException {
+	public URLInstruccioDto findById(Long entitatId, Long id) throws NotFoundException {
 		logger.debug("Consulta de la url (" +
 				"id=" + id + ")");
 		
-		URLInstruccionEntity entity = urlInstruccionRepository.findOne(id);
-		URLInstruccionDto dto = conversioTipusHelper.convertir(
+		URLInstruccioEntity entity = urlInstruccionRepository.findOne(id);
+		URLInstruccioDto dto = conversioTipusHelper.convertir(
 				entity,
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 		return dto;
 	}
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<URLInstruccionDto> findByEntitatPaginat(
+	public PaginaDto<URLInstruccioDto> findByEntitatPaginat(
 			Long entitatId, 
 			URLInstruccioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams)
 			throws NotFoundException {
 		logger.debug("Consulta de totes les avisos paginades (" +
 				"paginacioParams=" + paginacioParams + ")");
-		PaginaDto<URLInstruccionDto> resposta;
+		PaginaDto<URLInstruccioDto> resposta;
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId, 
 				false, 
@@ -140,13 +143,13 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 						filtre.getDescripcio() == null || filtre.getDescripcio().isEmpty(),
 						filtre.getDescripcio() != null ? filtre.getDescripcio().trim() : "",
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 		return resposta;
 	}
 
 	@Transactional(readOnly = true )
 	@Override
-	public List<URLInstruccionDto> findByEntitat(Long entitatId) throws NotFoundException {
+	public List<URLInstruccioDto> findByEntitat(Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId, 
 				false, 
@@ -157,9 +160,44 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 		
 		return conversioTipusHelper.convertirList(
 				urlInstruccionRepository.findByEntitat(entitat), 
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public String getURLInstruccio(Long entitatId, Long contingutId, Long urlInstruccioId) {
+		logger.debug("Generant URLs instrucció ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ", "
+				+ "urlInstruccioId=" + urlInstruccioId + ")");
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false, false, false);
+		
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				entitat,
+				contingutId);
+		String urlValor = "";
+		if (contingut instanceof ExpedientEntity) {
+			ExpedientEntity expedient = (ExpedientEntity)contingut;
+		
+			String eni = expedient.getNtiIdentificador();
+			URLInstruccioEntity urlInstruccio = urlInstruccionRepository.findOne(urlInstruccioId);
+			
+			if (urlInstruccio != null) {
+				String url = urlInstruccio.getUrl();
+		 		if (url.contains("[ENI]") && eni != null && ! eni.isEmpty()) {
+		 			urlValor = url.replaceAll("\\[ENI\\]", eni);
+				}
+			}
+			
+		}
+		return urlValor;
+	}
+	
 	private static final Logger logger = LoggerFactory.getLogger(URLInstruccioServiceImpl.class);
+
 	
 }

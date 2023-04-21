@@ -22,9 +22,9 @@ import es.caib.ripea.core.audit.RipeaAuditable;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Entity
-@Table(name = "ipa_url_instruccion")
+@Table(name = "ipa_url_instruccio")
 @EntityListeners(AuditingEntityListener.class)
-public class URLInstruccionEntity extends RipeaAuditable<Long> {
+public class URLInstruccioEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi")
 	private String codi;
@@ -105,21 +105,21 @@ public class URLInstruccionEntity extends RipeaAuditable<Long> {
 				entitat);
 	}
 	public static class Builder {
-		URLInstruccionEntity built;
+		URLInstruccioEntity built;
 		Builder(
 				String codi,
 				String nom,
 				String descripcio,
 				String url,
 				EntitatEntity entitat) {
-			built = new URLInstruccionEntity();
+			built = new URLInstruccioEntity();
 			built.codi = codi;
 			built.nom = nom;
 			built.descripcio = descripcio;
 			built.url = url;
 			built.entitat = entitat;
 		}
-		public URLInstruccionEntity build() {
+		public URLInstruccioEntity build() {
 			return built;
 		}
 	}
@@ -140,7 +140,7 @@ public class URLInstruccionEntity extends RipeaAuditable<Long> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		URLInstruccionEntity other = (URLInstruccionEntity) obj;
+		URLInstruccioEntity other = (URLInstruccioEntity) obj;
 		if (codi == null) {
 			if (other.codi != null)
 				return false;

@@ -265,6 +265,7 @@
 			<mvc:mapping path="/seguimentExpedientsPendents/**"/>
 			<mvc:mapping path="/urlInstruccio**"/>
 			<mvc:mapping path="/urlInstruccio/**"/>
+			<mvc:exclude-mapping path="/urlInstruccio/list/"/>
 			<mvc:exclude-mapping path="/metaExpedientRevisio**"/>
 			<mvc:exclude-mapping path="/metaExpedientRevisio/**"/>
 			<bean class="es.caib.ripea.war.interceptor.AccesAdminEntitatInterceptor"/>

@@ -66,6 +66,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.service.URLInstruccioService;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
@@ -118,6 +119,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	private OrganGestorService organGestorService;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Autowired
+	private URLInstruccioService urlInstruccioService;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
@@ -665,26 +668,27 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				interessats);
 	}
-
-	@RequestMapping(value = "/contingut/{contingutId}/url", method = RequestMethod.GET)
+	
+	@RequestMapping(value = "/contingut/{contingutId}/{urlInstruccioId}/valor", method = RequestMethod.GET)
 	@ResponseBody
-	public List<String> urlInstruccio(
+	public String urlInstruccio(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
+			@PathVariable Long urlInstruccioId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		if (! isGenerarUrlsInstruccioActiu())
 			throw new SecurityException("Es necessari activar la propietat 'es.caib.ripea.expedient.generar.urls.instruccio' per accedir a la gestió d'URLs d'instrucció");
 		
-		List<String> urls = contingutService.obtenerURLsInstruccio(entitatActual.getId(), contingutId);
+		String url = urlInstruccioService.getURLInstruccio(entitatActual.getId(), contingutId, urlInstruccioId);
 		
-		if (! urls.isEmpty())
+		if (! url.isEmpty())
 			MissatgesHelper.success(
 					request,
 					getMessage(request, "url.instruccio.url.copiat.ok"));
 		
-		return urls;
+		return url;
 	}
 
 	private boolean isGenerarUrlsInstruccioActiu() {

@@ -361,7 +361,10 @@
 		</c:if>
 		<%---- URLs instrucci� ----%>
 		<c:if test="${!isTasca && contingut.expedient && isGenerarUrlsInstruccioActiu}">
-			<li><a href="#" onclick="urlInstruccio(${contingut.id})"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.url"/></a></li>
+			<li class="dropdown dropdown-submenu">
+				<a data-toggle="dropdown" class="dropdown-toggle" id="urlInstruccio" href="#"><span class="fa fa-copy dropdown-item"></span>&nbsp;<spring:message code="comu.boto.url"/><span class="fa fa-caret-right" style="float: right; line-height: 20px;"></span></a>
+				<ul class="dropdown-menu dropdown-submenu-right" aria-labelledby="urlInstruccio"></ul>
+			</li>
 		</c:if>
 		<%---- Hist�ric d'accions ----%>
 		<c:if test="${!isTasca}">

@@ -14,7 +14,7 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-public class URLInstruccionDto implements Serializable {
+public class URLInstruccioDto implements Serializable {
 	
 	private Long id;
 	private String nom;

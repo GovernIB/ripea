@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.URLInstruccionEntity;
+import es.caib.ripea.core.entity.URLInstruccioEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -20,18 +20,18 @@ import es.caib.ripea.core.entity.URLInstruccionEntity;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-public interface URLInstruccionRepository extends JpaRepository<URLInstruccionEntity, Long> {
+public interface URLInstruccioRepository extends JpaRepository<URLInstruccioEntity, Long> {
 
-	List<URLInstruccionEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	List<URLInstruccioEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
 	
 	@Query(	"from " +
-			"    URLInstruccionEntity url " +
+			"    URLInstruccioEntity url " +
 			"where " +
 			"    url.entitat = :entitat " +
 			"and (:esNullCodi = true or lower(url.codi) like lower('%'||:codi||'%')) " + 
 			"and (:esNullNom = true or lower(url.nom) like lower('%'||:nom||'%')) " + 
 			"and (:esNullDescripcio = true or lower(url.descripcio) like lower('%'||:descripcio||'%')) ")
-	Page<URLInstruccionEntity> findByEntitat(
+	Page<URLInstruccioEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullCodi") boolean esNullCodi,
 			@Param("codi") String codi,
@@ -41,16 +41,16 @@ public interface URLInstruccionRepository extends JpaRepository<URLInstruccionEn
 			@Param("descripcio") String descripcio,
 			Pageable pageable);
 	
-	URLInstruccionEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
+	URLInstruccioEntity findByCodiAndEntitat(String codi, EntitatEntity entitat);
 	
-	List<URLInstruccionEntity> findByEntitat(EntitatEntity entitat);
+	List<URLInstruccioEntity> findByEntitat(EntitatEntity entitat);
 	
-	List<URLInstruccionEntity> findByEntitatAndCodiInOrderByIdAsc(
+	List<URLInstruccioEntity> findByEntitatAndCodiInOrderByIdAsc(
 			EntitatEntity entitat,
 			List<String> dominiCodis);
 	
 	
-	List<URLInstruccionEntity> findByEntitatAndCodi(
+	List<URLInstruccioEntity> findByEntitatAndCodi(
 			EntitatEntity entitat,
 			String dominiCodi);
 	

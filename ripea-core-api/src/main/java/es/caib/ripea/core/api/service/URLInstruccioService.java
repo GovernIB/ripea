@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.URLInstruccioFiltreDto;
-import es.caib.ripea.core.api.dto.URLInstruccionDto;
+import es.caib.ripea.core.api.dto.URLInstruccioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
@@ -32,9 +32,9 @@ public interface URLInstruccioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public URLInstruccionDto create(
+	public URLInstruccioDto create(
 			Long entitatId,
-			URLInstruccionDto url) throws NotFoundException;
+			URLInstruccioDto url) throws NotFoundException;
 
 	/**
 	 * Actualitza la informació d'una url que tengui el mateix
@@ -49,9 +49,9 @@ public interface URLInstruccioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public URLInstruccionDto update(
+	public URLInstruccioDto update(
 			Long entitatId,
-			URLInstruccionDto url) throws NotFoundException;
+			URLInstruccioDto url) throws NotFoundException;
 
 	/**
 	 * Esborra la url amb el mateix id que l'especificat.
@@ -65,7 +65,7 @@ public interface URLInstruccioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public URLInstruccionDto delete(
+	public URLInstruccioDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
@@ -81,7 +81,7 @@ public interface URLInstruccioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public URLInstruccionDto findById(
+	public URLInstruccioDto findById(
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
@@ -95,7 +95,7 @@ public interface URLInstruccioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<URLInstruccionDto> findByEntitatPaginat(
+	public PaginaDto<URLInstruccioDto> findByEntitatPaginat(
 			Long entitatId, 
 			URLInstruccioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException;
@@ -110,7 +110,19 @@ public interface URLInstruccioService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
-	public List<URLInstruccionDto> findByEntitat(
+	public List<URLInstruccioDto> findByEntitat(
 			Long entitatId) throws NotFoundException;
+	
+
+	/**
+	 * Obté el valor d'una URL d'instrucció
+	 * 
+	 * @param entitatId
+	 * @param contingutId
+	 * @param urlInstruccioId
+	 * @return
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public String getURLInstruccio(Long entitatId, Long contingutId, Long urlInstruccioId);
 
 }
