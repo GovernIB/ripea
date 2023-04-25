@@ -2033,7 +2033,7 @@ public class ContingutServiceImpl implements ContingutService {
 					DominiDto domini = dominiService.findByCodiAndEntitat(metaDada.getCodi(), entitatId);
 					
 					ResultatConsultaDto resultat = dominiService.getSelectedDomini(entitatId, domini, dada.getValorComString());
-					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, resultat.getText());
+					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, resultat.getId());
 				} else {
 					pluginHelper.arxiuExpedientMetadadesActualitzar((ExpedientEntity)node, metaDada, dada.getValorComString());
 				}
