@@ -332,7 +332,7 @@ $(document).ready(function() {
 	});
 	
 	$('#urlInstruccio').on('click', function() {
-		$(this).next('ul.dropdown-menu').empty().append('<span class="loading"></span>');
+		$(this).next('ul.dropdown-menu').empty().append('<span class="loading" style="width: 100%; text-align: center;"><img src="<c:url value="/img/loading.gif"/>"/></span>');
 		
 		$.ajax({
 			url: '<c:url value="/urlInstruccio/list/"/>',
