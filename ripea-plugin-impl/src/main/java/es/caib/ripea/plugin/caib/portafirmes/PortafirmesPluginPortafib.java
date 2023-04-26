@@ -958,6 +958,8 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return api;
 	}
 	
+	// currently doesn't exit equivalent in REST 
+	// email 2023.04.26 12:18: "A puntaré issue per afegir mètode a aquesta API per retornar informació de la Petició."
 	private PortaFIBPeticioDeFirmaWs getPeticioDeFirmaWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBPeticioDeFirma";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
@@ -983,6 +985,9 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return api;
 	}
 
+	
+	// currently doesn't exit equivalent in REST
+	// email 2023.04.25 13:55: "(1.B) métodos del webservice /ws/v1/PortaFIBUsuariEntitat:  Com que aquest WS no afecta a Peticions de Firma encara no està migrat i el podeu fer servir sense problemes."
 	private PortaFIBUsuariEntitatWs getUsuariEntitatWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBUsuariEntitat";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");

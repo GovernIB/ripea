@@ -643,7 +643,8 @@ public class PluginHelper {
 							expedient.getNom(), 
 							metaDada, 
 							valor, 
-							interessats));
+							interessats,
+							expedient.getNumero()));
 			expedient.updateArxiu(null);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
@@ -3275,7 +3276,7 @@ public class PluginHelper {
 		return text == null || text.isEmpty() ? null : Long.parseLong(text);
 	}
 	
-	private Expedient toArxiuExpedient(String identificador, String nom, MetaDadaEntity metaDada, Object valor, List<String> ntiInteressats) {
+	private Expedient toArxiuExpedient(String identificador, String nom, MetaDadaEntity metaDada, Object valor, List<String> ntiInteressats, String numeroExpedient) {
 		Expedient expedient = new Expedient();
 		expedient.setIdentificador(identificador);
 		expedient.setNom(nom);
@@ -3285,6 +3286,9 @@ public class PluginHelper {
 		Map<String, Object> metadadesValors = new HashMap<String, Object>();
 		metadadesValors.put(metaDada.getMetadadaArxiu(), valor);
 		metadades.addMetadadaAddicional("metadades_expedient", metadadesValors);
+		
+		if (isPropagarNumeroExpedientActiu())
+			metadades.addMetadadaAddicional("numeroExpedient", numeroExpedient);
 		
 		expedient.setMetadades(metadades);
 		
