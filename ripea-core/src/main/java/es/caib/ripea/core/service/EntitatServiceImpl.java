@@ -26,6 +26,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -75,11 +76,22 @@ public class EntitatServiceImpl implements EntitatService {
 
 		logger.debug("Actualitzant entitat existent (entitat=" + entitat + ")");
 		EntitatEntity entity = entityComprovarHelper.comprovarEntitat(entitat.getId(), false, false, false, false, false);
-		entity.update(entitat.getCodi(), entitat.getNom(), entitat.getDescripcio(), entitat.getCif(), entitat.getUnitatArrel(),
-						entitat.getCapsaleraColorFons(), entitat.getCapsaleraColorLletra());
-		if (entitat.getLogoImgBytes()!=null) {
+		entity.update(
+				entitat.getCodi(),
+				entitat.getNom(),
+				entitat.getDescripcio(),
+				entitat.getCif(),
+				entitat.getUnitatArrel(),
+				entitat.getCapsaleraColorFons(),
+				entitat.getCapsaleraColorLletra());
+
+	
+		if (Utils.isNotEmpty(entitat.getLogoImgBytes())) {
 			entity.updateLogoImgBytes(entitat.getLogoImgBytes());
+		} else if (!entitat.isLogo()) {
+			entity.updateLogoImgBytes(null);
 		}
+
 		return conversioTipusHelper.convertir(entity, EntitatDto.class);
 	}
 	

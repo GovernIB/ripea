@@ -20,6 +20,24 @@
 	<script src="<c:url value="/js/jasny-bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
+	
+	
+<script>
+
+$(document).ready(function() {
+	
+  $('#logoImg').change(function(){
+	    var path = $(this).val();
+	    if (path) {
+	     	$('#logo').val(true);
+		} else {
+			$('#logo').val(false);
+		}
+  });
+  
+});
+
+</script>	
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/entitat"/></c:set>
@@ -29,7 +47,10 @@
 		<rip:inputText name="nom" textKey="entitat.form.camp.nom" required="true"/>
 		<rip:inputText name="cif" textKey="entitat.form.camp.cif" required="true"/>
 		<rip:inputText name="unitatArrel" textKey="entitat.form.camp.unitat.codi" required="true"/>
-		<rip:inputFile name="logoImg" textKey="entitat.form.camp.logoImg"/>
+
+		<rip:inputFile name="logoImg" textKey="entitat.form.camp.logoImg" fileName="${entitatCommand.logo ? 'logo' : ''}" doNotShowErrors="1"/>
+		<form:hidden path="logo"/>
+		
 		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
 		<div id="modal-botons">

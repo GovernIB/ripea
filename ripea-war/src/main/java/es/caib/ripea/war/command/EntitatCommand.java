@@ -37,6 +37,7 @@ public class EntitatCommand {
 	@NotEmpty @Size(max=9)
 	private String unitatArrel;
 	private MultipartFile logoImg;
+	private boolean logo;
 	private String capsaleraColorFons;
 	private String capsaleraColorLletra;
 	
@@ -89,7 +90,13 @@ public class EntitatCommand {
 	public void setUnitatArrel(String unitatArrel) {
 		this.unitatArrel = unitatArrel != null ? unitatArrel.trim() : null;
 	}
-
+	public boolean isLogo() {
+		return logo;
+	}
+	public void setLogo(
+			boolean logo) {
+		this.logo = logo;
+	}
 	public static List<EntitatCommand> toEntitatCommands(
 			List<EntitatDto> dtos) {
 		List<EntitatCommand> commands = new ArrayList<EntitatCommand>();
@@ -103,9 +110,11 @@ public class EntitatCommand {
 	}
 
 	public static EntitatCommand asCommand(EntitatDto dto) {
-		return ConversioTipusHelper.convertir(
+		EntitatCommand entitat = ConversioTipusHelper.convertir(
 				dto,
 				EntitatCommand.class);
+		entitat.setLogo(dto.getLogoImgBytes() != null ? true : false);
+		return entitat;
 	}
 	public static EntitatDto asDto(EntitatCommand command) throws IOException {
 		EntitatDto entitat = ConversioTipusHelper.convertir(

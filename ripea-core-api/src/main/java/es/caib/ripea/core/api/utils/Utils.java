@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,7 +26,6 @@ public class Utils {
 		return rolsCurrentUser;
 	}
 	
-	
 	public static String trim(String value) { 
 		return StringUtils.trim(value);
 	}
@@ -34,14 +34,17 @@ public class Utils {
 		return object1 != null && object2 != null && object1.equals(object2);
 	}
 	
-	
     public static boolean isNotEmpty(final Collection<?> coll) {
        return CollectionUtils.isNotEmpty(coll);
     }
     
-    public static boolean isNotEmpty(final String st) {
-        return StringUtils.isNotEmpty(st);
-     }
+	public static boolean isNotEmpty(final String st) {
+		return StringUtils.isNotEmpty(st);
+	}
+	
+	public static boolean isNotEmpty(final byte[] array) {
+		return ArrayUtils.isNotEmpty(array);
+	}
 	
 	/**
 	 * Hibernate doesn't support empty collection as parameter for "IN" operator [WHERE column_name IN ()]

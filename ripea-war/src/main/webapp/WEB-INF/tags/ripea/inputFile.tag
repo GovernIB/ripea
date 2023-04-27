@@ -11,12 +11,14 @@
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="fileName" required="false" rtexprvalue="true"%>
+<%@ attribute name="doNotShowErrors" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
-<c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
+<c:set var="campErrors"><c:choose><c:when test="${not empty doNotShowErrors}"></c:when><c:otherwise><form:errors path="${campPath}"/></c:otherwise></c:choose></c:set>
 <c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}">*</c:if></c:set>
 <c:set var="campPlaceholder"><c:choose><c:when test="${not empty placeholderKey}"><spring:message code="${placeholderKey}"/></c:when><c:otherwise>${placeholder}</c:otherwise></c:choose></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
+
 <c:choose>
 	<c:when test="${not inline}">
 		<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
