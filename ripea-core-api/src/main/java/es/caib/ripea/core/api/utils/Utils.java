@@ -30,9 +30,41 @@ public class Utils {
        return CollectionUtils.isNotEmpty(coll);
     }
     
-    public static boolean isNotEmpty(final String st) {
-        return StringUtils.isNotEmpty(st);
-     }
+    /**
+     * <p>Checks if a String is not empty ("") and not null.</p>
+     *
+     * <pre>
+     * StringUtils.isNotEmpty(null)      = false
+     * StringUtils.isNotEmpty("")        = false
+     * StringUtils.isNotEmpty(" ")       = true
+     * StringUtils.isNotEmpty("bob")     = true
+     * StringUtils.isNotEmpty("  bob  ") = true
+     * </pre>
+     *
+     * @param str  the String to check, may be null
+     * @return <code>true</code> if the String is not empty and not null
+     */
+	public static boolean isNotEmpty(final String st) {
+		return StringUtils.isNotEmpty(st);
+	}
+	
+    /**
+     * <p>Checks if a String is empty ("") or null.</p>
+     *
+     * <pre>
+     * StringUtils.isEmpty(null)      = true
+     * StringUtils.isEmpty("")        = true
+     * StringUtils.isEmpty(" ")       = false
+     * StringUtils.isEmpty("bob")     = false
+     * StringUtils.isEmpty("  bob  ") = false
+     * </pre>
+     *
+     * @param str  the String to check, may be null
+     * @return <code>true</code> if the String is empty or null
+     */
+	public static boolean isEmpty(final String st) {
+		return StringUtils.isEmpty(st);
+	}
 	
 	/**
 	 * Hibernate doesn't support empty collection as parameter for "IN" operator [WHERE column_name IN ()]

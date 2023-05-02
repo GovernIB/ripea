@@ -1,0 +1,170 @@
+databaseChangeLog:
+- changeSet:
+    id: 1682673428002-1
+    author: limit
+    changes:
+    - insert:
+        tableName: ipa_config_group
+        columns:
+          - column:
+              name: POSITION
+              value: 3
+          - column:
+              name: PARENT_CODE
+              value: FIRMA
+          - column:
+              name: CODE
+              value: FIRMA_SIMPLE_WEB
+          - column:
+              name: DESCRIPTION
+              value: Configuració del plugin de firma simple web  
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.firmasimpleweb.class
+          - column:
+              name: value
+              value: es.caib.ripea.plugin.caib.firmaweb.FirmaSimpleWebPluginPortafib
+          - column:
+              name: description
+              value: Classe del plugin
+          - column:
+              name: group_code
+              value: FIRMA_SIMPLE_WEB
+          - column:
+              name: position
+              value: 1
+          - column:
+              name: jboss_property
+              value: 0
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.firmasimpleweb.endpoint
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Url del plugin
+          - column:
+              name: group_code
+              value: FIRMA_SIMPLE_WEB
+          - column:
+              name: position
+              value: 2
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1         
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.firmasimpleweb.username
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Usuari del plugin
+          - column:
+              name: group_code
+              value: FIRMA_SIMPLE_WEB
+          - column:
+              name: position
+              value: 3
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1 
+          - column:
+              name: configurable_organ
+              value: 1
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.firmasimpleweb.password
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Constrasenya del plugin
+          - column:
+              name: group_code
+              value: FIRMA_SIMPLE_WEB
+          - column:
+              name: position
+              value: 4
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: PASSWORD
+          - column:
+              name: configurable
+              value: 1              
+          - column:
+              name: configurable_organ
+              value: 1                 
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.firmasimpleweb.location
+          - column:
+              name: value
+              value: 
+          - column:
+              name: description
+              value: Lloc on es realitza la firma  
+          - column:
+              name: group_code
+              value: FIRMA_SIMPLE_WEB
+          - column:
+              name: position
+              value: 4
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1              
+          - column:
+              name: configurable_organ
+              value: 1                         

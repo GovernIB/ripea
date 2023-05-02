@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
@@ -501,6 +502,25 @@ public class DocumentServiceBean implements DocumentService {
 				parametres,
 				errorDescripcio,
 				throwable);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public String firmaSimpleWebStart(
+			FitxerDto fitxerPerFirmar,
+			String motiu, 
+			String urlReturnToRipea) {
+		return delegate.firmaSimpleWebStart(
+				fitxerPerFirmar,
+				motiu, 
+				urlReturnToRipea);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FirmaResultatDto firmaSimpleWebEnd(
+			String transactionID) {
+		return delegate.firmaSimpleWebEnd(transactionID);
 	}
 
 }

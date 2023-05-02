@@ -43,7 +43,7 @@ $(document).ready(function() {
 			<c:set var="formAction"><c:url value="/usuariTasca/${tascaId}/document/${document.id}/firmaPassarela"/></c:set>
 		</c:when>
 		<c:otherwise>
-			<c:set var="formAction"><c:url value="/document/${document.id}/firmaPassarela"/></c:set>
+			<c:set var="formAction"><c:url value="/document/${document.id}/firmaSimpleWebStart"/></c:set>
 		</c:otherwise>
 	</c:choose>
 	<form:form id="passarela-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="passarelaFirmaEnviarCommand" role="form" enctype="multipart/form-data">

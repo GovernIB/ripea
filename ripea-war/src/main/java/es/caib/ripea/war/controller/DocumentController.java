@@ -44,10 +44,12 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
 import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
@@ -67,8 +69,8 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
 import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
+import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -90,6 +92,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private PassarelaFirmaHelper passarelaFirmaHelper;
+
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 	@Autowired
@@ -477,6 +480,89 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					null);
 		}
 	}
+	
+	
+	
+	
+	@RequestMapping(value = "/{documentId}/firmaSimpleWebStart", method = RequestMethod.POST)
+	public String firmaSimpleWebStart(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			@Valid PassarelaFirmaEnviarCommand command,
+			BindingResult bindingResult,
+			Model model) throws IOException {
+
+		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
+		
+		if (bindingResult.hasErrors()) {
+			emplenarModelFirmaClient(
+					request,
+					documentId,
+					model);
+			return "passarelaFirmaForm";
+		}
+
+		FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
+				entitatActualId,
+				documentId);
+		
+		String urlReturnToRipea = aplicacioService.propertyBaseUrl() + "/document/" + documentId + "/firmaSimpleWebEnd/";
+		
+		String urlRedirectToPortafib = documentService.firmaSimpleWebStart(
+				fitxerPerFirmar,
+				command.getMotiu(),
+				urlReturnToRipea);
+		
+		return "redirect:" + urlRedirectToPortafib;
+
+	}
+
+	
+	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd/{transactionID}")
+	public String firmaSimpleWebEnd(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long documentId,
+			@PathVariable String transactionID) throws Exception {
+		
+		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
+		
+		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
+		
+		if (firmaResultat.getStatus() == StatusEnumDto.OK) {
+			
+			documentService.processarFirmaClient(
+					entitatActualId,
+					documentId,
+					firmaResultat.getFitxerFirmatNom(), 
+					firmaResultat.getFitxerFirmatContingut(), 
+					RolHelper.getRolActual(request));
+			
+			MissatgesHelper.success(
+					request,
+					getMessage(
+							request, 
+							"document.controller.firma.passarela.final.ok"));
+
+		} else if (firmaResultat.getStatus() == StatusEnumDto.WARNING) {
+			MissatgesHelper.warning(
+					request,
+					firmaResultat.getMsg());
+			
+		} else if (firmaResultat.getStatus() == StatusEnumDto.ERROR) {
+			MissatgesHelper.error(
+					request,
+					firmaResultat.getMsg());
+		}
+
+		
+		return "redirect:/contingut/" + documentService.findById(entitatActualId, documentId).getExpedientPare().getId();
+
+	}
+	
+
 
 	
 	// Web signature passarela AFTER 3

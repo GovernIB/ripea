@@ -77,6 +77,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
@@ -140,6 +141,7 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
+import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -207,6 +209,9 @@ public class PluginHelper {
 	private Map<String, FirmaServidorPlugin> firmaServidorPlugins = new HashMap<>();
 	private Map<String, ViaFirmaPlugin> viaFirmaPlugins = new HashMap<>();
 	private Map<String, ProcedimentPlugin> procedimentPlugins = new HashMap<>();
+	private Map<String, FirmaWebPlugin> firmaSimpleWebPlugins = new HashMap<>();
+	
+	
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -2215,6 +2220,7 @@ public class PluginHelper {
 			FitxerDto resposta = new FitxerDto();
 			resposta.setNom(convertit.getArxiuNom());
 			resposta.setContingut(convertit.getArxiuContingut());
+			resposta.setContentType("application/pdf");
 			return resposta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de conversió de documents: " + ex.getMessage();
@@ -3205,6 +3211,32 @@ public class PluginHelper {
 		}
 		return viaFirmaDispositiusDto;
 	}
+	
+	
+
+	public String firmaSimpleWebStart(
+			FitxerDto fitxerPerFirmar,
+			String motiu,
+			UsuariDto usuariActual, 
+			String urlReturnToRipea) {
+
+		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
+
+		return firmaWebPlugin.firmaSimpleWebStart(fitxerPerFirmar, motiu, usuariActual, urlReturnToRipea);
+
+	}
+	
+
+	public FirmaResultatDto firmaSimpleWebEnd(
+			String transactionID) {
+
+		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
+
+		return firmaWebPlugin.firmaSimpleWebEnd(transactionID);
+
+	}
+	
+	
 
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(UnitatOrganitzativa unitatOrganitzativa, List<UnitatOrganitzativa> unitatsOrganitzatives,
 																				   ArbreNodeDto<UnitatOrganitzativaDto> pare) {
@@ -3219,58 +3251,8 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	/*private CiutadaPersona toPluginCiutadaPersona(
-			InteressatEntity interessat) {
-		if (interessat == null)
-			return null;
-		if (	!InteressatDocumentTipusEnumDto.NIF.equals(interessat.getDocumentTipus()) &&
-				!InteressatDocumentTipusEnumDto.CIF.equals(interessat.getDocumentTipus())) {
-			throw new ValidationException(
-					interessat.getId(),
-					InteressatEntity.class,
-					"No es pot notificar a interessats amb el tipus de document " + interessat.getDocumentTipus());
-		}
-		CiutadaPersona persona = new CiutadaPersona();
-		if (interessat instanceof InteressatPersonaFisicaEntity) {
-			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
-			persona.setNif(interessatPf.getDocumentNum());
-			persona.setNom(interessatPf.getNom());
-			persona.setLlinatge1(interessatPf.getLlinatge1());
-			persona.setLlinatge2(interessatPf.getLlinatge2());
-			persona.setPaisCodi(interessat.getPais());
-			persona.setProvinciaCodi(interessat.getProvincia());
-			persona.setMunicipiCodi(interessat.getMunicipi());
-		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
-			InteressatPersonaFisicaEntity interessatPj = (InteressatPersonaFisicaEntity)interessat;
-			persona.setNif(interessatPj.getDocumentNum());
-			persona.setNom(interessatPj.getNom());
-			persona.setPaisCodi(interessat.getPais());
-			persona.setProvinciaCodi(interessat.getProvincia());
-			persona.setMunicipiCodi(interessat.getMunicipi());
-		} else if (interessat instanceof InteressatAdministracioEntity) {
-			throw new ValidationException(
-					interessat.getId(),
-					InteressatEntity.class,
-					"Els interessats de les notificacions només poden ser persones físiques o jurídiques");
-		}
-		return persona;
-	}
 
-	private String getIdiomaPerPluginCiutada(InteressatIdiomaEnumDto idioma) {
-		switch (idioma) {
-		case CA:
-			return "ca";
-		case ES:
-			return "es";
-		default:
-			return "ca";
-		}
-	}
-
-	private static final Pattern MOBIL_PATTERN = Pattern.compile("(\\+34|0034|34)?[ -]*(6|7)([0-9]){2}[ -]?(([0-9]){2}[ -]?([0-9]){2}[ -]?([0-9]){2}|([0-9]){3}[ -]?([0-9]){3})");
-	private boolean isTelefonMobil(String telefon) {
-		return MOBIL_PATTERN.matcher(telefon).matches();
-	}*/
+	
 
 	private Long toLongValue(String text) {
 		return text == null || text.isEmpty() ? null : Long.parseLong(text);
@@ -4321,6 +4303,61 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, "Error al crear la instància del plugin de gestió documental", ex);
 		}
 	}
+	
+	
+	
+	
+	private FirmaWebPlugin getFirmaSimpleWebPlugin() {
+		
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+		
+		FirmaWebPlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = firmaSimpleWebPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.firmasimpleweb.class");
+			if (Utils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (FirmaWebPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("FIRMA_SIMPLE_WEB", entitatCodi, organCodi));
+					firmaSimpleWebPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = firmaSimpleWebPlugins.get(entitatCodi);
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginFirmaWeb();
+		if (Utils.isEmpty(pluginClass)) {
+			throw new RuntimeException("No està configurada la classe per al plugin de firma simple web");
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (FirmaWebPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("FIRMA_SIMPLE_WEB", entitatCodi));
+			firmaSimpleWebPlugins.put(entitatCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new RuntimeException("Error al crear la instància del plugin de firma simple web", ex);
+		}
+		
+	}
+	
 
 	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
 	private synchronized void loadPluginProperties(String codeProperties) {
@@ -4358,7 +4395,8 @@ public class PluginHelper {
 		gestioDocumentalPlugins  = new HashMap<>();
 		firmaServidorPlugins  = new HashMap<>();
 		viaFirmaPlugins  = new HashMap<>();
-		procedimentPlugins  = new HashMap<>();
+		procedimentPlugins = new HashMap<>();
+		firmaSimpleWebPlugins = new HashMap<>();
 	}
 
 	private String getPropertyPluginDadesUsuari() {
@@ -4400,6 +4438,9 @@ public class PluginHelper {
 	}
 	private String getPropertyPluginFirmaServidor() {
 		return configHelper.getConfig("es.caib.ripea.plugin.firmaservidor.class");
+	}
+	private String getPropertyPluginFirmaWeb() {
+		return configHelper.getConfig("es.caib.ripea.plugin.firmasimpleweb.class");
 	}
 	private String getPropertyPluginViaFirma() {
 		return configHelper.getConfig("es.caib.ripea.plugin.viafirma.class");
