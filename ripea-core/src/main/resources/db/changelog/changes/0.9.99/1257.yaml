@@ -167,4 +167,19 @@ databaseChangeLog:
               value: 1              
           - column:
               name: configurable_organ
-              value: 1                         
+              value: 1        
+    - sql:
+        sql:  
+            delete from ipa_config where group_code = 'FIRMA_PASSARELA';
+            delete from ipa_config where group_code = 'FIRMA_PASSARELA-1';
+            delete from ipa_config where group_code = 'FIRMA_PASSARELA-2';
+            delete from ipa_config where group_code = 'FIRMA_PASSARELA-3';
+            
+            delete from ipa_config_group where code = 'FIRMA_PASSARELA';
+            delete from ipa_config_group where code = 'FIRMA_PASSARELA-1';
+            delete from ipa_config_group where code = 'FIRMA_PASSARELA-2';
+            delete from ipa_config_group where code = 'FIRMA_PASSARELA-3';         
+            
+            delete from ipa_config where key like '%.plugin.firmaservidor.portafib.plugins.signatureserver.portafib.api_passarela_username';
+            delete from ipa_config where key like '%.plugin.firmaservidor.portafib.plugins.signatureserver.portafib.api_passarela_url';
+            delete from ipa_config where key like '%.plugin.firmaservidor.portafib.plugins.signatureserver.portafib.api_passarela_password';                              

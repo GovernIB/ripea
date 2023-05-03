@@ -4,7 +4,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.text.SimpleDateFormat;
@@ -16,16 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.fundaciobit.plugins.signature.api.FileInfoSignature;
-import org.fundaciobit.plugins.signature.api.StatusSignature;
-import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,7 +27,6 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
@@ -61,16 +53,13 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
+import es.caib.ripea.war.command.FirmaSimpleWebCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
-import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -89,10 +78,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private DocumentService documentService;
-
-	@Autowired
-	private PassarelaFirmaHelper passarelaFirmaHelper;
-
 	@Autowired
 	private MetaDocumentService metaDocumentService;
 	@Autowired
@@ -406,8 +391,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		return null;
 	}
 
-	@RequestMapping(value = "/{documentId}/firmaPassarela", method = RequestMethod.GET)
-	public String firmaPassarelaGet(
+	@RequestMapping(value = "/{documentId}/firmaSimpleWeb", method = RequestMethod.GET)
+	public String firmaSimpleWebGet(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			Model model) {
@@ -416,69 +401,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				documentId);
 		model.addAttribute("document", document);
-		PassarelaFirmaEnviarCommand command = new PassarelaFirmaEnviarCommand();
+		FirmaSimpleWebCommand command = new FirmaSimpleWebCommand();
 		command.setMotiu(getMessage(
 						request, 
 						"contenidor.document.portafirmes.camp.motiu.default") +
 				" [" + document.getExpedientPare().getNom() + "]");
 		model.addAttribute(command);
-		return "passarelaFirmaForm";
-	}
-	
-	// Web signature passarela BEFORE 1
-	@RequestMapping(value = "/{documentId}/firmaPassarela", method = RequestMethod.POST)
-	public String firmaPassarelaPost(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			@Valid PassarelaFirmaEnviarCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-
-		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
-		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
-		
-		if (bindingResult.hasErrors()) {
-			emplenarModelFirmaClient(
-					request,
-					documentId,
-					model);
-			return "passarelaFirmaForm";
-		}
-		// ======== generate SignaturesSet ==========
-		if (command.getFirma().isEmpty()) {
-			FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
-					entitatActualId,
-					documentId);
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			String urlFinal = ModalHelper.getString(request) + "/document/" + documentId + "/firmaPassarelaFinal";
-			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSet(
-					request,
-					fitxerPerFirmar,
-					usuariActual.getNif(),
-					command.getMotiu(),
-					(command.getLloc() != null) ? command.getLloc() : "RIPEA",
-					usuariActual.getEmail(),
-					LocaleContextHolder.getLocale().getLanguage(),
-					urlFinal,
-					false);
-			return "redirect:" + procesFirmaUrl;
-
-		} else {
-			documentService.processarFirmaClient(
-					entitatActualId,
-					documentId,
-					command.getFirma().getOriginalFilename(), 
-					command.getFirma().getBytes(), RolHelper.getRolActual(request));
-			MissatgesHelper.success(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.ok"));
-			return getModalControllerReturnValueSuccess(
-					request, 
-					"redirect:/contingut/" + documentId,
-					null);
-		}
+		return "firmaSimpleWebForm";
 	}
 	
 	
@@ -488,7 +417,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String firmaSimpleWebStart(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
-			@Valid PassarelaFirmaEnviarCommand command,
+			@Valid FirmaSimpleWebCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
 
@@ -563,139 +492,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	}
 	
 
-
-	
-	// Web signature passarela AFTER 3
-	@RequestMapping(value = "/{documentId}/firmaPassarelaFinal")
-	public String firmaPassarelaFinal(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			@RequestParam("signaturesSetId") String signaturesSetId,
-			Model model) throws IOException {
-		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
-		
-		String organCodi = organGestorService.getOrganCodi();
-		
-		SignaturesSetExtend signaturesSet = passarelaFirmaHelper.getSignaturesSet(
-				request,
-				signaturesSetId);
-		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
-		
-		StatusSignaturesSet status = signaturesSet.getStatusSignaturesSet();
-		switch (status.getStatus()) {
-		case StatusSignaturesSet.STATUS_FINAL_OK:
-			FileInfoSignature firmaInfo = signaturesSet.getFileInfoSignatureArray()[0];
-			StatusSignature firmaStatus = firmaInfo.getStatusSignature();
-			if (firmaStatus.getStatus() == StatusSignature.STATUS_FINAL_OK) {
-				if (firmaStatus.getSignedData() == null || !firmaStatus.getSignedData().exists()) {
-					firmaStatus.setStatus(StatusSignature.STATUS_FINAL_ERROR);
-					String msg = "L'estat indica que ha finalitzat correctament però el fitxer firmat o no s'ha definit o no existeix";
-					firmaStatus.setErrorMsg(msg);
-					MissatgesHelper.error(
-							request,
-							getMessage(
-									request, 
-									"document.controller.firma.passarela.final.ok.nofile"),
-							null);
-				} else {
-					FileInputStream fis = new FileInputStream(firmaStatus.getSignedData());
-
-					documentService.processarFirmaClient(
-							entitatActualId,
-							documentId,
-							firmaStatus.getSignedData().getName(), 
-							IOUtils.toByteArray(fis), RolHelper.getRolActual(request));
-					
-					MissatgesHelper.success(
-							request,
-							getMessage(
-									request, 
-									"document.controller.firma.passarela.final.ok"));
-				}
-			} else {
-				logger.error("Error firma passarela: " +  firmaStatus.getErrorMsg() + " " + status);
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request, 
-								"document.controller.firma.passarela.final.ok.statuserr",
-								new Object[] {firmaStatus.getErrorMsg()}),
-						null);
-			}
-			break;
-		case StatusSignaturesSet.STATUS_FINAL_ERROR:
-			if (status.getErrorMsg() != null) {
-				MissatgesHelper.error(
-						request,
-						status.getErrorMsg(),
-						null);
-				break;
-			}
-		case StatusSignaturesSet.STATUS_CANCELLED:
-			MissatgesHelper.warning(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.cancel"));
-			break;
-		default:
-			MissatgesHelper.warning(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.desconegut"));
-		}
-		
-		
-		
-		
-		passarelaFirmaHelper.closeTransactionInWS(
-				request,
-				signaturesSet);
-		
-
-		
-		boolean ignorarModal = false;
-		String ignorarModalIdsProperty = aplicacioService.propertyPluginPassarelaFirmaIgnorarModalIds();
-		
-		logger.debug("Signatura set plugin id=" + signaturesSet.getPluginId() + ", ignorarModalIdsProperty=" + ignorarModalIdsProperty);
-		
-		if (ignorarModalIdsProperty != null && !ignorarModalIdsProperty.isEmpty()) {
-			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
-			for (String ignorarModalId: ignorarModalIds) {
-				if (StringUtils.isNumeric(ignorarModalId)) {
-					if (ignorarModalId == signaturesSet.getPluginId()) {
-						ignorarModal = true;
-						break;
-					}
-				}
-			}
-		}
-		
-		String forsarTancamentModal = aplicacioService.propertyFindByNom("plugin.passarelafirma.forsar.tancament.modal");
-		if (ignorarModal) {
-			EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-			return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
-		} else if (forsarTancamentModal == null || "true".equalsIgnoreCase(forsarTancamentModal)) {
-			String propertyValue = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.passarelafirma.versio.antiga");
-			boolean usingNewVersion = propertyValue == null || !propertyValue.equals("true");
-			if (usingNewVersion) {
-				EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-				return "redirect:/contingut/" + documentService.findById(entitat.getId(), documentId).getExpedientPare().getId();
-
-			} else {
-				return "redirect:/passarelaModalTancar";
-				
-			}
-			
-		} else {
-			String response = getModalControllerReturnValueSuccess(
-					request, 
-					"redirect:/contingut/" + documentId,
-					null);
-			return response;
-		}
-	}
 
 	@RequestMapping(value = "/{documentId}/viafirma/upload", method = RequestMethod.GET)
 	public String viaFirmaUploadGet(

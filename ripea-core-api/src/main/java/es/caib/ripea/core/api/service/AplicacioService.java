@@ -145,22 +145,6 @@ public interface AplicacioService {
 
 
 	/**
-	 * Retorna el valor de la propietat es.caib.ripea.plugin.passarelafirma.ids.
-	 * 
-	 * @return el valor del paràmetre.
-	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
-	public String propertyPluginPassarelaFirmaIds();
-
-	/**
-	 * Retorna el valor de la propietat plugin.passarelafirma.ignorar.modal.ids.
-	 * 
-	 * @return el valor del paràmetre.
-	 */
-	@PreAuthorize("hasRole('IPA_SUPER') or hasRole('IPA_ADMIN') or hasRole('tothom')")
-	public String propertyPluginPassarelaFirmaIgnorarModalIds();
-
-	/**
 	 * Retorna el valor de la propietat es.caib.ripea.plugin.escaneig..ids.
 	 * 
 	 * @return el valor del paràmetre.

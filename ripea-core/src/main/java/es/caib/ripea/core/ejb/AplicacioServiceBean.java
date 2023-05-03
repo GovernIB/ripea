@@ -120,18 +120,6 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public String propertyPluginPassarelaFirmaIds() {
-		return delegate.propertyPluginPassarelaFirmaIds();
-	}
-
-	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
-	public String propertyPluginPassarelaFirmaIgnorarModalIds() {
-		return delegate.propertyPluginPassarelaFirmaIgnorarModalIds();
-	}
-
-	@Override
-	@RolesAllowed({"IPA_SUPER", "IPA_ADMIN", "tothom"})
 	public String propertyPluginEscaneigIds() {
 		return delegate.propertyPluginEscaneigIds();
 	}

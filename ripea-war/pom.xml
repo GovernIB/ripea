@@ -43,34 +43,6 @@
 		</dependency>
 				
 		<dependency>
-			<groupId>org.fundaciobit.pluginsib.signatureweb</groupId>                    
-			<artifactId>pluginsib-signatureweb-api</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>		
-      
-		<dependency>
-			<groupId>org.fundaciobit.pluginsib.signatureweb</groupId>                    
-			<artifactId>pluginsib-signatureweb-portafib</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>    
-<!--
-		<dependency>
-			<groupId>org.fundaciobit.plugins</groupId>
-			<artifactId>plugin-signatureweb-api</artifactId>
-			<version>2.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.fundaciobit.plugins</groupId>
-			<artifactId>plugin-signatureweb-portafib</artifactId>
-			<version>2.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-  	-->
-		<dependency>
 			<artifactId>portafib-callback-beans</artifactId>
 			<groupId>es.caib.portafib</groupId>
 			<version>1.1</version>
