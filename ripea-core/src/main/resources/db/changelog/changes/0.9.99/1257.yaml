@@ -146,7 +146,7 @@ databaseChangeLog:
               value: es.caib.ripea.plugin.firmasimpleweb.location
           - column:
               name: value
-              value: 
+              value: Palma
           - column:
               name: description
               value: Lloc on es realitza la firma  
@@ -158,7 +158,7 @@ databaseChangeLog:
               value: 4
           - column:
               name: jboss_property
-              value: 1
+              value: 0
           - column:
               name: type_code
               value: TEXT
