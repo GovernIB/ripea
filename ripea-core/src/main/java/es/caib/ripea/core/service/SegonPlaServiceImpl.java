@@ -348,6 +348,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Nous comentaris per procediments";
 			} else if (entry.getKey() == EventTipusEnumDto.NOVA_ANOTACIO) {
 				header = "Noves anotacions pendents";
+			} else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {
+				header = "Canvi de responsables de tasques";
 			}
 			
 			text += header + "\n";
