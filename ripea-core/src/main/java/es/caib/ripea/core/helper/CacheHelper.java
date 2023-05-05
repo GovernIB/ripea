@@ -8,6 +8,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -597,6 +598,23 @@ public class CacheHelper {
 			}
 		}
 		return hasNotificacionsPendents;
+	}
+	
+	@Cacheable(value = "dataDarrerEnviament", key="#expedient")
+	public Date getDataDarrerEnviament(
+			ExpedientEntity expedient) {
+		List<DocumentPortafirmesEntity> lastEnviamentPortafirmesPendent = documentPortafirmesRepository.findByExpedientAndEstatInAndErrorOrderByEnviatDataDesc(
+				(ExpedientEntity) expedient,
+				new DocumentEnviamentEstatEnumDto[] {
+						DocumentEnviamentEstatEnumDto.PENDENT,
+						DocumentEnviamentEstatEnumDto.ENVIAT
+				},
+				false);
+		return (lastEnviamentPortafirmesPendent != null && !lastEnviamentPortafirmesPendent.isEmpty()) ? lastEnviamentPortafirmesPendent.get(0).getEnviatData() : null;
+	}
+
+	@CacheEvict(value = "dataDarrerEnviament", key="#expedient")
+	public void evictDataDarrerEnviament(ExpedientEntity expedient) {
 	}
 	
 	private boolean hasNotificacionsNoFinalitzades(DocumentEntity document) {

@@ -429,7 +429,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"S'ha produït un error recuperant el detall del flux de firma",
+					"S'ha produït un error recuperant el detall del flux de firmes",
 					ex);
 		}
 		return info;
@@ -452,7 +452,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"No s'ha pogut recuperar la url per visualitzar el flux de firma",
+					"No s'ha pogut recuperar la url per visualitzar el flux de firmes",
 					ex);
 		}
 		return urlPlantilla;
@@ -466,7 +466,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			esborrat = getFluxDeFirmaClient().deleteFlowTemplate(request);
 		} catch (Exception ex) {
 			throw new SistemaExternException(
-					"Hi ha hagut un problema esborrant el flux de firma",
+					"Hi ha hagut un problema esborrant el flux de firmes",
 					ex);
 		}
 		return esborrat;
@@ -566,6 +566,20 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException("S'ha produit un error transformant en l'objecte FirmaAsyncSimpleSignatureBlock[]", ex);
 		}
+	}
+	
+	@Override
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
+		String urlFluxFirmes;
+		try {
+			FirmaAsyncSimpleSignatureRequestInfo request = new FirmaAsyncSimpleSignatureRequestInfo(portafirmesId, idioma);
+			urlFluxFirmes = getFirmaAsyncSimpleApi().getUrlToViewFlow(request);
+		} catch (Exception ex) {
+			throw new SistemaExternException(
+					"No s'ha pogut recuperar la url per visualitzar l'estat del flux de firmes",
+					ex);
+		}
+		return urlFluxFirmes;
 	}
 
 	private List<PortafirmesBlockInfo> simpleBlockToPortafirmesBlockInfo(List<BlocDeFirmesWs> blocks) throws SistemaExternException {

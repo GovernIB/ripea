@@ -2110,7 +2110,8 @@ public class PluginHelper {
 		long t0 = System.currentTimeMillis();
 		String resposta = null;
 		try {
-			resposta = getPortafirmesPlugin().recuperarUrlViewEditPlantilla(plantillaFluxId, idioma, returnUrl, edicio);} catch (Exception ex) {
+			resposta = getPortafirmesPlugin().recuperarUrlViewEditPlantilla(plantillaFluxId, idioma, returnUrl, edicio);
+		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
 			integracioHelper.addAccioError(IntegracioHelper.INTCODI_PFIRMA, accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
 			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
@@ -2196,6 +2197,20 @@ public class PluginHelper {
 		return blocksDto;
 	}
 
+	public String portafirmesRecuperarUrlEstatFluxFirmes(long portafirmesId, String idioma) {
+		String accioDescripcio = "Recuperant url estat flux de firmes";
+		long t0 = System.currentTimeMillis();
+		String resposta = null;
+		try {
+			resposta = getPortafirmesPlugin().recuperarUrlViewEstatFluxDeFirmes(portafirmesId, idioma);
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+			integracioHelper.addAccioError(IntegracioHelper.INTCODI_PFIRMA, accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_PFIRMA, errorDescripcio, ex);
+		}
+		return resposta;
+	}
+	
 	public String conversioConvertirPdfArxiuNom(String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);
 	}

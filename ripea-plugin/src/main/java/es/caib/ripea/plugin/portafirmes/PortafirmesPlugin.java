@@ -253,5 +253,20 @@ public interface PortafirmesPlugin {
 	public List<PortafirmesFluxResposta> recuperarPlantillesPerFiltre(
 			String idioma,
 			String descripcio) throws SistemaExternException;
+	
+	/**
+	 * Recupera url per visualitzar l'estat d'un flux de firmes d'una petició.
+	 *
+	 * @param portafirmesId
+	 * 				Id de la petició de firma.
+	 * @param idioma
+	 * 				Idioma plantilla/flux.
+	 * @return la url de Portafirmes.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public String recuperarUrlViewEstatFluxDeFirmes(
+			long portafirmesId,
+			String idioma) throws SistemaExternException;
 
 }

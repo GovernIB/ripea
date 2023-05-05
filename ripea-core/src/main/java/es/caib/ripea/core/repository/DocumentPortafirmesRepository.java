@@ -16,6 +16,7 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -46,7 +47,10 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			DocumentEnviamentEstatEnumDto[] estat,
 			boolean error);
 	
-	
+	List<DocumentPortafirmesEntity> findByExpedientAndEstatInAndErrorOrderByEnviatDataDesc(
+			ExpedientEntity expedient,
+			DocumentEnviamentEstatEnumDto[] estat,
+			boolean error);
 	
 	@Query(	"from " +
 			"    DocumentPortafirmesEntity dp " +

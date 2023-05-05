@@ -658,6 +658,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		EntitatDto entitat = conversioTipusHelper.convertir(documentPortafirmes.getDocument().getEntitat(), EntitatDto.class);
 		ConfigHelper.setEntitat(entitat);
 		
+		//TODO: Esborrar després d'assegurar que la url de portafib (#1261) no dona problemes
 		actualitzarBlocksPortafirmes(
 				callbackEstat, 
 				documentPortafirmes,

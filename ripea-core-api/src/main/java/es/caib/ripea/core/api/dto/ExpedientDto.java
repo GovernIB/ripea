@@ -71,6 +71,8 @@ public class ExpedientDto extends NodeDto {
 
 	private boolean hasNoFirmatsOAmbFirmaInvalida;
 	
+	private Date dataDarrerEnviament;
+	
 	public MetaExpedientDto getMetaExpedient() {
 		return (MetaExpedientDto)getMetaNode();
 	}

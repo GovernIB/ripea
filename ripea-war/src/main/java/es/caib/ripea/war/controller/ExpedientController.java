@@ -93,7 +93,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	public static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
-
+	private static final String COOKIE_FIRMA_PENDENT = "firma_pendent";
+	
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
 	private static final String SESSION_ATTRIBUTE_RELACIONATS_FILTRE = "ExpedientUserController.session.relacionats.filtre";
 	
@@ -118,6 +119,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
+			@CookieValue(value = COOKIE_FIRMA_PENDENT, defaultValue = "false") boolean firmaPendent,
 			HttpServletRequest request,
 			Model model) {
 		
@@ -184,6 +186,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		
 		model.addAttribute("isDominisEnabled", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.habilitar.dominis"));
+		model.addAttribute("nomCookieFirmaPendent", COOKIE_FIRMA_PENDENT);
+		model.addAttribute("firmaPendent", firmaPendent);
 		
 		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
 		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
@@ -1681,7 +1685,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));
-
+		
+		Cookie cookieFirmaPendent = WebUtils.getCookie(request, COOKIE_FIRMA_PENDENT);
+		filtreCommand.setAmbFirmaPendent(cookieFirmaPendent != null && "true".equals(cookieFirmaPendent.getValue()));
+		
 		return filtreCommand;
 	}
 	

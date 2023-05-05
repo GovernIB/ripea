@@ -59,6 +59,7 @@ import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.ViaFirmaEnviarCommand;
@@ -100,6 +101,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private PortafirmesFluxService portafirmesFluxService;
 	
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -306,16 +309,24 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					documentId, 
 					null);
-			List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
-					entitatActual.getId(),
-					documentId, 
-					null);
+			if (portafirmes.getPortafirmesId() != null && !portafirmes.getPortafirmesId().isEmpty()) {
+				String urlFluxFirmes = documentService.recuperarUrlViewEstatFluxDeFirmes(Long.valueOf(portafirmes.getPortafirmesId()));
+				model.addAttribute(
+						"urlFluxFirmes", 
+						urlFluxFirmes);
+			} else {
+				//TODO: Esborrar després d'assegurar que la url de portafib no dona problemes
+				List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
+						entitatActual.getId(),
+						documentId, 
+						null);
+				model.addAttribute(
+						"blocks", 
+						documentPortafirmesBlocks);
+			}
 			model.addAttribute(
 					"portafirmes",
 					portafirmes);
-			model.addAttribute(
-					"blocks", 
-					documentPortafirmesBlocks);
 			model.addAttribute(
 					"document", 
 					documentService.findById(entitatActual.getId(), documentId));

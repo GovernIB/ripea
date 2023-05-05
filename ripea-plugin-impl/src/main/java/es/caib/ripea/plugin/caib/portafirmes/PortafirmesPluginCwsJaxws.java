@@ -583,6 +583,11 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	
 }

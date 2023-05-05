@@ -500,4 +500,10 @@ public class DocumentServiceBean implements DocumentService {
 				throwable);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId)  throws SistemaExternException {
+		return delegate.recuperarUrlViewEstatFluxDeFirmes(portafirmesId);
+	}
+
 }

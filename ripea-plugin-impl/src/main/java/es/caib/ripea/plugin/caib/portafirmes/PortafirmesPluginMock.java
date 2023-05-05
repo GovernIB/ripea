@@ -191,4 +191,9 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

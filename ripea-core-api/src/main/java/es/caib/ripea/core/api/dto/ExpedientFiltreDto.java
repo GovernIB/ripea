@@ -40,6 +40,8 @@ public class ExpedientFiltreDto implements Serializable {
 	private String interessat;
 	private String metaExpedientDominiValor;
 
+	private boolean ambFirmaPendent;
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

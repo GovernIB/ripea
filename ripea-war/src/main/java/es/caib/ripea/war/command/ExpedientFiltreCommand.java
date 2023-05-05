@@ -38,6 +38,7 @@ public class ExpedientFiltreCommand {
 	private String interessat;
 	private String metaExpedientDominiValor;
 
+	private boolean ambFirmaPendent;
 
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {
 		return ConversioTipusHelper.convertir(
@@ -102,6 +103,9 @@ public class ExpedientFiltreCommand {
 	}
 	public void setAgafatPer(String agafatPer) {
 		this.agafatPer = Utils.trim(agafatPer);
+	}
+	public void setAmbFirmaPendent(boolean ambFirmaPendent) {
+		this.ambFirmaPendent = ambFirmaPendent;
 	}
 
 }
