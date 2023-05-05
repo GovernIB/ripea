@@ -773,7 +773,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (command.getMetaNodeId() == null) {
 			bindingResult.rejectValue("metaNodeId", "NotNull");
 		}
-
+		if (command.getNtiOrigen() == null) {
+			bindingResult.rejectValue("ntiOrigen", "NotNull");
+		}
+		if (command.getNtiEstadoElaboracion() == null) {
+			bindingResult.rejectValue("ntiEstadoElaboracion", "NotNull");
+		}
 		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
@@ -818,7 +823,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 				
 				if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
-					throw new RuntimeException("El document amb nom '" + document.getNom() + "' no està firmat");
+					throw new ValidationException("El document amb nom '" + document.getNom() + "' no està firmat");
 				}
 				//No es possible concatenar els documents que no són pdf
 				if (Utils.equals(document.getFitxerContentType(), "application/pdf")) {
@@ -868,6 +873,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						null,
 						request, 
 						metaDocumentId);
+				
+				float sizeMB = (command.getFitxerContingut().length / 1024f) / 1024f;
+				if (sizeMB > 10) {
+					throw new ValidationException("Mida del document generat és " + sizeMB + " MB. Només es poden notificar documents que no superin els 10 MB");
+				}
 				
 				DocumentDto document = documentService.create(
 						entitatActual.getId(),
