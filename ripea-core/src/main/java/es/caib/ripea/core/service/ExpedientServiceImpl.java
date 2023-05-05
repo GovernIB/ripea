@@ -1649,6 +1649,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolsCurrentUser == null,
 					rolsCurrentUser,
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+					filtre.isAmbFirmaPendent(),
 					pageable);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
@@ -1721,7 +1722,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiValor(),
 					rolsCurrentUser == null,
 					rolsCurrentUser,
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));				
+					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+					filtre.isAmbFirmaPendent());				
 
 			result.setIds(expedientsIds);
 			if (cacheHelper.mostrarLogsRendiment())

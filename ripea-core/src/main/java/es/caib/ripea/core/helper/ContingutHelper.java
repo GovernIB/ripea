@@ -282,6 +282,10 @@ public class ContingutHelper {
 
 			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
 
+			if (onlyForList) {
+				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
+			}
+			
 			if (!onlyForList) {
 				dto.setTancatData(expedient.getTancatData());
 				dto.setTancatMotiu(expedient.getTancatMotiu());

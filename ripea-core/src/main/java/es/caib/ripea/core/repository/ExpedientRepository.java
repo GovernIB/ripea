@@ -120,7 +120,14 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) "
+			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " +
+			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
+			"		or e.id in (" + 
+			"			select dp.expedient.id " + 
+			"			from DocumentPortafirmesEntity dp " + 
+			"			where (dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
+			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
+			"				   and dp.error = false))"
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -168,6 +175,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			@Param("isAdmin") boolean isAdmin,
+			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			Pageable pageable);
 
 	
@@ -213,7 +221,14 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) "
+			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " + 
+			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
+			"		or e.id in (" + 
+			"			select dp.expedient.id " + 
+			"			from DocumentPortafirmesEntity dp " + 
+			"			where (dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
+			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT)"
+			+ "				   and dp.error = false))"
 			)
 	List<Long> findIdsByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -260,7 +275,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
-			@Param("isAdmin") boolean isAdmin);
+			@Param("isAdmin") boolean isAdmin,
+			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent);
 	
 	
 	@Query(	"select " +

@@ -72,6 +72,7 @@ body.loading .rmodal {
 <script>
 
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
+var mostrarExpedientsFirmaPendent = '${firmaPendent}' === 'true';
 var columnaAgafatPer = 19;
 $(document).ready(function() {
 
@@ -145,6 +146,16 @@ $(document).ready(function() {
 		// Amaga la columna i refresca la taula
 		$('#taulaDades').webutilDatatable('refresh');
 	})
+	$('#ambFirmaPendentBtn').click(function() {
+		mostrarExpedientsFirmaPendent = !$(this).hasClass('active');
+		// Modifica el formulari
+		$('#ambFirmaPendent').val(mostrarExpedientsFirmaPendent);
+		$(this).blur();
+		// Estableix el valor de la cookie
+		setCookie("${nomCookieFirmaPendent}", mostrarExpedientsFirmaPendent);
+		// Amaga la columna i refresca la taula
+		$('#taulaDades').webutilDatatable('refresh');
+	})
 	$(".email-user").click(function(e) {
 		e.preventDefault();
 		e.stopPropagation();
@@ -164,7 +175,7 @@ $(document).ready(function() {
 	$('#metaExpedientId').on('change', function() {
 		metaExpedientId = $(this).val();
 		if (counter != 0) {
-			
+			debugger
 			if (metaExpedientId) {
 				$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
 				.done(function(data) {
@@ -516,15 +527,19 @@ function hexToRgb(hex) {
 					</div>
 			 	</c:when>
 			 	<c:otherwise>
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-					</div>					
+						<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+					</div>		
 			 	</c:otherwise>
 			 </c:choose>
 
 			<rip:inputHidden name="meusExpedients"/>
-			
+			<rip:inputHidden name="ambFirmaPendent"/>
 			<div class="col-md-3 pull-right">
+				<c:if test="${rolActual!='tothom'}">
+					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+				</c:if>
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
 					<button type="submit" name="accio" value="filtrar" class="btn btn-primary"><span class="fa fa-filter"></span> <spring:message code="comu.boto.filtrar"/></button>
@@ -569,7 +584,7 @@ function hexToRgb(hex) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="18" 
+		data-default-order="20" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -590,6 +605,7 @@ function hexToRgb(hex) {
 				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
+				<th data-col-name="dataDarrerEnviament" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
 				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>	
@@ -613,6 +629,7 @@ function hexToRgb(hex) {
 						{{/if}}
 					</script>
 				</th>
+				<th data-col-name="dataDarrerEnviament" data-type="datetime" data-converter="datetime" nowrap data-orderable="false"><spring:message code="expedient.list.user.columna.data.enviament"/></th>
 				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>								
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
