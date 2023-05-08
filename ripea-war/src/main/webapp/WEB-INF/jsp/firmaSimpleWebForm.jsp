@@ -34,7 +34,7 @@ $(document).ready(function() {
 		</div>
 	</c:if>
 
-	<c:set var="formAction"><c:url value="/document/${document.id}/firmaSimpleWebStart"/></c:set>
+	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/firmaSimpleWebStart"/></c:set>
 
 	<form:form id="passarela-form" action="${formAction}" method="post" cssClass="form-horizontal" commandName="firmaSimpleWebCommand" role="form" enctype="multipart/form-data">
 		<rip:inputTextarea name="motiu" textKey="firmasimpleweb.form.camp.motiu" required="true"/>

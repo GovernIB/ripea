@@ -429,7 +429,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					request,
 					documentId,
 					model);
-			return "passarelaFirmaForm";
+			return "firmaSimpleWebForm";
 		}
 
 		FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
