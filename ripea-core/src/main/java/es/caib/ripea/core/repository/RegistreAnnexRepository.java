@@ -56,7 +56,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"    RegistreAnnexEntity a left join a.registre.expedientPeticions e " +
 			"where " +
 			"    a.registre.entitat = :entitat " +
-			"and ((:rolActual = 'IPA_ADMIN' and e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"and ((:rolActual = 'IPA_ADMIN') " +
 			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((e.metaExpedient.organGestor is not null and e.metaExpedient in (:metaExpedientsPermesos)) or (e.metaExpedient.organGestor is null and :hasPermisAdminComu = true and e.registre.destiCodi in (:organsPermesos)))) " +
 			"	or (:rolActual = 'tothom' and e.metaExpedient in (:metaExpedientsPermesos))) " +				
 			"and e.expedient is not null " +
@@ -94,7 +94,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"    RegistreAnnexEntity a left join a.registre.expedientPeticions e " +
 			"where " +
 			"    a.registre.entitat = :entitat " +
-			"and ((:rolActual = 'IPA_ADMIN' and e.metaExpedient in (:metaExpedientsPermesos)) " +
+			"and ((:rolActual = 'IPA_ADMIN') " +
 			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((e.metaExpedient.organGestor is not null and e.metaExpedient in (:metaExpedientsPermesos)) or (e.metaExpedient.organGestor is null and :hasPermisAdminComu = true and e.registre.destiCodi in (:organsPermesos)))) " +
 			"	or (:rolActual = 'tothom' and e.metaExpedient in (:metaExpedientsPermesos))) " +	
 			"and e.expedient is not null " +
