@@ -492,7 +492,7 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 				urlConsultaInicial="${urlConsultaInicial}" 
 				urlConsultaLlistat="${urlConsultaLlistat}" 
 				textKey="metadocument.form.camp.portafirmes.responsables"
-				suggestValue="codi"
+				suggestValue="nif"
 				suggestText="nom"
 				suggestTextAddicional="nif"
 				required="true"

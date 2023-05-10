@@ -844,7 +844,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 						String carrecName = destinatari.substring(destinatari.indexOf("[") + 1, destinatari.indexOf("]"));
 						signer.setPositionInTheCompany(carrecName);
 					} else {
-						signer.setUsername(destinatari);
+						signer.setAdministrationID(destinatari);
 					}
 					signature.setSigner(signer);
 					signatures.add(signature);
@@ -879,6 +879,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut recuperar el id de la transacció (" +
+					"portafib=" + getBaseUrl() + ", " +					
 					"nom=" + nom + ", " +
 					"descripcio=" + descripcio + ")",
 					ex);
@@ -899,6 +900,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut iniciar la transacció (" +
+					"portafib=" + getBaseUrl() + ", " +			
 					"transactionId=" + idTransaccio + ", " +
 					"returnUrl=" + urlReturn + ")",
 					ex);
