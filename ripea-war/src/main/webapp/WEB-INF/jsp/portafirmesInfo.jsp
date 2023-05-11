@@ -292,9 +292,10 @@ $(document).ready(function() {
 					</div>
 					<c:if test="${not empty urlFluxFirmes}">
 						<div class="blocks_container">
-							<iframe width="100%" height="100%" frameborder="0" allowtransparency="true" src="${urlFluxFirmes}"/>
+							<iframe width="100%" height="100%" frameborder="0" allowtransparency="true" src="${urlFluxFirmes}"></iframe>
 						</div>
 					</c:if>
+					<%--
 					<c:if test="${not empty blocks}">
 						<div class="blocks_container">
 							<div class="signers_container">
@@ -348,6 +349,7 @@ $(document).ready(function() {
 							</div>
 						</div>
 					</c:if>
+					 --%>
 				</div>
 				<div class="buttons_container">
 					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == null}">
