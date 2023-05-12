@@ -90,7 +90,7 @@ public class DocumentNotificacioHelper {
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
 		
-		if (!documentEntity.isArxiuEstatDefinitiu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL) {
+		if (!documentEntity.isArxiuEstatDefinitiu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL && !documentEntity.getFitxerContentType().equals("application/zip")) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}
 		
