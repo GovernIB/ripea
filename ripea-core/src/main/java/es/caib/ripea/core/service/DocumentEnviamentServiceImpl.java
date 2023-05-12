@@ -29,6 +29,7 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -76,7 +77,8 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
 	@Autowired
 	private DocumentNotificacioHelper documentNotificacioHelper;
-	
+	@Autowired
+	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 
 	
 
@@ -99,6 +101,11 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				false,
 				true);
 		documentNotificacioHelper.crear(notificacioDto, documentEntity);
+		
+		if (documentEntity.getFitxerContentType().equals("application/zip")) {
+			documentFirmaServidorFirma.doFirmar(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents");
+		}
+		
 	}
 	
 	@Transactional

@@ -179,8 +179,7 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual, 
-			boolean firmarEnServidor) {
+			String rolActual) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
@@ -219,9 +218,6 @@ public class DocumentServiceImpl implements DocumentService {
 				metaDocument,
 				true);
 		
-		if (firmarEnServidor) {
-			documentFirmaServidorFirma.doFirmar(documentDto.getId(), "Firma de document zip generat per notificar múltiples documents");
-		}
 		
 		return documentDto;
 	}

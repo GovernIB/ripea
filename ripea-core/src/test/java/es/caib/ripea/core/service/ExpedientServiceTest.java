@@ -547,8 +547,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								expedientCreat.getId(),
 								dto,
 								true, 
-								null, 
-								false);
+								null);
 						assertNotNull(documentCreat);
 						try {
 							expedientService.tancar(
@@ -626,8 +625,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										expedientCreat.getId(),
 										dto,
 										true, 
-										null, 
-										false);
+										null);
 								assertNotNull(documentCreat);
 							}
 							//Pare = carpeta
@@ -637,8 +635,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										carpetaCreada.getId(),
 										dto,
 										true, 
-										null, 
-										false);
+										null);
 								assertNotNull(documentCreat);
 							}
 							//Pare = sub carpeta
@@ -648,8 +645,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										subCarpetaCreada.getId(),
 										dto,
 										true, 
-										null, 
-										false);
+										null);
 								assertNotNull(documentCreat);
 							}
 							if (i == 6 || i == 7) {
@@ -658,8 +654,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										subCarpetaCreada2.getId(),
 										dto,
 										true, 
-										null, 
-										false);
+										null);
 								assertNotNull(documentCreat);
 							}
 						}

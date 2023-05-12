@@ -884,8 +884,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						expedientId,
 						DocumentGenericCommand.asDto(command),
 						false, 
-						RolHelper.getRolActual(request), 
-						metaDocumentId != null ? true : false);
+						RolHelper.getRolActual(request));
 
 				if (metaDocumentId != null) {
 					
@@ -942,8 +941,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					expedientId,
 					DocumentGenericCommand.asDto(command),
 					false, 
-					RolHelper.getRolActual(request), 
-					false);
+					RolHelper.getRolActual(request));
 			
 			return "redirect:../../document/" + document.getId() + "/notificar";
 	
@@ -1329,8 +1327,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
-					rolActual, 
-					false);
+					rolActual);
 			
 			crearDadesPerDefecteSiExisteixen(
 					entitatActual.getId(),

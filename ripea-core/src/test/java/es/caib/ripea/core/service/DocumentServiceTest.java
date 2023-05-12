@@ -64,8 +64,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								expedientCreat.getId(),
 								dto,
 								true, 
-								null, 
-								false);
+								null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						assertNotNull(documentCreat.getEstat());
@@ -108,7 +107,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null, false);
+								true, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						dto.setId(documentCreat.getId());
@@ -152,7 +151,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null, false);
+								true, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						DocumentDto documentObtingut1 = documentService.findById(
@@ -200,7 +199,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null, false);
+								true, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						FitxerDto fitxer = documentService.descarregar(
@@ -242,7 +241,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null, false);
+								true, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						String identificador = documentService.generarIdentificadorFirmaClient(
@@ -294,7 +293,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null, false);
+								true, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						Calendar dataCaducitat = Calendar.getInstance();

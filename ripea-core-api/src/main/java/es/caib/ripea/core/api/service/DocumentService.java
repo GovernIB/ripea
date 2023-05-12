@@ -56,7 +56,6 @@ public interface DocumentService {
 	 * @param document
 	 *            Informació del document que es vol crear.
 	 * @param rolActual TODO
-	 * @param firmarEnServidor TODO
 	 * @return El document creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -69,8 +68,7 @@ public interface DocumentService {
 			Long pareId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual, 
-			boolean firmarEnServidor) throws NotFoundException, ValidationException;
+			String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
