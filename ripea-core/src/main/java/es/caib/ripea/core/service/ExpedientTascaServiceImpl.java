@@ -419,22 +419,16 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		expedientTascaRepository.save(expedientTascaEntity);
 		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
+		
+		emailHelper.enviarEmailCanviarEstatTasca(
+				expedientTascaEntity,
+				null);
 
 		return conversioTipusHelper.convertir(
 				expedientTascaEntity,
 					ExpedientTascaDto.class);
 	}	
 
-	@Override
-	@Transactional
-	public void enviarEmailCrearTasca(Long expedientTascaId) {
-		
-		ExpedientTascaEntity expedientTascaEntity = tascaHelper.comprovarTasca(expedientTascaId);
-
-		emailHelper.enviarEmailCanviarEstatTasca(
-				expedientTascaEntity,
-				null);
-	}
 
 	@Transactional
 	@Override

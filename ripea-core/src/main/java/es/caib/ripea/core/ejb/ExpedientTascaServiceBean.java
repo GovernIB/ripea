@@ -263,13 +263,6 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	}
 
 	@Override
-	public void enviarEmailCrearTasca(
-			Long expedientTascaId) {
-		delegate.enviarEmailCrearTasca(
-				expedientTascaId);
-	}
-
-	@Override
 	public ExpedientTascaDto canviarTascaEstat(
 			Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,

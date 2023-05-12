@@ -153,13 +153,11 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaForm";
 		}
 
-		ExpedientTascaDto expedientTascaDto = expedientTascaService.createTasca(
+		expedientTascaService.createTasca(
 				entitatActual.getId(),
 				expedientId,
 				ExpedientTascaCommand.asDto(expedientTascaCommand));
 		
-		expedientTascaService.enviarEmailCrearTasca(
-				expedientTascaDto.getId());
 		
 		return getModalControllerReturnValueSuccess(
 				request,
