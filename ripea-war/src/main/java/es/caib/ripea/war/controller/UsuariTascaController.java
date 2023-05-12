@@ -194,6 +194,7 @@ public class UsuariTascaController extends BaseUserController {
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
 		model.addAttribute("tasca", expedientTascaDto);
 		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
+		model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
 		return "contingut";
 	}
 	
