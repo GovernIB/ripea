@@ -294,7 +294,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		portafirmesDocument.setArxiuNom(pdfFirmat.getNom());
 		portafirmesDocument.setArxiuContingut(pdfFirmat.getContingut());
 		Mockito.when(portafirmesPluginMock.download(Mockito.anyString())).thenReturn(portafirmesDocument);
-		Mockito.when(portafirmesPluginMock.recuperarBlocksFirmes(Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+//		Mockito.when(portafirmesPluginMock.recuperarBlocksFirmes(Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
 		Mockito.when(portafirmesPluginMock.upload(Mockito.any(PortafirmesDocument.class), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(PortafirmesPrioritatEnum.class), Mockito.nullable(Date.class), Mockito.<PortafirmesFluxBloc>anyList(), Mockito.anyString(), Mockito.nullable(List.class), Mockito.anyBoolean(), Mockito.nullable(String.class))).thenReturn(String.valueOf(System.currentTimeMillis()));
 		pluginHelper.setPortafirmesPlugin(entitat.getCodi(), portafirmesPluginMock);
 	}

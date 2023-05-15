@@ -1591,5 +1591,14 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
+
+
+	@Override
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId) throws SistemaExternException {
+		logger.debug("Recuperant url visualització estat flux de firmes (" +
+				"portafirmesId=" + portafirmesId +")");
+		String idioma = aplicacioService.getUsuariActual().getIdioma();
+		return pluginHelper.portafirmesRecuperarUrlEstatFluxFirmes(portafirmesId, idioma);
+	}
 	
 }

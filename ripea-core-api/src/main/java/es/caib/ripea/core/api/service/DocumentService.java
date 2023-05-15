@@ -685,6 +685,22 @@ public interface DocumentService {
 			Long entitatId,
 			Long expedientId);
 
+
+	
+	/**
+	 * Recupera url per visualitzar l'estat d'un flux de firmes d'una petició.
+	 *
+	 * @param portafirmesId
+	 * 				Id de la petició de firma.
+	 * @return la url de Portafirmes.
+	 * @throws SistemaExternException
+	 *            Hi ha hagut algun error en la comunicació amb el portafirmes.
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId)  throws SistemaExternException;
+
+
+
 	
 
 }

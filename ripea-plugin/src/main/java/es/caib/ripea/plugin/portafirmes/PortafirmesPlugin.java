@@ -204,31 +204,31 @@ public interface PortafirmesPlugin {
 	public void tancarTransaccioFlux(
 			String idTransaccio) throws SistemaExternException;
 
-	/**
-	 * Recupera els blocks de firma d'una petició de firma
-	 * 
-	 * @param idPlantilla
-	 * 				Id de la plantilla en cas de ser una petició a partir d'una plantilla
-	 * @param idTransaccio
-	 * 				Id de la transacció en cas de ser un flux nou
-	 * @param portafirmesFluxAsync
-	 * 				Indicar si és un tipus de firma simple (responsables) o de Portafib (flux)
-	 * @param portafirmesId
-	 * 				Id de la petició de portafirmes
-	 * @param idioma
-	 * 				Idioma en el que es vol recuerar el flux
-	 * 
-	 * @return Una llista amb els blocks de firma
-	 * @throws SistemaExternException
-	 * 			Si hi ha hagut algun problema per dur a terme l'acció.
-	 */
-	List<PortafirmesBlockInfo> recuperarBlocksFirmes(
-			String idPlantilla, 
-			String idTransaccio,
-			boolean portafirmesFluxAsync,
-			Long portafirmesId,
-			String idioma)
-			throws SistemaExternException;
+//	/**
+//	 * Recupera els blocks de firma d'una petició de firma
+//	 * 
+//	 * @param idPlantilla
+//	 * 				Id de la plantilla en cas de ser una petició a partir d'una plantilla
+//	 * @param idTransaccio
+//	 * 				Id de la transacció en cas de ser un flux nou
+//	 * @param portafirmesFluxAsync
+//	 * 				Indicar si és un tipus de firma simple (responsables) o de Portafib (flux)
+//	 * @param portafirmesId
+//	 * 				Id de la petició de portafirmes
+//	 * @param idioma
+//	 * 				Idioma en el que es vol recuerar el flux
+//	 * 
+//	 * @return Una llista amb els blocks de firma
+//	 * @throws SistemaExternException
+//	 * 			Si hi ha hagut algun problema per dur a terme l'acció.
+//	 */
+//	List<PortafirmesBlockInfo> recuperarBlocksFirmes(
+//			String idPlantilla, 
+//			String idTransaccio,
+//			boolean portafirmesFluxAsync,
+//			Long portafirmesId,
+//			String idioma)
+//			throws SistemaExternException;
 
 	/**
 	 * Recupera els càrrecs disponibles per un usuari aplicació
@@ -253,5 +253,20 @@ public interface PortafirmesPlugin {
 	public List<PortafirmesFluxResposta> recuperarPlantillesPerFiltre(
 			String idioma,
 			String descripcio) throws SistemaExternException;
+	
+	/**
+	 * Recupera url per visualitzar l'estat d'un flux de firmes d'una petició.
+	 *
+	 * @param portafirmesId
+	 * 				Id de la petició de firma.
+	 * @param idioma
+	 * 				Idioma plantilla/flux.
+	 * @return la url de Portafirmes.
+	 * @throws SistemaExternException
+	 *            Si hi ha hagut algun problema per dur a terme l'acció.
+	 */
+	public String recuperarUrlViewEstatFluxDeFirmes(
+			long portafirmesId,
+			String idioma) throws SistemaExternException;
 
 }

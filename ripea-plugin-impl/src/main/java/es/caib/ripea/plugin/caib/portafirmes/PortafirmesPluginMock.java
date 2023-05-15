@@ -166,12 +166,12 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 		return false;
 	}
 	
-	@Override
-	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
-			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
+//			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public List<PortafirmesCarrec> recuperarCarrecs() throws SistemaExternException {
@@ -188,6 +188,11 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 	@Override
 	public List<PortafirmesFluxResposta> recuperarPlantillesPerFiltre(String idioma,
 			String descripcio) throws SistemaExternException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;
 	}
