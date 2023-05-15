@@ -484,13 +484,15 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 					carrec.setCarrecName(carrecWs.getCarrecName());
 					carrec.setEntitatId(carrecWs.getEntitatID());
 					carrec.setUsuariPersonaId(carrecWs.getUsuariPersonaID());
-					UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
-					if (usuariPersona != null) {
-						carrec.setUsuariPersonaNif(usuariPersona.getNif());
-						carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
-						carrec.setUsuariPersonaNom(usuariPersona.getNom());
-					} else {
-						throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+					if (carrecMostrarPersona()) {
+						UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+						if (usuariPersona != null) {
+							carrec.setUsuariPersonaNif(usuariPersona.getNif());
+							carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
+							carrec.setUsuariPersonaNom(usuariPersona.getNom());
+						} else {
+							throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+						}
 					}
 					carrecs.add(carrec);
 				}
@@ -511,14 +513,17 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 				carrec.setCarrecName(carrecWs.getCarrecName());
 				carrec.setEntitatId(carrecWs.getEntitatID());
 				carrec.setUsuariPersonaId(carrecWs.getUsuariPersonaID());
-				UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
-				if (usuariPersona != null) {
-					carrec.setUsuariPersonaNif(usuariPersona.getNif());
-					carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
-					carrec.setUsuariPersonaNom(usuariPersona.getNom());
-				} else {
-					throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+				if (carrecMostrarPersona()) {
+					UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+					if (usuariPersona != null) {
+						carrec.setUsuariPersonaNif(usuariPersona.getNif());
+						carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
+						carrec.setUsuariPersonaNom(usuariPersona.getNom());
+					} else {
+						throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+					}
 				}
+
 			}
 			return carrec;
 		} catch (Exception ex) {
@@ -1044,6 +1049,12 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return getProperty(
 				"plugin.portafirmes.portafib.perfil");
 	}
+	
+	private boolean carrecMostrarPersona() {
+		return getAsBoolean(
+				"plugin.portafirmes.carrer.mostrar.persona");
+	}
+	
 	private Boolean isEnviarUrlExpedientPermitida() {
 		return Boolean.valueOf(getProperty(
 				"plugin.portafirmes.portafib.enviar.url.expedient",

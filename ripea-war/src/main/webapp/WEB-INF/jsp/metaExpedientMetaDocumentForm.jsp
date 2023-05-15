@@ -391,7 +391,11 @@ function recuperarCarrecs() {
 			if (carrecs) {
 				llistatCarrecs += '<div class="carrecsList">';
 				$.each(carrecs, function(i, carrec) {
-					var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					var persona = '';
+					if (carrec.usuariPersonaNom) {
+						persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					}
+					var nomCarrec = carrec.carrecName + persona;
 					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
 					
 					$('#portafirmesResponsables option').each(function(i, responsable) {
@@ -427,7 +431,11 @@ function seleccionarCarrec(carrec) {
 		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
 		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
 	} else {
-		var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNif + ')';
+		var persona = '';
+		if (carrec.usuariPersonaNif) {
+			persona = ' (' + carrec.usuariPersonaNif + ')';
+		}
+		var nomCarrec = carrec.carrecName + persona;
 		var items = [];
 		items.push({
 			"id": carrec.carrecId,
