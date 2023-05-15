@@ -8,10 +8,8 @@
 		<pattern>/ws*</pattern>
 		<pattern>/webdav*</pattern>
 		<pattern>/rest/notib*</pattern>
-		<pattern>/passarelaModalTancar*</pattern>
 	</excludes>
 	<decorator name="senseCapNiPeus" page="senseCapNiPeus.jsp">
-		<pattern>/firmapassarela*</pattern>
 		<pattern>/scanweb*</pattern>
 		<pattern>/error</pattern>
 	</decorator>

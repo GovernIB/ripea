@@ -63,7 +63,8 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null);
+								true, 
+								null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						assertNotNull(documentCreat.getEstat());

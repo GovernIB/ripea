@@ -45,16 +45,16 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 	}
 	
 	@Override
-	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, String idioma) throws SistemaExternException {
+	public SignaturaResposta firmar(String nom, String motiu, byte[] contingut, String idioma, String contentType) throws SistemaExternException {
 
-		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).mime(TipusMime.PDF).contingut(contingut).build());
+		return signar(SignaturaConsulta.builder().nom(nom).motiu(motiu).contentType(contentType).contingut(contingut).build());
 	}
 
 	public SignaturaResposta signar(SignaturaConsulta consulta) {
 
 		try {
 			ApiFirmaEnServidorSimple api = new ApiFirmaEnServidorSimpleJersey(getPropertyEndpoint(), getPropertyUsername(), getPropertyPassword());
-			FirmaSimpleFile fileToSign = new FirmaSimpleFile(consulta.getNom(), consulta.getMime().getTipus(), consulta.getContingut());
+			FirmaSimpleFile fileToSign = new FirmaSimpleFile(consulta.getNom(), consulta.getContentType(), consulta.getContingut());
 
 			// getAvailableProfiles(api);
 			String perfil = getPropertyPerfil();
@@ -113,7 +113,7 @@ import es.caib.ripea.plugin.firmaservidor.TipusMime;
 
 		FirmaSimpleSignDocumentRequest signature;
 		signature = new FirmaSimpleSignDocumentRequest(commonInfo, fileInfoSignature);
-
+		
 		FirmaSimpleSignatureResult fullResults = api.signDocument(signature);
 
 		FirmaSimpleStatus transactionStatus = fullResults.getStatus();

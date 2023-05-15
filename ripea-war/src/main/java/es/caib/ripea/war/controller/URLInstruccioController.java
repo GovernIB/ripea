@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -19,7 +21,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.URLInstruccionDto;
+import es.caib.ripea.core.api.dto.URLInstruccioDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.URLInstruccioService;
 import es.caib.ripea.war.command.URLInstruccioCommand;
 import es.caib.ripea.war.command.URLInstruccioFiltreCommand;
@@ -42,16 +46,16 @@ public class URLInstruccioController extends BaseAdminController {
 	@Autowired
 	private URLInstruccioService urlInstruccioService;
 
-	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get() {
 		return "urlInstruccioList";
 	}
+	
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
 			HttpServletRequest request) {
-		PaginaDto<URLInstruccionDto> urls = new PaginaDto<URLInstruccionDto>();
+		PaginaDto<URLInstruccioDto> urls = new PaginaDto<URLInstruccioDto>();
 		
         try {
         	EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -82,7 +86,7 @@ public class URLInstruccioController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		URLInstruccionDto urlInstruccio = null;
+		URLInstruccioDto urlInstruccio = null;
 		if (urlInstruccioId != null)
 			urlInstruccio = urlInstruccioService.findById(entitatActual.getId(), urlInstruccioId);
 		if (urlInstruccio != null) {
@@ -92,6 +96,7 @@ public class URLInstruccioController extends BaseAdminController {
 		}
 		return "urlInstruccioForm";
 	}
+	
 	@RequestMapping(method = RequestMethod.POST)
 	public String save(
 			HttpServletRequest request,
@@ -120,7 +125,16 @@ public class URLInstruccioController extends BaseAdminController {
 					"url.instruccio.controller.creat.ok");
 		}
 	}
-
+	
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	@ResponseBody
+	public List<URLInstruccioDto> list(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return urlInstruccioService.findByEntitat(entitatActual.getId());
+	}
+	
 //	@RequestMapping(value = "/{avisId}/enable", method = RequestMethod.GET)
 //	public String enable(
 //			HttpServletRequest request,

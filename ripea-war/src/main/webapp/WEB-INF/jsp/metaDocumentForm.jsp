@@ -295,7 +295,7 @@ function removeLoading() {
 			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dades"/></a></li>
 			<li role="presentation"><a href="#dades-nti" aria-controls="dades-nti" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dadesnti"/></a></li>
 			<li role="presentation"><a href="#firma-portafirmes" aria-controls="firma-portafirmes" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.portafirmes"/></a></li>
-			<li role="presentation"><a href="#firma-passarela" aria-controls="firma-passarela" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.passarela"/></a></li>
+			<li role="presentation"><a href="#firma-passarela" aria-controls="firma-passarela" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firmasimpleweb"/></a></li>
 			<c:if test="${isFirmaBiometrica}">
 				<li role="presentation"><a href="#firma-biometrica" aria-controls="firma-biometrica" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.biometrica"/></a></li>
 			</c:if>
@@ -360,7 +360,7 @@ function removeLoading() {
 				</div>									
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-passarela">
-				<rip:inputCheckbox name="firmaPassarelaActiva" textKey="metadocument.form.camp.passarela.activa"/>
+				<rip:inputCheckbox name="firmaPassarelaActiva" textKey="metadocument.form.camp.firmaSimpleWebActiva"/>
 			</div>
 			<c:if test="${isFirmaBiometrica}">
 				<div role="tabpanel" class="tab-pane" id="firma-biometrica">

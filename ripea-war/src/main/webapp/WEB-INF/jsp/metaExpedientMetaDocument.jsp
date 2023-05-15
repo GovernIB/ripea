@@ -70,7 +70,7 @@
 					</script>
 				</th>
 				<th data-col-name="firmaPassarelaActiva" data-orderable="false" data-template="#cellFirmaPassarelaActivaTemplate">
-					<spring:message code="metadocument.list.columna.firmaPassarelaActiva"/>
+					<spring:message code="metadocument.list.columna.firmaSimpleWebActiva"/>
 					<script id="cellFirmaPassarelaActivaTemplate" type="text/x-jsrender">
 						{{if firmaPassarelaActiva}}<span class="fa fa-check"></span>{{/if}}
 					</script>

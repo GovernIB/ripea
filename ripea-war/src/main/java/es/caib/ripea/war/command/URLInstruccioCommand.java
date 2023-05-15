@@ -6,7 +6,7 @@ package es.caib.ripea.war.command;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import es.caib.ripea.core.api.dto.URLInstruccionDto;
+import es.caib.ripea.core.api.dto.URLInstruccioDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.URLInstruccio;
 
@@ -59,15 +59,15 @@ public class URLInstruccioCommand {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public static URLInstruccioCommand asCommand(URLInstruccionDto dto) {
+	public static URLInstruccioCommand asCommand(URLInstruccioDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
 				URLInstruccioCommand.class);
 	}
-	public static URLInstruccionDto asDto(URLInstruccioCommand command) {
+	public static URLInstruccioDto asDto(URLInstruccioCommand command) {
 		return ConversioTipusHelper.convertir(
 				command,
-				URLInstruccionDto.class);
+				URLInstruccioDto.class);
 	}
 
 	@Override

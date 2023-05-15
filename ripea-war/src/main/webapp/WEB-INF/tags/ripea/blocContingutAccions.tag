@@ -79,14 +79,13 @@
 		<c:if test="${potModificar}">
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
-			<c:set var="isPermesEsborrarFinalsVar" value="${contingut.document && ((isPermesEsborrarFinals && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'DEFINITIU' || contingut.documentTipus == 'IMPORTAT')) || (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PENDENT' || contingut.estat == 'FIRMA_PARCIAL'))}"/>
 			<c:choose>
 				<c:when test="${contingut.expedient && contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 				
-				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitu || isPermesModificarCustodiatsVar) && expedientObert}">
+				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitiu || isPermesModificarCustodiatsVar) && expedientObert}">
 					<c:choose>
 						<c:when test="${isTasca}">
 							<li><a href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.pare.id}/document/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
@@ -184,7 +183,8 @@
 					<c:set var="esborrarConfirmacioMsg"><spring:message code="contingut.confirmacio.esborrar.node"/></c:set>
 				</c:otherwise>
 			</c:choose>
-			<c:if test="${(!contingut.document && !contingut.conteDocumentsDefinitius) || isPermesEsborrarFinalsVar || contingut.carpeta}">
+			
+			<c:if test="${(contingut.document && !contingut.documentDeAnotacio && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) || contingut.carpeta || (contingut.expedient && !contingut.conteDocumentsDefinitius)}">
 				<c:choose>
 					<c:when test="${isTasca}">
 						<li><a href="<c:url value="/usuariTasca/${tascaId}/contingut/${contingut.id}/delete"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
@@ -204,7 +204,7 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 			<c:if test="${contingut.documentTipus == 'DIGITAL' or contingut.documentTipus == 'IMPORTAT'}">
-				<c:if test="${!isTasca and ((contingut.arxiuEstatDefinitu or contingut.firmaParcial) or (imprimibleNoFirmats and contingut.pdf))}">
+				<c:if test="${!isTasca and ((contingut.arxiuEstatDefinitiu or contingut.firmaParcial) or (imprimibleNoFirmats and contingut.pdf))}">
 					<c:choose>
 						<c:when test="${contingut.fitxerExtension!='xsig'}">
 							<li>
@@ -282,10 +282,10 @@
 						<c:when test="${contingut.valid}">
 							<c:choose>
 								<c:when test="${isTasca}">
-									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/firmaSimpleWeb"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:when>
 								<c:otherwise>
-									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/firmaPassarela"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
+									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/firmaSimpleWeb"/>" data-toggle="modal" data-refresh-pagina="true" data-refresh-tancar="true"><span class="fa fa-edit"></span>&nbsp;<spring:message code="contingut.boto.firma.passarela"/>...</a></li>
 								</c:otherwise>								
 							</c:choose>						
 						</c:when>
@@ -359,9 +359,12 @@
 				</c:if>
 			</c:if>
 		</c:if>
-		<%---- URLs instrucció ----%>
+		<%---- URLs instrucciï¿½ ----%>
 		<c:if test="${!isTasca && contingut.expedient && isGenerarUrlsInstruccioActiu}">
-			<li><a href="#" onclick="urlInstruccio(${contingut.id})"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.url"/></a></li>
+			<li class="dropdown dropdown-submenu">
+				<a data-toggle="dropdown" class="dropdown-toggle" id="urlInstruccio" href="#"><span class="fa fa-copy dropdown-item"></span>&nbsp;<spring:message code="comu.boto.url"/><span class="fa fa-caret-right" style="float: right; line-height: 20px;"></span></a>
+				<ul class="dropdown-menu dropdown-submenu-right" aria-labelledby="urlInstruccio"></ul>
+			</li>
 		</c:if>
 		<%---- Histï¿½ric d'accions ----%>
 		<c:if test="${!isTasca}">

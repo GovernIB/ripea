@@ -12,7 +12,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.URLInstruccioFiltreDto;
-import es.caib.ripea.core.api.dto.URLInstruccionDto;
+import es.caib.ripea.core.api.dto.URLInstruccioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.URLInstruccioService;
 
@@ -31,39 +31,45 @@ public class URLInstruccioServiceBean implements URLInstruccioService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public URLInstruccionDto create(Long entitatId, URLInstruccionDto url) throws NotFoundException {
+	public URLInstruccioDto create(Long entitatId, URLInstruccioDto url) throws NotFoundException {
 		return delegate.create(entitatId, url);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public URLInstruccionDto update(Long entitatId, URLInstruccionDto url) throws NotFoundException {
+	public URLInstruccioDto update(Long entitatId, URLInstruccioDto url) throws NotFoundException {
 		return delegate.update(entitatId, url);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public URLInstruccionDto delete(Long entitatId, Long id) throws NotFoundException {
+	public URLInstruccioDto delete(Long entitatId, Long id) throws NotFoundException {
 		return delegate.delete(entitatId, id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public URLInstruccionDto findById(Long entitatId, Long id) throws NotFoundException {
+	public URLInstruccioDto findById(Long entitatId, Long id) throws NotFoundException {
 		return delegate.findById(entitatId, id);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<URLInstruccionDto> findByEntitatPaginat(Long entitatId, URLInstruccioFiltreDto filtre,
+	public PaginaDto<URLInstruccioDto> findByEntitatPaginat(Long entitatId, URLInstruccioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams) throws NotFoundException {
 		return delegate.findByEntitatPaginat(entitatId, filtre, paginacioParams);
 	}
 
 	@Override
 	@RolesAllowed({"tothom", "IPA_ADMIN"})
-	public List<URLInstruccionDto> findByEntitat(Long entitatId) throws NotFoundException {
+	public List<URLInstruccioDto> findByEntitat(Long entitatId) throws NotFoundException {
 		return delegate.findByEntitat(entitatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public String getURLInstruccio(Long entitatId, Long contingutId, Long urlInstruccioId) {
+		return delegate.getURLInstruccio(entitatId, contingutId, urlInstruccioId);
 	}
 
 

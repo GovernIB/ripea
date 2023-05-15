@@ -14,6 +14,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
@@ -66,7 +67,8 @@ public interface DocumentService {
 			Long entitatId,
 			Long pareId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient, String rolActual) throws NotFoundException, ValidationException;
+			boolean comprovarMetaExpedient, 
+			String rolActual) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
@@ -687,6 +689,7 @@ public interface DocumentService {
 			Long entitatId,
 			Long expedientId);
 
+
 	@PreAuthorize("hasRole('tothom')")
 	public void actualitzarEstatADefinititu(
 			Long documentId);
@@ -716,6 +719,15 @@ public interface DocumentService {
 			Map<String, String> parametres,
 			String errorDescripcio,
 			Throwable throwable);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String firmaSimpleWebStart(
+			FitxerDto fitxerPerFirmar,
+			String motiu, String base);
+
+	@PreAuthorize("hasRole('tothom')")
+	public FirmaResultatDto firmaSimpleWebEnd(String transactionID);
+
 
 	
 

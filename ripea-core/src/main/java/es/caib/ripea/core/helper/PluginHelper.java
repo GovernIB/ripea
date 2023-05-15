@@ -65,7 +65,6 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuOperacioEnumDto;
-import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
@@ -78,6 +77,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
@@ -109,9 +109,9 @@ import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
@@ -141,6 +141,7 @@ import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioResultat;
 import es.caib.ripea.plugin.digitalitzacio.DigitalitzacioTransaccioResposta;
 import es.caib.ripea.plugin.firmaservidor.FirmaServidorPlugin;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
+import es.caib.ripea.plugin.firmaweb.FirmaWebPlugin;
 import es.caib.ripea.plugin.gesdoc.GestioDocumentalPlugin;
 import es.caib.ripea.plugin.notificacio.EntregaPostalTipus;
 import es.caib.ripea.plugin.notificacio.Enviament;
@@ -208,6 +209,9 @@ public class PluginHelper {
 	private Map<String, FirmaServidorPlugin> firmaServidorPlugins = new HashMap<>();
 	private Map<String, ViaFirmaPlugin> viaFirmaPlugins = new HashMap<>();
 	private Map<String, ProcedimentPlugin> procedimentPlugins = new HashMap<>();
+	private Map<String, FirmaWebPlugin> firmaSimpleWebPlugins = new HashMap<>();
+	
+	
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -644,7 +648,8 @@ public class PluginHelper {
 							expedient.getNom(), 
 							metaDada, 
 							valor, 
-							interessats));
+							interessats,
+							expedient.getNumero()));
 			expedient.updateArxiu(null);
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 		} catch (Exception ex) {
@@ -2163,39 +2168,39 @@ public class PluginHelper {
 		return esborrat;
 	}
 	
-	public List<PortafirmesBlockDto> portafirmesRecuperarBlocksFirma(String idPlantilla, String idTransaccio, boolean portafirmesFluxAsync, String portafirmesId, String idioma) {
-
-		List<PortafirmesBlockDto> blocksDto = null;
-		String accioDescripcio = "Tancant flux de firma";
-		long t0 = System.currentTimeMillis();
-		try {
-			List<PortafirmesBlockInfo> portafirmesBlocks = getPortafirmesPlugin().recuperarBlocksFirmes(idPlantilla, idTransaccio, portafirmesFluxAsync,
-																										new Long(portafirmesId), idioma);
-			if (portafirmesBlocks != null) {
-				blocksDto = new ArrayList<PortafirmesBlockDto>();
-				for (PortafirmesBlockInfo portafirmesBlockInfo : portafirmesBlocks) {
-					PortafirmesBlockDto blockDto = new PortafirmesBlockDto();
-					List<PortafirmesBlockInfoDto> signersInfoDto = new ArrayList<PortafirmesBlockInfoDto>();
-					if (portafirmesBlockInfo.getSigners() != null) {
-						for (PortafirmesBlockSignerInfo portafirmesBlockSignerInfo : portafirmesBlockInfo.getSigners()) {
-							PortafirmesBlockInfoDto signerInfoDto = new PortafirmesBlockInfoDto();
-							signerInfoDto.setSignerCodi(portafirmesBlockSignerInfo.getSignerCodi());
-							signerInfoDto.setSignerId(portafirmesBlockSignerInfo.getSignerId());
-							signerInfoDto.setSignerNom(portafirmesBlockSignerInfo.getSignerNom());
-							signersInfoDto.add(signerInfoDto);
-						}
-					}
-					blockDto.setSigners(signersInfoDto);
-					blocksDto.add(blockDto);
-				}
-			}
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de portafirmes";
-			this.integracioHelper.addAccioError("PFIRMA", accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException("PFIRMA", errorDescripcio, ex);
-		}
-		return blocksDto;
-	}
+//	public List<PortafirmesBlockDto> portafirmesRecuperarBlocksFirma(String idPlantilla, String idTransaccio, boolean portafirmesFluxAsync, String portafirmesId, String idioma) {
+//
+//		List<PortafirmesBlockDto> blocksDto = null;
+//		String accioDescripcio = "Tancant flux de firma";
+//		long t0 = System.currentTimeMillis();
+//		try {
+//			List<PortafirmesBlockInfo> portafirmesBlocks = getPortafirmesPlugin().recuperarBlocksFirmes(idPlantilla, idTransaccio, portafirmesFluxAsync,
+//																										new Long(portafirmesId), idioma);
+//			if (portafirmesBlocks != null) {
+//				blocksDto = new ArrayList<PortafirmesBlockDto>();
+//				for (PortafirmesBlockInfo portafirmesBlockInfo : portafirmesBlocks) {
+//					PortafirmesBlockDto blockDto = new PortafirmesBlockDto();
+//					List<PortafirmesBlockInfoDto> signersInfoDto = new ArrayList<PortafirmesBlockInfoDto>();
+//					if (portafirmesBlockInfo.getSigners() != null) {
+//						for (PortafirmesBlockSignerInfo portafirmesBlockSignerInfo : portafirmesBlockInfo.getSigners()) {
+//							PortafirmesBlockInfoDto signerInfoDto = new PortafirmesBlockInfoDto();
+//							signerInfoDto.setSignerCodi(portafirmesBlockSignerInfo.getSignerCodi());
+//							signerInfoDto.setSignerId(portafirmesBlockSignerInfo.getSignerId());
+//							signerInfoDto.setSignerNom(portafirmesBlockSignerInfo.getSignerNom());
+//							signersInfoDto.add(signerInfoDto);
+//						}
+//					}
+//					blockDto.setSigners(signersInfoDto);
+//					blocksDto.add(blockDto);
+//				}
+//			}
+//		} catch (Exception ex) {
+//			String errorDescripcio = "Error al accedir al plugin de portafirmes";
+//			this.integracioHelper.addAccioError("PFIRMA", accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0, errorDescripcio, ex);
+//			throw new SistemaExternException("PFIRMA", errorDescripcio, ex);
+//		}
+//		return blocksDto;
+//	}
 
 	public String portafirmesRecuperarUrlEstatFluxFirmes(long portafirmesId, String idioma) {
 		String accioDescripcio = "Recuperant url estat flux de firmes";
@@ -2210,6 +2215,8 @@ public class PluginHelper {
 		}
 		return resposta;
 	}
+
+
 	
 	public String conversioConvertirPdfArxiuNom(String nomOriginal) {
 		return getConversioPlugin().getNomArxiuConvertitPdf(nomOriginal);
@@ -2230,6 +2237,7 @@ public class PluginHelper {
 			FitxerDto resposta = new FitxerDto();
 			resposta.setNom(convertit.getArxiuNom());
 			resposta.setContingut(convertit.getArxiuContingut());
+			resposta.setContentType("application/pdf");
 			return resposta;
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de conversió de documents: " + ex.getMessage();
@@ -2870,7 +2878,8 @@ public class PluginHelper {
 					notificacio.setCaducitat(cal.getTime());
 				}
 			}
-			if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+			
+			if (documentEntity.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) || Utils.notEquals(documentEntity.getFitxerContentType(), "application/pdf")) {
 				FitxerDto fitxer = documentHelper.getFitxerAssociat(documentEntity, null);
 				notificacio.setDocumentArxiuNom(fitxer.getNom());
 				notificacio.setDocumentArxiuContingut(fitxer.getContingut());
@@ -2926,12 +2935,12 @@ public class PluginHelper {
 				enviament.setEntregaPostalLinea1(interessatPerAdresa.getAdresa() + ", " + interessatPerAdresa.getCodiPostal() + ", " + municipi.getNom());
 				enviament.setEntregaPostalLinea2(provincia.getNom() + ", " + pais.getNom());
 			}
-			// ########## ENVIAMENT DEH  ###############
-			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh()) {
+			// ########## ENVIAMENT DEH  ############### 
+			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(configHelper.getConfig("es.caib.ripea.notificacio.enviament.deh.activa"))) {
 				enviament.setEntregaDehActiva(true);
 				enviament.setEntregaDehObligat(interessat.getEntregaDehObligat());
 				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacioSia());
-				enviament.setEntregaNif(usuari.getNif());
+				enviament.setEntregaNif(interessat.getDocumentNum());
 			}
 			enviaments.add(enviament);
 			notificacio.setEnviaments(enviaments);
@@ -3123,7 +3132,7 @@ public class PluginHelper {
 		accioParams.put("títol", document.getNom());
 		long t0 = System.currentTimeMillis();
 		try {
-			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma);
+			SignaturaResposta resposta = getFirmaServidorPlugin().firmar(fitxer.getNom(), motiu, fitxer.getContingut(), idioma, fitxer.getContentType());
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_FIRMASERV, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT,System.currentTimeMillis() - t0);
 			return resposta;
 		} catch (Exception ex) {
@@ -3219,6 +3228,32 @@ public class PluginHelper {
 		}
 		return viaFirmaDispositiusDto;
 	}
+	
+	
+
+	public String firmaSimpleWebStart(
+			FitxerDto fitxerPerFirmar,
+			String motiu,
+			UsuariDto usuariActual, 
+			String urlReturnToRipea) {
+
+		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
+
+		return firmaWebPlugin.firmaSimpleWebStart(fitxerPerFirmar, motiu, usuariActual, urlReturnToRipea);
+
+	}
+	
+
+	public FirmaResultatDto firmaSimpleWebEnd(
+			String transactionID) {
+
+		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
+
+		return firmaWebPlugin.firmaSimpleWebEnd(transactionID);
+
+	}
+	
+	
 
 	private ArbreNodeDto<UnitatOrganitzativaDto> getNodeArbreUnitatsOrganitzatives(UnitatOrganitzativa unitatOrganitzativa, List<UnitatOrganitzativa> unitatsOrganitzatives,
 																				   ArbreNodeDto<UnitatOrganitzativaDto> pare) {
@@ -3233,64 +3268,14 @@ public class PluginHelper {
 		return resposta;
 	}
 
-	/*private CiutadaPersona toPluginCiutadaPersona(
-			InteressatEntity interessat) {
-		if (interessat == null)
-			return null;
-		if (	!InteressatDocumentTipusEnumDto.NIF.equals(interessat.getDocumentTipus()) &&
-				!InteressatDocumentTipusEnumDto.CIF.equals(interessat.getDocumentTipus())) {
-			throw new ValidationException(
-					interessat.getId(),
-					InteressatEntity.class,
-					"No es pot notificar a interessats amb el tipus de document " + interessat.getDocumentTipus());
-		}
-		CiutadaPersona persona = new CiutadaPersona();
-		if (interessat instanceof InteressatPersonaFisicaEntity) {
-			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
-			persona.setNif(interessatPf.getDocumentNum());
-			persona.setNom(interessatPf.getNom());
-			persona.setLlinatge1(interessatPf.getLlinatge1());
-			persona.setLlinatge2(interessatPf.getLlinatge2());
-			persona.setPaisCodi(interessat.getPais());
-			persona.setProvinciaCodi(interessat.getProvincia());
-			persona.setMunicipiCodi(interessat.getMunicipi());
-		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
-			InteressatPersonaFisicaEntity interessatPj = (InteressatPersonaFisicaEntity)interessat;
-			persona.setNif(interessatPj.getDocumentNum());
-			persona.setNom(interessatPj.getNom());
-			persona.setPaisCodi(interessat.getPais());
-			persona.setProvinciaCodi(interessat.getProvincia());
-			persona.setMunicipiCodi(interessat.getMunicipi());
-		} else if (interessat instanceof InteressatAdministracioEntity) {
-			throw new ValidationException(
-					interessat.getId(),
-					InteressatEntity.class,
-					"Els interessats de les notificacions només poden ser persones físiques o jurídiques");
-		}
-		return persona;
-	}
 
-	private String getIdiomaPerPluginCiutada(InteressatIdiomaEnumDto idioma) {
-		switch (idioma) {
-		case CA:
-			return "ca";
-		case ES:
-			return "es";
-		default:
-			return "ca";
-		}
-	}
-
-	private static final Pattern MOBIL_PATTERN = Pattern.compile("(\\+34|0034|34)?[ -]*(6|7)([0-9]){2}[ -]?(([0-9]){2}[ -]?([0-9]){2}[ -]?([0-9]){2}|([0-9]){3}[ -]?([0-9]){3})");
-	private boolean isTelefonMobil(String telefon) {
-		return MOBIL_PATTERN.matcher(telefon).matches();
-	}*/
+	
 
 	private Long toLongValue(String text) {
 		return text == null || text.isEmpty() ? null : Long.parseLong(text);
 	}
 	
-	private Expedient toArxiuExpedient(String identificador, String nom, MetaDadaEntity metaDada, Object valor, List<String> ntiInteressats) {
+	private Expedient toArxiuExpedient(String identificador, String nom, MetaDadaEntity metaDada, Object valor, List<String> ntiInteressats, String numeroExpedient) {
 		Expedient expedient = new Expedient();
 		expedient.setIdentificador(identificador);
 		expedient.setNom(nom);
@@ -3300,6 +3285,9 @@ public class PluginHelper {
 		Map<String, Object> metadadesValors = new HashMap<String, Object>();
 		metadadesValors.put(metaDada.getMetadadaArxiu(), valor);
 		metadades.addMetadadaAddicional("metadades_expedient", metadadesValors);
+		
+		if (isPropagarNumeroExpedientActiu())
+			metadades.addMetadadaAddicional("numeroExpedient", numeroExpedient);
 		
 		expedient.setMetadades(metadades);
 		
@@ -4332,6 +4320,61 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_GESDOC, "Error al crear la instància del plugin de gestió documental", ex);
 		}
 	}
+	
+	
+	
+	
+	private FirmaWebPlugin getFirmaSimpleWebPlugin() {
+		
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+		
+		FirmaWebPlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = firmaSimpleWebPlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.firmasimpleweb.class");
+			if (Utils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (FirmaWebPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+								.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("FIRMA_SIMPLE_WEB", entitatCodi, organCodi));
+					firmaSimpleWebPlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = firmaSimpleWebPlugins.get(entitatCodi);
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginFirmaWeb();
+		if (Utils.isEmpty(pluginClass)) {
+			throw new RuntimeException("No està configurada la classe per al plugin de firma simple web");
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (FirmaWebPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+						.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("FIRMA_SIMPLE_WEB", entitatCodi));
+			firmaSimpleWebPlugins.put(entitatCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new RuntimeException("Error al crear la instància del plugin de firma simple web", ex);
+		}
+		
+	}
+	
 
 	private final static Map<String, Boolean> propertiesLoaded = new HashMap<>();
 	private synchronized void loadPluginProperties(String codeProperties) {
@@ -4369,7 +4412,8 @@ public class PluginHelper {
 		gestioDocumentalPlugins  = new HashMap<>();
 		firmaServidorPlugins  = new HashMap<>();
 		viaFirmaPlugins  = new HashMap<>();
-		procedimentPlugins  = new HashMap<>();
+		procedimentPlugins = new HashMap<>();
+		firmaSimpleWebPlugins = new HashMap<>();
 	}
 
 	private String getPropertyPluginDadesUsuari() {
@@ -4411,6 +4455,9 @@ public class PluginHelper {
 	}
 	private String getPropertyPluginFirmaServidor() {
 		return configHelper.getConfig("es.caib.ripea.plugin.firmaservidor.class");
+	}
+	private String getPropertyPluginFirmaWeb() {
+		return configHelper.getConfig("es.caib.ripea.plugin.firmasimpleweb.class");
 	}
 	private String getPropertyPluginViaFirma() {
 		return configHelper.getConfig("es.caib.ripea.plugin.viafirma.class");

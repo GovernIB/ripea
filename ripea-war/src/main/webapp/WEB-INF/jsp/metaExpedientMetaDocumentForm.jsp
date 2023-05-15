@@ -391,7 +391,11 @@ function recuperarCarrecs() {
 			if (carrecs) {
 				llistatCarrecs += '<div class="carrecsList">';
 				$.each(carrecs, function(i, carrec) {
-					var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					var persona = '';
+					if (carrec.usuariPersonaNom) {
+						persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					}
+					var nomCarrec = carrec.carrecName + persona;
 					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
 					
 					$('#portafirmesResponsables option').each(function(i, responsable) {
@@ -427,7 +431,11 @@ function seleccionarCarrec(carrec) {
 		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
 		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
 	} else {
-		var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNif + ')';
+		var persona = '';
+		if (carrec.usuariPersonaNif) {
+			persona = ' (' + carrec.usuariPersonaNif + ')';
+		}
+		var nomCarrec = carrec.carrecName + persona;
 		var items = [];
 		items.push({
 			"id": carrec.carrecId,
@@ -469,7 +477,7 @@ function removeLoading() {
 			<li role="presentation" class="active"><a href="#dades" aria-controls="dades" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dades"/></a></li>
 			<li role="presentation"><a href="#dades-nti" aria-controls="dades-nti" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.dadesnti"/></a></li>
 			<li role="presentation"><a href="#firma-portafirmes" aria-controls="firma-portafirmes" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.portafirmes"/></a></li>
-			<li role="presentation"><a href="#firma-passarela" aria-controls="firma-passarela" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.passarela"/></a></li>
+			<li role="presentation"><a href="#firma-passarela" aria-controls="firma-passarela" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firmasimpleweb"/></a></li>
 			<c:if test="${isFirmaBiometrica}">
 				<li role="presentation"><a href="#firma-biometrica" aria-controls="firma-biometrica" role="tab" data-toggle="tab"><spring:message code="metadocument.form.camp.tab.firma.biometrica"/></a></li>
 			</c:if>
@@ -515,7 +523,7 @@ function removeLoading() {
 						urlConsultaInicial="${urlConsultaInicial}" 
 						urlConsultaLlistat="${urlConsultaLlistat}" 
 						textKey="metadocument.form.camp.portafirmes.responsables"
-						suggestValue="codi"
+						suggestValue="nif"
 						suggestText="nom"
 						suggestTextAddicional="nif"
 						required="${!metaDocumentCommand.comu}"
@@ -525,7 +533,7 @@ function removeLoading() {
 				</div>							
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-passarela">
-				<rip:inputCheckbox name="firmaPassarelaActiva" textKey="metadocument.form.camp.passarela.activa" disabled="${bloquejarCamps}"/>
+				<rip:inputCheckbox name="firmaPassarelaActiva" textKey="metadocument.form.camp.firmaSimpleWebActiva" disabled="${bloquejarCamps}"/>
 			</div>
 			<c:if test="${isFirmaBiometrica}">
 				<div role="tabpanel" class="tab-pane" id="firma-biometrica">

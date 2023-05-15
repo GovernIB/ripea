@@ -35,6 +35,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
@@ -66,7 +67,6 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -85,6 +85,7 @@ import es.caib.ripea.core.entity.ViaFirmaUsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
@@ -168,7 +169,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private IntegracioHelper integracioHelper;
-
+	@Autowired
+	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 	
 	@Transactional
 	@Override
@@ -209,12 +211,15 @@ public class DocumentServiceImpl implements DocumentService {
 					ExpedientEntity.class,
 					"No es pot crear un document sense un meta-document associat");
 		}
-		return documentHelper.crearDocument(
+		DocumentDto documentDto = documentHelper.crearDocument(
 				document,
 				pare,
 				expedient,
 				metaDocument,
 				true);
+		
+		
+		return documentDto;
 	}
 
 	@Transactional
@@ -378,6 +383,32 @@ public class DocumentServiceImpl implements DocumentService {
 			return documentHelper.guardarDocumentArxiu(docId);
 		}
 	}
+	
+	
+	@Override
+	public String firmaSimpleWebStart(
+			FitxerDto fitxerPerFirmar,
+			String motiu, 
+			String urlReturnToRipea) {
+
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+
+		return pluginHelper.firmaSimpleWebStart(
+				fitxerPerFirmar,
+				motiu,
+				usuariActual, 
+				urlReturnToRipea);
+
+	}
+	
+	@Override
+	public FirmaResultatDto firmaSimpleWebEnd(
+			String transactionID) {
+
+		return pluginHelper.firmaSimpleWebEnd(transactionID);
+
+	}
+	
 
 
 	

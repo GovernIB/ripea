@@ -453,10 +453,10 @@ public class ExpedientHelper {
 		InteressatEntity interessatRipeaOverwritten = null;
 		for (InteressatEntity interessatRipea : interessatsRipea) {
 
-			if (Utils.isNotNullAndEqual(interessatRipea.getDocumentNum(), interessatDistribucio.getDocumentNumero()) || // interessatRipea == interessatDistribucio
-					interessatRipea.getRepresentant() != null && Utils.isNotNullAndEqual(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getDocumentNumero()) ||  // representantRipea == interessatDistribucio
-					interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEqual(interessatRipea.getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero()) || // interessatRipea == representantDistribucio
-					interessatRipea.getRepresentant() != null && interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEqual(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero())) { // representantRipea == representantDistribucio
+			if (Utils.isNotNullAndEquals(interessatRipea.getDocumentNum(), interessatDistribucio.getDocumentNumero()) || // interessatRipea == interessatDistribucio
+					interessatRipea.getRepresentant() != null && Utils.isNotNullAndEquals(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getDocumentNumero()) ||  // representantRipea == interessatDistribucio
+					interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEquals(interessatRipea.getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero()) || // interessatRipea == representantDistribucio
+					interessatRipea.getRepresentant() != null && interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEquals(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero())) { // representantRipea == representantDistribucio
 				interessatRipeaOverwritten = interessatRipea;
 			}
 		}

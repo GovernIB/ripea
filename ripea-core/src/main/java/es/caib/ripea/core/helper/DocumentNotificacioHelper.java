@@ -90,7 +90,7 @@ public class DocumentNotificacioHelper {
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
 		
-		if (!documentEntity.isArxiuEstatDefinitu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL) {
+		if (!documentEntity.isArxiuEstatDefinitiu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL && !documentEntity.getFitxerContentType().equals("application/zip")) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}
 		
@@ -420,7 +420,7 @@ public class DocumentNotificacioHelper {
 	
 	private ExpedientEntity validateExpedientPerNotificacio(DocumentEntity document, DocumentNotificacioTipusEnumDto notificacioTipus) {
 		//Document a partir de concatenació (docs firmats/custodiats) i document custodiat
-		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && (document.getArxiuEstat() == ArxiuEstatEnumDto.DEFINITIU)) {
+		if (!document.getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL) && !document.isArxiuEstatDefinitiu() && !document.getFitxerContentType().equals("application/zip")) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,

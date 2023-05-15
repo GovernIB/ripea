@@ -350,7 +350,7 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es pot actualitzar un document sense un meta-document associat");
 		}
-		if (!isModificacioCustodiatsActiva() && documentEntity.isArxiuEstatDefinitu()) {
+		if (!isModificacioCustodiatsActiva() && documentEntity.isArxiuEstatDefinitiu()) {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,

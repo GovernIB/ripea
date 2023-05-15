@@ -160,6 +160,33 @@ div.dropdown-menu.loading .rmodal_carrecs {
 a.btn.input-group-addon.portafirmesResponsables_btn {
 	background-color: #fff;
 }
+a.btn.input-group-addon.portafirmesResponsables_btn2 {
+	background-color: #fff;
+}
+
+#nifResponsable:focus {
+    border: 1px solid #66afe9 !important;
+}
+
+#nifResponsable {
+	width: 89%; 
+	padding: 6px 12px; 
+	color: #555; 
+	border: 1px solid #ccc; 
+	border-radius: 4px; 
+	float: left;
+	outline: none;
+	border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+#nifResponsableBtn {
+	border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    outline: none;
+}
+
+
 </style>
 
 <script type="text/javascript">
@@ -176,6 +203,8 @@ $(document).ready(function() {
 
 	// Tancar transacció i esborrar localstorage
 	window.parent.removeTransactionId(idModal);
+
+
 	
 	//crear nou flux
 	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function() {		
@@ -293,37 +322,60 @@ $(document).ready(function() {
 	
 	$("#portafirmesEnviarFluxId").trigger('change');
 	$(".portafirmesResponsables_btn").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.carrecs"/>");
+	$(".portafirmesResponsables_btn2").attr("title", "<spring:message code="contingut.portafirmes.afegir.reponsable.manual"/>");
 	
 	$("#portafirmesResponsables").on('select2:unselecting', function (e) {
 		var optionRemoved = e.params.args.data.id;
 		$("#portafirmesResponsables option[value='" + optionRemoved + "']").remove();
 	});
+
+
+	$(".portafirmesResponsables_btn2").on('click', function() {
+		toggleDropdownResponsable();
+	});	
+		
+	
 });
 
 function toggleCarrecs() {
-	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu.btn1');
 	if (dropdown.length === 0) {
 		$(".portafirmesResponsables_btn").parent().append(recuperarCarrecs());
-		$(".portafirmesResponsables_btn").parent().find('.dropdown-menu').toggle();
+		$(".portafirmesResponsables_btn").parent().find('.dropdown-menu.btn1').show();
+		$(".portafirmesResponsables_btn").css("background-color", "#ddd");
+		$(".portafirmesResponsables_btn").addClass("active");
 		
 	} else {
-		dropdown.toggle();
+		if (dropdown.is(":visible")) {
+			dropdown.hide();
+			$(".portafirmesResponsables_btn").css("background-color", "#fff");
+			$(".portafirmesResponsables_btn").removeClass("active");
+		} else {
+			dropdown.show();
+			$(".portafirmesResponsables_btn").css("background-color", "#ddd");
+			$(".portafirmesResponsables_btn").addClass("active");
+		}		
 	}
+
 }
 
 function recuperarCarrecs() {
-	var llistatCarrecs = "<div class='loading dropdown-menu'>";
+	var llistatCarrecs = "<div class='loading dropdown-menu btn1'>";
 	$.ajax({
 		type: 'GET',
 		dataType: "json",
 		url: "<c:url value="/metaExpedient/metaDocument/carrecs"/>",
 		success: function(carrecs) {
-			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu.btn1');
 			dropdown.removeClass('loading');
 			if (carrecs) {
 				llistatCarrecs += '<div class="carrecsList">';
 				$.each(carrecs, function(i, carrec) {
-					var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					var persona = '';
+					if (carrec.usuariPersonaNom) {
+						persona = ' (' + carrec.usuariPersonaNom + ' - ' + carrec.usuariPersonaNif + ' - ' + carrec.usuariPersonaId + ')';
+					}
+					var nomCarrec = carrec.carrecName + persona;
 					llistatCarrecs += "<div class='carrec_" + carrec.carrecId + "'><a onclick='seleccionarCarrec(" + JSON.stringify(carrec) + ")'>" + nomCarrec + "</a></div>";	
 					
 					$('#portafirmesResponsables option').each(function(i, responsable) {
@@ -336,14 +388,14 @@ function recuperarCarrecs() {
 			dropdown.append(llistatCarrecs);
 		},
 		error: function (error) {
-			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+			var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu.btn1');
 			dropdown.removeClass('loading');
 			dropdown.empty();
 			dropdown.append("Hi ha hagut un problema recuperant els càrrecs " + error.statusText);
 		},
 		statusCode: {
 	        500: function(error) {
-	        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
+	        	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu.btn1');
 				dropdown.removeClass('loading');
 	        	dropdown.empty();
 				dropdown.append("Hi ha hagut un problema recuperant els càrrecs: " + error.statusText);
@@ -359,7 +411,12 @@ function seleccionarCarrec(carrec) {
 		$("#portafirmesResponsables option[value='" + carrec.carrecId + "']").remove();
 		$('.carrec_' + carrec.carrecId).removeClass('carrec-selected');
 	} else {
-		var nomCarrec = carrec.carrecName + ' (' + carrec.usuariPersonaNif + ')';
+
+		var persona = '';
+		if (carrec.usuariPersonaNif) {
+			persona = ' (' + carrec.usuariPersonaNif + ')';
+		}
+		var nomCarrec = carrec.carrecName + persona;
 		var items = [];
 		items.push({
 			"id": "CARREC[" + carrec.carrecId + "]",
@@ -458,6 +515,110 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 	}
 }
 
+
+
+function toggleDropdownResponsable() {
+	
+	var dropdown = $(".portafirmesResponsables_btn2").parent().find('.dropdown-menu.btn2');
+	if (dropdown.length === 0) {
+		$(".portafirmesResponsables_btn2").parent().append('' + 
+				'<div class="dropdown-menu btn2" style="display: none;">' + 
+					'<input onkeydown="preventSubmitOnEnter(event)" id="nifResponsable" type="text" placeholder="<spring:message code="contingut.portafirmes.introdueix.reponsable.nif"/>">' +
+					'<button id="nifResponsableBtn" onclick="addResponable(); this.blur();" type="button" class="btn btn-default"><span class="fa fa-check"></span></button>' + 
+				'</div>');
+		$(".portafirmesResponsables_btn2").parent().find('.dropdown-menu').show();
+		$(".portafirmesResponsables_btn2").css("background-color", "#ddd");
+		$(".portafirmesResponsables_btn2").addClass("active");
+
+	} else {
+		if (dropdown.is(":visible")) {
+			$('#nifResponsable').parent().find('.help-block').remove();
+			$("#nifResponsable").val("");
+			dropdown.hide();
+			$(".portafirmesResponsables_btn2").css("background-color", "#fff");
+			$(".portafirmesResponsables_btn2").removeClass("active");
+		} else {
+			dropdown.show();
+			$(".portafirmesResponsables_btn2").css("background-color", "#ddd");
+			$(".portafirmesResponsables_btn2").addClass("active");
+		}
+
+
+	}
+}
+
+function addResponable() {
+
+	let value = $('#nifResponsable').val();
+
+	let ok = isDniNie(value);
+
+	if (ok) {
+		$('#nifResponsable').parent().find('.help-block').remove();
+	    var newOption = new Option(value, value, true, true);
+	    $("#portafirmesResponsables").append(newOption).trigger('change');
+	    $("#nifResponsable").val("");
+	} else {
+		$('#nifResponsable').parent().find('.help-block').remove();
+		$('#nifResponsable').parent().append('<p class="help-block" style="color: #a94442;"><span class="fa fa-exclamation-triangle"></span>&nbsp;<span><spring:message code="contingut.portafirmes.introdueix.reponsable.nif.novalid"/></span></p>');
+	}
+
+}
+
+function preventSubmitOnEnter(event) {
+
+    if(event.keyCode == 13) {
+        event.preventDefault();
+        return false;
+      }
+
+}
+
+
+
+function isDniNie(value) {
+
+	 value = value.toUpperCase();
+
+	 // Basic format test 
+	 if ( !value.match('((^[A-Z]{1}[0-9]{7}[A-Z0-9]{1}$|^[T]{1}[A-Z0-9]{8}$)|^[0-9]{8}[A-Z]{1}$)') ) {
+	  return false;
+	 }
+
+	 // Test NIF
+	 if ( /^[0-9]{8}[A-Z]{1}$/.test( value ) ) {
+	  return ( "TRWAGMYFPDXBNJZSQVHLCKE".charAt( value.substring( 8, 0 ) % 23 ) === value.charAt( 8 ) );
+	 }
+	 // Test specials NIF (starts with K, L or M)
+	 if ( /^[KLM]{1}/.test( value ) ) {
+	  return ( value[ 8 ] === String.fromCharCode( 64 ) );
+	 }
+
+	 // Test NIE
+	 //T
+	 if ( /^[T]{1}/.test( value ) ) {
+	  return ( value[ 8 ] === /^[T]{1}[A-Z0-9]{8}$/.test( value ) );
+	 }
+
+	 //XYZ
+	 if ( /^[XYZ]{1}/.test( value ) ) {
+	  return ( 
+	   value[ 8 ] === "TRWAGMYFPDXBNJZSQVHLCKE".charAt( 
+	    value.replace( 'X', '0' )
+	     .replace( 'Y', '1' )
+	     .replace( 'Z', '2' )
+	     .substring( 0, 8 ) % 23 
+	   ) 
+	  );
+	 }
+
+	 return false;
+}
+
+
+
+
+
 </script>
 </head>
 <body>
@@ -492,11 +653,12 @@ function recuperarFluxSeleccionat(portafirmesEnviarFluxId) {
 				urlConsultaInicial="${urlConsultaInicial}" 
 				urlConsultaLlistat="${urlConsultaLlistat}" 
 				textKey="metadocument.form.camp.portafirmes.responsables"
-				suggestValue="codi"
+				suggestValue="nif"
 				suggestText="nom"
 				suggestTextAddicional="nif"
 				required="true"
-				icon="fa fa-star"/>
+				icon="fa fa-star"
+				icon2="fa fa-plus"/>
 			<rip:inputSelect name="portafirmesSequenciaTipus" textKey="metadocument.form.camp.portafirmes.seqtip" optionItems="${metadocumentSeqtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		</c:when>
 		<c:when test="${fluxTipus == 'PORTAFIB'}">

@@ -263,12 +263,12 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 		return false;
 	}
 
-	@Override
-	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
-			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(String idPlantilla, String idTransaccio,
+//			boolean portafirmesFluxAsync, Long portafirmesId, String idioma) throws SistemaExternException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public List<PortafirmesCarrec> recuperarCarrecs() throws SistemaExternException {

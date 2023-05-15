@@ -39,7 +39,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                   name: URL
-                  type: VARCHAR(80 ${varcharUnit})
+                  type: VARCHAR(256 ${varcharUnit})
               - column:
                   constraints:
                     nullable: false

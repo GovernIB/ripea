@@ -555,13 +555,4 @@ public interface ContingutService {
 			String rolActual, 
 			PermissionEnumDto permission);
 	
-	/**
-	 * Genera les URLs d'instrucció per un expedient
-	 * 
-	 * @param entitatId
-	 * @param contingutId
-	 * @return
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public List<String> obtenerURLsInstruccio(Long entitatId, Long contingutId);
 }

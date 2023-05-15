@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ConnectException;
@@ -16,15 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.fundaciobit.plugins.signature.api.FileInfoSignature;
-import org.fundaciobit.plugins.signature.api.StatusSignature;
-import org.fundaciobit.plugins.signature.api.StatusSignaturesSet;
 import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -56,7 +49,6 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
@@ -74,7 +66,6 @@ import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
 import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
 import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
-import es.caib.ripea.war.command.PassarelaFirmaEnviarCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
 import es.caib.ripea.war.helper.ArxiuTemporalHelper;
@@ -85,12 +76,9 @@ import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.ExpedientHelper;
 import es.caib.ripea.war.helper.FitxerTemporalHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.ModalHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
-import es.caib.ripea.war.passarelafirma.SignaturesSetExtend;
-import es.caib.ripea.war.passarelafirma.PassarelaFirmaHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -127,8 +115,6 @@ public class UsuariTascaController extends BaseUserController {
 	private ArxiuTemporalHelper arxiuTemporalHelper;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private PassarelaFirmaHelper passarelaFirmaHelper;
 	@Autowired
 	private DigitalitzacioService digitalitzacioService;
 	@Autowired
@@ -208,6 +194,7 @@ public class UsuariTascaController extends BaseUserController {
 		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
 		model.addAttribute("tasca", expedientTascaDto);
 		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
+		model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
 		return "contingut";
 	}
 	
@@ -840,186 +827,6 @@ public class UsuariTascaController extends BaseUserController {
 		return "portafirmesInfo";
 	}
 	
-	@RequestMapping(value = "/{tascaId}/document/{documentId}/firmaPassarela", method = RequestMethod.GET)
-	public String firmaPassarelaGet(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long documentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentDto document = expedientTascaService.findDocumentById(
-				entitatActual.getId(),
-				tascaId,
-				documentId);
-		model.addAttribute("document", document);
-		PassarelaFirmaEnviarCommand command = new PassarelaFirmaEnviarCommand();
-		command.setMotiu(getMessage(
-						request, 
-						"contenidor.document.portafirmes.camp.motiu.default") +
-				" [" + document.getExpedientPare().getNom() + "]");
-		model.addAttribute(command);
-		return "passarelaFirmaForm";
-	}
-	
-	
-	
-	@RequestMapping(value = "/{tascaId}/document/{documentId}/firmaPassarela", method = RequestMethod.POST)
-	public String firmaPassarelaPost(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long documentId,
-			@Valid PassarelaFirmaEnviarCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (bindingResult.hasErrors()) {
-			emplenarModelFirmaClient(
-					request,
-					documentId,
-					model);
-			return "passarelaFirmaForm";
-		}
-		if (!command.getFirma().isEmpty()) {
-			expedientTascaService.processarFirmaClient(
-					null,
-					null,
-					command.getFirma().getOriginalFilename(),
-					command.getFirma().getBytes(), tascaId);
-			MissatgesHelper.success(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.ok"));
-			return getModalControllerReturnValueSuccess(
-					request, 
-					"redirect:/contingut/" + documentId,
-					null);
-		} else {
-			FitxerDto fitxerPerFirmar = expedientTascaService.convertirPdfPerFirmaClient(
-					entitatActual.getId(),
-					tascaId,
-					documentId);
-			UsuariDto usuariActual = aplicacioService.getUsuariActual();
-			String modalStr = (ModalHelper.isModal(request)) ? "/modal" : "";
-			String procesFirmaUrl = passarelaFirmaHelper.generateSignaturesSet(
-					request,
-					fitxerPerFirmar,
-					usuariActual.getNif(),
-					command.getMotiu(),
-					(command.getLloc() != null) ? command.getLloc() : "RIPEA",
-					usuariActual.getEmail(),
-					LocaleContextHolder.getLocale().getLanguage(),
-					modalStr + "/usuariTasca/" + tascaId + "/document/" + documentId +  "/firmaPassarelaFinal",
-					false);
-			return "redirect:" + procesFirmaUrl;
-		}
-	}
-	
-	
-	
-	@RequestMapping(value = "/{tascaId}/document/{documentId}/firmaPassarelaFinal")
-	public String firmaPassarelaFinal(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long documentId,
-			@RequestParam("signaturesSetId") String signaturesSetId,
-			Model model) throws IOException {
-		SignaturesSetExtend signaturesSet = passarelaFirmaHelper.getSignaturesSet(
-				request,
-				signaturesSetId);
-		passarelaFirmaHelper.setStatusFinalitzat(signaturesSet);
-		
-		StatusSignaturesSet status = signaturesSet.getStatusSignaturesSet();
-		switch (status.getStatus()) {
-		case StatusSignaturesSet.STATUS_FINAL_OK:
-			FileInfoSignature firmaInfo = signaturesSet.getFileInfoSignatureArray()[0];
-			StatusSignature firmaStatus = firmaInfo.getStatusSignature();
-			if (firmaStatus.getStatus() == StatusSignature.STATUS_FINAL_OK) {
-				if (firmaStatus.getSignedData() == null || !firmaStatus.getSignedData().exists()) {
-					firmaStatus.setStatus(StatusSignature.STATUS_FINAL_ERROR);
-					String msg = "L'estat indica que ha finalitzat correctament però el fitxer firmat o no s'ha definit o no existeix";
-					firmaStatus.setErrorMsg(msg);
-					MissatgesHelper.error(
-							request,
-							getMessage(
-									request, 
-									"document.controller.firma.passarela.final.ok.nofile"),
-							null);
-				} else {
-					FileInputStream fis = new FileInputStream(firmaStatus.getSignedData());
-					EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-					String identificador = expedientTascaService.generarIdentificadorFirmaClient(
-							entitatActual.getId(),
-							tascaId,
-							documentId);
-					expedientTascaService.processarFirmaClient(
-							null,
-							null,
-							firmaStatus.getSignedData().getName(),
-							IOUtils.toByteArray(fis), tascaId);
-					MissatgesHelper.success(
-							request,
-							getMessage(
-									request, 
-									"document.controller.firma.passarela.final.ok"));
-				}
-			} else {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request, 
-								"document.controller.firma.passarela.final.ok.statuserr"),
-						null);
-			}
-			break;
-		case StatusSignaturesSet.STATUS_FINAL_ERROR:
-			MissatgesHelper.error(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.error",
-							new Object[] {status.getErrorMsg()}),
-					null);
-			break;
-		case StatusSignaturesSet.STATUS_CANCELLED:
-			MissatgesHelper.warning(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.cancel"));
-			break;
-		default:
-			MissatgesHelper.warning(
-					request,
-					getMessage(
-							request, 
-							"document.controller.firma.passarela.final.desconegut"));
-		}
-		passarelaFirmaHelper.closeTransactionInWS(
-				request,
-				signaturesSet);
-		boolean ignorarModal = false;
-		String ignorarModalIdsProperty = aplicacioService.propertyPluginPassarelaFirmaIgnorarModalIds();
-		if (ignorarModalIdsProperty != null && !ignorarModalIdsProperty.isEmpty()) {
-			String[] ignorarModalIds = ignorarModalIdsProperty.split(",");
-			for (String ignorarModalId: ignorarModalIds) {
-				if (StringUtils.isNumeric(ignorarModalId)) {
-					if (ignorarModalId == signaturesSet.getPluginId()) {
-						ignorarModal = true;
-						break;
-					}
-				}
-			}
-		}
-		if (ignorarModal) {
-			return "redirect:/contingut/" + documentId;
-		} else {
-			return getModalControllerReturnValueSuccess(
-					request, 
-					"redirect:/contingut/" + documentId,
-					null);
-		}
-	}
 	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {

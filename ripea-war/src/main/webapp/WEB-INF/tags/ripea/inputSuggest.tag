@@ -20,6 +20,7 @@
 <%@ attribute name="suggestTextAddicional" required="false" rtexprvalue="true"%>
 <%@ attribute name="urlParamAddicional" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
+<%@ attribute name="icon2" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
 
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
@@ -68,6 +69,9 @@
 							data-url-param-addicional="${urlParamAddicional}" 
 							multiple="${multiple}"
 							data-idioma="${idioma}"/>
+							<c:if test="${not empty icon2}">
+								<a class="input-group-addon btn btn-default ${campPath}_btn2"><i class="${icon2}"></i></a>		
+							</c:if>							
 							<a class="input-group-addon btn btn-default ${campPath}_btn" onclick="toggleCarrecs()"><i class="${icon}"></i></a>
 					</div>
 					<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>

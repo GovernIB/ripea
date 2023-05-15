@@ -114,8 +114,7 @@ public interface ExpedientTascaService {
 			Long id, 
 			Long tascaId);
 
-	public void enviarEmailCrearTasca(
-			Long expedientTascaId);
+
 
 	public ExpedientTascaDto canviarTascaEstat(Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,

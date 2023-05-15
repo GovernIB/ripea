@@ -67,7 +67,10 @@ import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
  */
 public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implements NotificacioPlugin {
 
-	private boolean test = false; //test = true;
+	private boolean test = false; //test = true; //if true then automatic callback with testIdentificador and testReferncia
+	private String testIdentificador = "047a9033-de0e-452e-aada-a51825d0a886";
+	private String testReferencia = "4a1d3b1c-1e7b-4883-8968-54f770a39ee6";
+	
 	private NotificacioRestClientV2 clientV2;
 
 	public NotificacioPluginNotib() {
@@ -242,6 +245,11 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	public RespostaConsultaEstatNotificacio consultarNotificacio(
 			String identificador) throws SistemaExternException {
 		try {
+			
+			if (test) {
+				identificador = testIdentificador;
+			}
+			
 			RespostaConsultaEstatNotificacioV2 respostaConsultaEstat = getNotificacioRestClient().consultaEstatNotificacio(identificador);
 
 			RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
@@ -267,7 +275,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		try {
 			
 			if (test) {
-				referencia = "40cafe28-dfd1-4570-a472-0d10afc2de22";
+				referencia = testReferencia;
 			}
 			
 			RespostaConsultaEstatEnviamentV2 respostaConsultaEstat = getNotificacioRestClient().consultaEstatEnviament(referencia);

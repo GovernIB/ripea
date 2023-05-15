@@ -50,7 +50,7 @@ public class FirmaServidorPluginTest {
 		TipusFirma tipusFirma = TipusFirma.CADES;
 		byte[] contingut = new byte[0];
 		FirmaServidorPlugin signaturaPlugin = new FirmaServidorPluginMock();
-		SignaturaResposta signatura = signaturaPlugin.firmar(nom, motiu, contingut, "ca");
+		SignaturaResposta signatura = signaturaPlugin.firmar(nom, motiu, contingut, "ca", null);
 		assertNotNull("La firma retornada no pot ser nul·la", signatura);
 		assertNotNull("El contingut de la firma retornada no pot ser nul", signatura.getContingut());
 	}
@@ -63,7 +63,7 @@ public class FirmaServidorPluginTest {
 		byte[] contingut = new byte[0];
 		FirmaServidorPlugin signaturaPlugin = new FirmaServidorPluginMock();
 		try {
-			signaturaPlugin.firmar(nom, motiu, contingut, "ca");
+			signaturaPlugin.firmar(nom, motiu, contingut, "ca", null);
 			fail("S'esperava una excepció quan el motiu és \"e\".");
 		} catch (Exception e) {
 		}

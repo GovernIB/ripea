@@ -484,13 +484,15 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 					carrec.setCarrecName(carrecWs.getCarrecName());
 					carrec.setEntitatId(carrecWs.getEntitatID());
 					carrec.setUsuariPersonaId(carrecWs.getUsuariPersonaID());
-					UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
-					if (usuariPersona != null) {
-						carrec.setUsuariPersonaNif(usuariPersona.getNif());
-						carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
-						carrec.setUsuariPersonaNom(usuariPersona.getNom());
-					} else {
-						throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+					if (carrecMostrarPersona()) {
+						UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+						if (usuariPersona != null) {
+							carrec.setUsuariPersonaNif(usuariPersona.getNif());
+							carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
+							carrec.setUsuariPersonaNom(usuariPersona.getNom());
+						} else {
+							throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+						}
 					}
 					carrecs.add(carrec);
 				}
@@ -511,14 +513,17 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 				carrec.setCarrecName(carrecWs.getCarrecName());
 				carrec.setEntitatId(carrecWs.getEntitatID());
 				carrec.setUsuariPersonaId(carrecWs.getUsuariPersonaID());
-				UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
-				if (usuariPersona != null) {
-					carrec.setUsuariPersonaNif(usuariPersona.getNif());
-					carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
-					carrec.setUsuariPersonaNom(usuariPersona.getNom());
-				} else {
-					throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+				if (carrecMostrarPersona()) {
+					UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+					if (usuariPersona != null) {
+						carrec.setUsuariPersonaNif(usuariPersona.getNif());
+						carrec.setUsuariPersonaEmail(usuariPersona.getEmail());
+						carrec.setUsuariPersonaNom(usuariPersona.getNom());
+					} else {
+						throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + carrecWs.getUsuariPersonaID() + " relacionat amb aquest càrrec");
+					}
 				}
+
 			}
 			return carrec;
 		} catch (Exception ex) {
@@ -526,47 +531,49 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		}
 	}
 
-	@Override
-	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(
-			String idPlantilla, 
-			String idTransaccio, 
-			boolean portafirmesFluxAsync,
-			Long portafirmesId,
-			String idioma)
-			throws SistemaExternException {
-		List<FlowTemplateSimpleBlock> blocks = null;
-		try {
-			if (portafirmesFluxAsync) {
-				if (idPlantilla != null) {
-					FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest();
-					request.setFlowTemplateId(idPlantilla);
-					request.setLanguageUI(idioma);
-					
-					FlowTemplateSimpleFlowTemplate resultPlantilla = getFluxDeFirmaClient().getFlowInfoByFlowTemplateID(request);
-					blocks = resultPlantilla.getBlocks();
-				}
-				if (idTransaccio != null) {
-					//sobreescriu l'anterior
-					FlowTemplateSimpleGetFlowResultResponse resultTransaccio = getFluxDeFirmaClient().getFlowTemplateResult(idTransaccio);
-					blocks = resultTransaccio.getFlowInfo().getBlocks();
-					
-					try {
-						closeTransaction(idTransaccio);
-					} catch (Exception ex) {
-						throw new SistemaExternException("S'ha produit un error tancant la transacció", ex);
-					}
-				}
-				return asyncBlockToPortafirmesBlockInfo(blocks);
-			} else {
-				PeticioDeFirmaWs peticioFirmaSimple = getPeticioDeFirmaWs().getPeticioDeFirma(portafirmesId);
-				FluxDeFirmesWs fluxFirma = peticioFirmaSimple.getFluxDeFirmes();
-				List<BlocDeFirmesWs> blocs = fluxFirma.getBlocsDeFirmes();
-				return simpleBlockToPortafirmesBlockInfo(blocs);
-			}
-		} catch (Exception ex) {
-			throw new SistemaExternException("S'ha produit un error transformant en l'objecte FirmaAsyncSimpleSignatureBlock[]", ex);
-		}
-	}
+
+//	@Override
+//	public List<PortafirmesBlockInfo> recuperarBlocksFirmes(
+//			String idPlantilla, 
+//			String idTransaccio, 
+//			boolean portafirmesFluxAsync,
+//			Long portafirmesId,
+//			String idioma)
+//			throws SistemaExternException {
+//		List<FlowTemplateSimpleBlock> blocks = null;
+//		try {
+//			if (portafirmesFluxAsync) {
+//				if (idPlantilla != null) {
+//					FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest();
+//					request.setFlowTemplateId(idPlantilla);
+//					request.setLanguageUI(idioma);
+//					
+//					FlowTemplateSimpleFlowTemplate resultPlantilla = getFluxDeFirmaClient().getFlowInfoByFlowTemplateID(request);
+//					blocks = resultPlantilla.getBlocks();
+//				}
+//				if (idTransaccio != null) {
+//					//sobreescriu l'anterior
+//					FlowTemplateSimpleGetFlowResultResponse resultTransaccio = getFluxDeFirmaClient().getFlowTemplateResult(idTransaccio);
+//					blocks = resultTransaccio.getFlowInfo().getBlocks();
+//					
+//					try {
+//						closeTransaction(idTransaccio);
+//					} catch (Exception ex) {
+//						throw new SistemaExternException("S'ha produit un error tancant la transacció", ex);
+//					}
+//				}
+//				return asyncBlockToPortafirmesBlockInfo(blocks);
+//			} else {
+//				PeticioDeFirmaWs peticioFirmaSimple = getPeticioDeFirmaWs().getPeticioDeFirma(portafirmesId);
+//				FluxDeFirmesWs fluxFirma = peticioFirmaSimple.getFluxDeFirmes();
+//				List<BlocDeFirmesWs> blocs = fluxFirma.getBlocsDeFirmes();
+//				return simpleBlockToPortafirmesBlockInfo(blocs);
+//			}
+//		} catch (Exception ex) {
+//			throw new SistemaExternException("S'ha produit un error transformant en l'objecte FirmaAsyncSimpleSignatureBlock[]", ex);
+//		}
+//	}
+
 	
 	@Override
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
@@ -582,132 +589,132 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return urlFluxFirmes;
 	}
 
-	private List<PortafirmesBlockInfo> simpleBlockToPortafirmesBlockInfo(List<BlocDeFirmesWs> blocks) throws SistemaExternException {
-		List<PortafirmesBlockInfo> portafirmesBlocks = null;
-		try {
-			if (blocks != null) {
-				Collections.sort(blocks, new Comparator<BlocDeFirmesWs>() {
-					@Override
-					public int compare(BlocDeFirmesWs o1, BlocDeFirmesWs o2) {
-						if (o1.getOrdre() < o2.getOrdre())
-							return -1;
-						else
-							return 1;
-					}
-				});
-				portafirmesBlocks = new ArrayList<PortafirmesBlockInfo>();
-				for (BlocDeFirmesWs blocDeFirmesWs : blocks) {
-					PortafirmesBlockInfo portafirmesBlock = new PortafirmesBlockInfo();
-					List<PortafirmesBlockSignerInfo> signers = new ArrayList<PortafirmesBlockSignerInfo>();
-					
-					for (FirmaBean firmaBean : blocDeFirmesWs.getFirmes()) {
-						PortafirmesBlockSignerInfo signer = new PortafirmesBlockSignerInfo();
-						UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(firmaBean.getDestinatariID());
-						if (usuariEntitat != null) {
-							String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
-							UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
-							if (usuariPersona != null) {
-								signer.setSignerId(usuariPersona.getNif());
-								signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-								CarrecWs carrec = getUsuariEntitatWs().getCarrec(firmaBean.getDestinatariID());
-								if (carrec != null && carrec.getCarrecName() != null)
-									signer.setSignerNom(carrec.getCarrecName());
-								else
-									signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
-								signers.add(signer);
-							} else {
-								throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
-							}
-						} else {
-							throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + firmaBean.getDestinatariID());
-						}
-					}
-					portafirmesBlock.setSigners(signers);
-					portafirmesBlocks.add(portafirmesBlock);
-				}
-			}
-		} catch (Exception ex) {
-			throw new SistemaExternException(ex);
-		}
-		return portafirmesBlocks;
-	}
+//	private List<PortafirmesBlockInfo> simpleBlockToPortafirmesBlockInfo(List<BlocDeFirmesWs> blocks) throws SistemaExternException {
+//		List<PortafirmesBlockInfo> portafirmesBlocks = null;
+//		try {
+//			if (blocks != null) {
+//				Collections.sort(blocks, new Comparator<BlocDeFirmesWs>() {
+//					@Override
+//					public int compare(BlocDeFirmesWs o1, BlocDeFirmesWs o2) {
+//						if (o1.getOrdre() < o2.getOrdre())
+//							return -1;
+//						else
+//							return 1;
+//					}
+//				});
+//				portafirmesBlocks = new ArrayList<PortafirmesBlockInfo>();
+//				for (BlocDeFirmesWs blocDeFirmesWs : blocks) {
+//					PortafirmesBlockInfo portafirmesBlock = new PortafirmesBlockInfo();
+//					List<PortafirmesBlockSignerInfo> signers = new ArrayList<PortafirmesBlockSignerInfo>();
+//					
+//					for (FirmaBean firmaBean : blocDeFirmesWs.getFirmes()) {
+//						PortafirmesBlockSignerInfo signer = new PortafirmesBlockSignerInfo();
+//						UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(firmaBean.getDestinatariID());
+//						if (usuariEntitat != null) {
+//							String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
+//							UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+//							if (usuariPersona != null) {
+//								signer.setSignerId(usuariPersona.getNif());
+//								signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+//								CarrecWs carrec = getUsuariEntitatWs().getCarrec(firmaBean.getDestinatariID());
+//								if (carrec != null && carrec.getCarrecName() != null)
+//									signer.setSignerNom(carrec.getCarrecName());
+//								else
+//									signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+//								signers.add(signer);
+//							} else {
+//								throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+//							}
+//						} else {
+//							throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + firmaBean.getDestinatariID());
+//						}
+//					}
+//					portafirmesBlock.setSigners(signers);
+//					portafirmesBlocks.add(portafirmesBlock);
+//				}
+//			}
+//		} catch (Exception ex) {
+//			throw new SistemaExternException(ex);
+//		}
+//		return portafirmesBlocks;
+//	}
 	
-	private List<PortafirmesBlockInfo> asyncBlockToPortafirmesBlockInfo(List<FlowTemplateSimpleBlock> blocks)
-			throws SistemaExternException {
-		List<PortafirmesBlockInfo> portafirmesBlocks = null;
-		try {
-			if (blocks != null) {
-				Collections.sort(blocks, new Comparator<FlowTemplateSimpleBlock>() {
-					@Override
-					public int compare(FlowTemplateSimpleBlock o1, FlowTemplateSimpleBlock o2) {
-						if (o1.getOrder() < o2.getOrder())
-							return -1;
-						else
-							return 1;
-					}
-				});
-				portafirmesBlocks = new ArrayList<PortafirmesBlockInfo>();
-				for (FlowTemplateSimpleBlock flowTemplateSimpleBlock : blocks) {
-					PortafirmesBlockInfo portafirmesBlock = new PortafirmesBlockInfo();
-					List<PortafirmesBlockSignerInfo> signers = new ArrayList<PortafirmesBlockSignerInfo>();
-
-					for (FlowTemplateSimpleSignature flowTemplateSimpleSignature : flowTemplateSimpleBlock.getSignatures()) {
-
-						if (flowTemplateSimpleSignature.getSigner() != null) {
-							PortafirmesBlockSignerInfo signer = new PortafirmesBlockSignerInfo();
-							
-							if (flowTemplateSimpleSignature.getSigner().getExternalSigner() != null) {
-								FlowTemplateSimpleExternalSigner externalSigner = flowTemplateSimpleSignature.getSigner().getExternalSigner();
-								signer.setSignerId(externalSigner.getAdministrationId());	
-								signer.setSignerNom(externalSigner.getName() + " " + externalSigner.getSurnames());
-								signer.setSignerCodi(" ");
-							} else {
-								String intermediateServerUsername = flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername();
-								String positionInTheCompany = flowTemplateSimpleSignature.getSigner().getPositionInTheCompany();
-								if (intermediateServerUsername != null) {
-									UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(intermediateServerUsername);
-									if (usuariEntitat != null) {
-										String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
-										UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
-										if (usuariPersona != null) {
-											signer.setSignerId(usuariPersona.getNif());
-											signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-											signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
-										} else {
-											throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
-										}
-									} else {
-										throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + intermediateServerUsername);
-									} 
-								} else if (positionInTheCompany != null) {
-									CarrecWs carrec = getUsuariEntitatWs().getCarrec(positionInTheCompany);
-									if (carrec != null) {
-										String usuariPersonaId = carrec.getUsuariPersonaID();
-										UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
-										if (usuariPersona != null) {
-											signer.setSignerId(usuariPersona.getNif());
-											signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
-											signer.setSignerNom(carrec.getCarrecName());
-										} else {
-											throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
-										}
-									} else {
-										throw new SistemaExternException("No s'ha trobat cap càrrec amb codi " + positionInTheCompany);
-									} 
-								}
-							}
-							signers.add(signer);
-						}
-						portafirmesBlock.setSigners(signers);
-					}
-					portafirmesBlocks.add(portafirmesBlock);
-				}
-			}
-		} catch (Exception ex) {
-			throw new SistemaExternException(ex);
-		}
-		return portafirmesBlocks;
-	}
+//	private List<PortafirmesBlockInfo> asyncBlockToPortafirmesBlockInfo(List<FlowTemplateSimpleBlock> blocks)
+//			throws SistemaExternException {
+//		List<PortafirmesBlockInfo> portafirmesBlocks = null;
+//		try {
+//			if (blocks != null) {
+//				Collections.sort(blocks, new Comparator<FlowTemplateSimpleBlock>() {
+//					@Override
+//					public int compare(FlowTemplateSimpleBlock o1, FlowTemplateSimpleBlock o2) {
+//						if (o1.getOrder() < o2.getOrder())
+//							return -1;
+//						else
+//							return 1;
+//					}
+//				});
+//				portafirmesBlocks = new ArrayList<PortafirmesBlockInfo>();
+//				for (FlowTemplateSimpleBlock flowTemplateSimpleBlock : blocks) {
+//					PortafirmesBlockInfo portafirmesBlock = new PortafirmesBlockInfo();
+//					List<PortafirmesBlockSignerInfo> signers = new ArrayList<PortafirmesBlockSignerInfo>();
+//
+//					for (FlowTemplateSimpleSignature flowTemplateSimpleSignature : flowTemplateSimpleBlock.getSignatures()) {
+//
+//						if (flowTemplateSimpleSignature.getSigner() != null) {
+//							PortafirmesBlockSignerInfo signer = new PortafirmesBlockSignerInfo();
+//							
+//							if (flowTemplateSimpleSignature.getSigner().getExternalSigner() != null) {
+//								FlowTemplateSimpleExternalSigner externalSigner = flowTemplateSimpleSignature.getSigner().getExternalSigner();
+//								signer.setSignerId(externalSigner.getAdministrationId());	
+//								signer.setSignerNom(externalSigner.getName() + " " + externalSigner.getSurnames());
+//								signer.setSignerCodi(" ");
+//							} else {
+//								String intermediateServerUsername = flowTemplateSimpleSignature.getSigner().getIntermediateServerUsername();
+//								String positionInTheCompany = flowTemplateSimpleSignature.getSigner().getPositionInTheCompany();
+//								if (intermediateServerUsername != null) {
+//									UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(intermediateServerUsername);
+//									if (usuariEntitat != null) {
+//										String usuariPersonaId = usuariEntitat.getUsuariPersonaID();
+//										UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+//										if (usuariPersona != null) {
+//											signer.setSignerId(usuariPersona.getNif());
+//											signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+//											signer.setSignerNom(usuariPersona.getNom() + " " + usuariPersona.getLlinatges());
+//										} else {
+//											throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+//										}
+//									} else {
+//										throw new SistemaExternException("No s'ha trobat cap usuari entitat amb el codi " + intermediateServerUsername);
+//									} 
+//								} else if (positionInTheCompany != null) {
+//									CarrecWs carrec = getUsuariEntitatWs().getCarrec(positionInTheCompany);
+//									if (carrec != null) {
+//										String usuariPersonaId = carrec.getUsuariPersonaID();
+//										UsuariPersonaBean usuariPersona = getUsuariEntitatWs().getUsuariPersona(usuariPersonaId);
+//										if (usuariPersona != null) {
+//											signer.setSignerId(usuariPersona.getNif());
+//											signer.setSignerCodi(usuariPersona.getUsuariPersonaID());
+//											signer.setSignerNom(carrec.getCarrecName());
+//										} else {
+//											throw new SistemaExternException("No s'ha trobat cap usuari persona amb id " + usuariPersonaId);
+//										}
+//									} else {
+//										throw new SistemaExternException("No s'ha trobat cap càrrec amb codi " + positionInTheCompany);
+//									} 
+//								}
+//							}
+//							signers.add(signer);
+//						}
+//						portafirmesBlock.setSigners(signers);
+//					}
+//					portafirmesBlocks.add(portafirmesBlock);
+//				}
+//			}
+//		} catch (Exception ex) {
+//			throw new SistemaExternException(ex);
+//		}
+//		return portafirmesBlocks;
+//	}
 
 	private FirmaAsyncSimpleSignatureBlock[] recuperarFluxDeFirma(String idTransaccio) throws SistemaExternException {
 		List<FlowTemplateSimpleBlock> blocks = null;
@@ -858,7 +865,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 						String carrecName = destinatari.substring(destinatari.indexOf("[") + 1, destinatari.indexOf("]"));
 						signer.setPositionInTheCompany(carrecName);
 					} else {
-						signer.setUsername(destinatari);
+						signer.setAdministrationID(destinatari);
 					}
 					signature.setSigner(signer);
 					signatures.add(signature);
@@ -893,6 +900,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut recuperar el id de la transacció (" +
+					"portafib=" + getBaseUrl() + ", " +					
 					"nom=" + nom + ", " +
 					"descripcio=" + descripcio + ")",
 					ex);
@@ -913,6 +921,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut iniciar la transacció (" +
+					"portafib=" + getBaseUrl() + ", " +			
 					"transactionId=" + idTransaccio + ", " +
 					"returnUrl=" + urlReturn + ")",
 					ex);
@@ -972,6 +981,8 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return api;
 	}
 	
+	// currently doesn't exit equivalent in REST 
+	// email 2023.04.26 12:18: "A puntaré issue per afegir mètode a aquesta API per retornar informació de la Petició."
 	private PortaFIBPeticioDeFirmaWs getPeticioDeFirmaWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBPeticioDeFirma";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
@@ -997,6 +1008,9 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return api;
 	}
 
+	
+	// currently doesn't exit equivalent in REST
+	// email 2023.04.25 13:55: "(1.B) métodos del webservice /ws/v1/PortaFIBUsuariEntitat:  Com que aquest WS no afecta a Peticions de Firma encara no està migrat i el podeu fer servir sense problemes."
 	private PortaFIBUsuariEntitatWs getUsuariEntitatWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBUsuariEntitat";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
@@ -1042,6 +1056,12 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return getProperty(
 				"plugin.portafirmes.portafib.perfil");
 	}
+	
+	private boolean carrecMostrarPersona() {
+		return getAsBoolean(
+				"plugin.portafirmes.carrer.mostrar.persona");
+	}
+	
 	private Boolean isEnviarUrlExpedientPermitida() {
 		return Boolean.valueOf(getProperty(
 				"plugin.portafirmes.portafib.enviar.url.expedient",
