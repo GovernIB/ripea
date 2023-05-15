@@ -230,7 +230,7 @@ $(document).ready(function() {
 		<div class="tab-content">
 			<div class="tab-pane active in" id="dades" role="tabpanel">
 				<div class="portafirmes_container">
-					<div class="${not empty blocks ? 'table_container' : 'table_container_full'}">
+					<div class="${(not empty blocks || not empty urlFluxFirmes) ? 'table_container' : 'table_container_full'}">
 						<table class="table table-striped table-bordered">
 						<tbody>
 							<tr>
@@ -290,6 +290,12 @@ $(document).ready(function() {
 						</tbody>
 						</table>
 					</div>
+					<c:if test="${not empty urlFluxFirmes}">
+						<div class="blocks_container">
+							<iframe width="100%" height="100%" frameborder="0" allowtransparency="true" src="${urlFluxFirmes}"></iframe>
+						</div>
+					</c:if>
+					<%--
 					<c:if test="${not empty blocks}">
 						<div class="blocks_container">
 							<div class="signers_container">
@@ -343,6 +349,7 @@ $(document).ready(function() {
 							</div>
 						</div>
 					</c:if>
+					 --%>
 				</div>
 				<div class="buttons_container">
 					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == null}">

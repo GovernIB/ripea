@@ -187,34 +187,34 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				DocumentEstatEnumDto.FIRMA_PENDENT);
 		logAll(document, documentPortafirmes, LogTipusEnumDto.PFIRMA_ENVIAMENT);
 		
-		String idioma = aplicacioService.getUsuariActual().getIdioma();
-		List<PortafirmesBlockDto> portafirmesBlocks = pluginHelper.portafirmesRecuperarBlocksFirma(
-				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
-				transaccioId,
-				portafirmesFluxTipus.equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB),
-				documentPortafirmes.getPortafirmesId(),
-				idioma);
-
-		if (portafirmesBlocks != null) {
-			int i = 1;
-			for (PortafirmesBlockDto portafirmesBlock : portafirmesBlocks) {
-				PortafirmesBlockEntity portafirmesBlockEntity = PortafirmesBlockEntity.getBuilder(
-						documentPortafirmes,
-						i).build();
-	
-				portafirmesBlockRepository.save(portafirmesBlockEntity);
-				for (PortafirmesBlockInfoDto portafirmesBlockInfo : portafirmesBlock.getSigners()) {
-					PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = PortafirmesBlockInfoEntity.getBuilder(
-							portafirmesBlockEntity, 
-							portafirmesBlockInfo.getSignerNom(),
-							portafirmesBlockInfo.getSignerCodi(),
-							portafirmesBlockInfo.getSignerId(),
-							false).build();
-					portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
-				}
-				i++;
-			}
-		}
+//		String idioma = aplicacioService.getUsuariActual().getIdioma();
+//		List<PortafirmesBlockDto> portafirmesBlocks = pluginHelper.portafirmesRecuperarBlocksFirma(
+//				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
+//				transaccioId,
+//				portafirmesFluxTipus.equals(MetaDocumentFirmaFluxTipusEnumDto.PORTAFIB),
+//				documentPortafirmes.getPortafirmesId(),
+//				idioma);
+//
+//		if (portafirmesBlocks != null) {
+//			int i = 1;
+//			for (PortafirmesBlockDto portafirmesBlock : portafirmesBlocks) {
+//				PortafirmesBlockEntity portafirmesBlockEntity = PortafirmesBlockEntity.getBuilder(
+//						documentPortafirmes,
+//						i).build();
+//	
+//				portafirmesBlockRepository.save(portafirmesBlockEntity);
+//				for (PortafirmesBlockInfoDto portafirmesBlockInfo : portafirmesBlock.getSigners()) {
+//					PortafirmesBlockInfoEntity portafirmesBlockInfoEntity = PortafirmesBlockInfoEntity.getBuilder(
+//							portafirmesBlockEntity, 
+//							portafirmesBlockInfo.getSignerNom(),
+//							portafirmesBlockInfo.getSignerCodi(),
+//							portafirmesBlockInfo.getSignerId(),
+//							false).build();
+//					portafirmesBlockInfoRepository.save(portafirmesBlockInfoEntity);
+//				}
+//				i++;
+//			}
+//		}
 	}
 	
 	public DocumentPortafirmesDto portafirmesInfo(
@@ -658,6 +658,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		EntitatDto entitat = conversioTipusHelper.convertir(documentPortafirmes.getDocument().getEntitat(), EntitatDto.class);
 		ConfigHelper.setEntitat(entitat);
 		
+		//TODO: Esborrar després d'assegurar que la url de portafib (#1261) no dona problemes
 		actualitzarBlocksPortafirmes(
 				callbackEstat, 
 				documentPortafirmes,
