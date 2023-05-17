@@ -1366,14 +1366,17 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional
 	@Override
-	public CrearReglaResponseDto activarReglaDistribucio(Long metaExpedientId) {
+	public CrearReglaResponseDto canviarEstatReglaDistribucio(
+			Long metaExpedientId, 
+			boolean activa) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
 		metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PENDENT);
 
 		try {
 
-			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.activarRegla(
-					metaExpedient.getClassificacioSia());
+			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.canviEstat(
+					metaExpedient.getClassificacioSia(), 
+					activa);
 
 			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
 				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);

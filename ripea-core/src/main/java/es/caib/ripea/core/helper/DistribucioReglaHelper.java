@@ -62,10 +62,11 @@ public class DistribucioReglaHelper  {
 
 	}
 	
-	public CrearReglaResponseDto activarRegla(
-			String sia)  {
+	public CrearReglaResponseDto canviEstat(
+			String sia, 
+			boolean activa)  {
 		
-		logger.debug("Creant regla en distribucio (sia=" + sia + ")");
+		logger.debug("Canviant estat de la regla en distribucio (sia=" + sia + ")");
 		
 		try {
 			// Creació del client
@@ -77,12 +78,12 @@ public class DistribucioReglaHelper  {
 
 			ClientResponse response = client.canviEstat(
 					sia,
-					true);
+					activa);
 			int status = response.getStatus();
 			String reasonPhrase = response.getStatusInfo().getReasonPhrase();
 			String resp = response.getEntity(String.class);
 
-			logger.debug("Resposta de la creació de la regla " + status + " " + reasonPhrase + ": " + resp);
+			logger.debug("Resposta de la canvi d'estat de la regla " + status + " " + reasonPhrase + ": " + resp);
 
 			StatusEnumDto statusEnumDto = StatusEnumDto.ERROR;
 			if (status == 200) {
@@ -91,7 +92,7 @@ public class DistribucioReglaHelper  {
 				statusEnumDto = StatusEnumDto.WARNING;
 			} else {
 				statusEnumDto = StatusEnumDto.ERROR;
-				logger.error("Error retornat al crear regla en distribucio: " + status + " " + reasonPhrase + ": " + resp);
+				logger.error("Error retornat al canvi d'estat de la regla en distribucio: " + status + " " + reasonPhrase + ": " + resp);
 			}
 
 			return new CrearReglaResponseDto(

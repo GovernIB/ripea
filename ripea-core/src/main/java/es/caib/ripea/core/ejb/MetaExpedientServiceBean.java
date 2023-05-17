@@ -477,9 +477,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public CrearReglaResponseDto activarReglaDistribucio(
-			Long metaExpedientId) {
-		return delegate.activarReglaDistribucio(metaExpedientId);
+	public CrearReglaResponseDto canviarEstatReglaDistribucio(
+			Long metaExpedientId, 
+			boolean activa) {
+		return delegate.canviarEstatReglaDistribucio(
+				metaExpedientId, 
+				activa);
 	}
 
 //    @Override
