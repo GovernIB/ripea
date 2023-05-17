@@ -179,7 +179,7 @@ public class DocumentHelper {
 			entity.setGesDocAdjuntFirmaId(gestioDocumentalAdjuntFirmaId);
 		}
 		
-		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null);
 		
 		try {
 			if (entity.getExpedient().getArxiuUuid() != null) {
@@ -284,8 +284,11 @@ public class DocumentHelper {
 //	
 	
 	
-	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus) {
-		return documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu() ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
+	public ArxiuEstatEnumDto getArxiuEstat(DocumentFirmaTipusEnumDto documentFirmaTipus, DocumentEstatEnumDto estatAnterior) {
+		boolean isFirmatPujatArxiu = documentFirmaTipus != DocumentFirmaTipusEnumDto.SENSE_FIRMA && isFirmatPujatManualmentDefinitu();
+		boolean isEsborranyConvertit = documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA && (estatAnterior != null && estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU));
+		
+		return (isFirmatPujatArxiu || isEsborranyConvertit) ? ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
 	}
 	
 	public ArxiuFirmaDto getArxiuFirmaPades(String nom, byte[] contingut){
@@ -406,7 +409,7 @@ public class DocumentHelper {
 
 		boolean newFitxer = document.getFitxerContingut() != null;
 		boolean newFirma = document.getFirmaContingut() != null;
-		
+		DocumentEstatEnumDto estatAnterior = documentEntity.getEstat();
 		
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
 			
@@ -426,12 +429,15 @@ public class DocumentHelper {
 					document,
 					arxiuDocument);
 			
-			firmes = validaFirmaDocument(
-					documentEntity, 
-					fitxer,
-					null, 
-					false, 
-					true);
+			// No tornar a validar firma si el document està definitiu a l'arxiu
+			if (!isDocumentDefinitiuPujatArxiu(estatAnterior)) {
+				firmes = validaFirmaDocument(
+						documentEntity, 
+						fitxer,
+						null, 
+						false, 
+						true);
+			}
 			
 			documentEntity.updateEstat(DocumentEstatEnumDto.FIRMAT);
 			
@@ -450,17 +456,22 @@ public class DocumentHelper {
 				firmaContingut = getFirmaDetachedFromArxiuDocument(arxiuDocument);
 			}
 			
-			firmes = validaFirmaDocument(
-					documentEntity, 
-					fitxer,
-					firmaContingut, 
-					false, 
-					true);
-			
+			// No tornar a validar firma si el document està definitiu a l'arxiu
+			if (!isDocumentDefinitiuPujatArxiu(estatAnterior)) {
+				firmes = validaFirmaDocument(
+						documentEntity, 
+						fitxer,
+						firmaContingut, 
+						false, 
+						true);
+			}
 			documentEntity.updateEstat(DocumentEstatEnumDto.FIRMAT);
 			
 		}
 		
+		if ((estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU) || estatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) && isConversioDefinitiuActiu()) {
+			documentEntity.updateEstat(estatAnterior);
+		}
 		
 		// Al modificar el document, eliminam l'alerta de document invàlid,
 		// i el passam de importat a digital, ja que no és el mateix document que haviem importat
@@ -481,7 +492,7 @@ public class DocumentHelper {
 
 		if (arxiuDocument == null || arxiuDocument.getEstat() == DocumentEstat.ESBORRANY || isPropagarModificacioDefinitiusActiva()) {
 
-			ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+			ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, estatAnterior);
 
 			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 				pluginHelper.arxiuPropagarFirmaSeparada(
@@ -499,6 +510,10 @@ public class DocumentHelper {
 		}
 
 		return dto;
+	}
+	
+	private boolean isDocumentDefinitiuPujatArxiu(DocumentEstatEnumDto estatDocument) {
+		return isFirmatPujatManualmentDefinitu() && (estatDocument.equals(DocumentEstatEnumDto.DEFINITIU) || estatDocument.equals(DocumentEstatEnumDto.CUSTODIAT));		
 	}
 	
 	private FitxerDto fitxer(
@@ -632,7 +647,8 @@ public class DocumentHelper {
 			//		}
 				}
 			}
-			ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.ESBORRANY;
+			boolean documentDefinitiu = documentEntity.getEstat().equals(DocumentEstatEnumDto.DEFINITIU) || documentEntity.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT);
+			ArxiuEstatEnumDto arxiuEstat = (isConversioDefinitiuActiu() && documentDefinitiu) ?  ArxiuEstatEnumDto.DEFINITIU : ArxiuEstatEnumDto.ESBORRANY;
 			contingutHelper.arxiuPropagarModificacio(
 					documentEntity,
 					fitxer,
@@ -1280,7 +1296,7 @@ public class DocumentHelper {
 							true);
 				}
 		
-				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus);
+				ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null);
 				
 				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 					pluginHelper.arxiuPropagarFirmaSeparada(
@@ -1416,6 +1432,9 @@ public class DocumentHelper {
 	}
 	public boolean isPropagarConversioDefinitiuActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu.propagar.arxiu");
+	}
+	public boolean isConversioDefinitiuActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu");
 	}
 	public boolean isPropagarModificacioDefinitiusActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.propagar.modificacio.arxiu");

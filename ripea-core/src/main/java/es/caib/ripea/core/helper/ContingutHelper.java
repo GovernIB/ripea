@@ -1703,8 +1703,9 @@ public class ContingutHelper {
 		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
 		
 		if (arxiuEstat == ArxiuEstatEnumDto.DEFINITIU) {
-			
-			if (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL)) {
+			boolean ambFirmes = firmes != null && ! firmes.isEmpty();
+			if ((!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) && ! isConversioDefinitiuActiu())
+					|| (!document.getEstat().equals(DocumentEstatEnumDto.FIRMA_PARCIAL) && isConversioDefinitiuActiu() && ambFirmes)) {
 				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 			}
 
@@ -2070,6 +2071,10 @@ public class ContingutHelper {
 
 	private boolean isPermesEsborrarFinals() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.esborrar.finals");
+	}
+	
+	public boolean isConversioDefinitiuActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.conversio.definitiu");
 	}
 	
 	private boolean isCertificacioAmbFirma(byte[] certificacioContingut) {

@@ -347,7 +347,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					}
 					
 					// ============================== SAVE IN ARXIU ==========================
-					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+					ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
 					if (portafirmesDocument.getTipusFirma() == null || portafirmesDocument.getTipusFirma().isEmpty() || portafirmesDocument.getTipusFirma().equals("PAdES")) {
 						
 						List<ArxiuFirmaDto> firmes = null;

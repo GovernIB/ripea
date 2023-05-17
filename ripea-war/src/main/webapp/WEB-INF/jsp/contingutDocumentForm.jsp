@@ -548,73 +548,79 @@ function removeLoading() {
 			<rip:inputText name="ntiIdDocumentoOrigen" textKey="contingut.document.form.camp.id.doc.origen" required="true" comment="contingut.document.form.camp.id.doc.origen.comtentari"/>
 		</div>
 <%--		<c:if test="${documentCommand.documentTipus != 'IMPORTAT' && isPermesModificarCustodiatsVar}">--%>
-		<c:if test="${!documentCommand.arxiuEstatDefinitu || isPermesModificarCustodiatsVar}">
-			<ul class="nav nav-tabs" role="tablist">
-				<li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
-				<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
-			</ul>
-			<br/>
-			<div class="tab-content">
-				<div role="tabpanel" class="tab-pane active" id="fitxer">
-					<c:choose>
-						<c:when test="${isDeteccioFirmaAutomaticaActiva}">
-							<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
-							<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
-							<div id="arxiuInput">
-								<div id="inputDoc">
-									<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
-									<c:if test="${!empty documentCommand.id && !documentCommand.validacioFirmaCorrecte}">
-										<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
-									</c:if>
+		<c:choose>
+			<c:when test="${!documentCommand.arxiuEstatDefinitu || isPermesModificarCustodiatsVar}">
+				<ul class="nav nav-tabs" role="tablist">
+					<li role="presentation" class="active"><a href="#fitxer" id="fitxerTab" class="fitxer" aria-controls="fitxer" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.fitxer"/></a></li>
+					<li role="presentation"><a href="#escaneig" id="escaneigTab" class="escaneig" aria-controls="escaneig" role="tab" data-toggle="tab"><spring:message code="contingut.document.form.camp.tab.escaneig"/></a></li>
+				</ul>
+				<br/>
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane active" id="fitxer">
+						<c:choose>
+							<c:when test="${isDeteccioFirmaAutomaticaActiva}">
+								<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>
+								<iframe id="target_iframe" name="target_iframe" style="display: none;"></iframe>
+								<div id="arxiuInput">
+									<div id="inputDoc">
+										<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+										<c:if test="${!empty documentCommand.id && !documentCommand.validacioFirmaCorrecte}">
+											<div class="alert alert-danger" style="padding-top: 5px; padding-bottom: 5px; padding-left: 10px; margin-top: -20px; margin-bottom: 0px;" role="alert"><span>${documentCommand.validacioFirmaErrorMsg}</span></div>
+										</c:if>
+									</div>
+									<div id="inputAmbFirma" class="hidden">
+										<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
+									</div>
+									<div id="input-firma" class="hidden">
+										<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
+										<div id="input-firma-arxiu" class="hidden">
+											<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}" fileName="${documentCommand.tipusFirma=='SEPARAT' ? 'firma_separada' : ''}"/>
+										</div>
+									</div>
 								</div>
-								<div id="inputAmbFirma" class="hidden">
-									<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-								</div>
+							</c:when>
+							<c:otherwise>
+								<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
+								<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
 								<div id="input-firma" class="hidden">
 									<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 									<div id="input-firma-arxiu" class="hidden">
-										<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}" fileName="${documentCommand.tipusFirma=='SEPARAT' ? 'firma_separada' : ''}"/>
+										<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
 									</div>
 								</div>
+							</c:otherwise>
+						</c:choose>
+					</div>
+					<div role="tabpanel" class="tab-pane" id="escaneig">
+					<c:if test="${not empty noFileScanned}">
+						<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span><spring:message code="contingut.document.form.camp.escaneig.buid"/></span></div>
+					</c:if>
+						<div class="steps">
+							<div class="col-md-12 text-center">
+								<span class="btn btn-default start-scan-btn btn-md"><spring:message code="contingut.document.form.camp.escaneig.iniciar"/> <i class="fa fa-play"></i></span>
 							</div>
-						</c:when>
-						<c:otherwise>
-							<rip:inputFile name="arxiu" textKey="contingut.document.form.camp.arxiu" required="${empty documentCommand.id}" fileName="${nomDocument}"/>
-							<rip:inputCheckbox name="ambFirma" textKey="contingut.document.form.camp.amb.firma"></rip:inputCheckbox>
-							<div id="input-firma" class="hidden">
-								<rip:inputRadio name="tipusFirma" textKey="contingut.document.form.camp.tipus.firma" botons="true" optionItems="${tipusFirmaOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-								<div id="input-firma-arxiu" class="hidden">
-									<rip:inputFile name="firma" textKey="contingut.document.form.camp.firma" required="${empty documentCommand.id}"/>
-								</div>
+							<div class="col-md-12 text-center scan-profile"></div>
+							<div class="col-md-12 text-center scan-result">
+								<c:if test="${not empty nomDocument && empty documentCommand.id}">
+									<script>
+										$('.start-scan-btn').hide();
+									</script>
+									<a class="downloadLink" href="<c:url value="/digitalitzacio/descarregarResultat/${idTransaccio}"/>">${nomDocument}</a> <br>
+									<span class='btn btn-default scan-cancel-btn'><spring:message code="contingut.document.form.camp.escaneig.cancelar"/></span>
+								</c:if>
 							</div>
-						</c:otherwise>
-					</c:choose>
-				</div>
-				<div role="tabpanel" class="tab-pane" id="escaneig">
-				<c:if test="${not empty noFileScanned}">
-					<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span><spring:message code="contingut.document.form.camp.escaneig.buid"/></span></div>
-				</c:if>
-					<div class="steps">
-						<div class="col-md-12 text-center">
-							<span class="btn btn-default start-scan-btn btn-md"><spring:message code="contingut.document.form.camp.escaneig.iniciar"/> <i class="fa fa-play"></i></span>
-						</div>
-						<div class="col-md-12 text-center scan-profile"></div>
-						<div class="col-md-12 text-center scan-result">
-							<c:if test="${not empty nomDocument && empty documentCommand.id}">
-								<script>
-									$('.start-scan-btn').hide();
-								</script>
-								<a class="downloadLink" href="<c:url value="/digitalitzacio/descarregarResultat/${idTransaccio}"/>">${nomDocument}</a> <br>
-								<span class='btn btn-default scan-cancel-btn'><spring:message code="contingut.document.form.camp.escaneig.cancelar"/></span>
-							</c:if>
-						</div>
-						<div class="col-md-12 text-center scan-back-btn hidden">
-							<span class="btn btn-default btn-lg"><spring:message code="contingut.document.form.camp.escaneig.tornar"/> <i class="fa fa-back"></i></span>
+							<div class="col-md-12 text-center scan-back-btn hidden">
+								<span class="btn btn-default btn-lg"><spring:message code="contingut.document.form.camp.escaneig.tornar"/> <i class="fa fa-back"></i></span>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</c:if>
+			</c:when>
+			<c:when test="${documentCommand.arxiuEstatDefinitu || isPermesModificarCustodiatsVar}">
+				<form:hidden path="ambFirma"/>
+				<form:hidden path="tipusFirma"/>
+			</c:when>
+		</c:choose>
 		<div class="rmodal"></div>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="crearDocumentBtnSubmit btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

@@ -1118,15 +1118,17 @@ public class PluginHelper {
 			
 		} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
 			
-			ArxiuFirmaDto primeraFirma = firmes.get(0);
-			Firma firma = getFirma(
-					primeraFirma.getFitxerNom(),
-					primeraFirma.getTipusMime(),
-					primeraFirma.getContingut(),
-					primeraFirma.getTipus(),
-					primeraFirma.getPerfil(),
-					primeraFirma.getCsvRegulacio());
-			documentArxiu.setFirmes(Arrays.asList(firma));
+			if (firmes != null) {
+				ArxiuFirmaDto primeraFirma = firmes.get(0);
+				Firma firma = getFirma(
+						primeraFirma.getFitxerNom(),
+						primeraFirma.getTipusMime(),
+						primeraFirma.getContingut(),
+						primeraFirma.getTipus(),
+						primeraFirma.getPerfil(),
+						primeraFirma.getCsvRegulacio());
+				documentArxiu.setFirmes(Arrays.asList(firma));
+			}
 
 		} else if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 			
@@ -1152,6 +1154,15 @@ public class PluginHelper {
 			documentArxiu.setFirmes(arxiuFirmes);
 
 		}
+		
+		// És una modificació de metadades d'un document definitiu
+		if (documentArxiu.getContingut() == null && fitxer != null && isModificacioCustodiatsActiva()) {
+			documentArxiu.setContingut(
+					getDocumentContingut(
+							fitxer.getNom(),
+							fitxer.getContentType(),
+							fitxer.getContingut()));
+		} 
 
 	}
 	
@@ -3403,7 +3414,8 @@ public class PluginHelper {
 		// ========== METADADES ADDICIONALS ============
 		Map<String, Object> metadadesAddicionals = new HashMap<String, Object>();
 		if (getPropertyArxiuMetadadesAddicionalsActiu()) {
-			metadadesAddicionals.put("tipusDocumentNom", documentEntity.getMetaDocument().getNom());
+			if (documentEntity.getMetaDocument() != null)
+				metadadesAddicionals.put("tipusDocumentNom", documentEntity.getMetaDocument().getNom());
 			metadadesAddicionals.put("isImportacio", DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()));
 			
 			
@@ -3423,7 +3435,7 @@ public class PluginHelper {
 		DocumentExtensio extensio = null;
 		
 		String fitxerNom = null;
-		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA && ! isModificacioCustodiatsActiva()) {
 			ArxiuFirmaDto primeraFirma = firmes.get(0);
 			fitxerNom = primeraFirma.getFitxerNom();
 		} 
@@ -4504,7 +4516,9 @@ public class PluginHelper {
 	public boolean isPropagarNumeroExpedientActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.numero.expedient.propagar.arxiu");
 	}
-	
+	public boolean isModificacioCustodiatsActiva() {
+		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
+	}
 	public void setArxiuPlugin(String entitatCodi, IArxiuPlugin arxiuPlugin) {
 		arxiuPlugins.put(entitatCodi, arxiuPlugin);
 	}
