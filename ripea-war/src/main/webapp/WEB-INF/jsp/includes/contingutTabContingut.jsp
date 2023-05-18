@@ -948,8 +948,8 @@ $(document).ready(function() {
 	                if (!isPdf) {
 	                    isTotPdf = false;
 	                }
-		    		var isPendentGuardarArxiu = $('#grid-documents').find('li#' + docId).hasClass('docAdjuntPendentGuardarArxiu');
-	                if (!isPendentGuardarArxiu) {
+		    		var isPendentGuardarArxiu = $('#grid-documents').find('li#' + docId).hasClass('isPendentGuardarEnArxiu');
+	                if (isPendentGuardarArxiu) {
 	                	isTotGuardatEnArxiu = false;
 	                }
 		    	}
@@ -965,26 +965,26 @@ $(document).ready(function() {
 	                if (!isPdf) {
 	                    isTotPdf = false;
 	                }
-		    		var isPendentGuardarArxiu = $('#table-documents').find('tr#' + docId).hasClass('docAdjuntPendentGuardarArxiu');
-	                if (!isPendentGuardarArxiu) {
+		    		var isPendentGuardarArxiu = $('#table-documents').find('tr#' + docId).hasClass('isPendentGuardarEnArxiu');
+	                if (isPendentGuardarArxiu) {
 	                	isTotGuardatEnArxiu = false;
 	                }
 		    	}
 		    }
 
 		    
-		    if (isTotFirmat) {
+		    if (isTotFirmat && isTotGuardatEnArxiu) {
 			    
-		    	if (isTotPdf && ${isConcatentarMultiplePDFs}) {
-
+		    	if (isTotPdf && ${isConcatentarMultiplePDFs}) { // if concatanate
+					// then show modal maximized
 		    		$('#notificar-mult a').data('maximized', 'true');
 		    		$('#notificar-mult a.btn.btn-default').off();
 		    		$('#notificar-mult a').removeData('webutilModal');
 		    		$('#notificar-mult a').webutilModal();
 
-			    } else {
-
-			    	$('#notificar-mult a').data('maximized', 'false');
+			    } else { // if zip
+			    	// then show modal not maximized
+			    	$('#notificar-mult a').removeData('maximized');
 			    	$('#notificar-mult a.btn.btn-default').off();
 		    		$('#notificar-mult a').removeData('webutilModal');
 			    	$('#notificar-mult a').webutilModal();
@@ -1572,7 +1572,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 													</c:if>
 											
 													<tr id="${fill.id}"
-														class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+														class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
 														data-expedient-id="${expedientId}" 
 														data-node="treetable-${fill.id}"
 														data-pnode="treetable-${entry.key.id}">
@@ -1738,7 +1738,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 													</c:if>
 											
 													<tr id="${fill.id}"
-														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
 														data-expedient-id="${expedientId}" 
 														data-node="treetable-${fill.id}"
 														data-pnode="treetable-${entry.key.id}">
@@ -1906,7 +1906,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 									</c:if>
 
 									<li id="${fill.id}"
-										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>">
+										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>">
 										<div id="${fill.id}" class="thumbnail element-noclick">
 											<div class="text-center">
 												<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true" />

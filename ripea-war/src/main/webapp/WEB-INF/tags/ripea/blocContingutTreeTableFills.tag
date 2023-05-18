@@ -22,7 +22,7 @@
 		</c:if>
 
 		<tr id="${fill.id}"
-			class="element-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+			class="element-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
 			data-expedient-id="${expedient.id}" 
 			data-node="treetable-${fill.id}"
 			data-pnode="treetable-${contingut.id}">
