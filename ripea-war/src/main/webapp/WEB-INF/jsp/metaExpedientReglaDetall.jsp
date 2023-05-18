@@ -66,10 +66,10 @@ $(document).ready(function() {
 				<dd>
 					<c:choose>
 						<c:when test="${regla.activa}">
-							<span class="fa fa-check" style="color:green;"></span>
+							<span class="fa fa-check" style="color:green;"></span> <a href="<c:url value="/modal/metaExpedient/${metaExpedient.id}/canviarEstatReglaDistribucio/false"/>" class="btn btn-xs btn-default btn-load" style="margin-left: 10px;"><span class="fa fa-close"></span> <spring:message code="metaexpedient.list.accio.boto.desactivar.regla"/></a>
 						</c:when>
 						<c:otherwise>
-							<span class="fa fa-close" style="color:red;"></span> <a href="<c:url value="/modal/metaExpedient/${metaExpedient.id}/reglaActivar"/>" class="btn btn-xs btn-default btn-load" style="margin-left: 10px;"><span class="fa fa-check"></span> <spring:message code="metaexpedient.list.accio.boto.activar.regla"/></a>
+							<span class="fa fa-close" style="color:red;"></span> <a href="<c:url value="/modal/metaExpedient/${metaExpedient.id}/canviarEstatReglaDistribucio/true"/>" class="btn btn-xs btn-default btn-load" style="margin-left: 10px;"><span class="fa fa-check"></span> <spring:message code="metaexpedient.list.accio.boto.activar.regla"/></a>
 						</c:otherwise>
 					</c:choose>
 				</dd>			

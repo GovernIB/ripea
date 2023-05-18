@@ -817,12 +817,17 @@ public class MetaExpedientController extends BaseAdminController {
 		
 	}
 	
-	@RequestMapping(value = "/{metaExpedientId}/reglaActivar", method = RequestMethod.GET)
-	public String reglaActivar(HttpServletRequest request, @PathVariable Long metaExpedientId, Model model) {
+	@RequestMapping(value = "/{metaExpedientId}/canviarEstatReglaDistribucio/{activa}", method = RequestMethod.GET)
+	public String reglaActivar(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable boolean activa,
+			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 
-		CrearReglaResponseDto crearReglaResponseDto = metaExpedientService.activarReglaDistribucio(
-				metaExpedientId);
+		CrearReglaResponseDto crearReglaResponseDto = metaExpedientService.canviarEstatReglaDistribucio(
+				metaExpedientId, 
+				activa);
 		
 		String message = getMessage(
 				request, 

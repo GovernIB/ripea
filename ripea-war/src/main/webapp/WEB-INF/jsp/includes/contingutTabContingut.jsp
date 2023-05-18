@@ -922,99 +922,109 @@ $(document).ready(function() {
 	}
 
 	function enableDisableMultipleButtons(docsIdx) {
-		var isTotFirmat = true;
-		var isTotPdf = true;
-		var isTotDocAdjuntGuardatEnArxiu = true;
-	
-		var comprovacioUrl = '<c:url value="/contingut/${contingut.id}/comprovarContingut"/>';
-		$('#loading').removeClass('hidden');
-		//lista
-		var tableDocuments = document.getElementById('table-documents');
-		$(tableDocuments).addClass("disabled");
-		//icones
-		var gridDocuments = document.getElementById('grid-documents');
-		$(gridDocuments).addClass("disabled");
-	
-			if (docsIdx != undefined && tableDocuments != undefined) {
-				var inputs = tableDocuments.querySelectorAll('tbody>tr>td>input');
-				inputs.forEach(function(input) {
-					var documentId = parseInt(input.id);
-					if (docsIdx.includes(documentId)) {
-						var isFirmatCurrentDocument = $(input.closest('tr')).hasClass('firmat');
-						var isPdfCurrentDocument = $(input.closest('tr')).hasClass('isPdf');
-						var isDocAdjuntPendentGuardarArxiu = $(input.closest('tr')).hasClass('docAdjuntPendentGuardarArxiu');
-						if (isDocAdjuntPendentGuardarArxiu) {
-							isTotDocAdjuntGuardatEnArxiu = false;
-						}
-						
-						if (!isFirmatCurrentDocument) {
-							isTotFirmat = false;
-							return false;
-						}
-						if (!isPdfCurrentDocument) {
-							isTotPdf = false;
-						}
-					}
-				});
-	
-			} else if (docsIdx != undefined && gridDocuments != undefined) {
-				var list = gridDocuments.querySelectorAll('li');
-				list.forEach(function(child) {
-					var childId = $(child).attr('id');
-					var documentId = parseInt(childId);
-					if (docsIdx.includes(documentId)) {
-						var isFirmatCurrentDocument = $(child).hasClass('firmat');
-						var isPdfCurrentDocument = $(child).hasClass('isPdf');
-						var isDocAdjuntPendentGuardarArxiu = $(child).hasClass('docAdjuntPendentGuardarArxiu');
-						if (isDocAdjuntPendentGuardarArxiu) {
-							isTotDocAdjuntGuardatEnArxiu = false;
-						}
-						
-						if (!isFirmatCurrentDocument) {
-							isTotFirmat = false;
-							return false;
-						}
-						if (!isPdfCurrentDocument) {
-							isTotPdf = false;
-						}
-					}
-				});
-			}		
+		
+	    $('#loading').removeClass('hidden');
+	    $('#table-documents').addClass("disabled");
+	    $('#grid-documents ').addClass("disabled");
 
-	
-		
-		if (isTotFirmat && isTotPdf && ${isConcatentarMultiplePDFs}) {
-			$('.nomaximized').addClass('hidden'); //zip
-			$('.maximized').removeClass('hidden'); //concatenació
-			$('#notificar-mult').removeClass("disabled");
-			$('#definitiu-mult').addClass("disabled");
-		} else if (isTotFirmat) {
-			$('.nomaximized').removeClass('hidden'); //zip
-			$('.maximized').addClass('hidden'); //concatenació
-			$('#notificar-mult').removeClass("disabled");
-			$('#definitiu-mult').addClass("disabled");
-		} else if (!isTotDocAdjuntGuardatEnArxiu) {
-			$('#definitiu-mult').addClass("disabled");
-			$('#tipusdocumental-mult').addClass("disabled");
+	    var textNotificar = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>';
+	    var textNotificarNomesFirmats = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar.nomes.firmats"/>';
+
+
+	    if (docsIdx != undefined && docsIdx.length > 0) { // if at least one row is selected
+
+		    var isTotFirmat = true;
+		    var isTotPdf = true;
+		    var isTotGuardatEnArxiu = true;
+
+
+		    if ($('#vistaGrid').hasClass('active')) { // if view grid 
+		    	for (docId of docsIdx) {
+		    		var isFirmat = $('#grid-documents').find('li#' + docId).hasClass('firmat');
+		    		if (!isFirmat) {
+		    			isTotFirmat = false;
+					}
+		    		var isPdf = $('#grid-documents').find('li#' + docId).hasClass('isPdf');
+	                if (!isPdf) {
+	                    isTotPdf = false;
+	                }
+		    		var isPendentGuardarArxiu = $('#grid-documents').find('li#' + docId).hasClass('isPendentGuardarEnArxiu');
+	                if (isPendentGuardarArxiu) {
+	                	isTotGuardatEnArxiu = false;
+	                }
+		    	}
+
+		    } else { // if any other view
+
+		    	for (docId of docsIdx) {
+		    		var isFirmat = $('#table-documents').find('tr#' + docId).hasClass('firmat');
+		    		if (!isFirmat) {
+		    			isTotFirmat = false;
+					}
+		    		var isPdf = $('#table-documents').find('tr#' + docId).hasClass('isPdf');
+	                if (!isPdf) {
+	                    isTotPdf = false;
+	                }
+		    		var isPendentGuardarArxiu = $('#table-documents').find('tr#' + docId).hasClass('isPendentGuardarEnArxiu');
+	                if (isPendentGuardarArxiu) {
+	                	isTotGuardatEnArxiu = false;
+	                }
+		    	}
+		    }
+
+		    
+		    if (isTotFirmat && isTotGuardatEnArxiu) {
+			    
+		    	if (isTotPdf && ${isConcatentarMultiplePDFs}) { // if concatanate
+					// then show modal maximized
+		    		$('#notificar-mult a').data('maximized', 'true');
+		    		$('#notificar-mult a.btn.btn-default').off();
+		    		$('#notificar-mult a').removeData('webutilModal');
+		    		$('#notificar-mult a').webutilModal();
+
+			    } else { // if zip
+			    	// then show modal not maximized
+			    	$('#notificar-mult a').removeData('maximized');
+			    	$('#notificar-mult a.btn.btn-default').off();
+		    		$('#notificar-mult a').removeData('webutilModal');
+			    	$('#notificar-mult a').webutilModal();
+
+				}
+
+		    	$('#notificar-mult').prop('title', textNotificar);
+		        $('#notificar-mult a').removeClass("disabled"); // it is disabling $('#notificar-mult a') instead of $('#notificar-mult') so it is possible to see tooltip on $('#notificar-mult')
+		        $('#definitiu-mult a').addClass("disabled");
+		        
+		    } else if (!isTotGuardatEnArxiu) {
+
+		    	$('#notificar-mult').prop('title', textNotificarNomesFirmats);
+		        $('#notificar-mult a').addClass("disabled");
+		        $('#definitiu-mult a').addClass("disabled");
+		    } else {
+		    	$('#notificar-mult').prop('title', textNotificarNomesFirmats);
+		        $('#notificar-mult a').addClass("disabled");
+		        $('#definitiu-mult a').removeClass("disabled");
+		    }
+
+
+	        $('#descarregar-mult a').removeClass("disabled");
+	        $('#moure-mult a').removeClass("disabled");
+	        $('#tipusdocumental-mult').removeClass("disabled");
+
 		} else {
-			$('#notificar-mult').addClass("disabled");
-			$('#definitiu-mult').removeClass("disabled");
-			$('#tipusdocumental-mult').removeClass("disabled");
-		}
-		
-		if (docsIdx != undefined && docsIdx.length > 0) {
-			$('#descarregar-mult').removeClass("disabled");
-			$('#moure-mult').removeClass("disabled");
-			$('#tipusdocumental-mult').removeClass("disabled");
-		} else {
-			$('#descarregar-mult').addClass("disabled");
-			$('#notificar-mult').addClass("disabled");
-			$('#moure-mult').addClass("disabled");
-			$('#tipusdocumental-mult').addClass("disabled");
-		}
-		$('#grid-documents ').removeClass("disabled");
-		$('#table-documents').removeClass("disabled");
-		$('#loading').addClass('hidden');
+	        $('#descarregar-mult a').addClass("disabled");
+	        $('#notificar-mult').prop('title', textNotificar);
+	        $('#notificar-mult a').addClass("disabled");
+	        $('#moure-mult a').addClass("disabled");
+	        $('#tipusdocumental-mult').addClass("disabled");
+	    }
+	    
+
+	    $('#table-documents').removeClass("disabled");
+	    $('#grid-documents ').removeClass("disabled");
+	    $('#loading').addClass('hidden');
+
+	    
 	}
 	
 	function selectAll(docsIdx) {
@@ -1353,13 +1363,10 @@ function getDetallsSignants(idTbody, contingutId, header) {
 				
 				<%---- Button notificar mult ----%>
 				<div class="btn-group">
-					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenar"/>" id="notificar-mult" class="btn-group">
-						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default maximized hidden" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
+					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>" id="notificar-mult" class="btn-group">
+						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true">
 							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
 						</a> 
-						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default nomaximized" data-toggle="modal" data-missatge-loading="<spring:message code="concatenacio.zip.modal.missatge"/>" data-refresh-pagina="true">
-							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</a>
 					</div>
 					<c:if test="${convertirDefinitiu}">
 						<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
@@ -1565,7 +1572,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 													</c:if>
 											
 													<tr id="${fill.id}"
-														class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+														class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
 														data-expedient-id="${expedientId}" 
 														data-node="treetable-${fill.id}"
 														data-pnode="treetable-${entry.key.id}">
@@ -1731,7 +1738,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 													</c:if>
 											
 													<tr id="${fill.id}"
-														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>"
+														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
 														data-expedient-id="${expedientId}" 
 														data-node="treetable-${fill.id}"
 														data-pnode="treetable-${entry.key.id}">
@@ -1899,7 +1906,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 									</c:if>
 
 									<li id="${fill.id}"
-										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> docAdjuntPendentGuardarArxiu</c:if>">
+										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>">
 										<div id="${fill.id}" class="thumbnail element-noclick">
 											<div class="text-center">
 												<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true" />

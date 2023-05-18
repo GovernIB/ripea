@@ -586,8 +586,9 @@ public interface MetaExpedientService {
 			Long metaExpedientId);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	public CrearReglaResponseDto activarReglaDistribucio(
-			Long metaExpedientId);
+	public CrearReglaResponseDto canviarEstatReglaDistribucio(
+			Long metaExpedientId, 
+			boolean activa);
 
 //	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 }
