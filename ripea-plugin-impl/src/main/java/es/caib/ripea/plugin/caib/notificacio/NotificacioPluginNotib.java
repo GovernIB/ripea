@@ -285,9 +285,9 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			resposta.setEstat(respostaConsultaEstat.getEstat() != null ? EnviamentEstat.valueOf(respostaConsultaEstat.getEstat().toString()) : null);
 			resposta.setEstatData(respostaConsultaEstat.getEstatData());
 			resposta.setEstatDescripcio(respostaConsultaEstat.getEstatDescripcio());
-			resposta.setEstatOrigen(respostaConsultaEstat.getDatat().getOrigen());
-			resposta.setReceptorNif(respostaConsultaEstat.getDatat().getReceptorNif());
-			resposta.setReceptorNom(respostaConsultaEstat.getDatat().getReceptorNom());
+			resposta.setEstatOrigen(respostaConsultaEstat.getDatat() != null ? respostaConsultaEstat.getDatat().getOrigen() : null);
+			resposta.setReceptorNif(respostaConsultaEstat.getDatat() != null ? respostaConsultaEstat.getDatat().getReceptorNif() : null);
+			resposta.setReceptorNom(respostaConsultaEstat.getDatat() != null ? respostaConsultaEstat.getDatat().getReceptorNom() : null);
 			if (respostaConsultaEstat.getCertificacio() != null) {
 				Certificacio certificacio = respostaConsultaEstat.getCertificacio();
 				resposta.setCertificacioData(certificacio.getData());

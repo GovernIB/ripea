@@ -158,7 +158,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 			
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
-			String fluxPerDefecteId = documentService.findById(entitatActual.getId(), documentId).getMetaDocument().getPortafirmesFluxId();
+			String fluxPerDefecteId = documentService.findById(entitatActual.getId(), documentId, null).getMetaDocument().getPortafirmesFluxId();
 			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
 				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId);
 				

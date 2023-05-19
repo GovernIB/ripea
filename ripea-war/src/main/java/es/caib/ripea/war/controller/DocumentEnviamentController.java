@@ -341,6 +341,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			FitxerDto fitxer = documentService.descarregar(
 					entitatActual.getId(),
 					documentId,
+					null, 
 					null);
 			writeFileToResponse(
 					fitxer.getNom(),

@@ -121,7 +121,7 @@ public class SeguimentPortafirmesController extends BaseAdminController {
 					documentPortafirmesBlocks);
 			model.addAttribute(
 					"document", 
-					documentService.findById(entitatActual.getId(), documentId));
+					documentService.findById(entitatActual.getId(), documentId, null));
 			
 			model.addAttribute(
 					"readOnly", 

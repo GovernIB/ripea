@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
@@ -62,6 +63,7 @@ import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -121,11 +123,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private URLInstruccioService urlInstruccioService;
+	@Autowired
+	private ExpedientTascaService expedientTascaService;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		String organCodi = organGestorService.getOrganCodiFromContingutId(contingutId);
 		SessioHelper.setOrganActual(request, organCodi);
@@ -139,24 +144,43 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			long t1 = System.currentTimeMillis();
 		
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			contingutService.checkIfPermitted(contingutId, RolHelper.getRolActual(request), PermissionEnumDto.READ);
-			ContingutDto contingut = contingutService.findAmbIdUser(
-					entitatActual.getId(),
-					contingutId,
-					true,
-					true, 
-					true,
-					RolHelper.getRolActual(request), 
-					false,
-					expedientHelper.isVistaTreetablePerTipusDocuments(request), 
-					expedientHelper.isVistaTreetablePerEstats(request));
+			ContingutDto contingut = null;
+			if (tascaId == null) {
+				contingutService.checkIfPermitted(contingutId, RolHelper.getRolActual(request), PermissionEnumDto.READ);
+				contingut = contingutService.findAmbIdUser(
+						entitatActual.getId(),
+						contingutId,
+						true,
+						true, 
+						true,
+						RolHelper.getRolActual(request), 
+						false,
+						expedientHelper.isVistaTreetablePerTipusDocuments(request), 
+						expedientHelper.isVistaTreetablePerEstats(request));
+			} else {
+				ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(tascaId);
+				contingut = expedientTascaService.findTascaExpedient(
+						entitatActual.getId(),
+						expedientTascaDto.getExpedient().getId(),
+						expedientTascaDto.getId(),
+						true,
+						true);
+				model.addAttribute("tascaId", tascaId);
+				model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
+				model.addAttribute("tascaDescripcio", expedientTascaDto.getMetaExpedientTasca().getDescripcio());
+				model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
+				model.addAttribute("tasca", expedientTascaDto);
+			}
+			
+
 
 			omplirModelPerMostrarContingut(
 					request,
 					entitatActual,
 					contingut,
 					SessioHelper.desmarcarLlegit(request),
-					model);
+					model, 
+					tascaId);
 			model.addAttribute("isMostrarImportacio", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.importacio.activa")));
 			model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
 			model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
@@ -251,29 +275,26 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@RequestParam(value = "contingutNavigationId", required = false) Long contingutNavigationId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) throws IOException {
 
 		String url = "";
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			ContingutDto contingut = contingutService.findAmbIdUser(
-					entitatActual.getId(),
-					contingutId,
-					true,
-					false, null, null);
+			Long pareId = contingutService.getContingutPareId(contingutId);
 			
-			boolean isExpedient = contingut.getPare() == null;
+			boolean isExpedient = pareId == null;
 			if (isExpedient) {
 				url = "redirect:../../expedient";
 			} else {
-				url = "redirect:../../contingut/" +
-						(contingutNavigationId != null ? contingutNavigationId : contingut.getPare().getId());
+				url = "redirect:../../contingut/" + (contingutNavigationId != null ? contingutNavigationId : pareId) + "?tascaId=" + tascaId;
 			}
 			
 			contingutService.deleteReversible(
 					entitatActual.getId(),
 					contingutId, 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					tascaId);
 
 			deselect(request, contingutId);
 			return getAjaxControllerReturnValueSuccess(
@@ -833,7 +854,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual,
 			ContingutDto contingut,
 			boolean pipellaAnotacionsRegistre,
-			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+			Model model, 
+			Long tascaId) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		
 		long t1 = System.currentTimeMillis();
 		
@@ -849,71 +871,76 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						null, 
 						false));
 		
-		if (contingut instanceof CarpetaDto) {
-			contingut = contingut.getExpedientPare();
-		}
-		if (contingut instanceof ExpedientDto) {
-			model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
-					entitatActual.getId(),
-					contingut.getId()));
-			
-			model.addAttribute(
-					"interessatsCount",
-					interessatService.findByExpedient(
-							entitatActual.getId(),
-							contingut.getId(),
-							false).size());			
-			model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
-					entitatActual.getId(),
-					contingut.getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
-			
-			model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
-					entitatActual.getId(),
-					contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
-		}
-		if (contingut instanceof ExpedientDto || contingut instanceof DocumentDto) {
-			model.addAttribute(
-					"metaDades",
-					metaDadaService.findByNode(
-							entitatActual.getId(),
-							contingut.getId()));
-			model.addAttribute(
-					"dadesCommand",
-					beanGeneratorHelper.generarCommandDadesNode(
-							entitatActual.getId(),
-							contingut.getId(),
-							((NodeDto)contingut).getDades()));
-		} 
-
 		expedientHelper.omplirVistaActiva(request, model);
-		
-		model.addAttribute(
-				"registreTipusEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						RegistreTipusEnum.class,
-						"registre.anotacio.tipus.enum."));
-		model.addAttribute(
-				"notificacioEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentEnviamentEstatEnumDto.class,
-						"notificacio.estat.enum.",
-						new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
-		model.addAttribute(
-				"publicacioEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentEnviamentEstatEnumDto.class,
-						"publicacio.estat.enum.",
-						new Enum<?>[] {
-							DocumentEnviamentEstatEnumDto.ENVIAT,
-							DocumentEnviamentEstatEnumDto.PROCESSAT,
-							DocumentEnviamentEstatEnumDto.CANCELAT}));
-		model.addAttribute(
-				"interessatTipusEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						InteressatTipusEnumDto.class,
-						"interessat.tipus.enum."));
-
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
+		
+		if (tascaId == null) {
+			if (contingut instanceof CarpetaDto) {
+				contingut = contingut.getExpedientPare();
+			}
+			if (contingut instanceof ExpedientDto) {
+				model.addAttribute("relacionats", expedientService.relacioFindAmbExpedient(
+						entitatActual.getId(),
+						contingut.getId()));
+				
+				model.addAttribute(
+						"interessatsCount",
+						interessatService.findByExpedient(
+								entitatActual.getId(),
+								contingut.getId(),
+								false).size());			
+				model.addAttribute("notificacionsCount", documentEnviamentService.enviamentsCount(
+						entitatActual.getId(),
+						contingut.getId(), DocumentEnviamentTipusEnumDto.NOTIFICACIO));
+				
+				model.addAttribute("publicacionsCount", documentEnviamentService.enviamentsCount(
+						entitatActual.getId(),
+						contingut.getId(), DocumentEnviamentTipusEnumDto.PUBLICACIO));
+			}
+			if (contingut instanceof ExpedientDto || contingut instanceof DocumentDto) {
+				model.addAttribute(
+						"metaDades",
+						metaDadaService.findByNode(
+								entitatActual.getId(),
+								contingut.getId()));
+				model.addAttribute(
+						"dadesCommand",
+						beanGeneratorHelper.generarCommandDadesNode(
+								entitatActual.getId(),
+								contingut.getId(),
+								((NodeDto)contingut).getDades()));
+			} 
+
+			
+			model.addAttribute(
+					"registreTipusEnumOptions",
+					EnumHelper.getOptionsForEnum(
+							RegistreTipusEnum.class,
+							"registre.anotacio.tipus.enum."));
+			model.addAttribute(
+					"notificacioEstatEnumOptions",
+					EnumHelper.getOptionsForEnum(
+							DocumentEnviamentEstatEnumDto.class,
+							"notificacio.estat.enum.",
+							new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
+			model.addAttribute(
+					"publicacioEstatEnumOptions",
+					EnumHelper.getOptionsForEnum(
+							DocumentEnviamentEstatEnumDto.class,
+							"publicacio.estat.enum.",
+							new Enum<?>[] {
+								DocumentEnviamentEstatEnumDto.ENVIAT,
+								DocumentEnviamentEstatEnumDto.PROCESSAT,
+								DocumentEnviamentEstatEnumDto.CANCELAT}));
+			model.addAttribute(
+					"interessatTipusEnumOptions",
+					EnumHelper.getOptionsForEnum(
+							InteressatTipusEnumDto.class,
+							"interessat.tipus.enum."));
+
+
+		}
+
 		
 		Set<Long> seleccio = new HashSet<Long>();
 		RequestSessionHelper.actualitzarObjecteSessio(

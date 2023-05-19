@@ -56,6 +56,7 @@ public interface DocumentService {
 	 * @param document
 	 *            Informació del document que es vol crear.
 	 * @param rolActual TODO
+	 * @param tascaId TODO
 	 * @return El document creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -68,7 +69,8 @@ public interface DocumentService {
 			Long pareId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual) throws NotFoundException, ValidationException;
+			String rolActual, 
+			Long tascaId) throws NotFoundException, ValidationException;
 
 	/**
 	 * Modifica un document.
@@ -78,6 +80,7 @@ public interface DocumentService {
 	 * @param document
 	 *            Informació del document que es vol crear.
 	 * @param rolActual TODO
+	 * @param tascaId TODO
 	 * @return El document modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -88,7 +91,9 @@ public interface DocumentService {
 	public DocumentDto update(
 			Long entitatId,
 			DocumentDto document,
-			boolean comprovarMetaExpedient, String rolActual) throws NotFoundException, ValidationException;
+			boolean comprovarMetaExpedient, 
+			String rolActual, 
+			Long tascaId) throws NotFoundException, ValidationException;
 
 	/**
 	 * Consulta un document donat el seu id.
@@ -97,6 +102,7 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param id
 	 *            Atribut id del document que es vol trobar.
+	 * @param tascaId TODO
 	 * @return El document.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -104,7 +110,8 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto findById(
 			Long entitatId,
-			Long id) throws NotFoundException;
+			Long documentId, 
+			Long tascaId) throws NotFoundException;
 
 	/**
 	 * Consulta les versions d'un document.
@@ -249,6 +256,7 @@ public interface DocumentService {
 	 *            Atribut id del document del qual es vol descarregar el contingut.
 	 * @param versio
 	 *            El número de versió del document que es vol descarregar.
+	 * @param tascaId TODO
 	 * @return el fitxer amb el contingut.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -257,7 +265,8 @@ public interface DocumentService {
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
-			String versio) throws NotFoundException;
+			String versio, 
+			Long tascaId) throws NotFoundException;
 
 	/**
 	 * Crea un nou document associat a una consulta a PINBAL.

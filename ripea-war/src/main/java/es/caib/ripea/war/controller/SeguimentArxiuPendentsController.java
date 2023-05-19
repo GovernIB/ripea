@@ -581,7 +581,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 		
 		for (Long documentId : seleccio) {
 			
-			DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
+			DocumentDto document = documentService.findById(entitatActual.getId(), documentId, null);
 			Exception exception = null;
 			if (document.getArxiuUuid() == null) { //documents uploaded manually in ripea that were not saved in arxiu
 				try {

@@ -496,14 +496,7 @@ function removeLoading() {
 
 
 
-	<c:choose>
-		<c:when test="${isTasca}">
-			<c:set var="formAction"><rip:modalUrl value="/usuariTasca/${tascaId}/pare/${documentCommand.pareId}/document${isCreate ? '/docNew' : '/docUpdate'}"/></c:set>
-		</c:when>
-		<c:otherwise>
-			<c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document${isCreate ? '/docNew' : '/docUpdate'}"/></c:set>
-		</c:otherwise>
-	</c:choose>
+	<c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document${isCreate ? '/docNew' : '/docUpdate'}?tascaId=${tascaId}"/></c:set>
 	
 	<c:if test="${!empty documentCommand.id && documentCommand.arxiuEstatDefinitu && !isPermesPropagarModificacioDefinitius}">
 		<div class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span>&nbsp; <spring:message code="contingut.document.form.arxiu.definitiu.avis"/></div>

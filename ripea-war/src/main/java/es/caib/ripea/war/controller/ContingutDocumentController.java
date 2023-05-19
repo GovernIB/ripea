@@ -144,14 +144,17 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) throws ClassNotFoundException, IOException {
-		return get(request, pareId, null, model);
+		return get(request, pareId, null, tascaId, model);
 	}
+	
 	@RequestMapping(value = "/{pareId}/document/modificar/{documentId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) throws ClassNotFoundException, IOException {
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
 		FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
@@ -160,7 +163,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (documentId != null) {
 			document = documentService.findById(
 					entitatActual.getId(),
-					documentId);
+					documentId, 
+					tascaId);
 		}
 		DocumentCommand command = null;
 		if (document != null) {
@@ -174,7 +178,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			setTipusFirma(command, document);
 			
 			model.addAttribute("isPermesPropagarModificacioDefinitius", isPropagarModificacioDefinitiusActiva());
-			omplirModelFormulari(request, command, documentId, model);
+			omplirModelFormulari(
+					request,
+					command,
+					documentId,
+					model,
+					tascaId);
 			
 		} else {
 			command = new DocumentCommand();
@@ -185,7 +194,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					command,
 					pareId,
-					model);
+					model, 
+					tascaId);
 		}
 
 		command.setEntitatId(entitatActual.getId());
@@ -194,7 +204,12 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		model.addAttribute(command);
 		model.addAttribute("contingutId", pareId);
-		model.addAttribute("documentId", documentId);		
+		model.addAttribute("documentId", documentId);	
+		
+		if (tascaId != null) {
+			model.addAttribute("tascaId", tascaId);
+		}
+		
 		return "contingutDocumentForm";
 	}
 	
@@ -219,6 +234,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public String postNew(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
@@ -244,7 +260,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					pareId,
 					command,
-					model);
+					model, 
+					tascaId);
 		}
 		
 		if (bindingResult.hasErrors()) {
@@ -252,7 +269,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					command,
 					pareId,
-					model);
+					model, 
+					tascaId);
 			return "contingutDocumentForm";
 		}
 		try {
@@ -260,14 +278,16 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					command,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					tascaId);
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
 					request,
 					command,
 					pareId,
-					model);
+					model, 
+					tascaId);
 			return "contingutDocumentForm";
 		} catch (Exception ex) {
 			logger.error("Error al crear un document", ex);
@@ -282,7 +302,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 							request,
 							command,
 							pareId,
-							model);
+							model, 
+							tascaId);
 					return "contingutDocumentForm";
 				}
 			} else {
@@ -297,6 +318,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public String postUpdate(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			@Validated({UpdateDigital.class}) DocumentCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
@@ -319,7 +341,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					contingutId,
 					command,
-					model);
+					model,
+					tascaId);
 		}
 				
 		if (bindingResult.hasErrors()) {
@@ -327,7 +350,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					command,
 					contingutId,
-					model);
+					model, 
+					tascaId);
 			return "contingutDocumentForm";
 		}
 		try {
@@ -335,14 +359,16 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					command,
 					command.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT) ? false : true,
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					tascaId);
 		} catch (ValidationException ex) {
 			MissatgesHelper.error(request, ex.getMessage(), ex);
 			omplirModelFormulari(
 					request,
 					command,
 					contingutId,
-					model);
+					model, 
+					tascaId);
 			return "contingutDocumentForm";
 		}
 	}
@@ -430,7 +456,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		DocumentDto document = documentService.findById(entitatActual.getId(), documentId);
+		DocumentDto document = documentService.findById(entitatActual.getId(), documentId, null);
 		Exception exception = null;
 		if (document.getArxiuUuid() == null) {
 			
@@ -497,7 +523,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			Long contingutId,
 			DocumentCommand command,
-			Model model) throws ClassNotFoundException, IOException {
+			Model model, 
+			Long tascaId) throws ClassNotFoundException, IOException {
 		boolean returnScannedFile = false;
 		boolean returnSignedFile = false;
 		
@@ -538,7 +565,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						request,
 						command,
 						contingutId,
-						model);
+						model, 
+						tascaId);
 				model.addAttribute("contingutId", contingutId);
 				return "contingutDocumentForm";
 			}
@@ -569,7 +597,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					request,
 					command,
 					contingutId,
-					model);
+					model, 
+					tascaId);
 			model.addAttribute("contingutId", contingutId);
 			model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");	
 			return "contingutDocumentForm";
@@ -631,64 +660,50 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable Long pareId,
-			@PathVariable Long documentId) throws IOException {
+			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				documentId,
-				true,
-				false, null, null);
-		if (contingut instanceof DocumentDto) {
+
 			
-			try {
-				FitxerDto fitxer = documentService.descarregar(entitatActual.getId(),
-						documentId,
-						null);
-				writeFileToResponse(fitxer.getNom(),
-						fitxer.getContingut(),
-						response);
-				return null;
-				
-			} catch (Exception e) {
-				logger.error("Error al descarregar un document", e);
-				
-				if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundDocumentException.class)) {
-					return getAjaxControllerReturnValueError(
-							request,
-							"redirect:../../",
-							"document.controller.descarregar.error.arxiuNoTrobat",
-							e);
-				} else {
-					
-					Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-					
-					if (root.getMessage() != null && root.getMessage().contains("timed out")) {
-						MissatgesHelper.error(
-								request, 
-								getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
-					} else {
-						MissatgesHelper.error(
-								request, 
-								getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
-					}
-					return "redirect:../../../../contingut/" + pareId;
-				}
-			}
+		try {
+			FitxerDto fitxer = documentService.descarregar(
+					entitatActual.getId(),
+					documentId,
+					null, 
+					tascaId);
+			writeFileToResponse(fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
 			
-		} else {
-			MissatgesHelper.error(
-					request, 
-					getMessage(
+		} catch (Exception e) {
+			logger.error("Error al descarregar un document", e);
+			
+			if (ExceptionHelper.isExceptionOrCauseInstanceOf(e, ArxiuNotFoundDocumentException.class)) {
+				return getAjaxControllerReturnValueError(
+						request,
+						"redirect:../../",
+						"document.controller.descarregar.error.arxiuNoTrobat",
+						e);
+			} else {
+				
+				Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+				
+				if (root.getMessage() != null && root.getMessage().contains("timed out")) {
+					MissatgesHelper.error(
 							request, 
-							"document.controller.descarregar.error"),
-					null);
-			if (contingut.getPare() != null)
-				return "redirect:../../contingut/" + pareId;
-			else
-				return "redirect:../../expedient";
+							getMessage(request, "document.controller.descarregar.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
+				} else {
+					MissatgesHelper.error(
+							request, 
+							getMessage(request, "document.controller.descarregar.error") + ": " + root.getMessage(), root);
+				}
+				return "redirect:../../../../contingut/" + pareId;
+			}
 		}
 
 	}
+	
 	
 	@RequestMapping(value = "/{pareId}/descarregarMultiples", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public void descarregarMultiple(
@@ -884,7 +899,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						expedientId,
 						DocumentGenericCommand.asDto(command),
 						false, 
-						RolHelper.getRolActual(request));
+						RolHelper.getRolActual(request), 
+						null);
 
 				if (metaDocumentId != null) {
 					
@@ -941,7 +957,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					expedientId,
 					DocumentGenericCommand.asDto(command),
 					false, 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					null);
 			
 			return "redirect:../../document/" + document.getId() + "/notificar";
 	
@@ -1209,7 +1226,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		FitxerDto fitxer = documentService.descarregar(
 				entitatActual.getId(),
 				documentId,
-				versio);
+				versio, 
+				null);
 		writeFileToResponse(
 				fitxer.getNom(),
 				fitxer.getContingut(),
@@ -1315,7 +1333,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			DocumentCommand command,
 			boolean comprovarMetaExpedient,
-			String rolActual) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
+			String rolActual, 
+			Long tascaId) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
@@ -1327,7 +1346,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					pareId,
 					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
-					rolActual);
+					rolActual, 
+					tascaId);
 			
 			crearDadesPerDefecteSiExisteixen(
 					entitatActual.getId(),
@@ -1354,7 +1374,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					DocumentCommand.asDto(command),
 					comprovarMetaExpedient, 
-					rolActual);
+					rolActual, 
+					tascaId);
 			
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -1410,7 +1431,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			DocumentCommand command,
 			Long contingutId,
-			Model model) throws ClassNotFoundException, IOException {
+			Model model, 
+			Long tascaId) throws ClassNotFoundException, IOException {
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (command.getId() == null) {
@@ -1475,6 +1497,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
 		model.addAttribute("isDeteccioFirmaAutomaticaActiva", isDeteccioFirmaAutomaticaActiva());
+		
+		if (tascaId != null) {
+			model.addAttribute("tascaId", tascaId);
+		}
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutDocumentController.class); 

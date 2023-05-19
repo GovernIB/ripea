@@ -3,25 +3,17 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,55 +22,22 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.FitxerTemporalDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.registre.RegistreTipusEnum;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DigitalitzacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.api.service.OrganGestorService;
-import es.caib.ripea.war.command.DocumentCommand;
-import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
-import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
-import es.caib.ripea.war.command.DocumentCommand.DocumentFisicOrigenEnum;
-import es.caib.ripea.war.command.DocumentCommand.UpdateDigital;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
-import es.caib.ripea.war.helper.ArxiuTemporalHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.ExpedientHelper;
-import es.caib.ripea.war.helper.FitxerTemporalHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.helper.SessioHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -94,33 +53,15 @@ public class UsuariTascaController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientTascaController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
-	
-	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
-	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
-	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
+
 
 	@Autowired
 	private ExpedientTascaService expedientTascaService;
 	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private ServletContext servletContext;
-	@Autowired
 	private DocumentService documentService;
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private ArxiuTemporalHelper arxiuTemporalHelper;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private DigitalitzacioService digitalitzacioService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private ExpedientHelper expedientHelper;
+	
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -165,38 +106,7 @@ public class UsuariTascaController extends BaseUserController {
 				expedientTascaService.findAmbAuthentication(
 						entitatActual.getId(), DatatablesHelper.getPaginacioDtoFromRequest(request)));		
 	}
-	
-	@RequestMapping(value = "/{expedientTascaId}/tramitar", method = RequestMethod.GET)
-	public String tramitarTasca(
-			HttpServletRequest request,
-			@PathVariable Long expedientTascaId,
-			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 
-		ContingutDto expedient = expedientTascaService.findTascaExpedient(
-				entitatActual.getId(),
-				expedientTascaDto.getExpedient().getId(),
-				expedientTascaDto.getId(),
-				true,
-				true);
-		
-		omplirModelPerMostrarContingut(
-				request,
-				entitatActual,
-				expedient,
-				SessioHelper.desmarcarLlegit(request),
-				model);
-		
-		model.addAttribute("tascaId", expedientTascaId);
-		model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
-		model.addAttribute("tascaDescripcio", expedientTascaDto.getMetaExpedientTasca().getDescripcio());
-		model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
-		model.addAttribute("tasca", expedientTascaDto);
-		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
-		model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
-		return "contingut";
-	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/iniciar", method = RequestMethod.GET)
 	public String expedientTascaIniciar(
@@ -281,416 +191,7 @@ public class UsuariTascaController extends BaseUserController {
 	    				true));
 	}
 	
-	@RequestMapping(value = "/{tascaId}/pare/{pareId}/document/new", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long pareId,
-			Model model) throws ClassNotFoundException, IOException {
-		return get(request, tascaId, pareId, null, model);
-	}
-	@RequestMapping(value = "/{tascaId}/pare/{pareId}/document/{documentId}", method = RequestMethod.GET)
-	public String get(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long pareId,
-			@PathVariable Long documentId,
-			Model model) throws ClassNotFoundException, IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentDto document = null;
-		if (documentId != null) {
-			document = expedientTascaService.findDocumentById(
-					entitatActual.getId(),
-					tascaId,
-					documentId);
-		}
-		DocumentCommand command = null;
-		if (document != null) {
-			command = DocumentCommand.asCommand(document);
-			omplirModelFormulariAmbDocument(
-					request,
-					command,
-					documentId,
-					model,
-					document);
-		} else {
-			command = new DocumentCommand();
-			LocalDateTime ara = new LocalDateTime();
-			command.setDataTime(ara);
-
-			omplirModelFormulari(
-					request,
-					command,
-					pareId,
-					model);
-		}
-		command.setEntitatId(entitatActual.getId());
-		command.setPareId(pareId);
-		command.setOrigen(DocumentFisicOrigenEnum.DISC);
-		command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
-		model.addAttribute(command);
-		model.addAttribute("contingutId", pareId);
-		model.addAttribute("documentId", documentId);
-		model.addAttribute("tascaId", tascaId);
-		return "contingutDocumentForm";
-	}
 	
-	@RequestMapping(value = "/{tascaId}/pare/{pareId}/document/docNew", method = RequestMethod.POST)
-	public String postNew(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long pareId,
-			@Validated({CreateDigital.class, CreateFirmaSeparada.class}) DocumentCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
-		//TODO: make one method for ContingutDocumentController.postNew() and UsuariTascaController.postNew()
-		
-		FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
-				request,
-				command,
-				model);
-		
-		if (command.isOnlyFileSubmit()) {
-			fillModelFileSubmit(command, model, request);
-			return "fileUploadResult";
-		}
-
-		if ((command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE02 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE03 || command.getNtiEstadoElaboracion() == DocumentNtiEstadoElaboracionEnumDto.EE04) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
-			bindingResult.rejectValue("ntiIdDocumentoOrigen", "NotNull");
-		}
-		
-		//Recuperar document escanejat
-		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
-			recuperarResultatEscaneig(
-					request,
-					pareId,
-					command,
-					model);
-		}
-		
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					command,
-					pareId,
-					model);
-			model.addAttribute("contingutId", pareId);
-			return "contingutDocumentForm";
-		}
-		try {
-			return createUpdateDocument(
-					request,
-					command,
-					tascaId,
-					bindingResult,
-					model);
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage(), exception);
-			omplirModelFormulari(
-					request,
-					command,
-					pareId,
-					model);
-			return "contingutDocumentForm";
-		} finally {
-			FitxerTemporalHelper.esborrarFitxersAdjuntsSessio(request);
-		}
-	}
-	
-	@RequestMapping(value = "/{tascaId}/pare/{pareId}/document/docUpdate", method = RequestMethod.POST)
-	public String postUpdate(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long pareId,
-			@Validated({UpdateDigital.class}) DocumentCommand command,
-			BindingResult bindingResult,
-			Model model) throws IOException, ClassNotFoundException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		if (bindingResult.hasErrors()) {
-			omplirModelFormulari(
-					request,
-					command,
-					pareId,
-					model);
-			model.addAttribute("contingutId", pareId);
-			return "contingutDocumentForm";
-		}
-		try {
-			return createUpdateDocument(
-					request,
-					command,
-					tascaId,
-					bindingResult,
-					model);
-		} catch (Exception exception) {
-			MissatgesHelper.error(request, exception.getMessage(), exception);
-			omplirModelFormulari(
-					request,
-					command,
-					pareId,
-					model);
-			return "contingutDocumentForm";
-		}
-	}
-	
-	
-	
-	@RequestMapping(value = "/{tascaId}/contingut/{contingutId}/delete", method = RequestMethod.GET)
-	public String delete(
-			HttpServletRequest request,
-			@PathVariable Long tascaId,
-			@PathVariable Long contingutId,
-			Model model) throws IOException {
-	
-		try {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
-			expedientTascaService.deleteTascaReversible(
-					entitatActual.getId(),
-					tascaId,
-					contingutId);
-			
-			return getAjaxControllerReturnValueSuccess(
-					request,
-					"redirect:/usuariTasca/" + tascaId + "/tramitar",
-					"contingut.controller.element.esborrat.ok");
-		} catch (Exception e) {
-			log.error("Error al esborrar el contingut (id=" + contingutId + ")", e);
-			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
-			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
-				return getModalControllerReturnValueErrorMessageText(
-						request,
-						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + getMessage(request, "error.arxiu.connectTimedOut"), root);
-				
-			} else {
-				return getModalControllerReturnValueErrorMessageText(
-						request,
-						"redirect:../../contingut/" + contingutId,
-						getMessage(request, "contingut.controller.element.esborrat.error") + ": " + root.getMessage(), root);
-			}
-		}
-
-	}
-	
-	
-	
-	@RequestMapping(value = "/{tascaId}/pare/{pareId}/document/{documentId}/descarregar", method = RequestMethod.GET)
-	public String descarregar(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long tascaId,
-			@PathVariable Long pareId,
-			@PathVariable Long documentId) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
-		FitxerDto fitxer = expedientTascaService.descarregar(
-				entitatActual.getId(),
-				documentId,
-				tascaId,
-				null);
-		writeFileToResponse(
-				fitxer.getNom(),
-				fitxer.getContingut(),
-				response);
-
-		return null;
-	}
-	
-	
-	private String createUpdateDocument(
-			HttpServletRequest request,
-			DocumentCommand command,
-			Long tascaId,
-			BindingResult bindingResult,
-			Model model) throws NotFoundException, ValidationException, IOException, ClassNotFoundException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, ParseException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
-//		List<DadaDto> dades = new ArrayList<DadaDto>();
-//		Map<String, Object> valors = new HashMap<String, Object>();
-
-		if (command.getId() == null) {
-			expedientTascaService.createDocument(
-					entitatActual.getId(),
-					command.getPareId(),
-					tascaId,
-					DocumentCommand.asDto(command),
-					true);
-			
-//			//Valor per defecte d'algunes metadades
-//			List<MetaDadaDto> metadades = metaDadaService.findByNode(
-//					entitatActual.getId(), 
-//					document.getId());
-//			for (MetaDadaDto metadada : metadades) {
-//				DadaDto dada = new DadaDto();
-//				dada.setMetaDada(metadada);
-//				dada.setValor(metadada.getValor());
-//				dades.add(dada);
-//			}
-//			Object dadesCommand = beanGeneratorHelper.generarCommandDadesNode(
-//					entitatActual.getId(),
-//					document.getId(),
-//					dades);
-//			for (DadaDto dada: dades) {
-//				MetaDadaDto metaDada = metaDadaService.findById(
-//						entitatActual.getId(), 
-//						command.getMetaNodeId(),
-//						dada.getMetaDada().getId());
-//				Object valor = PropertyUtils.getSimpleProperty(dadesCommand, metaDada.getCodi());
-//				if (valor != null && (!(valor instanceof String) || !((String) valor).isEmpty())) {
-//					valors.put(metaDada.getCodi(), valor);
-//				}
-//			}
-//			
-//			contingutService.dadaSave(
-//					entitatActual.getId(),
-//					document.getId(),
-//					valors);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../../contingut/" + command.getPareId(),
-					"document.controller.creat.ok");
-		} else {
-			expedientTascaService.updateDocument(
-					entitatActual.getId(),
-					tascaId,
-					DocumentCommand.asDto(command),
-					true);
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../contingut/" + command.getPareId(),
-					"document.controller.modificat.ok");
-		}
-	}
-	
-	
-	
-	
-	
-	
-	
-	private void omplirModelFormulariAmbDocument(
-			HttpServletRequest request,
-			DocumentCommand command,
-			Long contingutId,
-			Model model,
-			DocumentDto document) throws ClassNotFoundException, IOException {
-		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
-		if(document.getFitxerNom() != null) {
-			model.addAttribute("nomDocument", document.getFitxerNom());
-		}
-		omplirModelFormulari(request, command, contingutId, model);
-	}
-	
-	private void omplirModelFormulari(
-			HttpServletRequest request,
-			DocumentCommand command,
-			Long pareId,
-			Model model) throws ClassNotFoundException, IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		if (command.getId() == null) {
-			model.addAttribute(
-					"metaDocuments",
-					metaDocumentService.findActiusPerCreacio(
-							entitatActual.getId(),
-							pareId, 
-							null, 
-							false));
-		} else {
-			model.addAttribute(
-					"metaDocuments",
-					metaDocumentService.findActiusPerModificacio(
-							entitatActual.getId(),
-							command.getId()));
-		}
-		model.addAttribute(
-				"digitalOrigenOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentFisicOrigenEnum.class,
-						"document.fisic.origen.enum."));
-		model.addAttribute(
-				"tipusFirmaOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentTipusFirmaEnumDto.class,
-						"document.tipus.firma.enum."));
-		String tempId = command.getEscanejatTempId();
-		if (tempId != null) {
-			model.addAttribute(
-					"escanejat",
-					arxiuTemporalHelper.llegirFitxerSenseContingut(
-							servletContext,
-							tempId));
-		}
-		model.addAttribute(
-				"ntiOrigenOptions",
-				EnumHelper.getOptionsForEnum(
-						NtiOrigenEnumDto.class,
-						"document.nti.origen.enum."));
-		model.addAttribute(
-				"ntiEstatElaboracioOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiEstadoElaboracionEnumDto.class,
-						"document.nti.estela.enum."));
-		model.addAttribute(
-				"ntiTipusDocumentalOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNtiTipoDocumentalEnumDto.class,
-						"document.nti.tipdoc.enum."));
-		String propertyEscanejarActiu = aplicacioService.propertyFindByNom("es.caib.ripea.document.nou.escanejar.actiu");
-		model.addAttribute(
-				"escanejarActiu",
-				(propertyEscanejarActiu == null) ? false : new Boolean(propertyEscanejarActiu));
-	}
-	
-
-	public void omplirModelPerMostrarContingut(
-			HttpServletRequest request,
-			EntitatDto entitatActual,
-			ContingutDto contingut,
-			boolean pipellaAnotacionsRegistre,
-			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		model.addAttribute("contingut", contingut);
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
-		model.addAttribute(
-				"metaDocuments",
-				metaDocumentService.findActiusPerCreacio(
-						entitatActual.getId(),
-						contingut.getId(), 
-						null, 
-						false));
-
-		expedientHelper.omplirVistaActiva(request, model);
-		
-		model.addAttribute(
-				"registreTipusEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						RegistreTipusEnum.class,
-						"registre.anotacio.tipus.enum."));
-		model.addAttribute(
-				"notificacioEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentEnviamentEstatEnumDto.class,
-						"notificacio.estat.enum.",
-						new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
-		model.addAttribute(
-				"publicacioEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentEnviamentEstatEnumDto.class,
-						"publicacio.estat.enum.",
-						new Enum<?>[] {
-							DocumentEnviamentEstatEnumDto.ENVIAT,
-							DocumentEnviamentEstatEnumDto.PROCESSAT,
-							DocumentEnviamentEstatEnumDto.CANCELAT}));
-		model.addAttribute(
-				"interessatTipusEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						InteressatTipusEnumDto.class,
-						"interessat.tipus.enum."));
-
-		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);
-	}
 	
 	@RequestMapping(value = "/{tascaId}/document/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -827,30 +328,7 @@ public class UsuariTascaController extends BaseUserController {
 		return "portafirmesInfo";
 	}
 	
-	
-	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
-		if (command.isUnselect()) {
-			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
-		}
-		FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
-		if (fitxerTemp != null) {
-			SignatureInfoDto signatureInfoDto = documentService.checkIfSignedAttached(fitxerTemp.getBytes(), fitxerTemp.getContentType());
-			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
-			model.addAttribute("isError", signatureInfoDto.isError());
-			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
-		}
-	}
-	
-	private void emplenarModelFirmaClient(
-			HttpServletRequest request,
-			Long documentId,
-			Model model) {
-		emplenarModelPortafirmes(
-				request,
-				documentId,
-				model);
-	}
-	
+
 	private void setFluxPredefinit(
 			MetaDocumentDto metaDocument,
 			Model model,
@@ -869,78 +347,7 @@ public class UsuariTascaController extends BaseUserController {
 		}
 		model.addAttribute("fluxTipus", metaDocument.getPortafirmesFluxTipus());
 	}
-	
-	private String recuperarResultatEscaneig(
-			HttpServletRequest request,
-			Long contingutId,
-			DocumentCommand command,
-			Model model) throws ClassNotFoundException, IOException {
-		boolean returnScannedFile = false;
-		boolean returnSignedFile = false;
-		
-		String idTransaccio = (String) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO);
-		
-		Object scannedFile = RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_RETURN_SCANNED);
-		Object signedFile = RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_RETURN_SIGNED);
-		
-		if (scannedFile != null) {
-			returnScannedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_RETURN_SCANNED);
-		}
-		if (signedFile != null) {
-			returnSignedFile = (boolean) RequestSessionHelper.obtenirObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_RETURN_SIGNED);
-		}
-		if (idTransaccio != null) { 
-			DigitalitzacioResultatDto resultat = digitalitzacioService.recuperarResultat(
-					idTransaccio, 
-					returnScannedFile, 
-					returnSignedFile);
-			if (resultat != null && resultat.isError() && !resultat.getEstat().equals(DigitalitzacioEstatDto.FINAL_OK)) {
-				MissatgesHelper.error(
-						request,
-						getMessage(
-								request, 
-								"document.digitalitzacio.estat.enum."+ resultat.getEstat()),
-						null);
-				omplirModelFormulari(
-						request,
-						command,
-						contingutId,
-						model);
-				model.addAttribute("contingutId", contingutId);
-				return "contingutDocumentForm";
-			}
-			model.addAttribute("nomDocument", resultat.getNomDocument());
-			model.addAttribute("idTransaccio", idTransaccio);
-			command.setFitxerNom(resultat.getNomDocument());
-			command.setFitxerContentType(resultat.getMimeType());
-			command.setFitxerContingut(resultat.getContingut());
-				
-			//Amb firma?
-			if (returnSignedFile) {
-				command.setAmbFirma(true);
-			}
-		} else {
-			omplirModelFormulari(
-					request,
-					command,
-					contingutId,
-					model);
-			model.addAttribute("contingutId", contingutId);
-			model.addAttribute("noFileScanned", "no s'ha seleccionat cap document");	
-			return "contingutDocumentForm";
-		}
-		return idTransaccio;
-	}
+
 	
 	private void emplenarModelPortafirmes(
 			HttpServletRequest request,
@@ -949,7 +356,7 @@ public class UsuariTascaController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, null);
 		model.addAttribute("document", document);
 	}
 

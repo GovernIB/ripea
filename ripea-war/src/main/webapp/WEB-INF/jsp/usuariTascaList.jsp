@@ -34,6 +34,7 @@
 		style="width:100%">
 		<thead>
 			<tr>
+				<th data-col-name="expedient.id" data-visible="false"></th>
 				<th data-col-name="expedient.nomINumero" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.expedient"/></th>
 				<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
 				<th data-col-name="metaExpedientTasca.descripcio" data-orderable="false" width="30%" data-template="#cellTascaDescripcio" >
@@ -89,7 +90,7 @@
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/tramitar"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
+								<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/contingut/{{:expedient.id}}?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
 								{{if estat == 'PENDENT'}}					
 									<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
 									<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>	 

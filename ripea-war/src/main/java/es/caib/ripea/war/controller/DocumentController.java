@@ -101,7 +101,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		model.addAttribute("document", document);
 		model.addAttribute("annexos", 
 				documentService.findAnnexosAmbExpedient(
@@ -140,7 +141,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				entitatActual.getId(),
 				document.getMetaDocument().getId());
@@ -223,7 +225,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				documentId,
 				RolHelper.getRolActual(request));
-		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
+		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc != null || doc.getGesDocFirmatId() != null) {
 			return "redirect:./info";
 		} else {
@@ -244,7 +246,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				documentId,
 				RolHelper.getRolActual(request));
-		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId);
+		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc == null) {
 			return this.getModalControllerReturnValueSuccess(
 					request,
@@ -317,7 +319,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					portafirmes);
 			model.addAttribute(
 					"document", 
-					documentService.findById(entitatActual.getId(), documentId));
+					documentService.findById(entitatActual.getId(), documentId, null));
 			
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
@@ -382,7 +384,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		return "redirect:" + document.getCustodiaUrl();
 	}
 
@@ -410,7 +413,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		model.addAttribute("document", document);
 		FirmaSimpleWebCommand command = new FirmaSimpleWebCommand();
 		command.setMotiu(getMessage(
@@ -498,7 +502,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		}
 
 		
-		return "redirect:/contingut/" + documentService.findById(entitatActualId, documentId).getExpedientPare().getId();
+		return "redirect:/contingut/" + documentService.findById(entitatActualId, documentId, null).getExpedientPare().getId();
 
 	}
 	
@@ -513,7 +517,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		model.addAttribute("document", document);
 		
 		ViaFirmaEnviarCommand command = new ViaFirmaEnviarCommand();
@@ -695,7 +700,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
-				documentId);
+				documentId, 
+				null);
 		model.addAttribute("document", document);
 		model.addAttribute("annexos", 
 				documentService.findAnnexosAmbExpedient(

@@ -53,6 +53,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
@@ -75,6 +76,7 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
@@ -103,12 +105,14 @@ import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PinbalHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.SynchronizationHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
@@ -171,6 +175,10 @@ public class DocumentServiceImpl implements DocumentService {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired
+	private ExpedientTascaRepository expedientTascaRepository;
+	@Autowired
+	private UsuariHelper usuariHelper;
 	
 	@Transactional
 	@Override
@@ -179,20 +187,41 @@ public class DocumentServiceImpl implements DocumentService {
 			Long pareId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		logger.debug("Creant nou document (" +
 				"entitatId=" + entitatId + ", " +
 				"pareId=" + pareId + ", " +
 				"document=" + document + ")");
-		ContingutEntity pare = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				pareId,
-				false,
-				false,
-				false,
-				false, 
-				false, 
-				true, rolActual);
+		
+		ContingutEntity pare = null;
+		if (tascaId == null) {
+			pare = contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					pareId,
+					false,
+					false,
+					false,
+					false, 
+					false, 
+					true, 
+					rolActual);
+		} else {
+			pare = contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					pareId);
+			
+			ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(tascaId);
+			if (expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT) {
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				expedientTascaEntity.updateEstat(TascaEstatEnumDto.INICIADA);
+				UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
+				expedientTascaEntity.updateResponsableActual(responsableActual);
+			}
+		}
+		
+
 		if (! checkCarpetaUniqueContraint(document.getNom(), pare, entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
@@ -228,34 +257,44 @@ public class DocumentServiceImpl implements DocumentService {
 			Long entitatId,
 			DocumentDto documentDto,
 			boolean comprovarMetaExpedient, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		logger.debug("Actualitzant el document (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + documentDto.getId() + ", " +
 				"document=" + documentDto + ")");
-		DocumentEntity documentEntity = documentHelper.comprovarDocument(
-				entitatId,
-				documentDto.getId(),
-				false,
-				true,
-				false,
-				false, 
-				false, 
-				rolActual);
-		ContingutEntity pare = null;
-		if (documentDto.getPareId() != null) {
-			contingutHelper.comprovarContingutDinsExpedientModificable(
-					entitatId,
-					documentDto.getPareId(),
-					false,
-					false,
-					false,
-					false, 
-					false, 
-					true, rolActual);
-		} 
 		
-		if (! checkCarpetaUniqueContraint(documentDto.getNom(), pare, entitatId)) {
+		DocumentEntity documentEntity = null;
+		if (tascaId == null) {
+			documentEntity = documentHelper.comprovarDocument(
+					entitatId,
+					documentDto.getId(),
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					rolActual);
+			if (documentDto.getPareId() != null) {
+				contingutHelper.comprovarContingutDinsExpedientModificable(
+						entitatId,
+						documentDto.getPareId(),
+						false,
+						false,
+						false,
+						false, 
+						false, 
+						true, 
+						rolActual);
+			} 
+		} else {
+			documentEntity = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					documentDto.getId());
+		}
+		
+		if (! checkCarpetaUniqueContraint(documentDto.getNom(), null, entitatId)) {
 			throw new ContingutNotUniqueException();
 		}
 		return documentHelper.updateDocument(
@@ -333,15 +372,27 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public DocumentDto findById(
 			Long entitatId,
-			Long id) {
+			Long documentId, 
+			Long tascaId) {
 		logger.debug("Obtenint el document ("
 				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-				entitatId,
-				id,
-				true,
-				false);
+				+ "documentId=" + documentId 
+				+ "tascaId=" + tascaId + ")");
+		
+		DocumentEntity document = null;
+		if (tascaId == null) {
+			document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+					entitatId,
+					documentId,
+					true,
+					false);
+		} else {
+			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					documentId);
+		}
+
 		return toDocumentDto(document);
 	}
 
@@ -554,18 +605,27 @@ public class DocumentServiceImpl implements DocumentService {
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
-			String versio) {
+			String versio, 
+			Long tascaId) {
 		logger.debug("Descarregant contingut del document ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + id + ", "
 				+ "versio=" + versio + ")");
 		
 		try {
-			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-					entitatId,
-					id,
-					true,
-					false);
+			DocumentEntity document = null;
+			if (tascaId == null) {
+				document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+						entitatId,
+						id,
+						true,
+						false);
+			} else {
+				document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+						entitatId,
+						tascaId,
+						id);
+			}
 			
 			return documentHelper.getFitxerAssociat(
 					document,

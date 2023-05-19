@@ -32,14 +32,12 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -199,28 +197,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		return dto;
 	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public FitxerDto descarregar(
-			Long entitatId,
-			Long contingutId,
-			Long tascaId,
-			String versio) {
-		logger.debug("Descarregant contingut del document ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + contingutId + ", "
-				+ "versio=" + versio + ")");
-
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				contingutId);
-
-		return documentHelper.getFitxerAssociat(
-				document,
-				versio);
-	}	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -430,78 +406,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	}	
 
 
-	@Transactional
-	@Override
-	public DocumentDto createDocument(
-			Long entitatId,
-			Long pareId,
-			Long tascaId,
-			DocumentDto document,
-			boolean comprovarMetaExpedient) {
-		logger.debug("Creant nou document (" +
-				"entitatId=" + entitatId + ", " +
-				"pareId=" + pareId + ", " +
-				"document=" + document + ")");
-		ContingutEntity pare = contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				pareId);
-		
-		ExpedientEntity expedient = pare.getExpedientPare();
-		
-		MetaDocumentEntity metaDocument = null;
-		if (document.getMetaDocument() != null) {
-			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					pare.getEntitat(),
-					expedient.getMetaExpedient(),
-					document.getMetaDocument().getId(),
-					true,
-					comprovarMetaExpedient);
-		} else {
-			throw new ValidationException(
-					"<creacio>",
-					ExpedientEntity.class,
-					"No es pot crear un document sense un meta-document associat");
-		}
-		
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(tascaId);
-		if (expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			expedientTascaEntity.updateEstat(TascaEstatEnumDto.INICIADA);
-			UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
-			expedientTascaEntity.updateResponsableActual(responsableActual);
-		}
-
-		return documentHelper.crearDocument(
-				document,
-				pare,
-				expedient,
-				metaDocument,
-				true);
-	}
-
-	@Transactional
-	@Override
-	public DocumentDto updateDocument(
-			Long entitatId,
-			Long tascaId,
-			DocumentDto documentDto,
-			boolean comprovarMetaExpedient) {
-		logger.debug("Actualitzant el document (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + documentDto.getId() + ", " +
-				"document=" + documentDto + ")");
-		DocumentEntity documentEntity = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				documentDto.getId());
 	
-		return documentHelper.updateDocument(
-				entitatId,
-				documentEntity,
-				documentDto,
-				comprovarMetaExpedient);
-	}
 
 	@Transactional
 	@Override

@@ -140,6 +140,7 @@ public class DocumentHelper {
 						fitxer = documentService.descarregar(
 								entitatActual.getId(),
 								docId,
+								null, 
 								null);
 					try {
 						ZipEntry entry = new ZipEntry(revisarContingutNom(document.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom()));

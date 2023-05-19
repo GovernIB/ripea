@@ -63,6 +63,7 @@ public interface ContingutService {
 	 * @param contingutId
 	 *            Atribut id del contingut que es vol esborrar.
 	 * @param rolActual TODO
+	 * @param tascaId TODO
 	 * @param nomesMarcarEsborrat
 	 *            Posar a true si es vol esborrar el contingut definitivament
 	 *            o false si només es vol marcar com a esborrat.
@@ -76,7 +77,9 @@ public interface ContingutService {
 	@PreAuthorize("hasRole('tothom')")
 	public ContingutDto deleteReversible(
 			Long entitatId,
-			Long contingutId, String rolActual) throws IOException, NotFoundException;
+			Long contingutId, 
+			String rolActual, 
+			Long tascaId) throws IOException, NotFoundException;
 
 	/**
 	 * Esborra un contingut sense possibilitat de recuperar-lo.
@@ -554,5 +557,9 @@ public interface ContingutService {
 			Long contingutId,
 			String rolActual, 
 			PermissionEnumDto permission);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Long getContingutPareId(
+			Long contingutId);
 	
 }

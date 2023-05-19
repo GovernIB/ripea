@@ -218,27 +218,40 @@ public class ContingutServiceImpl implements ContingutService {
 	public ContingutDto deleteReversible(
 			Long entitatId,
 			Long contingutId, 
-			String rolActual) throws IOException {
+			String rolActual, 
+			Long tascaId) throws IOException {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
 		
-		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
-				entitatId,
-				contingutId,
-				false,
-				false,
-				false,
-				true, 
-				false, 
-				true, rolActual);
+		ContingutEntity contingut = null;
+		if (tascaId == null) {
+			contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+					entitatId,
+					contingutId,
+					false,
+					false,
+					false,
+					true, 
+					false, 
+					true, 
+					rolActual);
+		} else {
+		  contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					contingutId);
+		}
+
+		
 		if (contingut instanceof ExpedientEntity) {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
 
 		return contingutHelper.deleteReversible(
 				entitatId,
-				contingut, null);
+				contingut, 
+				rolActual);
 	}
 
 	@Transactional
@@ -733,6 +746,15 @@ public class ContingutServiceImpl implements ContingutService {
 				true, 
 				rolActual, 
 				organActualId);
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Long getContingutPareId(
+			Long contingutId) {
+		
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		return contingut.getPare() != null ? contingut.getPare().getId() : null;
 	}
 	
 	

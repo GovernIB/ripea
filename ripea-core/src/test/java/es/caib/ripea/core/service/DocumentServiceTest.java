@@ -64,6 +64,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								expedientCreat.getId(),
 								dto,
 								true, 
+								null, 
 								null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
@@ -107,7 +108,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null);
+								true, null, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						dto.setId(documentCreat.getId());
@@ -117,7 +118,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 						DocumentDto documentModificat = documentService.update(
 								entitatCreada.getId(),
 								dto,
-								true, null);
+								true, null, null);
 						comprovarDocument(
 								dto,
 								documentModificat);
@@ -151,21 +152,21 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null);
+								true, null, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						DocumentDto documentObtingut1 = documentService.findById(
 								entitatCreada.getId(),
-								documentCreat.getId());
+								documentCreat.getId(), null);
 						assertNotNull(documentObtingut1);
 						assertNotNull(documentObtingut1.getId());
 						assertNull(documentObtingut1.getEsborratData());
 						contingutService.deleteReversible(
 								entitatCreada.getId(),
-								documentCreat.getId(), null);
+								documentCreat.getId(), null, null);
 						DocumentDto documentObtingut2 = documentService.findById(
 								entitatCreada.getId(),
-								documentCreat.getId());
+								documentCreat.getId(), null);
 						assertNotNull(documentObtingut2);
 						assertNotNull(documentObtingut2.getEsborratData());
 						Mockito.verify(arxiuPluginMock, Mockito.times(1)).documentEsborrar(Mockito.anyString());
@@ -199,13 +200,13 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null);
+								true, null, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						FitxerDto fitxer = documentService.descarregar(
 								entitatCreada.getId(),
 								documentCreat.getId(),
-								null);
+								null, null);
 						assertNotNull(fitxer);
 						assertEquals(dto.getFitxerNom(), fitxer.getNom());
 						assertEquals(dto.getFitxerContentType(), fitxer.getContentType());
@@ -241,7 +242,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null);
+								true, null, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						String identificador = documentService.generarIdentificadorFirmaClient(
@@ -254,7 +255,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								"firma.pdf", dto.getFitxerContingut(), null);
 						DocumentDto documentFirmat = documentService.findById(
 								entitatCreada.getId(),
-								documentCreat.getId());
+								documentCreat.getId(), null);
 						assertNotNull(documentFirmat);
 						assertNotNull(documentFirmat.getId());
 						assertTrue(documentFirmat.isCustodiat());
@@ -293,7 +294,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								entitatCreada.getId(),
 								expedientCreat.getId(),
 								dto,
-								true, null);
+								true, null, null);
 						assertNotNull(documentCreat);
 						assertNotNull(documentCreat.getId());
 						Calendar dataCaducitat = Calendar.getInstance();
@@ -311,7 +312,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								null, null);
 						DocumentDto documentEnviat = documentService.findById(
 								entitatCreada.getId(),
-								documentCreat.getId());
+								documentCreat.getId(), null);
 						assertNotNull(documentEnviat);
 						assertNotNull(documentEnviat.getId());
 						assertEquals(DocumentEstatEnumDto.FIRMA_PENDENT, documentEnviat.getEstat());
@@ -346,7 +347,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 						assertNull(callbackException);
 						DocumentDto documentFirmat = documentService.findById(
 								entitatCreada.getId(),
-								documentCreat.getId());
+								documentCreat.getId(), null);
 						assertNotNull(documentFirmat);
 						assertNotNull(documentFirmat.getId());
 						assertEquals(DocumentEstatEnumDto.CUSTODIAT, documentFirmat.getEstat());

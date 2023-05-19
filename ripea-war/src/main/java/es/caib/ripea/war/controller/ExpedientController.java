@@ -1570,7 +1570,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					contingutService.deleteReversible(
 							entitatActual.getId(),
 							contingutId, 
-							RolHelper.getRolActual(request));
+							RolHelper.getRolActual(request), 
+							null);
 					borrados++;
 				} catch (Exception e) {
 					errors++;

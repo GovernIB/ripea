@@ -42,29 +42,12 @@ public interface ExpedientTascaService {
 			boolean ambVersions);
 
 
-	public FitxerDto descarregar(
-			Long entitatId,
-			Long contingutId,
-			Long tascaId,
-			String versio);
-
-	public DocumentDto createDocument(
-			Long entitatId,
-			Long pareId,
-			Long tascaId,
-			DocumentDto document,
-			boolean comprovarMetaExpedient);
 
 	public DocumentDto findDocumentById(
 			Long entitatId,
 			Long tascaId,
 			Long documentId);
 
-	public DocumentDto updateDocument(
-			Long entitatId,
-			Long tascaId,
-			DocumentDto documentDto,
-			boolean comprovarMetaExpedient);
 
 	public ContingutDto deleteTascaReversible(
 			Long entitatId,

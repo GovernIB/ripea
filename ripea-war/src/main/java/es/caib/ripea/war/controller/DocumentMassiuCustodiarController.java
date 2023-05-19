@@ -225,7 +225,7 @@ public class DocumentMassiuCustodiarController extends BaseUserOAdminOOrganContr
 		for (Long id : seleccio) {
 			Exception exception = null;
 			try {
-				DocumentDto doc = documentService.findById(entitatActual.getId(), id);
+				DocumentDto doc = documentService.findById(entitatActual.getId(), id, null);
 				if (doc.getGesDocAdjuntId() != null) {
 					exception = documentService.guardarDocumentArxiu(id);
 				} else {

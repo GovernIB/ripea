@@ -144,7 +144,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						try {
 							ContingutDto esborrat = contingutService.deleteReversible(
 									entitatCreada.getId(),
-									expedientCreat.getId(), null);
+									expedientCreat.getId(), null, null);
 							assertTrue(esborrat instanceof ExpedientDto);
 							comprovarExpedientCoincideix(
 									expedientCreate,
@@ -547,7 +547,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								expedientCreat.getId(),
 								dto,
 								true, 
-								null);
+								null, null);
 						assertNotNull(documentCreat);
 						try {
 							expedientService.tancar(
@@ -625,7 +625,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										expedientCreat.getId(),
 										dto,
 										true, 
-										null);
+										null, null);
 								assertNotNull(documentCreat);
 							}
 							//Pare = carpeta
@@ -635,7 +635,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										carpetaCreada.getId(),
 										dto,
 										true, 
-										null);
+										null, null);
 								assertNotNull(documentCreat);
 							}
 							//Pare = sub carpeta
@@ -645,7 +645,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										subCarpetaCreada.getId(),
 										dto,
 										true, 
-										null);
+										null, null);
 								assertNotNull(documentCreat);
 							}
 							if (i == 6 || i == 7) {
@@ -654,7 +654,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 										subCarpetaCreada2.getId(),
 										dto,
 										true, 
-										null);
+										null, null);
 								assertNotNull(documentCreat);
 							}
 						}

@@ -63,13 +63,15 @@ public class DocumentServiceBean implements DocumentService {
 			Long contenidorId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
 				document,
 				comprovarMetaExpedient, 
-				rolActual);
+				rolActual, 
+				tascaId);
 	}
 
 	@Override
@@ -78,20 +80,25 @@ public class DocumentServiceBean implements DocumentService {
 			Long entitatId,
 			DocumentDto document,
 			boolean comprovarMetaExpedient, 
-			String rolActual) {
+			String rolActual, Long tascaId) {
 		return delegate.update(
 				entitatId,
 				document,
 				comprovarMetaExpedient, 
-				rolActual);
+				rolActual, 
+				tascaId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public DocumentDto findById(
 			Long entitatId,
-			Long id) {
-		return delegate.findById(entitatId, id);
+			Long documentId, 
+			Long tascaId) {
+		return delegate.findById(
+				entitatId, 
+				documentId, 
+				tascaId);
 	}
 
 	@Override
@@ -119,11 +126,13 @@ public class DocumentServiceBean implements DocumentService {
 	public FitxerDto descarregar(
 			Long entitatId,
 			Long id,
-			String versio) {
+			String versio, 
+			Long tascaId) {
 		return delegate.descarregar(
 				entitatId,
 				id,
-				versio);
+				versio, 
+				tascaId);
 	}
 
 	@Override

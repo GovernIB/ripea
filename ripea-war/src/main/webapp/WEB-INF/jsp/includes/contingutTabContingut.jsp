@@ -1356,7 +1356,8 @@ function getDetallsSignants(idTbody, contingutId, header) {
 					</a>
 				</div>
 			</div>
-			<c:if test="${(expedientAgafatPerUsuariActual or contingut.admin) and expedientObert}">
+			
+			<c:if test="${potModificar && !isTasca}">
 				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
 				
 				
@@ -1448,35 +1449,29 @@ function getDetallsSignants(idTbody, contingutId, header) {
 							</li>
 						</c:if>
 						<%---- Document... ----%>
-						<c:choose>
-							<c:when test="${isTasca}">
-								<li><a id="document-new" href="<c:url value="/usuariTasca/${tascaId}/pare/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...</a></li>
-							</c:when>
-							<c:otherwise>
-								<li>
-								<c:choose>
-									<c:when test="${empty metaDocumentsLeft}">
-										<a href="#" id="document-new-empty-metadocuments">
-											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
-										</a>
-											</c:when>
-									<c:otherwise>
-										<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new"/>" data-toggle="modal" data-refresh-pagina="true">
-											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
-										</a>
-									</c:otherwise>
-								</c:choose>
-								</li>
-								<c:if test="${not empty metaDocumentsPinbalLeft}">
-									<li>
-										<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
-											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
-										</a>
-									</li>
-								</c:if>
-							</c:otherwise>
-						</c:choose>
+						<li>
+							<c:choose>
+								<c:when test="${empty metaDocumentsLeft}">
+									<a href="#" id="document-new-empty-metadocuments">
+										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+									</a>
+										</c:when>
+								<c:otherwise>
+									<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true">
+										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+									</a>
+								</c:otherwise>
+							</c:choose>
+						</li>
 						<c:if test="${!isTasca}">
+							<%---- Consulta PINBAL... ----%>	
+							<c:if test="${not empty metaDocumentsPinbalLeft}">
+								<li>
+									<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
+										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+									</a>
+								</li>
+							</c:if>						
 							<%---- Carpeta... ----%>
 							<c:if test="${isCreacioCarpetesActiva}">
 								<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>

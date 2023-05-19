@@ -96,32 +96,8 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				ambVersions);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public FitxerDto descarregar(Long entitatId,
-			Long contingutId,
-			Long tascaId,
-			String versio) {
-		return delegate.descarregar(entitatId,
-				contingutId,
-				tascaId,
-				versio);
-	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public DocumentDto createDocument(Long entitatId,
-			Long pareId,
-			Long tascaId,
-			DocumentDto document,
-			boolean comprovarMetaExpedient) {
-		delegate.createDocument(entitatId,
-				pareId,
-				tascaId,
-				document,
-				comprovarMetaExpedient);
-		return null;
-	}
+
 
 	@Override
 	@RolesAllowed("tothom")
@@ -135,18 +111,6 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				documentId);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public DocumentDto updateDocument(Long entitatId,
-			Long tascaId,
-			DocumentDto documentDto,
-			boolean comprovarMetaExpedient) {
-		return delegate.updateDocument(
-				entitatId,
-				tascaId,
-				documentDto,
-				comprovarMetaExpedient);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
