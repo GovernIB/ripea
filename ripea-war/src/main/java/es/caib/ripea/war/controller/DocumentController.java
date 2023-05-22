@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
@@ -96,13 +97,14 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesUploadGet(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
 				documentId, 
-				null);
+				tascaId);
 		model.addAttribute("document", document);
 		model.addAttribute("annexos", 
 				documentService.findAnnexosAmbExpedient(
@@ -219,6 +221,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesReintentar(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Exception exc = documentService.portafirmesReintentar(
@@ -231,7 +234,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		} else {
 			return this.getModalControllerReturnValueSuccess(
 					request,
-					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId() + "?tascaId=" + tascaId,
 					"firma.info.processat.ok");
 		}
 	}
@@ -240,7 +243,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesReintentarGuardarArxiu(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
+		
+		model.addAttribute(
+				"tascaId", 
+				tascaId);
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
@@ -276,6 +285,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesCancel(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		documentService.portafirmesCancelar(
@@ -284,7 +294,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				RolHelper.getRolActual(request));
 		return this.getModalControllerReturnValueSuccess(
 				request,
-				"redirect:../../../contingut/" + documentId,
+				"redirect:../../../contingut/" + documentId + "?tascaId=" + tascaId,
 				"document.controller.portafirmes.cancel.ok");
 	}
 
@@ -292,6 +302,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesInfo(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -320,6 +331,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			model.addAttribute(
 					"document", 
 					documentService.findById(entitatActual.getId(), documentId, null));
+			
+			model.addAttribute(
+					"tascaId", 
+					tascaId);
 			
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(

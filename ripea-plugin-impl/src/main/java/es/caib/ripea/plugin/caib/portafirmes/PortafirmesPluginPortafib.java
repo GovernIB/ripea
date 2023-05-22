@@ -579,6 +579,11 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 	public String recuperarUrlViewEstatFluxDeFirmes(long portafirmesId, String idioma) throws SistemaExternException {
 		String urlFluxFirmes;
 		try {
+			// only works in jboss in tomcat gives error: 
+			// java.lang.AbstractMethodError: org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimpleJersey.getUrlToViewFlow(Lorg/fundaciobit/apisib/apifirmaasyncsimple/v2/beans/FirmaAsyncSimpleSignatureRequestInfo;)Ljava/lang/String;
+			// don't know why it is happening because it seems there is only one class: org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimpleJersey (apifirmaasyncsimple-jersey-2.0.1.jar) 
+			// that extends interface org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimple (apifirmaasyncsimple-api-2.0.1.jar) 
+			// and this class has method getUrlToViewFlow() defined
 			FirmaAsyncSimpleSignatureRequestInfo request = new FirmaAsyncSimpleSignatureRequestInfo(portafirmesId, idioma);
 			urlFluxFirmes = getFirmaAsyncSimpleApi().getUrlToViewFlow(request);
 		} catch (Exception ex) {

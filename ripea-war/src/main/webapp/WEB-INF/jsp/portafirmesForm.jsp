@@ -631,14 +631,9 @@ function isDniNie(value) {
 			</a>
 		</div>
 	</c:if>
-	<c:choose>
-		<c:when test="${isTasca}">
-			<c:set var="formAction"><rip:modalUrl value="/usuariTasca/${tascaId}/document/${document.id}/portafirmes/upload"/></c:set>
-		</c:when>
-		<c:otherwise>
-			<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/portafirmes/upload"/></c:set>
-		</c:otherwise>
-	</c:choose>
+
+	<c:set var="formAction"><rip:modalUrl value="/document/${document.id}/portafirmes/upload?tascaId=${tascaId}"/></c:set>
+
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal content" commandName="portafirmesEnviarCommand" role="form">
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>

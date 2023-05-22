@@ -200,7 +200,7 @@ $(document).ready(function() {
 
 				<spring:message code="firma.info.errors.processament"/>
 					
-				<a href="../portafirmes/reintentar" class="btn btn-xs btn-default pull-right">
+				<a href="../portafirmes/reintentar?tascaId=${tascaId}" class="btn btn-xs btn-default pull-right">
 					<span class="fa fa-refresh"></span>
 					<spring:message code="firma.info.errors.reintentar"/>
 				</a>
