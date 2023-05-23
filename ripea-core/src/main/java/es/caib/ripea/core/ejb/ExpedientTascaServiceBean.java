@@ -4,17 +4,22 @@
 package es.caib.ripea.core.ejb;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
-import es.caib.ripea.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 
 /**
@@ -124,107 +129,6 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 				contingutId);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public void portafirmesEnviar(
-			Long entitatId,
-			Long documentId,
-			String assumpte,
-			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
-			String[] portafirmesResponsables,
-			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
-			Long[] annexosIds,
-			Long tascaId,
-			String transaccioId) {
-		delegate.portafirmesEnviar(
-				entitatId,
-				documentId,
-				assumpte,
-				prioritat,
-				dataCaducitat,
-				portafirmesResponsables,
-				portafirmesSeqTipus,
-				portafirmesFluxTipus,
-				annexosIds,
-				tascaId,
-				transaccioId);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public DocumentPortafirmesDto portafirmesInfo(
-			Long entitatId,
-			Long tascaId,
-			Long documentId) {
-		return delegate.portafirmesInfo(
-				entitatId,
-				tascaId,
-				documentId);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public void portafirmesCancelar(
-			Long entitatId,
-			Long tascaId,
-			Long docuemntId, String rolActual) {
-		delegate.portafirmesCancelar(
-				entitatId,
-				tascaId,
-				docuemntId, rolActual);
-		
-	}
-
-	@Override
-	public FitxerDto convertirPdfPerFirmaClient(
-			Long entitatId,
-			Long tascaId,
-			Long documentId) {
-		return delegate.convertirPdfPerFirmaClient(
-				entitatId,
-				tascaId,
-				documentId);
-	}
-
-	@Override
-	public String generarIdentificadorFirmaClient(
-			Long entitatId,
-			Long tascaId,
-			Long id) {
-		return delegate.generarIdentificadorFirmaClient(
-				entitatId,
-				tascaId,
-				id);
-	}
-
-	@Override
-	public void processarFirmaClient(
-			Long entitatId,
-			Long documentId,
-			String arxiuNom,
-			byte[] arxiuContingut, 
-			Long tascaId) {
-
-		delegate.processarFirmaClient(
-				entitatId,
-				documentId,
-				arxiuNom,
-				arxiuContingut, 
-				tascaId);
-	}
-
-	@Override
-	public void portafirmesReintentar(
-			Long entitatId,
-			Long id, 
-			Long tascaId) {
-		delegate.portafirmesReintentar(
-				entitatId,
-				id,
-				tascaId);
-	}
 
 	@Override
 	public ExpedientTascaDto canviarTascaEstat(

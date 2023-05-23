@@ -750,11 +750,20 @@ public class ContingutServiceImpl implements ContingutService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public Long getContingutPareId(
+	public Long getPareId(
 			Long contingutId) {
 		
 		ContingutEntity contingut = contingutRepository.findOne(contingutId);
 		return contingut.getPare() != null ? contingut.getPare().getId() : null;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public Long getExpedientId(
+			Long contingutId) {
+		
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		return contingut.getExpedientPare().getId();
 	}
 	
 	

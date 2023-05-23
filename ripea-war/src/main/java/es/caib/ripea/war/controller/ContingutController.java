@@ -281,7 +281,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		String url = "";
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			Long pareId = contingutService.getContingutPareId(contingutId);
+			Long pareId = contingutService.getPareId(contingutId);
 			
 			boolean isExpedient = pareId == null;
 			if (isExpedient) {

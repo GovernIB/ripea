@@ -615,7 +615,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 					exception = documentService.portafirmesReintentar(
 							entitatActual.getId(),
 							documentId,
-							RolHelper.getRolActual(request));
+							RolHelper.getRolActual(request), 
+							null);
 				} catch (Exception e) {
 					exception = e;
 				}

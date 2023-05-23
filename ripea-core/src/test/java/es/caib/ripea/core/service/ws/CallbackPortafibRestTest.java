@@ -29,7 +29,7 @@ public class CallbackPortafibRestTest {
 			//   70 - DOCUMENT_REBUTJAT;
 			//   80 - DOCUMENT_PAUSAT;
 			new CallbackPortafibRestTest().test(
-					1295578,
+					1330338,
 					60,
 					null);
 		} catch (Exception ex) {

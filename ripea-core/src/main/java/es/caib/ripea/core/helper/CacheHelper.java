@@ -412,7 +412,7 @@ public class CacheHelper {
 //   		### SI ÉS UNA BBDD MYSQL I HI HA FILTRE
    			if (isMySql && !filtre.isEmpty()) {
    				jdbcTemplate.setMaxRows(0);
-   				consulta = "SELECT * FROM (" + consulta + ") RESULT WHERE RESULT.VALOR LIKE '%"+ filtre + "%'";
+   				consulta = "SELECT * FROM (" + consulta + ") RESULT WHERE LOWER(RESULT.VALOR) LIKE LOWER('%"+ filtre + "%')";
    			}
    			
 //			### NOMÉS PAGINACIÓ SENSE FILTRE
@@ -423,7 +423,7 @@ public class CacheHelper {
 //   		### SI ÉS UNA BBDD ORACLE I HI HA FILTRE
    			if (!isMySql && !filtre.isEmpty()) {
    				jdbcTemplate.setMaxRows(0);
-   				consulta = "SELECT * FROM (" + consulta + ") WHERE VALOR LIKE '%"+ filtre + "%'";
+   				consulta = "SELECT * FROM (" + consulta + ") WHERE LOWER(VALOR) LIKE LOWER('%"+ filtre + "%')";
    			}
    			
    			if (!isMySql && filtre.isEmpty()) {

@@ -130,6 +130,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				command);
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_TRANSACCIOID);
 		model.addAttribute("isNouEnviament", true);
+		model.addAttribute("tascaId", tascaId);
 		model.addAttribute(command);
 		return "portafirmesForm";
 	}
@@ -137,6 +138,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesUploadPost(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			@Valid PortafirmesEnviarCommand command,
 			BindingResult bindingResult,
 			Model model) {
@@ -144,7 +146,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
 				documentId, 
-				null);
+				tascaId);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
 				entitatActual.getId(),
 				document.getMetaDocument().getId());
@@ -199,7 +201,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					command.getPortafirmesFluxTipus(),
 					command.getAnnexos(),
 					transaccioId, 
-					RolHelper.getRolActual(request)); //nou flux
+					RolHelper.getRolActual(request), 
+					tascaId); //nou flux
 			
 			return this.getModalControllerReturnValueSuccess(
 					request,
@@ -227,14 +230,15 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
 				documentId,
-				RolHelper.getRolActual(request));
+				RolHelper.getRolActual(request),
+				tascaId);
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc != null || doc.getGesDocFirmatId() != null) {
 			return "redirect:./info";
 		} else {
 			return this.getModalControllerReturnValueSuccess(
 					request,
-					"redirect:../../../contingut/" + doc.getExpedientPare().getId() + "?tascaId=" + tascaId,
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId() + "?tascaId=" + (tascaId == null ? "" : tascaId),
 					"firma.info.processat.ok");
 		}
 	}
@@ -254,12 +258,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		Exception exc = documentService.portafirmesReintentar(
 				entitatActual.getId(),
 				documentId,
-				RolHelper.getRolActual(request));
+				RolHelper.getRolActual(request), 
+				tascaId);
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc == null) {
 			return this.getModalControllerReturnValueSuccess(
 					request,
-					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId() + "?tascaId=" + (tascaId == null ? "" : tascaId),
 					"document.controller.guardar.arxiu.ok");
 
 		} else {
@@ -272,7 +277,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			}
 			return getAjaxControllerReturnValueError(
 					request,
-					"redirect:../../../contingut/" + doc.getExpedientPare().getId(),
+					"redirect:../../../contingut/" + doc.getExpedientPare().getId() + "?tascaId=" + (tascaId == null ? "" : tascaId),
 					"document.controller.guardar.arxiu.error",
 					new Object[] {msg},
 					root);
@@ -291,10 +296,11 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		documentService.portafirmesCancelar(
 				entitatActual.getId(),
 				documentId, 
-				RolHelper.getRolActual(request));
+				RolHelper.getRolActual(request), 
+				tascaId);
 		return this.getModalControllerReturnValueSuccess(
 				request,
-				"redirect:../../../contingut/" + documentId + "?tascaId=" + tascaId,
+				"redirect:../../../contingut/" + documentId + "?tascaId=" + (tascaId == null ? "" : tascaId),
 				"document.controller.portafirmes.cancel.ok");
 	}
 
@@ -330,7 +336,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					portafirmes);
 			model.addAttribute(
 					"document", 
-					documentService.findById(entitatActual.getId(), documentId, null));
+					documentService.findById(entitatActual.getId(), documentId, tascaId));
 			
 			model.addAttribute(
 					"tascaId", 
@@ -374,35 +380,36 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				"redirect:../../../contingut/" + documentId,
 				"document.controller.viafirma.reintentar.ok");
 	}
-	
-	@RequestMapping(value = "/{documentId}/custodia/reintentar", method = RequestMethod.GET)
-	public String custodiaReintentar(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentService.portafirmesReintentar(
-				entitatActual.getId(),
-				documentId, 
-				RolHelper.getRolActual(request));
-		return this.getAjaxControllerReturnValueSuccess(
-				request,
-				"redirect:../../../../../../../contingut/" + documentId,
-				"document.controller.custodia.reintentar.ok");
-	}
-
-	@RequestMapping(value = "/{documentId}/custodia/info", method = RequestMethod.GET)
-	public String custodiaInfo(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentDto document = documentService.findById(
-				entitatActual.getId(),
-				documentId, 
-				null);
-		return "redirect:" + document.getCustodiaUrl();
-	}
+//	
+//	@RequestMapping(value = "/{documentId}/custodia/reintentar", method = RequestMethod.GET)
+//	public String custodiaReintentar(
+//			HttpServletRequest request,
+//			@PathVariable Long documentId,
+//			Model model) {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		documentService.portafirmesReintentar(
+//				entitatActual.getId(),
+//				documentId, 
+//				RolHelper.getRolActual(request), 
+//				null);
+//		return this.getAjaxControllerReturnValueSuccess(
+//				request,
+//				"redirect:../../../../../../../contingut/" + documentId,
+//				"document.controller.custodia.reintentar.ok");
+//	}
+//
+//	@RequestMapping(value = "/{documentId}/custodia/info", method = RequestMethod.GET)
+//	public String custodiaInfo(
+//			HttpServletRequest request,
+//			@PathVariable Long documentId,
+//			Model model) {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		DocumentDto document = documentService.findById(
+//				entitatActual.getId(),
+//				documentId, 
+//				null);
+//		return "redirect:" + document.getCustodiaUrl();
+//	}
 
 	@RequestMapping(value = "/{documentId}/pdf", method = RequestMethod.GET)
 	public String convertirPdf(
@@ -424,6 +431,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String firmaSimpleWebGet(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
@@ -437,6 +445,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 						"contenidor.document.portafirmes.camp.motiu.default") +
 				" [" + document.getExpedientPare().getNom() + "]");
 		model.addAttribute(command);
+		model.addAttribute("tascaId", tascaId);
 		return "firmaSimpleWebForm";
 	}
 	
@@ -447,6 +456,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String firmaSimpleWebStart(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			@Valid FirmaSimpleWebCommand command,
 			BindingResult bindingResult,
 			Model model) throws IOException {
@@ -466,7 +476,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				entitatActualId,
 				documentId);
 		
-		String urlReturnToRipea = aplicacioService.propertyBaseUrl() + "/document/" + documentId + "/firmaSimpleWebEnd/";
+		String urlReturnToRipea = aplicacioService.propertyBaseUrl() + "/document/" + documentId + "/firmaSimpleWebEnd?tascaId=" + (tascaId == null ? "" : tascaId);
 		
 		String urlRedirectToPortafib = documentService.firmaSimpleWebStart(
 				fitxerPerFirmar,
@@ -478,12 +488,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	}
 
 	
-	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd/{transactionID}")
+	@RequestMapping(value = "/{documentId}/firmaSimpleWebEnd")
 	public String firmaSimpleWebEnd(
 			HttpServletRequest request,
 			HttpServletResponse response,
 			@PathVariable Long documentId,
-			@PathVariable String transactionID) throws Exception {
+			@RequestParam(value = "transactionID", required = true) String transactionID,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) throws Exception {
 		
 		Long entitatActualId = getEntitatActualComprovantPermisos(request).getId();
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(documentId));
@@ -497,7 +508,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					documentId,
 					firmaResultat.getFitxerFirmatNom(), 
 					firmaResultat.getFitxerFirmatContingut(), 
-					RolHelper.getRolActual(request));
+					RolHelper.getRolActual(request), 
+					tascaId);
 			
 			MissatgesHelper.success(
 					request,
@@ -515,9 +527,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					request,
 					firmaResultat.getMsg());
 		}
-
 		
-		return "redirect:/contingut/" + documentService.findById(entitatActualId, documentId, null).getExpedientPare().getId();
+
+		return "redirect:/contingut/" + contingutService.getExpedientId(documentId) + "?tascaId=" + (tascaId == null ? "" : tascaId);
 
 	}
 	

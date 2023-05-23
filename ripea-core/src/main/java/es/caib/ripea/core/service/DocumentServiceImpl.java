@@ -830,7 +830,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void portafirmesEnviar(
 			Long entitatId,
-			Long id,
+			Long documentId,
 			String assumpte,
 			PortafirmesPrioritatEnumDto prioritat,
 			String portafirmesFluxId,
@@ -839,23 +839,34 @@ public class DocumentServiceImpl implements DocumentService {
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
 			String transaccioId, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
-				"id=" + id + ", " +
+				"documentId=" + documentId + ", " +
 				"assumpte=" + assumpte + ", " +
 				"prioritat=" + prioritat + ")");
-		DocumentEntity document = documentHelper.comprovarDocument(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false, 
-				false, 
-				rolActual);
+		DocumentEntity document = null;
+		
+		if (tascaId == null) {
+			document = documentHelper.comprovarDocument(
+					entitatId,
+					documentId,
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					rolActual);
+		} else {
+			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					documentId);
+		}
+		
 		
 		
 		try {
@@ -886,20 +897,31 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long id, 
-			String rolActual) {
+			Long documentId, 
+			String rolActual, 
+			Long tascaId) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
-				"id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocument(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false, 
-				false, 
-				rolActual);
+				"documentId=" + documentId + ")");
+		DocumentEntity document = null;
+		
+		if (tascaId == null) {
+			document = documentHelper.comprovarDocument(
+					entitatId,
+					documentId,
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					rolActual);
+		} else {
+			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					documentId);
+		}
+		
 
 		firmaPortafirmesHelper.portafirmesCancelar(
 				entitatId,
@@ -968,22 +990,36 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Long id, 
-			String rolActual) {
+			Long documentId, 
+			String rolActual, 
+			Long tascaId) {
 		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
 				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id
+				+ "id=" + documentId
 				+ "rolActual=" + rolActual +")");
-
-		DocumentEntity document = documentHelper.comprovarDocument(
-				entitatId,
-				id,
-				false,
-				true,
-				false,
-				false, 
-				false, 
-				rolActual);
+		
+		DocumentEntity document = null;
+		
+		if (tascaId == null) {
+			document = documentHelper.comprovarDocument(
+					entitatId,
+					documentId,
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					rolActual);
+		} else {
+			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
+					entitatId,
+					tascaId,
+					documentId);
+		}
+		
+		
+		
+		
 		return firmaPortafirmesHelper.portafirmesReintentar(
 				entitatId,
 				document);
@@ -1533,7 +1569,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long documentId,
 			String arxiuNom, 
 			byte[] arxiuContingut, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		
 		String identificador = documentHelper.generarIdentificadorFirmaClient(
 				entitatId,
@@ -1553,16 +1590,27 @@ public class DocumentServiceImpl implements DocumentService {
 					ex);
 		}
 		if (objecte != null) {
-			DocumentEntity document = documentHelper.comprovarDocument(
-					objecte.getEntitatId(),
-					objecte.getDocumentId(),
-					false,
-					true,
-					false,
-					false, 
-					false, 
-					rolActual);
 			
+			DocumentEntity document = null;
+			
+			if (tascaId == null) {
+				document = documentHelper.comprovarDocument(
+						objecte.getEntitatId(),
+						objecte.getDocumentId(),
+						false,
+						true,
+						false,
+						false, 
+						false, 
+						rolActual);
+
+			} else {
+				document = contingutHelper.comprovarDocumentPerTasca(
+						entitatId,
+						tascaId,
+						documentId);
+			}
+
 			firmaAppletHelper.processarFirmaClient(
 					identificador,
 					changeExtensioToPdf(arxiuNom),
