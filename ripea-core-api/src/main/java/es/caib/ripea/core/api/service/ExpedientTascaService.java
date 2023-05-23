@@ -1,10 +1,15 @@
 package es.caib.ripea.core.api.service;
 
-import es.caib.ripea.core.api.dto.*;
-
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 
 public interface ExpedientTascaService {
 
@@ -54,56 +59,14 @@ public interface ExpedientTascaService {
 			Long tascaId,
 			Long contingutId) throws IOException;
 
-	public void portafirmesEnviar(
-			Long entitatId,
-			Long documentId,
-			String assumpte,
-			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
-			String[] portafirmesResponsables,
-			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
-			Long[] annexosIds,
-			Long tascaId,
-			String transaccioId);
 
-	public DocumentPortafirmesDto portafirmesInfo(
-			Long entitatId,
-			Long tascaId,
-			Long documentId);
-
-	public void portafirmesCancelar(
-			Long entitatId,
-			Long tascaId,
-			Long docuemntId, String rolActual);
-
-	public FitxerDto convertirPdfPerFirmaClient(
-			Long entitatId,
-			Long tascaId,
-			Long documentId);
-
-	public String generarIdentificadorFirmaClient(
-			Long entitatId,
-			Long tascaId,
-			Long id);
-
-	public void processarFirmaClient(Long entitatId,
-			Long documentId,
-			String arxiuNom,
-			byte[] arxiuContingut, Long tascaId);
-
-	public void portafirmesReintentar(
-			Long entitatId,
-			Long id, 
-			Long tascaId);
-
-
-
-	public ExpedientTascaDto canviarTascaEstat(Long expedientTascaId,
+	public ExpedientTascaDto canviarTascaEstat(
+			Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
 			String motiu);
 	
-	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
+	public ExpedientTascaDto updateResponsables(
+			Long expedientTascaId, 
 			List<String> responsablesCodi);
 
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
@@ -114,5 +77,7 @@ public interface ExpedientTascaService {
 			String text,
 			String rolActual);
 
-	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId);
+	public List<ExpedientTascaComentariDto> findComentarisPerTasca(
+			Long entitatId, 
+			Long expedientTascaId);
 }

@@ -303,6 +303,7 @@ public interface DocumentService {
 	 * @param prioritat
 	 *            La prioritat de l'enviament.
 	 * @param rolActual TODO
+	 * @param tascaId TODO
 	 * @param dataCaducitat
 	 *            La data màxima per a firmar el document.
 	 * @throws NotFoundException
@@ -323,7 +324,9 @@ public interface DocumentService {
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
-			String transaccioId, String rolActual) throws NotFoundException, IllegalStateException, SistemaExternException;
+			String transaccioId, 
+			String rolActual, 
+			Long tascaId) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Recupera els dispositius disponibles per un usuari
@@ -410,6 +413,7 @@ public interface DocumentService {
 	 * @param entitatId
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param rolActual TODO
+	 * @param tascaId TODO
 	 * @param id
 	 *            Atribut id del document que es vol enviar a firmar.
 	 * @param versio
@@ -424,7 +428,9 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long documentId, String rolActual) throws NotFoundException, IllegalStateException, SistemaExternException;
+			Long documentId, 
+			String rolActual, 
+			Long tascaId) throws NotFoundException, IllegalStateException, SistemaExternException;
 
 	/**
 	 * Processa una petició del callback de portafirmes.
@@ -580,6 +586,7 @@ public interface DocumentService {
 	 * @param arxiuContingut
 	 *            Contingut de l'arxiu firmat.
 	 * @param rolActual TODO
+	 * @param tascaId TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws SistemaExternException
@@ -589,7 +596,10 @@ public interface DocumentService {
 	public void processarFirmaClient(
 			Long entitatId,
 			Long documentId,
-			String arxiuNom, byte[] arxiuContingut, String rolActual) throws NotFoundException, SistemaExternException;
+			String arxiuNom, 
+			byte[] arxiuContingut, 
+			String rolActual, 
+			Long tascaId) throws NotFoundException, SistemaExternException;
 
 	FitxerDto descarregarImprimible(Long entitatId, Long id, String versio);
 	
@@ -650,7 +660,9 @@ public interface DocumentService {
 
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Long id, String rolActual);
+			Long id, 
+			String rolActual, 
+			Long tascaId);
 
 	public List<Long> findDocumentsIdsPerCustodiarMassiu(
 			Long entitatId,

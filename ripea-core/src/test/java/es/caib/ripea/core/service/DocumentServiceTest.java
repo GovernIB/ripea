@@ -252,7 +252,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 						documentService.processarFirmaClient(
 								null,
 								null,
-								"firma.pdf", dto.getFitxerContingut(), null);
+								"firma.pdf", dto.getFitxerContingut(), null, null);
 						DocumentDto documentFirmat = documentService.findById(
 								entitatCreada.getId(),
 								documentCreat.getId(), null);
@@ -309,7 +309,7 @@ public class DocumentServiceTest extends BaseExpedientServiceTest {
 								MetaDocumentFirmaSequenciaTipusEnumDto.SERIE,
 								MetaDocumentFirmaFluxTipusEnumDto.SIMPLE,
 								null,
-								null, null);
+								null, null, null);
 						DocumentDto documentEnviat = documentService.findById(
 								entitatCreada.getId(),
 								documentCreat.getId(), null);

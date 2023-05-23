@@ -389,14 +389,18 @@ public class ContingutServiceBean implements ContingutService {
 				contingutId,
 				rolActual, 
 				permission);
-		
-		
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public Long getContingutPareId(Long contingutId) {
-		return delegate.getContingutPareId(contingutId);
+	public Long getPareId(Long contingutId) {
+		return delegate.getPareId(contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public Long getExpedientId(Long contingutId) {
+		return delegate.getExpedientId(contingutId);
 	}
 
 }

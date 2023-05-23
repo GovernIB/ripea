@@ -176,7 +176,8 @@ public class DocumentServiceBean implements DocumentService {
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
 			String transaccioId, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		delegate.portafirmesEnviar(
 				entitatId,
 				id,
@@ -188,17 +189,21 @@ public class DocumentServiceBean implements DocumentService {
 				portafirmesFluxTipus,
 				annexosIds,
 				transaccioId, 
-				rolActual);
+				rolActual, 
+				tascaId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public void portafirmesCancelar(
 			Long entitatId,
-			Long id, String rolActual) {
+			Long id, 
+			String rolActual, 
+			Long tascaId) {
 		delegate.portafirmesCancelar(
 				entitatId,
-				id, rolActual);
+				id, rolActual, 
+				tascaId);
 	}
 
 	@Override
@@ -316,13 +321,15 @@ public class DocumentServiceBean implements DocumentService {
 			Long documentId,
 			String arxiuNom, 
 			byte[] arxiuContingut, 
-			String rolActual) {
+			String rolActual, 
+			Long tascaId) {
 		delegate.processarFirmaClient(
 				entitatId,
 				documentId,
 				arxiuNom, 
 				arxiuContingut, 
-				rolActual);
+				rolActual, 
+				tascaId);
 	}
 
 	@Override	
@@ -402,8 +409,14 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public Exception portafirmesReintentar(
 			Long entitatId,
-			Long id, String rolActual) {
-		return delegate.portafirmesReintentar(entitatId, id, rolActual);
+			Long id, 
+			String rolActual, 
+			Long tascaId) {
+		return delegate.portafirmesReintentar(
+				entitatId, 
+				id, 
+				rolActual, 
+				tascaId);
 	}
 
 	@Override

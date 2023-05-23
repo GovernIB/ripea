@@ -559,7 +559,10 @@ public interface ContingutService {
 			PermissionEnumDto permission);
 
 	@PreAuthorize("hasRole('tothom')")
-	public Long getContingutPareId(
+	public Long getPareId(
 			Long contingutId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Long getExpedientId(Long contingutId);
 	
 }

@@ -5,7 +5,6 @@ package es.caib.ripea.core.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,17 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
@@ -41,19 +35,13 @@ import es.caib.ripea.core.entity.ExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
-import es.caib.ripea.core.firma.DocumentFirmaAppletHelper.ObjecteFirmaApplet;
-import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.TascaHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
@@ -94,23 +82,14 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Autowired
 	private AlertaRepository alertaRepository;
 	@Autowired
-	private DocumentHelper documentHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private UsuariHelper usuariHelper;
 	@Autowired
-	private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
-	@Autowired
-	private DocumentFirmaAppletHelper documentFirmaAppletHelper;
-	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
 	private TascaHelper tascaHelper;
-	@Autowired
-	private OrganGestorHelper organGestorHelper;
+
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -406,108 +385,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	}	
 
 
-	
-
-	@Transactional
-	@Override
-	public void portafirmesEnviar(
-			Long entitatId,
-			Long documentId,
-			String assumpte,
-			PortafirmesPrioritatEnumDto prioritat,
-			Date dataCaducitat,
-			String[] portafirmesResponsables,
-			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
-			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
-			Long[] annexosIds,
-			Long tascaId,
-			String transaccioId) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
-		logger.debug("Enviant document a portafirmes (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + documentId + ", " +
-				"assumpte=" + assumpte + ", " +
-				"prioritat=" + prioritat + ", " +
-				"dataCaducitat=" + dataCaducitat + ")");
-		
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				documentId);
-		
-		documentFirmaPortafirmesHelper.portafirmesEnviar(
-				entitatId,
-				document,
-				assumpte,
-				prioritat,
-				dataCaducitat,
-				null,
-				portafirmesResponsables,
-				portafirmesSeqTipus,
-				portafirmesFluxTipus,
-				annexosIds,
-				transaccioId);
-	}
-
-	@Transactional(readOnly = true)
-	@Override
-	public DocumentPortafirmesDto portafirmesInfo(
-			Long entitatId,
-			Long tascaId,
-			Long documentId) {
-		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + documentId + ")");
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				documentId);
-
-		return documentFirmaPortafirmesHelper.portafirmesInfo(
-				entitatId,
-				document);
-	}
-
-	@Transactional
-	@Override
-	public void portafirmesReintentar(
-			Long entitatId,
-			Long id, 
-			Long tascaId) {
-		logger.debug("Reintentant processament d'enviament a portafirmes amb error ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				id);
-		documentFirmaPortafirmesHelper.portafirmesReintentar(
-				entitatId,
-				document);
-
-	}
-
-	@Transactional
-	@Override
-	public void portafirmesCancelar(
-			Long entitatId,
-			Long tascaId,
-			Long docuemntId, 
-			String rolActual) {
-		logger.debug("Enviant document a portafirmes (" +
-				"entitatId=" + entitatId + ", " +
-				"id=" + docuemntId + ")");
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				docuemntId);
-
-		documentFirmaPortafirmesHelper.portafirmesCancelar(
-				entitatId,
-				document, 
-				rolActual);
-	}
-
 	@Transactional(readOnly = true)
 	@Override
 	public DocumentDto findDocumentById(
@@ -524,100 +401,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		return toDocumentDto(document);
 	}
 
-	@Transactional
-	@Override
-	public FitxerDto convertirPdfPerFirmaClient(
-			Long entitatId,
-			Long tascaId,
-			Long documentId) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
-		
-		logger.debug("Converteix un document en PDF per a la firma client ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + documentId + ")");
-		
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
-				tascaId,
-				documentId);
-		
-		
-		return pluginHelper.conversioConvertirPdf(
-				documentHelper.getFitxerAssociat(document, null),
-				null);
-	}
-
-	@Transactional
-	@Override
-	public String generarIdentificadorFirmaClient(
-			Long entitatId,
-			Long tascaId,
-			Long id) {
-		logger.debug("Generar identificador firma al navegador ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		contingutHelper.comprovarContingutPertanyTascaAccesible(entitatId, tascaId, id);
-		try {
-			return documentFirmaAppletHelper.firmaClientXifrar(
-					documentFirmaAppletHelper.obtainInstanceObjecteFirmaApplet( 
-							new Long(System.currentTimeMillis()),
-							entitatId,
-							id));
-		} catch (Exception ex) {
-			logger.error(
-					"Error al generar l'identificador per la firma al navegador (" +
-					"entitatId=" + entitatId + ", " +
-					"documentId=" + id + ")",
-					ex);
-			throw new RuntimeException(
-					"Error al generar l'identificador per la firma al navegador (" +
-					"entitatId=" + entitatId + ", " +
-					"documentId=" + id + ")",
-					ex);
-		}
-	}
-	
-	
-	@Transactional
-	@Override
-	public void processarFirmaClient(
-			Long entitatId,
-			Long documentId,
-			String arxiuNom,
-			byte[] arxiuContingut, 
-			Long tascaId) {
-		String identificador = documentHelper.generarIdentificadorFirmaClient(
-				entitatId,
-				documentId);
-		logger.debug("Custodiar identificador firma applet ("
-				+ "identificador=" + identificador + ")");
-		ObjecteFirmaApplet objecte = null;
-		try {
-			objecte = documentFirmaAppletHelper.firmaAppletDesxifrar(
-					identificador,
-					DocumentFirmaAppletHelper.CLAU_SECRETA);
-		} catch (Exception ex) {
-			throw new RuntimeException(
-					"Error al desxifrar l'identificador per la firma via applet (" +
-					"identificador=" + identificador + ")",
-					ex);
-		}
-		if (objecte != null) {
-			DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(objecte.getEntitatId(), tascaId, objecte.getDocumentId());
-			documentFirmaAppletHelper.processarFirmaClient(
-					identificador,
-					arxiuNom,
-					arxiuContingut,
-					document);
-		} else {
-			logger.error(
-					"No s'han trobat les dades del document amb identificador applet (" +
-					"identificador=" + identificador + ")");
-			throw new RuntimeException(
-					"No s'han trobat les dades del document amb identificador applet (" +
-					"identificador=" + identificador + ")");
-		}
-	}
 
 	@Transactional
 	@Override

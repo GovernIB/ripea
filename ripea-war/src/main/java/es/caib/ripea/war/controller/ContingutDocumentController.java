@@ -452,6 +452,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
 			@RequestParam(value = "origin") String origin,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model)  {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -479,16 +480,16 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				exception = documentService.portafirmesReintentar(
 						entitatActual.getId(),
 						documentId, 
-						RolHelper.getRolActual(request));
+						RolHelper.getRolActual(request), 
+						tascaId);
 			} catch (Exception e) {
 				exception = e;
 			}
 		}
 		
-		
 		String redirect = null;
 		if (origin.equals("docDetail")) {
-			redirect = "redirect:../../";
+			redirect = "redirect:../../?tascaId=" + (tascaId == null ? "" : tascaId);
 		} else if (origin.equals("seguiment")) {
 			redirect = "redirect:../../../../seguimentArxiuPendents/#documents";
 		}

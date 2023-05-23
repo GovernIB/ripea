@@ -31,10 +31,10 @@
 		<c:choose>
 			<c:when test="${contingut.document && contingut.arxiuUuid==null}">
 				<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
-				<li class="disabledMsg" title="${expedient.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedient.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				<li class="disabledMsg" title="${expedient.arxiuUuid == null ? primerGuardarExpedientArxiu : ''}"><a class="${expedient.arxiuUuid == null ? 'disabled' : ''}" href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/guardarDocumentArxiu?origin=docDetail&tascaId=${tascaId}"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 			</c:when>
 			<c:when test="${contingut.document && contingut.gesDocFirmatId != null}">
-				<li><a href="<c:url value="/document/${contingut.id}/portafirmes/reintentarGuardarArxiu"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+				<li><a href="<c:url value="/document/${contingut.id}/portafirmes/reintentarGuardarArxiu?tascaId=${tascaId}"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 			</c:when>			
 			<c:when test="${contingut.expedient && contingut.arxiuUuid==null}">
 				<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
@@ -225,14 +225,7 @@
 				<c:if test="${contingut.metaNode.firmaPortafirmesActiva && (contingut.estat == 'REDACCIO' || contingut.estat == 'FIRMA_PARCIAL') && (contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT') && contingut.fitxerExtension!='zip'}">
 					<c:choose>
 						<c:when test="${contingut.valid}">
-							<c:choose>
-								<c:when test="${isTasca}">
-									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/usuariTasca/${tascaId}/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
-								</c:when>
-								<c:otherwise>
-									<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/portafirmes/upload"/>" data-toggle="modal" data-height="450px" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
-								</c:otherwise>								
-							</c:choose>
+							<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/document/${contingut.id}/portafirmes/upload?tascaId=${tascaId}"/>" data-toggle="modal" data-height="450px" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>
 						</c:when>
 						<c:otherwise>
 							<li class="disabled"><a href="#"/><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="contingut.boto.portafirmes.enviar"/>...</a></li>

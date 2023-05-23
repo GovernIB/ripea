@@ -104,7 +104,7 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			
 
 			// Aquí especificam la URL de retorn un cop finalitzada la transacció
-			urlReturnToRipea = urlReturnToRipea + transactionID;
+			urlReturnToRipea = urlReturnToRipea + "&transactionID=" + transactionID;
 
 			FirmaSimpleStartTransactionRequest startTransactionInfo;
 			startTransactionInfo = new FirmaSimpleStartTransactionRequest(
