@@ -103,6 +103,9 @@ public class UsuariHelper {
 							getIdiomaPerDefecte()).build());
 			DadesUsuari dadesUsuari = cacheHelper.findUsuariAmbCodi(auth.getName());
 			if (dadesUsuari != null) {
+				if (auth.getName().equals("INIT")) {
+					logger.info("INIT user in seycon: " + dadesUsuari.getNom() + ", " + dadesUsuari.getNif() + ", " + dadesUsuari.getEmail());
+				}
 				usuari.update(
 						dadesUsuari.getNom(),
 						dadesUsuari.getNif(),
