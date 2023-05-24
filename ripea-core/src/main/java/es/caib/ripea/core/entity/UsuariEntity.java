@@ -101,10 +101,31 @@ public class UsuariEntity implements Serializable {
 			String nom,
 			String nif,
 			String email) {
-		this.nom = nom;
-		this.nif = nif;
-		this.email = email;
+		
+		this.nom = trimAndShorten(nom, 200);
+		this.email = trimAndShorten(email, 200);
+		this.nif = trimAndShortenNif(nif);
 		this.inicialitzat = true;
+	}
+	
+	private static String trimAndShortenNif(String value) {
+		String valueProcessed = null;
+		if (value != null) {
+			valueProcessed = value.replaceAll("[-_ ]", "");
+			valueProcessed = trimAndShorten(valueProcessed, 9);
+		}
+
+		return valueProcessed;
+	}
+	
+	private static String trimAndShorten (String value, int endIndex){
+		String valueProcessed = null;
+		if (value != null) {
+			valueProcessed = value.trim();
+			valueProcessed = valueProcessed.substring(0, Math.min(endIndex, valueProcessed.length()));
+		}
+		
+		return valueProcessed;
 	}
 	
 
@@ -152,9 +173,9 @@ public class UsuariEntity implements Serializable {
 				String idioma) {
 			built = new UsuariEntity();
 			built.codi = codi;
-			built.nom = nom;
-			built.nif = nif;
-			built.email = email;
+			built.nom = trimAndShorten(nom, 200);
+			built.nif = trimAndShortenNif(nif);
+			built.email = trimAndShorten(email, 200);
 			built.idioma = idioma;
 			built.inicialitzat = true;
 		}
