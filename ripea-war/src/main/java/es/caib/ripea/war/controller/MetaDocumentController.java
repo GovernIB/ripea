@@ -266,10 +266,7 @@ public class MetaDocumentController extends BaseAdminController {
 
 	private void emplenarModelForm(HttpServletRequest request, Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
-		model.addAttribute("isPortafirmesDocumentTipusSuportat", new Boolean(tipus != null));
-		model.addAttribute("portafirmesDocumentTipus", tipus);
 		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",

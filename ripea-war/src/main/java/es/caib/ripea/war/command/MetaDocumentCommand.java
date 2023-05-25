@@ -22,7 +22,6 @@ import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
-import es.caib.ripea.war.validation.PortafirmesDocumentTipusNotEmpty;
 import es.caib.ripea.war.validation.ResponsableNotEmpty;
 import lombok.Getter;
 
@@ -33,7 +32,6 @@ import lombok.Getter;
  */
 @Getter
 @ResponsableNotEmpty
-@PortafirmesDocumentTipusNotEmpty
 @CodiMetaDocumentNoRepetit(
 		campId = "id",
 		campCodi = "codi",
@@ -52,8 +50,6 @@ public class MetaDocumentCommand {
 	@NotNull
 	private MultiplicitatEnumDto multiplicitat;
 	private boolean firmaPortafirmesActiva;
-	@Size(max=64)
-	private String portafirmesDocumentTipus;
 	@Size(max=64)
 	private String portafirmesFluxId;
 	private String[] portafirmesResponsables;
@@ -144,10 +140,6 @@ public class MetaDocumentCommand {
 
 	public void setFirmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
 		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
-	}
-
-	public void setPortafirmesDocumentTipus(String portafirmesDocumentTipus) {
-		this.portafirmesDocumentTipus = portafirmesDocumentTipus != null ? portafirmesDocumentTipus.trim() : null;
 	}
 
 	public void setPortafirmesFluxId(String portafirmesFluxId) {

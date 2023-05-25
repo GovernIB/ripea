@@ -22,7 +22,6 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 
 	private MultiplicitatEnumDto multiplicitat;
 	private boolean firmaPortafirmesActiva;
-	private String portafirmesDocumentTipus;
 	private String portafirmesFluxId;
 	private String[] portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;

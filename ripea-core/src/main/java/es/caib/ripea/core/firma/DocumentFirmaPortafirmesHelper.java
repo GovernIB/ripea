@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,6 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -160,7 +160,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				assumpte,
 				prioritat,
 				dataCaducitat,
-				document.getMetaDocument().getPortafirmesDocumentTipus(),
+				StringUtils.stripStart(document.getMetaDocument().getNtiTipoDocumental(), "TD0"),
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,

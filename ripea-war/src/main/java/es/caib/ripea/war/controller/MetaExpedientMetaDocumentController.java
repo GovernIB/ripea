@@ -490,10 +490,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-		List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
 		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
-		model.addAttribute("isPortafirmesDocumentTipusSuportat", new Boolean(tipus != null));
-		model.addAttribute("portafirmesDocumentTipus", tipus);
 		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",
