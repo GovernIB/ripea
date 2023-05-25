@@ -109,7 +109,6 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		metaDocument.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
 		metaDocument.setGlobalReadOnly(false);*/
 		metaDocument.setFirmaPortafirmesActiva(true);
-		metaDocument.setPortafirmesDocumentTipus("1234");
 		metaDocument.setPortafirmesFluxId("1234");
 		metaDocument.setPortafirmesResponsables(new String[] {"123456789Z"});
 		metaDocument.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
