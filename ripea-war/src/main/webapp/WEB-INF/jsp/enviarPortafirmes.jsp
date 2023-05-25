@@ -425,7 +425,7 @@
 				type: 'GET',
 				dataType: "json",
 				async: false,
-				url: "<c:url value="/document/${metadocumentId}/portafirmes/flux/plantilles"/>",
+				url: "<c:url value="/massiu/portafirmes/${metadocumentId}/portafirmes/flux/plantilles"/>",
 				success: function(data) {
 					var defaultPortafirmesFluxId = "${portafirmesFluxId}";
 					var plantillaActual = "${portafirmesFluxSeleccionat}";

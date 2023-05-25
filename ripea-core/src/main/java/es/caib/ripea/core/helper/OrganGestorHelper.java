@@ -487,15 +487,16 @@ public class OrganGestorHelper {
 	
 	@Transactional
 	public String getOrganCodiFromContingutId(Long contingutId) {
-//		if (contingutId == null) {
-//			logger.error("No es pot actualitzar organCodi porque esta null", new RuntimeException());
-//			return null;
-//		} else {
-			ContingutEntity contingut = contingutRepository.findOne(contingutId);
-			ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-			return deproxied.getExpedientPare().getOrganGestor().getCodi();
-//		}
 
+		String organCodi = null;
+		if (contingutId != null) {
+			ContingutEntity contingut = contingutRepository.findOne(contingutId);
+			if (contingut != null) {
+				ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+				organCodi =  deproxied.getExpedientPare().getOrganGestor().getCodi();
+			}
+		}
+		return organCodi;
 	}
 	
 	@Transactional
