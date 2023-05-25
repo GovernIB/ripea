@@ -391,7 +391,7 @@ public class EntityComprovarHelper {
 				metaExpedientId);
 		if (comprovarPermisCreate) {
 			if (!metaExpedient.isActiu()) {
-				throw new ValidationException(metaExpedientId, MetaExpedientEntity.class, "El meta-expedient no es troba actiu (id=" + metaExpedientId + ")");
+				throw new ValidationException(metaExpedientId, MetaExpedientEntity.class, "El procediment no es troba actiu (id=" + metaExpedientId + ")");
 			}
 		}
 		comprovarPermisos(
