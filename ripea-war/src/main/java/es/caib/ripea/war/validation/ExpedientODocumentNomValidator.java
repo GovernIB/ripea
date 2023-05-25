@@ -8,7 +8,9 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.war.command.ContenidorCommand;
 
 
@@ -19,6 +21,9 @@ import es.caib.ripea.war.command.ContenidorCommand;
  */
 public class ExpedientODocumentNomValidator implements ConstraintValidator<ExpedientODocumentNom, Object> {
 	
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@Override
 	public void initialize(ExpedientODocumentNom constraintAnnotation) {
 	}
@@ -28,7 +33,7 @@ public class ExpedientODocumentNomValidator implements ConstraintValidator<Exped
 		try {
 			
 			ContenidorCommand contenidorCommand = (ContenidorCommand) value;
-			if (contenidorCommand.getNom().contains(".")) {
+			if (contenidorCommand.getNom().contains(".") && ! isPermesPuntsNomExpedient()) {
 				return false;
 			} else {
 				return true;
@@ -40,6 +45,10 @@ public class ExpedientODocumentNomValidator implements ConstraintValidator<Exped
         }
 	}
 
+	private boolean isPermesPuntsNomExpedient() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.permetre.punts"));
+	}
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExpedientODocumentNomValidator.class);
 
 }
