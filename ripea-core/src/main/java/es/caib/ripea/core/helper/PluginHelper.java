@@ -65,6 +65,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuOperacioEnumDto;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
@@ -88,8 +89,6 @@ import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
@@ -154,8 +153,6 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
@@ -920,7 +917,7 @@ public class PluginHelper {
 		
 		String documentNomInArxiu = documentNomInArxiu(
 				document.getNom() + "_firma_separada",
-				contingutPare.getArxiuUuid());
+				document.getPare());
 		documentArxiu.setNom(documentNomInArxiu);
 		
 		documentArxiu.setContingut(
@@ -1172,16 +1169,23 @@ public class PluginHelper {
 	private IntegracioAccioDto getIntegracioAccioArxiu(
 			DocumentEntity document, 
 			String accioDescripcio) {
-		
-		String serieDocumental = document.getExpedient().getMetaExpedient().getSerieDocumental();
-		ContingutEntity contingutPare = getContingutPare(document);
+
 		Map<String, String> accioParams = new HashMap<String, String>();
+
 		accioParams.put("id", document.getId().toString());
 		accioParams.put("títol", document.getNom());
+		ContingutEntity contingutPare = getContingutPare(document);
 		if (contingutPare != null) {
 			accioParams.put("contingutPareId", contingutPare.getId().toString());
 			accioParams.put("contingutPareNom", contingutPare.getNom());
+			accioParams.put("contingutPareTipus", contingutPare.getTipus().toString());
+			
 		}
+		ExpedientEntity expedient = document.getExpedient();
+		accioParams.put("expedientId", expedient.getId().toString());
+		accioParams.put("expedientNom", expedient.getNom());
+		
+		String serieDocumental = expedient.getMetaExpedient().getSerieDocumental();
 		if (serieDocumental != null) {
 			accioParams.put("serieDocumental", serieDocumental);
 		}
@@ -1207,9 +1211,17 @@ public class PluginHelper {
 	}
 	
 
-	private String documentNomInArxiu(String nomPerComprovar, String expedientUuid) {
+	private String documentNomInArxiu(
+			String nomPerComprovar, 
+			ContingutEntity pare) {
 
-		List<ContingutArxiu> continguts = arxiuExpedientConsultarPerUuid(expedientUuid).getContinguts();
+		List<ContingutArxiu> continguts = null;
+		if (pare.getTipus() == ContingutTipusEnumDto.EXPEDIENT) {
+			continguts = arxiuExpedientConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
+		} else {
+			continguts = arxiuCarpetaConsultarPerUuid(pare.getArxiuUuid()).getContinguts();
+		} 
+
 		nomPerComprovar = ArxiuConversioHelper.revisarContingutNom(nomPerComprovar);
 		int ocurrences = 0;
 		if (continguts != null) {
@@ -1641,6 +1653,24 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
 		}
 	}
+	
+	public Carpeta arxiuCarpetaConsultarPerUuid(String uuid) {
+
+		String accioDescripcio = "Consulta d'una carpeta per uuid";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		long t0 = System.currentTimeMillis();
+		try {
+			Carpeta arxiuCarpeta = getArxiuPlugin().carpetaDetalls(uuid);
+			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
+			return arxiuCarpeta;
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin d'arxiu digital: " + ex.getMessage();
+			integracioHelper.addAccioError(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
+			throw new SistemaExternException(IntegracioHelper.INTCODI_ARXIU, errorDescripcio, ex);
+		}
+	}
+
+	
 
 	public void arxiuCarpetaEsborrar(CarpetaEntity carpeta) {
 
@@ -3358,7 +3388,9 @@ public class PluginHelper {
 
 		String documentNomInArxiu = documentEntity.getNom();
 		if (!DocumentTipusEnumDto.IMPORTAT.equals(documentEntity.getDocumentTipus()) && !isComprovacioNomsDesactivada()) {
-			documentNomInArxiu = documentNomInArxiu(documentEntity.getNom(), documentEntity.getExpedient().getArxiuUuid());
+			documentNomInArxiu = documentNomInArxiu(
+					documentEntity.getNom(), 
+					documentEntity.getPare());
 		}
 		documentArxiu.setNom(documentNomInArxiu);
 		documentArxiu.setDescripcio(documentEntity.getDescripcio());

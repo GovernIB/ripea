@@ -447,7 +447,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 	
 	@RequestMapping(value = "/{pareId}/document/{documentId}/guardarDocumentArxiu", method = RequestMethod.GET)
-	public String guardarEnArxiuDocumentAdjunt(
+	public String guardarDocumentArxiu(
 			HttpServletRequest request,
 			@PathVariable Long pareId,
 			@PathVariable Long documentId,
