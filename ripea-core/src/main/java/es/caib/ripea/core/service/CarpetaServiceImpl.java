@@ -119,7 +119,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				id,
 				CarpetaEntity.class);
 		String nomOriginal = carpeta.getNom();
-		carpeta.update(
+		carpeta.updateNom(
 				nom);
 		// Registra al log la modificació de la carpeta
 		contingutLogHelper.log(

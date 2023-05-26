@@ -71,6 +71,10 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			String nom,
 			int esborrat);
 	
+	List<ContingutEntity> findByPareIdAndEsborrat(
+			Long pareId,
+			int esborrat);
+	
 	@Query(	"select " +
 			"    c " +
 			"from " +

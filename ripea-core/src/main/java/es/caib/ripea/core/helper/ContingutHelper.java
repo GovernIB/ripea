@@ -261,8 +261,10 @@ public class ContingutHelper {
 						ExpedientEstatDto.class));
 			}
 			
-			omplirPermisosPerExpedient(dto, rolActual, contingut.getId());
-
+			if (ambPermisos) {
+				omplirPermisosPerExpedient(dto, rolActual, contingut.getId());
+			}
+			
 			dto.setNumSeguidors(expedient.getSeguidors().size());
 			dto.setNumComentaris(expedient.getComentaris().size());
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -2012,6 +2014,27 @@ public class ContingutHelper {
 			fContent.delete();
 		}
 	}
+	
+
+	public String getUniqueNameInPare(String nomPerComprovar, Long pareId) {
+
+		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborrat(pareId, 0);
+		if (continguts != null) {
+			int ocurrences = 0;
+			List<String> noms = new ArrayList<String>();
+			for(ContingutEntity contingut : continguts) {
+				noms.add(contingut.getNom());
+			}
+			String newName = new String(nomPerComprovar);
+			while(noms.indexOf(newName) >= 0) {
+				ocurrences ++;
+				newName = nomPerComprovar + " (" + ocurrences + ")";
+			}
+			return newName;
+		}
+		return nomPerComprovar;
+	}
+	
 	
 
 	public void checkIfPermitted(

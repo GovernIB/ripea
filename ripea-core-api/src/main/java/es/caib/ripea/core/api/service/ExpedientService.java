@@ -68,26 +68,7 @@ public interface ExpedientService {
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc) throws NotFoundException, ValidationException;
 
-	/**
-	 * Modifica un expedient.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany l'expedient.
-	 * @param id
-	 *            Atribut id de l'expedient que es vol modificar.
-	 * @param nom
-	 *            Nom de l'expedient.
-	 * @return L'expedient modificat.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 * @throws NomInvalidException
-	 *             Si el nom del contenidor conté caràcters invàlids.
-	 */
-	@PreAuthorize("hasRole('tothom')")
-	public ExpedientDto update(
-			Long entitatId,
-			Long id,
-			String nom) throws NotFoundException, ValidationException;
+
 
 	/**
 	 * Consulta un expedient donat el seu id.
@@ -490,10 +471,7 @@ public interface ExpedientService {
 			String rolActual,
 			Long entitatId);
 
-	@PreAuthorize("hasRole('tothom')")
-	public List<ExpedientDto> findByIds(
-			Long entitatId,
-			Set<Long> ids);
+
 
 	/**
 	 * Retorna una pàgina d'expedients relacionats amb l'expedient especificat.

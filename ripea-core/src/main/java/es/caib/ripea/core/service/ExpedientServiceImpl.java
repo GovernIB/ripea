@@ -257,7 +257,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"sequencia=" + expedient.getSequencia() + ", " +
 						"any=" + expedient.getAny() + ", " +
 						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
-		ExpedientDto expedientDto = expedientHelper.toExpedientDto(expedient, true, null, false);
+		ExpedientDto expedientDto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 
 		
 		// if expedient comes from distribucio
@@ -491,29 +491,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 
-	
-
-	@Transactional
-	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom) {
-		logger.debug(
-				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
-						nom + ")");
-		contingutHelper.comprovarContingutDinsExpedientModificable(entitatId, id, false, true, false, false, false, true, null);
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				false,
-				false,
-				true,
-				false,
-				false,
-				null);
-
-		expedientHelper.updateNomExpedient(expedient, nom);
-		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, true, null, false);
-		contingutHelper.arxiuPropagarModificacio(expedient);
-		return dto;
-	}
 
 	@Transactional
 	@Override
@@ -537,7 +514,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (grupId != null) {
 			expedient.setGrup(grupRepository.findOne(grupId));
 		}
-		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, true, null, false);
+		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
 	}
@@ -554,29 +531,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		return expedientHelper.toExpedientDto(expedient, true, null, false);
+		return expedientHelper.toExpedientDto(expedient, true, true, null, false);
 	}
 	
-	@Transactional(readOnly = true)
-	@Override
-	public List<ExpedientDto> findByIds(Long entitatId, Set<Long> ids) {
-		logger.trace("Obtenint l'expedients (" + "entitatId=" + entitatId + ", " + "ids=" + ids + ")");
-		List<ExpedientDto> expedients = new ArrayList<>();
-		
-		for (Long id : ids) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-					id,
-					false,
-					true,
-					false,
-					false,
-					false,
-					null);
-			expedients.add(expedientHelper.toExpedientDto(expedient, true, null, false));
-		}
-		return expedients;
-	}
-	
+
 	
 
 	@Transactional(readOnly = true)
@@ -1661,7 +1619,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					new ConverterParam<ExpedientEntity, ExpedientDto>() {
 						@Override
 						public ExpedientDto convert(ExpedientEntity source, String param) {
-							return expedientHelper.toExpedientDto(source, false, param, true);
+							return expedientHelper.toExpedientDto(source, false, true, param, true);
 						}
 					});
 			for (ExpedientDto expedient: paginaDto) {
@@ -1971,7 +1929,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					new ConverterParam<ExpedientEntity, ExpedientDto>() {
 						@Override
 						public ExpedientDto convert(ExpedientEntity source, String param) {
-							return expedientHelper.toExpedientDto(source, false, param, true);
+							return expedientHelper.toExpedientDto(source, false, false, param, true);
 						}
 					});
 			logger.trace("toPaginaDto time:  " + (System.currentTimeMillis() - t5) + " ms");

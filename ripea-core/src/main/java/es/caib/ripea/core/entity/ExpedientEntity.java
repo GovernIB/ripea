@@ -277,7 +277,7 @@ public class ExpedientEntity extends NodeEntity {
 	public String getNumero() {
 		return numero;
 	}
-	public void update(
+	public void updateNom(
 			String nom) {
 		this.nom = nom;
 	}

@@ -567,11 +567,15 @@ public class ExpedientHelper {
 		
 			// ########################### CREATE DOCUMENT IN DB ########################
 			DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
+			
 			contingutHelper.comprovarNomValid(
 					carpetaEntity,
 					documentDto.getNom(),
 					null,
 					DocumentEntity.class);
+			
+			String uniqueNameInPare = contingutHelper.getUniqueNameInPare(documentDto.getNom(), carpetaEntity.getId());
+			documentDto.setNom(uniqueNameInPare);
 			
 			//	Recuperar tipus document per defecte
 			MetaDocumentEntity metaDocument = metaDocumentId != null ? metaDocumentRepository.findOne(metaDocumentId) : null;
@@ -902,7 +906,7 @@ public class ExpedientHelper {
 	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
 		contingutHelper.comprovarNomValid(expedient.getPare(), nom, expedient.getId(), ExpedientEntity.class);
 		String nomOriginal = expedient.getNom();
-		expedient.update(nom);
+		expedient.updateNom(nom);
 		contingutLogHelper.log(
 				expedient,
 				LogTipusEnumDto.MODIFICACIO,
@@ -992,18 +996,23 @@ public class ExpedientHelper {
 				contingutPare,
 				nom,
 				esborrat);
-		return expedient == null ? null : toExpedientDto(expedient, true, null, false);
+		return expedient == null ? null : toExpedientDto(expedient, false, false, null, false);
 	}
 
 
 	@Transactional(readOnly = true)
-	public ExpedientDto toExpedientDto(ExpedientEntity expedient, boolean ambPathIPermisos, String rolActual, boolean onlyForList) {
+	public ExpedientDto toExpedientDto(
+			ExpedientEntity expedient,
+			boolean ambPath,
+			boolean ambPermisos,
+			String rolActual,
+			boolean onlyForList) {
 		ExpedientDto expedientDto = (ExpedientDto) contingutHelper.toContingutDto(
 				expedient,
-				ambPathIPermisos,
+				ambPermisos,
 				false,
 				false,
-				ambPathIPermisos,
+				ambPath,
 				false,
 				false,
 				rolActual,

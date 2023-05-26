@@ -31,7 +31,7 @@ public class CarpetaEntity extends ContingutEntity {
 	@ForeignKey(name = "ipa_carpeta_exprel_fk")
 	private ExpedientEntity expedientRelacionat;
 	
-	public void update(
+	public void updateNom(
 			String nom) {
 		this.nom = nom;
 	}

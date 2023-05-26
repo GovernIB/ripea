@@ -227,13 +227,13 @@ public class ContingutServiceImpl implements ContingutService {
 		ContingutEntity contingut = null;
 		if (tascaId == null) {
 			contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
-					entitatId,
-					contingutId,
-					false,
-					false,
-					false,
-					true, 
-					false, 
+				entitatId,
+				contingutId,
+				false,
+				false,
+				false,
+				true, 
+				false, 
 					true, 
 					rolActual);
 		} else {
@@ -329,23 +329,23 @@ public class ContingutServiceImpl implements ContingutService {
 					ContingutEntity.class,
 					"Aquest contingut no està esborrat");
 		}
-//		if (contingut.getPare() == null) {
-//			logger.error("Aquest contingut no te pare (contingutId=" + contingutId + ")");
-//			throw new ValidationException(
-//					contingutId,
-//					ContingutEntity.class,
-//					"Aquest contingut no te pare");
-//		}
-		boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
-				contingut.getPare(),
-				contingut.getNom(),
-				0) != null;
-		if (nomDuplicat) {
-			throw new ValidationException(
-					contingutId,
-					ContingutEntity.class,
-					"Ja existeix un altre contingut amb el mateix nom dins el mateix pare");
+		
+		if (contingut instanceof DocumentEntity) {
+			String uniqueNameInPare = contingutHelper.getUniqueNameInPare(contingut.getNom(), contingut.getPare().getId());
+			contingut.updateNom(uniqueNameInPare);
+		} else {
+			boolean nomDuplicat = contingutRepository.findByPareAndNomAndEsborrat(
+					contingut.getPare(),
+					contingut.getNom(),
+					0) != null;
+			if (nomDuplicat) {
+				throw new ValidationException(
+						contingutId,
+						ContingutEntity.class,
+						"Ja existeix un altre contingut amb el mateix nom dins el mateix pare");
+			}
 		}
+
 		// Recupera el contingut esborrat
 		contingut.updateEsborrat(0);
 		ContingutDto dto = contingutHelper.toContingutDto(

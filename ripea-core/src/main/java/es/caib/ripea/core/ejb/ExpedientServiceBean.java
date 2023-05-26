@@ -81,17 +81,6 @@ public class ExpedientServiceBean implements ExpedientService {
 				rolActual,
 				organId);
 	}
-	@Override
-	@RolesAllowed("tothom")
-	public ExpedientDto update(
-			Long entitatId,
-			Long id,
-			String nom) {
-		return delegate.update(
-				entitatId,
-				id,
-				nom);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
@@ -409,15 +398,7 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.hasReadPermissionsAny(rolActual, entitatId);
 	}
 	
-	@Override
-	@RolesAllowed("tothom")
-	public List<ExpedientDto> findByIds(
-			Long entitatId,
-			Set<Long> ids) {
-		return delegate.findByIds(
-				entitatId,
-				ids);
-	}
+
 	
 	@Override
 	@RolesAllowed("tothom")

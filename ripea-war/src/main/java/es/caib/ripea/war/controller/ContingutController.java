@@ -287,7 +287,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			if (isExpedient) {
 				url = "redirect:../../expedient";
 			} else {
-				url = "redirect:../../contingut/" + (contingutNavigationId != null ? contingutNavigationId : pareId) + "?tascaId=" + tascaId;
+				url = "redirect:../../contingut/" + (contingutNavigationId != null ? contingutNavigationId : pareId) + "?tascaId=" + (tascaId == null ? "" : tascaId);
 			}
 			
 			contingutService.deleteReversible(

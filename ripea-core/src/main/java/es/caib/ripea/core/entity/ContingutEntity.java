@@ -42,16 +42,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(	name = "ipa_contingut",
-		uniqueConstraints = {
-				@UniqueConstraint(
-						name = "ipa_contingut_mult_uk",
-						columnNames = {
-								"nom",
-								"tipus",
-								"pare_id",
-								"entitat_id",
-								"esborrat"})})
+@Table(name = "ipa_contingut")
 @Inheritance(strategy=InheritanceType.JOINED)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class ContingutEntity extends RipeaAuditable<Long> {
@@ -133,7 +124,7 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		this.fills.add(fill);
 	}
 
-	public void update(String nom) {
+	public void updateNom(String nom) {
 		this.nom = nom;
 	}
 	public void updatePare(ContingutEntity pare) {
