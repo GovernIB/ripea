@@ -42,7 +42,7 @@ public class ConversioTipusHelper {
 
 	private static MapperFacade getMapperFacade() {
 		if (mapperFactory == null)
-			mapperFactory = new DefaultMapperFactory.Builder().build();
+			mapperFactory = new DefaultMapperFactory.Builder().compilerStrategy(new CustomJavassistCompilerStrategy()).build();
 		return mapperFactory.getMapperFacade();
 	}
 
