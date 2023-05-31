@@ -1380,7 +1380,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
 			Set<Long> expedientIds,
-			boolean exportar) throws IOException {
+			boolean exportar,
+			String format) throws IOException {
 		if (expedientIds.size() == 1)
 			logger.debug("Exportant índex de l'expedient (" + "entitatId=" + entitatId + ", " + "expedientId=" + expedientIds.iterator().next() + ")");
 		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
@@ -1404,7 +1405,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			resultat = expedientHelper.exportarExpedient(
 					entitatActual, 
 					expedients, 
-					exportar);	
+					exportar,
+					format);	
 		} catch (Exception ex) {
 			throw new RuntimeException("Hi ha hagut un problema generant l'índex de l'expedient", ex);
 		}
@@ -1425,7 +1427,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			FitxerDto resultat = exportIndexExpedient(
 					entitatId, 
 					expedientIds, 
-					false);
+					false,
+					format);
 			resposta.setNom(resultat.getNom());
 			resposta.setContentType("application/pdf");
 			resposta.setContingut(resultat.getContingut());
@@ -1434,7 +1437,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ZipOutputStream zos = new ZipOutputStream(baos);
 			for (Long expedientId : expedientIds) {
 				Set<Long> expedientIdSet = new HashSet<>(Arrays.asList(expedientId));
-				FitxerDto resultat = exportIndexExpedient(entitatId, expedientIdSet, false);
+				FitxerDto resultat = exportIndexExpedient(entitatId, expedientIdSet, false, "PDF");
 				contingutHelper.crearNovaEntrada(
 						resultat.getNom(), 
 						resultat, 

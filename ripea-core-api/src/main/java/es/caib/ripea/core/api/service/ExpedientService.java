@@ -416,6 +416,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param expedientIds
 	 *            Els expedients dels que vol generar l'índex
+	 * @param format Format pel fitxer d'exportació ("PDF" o "EXCEL").
 	 * @return Un document amb l'índex.
 	 * @throws IOException 
 	 */
@@ -423,7 +424,7 @@ public interface ExpedientService {
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
 			Set<Long> expedientIds,
-			boolean exportar) throws IOException;
+			boolean exportar, String format) throws IOException;
 
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(

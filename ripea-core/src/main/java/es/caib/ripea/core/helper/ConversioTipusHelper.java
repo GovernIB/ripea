@@ -27,6 +27,7 @@ import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
@@ -781,22 +782,50 @@ public class ConversioTipusHelper {
 					} else {
 						target.setNom(source.getNomEspanyol());
 					}
+	            	target.setNom("blabla");
 	            }
 	        })
 	        .byDefault()
 	        .register();	      
 		
-		
+      
+	      //if not excluded with the new version of orika 1.4.6 it gives: ma.glasnost.orika.MappingException: Encountered mapping of primitive to object (or vise-versa); sourceType=boolean, destinationType=ExpedientEntity
+	      mapperFactory.classMap(DocumentEntity.class, DocumentDto.class) 
+	      	.exclude("esborrat")
+	      	.exclude("expedient")
+	      	.exclude("document")
+	      	.exclude("node")
+	      	.exclude("carpeta")
+	      	.exclude("escriptori")
+	      	.exclude("registre")
+	        .byDefault()
+	        .register();	      
+	      
+	      mapperFactory.classMap(CarpetaEntity.class, CarpetaDto.class) 
+	      	.exclude("esborrat")
+	      	.exclude("expedient")
+	      	.exclude("document")
+	      	.exclude("node")
+	      	.exclude("carpeta")
+	      	.exclude("escriptori")
+	      	.exclude("registre")
+	        .byDefault()
+	        .register();
 
-//		mapperFactory.classMap(RegistreEntity.class, RegistreDto.class)
-//				.byDefault()
-//				.register();
-//
-//		mapperFactory.classMap(RegistreAnnexEntity.class, RegistreAnnexDto.class)
-//				.exclude("contingut")
-//				.exclude("firmaContingut")
-//				.byDefault()
-//				.register();
+	      mapperFactory.classMap(ExpedientEntity.class, ExpedientDto.class) 
+	      	.exclude("esborrat")
+	      	.exclude("expedient")
+	      	.exclude("document")
+	      	.exclude("node")
+	      	.exclude("carpeta")
+	      	.exclude("escriptori")
+	      	.exclude("registre")
+	      	.exclude("peticions")
+	      	.exclude("tasques")
+	        .byDefault()
+	        .register();
+	      
+	      
 	}
 	
 

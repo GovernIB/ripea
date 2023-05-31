@@ -314,11 +314,12 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportIndexExpedient(Long entitatId, Set<Long> expedientId, boolean exportar) throws IOException {
+	public FitxerDto exportIndexExpedient(Long entitatId, Set<Long> expedientId, boolean exportar, String format) throws IOException {
 		return delegate.exportIndexExpedient(
 				entitatId,
 				expedientId,
-				exportar);
+				exportar,
+				format);
 	}
 	
 	@Override

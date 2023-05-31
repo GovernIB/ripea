@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -51,6 +52,32 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.id = :documentId ")
 	Long findExpedientId(
 			@Param("documentId") Long documentId);
+	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"c.expedient = :expedient " +
+			"and c.esborrat = :esborrat " +
+			"and c.ordre != 0")
+	List<DocumentEntity> findByExpedientAndEsborratAndOrdenat(
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esborrat") int esborrat,
+			Sort sort);
+	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"c.expedient = :expedient " +
+			"and c.esborrat = :esborrat " +
+			"and c.ordre = 0")
+	List<DocumentEntity> findByExpedientAndEsborratSenseOrdre(
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esborrat") int esborrat,
+			Sort sort);
 
 
 	@Query(	" SELECT " +

@@ -1173,7 +1173,8 @@ public class ExpedientHelper {
 	public FitxerDto exportarExpedient(
 			EntitatEntity entitatActual, 
 			List<ExpedientEntity> expedients,
-			boolean exportar) throws IOException {
+			boolean exportar,
+			String format) throws IOException {
 		FitxerDto resultat = new FitxerDto();
 		if (exportar) {
 //			crear estructura documents + exportació ENI + índex
@@ -1255,7 +1256,7 @@ public class ExpedientHelper {
 				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
 			}
 			
-			FitxerDto indexDoc = contingutHelper.generarIndex(entitatActual, expedients, exportar);
+			FitxerDto indexDoc = contingutHelper.generarIndexPdf(entitatActual, expedients, exportar);
 			contingutHelper.crearNovaEntrada(indexDoc.getNom(), indexDoc, zos);
 			zos.close();
 			
@@ -1263,7 +1264,12 @@ public class ExpedientHelper {
 			resultat.setContentType("application/zip");
 			resultat.setContingut(baos.toByteArray());
 		} else {
-			resultat = contingutHelper.generarIndex(entitatActual, expedients, exportar);
+			if ("PDF".equalsIgnoreCase(format))
+				resultat = contingutHelper.generarIndexPdf(entitatActual, expedients, exportar);
+			else if ("XLSX".equalsIgnoreCase(format))
+				resultat = contingutHelper.generarIndexXlsx(entitatActual, expedients, exportar);
+			else
+				resultat = contingutHelper.generarIndexPdf(entitatActual, expedients, exportar);
 		}
 		return resultat;
 	}

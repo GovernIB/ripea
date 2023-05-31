@@ -1871,12 +1871,12 @@ public class ContingutHelper {
 		return pathDto;
 	}
 
-	public FitxerDto generarIndex(
+	public FitxerDto generarIndexPdf(
 			EntitatEntity entitatActual,
 			List<ExpedientEntity> expedients,
 			boolean exportar) throws IOException {
 
-		byte[] indexGenerated = indexHelper.generarIndexPerExpedient(
+		byte[] indexGenerated = indexHelper.generarIndexPdfPerExpedient(
 				expedients,
 				entitatActual,
 				exportar);
@@ -1892,6 +1892,32 @@ public class ContingutHelper {
 			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedientNom + ".pdf");
 		}
 		fitxer.setContentType("application/pdf");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+	
+	public FitxerDto generarIndexXlsx(
+			EntitatEntity entitatActual,
+			List<ExpedientEntity> expedients,
+			boolean exportar) throws IOException {
+
+		byte[] indexGenerated = indexHelper.generarIndexXlsxPerExpedient(
+				expedients,
+				entitatActual,
+				exportar);
+
+		FitxerDto fitxer = new FitxerDto();
+		if (expedients.size() > 1) {
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".xlsx");
+		} else {
+			String expedientNom = expedients.get(0).getNom();
+			if (expedientNom.contains("\"")) {
+				expedientNom = "\"" + expedientNom.replace("\"", "\\\"") + "\"";
+			}
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedientNom + ".xlsx");
+		}
+		fitxer.setContentType("application/vnd.ms-excel");
 		if (indexGenerated != null)
 			fitxer.setContingut(indexGenerated);
 		return fitxer;

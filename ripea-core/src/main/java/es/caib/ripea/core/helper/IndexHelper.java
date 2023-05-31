@@ -15,7 +15,22 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.common.usermodel.HyperlinkType;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.Hyperlink;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +44,7 @@ import java.math.BigDecimal;
 import java.nio.file.NoSuchFileException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +66,10 @@ public class IndexHelper {
 	private Font frutiger11TitolBold = FontFactory.getFont("Frutiger", 11, Font.BOLD);
 	private Font frutiger9TitolBold = FontFactory.getFont("Frutiger", 9, Font.BOLD);
 	private Font frutiger10Italic = FontFactory.getFont("Frutiger", 10, Font.ITALIC, new BaseColor(160, 160, 160));
-	
+
+    private SimpleDateFormat sdt = new SimpleDateFormat("dd-MM-yyyy");
+    private SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+    
 	@Autowired
 	private MessageHelper messageHelper;
 	@Autowired
@@ -71,8 +90,11 @@ public class IndexHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private DocumentRepository documentRepository;
 
-	public byte[] generarIndexPerExpedient(
+	//### Genera índex PDF ###
+	public byte[] generarIndexPdfPerExpedient(
 			List<ExpedientEntity> expedients, 
 			EntitatEntity entitatActual,
 			boolean exportar) {
@@ -697,6 +719,465 @@ public class IndexHelper {
 	    }
 	}
 	
+	//### Genera índex XSL/XLSX ###
+	public byte[] generarIndexXlsxPerExpedient(List<ExpedientEntity> expedients, EntitatEntity entitatActual, boolean exportar) {
+	    try (Workbook workbook = new XSSFWorkbook()) {
+	        
+	        int rowNum = 0;
+	        for (ExpedientEntity expedient : expedients) {
+	        	boolean hasRelacions = !expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty();
+		        Sheet sheet = workbook.createSheet(validarNombreHoja(expedient.getNom()));
+	            crearTitol(sheet, expedient);
+	            crearTaulaDocuments(sheet, expedient, entitatActual, workbook, false, hasRelacions);
+
+	            if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
+	                crearTitolRelacio(sheet, expedient.getRelacionatsAmb(), expedient.getRelacionatsPer());
+
+	                if (!expedient.getRelacionatsAmb().isEmpty()) {
+	                    for (ExpedientEntity expedient_relacionat : expedient.getRelacionatsAmb()) {
+	                    	Sheet sheetRelacio = workbook.createSheet(validarNombreHoja(expedient_relacionat.getNom()));
+	                        crearTitol(sheetRelacio, expedient_relacionat);
+	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions);
+	                        
+	                        // Le da formato a la hoja
+	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions);
+	                    }
+	                }
+	                if (!expedient.getRelacionatsPer().isEmpty()) {
+	                    for (ExpedientEntity expedient_relacionat : expedient.getRelacionatsPer()) {
+	                    	Sheet sheetRelacio = workbook.createSheet(validarNombreHoja(expedient_relacionat.getNom()));
+	                        crearTitol(sheetRelacio, expedient_relacionat);
+	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions);
+	                        
+	                        // Le da formato a la hoja
+	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions);
+	                    }
+	                }
+
+	                if (rowNum < expedients.size() - 1) {
+	                	sheet.createRow(rowNum++).createCell(0).setCellStyle(workbook.createCellStyle());
+	                }
+	            }
+		        
+	            // Le da formato a la hoja
+	            formatExcel(workbook, sheet, false, hasRelacions);
+	        }
+
+
+	        ByteArrayOutputStream out = new ByteArrayOutputStream();
+	        workbook.write(out);
+	        return out.toByteArray();
+	    } catch (Exception ex) {
+	        throw new RuntimeException("S'ha produït un error generant l'índex de l'expedient", ex);
+	    }
+	}
+
+	private void formatExcel(Workbook workbook, Sheet sheet, boolean isRelacio, boolean hasRelacions) {
+        // Combina las celdas título, subtítulo y descripción expedientes relacionados
+        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 8));
+        sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 8));
+        sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, 8));
+        sheet.addMergedRegion(new CellRangeAddress(5, 5, 0, 2));
+        if (hasRelacions && ! isRelacio)
+        	sheet.addMergedRegion(new CellRangeAddress(8, 8, 0, 8));
+        
+        // Itera sobre todas las filas con valores en la hoja de trabajo
+        for (Row row : sheet) {
+            float maxCellHeight = 0; // Ancho máximo de la columna
+            
+            if (row.getLastCellNum() > -1) {
+                for (Cell cell : row) {
+                    // Ajusta automáticamente el tamaño de la columna basado en el contenido de la celda
+                    int columnIndex = cell.getColumnIndex();
+                    sheet.autoSizeColumn(columnIndex);
+                    
+//                    cell.setCellStyle(cellStyle);
+                    
+                    // Obtiene el estilo de la celda
+                    org.apache.poi.ss.usermodel.Font font = workbook.getFontAt(cell.getCellStyle().getFontIndex());
+                    
+                    // Estimación aproximada del alto del texto
+                    float fontSize = font.getFontHeightInPoints();
+                    float lineHeight = (fontSize / 72) * 96; // Convertir el tamaño de la fuente a puntos por pulgada (dpi)
+                    int lines = cell.getStringCellValue().split("\n").length;
+                    float estimatedTextHeight = lineHeight * lines + 2;
+                    
+                    if (estimatedTextHeight > maxCellHeight) {
+                    	maxCellHeight = estimatedTextHeight;
+                    }
+                    
+                    if ((isRelacio && row.getRowNum() == 8) 
+                    		|| (!isRelacio && row.getRowNum() == 10 && hasRelacions) 
+                    		|| (!isRelacio && row.getRowNum() == 8 && !hasRelacions)) {
+                		CellStyle headerStyle = workbook.createCellStyle();
+                		headerStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
+                		headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                        headerStyle.setAlignment(HorizontalAlignment.LEFT);
+                        headerStyle.setVerticalAlignment(VerticalAlignment.TOP);
+                		cell.setCellStyle(headerStyle);
+                		
+                	    org.apache.poi.ss.usermodel.Font titleFont = sheet.getWorkbook().createFont();
+                	    titleFont.setBold(true);
+                	    titleFont.setFontName("Arial");
+                	    titleFont.setFontHeightInPoints((short) 10);
+                	    
+                	    headerStyle.setFont(titleFont);
+                    }
+                }
+            }
+            
+            // Establece la altura de fila estimada
+            row.setHeightInPoints(maxCellHeight);
+        }
+	}
+	private void crearTitol(Sheet sheet, ExpedientEntity expedient) {
+	    Row row = sheet.createRow(sheet.getLastRowNum() + 1); //1
+	    Cell cell = row.createCell(0);
+	    cell.setCellValue(expedient.getNom());
+
+	    // Título
+	    CellStyle titleStyle = sheet.getWorkbook().createCellStyle();
+	    org.apache.poi.ss.usermodel.Font titleFont = sheet.getWorkbook().createFont();
+	    titleFont.setFontName("Arial");
+	    titleFont.setBold(true);
+	    titleFont.setFontHeightInPoints((short) 14);
+	    titleStyle.setFont(titleFont);
+	    titleStyle.setWrapText(true); 
+	    row.setRowStyle(titleStyle);
+	    
+	    // El resto de filas
+	    CellStyle style = sheet.getWorkbook().createCellStyle();
+	    org.apache.poi.ss.usermodel.Font font = sheet.getWorkbook().createFont();
+	    font.setFontName("Arial");
+	    font.setFontHeightInPoints((short) 10);
+	    style.setFont(font);
+	    
+	    // Número
+	    row = sheet.createRow(sheet.getLastRowNum() + 1); //2
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.numero") + (expedient.getNumero() != null ? expedient.getNumero() : expedientHelper.calcularNumero(expedient)));
+	    row.setRowStyle(style);
+	    
+	    // Serie documental
+	    row = sheet.createRow(sheet.getLastRowNum() + 1); //3
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.serie") + expedient.getMetaExpedient().getSerieDocumental());
+	    row.setRowStyle(style);
+	    
+	    // Clasificacion
+	    row = sheet.createRow(sheet.getLastRowNum() + 1); //4
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.classificacio") + expedient.getMetaExpedient().getClassificacioSia());
+	    row.setRowStyle(style);
+	    
+	    // Fecha apertura
+	    row = sheet.createRow(sheet.getLastRowNum() + 1); //5
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.data") + sdtTime.format(expedient.getNtiFechaApertura()));
+	    row.setRowStyle(style);
+	    
+	    // Estado
+	    row = sheet.createRow(sheet.getLastRowNum() + 1); //6
+	    cell = row.createCell(0);
+	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.estat") + messageHelper.getMessage("expedient.service.exportacio.index.expedient.estat." + expedient.getEstat()));
+	    row.setRowStyle(style);
+	    
+//	    CellStyle subtitleStyle = sheet.getWorkbook().createCellStyle();
+//	    org.apache.poi.ss.usermodel.Font subtitleFont = sheet.getWorkbook().createFont();
+//	    subtitleFont.setBold(true);
+//	    subtitleFont.setFontHeightInPoints((short) 9);
+//	    subtitleStyle.setFont(subtitleFont);
+//	    cell.setCellStyle(subtitleStyle);
+	}
+
+	private void crearTaulaDocuments(Sheet sheet, ExpedientEntity expedient, EntitatEntity entitatActual, Workbook workbook, boolean isRelacio, boolean hasRelacions) throws NoSuchFileException, IOException {
+        // Crea un estilo de celda
+        CellStyle cellDataStyle = workbook.createCellStyle();
+        cellDataStyle.setAlignment(HorizontalAlignment.LEFT);
+        cellDataStyle.setVerticalAlignment(VerticalAlignment.TOP);
+        cellDataStyle.setWrapText(true); 
+        
+        
+		// Crear la tabla y establecer los estilos
+	    // Agregar las filas y celdas correspondientes a los documentos del expediente
+		int rowTitleIdx = isRelacio ? 8 : (hasRelacions ? 10 : 8);
+		int colIdx = 0;
+		Row headerRow = sheet.createRow(rowTitleIdx);
+		
+	    headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.nom"));
+//		if (isMostrarCampsAddicionals())
+//			headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.nomnatural"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.descripcio"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocument"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.fichero"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.ubicacio"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.tipusdocumental"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.origen"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.datacreacio"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.datadocument"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.firmat"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.datafirma"));
+//		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.enllac"));
+		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.link"));
+        
+		List<DocumentEntity> documents = new ArrayList<DocumentEntity>();
+		List<DocumentEntity> fillsOrder1 = documentRepository.findByExpedientAndEsborratAndOrdenat(
+				expedient,
+				0,
+				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		
+		List<DocumentEntity> fillsOrder2 = documentRepository.findByExpedientAndEsborratSenseOrdre(
+				expedient,
+				0,
+				new Sort("createdDate"));
+		
+		documents.addAll(fillsOrder1);
+		documents.addAll(fillsOrder2);
+		
+		int contentRowIdx = isRelacio ? 9 : (hasRelacions ? 11 : 9);
+		
+	    for (DocumentEntity document : documents) {
+			if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT) || document.getEstat().equals(DocumentEstatEnumDto.DEFINITIU)) {
+				colIdx = 0;
+		        Row dataRow = sheet.createRow(contentRowIdx++);
+		        List<String> subTitols = null;
+				ArxiuDetallDto arxiuDetall = contingutService.getArxiuDetall(
+						entitatActual.getId(),
+						document.getId());
+					
+		        // Nom
+		        String nom = document.getNom() != null ? document.getNom() : "";
+		        dataRow.createCell(colIdx++).setCellValue(nom);
+		        
+//				if (isMostrarCampsAddicionals() && arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+//					// Nom natural
+//					Object tituloDocMet = arxiuDetall.getMetadadesAddicionals().get("tituloDoc");
+//					String tituloDoc = tituloDocMet != null ? tituloDocMet.toString() : "";
+//					dataRow.createCell(colIdx++).setCellValue(tituloDoc);
+//				}
+				
+		        // Descripció
+		        String descripcio = document.getDescripcio() != null ? document.getDescripcio() : "";
+		        dataRow.createCell(colIdx++).setCellValue(descripcio);
+		        
+		        
+		        // Tipus document
+		     	String tipusDocument = document.getDocumentTipus() != null ? messageHelper.getMessage("document.tipus.enum." + document.getDocumentTipus()) : "";
+		        
+		        if (document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
+					subTitols = new ArrayList<String>();
+					
+					if (arxiuDetall != null && arxiuDetall.getMetadadesAddicionals() != null) {
+						Object numRegistreMet = arxiuDetall.getMetadadesAddicionals().get("numRegistre");
+						Object dataRegistreMet = arxiuDetall.getMetadadesAddicionals().get("dataRegistre");
+						if (numRegistreMet != null) {
+							String numRegistre = numRegistreMet != null ? numRegistreMet.toString() : "";
+							subTitols.add(numRegistre);
+						}
+						if (dataRegistreMet != null) {
+							Date dataRegistre = dataRegistreMet != null ? (Date)dataRegistreMet : null;
+							subTitols.add(sdtTime.format(dataRegistre));
+						}
+					}
+					
+					if (!subTitols.isEmpty()) {
+						String textAddicional = "-----------------------------------\n";
+						for (String subTitol: subTitols) {
+							textAddicional += subTitol + "\n";
+						}
+						dataRow.createCell(colIdx++).setCellValue(tipusDocument + "\n" + textAddicional);
+					}
+				} else {
+					dataRow.createCell(colIdx++).setCellValue(tipusDocument);
+				}
+		        
+		        // Nom fitxer
+		     	String nombreFichero = document.getFitxerNom();
+		        dataRow.createCell(colIdx++).setCellValue(nombreFichero != null ? nombreFichero : "-");
+		        
+		        // Ubicacó
+		        List<ContingutEntity> path = getPathContingut(document);
+		        String pathstr = "";
+		        if (path.size() > 1) {
+		        	pathstr = "/";
+			        for (ContingutEntity contigut: path) {
+						pathstr += contigut.getNom() + "/";
+					}
+		        }
+		        dataRow.createCell(colIdx++).setCellValue(pathstr);
+		        
+		        // Tipus documental
+		     	String tipusDocumental = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("document.nti.tipdoc.enum." + document.getNtiTipoDocumental()) : "";
+		        dataRow.createCell(colIdx++).setCellValue(tipusDocumental);
+
+		        // Origen
+		     	String origen = document.getNtiTipoDocumental() != null ? messageHelper.getMessage("expedient.service.exportacio.index.origen." + document.getNtiOrigen()) : "";
+		        dataRow.createCell(colIdx++).setCellValue(origen);
+		        
+		        // Data creació
+		     	String dataCreacio = document.getCreatedDate() != null ? sdt.format(document.getCreatedDate().toDate()) : "";
+		        dataRow.createCell(colIdx++).setCellValue(dataCreacio);
+		        
+		     	// Data captura
+		     	String dataCaptura = document.getDataCaptura() != null ? sdt.format(document.getDataCaptura()) : "";
+		        dataRow.createCell(colIdx++).setCellValue(dataCaptura);
+		        
+				// Custodiat / Notificat
+				DocumentNotificacioEstatEnumCustom estatNotificacio = null;
+				List<DocumentNotificacioEntity> notificacions = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc((DocumentEntity)document);		
+				boolean hasNotificacions = notificacions != null && !notificacions.isEmpty();
+		
+				if (hasNotificacions) {
+					// Estat darrera notificació
+				DocumentNotificacioEstatEnumDto estatLastNotificacio = notificacions.get(0).getNotificacioEstat();
+					switch (estatLastNotificacio) {
+						case PENDENT:
+							estatNotificacio = DocumentNotificacioEstatEnumCustom.PENDENT;
+							break;
+						case REGISTRADA:
+							estatNotificacio = DocumentNotificacioEstatEnumCustom.REGISTRAT;
+							break;
+						case ENVIADA:
+							estatNotificacio = DocumentNotificacioEstatEnumCustom.ENVIAT;
+							break;
+						case FINALITZADA:
+							estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+							break;
+						case PROCESSADA:
+							estatNotificacio = DocumentNotificacioEstatEnumCustom.NOTIFICAT;
+							break;
+					}
+					
+					if (!document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT))
+						dataRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio));
+				}
+				
+				if (document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)) {
+					subTitols = new ArrayList<String>();
+					Map<Integer, Date> datesFirmes = null;
+					try {
+						es.caib.plugins.arxiu.api.Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
+								document,
+								null,
+								null,
+								true,
+								false);
+						byte[] contingutArxiu = documentHelper.getContingutFromArxiuDocument(arxiuDocument);
+						datesFirmes = getDataFirmaFromDocument(contingutArxiu);
+					} catch (Exception ex) {
+						logger.error("Hi ha hagut un error recuperant l'hora de firma del document", ex);
+					}
+					if (hasNotificacions) {
+						String missatgeEstatNotificacio = messageHelper.getMessage("expedient.service.exportacio.index.estat." + estatNotificacio);
+						subTitols.add(missatgeEstatNotificacio);
+					}
+					
+					String text = messageHelper.getMessage("expedient.service.exportacio.index.estat.firmat");
+					String textAddicional = "";
+					for (String subTitol: subTitols) {
+						textAddicional += subTitol + "\n";
+					}
+					dataRow.createCell(colIdx++).setCellValue(text + (textAddicional.isEmpty() ? "" : "\n" + textAddicional));
+					
+
+					if (datesFirmes != null && !datesFirmes.isEmpty()) {
+						String dataFirma = sdtTime.format(datesFirmes.get(datesFirmes.size()));						
+						dataRow.createCell(colIdx++).setCellValue(dataFirma);
+					} else {
+						dataRow.createCell(colIdx++).setCellValue("-");
+					}
+				} 
+				
+				
+				if (!hasNotificacions && !document.getEstat().equals(DocumentEstatEnumDto.CUSTODIAT)){
+					dataRow.createCell(colIdx++).setCellValue("-");
+					dataRow.createCell(colIdx++).setCellValue("-");
+				}
+				
+				
+//		        // Enllaç directe
+		        CellStyle linkStyle = workbook.createCellStyle();
+		        org.apache.poi.ss.usermodel.Font linkFont = workbook.createFont();
+		        linkFont.setUnderline(org.apache.poi.ss.usermodel.Font.U_SINGLE);
+		        linkFont.setColor(IndexedColors.BLUE.getIndex());
+		        linkStyle.setFont(linkFont);
+		        linkStyle.setAlignment(HorizontalAlignment.LEFT);
+		        linkStyle.setVerticalAlignment(VerticalAlignment.TOP);
+		        
+//		        String enlace = getBaseUrl() + "/contingut/" + document.getPareId() + "/document/" + document.getId() + "/descarregar";
+//		        org.apache.poi.ss.usermodel.Cell cellEnlace = dataRow.createCell(colIdx++);
+//		        cellEnlace.setCellValue(enlace);
+//		        Hyperlink hyperlink = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
+//				hyperlink.setAddress(enlace);
+//		        cellEnlace.setHyperlink(hyperlink);
+//		        cellEnlace.setCellStyle(linkStyle);
+
+		     	// Enllaç csv
+		     	String csv = document.getNtiCsv() != null ? getCsvUrl() + document.getNtiCsv() : "";
+		     	if (csv.isEmpty() && arxiuDetall != null && !arxiuDetall.getMetadadesAddicionals().isEmpty()) {
+		     		String metadadaAddicionalCsv = (String) arxiuDetall.getMetadadesAddicionals().get("csv");
+		     		csv = metadadaAddicionalCsv != null ? getCsvUrl() + metadadaAddicionalCsv : "";
+			     }
+		        org.apache.poi.ss.usermodel.Cell cellCsv = dataRow.createCell(colIdx++);
+		        cellCsv.setCellValue(csv);
+		        Hyperlink hyperlink = workbook.getCreationHelper().createHyperlink(HyperlinkType.URL);
+				hyperlink.setAddress(csv);
+				cellCsv.setHyperlink(hyperlink);
+				cellCsv.setCellStyle(linkStyle);
+
+				dataRow.setRowStyle(cellDataStyle);
+			}
+	    }
+	}
+	
+	private String validarNombreHoja(String nombreHoja) {
+	    // Lista de caracteres no válidos en el nombre de una hoja de cálculo en Excel
+	    String caracteresNoValidos = "[\\\\/*?\\[\\]]";
+	    String nombreValido = nombreHoja.replaceAll(caracteresNoValidos, "");
+	    
+	    // Limitar la longitud del nombre a 31 caracteres (límite de Excel)
+	    if (nombreValido.length() > 31) {
+	        nombreValido = nombreValido.substring(0, 31);
+	    }
+	    
+	    return nombreValido;
+	}
+	
+	private List<ContingutEntity> getPathContingut(ContingutEntity contingut) {
+		List<ContingutEntity> path = null;
+		ContingutEntity contingutActual = contingut;
+		while (contingutActual != null && contingutActual.getPare() != null) {
+			if (path == null)
+				path = new ArrayList<ContingutEntity>();
+			ContingutEntity c = contingutRepository.findOne(contingutActual.getPare().getId());
+			path.add(c);
+			contingutActual = c;
+		}
+		if (path != null) {
+			Collections.reverse(path);
+		}
+		return path;
+	}
+	
+	private void crearTitolRelacio(Sheet sheet, List<ExpedientEntity> relacionatAmb, List<ExpedientEntity> relacionatPer) {
+	    Row row = sheet.createRow(8);
+	    Cell cell = row.createCell(0);
+	    int totalRelacionats = relacionatAmb.size() + relacionatPer.size();
+	    
+	    if (totalRelacionats == 1)
+	    	cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.relacio.excel"));
+	    else if (totalRelacionats > 1) 
+	    	cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.relacions.excel", new Object[] {totalRelacionats}));
+	    
+	    CellStyle titleStyle = sheet.getWorkbook().createCellStyle();
+	    org.apache.poi.ss.usermodel.Font titleFont = sheet.getWorkbook().createFont();
+	    titleFont.setItalic(true);
+	    titleFont.setFontName("Arial");
+	    titleFont.setFontHeightInPoints((short) 10);
+	    titleStyle.setFont(titleFont);
+	    cell.setCellStyle(titleStyle);
+	}
+	
 	private InputStream getCapsaleraDefaultLogo() {
 		return getClass().getResourceAsStream("/es/caib/ripea/core/templates/govern-logo.png");
 	}
@@ -715,6 +1196,10 @@ public class IndexHelper {
 	
 	private boolean isMostrarCampsAddicionals() throws NoSuchFileException, IOException {
 		return configHelper.getAsBoolean("es.caib.ripea.index.expedient.camps.addicionals");
+	}
+	
+	private String getBaseUrl() {
+		return configHelper.getConfig("es.caib.ripea.base.url");
 	}
 	
 	private enum DocumentNotificacioEstatEnumCustom {PENDENT, REGISTRAT, ENVIAT, NOTIFICAT};

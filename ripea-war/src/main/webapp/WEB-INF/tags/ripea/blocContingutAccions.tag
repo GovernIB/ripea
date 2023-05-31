@@ -322,7 +322,10 @@
 				<c:choose>
 					<c:when test="${contingut.hasFills}">
 						<%---- Exportar índex PDF... ----%>
-						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>
+						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>
+						<c:if test="${isExportacioExcelActiva}">
+							<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarIndex/XLSX"/>"><span class="fa fa-th-list"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.xlsx"/>...</a></li>
+						</c:if>
 						<%---- Índex PDF i exportació ENI... ----%>
 						<c:choose>
 							<c:when test="${contingut.conteDocumentsDefinitius}">

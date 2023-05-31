@@ -667,7 +667,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						FitxerDto index = expedientService.exportIndexExpedient(
 								entitatCreada.getId(), 
 								new HashSet<>(Arrays.asList(expedientCreat.getId())),
-								false);
+								false,
+								"PDF");
 						
 						assertNotNull(index);
 						assertNotNull(index.getContingut());

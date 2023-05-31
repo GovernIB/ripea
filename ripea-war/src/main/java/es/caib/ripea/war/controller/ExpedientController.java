@@ -358,16 +358,22 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 	}
 	
-	@RequestMapping(value = "/{expedientId}/generarIndex", method = RequestMethod.GET)
+	@RequestMapping(value = "/{expedientId}/generarIndex/{format}", method = RequestMethod.GET)
 	public void generarIndex(
 			@PathVariable Long expedientId,
+			@PathVariable String format,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (! isExportacioExcelActiva() && format != null && format.equals("XLSX"))
+			throw new SecurityException("És necessari activar la propietat 'es.caib.ripea.expedient.exportacio.excel' per realitzar la exportació a excel");
+		
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
 				new HashSet<>(Arrays.asList(expedientId)),
-				false);
+				false,
+				format);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 		
@@ -380,13 +386,15 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/{expedientId}/generarExportarIndex", method = RequestMethod.GET)
 	public void generarExportarIndex(
 			@PathVariable Long expedientId,
+			@PathVariable String format,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportIndexExpedient(
 				entitatActual.getId(),
 				new HashSet<>(Arrays.asList(expedientId)),
-				true);
+				true,
+				format);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 		
@@ -1695,6 +1703,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	
 	private boolean isFiltreDataCreacioActiu() {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.filtre.data.creacio.actiu"));
+	}
+	
+	private boolean isExportacioExcelActiva() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel"));
 	}
 
 	private ExpedientFiltreCommand getRelacionarFiltreCommand(
