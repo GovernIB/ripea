@@ -33,6 +33,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private byte[] plantillaContingut;
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
 	private String ntiTipoDocumental;
+	private String ntiTipoDocumentalNom;
 	private NtiOrigenEnumDto ntiOrigen;
 	private boolean firmaBiometricaActiva;
 	private boolean biometricaLectura;
@@ -55,6 +56,9 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	}
 	public void setLeftPerCreacio(boolean leftPerCreacio) {
 		this.leftPerCreacio = leftPerCreacio;
+	}
+	public String getNtiTipusDocumentalCodiNom() {
+		return ntiTipoDocumental + " - " + ntiTipoDocumentalNom;
 	}
 	
 	@Override

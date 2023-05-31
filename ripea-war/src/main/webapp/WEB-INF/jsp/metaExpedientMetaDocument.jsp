@@ -63,6 +63,33 @@
 						{{if perDefecte}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="multiplicitat" data-orderable="false" data-template="#cellMultiplicitat">
+					<spring:message code="metadocument.list.columna.multiplicitat"/>
+					<script id="cellMultiplicitat" type="text/x-jsrender">
+						{{if multiplicitat == 'M_1'}}
+							<spring:message code="multiplicitat.enum.M_1"/>
+						{{else multiplicitat == 'M_0_1'}}
+							<spring:message code="multiplicitat.enum.M_0_1"/>
+						{{else multiplicitat == 'M_0_N'}}
+							<spring:message code="multiplicitat.enum.M_0_N"/>
+						{{else multiplicitat == 'M_1_N'}}
+							<spring:message code="multiplicitat.enum.M_1_N"/>
+						{{/if}}
+					</script>
+				</th>
+				<th data-col-name="ntiOrigen" data-orderable="false" data-template="#cellNtiOrigen">
+					<spring:message code="metadocument.list.columna.origen"/>
+					<script id="cellNtiOrigen" type="text/x-jsrender">
+						{{if ntiOrigen == 'O0'}}
+							<spring:message code="nti.origen.enum.O0"/>
+						{{else ntiOrigen == 'O1'}}
+							<spring:message code="nti.origen.enum.O1"/>
+						{{/if}}
+					</script>
+				</th>
+				<th data-col-name="ntiTipusDocumentalCodiNom" data-orderable="false" >
+					<spring:message code="metadocument.list.columna.tipus.documental"/>
+				</th>												
 				<th data-col-name="firmaPortafirmesActiva" data-orderable="false" data-template="#cellFirmaPortafirmesActivaTemplate">
 					<spring:message code="metadocument.list.columna.firmaPortafirmesActiva"/>
 					<script id="cellFirmaPortafirmesActivaTemplate" type="text/x-jsrender">
