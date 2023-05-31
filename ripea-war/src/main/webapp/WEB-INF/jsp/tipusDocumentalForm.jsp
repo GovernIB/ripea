@@ -24,7 +24,9 @@
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<rip:inputText name="codi" textKey="tipusdocumental.form.camp.codi" required="true"/>
-		<rip:inputText name="nom" textKey="tipusdocumental.form.camp.nom" required="true"/>
+<%-- 		<rip:inputText name="codiEspecific" textKey="tipusdocumental.form.camp.codi.especific"/> --%>
+		<rip:inputText name="nomEspanyol" textKey="tipusdocumental.form.camp.nom" required="true"/>
+		<rip:inputText name="nomCatala" textKey="tipusdocumental.form.camp.nom.catala"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/tipusDocumental"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

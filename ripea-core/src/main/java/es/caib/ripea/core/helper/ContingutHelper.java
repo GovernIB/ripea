@@ -509,7 +509,7 @@ public class ContingutHelper {
 						contingut.getEntitat());
 
 				if (tipusDocumental != null) {
-					dto.setNtiTipoDocumentalNom(tipusDocumental.getNom());
+					dto.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
 				} else {
 					List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
 

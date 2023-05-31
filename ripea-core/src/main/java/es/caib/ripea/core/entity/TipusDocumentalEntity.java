@@ -28,8 +28,12 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "codi", length = 64, nullable = false)
 	private String codi;
+//	@Column(name = "codi_especific", length = 64)
+//	private String codiEspecific;
 	@Column(name = "nom", length = 256, nullable = false)
-	private String nom;
+	private String nomEspanyol;
+	@Column(name = "nom_catala", length = 256)
+	private String nomCatala;
 	
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "entitat_id")
@@ -40,40 +44,60 @@ public class TipusDocumentalEntity extends RipeaAuditable<Long> {
 		return codi;
 	}
 
-	public String getNom() {
-		return nom;
+	public String getNomEspanyol() {
+		return nomEspanyol;
 	}
 
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
 
+	public String getNomCatala() {
+		return nomCatala;
+	}
+
+//	public String getCodiEspecific() {
+//		return codiEspecific;
+//	}
+
 	public void update(
 			String codi,
-			String nom) {
+			String nom, 
+			String nomCatala, 
+			String codiEspecific) {
 		this.codi = codi;
-		this.nom = nom;
+		this.nomEspanyol = nom;
+		this.nomCatala = nomCatala;
+//		this.codiEspecific = codiEspecific;
 	}
 
 	public static Builder getBuilder(
 			String codi,
 			String nom,
-			EntitatEntity entitat) {
+			EntitatEntity entitat, 
+			String nomCatala, 
+			String codiEspecific) {
 		return new Builder(
 				codi,
 				nom,
-				entitat);
+				entitat, 
+				nomCatala, 
+				codiEspecific);
 	}
 	public static class Builder {
 		TipusDocumentalEntity built;
 		Builder(
 				String codi,
 				String nom,
-				EntitatEntity entitat) {
+				EntitatEntity entitat,
+				String nomCatala, 
+				String codiEspecific) {
 			built = new TipusDocumentalEntity();
 			built.codi = codi;
-			built.nom = nom;
+			built.nomEspanyol = nom;
 			built.entitat = entitat;
+			built.nomCatala = nomCatala;
+//			built.codiEspecific = codiEspecific;
 			
 		}
 		public TipusDocumentalEntity build() {

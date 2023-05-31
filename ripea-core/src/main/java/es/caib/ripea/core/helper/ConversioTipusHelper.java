@@ -14,6 +14,7 @@ import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,7 @@ import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -49,11 +51,13 @@ import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.config.OrganConfigDto;
 import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
 import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.DadaEntity;
@@ -71,16 +75,21 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
+import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
 import ma.glasnost.orika.metadata.Type;
 
@@ -104,6 +113,9 @@ public class ConversioTipusHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private TascaHelper tascaHelper;
+	@Autowired
+	private TipusDocumentalRepository tipusDocumentalRepository;
+	
 	public ConversioTipusHelper() {
 		mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapperFactory.getConverterFactory().registerConverter(
@@ -743,6 +755,36 @@ public class ConversioTipusHelper {
 					}
 				});
 		
+		
+	      mapperFactory.classMap(MetaDocumentEntity.class, MetaDocumentDto.class)
+	        .customize(new CustomMapper<MetaDocumentEntity,MetaDocumentDto>() {
+	            @Override
+	            public void mapAtoB(MetaDocumentEntity source, MetaDocumentDto target, MappingContext mappingContext) {
+	            	TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodi(source.getNtiTipoDocumental());
+//					target.setNtiTipoDocumental(tipusDocumental.getCodiEspecific() != null ? tipusDocumental.getCodiEspecific() : tipusDocumental.getCodi());
+	            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
+	            		target.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
+					} else {
+						target.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
+					}
+	            }
+	        })
+	        .byDefault()
+	        .register();
+	      
+	      mapperFactory.classMap(TipusDocumentalEntity.class, TipusDocumentalDto.class)
+	        .customize(new CustomMapper<TipusDocumentalEntity,TipusDocumentalDto>() {
+	            @Override
+	            public void mapAtoB(TipusDocumentalEntity source, TipusDocumentalDto target, MappingContext mappingContext) {
+	            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(source.getNomCatala())) {
+	            		target.setNom(source.getNomCatala());
+					} else {
+						target.setNom(source.getNomEspanyol());
+					}
+	            }
+	        })
+	        .byDefault()
+	        .register();	      
 		
 		
 

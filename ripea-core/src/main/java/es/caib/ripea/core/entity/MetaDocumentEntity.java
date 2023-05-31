@@ -84,8 +84,16 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	@Column(name = "nti_estela", length = 4)
 	@Enumerated(EnumType.STRING)
 	private DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion;
+	
+	
 	@Column(name = "nti_tipdoc", length = 4)
 	private String ntiTipoDocumental;
+	
+//	@ManyToOne
+//	@JoinColumn(name = "nti_tipusdoc")
+//	@ForeignKey(name = "ipa_tipdoc_metadoc_fk")
+//	private TipusDocumentalEntity ntiTipusDocumental;
+	
 	
 	@Column(name = "firma_biometrica")
 	private boolean firmaBiometricaActiva;

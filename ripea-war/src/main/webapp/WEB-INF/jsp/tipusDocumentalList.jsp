@@ -33,7 +33,11 @@
 		<thead>
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="tipusdocumental.columna.codi"/></th>
-				<th data-col-name="nom" data-orderable="false"><spring:message code="tipusdocumental.columna.nom"/></th>
+<%-- 				<c:if test="${tipusDocumentalsNtiCodiEspecific}"> --%>
+<%-- 					<th data-col-name="codiEspecific" data-orderable="false"><spring:message code="tipusdocumental.columna.codi.especific"/></th> --%>
+<%-- 				</c:if> --%>
+				<th data-col-name="nomEspanyol" data-orderable="false"><spring:message code="tipusdocumental.columna.nom"/></th>
+				<th data-col-name="nomCatala" data-orderable="false"><spring:message code="tipusdocumental.columna.nom.catala"/></th>
 				<c:if test="${suportaMetaDocumentalsAddicionals}">
 					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">

@@ -22,15 +22,15 @@ import es.caib.ripea.core.entity.TipusDocumentalEntity;
  */
 public interface TipusDocumentalRepository extends JpaRepository<TipusDocumentalEntity, Long> {
 
-	List<TipusDocumentalEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
+	List<TipusDocumentalEntity> findByEntitatOrderByNomEspanyolAsc(EntitatEntity entitat);
 	
-	
+	TipusDocumentalEntity findByCodi(String codi);
 	
 	@Query(	"from " +
 			"    TipusDocumentalEntity tipusDocumental " +
 			"where " +
 			"    tipusDocumental.entitat = :entitat " +
-			"and (:esNullFiltre = true or lower(tipusDocumental.codi) like lower('%'||:filtre||'%') or lower(tipusDocumental.nom) like lower('%'||:filtre||'%')) ")
+			"and (:esNullFiltre = true or lower(tipusDocumental.codi) like lower('%'||:filtre||'%') or lower(tipusDocumental.nomEspanyol) like lower('%'||:filtre||'%') or lower(tipusDocumental.nomCatala) like lower('%'||:filtre||'%')) ")
 	Page<TipusDocumentalEntity> findByEntitat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullFiltre") boolean esNullFiltre,

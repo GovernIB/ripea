@@ -1305,7 +1305,7 @@ public class ContingutServiceImpl implements ContingutService {
 							entitat);
 
 					if (tipusDocumental != null) {
-						arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNom());
+						arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
 					} else {
 						List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
 						
@@ -1316,7 +1316,7 @@ public class ContingutServiceImpl implements ContingutService {
 						}
 					}
 
-					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNom());
+					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
 				}
 
 				arxiuDetall.setEniOrgans(metadades.getOrgans());

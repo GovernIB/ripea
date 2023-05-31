@@ -65,8 +65,10 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		
 		TipusDocumentalEntity entity = TipusDocumentalEntity.getBuilder(
 				tipusDocumental.getCodi(),
-				tipusDocumental.getNom(),
-				entitat).build();
+				tipusDocumental.getNomEspanyol(),
+				entitat,
+				tipusDocumental.getNomCatala(), 
+				tipusDocumental.getCodiEspecific()).build();
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
 				tipusDocumentalRepository.save(entity),
 				TipusDocumentalDto.class);
@@ -102,7 +104,9 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 
 		tipusDocumentalEntity.update(
 				tipusDocumental.getCodi(),
-				tipusDocumental.getNom());
+				tipusDocumental.getNomEspanyol(), 
+				tipusDocumental.getNomCatala(), 
+				tipusDocumental.getCodiEspecific());
 		TipusDocumentalDto dto = conversioTipusHelper.convertir(
 				tipusDocumentalEntity,
 				TipusDocumentalDto.class);
@@ -184,7 +188,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false, 
 				true, false);
 
-		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findByEntitatOrderByNomAsc(entitat);
+		List<TipusDocumentalEntity> tipusDocumentalsEntity = tipusDocumentalRepository.findByEntitatOrderByNomEspanyolAsc(entitat);
 		List<TipusDocumentalDto> tipusDocumentalsDto =  conversioTipusHelper.convertirList(
 				tipusDocumentalsEntity,
 				TipusDocumentalDto.class);

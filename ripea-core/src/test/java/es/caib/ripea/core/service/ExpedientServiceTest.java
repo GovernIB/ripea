@@ -106,7 +106,12 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						ExpedientDto modificat = expedientService.update(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								expedientUpdate.getNom());
+								expedientUpdate.getNom(),
+								0,
+								null, 
+								null, 
+								null,
+								null);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
