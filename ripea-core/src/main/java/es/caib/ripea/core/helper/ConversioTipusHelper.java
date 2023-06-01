@@ -472,9 +472,8 @@ public class ConversioTipusHelper {
 						}
 						target.setEstatPendentEnviarDistribucio(estatPendentEnviarDistribucio);
 						
-						
 						String interessatsResum = "";
-						if (source.getRegistre().getInteressats() != null)
+						if (source.getRegistre() != null && source.getRegistre().getInteressats() != null)
 							for (RegistreInteressatEntity interessat : source.getRegistre().getInteressats()) {
 								if (interessat.getTipus() == InteressatTipus.PERSONA_FISICA) {
 									interessatsResum += interessat.getNom() == null ? "" : interessat.getNom() + " ";

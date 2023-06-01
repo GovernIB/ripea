@@ -107,4 +107,13 @@ public interface ExpedientPeticioService {
 	@PreAuthorize("hasRole('tothom')")
 	public void evictCountAnotacionsPendents(
 			Long entitatId);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public PaginaDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
+			ExpedientPeticioFiltreDto filtre,
+			PaginacioParamsDto paginacioParams);
+
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	public void comunicadaReprocessar(
+			Long expedientPeticioId);
  }

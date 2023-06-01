@@ -154,11 +154,6 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
 	}
 
-	public void updateDataAlta(
-			Date dataAlta) {
-		this.dataAlta = dataAlta;
-	}
-
 	public void updateEstat(
 			ExpedientPeticioEstatEnumDto estat) {
 		this.estat = estat;

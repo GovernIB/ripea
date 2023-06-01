@@ -13,8 +13,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +21,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.SegonPlaService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.config.PropertiesConstants;
 import es.caib.ripea.core.config.SchedulingConfig;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -38,18 +34,17 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EmailPendentEnviarEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.ExpedientPeticioHelper0;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.SynchronizationHelper;
@@ -114,7 +109,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	
 	@Autowired
 	private DocumentRepository documentRepository;
-
+	
+	@Autowired
+	private ExpedientPeticioHelper0 expedientPeticioHelper0;
 
 	private static final String PREFIX_RIPEA = "[RIPEA]";
 
@@ -123,82 +120,26 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 */
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
-
-		if (cacheHelper.mostrarLogsSegonPla())
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 
 
 		// find peticions with no anotació associated and with no errors from previous invocation of this method
-		List<ExpedientPeticioEntity> peticions = expedientPeticioRepository.findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto.CREAT);
+		List<Long> peticionsId = expedientPeticioRepository.findIdByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto.CREAT);
 
 
-		if (peticions != null && !peticions.isEmpty()) {
-			for (ExpedientPeticioEntity expedientPeticioEntity : peticions) {
-
-				AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
-				anotacioRegistreId.setIndetificador(expedientPeticioEntity.getIdentificador());
-				anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
-				try {
-
-					// obtain anotació from DISTRIBUCIO
-					AnotacioRegistreEntrada registre = DistribucioHelper.getBackofficeIntegracioRestClient().consulta(anotacioRegistreId);
-
-					// create anotació in db and associate it with expedient peticion
-					expedientPeticioHelper.crearRegistrePerPeticio(
-							registre,
-							expedientPeticioEntity);
-
-					// change state of anotació in DISTRIBUCIO to BACK_REBUDA
-					try {
-						DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
-								anotacioRegistreId,
-								Estat.REBUDA,
-								"");
-						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), true);
-						
-					} catch (Exception e) {
-						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), false);
-					}
-					EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
-					if (entitatAnotacio != null)
-						cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
-					
-					
-					try {
-						emailHelper.novaAnotacioPendent(expedientPeticioEntity.getId());
-					} catch (Exception e) {
-						logger.error("Error al enviar email per nova anotació pendent", e);
-					}
-					
-
-				} catch (Throwable e) {
-
-					logger.error("Error consultar i guardar anotació per petició: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
-					
-					try {
-						// add error to peticio, so it will not be processed anymore until it will be resent from DISTRIBUCIO
-						expedientPeticioHelper.addExpedientPeticioConsultaError(
-								expedientPeticioEntity.getId(),
-								StringUtils.abbreviate(
-										ExceptionUtils.getStackTrace(e),
-										3600));
-
-						// change state of anotació in DISTRIBUCIO to BACK_ERROR
-						DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
-								anotacioRegistreId,
-								Estat.ERROR,
-								StringUtils.abbreviate(
-										ExceptionUtils.getStackTrace(e),
-										3600));
-						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), true);
-						
-					} catch (Exception e1) {
-						expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioEntity.getId(), false);
-						logger.error(ExceptionUtils.getStackTrace(e1));
-					}
+		if (Utils.isNotEmpty(peticionsId)) {
+			for (Long peticionId : peticionsId) {
+				synchronized (SynchronizationHelper.get0To99Lock(peticionId, SynchronizationHelper.locksAnnotacions)) {
+					expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(peticionId, false);
 				}
 			}
 		}
+		
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("Fin de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients :  " + (System.currentTimeMillis() - t1) + " ms");
+		
 	}
 
 	@Override

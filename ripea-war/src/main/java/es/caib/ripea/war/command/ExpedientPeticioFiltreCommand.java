@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
@@ -26,6 +27,7 @@ public class ExpedientPeticioFiltreCommand {
 	private Date dataInicial;
 	private Date dataFinal;
 	private ExpedientPeticioEstatViewEnumDto estat;
+	private ExpedientPeticioEstatEnumDto estatAll;
 	private Long metaExpedientId;
 	private String procedimentCodi;
 	private String interessat;
@@ -86,6 +88,10 @@ public class ExpedientPeticioFiltreCommand {
 	public static ExpedientPeticioFiltreDto asDto(ExpedientPeticioFiltreCommand command) {
 		return ConversioTipusHelper.convertir(command,
 				ExpedientPeticioFiltreDto.class);
+	}
+	public void setEstatAll(
+			ExpedientPeticioEstatEnumDto estatAll) {
+		this.estatAll = estatAll;
 	}
 
 }
