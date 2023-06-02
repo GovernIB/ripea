@@ -453,4 +453,9 @@ public class ExpedientServiceBean implements ExpedientService {
 			ContingutVistaEnumDto vistaActual) {
 		delegate.setVistaUsuariActual(vistaActual);
 	}
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds) throws IOException {
+		return delegate.exportarEniExpedient(entitatId, expedientIds);
+	}
 }

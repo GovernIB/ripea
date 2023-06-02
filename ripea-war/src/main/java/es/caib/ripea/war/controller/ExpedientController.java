@@ -386,7 +386,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/{expedientId}/generarExportarIndex", method = RequestMethod.GET)
 	public void generarExportarIndex(
 			@PathVariable Long expedientId,
-			@PathVariable String format,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -394,7 +393,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				new HashSet<>(Arrays.asList(expedientId)),
 				true,
-				format);
+				"PDF");
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 		
@@ -402,6 +401,57 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				fitxer.getNom(),
 				fitxer.getContingut(),
 				response);
+	}
+	
+	@RequestMapping(value = "/{expedientId}/exportarEni", method = RequestMethod.GET)
+	public void exportarEni(
+			@PathVariable Long expedientId,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		FitxerDto fitxer = expedientService.exportarEniExpedient(
+				entitatActual.getId(), 
+				new HashSet<>(Arrays.asList(expedientId)));
+
+		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+		
+		writeFileToResponse(
+				fitxer.getNom(),
+				fitxer.getContingut(),
+				response);
+	}
+	
+	@RequestMapping(value = "/exportarEni", method = RequestMethod.GET)
+	public String exportarEniMassiu(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+		ExpedientFiltreCommand command = getFiltreCommand(request);
+		if (seleccio == null || seleccio.isEmpty() || command == null) {
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"expedient.controller.exportacio.seleccio.buida"),
+					null);
+			return "redirect:../expedient";
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			FitxerDto fitxer = expedientService.exportarEniExpedient(
+					entitatActual.getId(), 
+					seleccio);
+	
+			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+			
+			writeFileToResponse(
+					fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+			return null;
+		}
 	}
 	
 	@RequestMapping(value = "/generarIndex/{format}", method = RequestMethod.GET)

@@ -426,6 +426,22 @@ public interface ExpedientService {
 			Set<Long> expedientIds,
 			boolean exportar, String format) throws IOException;
 
+	/**
+	 * Exportació ENI de l'expedient.
+	 * 
+	 * @param entitatId 
+	 *            Atribut id de l'entitat.
+	 * @param expedientIds
+	 *            Els expedients dels que vol generar l'índex
+	 * @return Document exportat ENI.
+	 * @throws IOException 
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto exportarEniExpedient(
+			Long entitatId, 
+			Set<Long> expedientIds) throws IOException;
+	
+	
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,

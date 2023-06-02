@@ -570,6 +570,7 @@ function hexToRgb(hex) {
 						<li><a href="expedient/export/CSV"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.CSV"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/ZIP"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.zip"/></a></li>
 						<li><a class="fileDownload" href="expedient/generarIndex/PDF"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/></a></li>
+						<li><a class="fileDownload" href="expedient/exportarEni"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/></a></li>
 					</ul>
 				</div>
 			</div>

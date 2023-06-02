@@ -329,6 +329,7 @@
 						<%---- Índex PDF i exportació ENI... ----%>
 						<c:choose>
 							<c:when test="${contingut.conteDocumentsDefinitius}">
+			 					<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
 								<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
 			 				</c:when>
 			 				<c:otherwise>

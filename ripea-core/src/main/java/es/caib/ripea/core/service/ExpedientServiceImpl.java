@@ -1375,6 +1375,61 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return fitxer;
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds) throws IOException {
+		logger.debug(
+				"Exportant ENI dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ")");
+		entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				false, 
+				false, 
+				false, 
+				true, 
+				false);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		FitxerDto resultat = new FitxerDto();
+//		comprovar accés expedients
+		for (Long expedientId : expedientIds) {
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+					expedientId,
+					false,
+					true,
+					false,
+					false,
+					false,
+					null);
+
+			if (expedientIds.size() > 1) {
+				String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+				if (expedientExportacioEni != null) {
+					FitxerDto exportacioEni = new FitxerDto();
+					exportacioEni.setNom(expedient.getNom() + "_exportació_ENI.xml");
+					exportacioEni.setContentType("application/xml");
+					exportacioEni.setContingut(expedientExportacioEni.getBytes());
+					contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+				}
+			} else {
+				String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+				if (expedientExportacioEni != null) {
+					resultat.setNom(expedient.getNom() + "_exportació_ENI.xml");
+					resultat.setContentType("application/xml");
+					resultat.setContingut(expedientExportacioEni.getBytes());
+				}
+			}
+		}
+		
+		if (expedientIds.size() > 1) {
+			zos.close();
+			
+			resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.eni") + ".zip");
+			resultat.setContentType("application/zip");
+			resultat.setContingut(baos.toByteArray());
+		}
+		return resultat;
+	}
+	
 	@Override
 	@Transactional
 	public FitxerDto exportIndexExpedient(
