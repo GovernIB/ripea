@@ -340,7 +340,8 @@ public class ExpedientHelper {
 			if (associarInteressats) {
 				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
 			}
-			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioId, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 		}
 		// crear carpetes per defecte del procediment
 		crearCarpetesMetaExpedient(entitatId, metaExpedient, expedient);
@@ -494,7 +495,8 @@ public class ExpedientHelper {
 		}
 		
 		relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedientId);
-		expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioId, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 		
 		if (associarInteressats) {
 			associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual);

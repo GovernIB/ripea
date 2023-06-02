@@ -66,12 +66,14 @@ import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.ExpedientPeticioHelper0;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosPerAnotacions;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
@@ -130,6 +132,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	
+	@Autowired
+	private ExpedientPeticioHelper0 expedientPeticioHelper0;
 
 	
 	@Transactional(readOnly = true)
@@ -211,7 +216,55 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		return result;
 
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
+			ExpedientPeticioFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		log.debug("Consultant els expedient peticions comunicades segons el filtre (" +
+				"filtre=" +
+				filtre +
+				", paginacioParams=" +
+				paginacioParams +
+				")");
 
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+
+		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findComunicadesByFiltre(
+				StringUtils.isEmpty(filtre.getNumero()),
+				StringUtils.trim(filtre.getNumero()),		
+				filtre.getDataInicial() == null,
+				filtre.getDataInicial(),
+				filtre.getDataFinal() == null,
+				DateHelper.toDateFinalDia(filtre.getDataFinal()),
+				filtre.getEstatAll() == null,
+				filtre.getEstatAll(),
+				paginacioHelper.toSpringDataPageable(
+						paginacioParams,
+						ordenacioMap));
+
+
+		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(
+				paginaExpedientPeticios,
+				ExpedientPeticioListDto.class);
+
+		return result;
+
+	}
+
+
+	@Transactional
+	@Override
+	public void comunicadaReprocessar(Long expedientPeticioId) {
+
+		synchronized (SynchronizationHelper.get0To99Lock(expedientPeticioId, SynchronizationHelper.locksAnnotacions)) {
+			expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);
+		}
+		
+		
+	}
 
 	
 	@Transactional(readOnly = true)

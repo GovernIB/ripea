@@ -24,6 +24,7 @@ import es.caib.distribucio.rest.client.domini.Interessat;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -77,39 +78,49 @@ public class ExpedientPeticioHelper {
 	@Transactional
 	public void crearExpedientsPeticions(List<es.caib.distribucio.ws.backoffice.AnotacioRegistreId> ids) {
 		for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : ids) {
-			ExpedientPeticioEntity peticio = expedientPeticioRepository.findByIdentificador(anotacioRegistreId.getIndetificador());
-			// only create peticions that were not created before
-			// distribucio will be resending ids until ripea call Distribucio WS method canviEstat(BACK_REBUDA)
-			if (peticio == null) {
-				logger.debug("Creant una petició de creació d’expedient (" 
-						+ "identificador=" + anotacioRegistreId.getIndetificador() + ", " 
-						+ "clauAcces=" + anotacioRegistreId.getClauAcces() + ")");
-				
-				ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
-						anotacioRegistreId.getIndetificador(),
-						anotacioRegistreId.getClauAcces(),
-						new Date(),
-						ExpedientPeticioEstatEnumDto.CREAT).
-						build();
-				
-				expedientPeticioRepository.save(expedientPeticioEntity);
-			} else {
-				RegistreEntity registre = peticio.getRegistre();
-				if (registre != null) {
-					peticio.updateRegistre(null);
-					registreRepository.delete(registre);
+			
+			long t2 = System.currentTimeMillis();
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotació start: " + anotacioRegistreId.getIndetificador());
+			
+			try {
+				ExpedientPeticioEntity peticio = expedientPeticioRepository.findByIdentificador(anotacioRegistreId.getIndetificador());
+				// only create peticions that were not created before
+				// distribucio will be resending ids until ripea call Distribucio WS method canviEstat(BACK_REBUDA)
+				if (peticio == null) {
+					
+					ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
+							anotacioRegistreId.getIndetificador(),
+							anotacioRegistreId.getClauAcces(),
+							new Date(),
+							ExpedientPeticioEstatEnumDto.CREAT).
+							build();
+					
+					expedientPeticioRepository.save(expedientPeticioEntity);
+				} else {
+					RegistreEntity registre = peticio.getRegistre();
+					if (registre != null) {
+						peticio.updateRegistre(null);
+						registreRepository.delete(registre);
+					}
+					peticio.updateConsultaWsError(false);
+					peticio.updateConsultaWsErrorDate(null);
+					peticio.updateConsultaWsErrorDesc(null);
+					peticio.updateEstat(ExpedientPeticioEstatEnumDto.CREAT);
 				}
-				peticio.updateConsultaWsError(false);
-				peticio.updateConsultaWsErrorDate(null);
-				peticio.updateConsultaWsErrorDesc(null);
-				peticio.updateEstat(ExpedientPeticioEstatEnumDto.CREAT);
+				
+				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+					logger.info("Comunicant anotació end: " + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t2) + " ms");
+				
+			} catch (Throwable e) {
+				logger.error("Error comunicant anotació:" + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t2) + " ms", e);
+				throw e;
 			}
 		}
 	}
 
-	public void canviEstatExpedientPeticio(Long expedientPeticioId, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
+	public void canviEstatExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
 
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateEstat(expedientPeticioEstatEnumDto);
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null) {
@@ -121,10 +132,11 @@ public class ExpedientPeticioHelper {
 	public void canviEstatExpedientPeticioNewTransaction(
 			Long expedientPeticioId,
 			ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
-		canviEstatExpedientPeticio(expedientPeticioId, expedientPeticioEstatEnumDto);
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		canviEstatExpedientPeticio(expedientPeticioEntity, expedientPeticioEstatEnumDto);
 	}
 
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void addExpedientPeticioConsultaError(
 			Long expedientPeticioId,
 			String errorDescription) {
@@ -143,6 +155,15 @@ public class ExpedientPeticioHelper {
 		expedientPeticioEntity.updateConsultaWsErrorDesc(null);
 		expedientPeticioEntity.updateConsultaWsErrorDate(null);
 	}
+	
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public ExpedientPeticioInfoDto getExpedeintPeticiInfo(Long expedientPeticioId) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		return new ExpedientPeticioInfoDto(expedientPeticioEntity.getIdentificador(), expedientPeticioEntity.getClauAcces(), expedientPeticioEntity.getEstat());
+		
+	}
+	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void setEstatCanviatDistribucioNewTransaction(Long expedientPeticioId, boolean canviat) {
@@ -152,7 +173,8 @@ public class ExpedientPeticioHelper {
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, ExpedientPeticioEntity expedientPeticioEntity) {
+	public void crearRegistrePerPeticio(AnotacioRegistreEntrada registreEntrada, Long expedientPeticioId) {
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		EntitatEntity entitat = entitatRepository.findByUnitatArrel(
 				registreEntrada.getEntitatCodi());
 		if (entitat == null) {
@@ -250,7 +272,7 @@ public class ExpedientPeticioHelper {
 //		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
 		// change state of expedient peticio to pendent de processar
 		canviEstatExpedientPeticio(
-				expedientPeticioEntity.getId(),
+				expedientPeticioEntity,
 				ExpedientPeticioEstatEnumDto.PENDENT);
 		
 //		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());

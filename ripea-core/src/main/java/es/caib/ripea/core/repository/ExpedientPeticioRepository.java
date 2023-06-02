@@ -18,7 +18,6 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
 
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 
@@ -40,7 +39,14 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	
 	ExpedientPeticioEntity findByIdentificador(String identificador);
 
-	List<ExpedientPeticioEntity> findByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto estat);
+	
+	@Query("select ep.id from" +
+			"    ExpedientPeticioEntity ep " +
+			"where " +
+			"ep.estat = :estat " +
+			"and ep.consultaWsError = false")
+	List<Long> findIdByEstatAndConsultaWsErrorIsFalse(
+			@Param("estat") ExpedientPeticioEstatEnumDto estat);
 	
 	List<ExpedientPeticioEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 
@@ -100,6 +106,29 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			Pageable pageable);
 	
 
+	
+	@Query("select " +
+			"	ep " +
+			"from " +
+			"    ExpedientPeticioEntity ep " +
+			"where " +
+			"(:esNullNumero = true or lower(ep.identificador) like lower('%'||:numero||'%')) " +
+			"and (:esNullDataInicial = true or ep.dataAlta >= :dataInicial) " +
+			"and (:esNullDataFinal = true or ep.dataAlta <= :dataFinal) " +
+			"and (:esNullEstat = true or estat = :estat )"
+			)
+	Page<ExpedientPeticioEntity> findComunicadesByFiltre(
+			@Param("esNullNumero") boolean esNullNumero,
+			@Param("numero") String numero,
+			@Param("esNullDataInicial") boolean esNullDataInicial,
+			@Param("dataInicial") Date dataInicial,
+			@Param("esNullDataFinal") boolean esNullDataFinal,
+			@Param("dataFinal") Date dataFinal,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientPeticioEstatEnumDto estat,
+			Pageable pageable);
+	
+	
 	
 	@Query("select " +
 			"	count(ep) " +

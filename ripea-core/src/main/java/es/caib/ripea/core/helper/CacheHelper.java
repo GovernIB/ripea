@@ -742,6 +742,21 @@ public class CacheHelper {
 	}
 	
 	
+	@Cacheable(value = "mostrarLogsRendimentDescarregarAnotacio")
+	public boolean mostrarLogsRendimentDescarregarAnotacio() {
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@CacheEvict(value = "mostrarLogsRendimentDescarregarAnotacio")
+	public void evictMostrarLogsRendimentDescarregarAnotacio() {
+	}
+	
+	
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,
 			MultiplicitatEnumDto multiplicitat) {

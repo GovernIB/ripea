@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.distribucio.ws.backoffice.Backoffice;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 
 
@@ -32,12 +33,20 @@ public class BackofficeWsServiceImpl implements Backoffice {
 
 	@Autowired
 	private ExpedientPeticioHelper expedientPeticioHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
 	
 	@Override
 	public void comunicarAnotacionsPendents(List<AnotacioRegistreId> ids) {
 		try {
+			long t2 = System.currentTimeMillis();
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotacions start: " + ids.size());
 			
 			expedientPeticioHelper.crearExpedientsPeticions(ids);
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotacions end:  " + (System.currentTimeMillis() - t2) + " ms");
 
 		} catch (Exception ex) {
 			logger.error(

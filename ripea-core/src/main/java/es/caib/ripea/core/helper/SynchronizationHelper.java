@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SynchronizationHelper {
 
 	public static Map<Long, Object> locksExpedients = new ConcurrentHashMap<>();  // think if shoudn't be replaced by JPA @Lock(LockModeType.PESSIMISTIC_READ)
-	
+	public static Map<Long, Object> locksAnnotacions = new ConcurrentHashMap<>();  // think if shoudn't be replaced by JPA @Lock(LockModeType.PESSIMISTIC_READ)
 	
 	
 	

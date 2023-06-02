@@ -15,6 +15,10 @@ public class Utils {
 		return StringUtils.trimToNull(value);
 	}
 	
+	public static String abbreviate(String value, int maxWidth) { 
+		return StringUtils.abbreviate(value, maxWidth);
+	}
+	
 	public static boolean isNotNullAndEquals(String object1, String object2) {
 		return object1 != null && object2 != null && object1.equals(object2);
 	}

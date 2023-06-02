@@ -53,7 +53,7 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	
 	// these fields are filled if error occurs while getting anotacio from DISTRIBUCIO and saving it in DB
 	@Column(name = "consulta_ws_error")
-	private boolean consultaWsError = false; // this field can be removed because it is being substituted by pendentCanviEstatDistribucio
+	private boolean consultaWsError = false;
 	@Column(name = "consulta_ws_error_desc", length = 4000)
 	private String consultaWsErrorDesc;
 	@Column(name = "consulta_ws_error_date")
@@ -152,11 +152,6 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	public void updateExpedientPeticioAccioEnumDto(
 			ExpedientPeticioAccioEnumDto expedientPeticioAccioEnumDto) {
 		this.expedientPeticioAccioEnumDto = expedientPeticioAccioEnumDto;
-	}
-
-	public void updateDataAlta(
-			Date dataAlta) {
-		this.dataAlta = dataAlta;
 	}
 
 	public void updateEstat(

@@ -3,10 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.util.Date;
+
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
 
 /**
  * Informació d'un expedient peticio per llistat.
@@ -32,6 +34,18 @@ public class ExpedientPeticioListDto {
 	private boolean pendentEnviarDistribucio;
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	private String interessatsResum;
+	
+	private Long anotacioId;
+	private boolean consultaWsError; 
+	private String consultaWsErrorDesc;
+	private Date consultaWsErrorDate;
+	private boolean pendentCanviEstatDistribucio;
+	private int reintentsCanviEstatDistribucio;
+	
+    public String getConsultaWsErrorDescShort() {
+		return Utils.abbreviate(consultaWsErrorDesc, 400);
+    	
+    }
 
     public String getProcedimentCodiSiaINom() {
 		if (procedimentCodi != null) {

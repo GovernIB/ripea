@@ -456,6 +456,8 @@ public class ConversioTipusHelper {
 							registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
 							registre.setProcedimentCodi(source.getRegistre().getProcedimentCodi());
 							registre.setOrigenRegistreNumero(source.getRegistre().getOrigenRegistreNumero());
+							target.setAnotacioId(source.getRegistre().getId());
+							
 						}
 						target.setRegistre(registre);
 						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
@@ -466,6 +468,13 @@ public class ConversioTipusHelper {
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
 						target.setPendentEnviarDistribucio(source.isPendentCanviEstatDistribucio());
 						target.setDataAlta(source.getDataAlta());
+						
+						target.setConsultaWsError(source.isConsultaWsError());
+						target.setConsultaWsErrorDesc(source.getConsultaWsErrorDesc());
+						target.setConsultaWsErrorDate(source.getConsultaWsErrorDate());
+						target.setPendentCanviEstatDistribucio(source.isPendentCanviEstatDistribucio());
+						target.setReintentsCanviEstatDistribucio(source.getReintentsCanviEstatDistribucio());
+
 						
 						ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio = null;
 						switch (source.getEstat()) {
@@ -485,9 +494,8 @@ public class ConversioTipusHelper {
 						}
 						target.setEstatPendentEnviarDistribucio(estatPendentEnviarDistribucio);
 						
-						
 						String interessatsResum = "";
-						if (source.getRegistre().getInteressats() != null)
+						if (source.getRegistre() != null && source.getRegistre().getInteressats() != null)
 							for (RegistreInteressatEntity interessat : source.getRegistre().getInteressats()) {
 								if (interessat.getTipus() == InteressatTipus.PERSONA_FISICA) {
 									interessatsResum += interessat.getNom() == null ? "" : interessat.getNom() + " ";
