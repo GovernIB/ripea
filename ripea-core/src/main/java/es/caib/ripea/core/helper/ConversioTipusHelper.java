@@ -769,7 +769,14 @@ public class ConversioTipusHelper {
 	        .customize(new CustomMapper<MetaDocumentEntity,MetaDocumentDto>() {
 	            @Override
 	            public void mapAtoB(MetaDocumentEntity source, MetaDocumentDto target, MappingContext mappingContext) {
-	            	TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodi(source.getNtiTipoDocumental());
+	            	
+	            	TipusDocumentalEntity tipusDocumental = null;
+					if (source.getMetaExpedient() != null) {
+						tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(source.getNtiTipoDocumental(), source.getMetaExpedient().getEntitat());
+					}  else {
+						tipusDocumental = tipusDocumentalRepository.findByCodi(source.getNtiTipoDocumental()).get(0);
+					}
+	            	
 //					target.setNtiTipoDocumental(tipusDocumental.getCodiEspecific() != null ? tipusDocumental.getCodiEspecific() : tipusDocumental.getCodi());
 	            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
 	            		target.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
@@ -790,7 +797,6 @@ public class ConversioTipusHelper {
 					} else {
 						target.setNom(source.getNomEspanyol());
 					}
-	            	target.setNom("blabla");
 	            }
 	        })
 	        .byDefault()
