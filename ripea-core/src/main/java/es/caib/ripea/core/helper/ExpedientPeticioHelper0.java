@@ -16,8 +16,8 @@ import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.domini.Estat;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -69,15 +69,20 @@ public class ExpedientPeticioHelper0 {
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("anotacioGuardarAll  start (" + expedientPeticioId + ")");
 		
-		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
+		ExpedientPeticioInfoDto epInfo = expedientPeticioHelper.getExpedeintPeticiInfo(expedientPeticioId);
 		
-		if (expedientPeticioEntity.getEstat() == ExpedientPeticioEstatEnumDto.CREAT) {
+		if (epInfo.getEstat() == ExpedientPeticioEstatEnumDto.CREAT) {
 			
-			String identificador = expedientPeticioEntity.getIdentificador();
+			String identificador = epInfo.getIdentificador();
 			AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 			anotacioRegistreId.setIndetificador(identificador);
-			anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());
+			anotacioRegistreId.setClauAcces(epInfo.getClauAcces());
 			try {
+				
+				boolean throwMockException = false; // throwMockException = true
+				if (throwMockException) {
+					throw new RuntimeException("Mock exception al descarregar anotacio de distribució");
+				}
 				
 				long t2 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -97,7 +102,7 @@ public class ExpedientPeticioHelper0 {
 				// create anotació in db and associate it with expedient peticion
 				expedientPeticioHelper.crearRegistrePerPeticio(
 						registre,
-						expedientPeticioEntity);
+						expedientPeticioId);
 
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar crearRegistrePerPeticio end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t3) + " ms");
@@ -151,7 +156,7 @@ public class ExpedientPeticioHelper0 {
 
 			} catch (Throwable e) {
 
-				logger.error("Error consultar i guardar anotació per petició: " + expedientPeticioEntity.getIdentificador() + " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
+				logger.error("Error consultar i guardar anotació per petició: " + identificador + " RootCauseMessage: " + ExceptionUtils.getRootCauseMessage(e));
 				
 				long t7 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())

@@ -734,6 +734,10 @@ public class CacheHelper {
 		}
 	}
 	
+	@CacheEvict(value = "mostrarLogsRendimentDescarregarAnotacio")
+	public void evictMostrarLogsRendimentDescarregarAnotacio() {
+	}
+	
 	
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,

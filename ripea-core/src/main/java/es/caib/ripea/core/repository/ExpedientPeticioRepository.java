@@ -39,7 +39,14 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	
 	ExpedientPeticioEntity findByIdentificador(String identificador);
 
-	List<Long> findIdByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto estat);
+	
+	@Query("select ep.id from" +
+			"    ExpedientPeticioEntity ep " +
+			"where " +
+			"ep.estat = :estat " +
+			"and ep.consultaWsError = false")
+	List<Long> findIdByEstatAndConsultaWsErrorIsFalse(
+			@Param("estat") ExpedientPeticioEstatEnumDto estat);
 	
 	List<ExpedientPeticioEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 

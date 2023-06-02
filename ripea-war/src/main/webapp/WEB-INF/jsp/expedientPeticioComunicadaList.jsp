@@ -113,7 +113,7 @@ table.dataTable td {
 					</script>
 				</th>
 				<th data-col-name="reintentsCanviEstatDistribucio"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
-				
+				<th data-col-name="anotacioId">Id</th>
 				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="15%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

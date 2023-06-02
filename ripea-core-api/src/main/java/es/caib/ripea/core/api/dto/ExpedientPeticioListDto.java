@@ -35,7 +35,7 @@ public class ExpedientPeticioListDto {
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	private String interessatsResum;
 	
-	
+	private Long anotacioId;
 	private boolean consultaWsError; 
 	private String consultaWsErrorDesc;
 	private Date consultaWsErrorDate;

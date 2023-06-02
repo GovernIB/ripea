@@ -120,14 +120,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 */
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() {
-		long t1 = System.currentTimeMillis();
+
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
-
+		
+		long t1 = System.currentTimeMillis();
 
 		// find peticions with no anotació associated and with no errors from previous invocation of this method
 		List<Long> peticionsId = expedientPeticioRepository.findIdByEstatAndConsultaWsErrorIsFalse(ExpedientPeticioEstatEnumDto.CREAT);
-
+		
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("Execució de tasca periòdica, Anotacions comunicades pendents de consulta: " + peticionsId.size());
+		
 
 		if (Utils.isNotEmpty(peticionsId)) {
 			for (Long peticionId : peticionsId) {

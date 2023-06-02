@@ -443,6 +443,8 @@ public class ConversioTipusHelper {
 							registre.setDestiDescripcio(source.getRegistre().getDestiDescripcio());
 							registre.setProcedimentCodi(source.getRegistre().getProcedimentCodi());
 							registre.setOrigenRegistreNumero(source.getRegistre().getOrigenRegistreNumero());
+							target.setAnotacioId(source.getRegistre().getId());
+							
 						}
 						target.setRegistre(registre);
 						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
