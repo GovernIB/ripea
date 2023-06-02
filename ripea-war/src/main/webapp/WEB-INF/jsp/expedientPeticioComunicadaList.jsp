@@ -43,6 +43,7 @@ table.dataTable td {
 </head>
 <body>
 
+
 	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
 
 		<div class="row">
@@ -81,22 +82,48 @@ table.dataTable td {
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
+				<th data-col-name="identificador" width="20%"><spring:message code="expedient.peticio.list.columna.numero"/></th>
 				<th data-col-name="dataAlta" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.comunicacio"/></th>
-				<th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate">
+				<th data-col-name="estat" width="10%"  data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
 						{{:estat}}
 					</script>
 				</th>
 				
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="consultaWsError" data-template="#cellConsultaWsError" width="1%">
+					<spring:message code="expedient.peticio.list.columna.consultaWsError"/>
+					<script id="cellConsultaWsError" type="text/x-jsrender">
+						{{if consultaWsError}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+
+				<th data-col-name="consultaWsErrorDescShort" width="50%" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
+					<spring:message code="expedient.peticio.list.columna.consultaWsErrorDesc"/>
+					<script id="cellConsultaWsErrorDesc" type="text/x-jsrender">
+						<span title="{{:consultaWsErrorDesc}}">{{:consultaWsErrorDescShort}}</span>
+					</script>
+				</th>
+				<th data-col-name="consultaWsErrorDate" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.consultaWsErrorDate"/></th>
+				
+				<th data-col-name="pendentCanviEstatDistribucio" data-template="#cellPendentCanviEstatDistribucio" width="1%">
+					<spring:message code="expedient.peticio.list.columna.pendentCanviEstatDistribucio"/>
+					<script id="cellPendentCanviEstatDistribucio" type="text/x-jsrender">
+						{{if pendentCanviEstatDistribucio}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>
+				<th data-col-name="reintentsCanviEstatDistribucio"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
+				
+				
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="15%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if estat == 'CREAT'}}
 							<a href="<c:url value="/expedientPeticioComunicades/reprocessar/{{:id}}"/>" class="btn btn-default" ><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.processar"/></a>
 						{{/if}}
 					</script>
 				</th>
+				
+				<th data-col-name="consultaWsErrorDesc" data-visible="false"></th>
 			</tr>
 		</thead>
 	</table>

@@ -454,6 +454,13 @@ public class ConversioTipusHelper {
 						target.setPendentEnviarDistribucio(source.isPendentCanviEstatDistribucio());
 						target.setDataAlta(source.getDataAlta());
 						
+						target.setConsultaWsError(source.isConsultaWsError());
+						target.setConsultaWsErrorDesc(source.getConsultaWsErrorDesc());
+						target.setConsultaWsErrorDate(source.getConsultaWsErrorDate());
+						target.setPendentCanviEstatDistribucio(source.isPendentCanviEstatDistribucio());
+						target.setReintentsCanviEstatDistribucio(source.getReintentsCanviEstatDistribucio());
+
+						
 						ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio = null;
 						switch (source.getEstat()) {
 //						case CREAT:
