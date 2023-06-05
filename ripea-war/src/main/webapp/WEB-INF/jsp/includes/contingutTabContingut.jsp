@@ -224,7 +224,15 @@ $(document).ready(function() {
 		$("#tascaBtn").appendTo(".panel-heading h2");
 		<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 	
-		$('#table-documents').treeTable();
+		<c:choose>
+			<c:when test="${isFolderCollapsedDefault}">
+				$('#table-documents').treeTable({ startCollapsed: true });
+			</c:when>
+			<c:otherwise>
+				$('#table-documents').treeTable();
+			</c:otherwise>
+		</c:choose>
+		
 		//remove treetable click events on unnecessary columns for all rows
 		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8)').css('cursor','default').unbind('click');
 		//remove treetable click events on all columns for document rows

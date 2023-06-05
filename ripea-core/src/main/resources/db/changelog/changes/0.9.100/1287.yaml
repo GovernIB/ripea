@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1685959664822-1
+      id: 1685959676540-1
       author: limit
       changes:
         - insert:
@@ -8,19 +8,19 @@ databaseChangeLog:
             columns:
               - column:
                   name: key
-                  value: es.caib.ripea.expedient.exportacio.excel
+                  value: es.caib.ripea.contingut.contreure.carpetes
               - column:
                   name: value
                   value: false
               - column:
                   name: description
-                  value: Permetre exportació índex expedient a EXCEL
+                  value: Contreure per defecte les carpetes
               - column:
                   name: group_code
                   value: CONTINGUT
               - column:
                   name: position
-                  value: 36
+                  value: 37
               - column:
                   name: jboss_property
                   value: 0
