@@ -112,13 +112,14 @@ public class ExpedientPeticioHelper0 {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
 				
-				
-				boolean throwMockException1 = false; // throwMockException1 = true
-				if (throwMockException1) {
-					throw new RuntimeException("Mock exception al canviar estat de l'anotació a BACK_REBUDA en distribució");
-				}
+
 				// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 				try {
+					boolean throwMockException1 = false; // throwMockException1 = true
+					if (throwMockException1) {
+						throw new RuntimeException("Mock exception al canviar estat de l'anotació a BACK_REBUDA en distribució");
+					}
+					
 					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
@@ -185,7 +186,7 @@ public class ExpedientPeticioHelper0 {
 					
 				} catch (Exception e1) {
 					expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioId, false);
-					logger.error(ExceptionUtils.getStackTrace(e1));
+					logger.error("Error al enviar ERROR estat al distribució (" + identificador + ", " + expedientPeticioId + ")" , e1);
 				}
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())

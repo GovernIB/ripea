@@ -184,7 +184,7 @@ table.dataTable td {
 					</script>
 				</th>
 
-				<th data-col-name="consultaWsErrorDescShort" width="50%" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
+				<th data-col-name="consultaWsErrorDescShort" width="45%" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
 					<spring:message code="expedient.peticio.list.columna.consultaWsErrorDesc"/>
 					<script id="cellConsultaWsErrorDesc" type="text/x-jsrender">
 						<span title="{{:consultaWsErrorDesc}}">{{:consultaWsErrorDescShort}}</span>
@@ -192,14 +192,14 @@ table.dataTable td {
 				</th>
 				<th data-col-name="consultaWsErrorDate" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.consultaWsErrorDate"/></th>
 				
-				<th data-col-name="pendentCanviEstatDistribucio" data-template="#cellPendentCanviEstatDistribucio" width="1%">
+				<th data-col-name="pendentCanviEstatDistribucio" data-template="#cellPendentCanviEstatDistribucio" width="1%" data-orderable="false">
 					<spring:message code="expedient.peticio.list.columna.pendentCanviEstatDistribucio"/>
 					<script id="cellPendentCanviEstatDistribucio" type="text/x-jsrender">
 						{{if pendentCanviEstatDistribucio}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="reintentsCanviEstatDistribucio"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
-				<th data-col-name="anotacioId">Id</th>
+				<th data-col-name="reintentsCanviEstatDistribucio" data-orderable="false" width="1%"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
+				<th data-col-name="anotacioId" data-orderable="false" width="5%">Id</th>
 				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="15%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
