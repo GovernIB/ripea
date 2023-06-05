@@ -162,7 +162,18 @@ table.dataTable td {
 				<th data-col-name="estat" width="10%"  data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{:estat}}
+
+						{{if estat == 'CREAT'}}
+							<spring:message code="expedient.peticio.estat.enum.CREAT"/>
+						{{else estat == 'PENDENT'}}
+							<spring:message code="expedient.peticio.estat.enum.PENDENT"/>
+						{{else estat == 'PROCESSAT_PENDENT'}}
+							<spring:message code="expedient.peticio.estat.enum.PROCESSAT_PENDENT"/>
+						{{else estat == 'PROCESSAT_NOTIFICAT'}}
+							<spring:message code="expedient.peticio.estat.enum.PROCESSAT_NOTIFICAT"/>
+						{{else estat == 'REBUTJAT'}}
+							<spring:message code="expedient.peticio.estat.enum.REBUTJAT"/>
+						{{/if}}
 					</script>
 				</th>
 				

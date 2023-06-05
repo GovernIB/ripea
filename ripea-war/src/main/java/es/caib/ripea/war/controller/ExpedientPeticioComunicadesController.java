@@ -228,7 +228,7 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 					
 					MissatgesHelper.error(
 							request,
-							"Error",
+							getMessage(request, "expedient.peticio.comunicades.consultar.error", new Object[]{id}),
 							exception);
 					
 					errors++;
@@ -239,10 +239,10 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 			}
 			
 			if (correctes > 0){
-				MissatgesHelper.success(request, getMessage(request, "massiu.canvi.estat.anotacio.distribucio.ok", new Object[]{correctes}));
+				MissatgesHelper.success(request, getMessage(request, "expedient.peticio.comunicades.consultar.massiu.ok", new Object[]{correctes}));
 			} 
 			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "massiu.canvi.estat.anotacio.distribucio.errors", new Object[]{errors}), null);
+				MissatgesHelper.error(request, getMessage(request, "expedient.peticio.comunicades.consultar.massiu.error", new Object[]{errors}), null);
 			} 
 			
 			seleccio.clear();
@@ -284,6 +284,7 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 			filtreCommand = new ExpedientPeticioFiltreCommand();
 			filtreCommand.setEstatAll(ExpedientPeticioEstatEnumDto.CREAT);
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
+			filtreCommand.setNomesAmbErrorsConsulta(true);
 		}
 		return filtreCommand;
 	}

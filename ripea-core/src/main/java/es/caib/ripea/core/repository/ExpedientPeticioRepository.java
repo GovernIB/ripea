@@ -46,7 +46,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"	ExpedientPeticioEntity ep " +
 			"where " +
 			"ep.identificador = :identificador ")
-	Long findIdByIdentificador(String identificador);
+	Long findIdByIdentificador(
+			@Param("identificador") String identificador);
 	
 
 	

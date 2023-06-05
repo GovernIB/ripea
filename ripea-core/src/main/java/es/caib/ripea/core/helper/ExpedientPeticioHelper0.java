@@ -112,6 +112,11 @@ public class ExpedientPeticioHelper0 {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
 				
+				
+				boolean throwMockException1 = false; // throwMockException1 = true
+				if (throwMockException1) {
+					throw new RuntimeException("Mock exception al canviar estat de l'anotació a BACK_REBUDA en distribució");
+				}
 				// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 				try {
 					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(

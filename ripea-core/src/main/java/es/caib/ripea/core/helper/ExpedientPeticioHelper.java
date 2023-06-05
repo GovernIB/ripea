@@ -76,6 +76,9 @@ public class ExpedientPeticioHelper {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
 			
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("Creant l'anotació: " + anotacioRegistreId.getIndetificador());
+		
 		ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
 				anotacioRegistreId.getIndetificador(),
 				anotacioRegistreId.getClauAcces(),
@@ -85,7 +88,7 @@ public class ExpedientPeticioHelper {
 		expedientPeticioRepository.save(expedientPeticioEntity);
 	}
 	
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void resetExpedientPeticion(Long peticioId) {
 			
 		ExpedientPeticioEntity peticio = expedientPeticioRepository.findOne(peticioId);
@@ -95,6 +98,8 @@ public class ExpedientPeticioHelper {
 				logger.info("Anotació ja descarregada: " + peticio.getId() + ", " + peticio.getIdentificador());
 
 		} else {
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Netejant l'anotació: " + peticio.getId() + ", " + peticio.getIdentificador());
 			RegistreEntity registre = peticio.getRegistre();
 			if (registre != null) {
 				peticio.updateRegistre(null);
@@ -305,8 +310,11 @@ public class ExpedientPeticioHelper {
 				estat = es.caib.distribucio.rest.client.domini.Estat.REBUTJADA;
 				break;
 			}
-			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Canviant estat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
 			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, estat, observacions);
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Estat canviat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
 			pendent.setEstatCanviatDistribucio(true);
 			
 			
