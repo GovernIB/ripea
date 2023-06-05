@@ -233,12 +233,14 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 
 	@Override
 	@RolesAllowed("IPA_SUPER")
-	public PaginaDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
+	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		return delegate.findComunicadesAmbFiltre(
 				filtre,
-				paginacioParams);
+				paginacioParams, 
+				resultEnum);
 	}
 
 	@Override

@@ -179,7 +179,7 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 				exception = ex;
 			}
 			if (exception != null ) {
-				log.error("Error al custodiar document pendent", exception);
+				log.error("Error al canviar estadó de anotació en Distribució", exception);
 				
 				ExpedientPeticioDto expedientPeticio = expedientPeticioService.findOne(id);
 				MissatgesHelper.error(

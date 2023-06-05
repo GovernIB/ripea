@@ -202,6 +202,33 @@ public class ExpedientPeticioHelper0 {
 		
 	}
 	
+	public void comunicarAnotacioPendent(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
+
+		long t3 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("Comunicant anotació start: " + anotacioRegistreId.getIndetificador());
+
+		try {
+			Long peticioId = expedientPeticioRepository.findIdByIdentificador(anotacioRegistreId.getIndetificador());
+			
+			if (peticioId == null) {
+				expedientPeticioHelper.crearExpedientPeticion(anotacioRegistreId);
+			} else {
+				synchronized (SynchronizationHelper.get0To99Lock(peticioId, SynchronizationHelper.locksAnnotacions)) {
+					expedientPeticioHelper.resetExpedientPeticion(peticioId);
+				}
+			}
+
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotació end: " + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms");
+
+		} catch (Throwable e) {
+			logger.error("Error comunicant anotació:" + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms", e);
+			throw e;
+		}
+			
+	}
+	
 	
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientPeticioHelper0.class);
 
