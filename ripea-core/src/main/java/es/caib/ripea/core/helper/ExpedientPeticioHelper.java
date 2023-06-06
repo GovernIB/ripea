@@ -72,52 +72,46 @@ public class ExpedientPeticioHelper {
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
-	/*
-	 * Crear peticions de creació d’expedients amb estat pendent d'aprovació
-	 */
-	@Transactional
-	public void crearExpedientsPeticions(List<es.caib.distribucio.ws.backoffice.AnotacioRegistreId> ids) {
-		for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : ids) {
+
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
 			
-			long t2 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("Creant l'anotació: " + anotacioRegistreId.getIndetificador());
+		
+		ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
+				anotacioRegistreId.getIndetificador(),
+				anotacioRegistreId.getClauAcces(),
+				new Date(),
+				ExpedientPeticioEstatEnumDto.CREAT).build();
+
+		expedientPeticioRepository.save(expedientPeticioEntity);
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void resetExpedientPeticion(Long peticioId) {
+			
+		ExpedientPeticioEntity peticio = expedientPeticioRepository.findOne(peticioId);
+		
+		if (peticio.getEstat() == ExpedientPeticioEstatEnumDto.PENDENT) {
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-				logger.info("Comunicant anotació start: " + anotacioRegistreId.getIndetificador());
-			
-			try {
-				ExpedientPeticioEntity peticio = expedientPeticioRepository.findByIdentificador(anotacioRegistreId.getIndetificador());
-				// only create peticions that were not created before
-				// distribucio will be resending ids until ripea call Distribucio WS method canviEstat(BACK_REBUDA)
-				if (peticio == null) {
-					
-					ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
-							anotacioRegistreId.getIndetificador(),
-							anotacioRegistreId.getClauAcces(),
-							new Date(),
-							ExpedientPeticioEstatEnumDto.CREAT).
-							build();
-					
-					expedientPeticioRepository.save(expedientPeticioEntity);
-				} else {
-					RegistreEntity registre = peticio.getRegistre();
-					if (registre != null) {
-						peticio.updateRegistre(null);
-						registreRepository.delete(registre);
-					}
-					peticio.updateConsultaWsError(false);
-					peticio.updateConsultaWsErrorDate(null);
-					peticio.updateConsultaWsErrorDesc(null);
-					peticio.updateEstat(ExpedientPeticioEstatEnumDto.CREAT);
-				}
-				
-				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-					logger.info("Comunicant anotació end: " + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t2) + " ms");
-				
-			} catch (Throwable e) {
-				logger.error("Error comunicant anotació:" + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t2) + " ms", e);
-				throw e;
+				logger.info("Anotació ja descarregada: " + peticio.getId() + ", " + peticio.getIdentificador());
+
+		} else {
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Netejant l'anotació: " + peticio.getId() + ", " + peticio.getIdentificador());
+			RegistreEntity registre = peticio.getRegistre();
+			if (registre != null) {
+				peticio.updateRegistre(null);
+				registreRepository.delete(registre);
 			}
+			peticio.updateConsultaWsError(false);
+			peticio.updateConsultaWsErrorDate(null);
+			peticio.updateConsultaWsErrorDesc(null);
+			peticio.updateEstat(ExpedientPeticioEstatEnumDto.CREAT);
 		}
 	}
+
 
 	public void canviEstatExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
 
@@ -284,7 +278,14 @@ public class ExpedientPeticioHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Exception reintentarCanviEstatDistribucio(Long id) {
 
+		
 		ExpedientPeticioEntity pendent = expedientPeticioRepository.findOne(id);
+		
+		long t2 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("reintentarCanviEstatDistribucio start (" + pendent.getIdentificador() + ", " + id + ")");
+		
+		
 		Exception exception = null;
 		AnotacioRegistreId anotacio = new AnotacioRegistreId();
 		anotacio.setIndetificador(pendent.getIdentificador());
@@ -309,15 +310,22 @@ public class ExpedientPeticioHelper {
 				estat = es.caib.distribucio.rest.client.domini.Estat.REBUTJADA;
 				break;
 			}
-			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Canviant estat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
 			DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(anotacio, estat, observacions);
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Estat canviat (" + pendent.getIdentificador() + "," + pendent.getClauAcces() + ", " + estat + "," + observacions + ")");
 			pendent.setEstatCanviatDistribucio(true);
+			
 			
 		} catch (Exception ex) {
 			logger.error("Error al reintentar canvi estat a Distribució de anotacio amb id " + pendent.getId(), ex);
 			exception = ex;
 			pendent.setEstatCanviatDistribucio(false, true);
 		}
+		
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("reintentarCanviEstatDistribucio end (" + pendent.getIdentificador() + ", " + id + "):  " + (System.currentTimeMillis() - t2) + " ms");
 		return exception;
 	}
 	

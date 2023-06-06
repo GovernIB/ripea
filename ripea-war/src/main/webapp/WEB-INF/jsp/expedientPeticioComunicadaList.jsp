@@ -40,6 +40,65 @@ table.dataTable td {
 
 </style>
 
+
+
+<script>
+	$(document).ready(function() {
+
+
+		$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
+			$.get("expedientPeticioComunicades/" + accio,
+				{ids: ids},
+				function(data) {
+					$("#seleccioCount").html(data);
+				}
+			);
+		});
+
+		$('#taulaDades').one('draw.dt', function () {
+
+			$('#seleccioAll').on('click', function() {
+				$.get("./expedientPeticioComunicades/select",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taulaDades').webutilDatatable('refresh');
+					}
+				);
+				return false;
+			});
+			$('#seleccioNone').on('click', function() {
+				$.get(
+					"./expedientPeticioComunicades/deselect",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taulaDades').webutilDatatable('select-none');
+						$('#taulaDades').webutilDatatable('refresh');
+					}
+				);
+				return false;
+			});
+		});
+
+
+
+
+    	$('#nomesAmbErrorsConsultaBtn').click(function() {
+    		nomesAmbErrors = !$(this).hasClass('active');
+    		$('#nomesAmbErrorsConsulta').val(nomesAmbErrors);
+    	});
+
+    	if ($('#nomesAmbErrorsConsulta').val() == 'true') {
+    		$('#nomesAmbErrorsConsultaBtn').addClass('active')
+		} else {
+			$('#nomesAmbErrorsConsultaBtn').removeClass('active')
+		}
+		
+
+		
+	});
+
+
+</script>
 </head>
 <body>
 
@@ -59,6 +118,10 @@ table.dataTable td {
 			<div class="col-md-2	">							
 				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataComunicacioFinal"/>
 			</div>	
+			<div class="col-md-2" style="padding-left: 0;">
+				<button id="nomesAmbErrorsConsultaBtn" style="width: 45px;" title="<spring:message code="expedient.peticio.list.placeholder.nomesAmbErrorsConsulta"/>" class="btn btn-default" data-toggle="button"><span class="fa fa-warning"></span></button>
+				<rip:inputHidden name="nomesAmbErrorsConsulta"/>
+			</div>			
 				
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
@@ -69,25 +132,48 @@ table.dataTable td {
 			</div>
 		</div>
 	</form:form>
+
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="btn-group pull-right">
+			<a id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
+			<a id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
+			<a class="btn btn-default" href="./expedientPeticioComunicades/comunicadaConsultarMassiu" >
+				<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="comu.boto.consultar"/>
+			</a>
+
+		</div>
+	</script>
 	
-	<script id="rowhrefTemplate" type="text/x-jsrender">expedientPeticio/{{:id}}</script> 
 	<table
 		id="taulaDades"
 		data-toggle="datatable" 
-		data-url="<c:url value="/expedientPeticioComunicades/datatable"/>"  <%-- URL which will load rows of datatable  --%>
+		data-url="<c:url value="/expedientPeticioComunicades/datatable"/>"
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="1" <%-- default column number to be sorted  --%>
-		data-default-dir="desc" <%-- default ordering direction  --%>
-		data-save-state="true" 
+		data-default-order="2"
+		data-default-dir="desc" 
+		data-botons-template="#botonsTemplate"
+		data-selection-enabled="true"
 		style="width:100%">
 		<thead>
 			<tr>
+				<th data-col-name="id" data-visible="false"></th>
 				<th data-col-name="identificador" width="20%"><spring:message code="expedient.peticio.list.columna.numero"/></th>
 				<th data-col-name="dataAlta" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.comunicacio"/></th>
 				<th data-col-name="estat" width="10%"  data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{:estat}}
+
+						{{if estat == 'CREAT'}}
+							<spring:message code="expedient.peticio.estat.enum.CREAT"/>
+						{{else estat == 'PENDENT'}}
+							<spring:message code="expedient.peticio.estat.enum.PENDENT"/>
+						{{else estat == 'PROCESSAT_PENDENT'}}
+							<spring:message code="expedient.peticio.estat.enum.PROCESSAT_PENDENT"/>
+						{{else estat == 'PROCESSAT_NOTIFICAT'}}
+							<spring:message code="expedient.peticio.estat.enum.PROCESSAT_NOTIFICAT"/>
+						{{else estat == 'REBUTJAT'}}
+							<spring:message code="expedient.peticio.estat.enum.REBUTJAT"/>
+						{{/if}}
 					</script>
 				</th>
 				
@@ -98,7 +184,7 @@ table.dataTable td {
 					</script>
 				</th>
 
-				<th data-col-name="consultaWsErrorDescShort" width="50%" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
+				<th data-col-name="consultaWsErrorDescShort" width="45%" data-orderable="false" data-template="#cellConsultaWsErrorDesc">
 					<spring:message code="expedient.peticio.list.columna.consultaWsErrorDesc"/>
 					<script id="cellConsultaWsErrorDesc" type="text/x-jsrender">
 						<span title="{{:consultaWsErrorDesc}}">{{:consultaWsErrorDescShort}}</span>
@@ -106,19 +192,19 @@ table.dataTable td {
 				</th>
 				<th data-col-name="consultaWsErrorDate" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.consultaWsErrorDate"/></th>
 				
-				<th data-col-name="pendentCanviEstatDistribucio" data-template="#cellPendentCanviEstatDistribucio" width="1%">
+				<th data-col-name="pendentCanviEstatDistribucio" data-template="#cellPendentCanviEstatDistribucio" width="1%" data-orderable="false">
 					<spring:message code="expedient.peticio.list.columna.pendentCanviEstatDistribucio"/>
 					<script id="cellPendentCanviEstatDistribucio" type="text/x-jsrender">
 						{{if pendentCanviEstatDistribucio}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="reintentsCanviEstatDistribucio"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
-				<th data-col-name="anotacioId">Id</th>
+				<th data-col-name="reintentsCanviEstatDistribucio" data-orderable="false" width="1%"><spring:message code="expedient.peticio.list.columna.reintentsCanviEstatDistribucio"/></th>
+				<th data-col-name="anotacioId" data-orderable="false" width="5%">Id</th>
 				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="15%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if estat == 'CREAT'}}
-							<a href="<c:url value="/expedientPeticioComunicades/reprocessar/{{:id}}"/>" class="btn btn-default" ><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.processar"/></a>
+							<a href="<c:url value="/expedientPeticioComunicades/comunicadaConsultar/{{:id}}"/>" class="btn btn-default" ><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.consultar"/></a>
 						{{/if}}
 					</script>
 				</th>

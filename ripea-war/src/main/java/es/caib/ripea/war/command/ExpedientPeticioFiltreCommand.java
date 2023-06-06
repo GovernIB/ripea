@@ -35,6 +35,8 @@ public class ExpedientPeticioFiltreCommand {
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	
 	private boolean nomesPendentEnviarDistribucio;
+	
+	private boolean nomesAmbErrorsConsulta;
 
 
 	public void setMetaExpedientId(Long metaExpedientId) {
@@ -76,6 +78,12 @@ public class ExpedientPeticioFiltreCommand {
 	public void setInteressat(String interessat) {
 		this.interessat = StringUtils.trim(interessat);
 	}
+	public void setNomesAmbErrorsConsulta(
+			boolean nomesAmbErrorsConsulta) {
+		this.nomesAmbErrorsConsulta = nomesAmbErrorsConsulta;
+	}
+
+	
 	
 	@Override
 	public String toString() {

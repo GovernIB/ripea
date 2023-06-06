@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import es.caib.distribucio.ws.backoffice.AnotacioRegistreId;
 import es.caib.distribucio.ws.backoffice.Backoffice;
 import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.ExpedientPeticioHelper;
+import es.caib.ripea.core.helper.ExpedientPeticioHelper0;
 
 
 
@@ -32,9 +32,10 @@ import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 public class BackofficeWsServiceImpl implements Backoffice {
 
 	@Autowired
-	private ExpedientPeticioHelper expedientPeticioHelper;
+	private ExpedientPeticioHelper0 expedientPeticioHelper0;
 	@Autowired
 	private CacheHelper cacheHelper;
+	
 	
 	@Override
 	public void comunicarAnotacionsPendents(List<AnotacioRegistreId> ids) {
@@ -43,18 +44,25 @@ public class BackofficeWsServiceImpl implements Backoffice {
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Comunicant anotacions start: " + ids.size());
 			
-			expedientPeticioHelper.crearExpedientsPeticions(ids);
+			
+			for (es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId : ids) {
+				expedientPeticioHelper0.comunicarAnotacioPendent(anotacioRegistreId);
+			}
+			
 			
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("Comunicant anotacions end:  " + (System.currentTimeMillis() - t2) + " ms");
 
 		} catch (Exception ex) {
-			logger.error(
-					"Error al comunicar anotacions pendents" + ex);
+			logger.error("Error al comunicar anotacions pendents" + ex);
 			throw new RuntimeException(ex);
 		}
 		
 	}
+	
+	
+	
+
 	
 	private static final Logger logger = LoggerFactory.getLogger(BackofficeWsServiceImpl.class);
 }

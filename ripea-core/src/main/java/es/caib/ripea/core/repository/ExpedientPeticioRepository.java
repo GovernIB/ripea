@@ -38,6 +38,17 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 	String getRegistreJustificantArxiuUuid(@Param("id") Long id);
 	
 	ExpedientPeticioEntity findByIdentificador(String identificador);
+	
+	
+	@Query("select " +
+			"	ep.id " +
+			"from " +
+			"	ExpedientPeticioEntity ep " +
+			"where " +
+			"ep.identificador = :identificador ")
+	Long findIdByIdentificador(
+			@Param("identificador") String identificador);
+	
 
 	
 	@Query("select ep.id from" +
@@ -115,7 +126,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"(:esNullNumero = true or lower(ep.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInicial = true or ep.dataAlta >= :dataInicial) " +
 			"and (:esNullDataFinal = true or ep.dataAlta <= :dataFinal) " +
-			"and (:esNullEstat = true or estat = :estat )"
+			"and (:esNullEstat = true or estat = :estat )" + 
+			"and (:nomesAmbErrorsConsulta = false or ep.consultaWsError = true) "
 			)
 	Page<ExpedientPeticioEntity> findComunicadesByFiltre(
 			@Param("esNullNumero") boolean esNullNumero,
@@ -126,8 +138,31 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("dataFinal") Date dataFinal,
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") ExpedientPeticioEstatEnumDto estat,
+			@Param("nomesAmbErrorsConsulta") boolean nomesAmbErrorsConsulta,
 			Pageable pageable);
 	
+	
+	@Query("select " +
+			"	ep.id " +
+			"from " +
+			"    ExpedientPeticioEntity ep " +
+			"where " +
+			"(:esNullNumero = true or lower(ep.identificador) like lower('%'||:numero||'%')) " +
+			"and (:esNullDataInicial = true or ep.dataAlta >= :dataInicial) " +
+			"and (:esNullDataFinal = true or ep.dataAlta <= :dataFinal) " +
+			"and (:esNullEstat = true or estat = :estat )" + 
+			"and (:nomesAmbErrorsConsulta = false or ep.consultaWsError = true) "
+			)
+	List<Long> findIdsComunicadesByFiltre(
+			@Param("esNullNumero") boolean esNullNumero,
+			@Param("numero") String numero,
+			@Param("esNullDataInicial") boolean esNullDataInicial,
+			@Param("dataInicial") Date dataInicial,
+			@Param("esNullDataFinal") boolean esNullDataFinal,
+			@Param("dataFinal") Date dataFinal,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientPeticioEstatEnumDto estat,
+			@Param("nomesAmbErrorsConsulta") boolean nomesAmbErrorsConsulta);
 	
 	
 	@Query("select " +

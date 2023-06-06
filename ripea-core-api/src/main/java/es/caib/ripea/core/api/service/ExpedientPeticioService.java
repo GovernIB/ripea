@@ -109,9 +109,10 @@ public interface ExpedientPeticioService {
 			Long entitatId);
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
-	public PaginaDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
+	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum);
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public void comunicadaReprocessar(

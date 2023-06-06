@@ -112,8 +112,14 @@ public class ExpedientPeticioHelper0 {
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar canviEstat start (" + identificador + ", " + expedientPeticioId + ")");
 				
+
 				// change state of anotació in DISTRIBUCIO to BACK_REBUDA
 				try {
+					boolean throwMockException1 = false; // throwMockException1 = true
+					if (throwMockException1) {
+						throw new RuntimeException("Mock exception al canviar estat de l'anotació a BACK_REBUDA en distribució");
+					}
+					
 					DistribucioHelper.getBackofficeIntegracioRestClient().canviEstat(
 							anotacioRegistreId,
 							Estat.REBUDA,
@@ -180,7 +186,7 @@ public class ExpedientPeticioHelper0 {
 					
 				} catch (Exception e1) {
 					expedientPeticioHelper.setEstatCanviatDistribucioNewTransaction(expedientPeticioId, false);
-					logger.error(ExceptionUtils.getStackTrace(e1));
+					logger.error("Error al enviar ERROR estat al distribució (" + identificador + ", " + expedientPeticioId + ")" , e1);
 				}
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
@@ -200,6 +206,33 @@ public class ExpedientPeticioHelper0 {
 				logger.info("anotacioGuardar consultaAll ja guardat end (" + expedientPeticioId + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		}
 		
+	}
+	
+	public void comunicarAnotacioPendent(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
+
+		long t3 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("Comunicant anotació start: " + anotacioRegistreId.getIndetificador());
+
+		try {
+			Long peticioId = expedientPeticioRepository.findIdByIdentificador(anotacioRegistreId.getIndetificador());
+			
+			if (peticioId == null) {
+				expedientPeticioHelper.crearExpedientPeticion(anotacioRegistreId);
+			} else {
+				synchronized (SynchronizationHelper.get0To99Lock(peticioId, SynchronizationHelper.locksAnnotacions)) {
+					expedientPeticioHelper.resetExpedientPeticion(peticioId);
+				}
+			}
+
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("Comunicant anotació end: " + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms");
+
+		} catch (Throwable e) {
+			logger.error("Error comunicant anotació:" + anotacioRegistreId.getIndetificador() + ":  " + (System.currentTimeMillis() - t3) + " ms", e);
+			throw e;
+		}
+			
 	}
 	
 	

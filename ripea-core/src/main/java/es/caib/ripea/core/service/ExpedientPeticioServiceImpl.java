@@ -220,18 +220,25 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
+	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		log.debug("Consultant els expedient peticions comunicades segons el filtre (" +
 				"filtre=" +
 				filtre +
 				", paginacioParams=" +
 				paginacioParams +
 				")");
+		
+		ResultDto<ExpedientPeticioListDto> result = new ResultDto<ExpedientPeticioListDto>();
 
-		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 
+
+		if (resultEnum == ResultEnumDto.PAGE) {
+			
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findComunicadesByFiltre(
 				StringUtils.isEmpty(filtre.getNumero()),
 				StringUtils.trim(filtre.getNumero()),		
@@ -241,14 +248,32 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				DateHelper.toDateFinalDia(filtre.getDataFinal()),
 				filtre.getEstatAll() == null,
 				filtre.getEstatAll(),
+				filtre.isNomesAmbErrorsConsulta(),
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));
 
 
-		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(
+		PaginaDto<ExpedientPeticioListDto> paginaDto = paginacioHelper.toPaginaDto(
 				paginaExpedientPeticios,
 				ExpedientPeticioListDto.class);
+		result.setPagina(paginaDto);
+		} else {
+			
+			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
+			List<Long> idsExpedientPeticios = expedientPeticioRepository.findIdsComunicadesByFiltre(
+					StringUtils.isEmpty(filtre.getNumero()),
+					StringUtils.trim(filtre.getNumero()),		
+					filtre.getDataInicial() == null,
+					filtre.getDataInicial(),
+					filtre.getDataFinal() == null,
+					DateHelper.toDateFinalDia(filtre.getDataFinal()),
+					filtre.getEstatAll() == null,
+					filtre.getEstatAll(),
+					filtre.isNomesAmbErrorsConsulta());
+			
+			result.setIds(idsExpedientPeticios);
+		}
 
 		return result;
 

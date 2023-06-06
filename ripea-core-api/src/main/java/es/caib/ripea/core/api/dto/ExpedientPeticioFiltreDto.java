@@ -34,6 +34,7 @@ public class ExpedientPeticioFiltreDto implements Serializable {
 	private ExpedientPeticioEstatEnumDto estatAll;
 	private ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio;
 	private boolean nomesPendentEnviarDistribucio;
+	private boolean nomesAmbErrorsConsulta;
 	
 
 	@Override
