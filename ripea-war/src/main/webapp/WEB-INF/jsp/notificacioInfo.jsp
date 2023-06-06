@@ -167,9 +167,6 @@ $(document).ready(function(){
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title"><strong><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</strong></h3>
-							<!-- DO NOT DELETE, remove "display: none" to manually refresh state from Notib -->	
-								<a href="<c:url value="/document/notificacio/actualitzarEstat/${notificacio.enviamentIdentificador}/${enviament.enviamentReferencia}"/>" class="btn btn-default btn-sm pull-right" style="display: none"><span class="fa fa-refresh"></span></a>
-							<!-- /DO NOT DELETE -->									
 						</div>
 						<table class="table table-bordered" width="100%">
 						  <!------- INTERESSAT ------->							
@@ -296,16 +293,25 @@ $(document).ready(function(){
 						   	</td>
 						  </tr>
 						  <!------- ESTAT ------->	
-						  <c:if test="${not empty enviament.enviamentDatatEstat}">
-							  <tr>
-							    <td style="width: 15%">
-							      	<strong><spring:message code="notificacio.info.camp.estat"/></strong>
-							    </td>
-							    <td>
-							    	<spring:message code="notificacio.enviamentEstat.enum.${enviament.enviamentDatatEstat}"/>
-							   	</td>					    
-							  </tr>
-						  </c:if>
+						  <tr>
+						    <td style="width: 15%">
+						      	<strong><spring:message code="notificacio.info.camp.estat"/></strong>
+						    </td>
+						    <td>
+						    	<c:if test="${not empty enviament.enviamentDatatEstat}">
+						    	 	<spring:message code="notificacio.enviamentEstat.enum.${enviament.enviamentDatatEstat}"/>
+						    	 </c:if>
+						    	<c:if test="${!enviament.finalitzat}">
+							    	<a href="<c:url value="/modal/document/notificacio/actualitzarEstat/${notificacio.enviamentIdentificador}/${enviament.enviamentReferencia}?contingutNavigationId=${contingutNavigationId}"/>" 
+							    	    class="btn btn-default btn-sm pull-right" 
+							    	    title="<spring:message code="enviament.info.accio.ectualitzar.estat"/>"
+							    	    style="margin-right: 8px;">
+							    			<span class="fa fa-refresh"></span>
+							    	</a>
+						    	 </c:if>						    	 
+
+						   	</td>					    
+						  </tr>
 						  <!------- ESTAT DATA ------->	
 						  <c:if test="${not empty enviament.enviamentDatatData}">
 							  <tr>

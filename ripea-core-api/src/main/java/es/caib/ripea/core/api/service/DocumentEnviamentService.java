@@ -225,16 +225,6 @@ public interface DocumentEnviamentService {
 			Long entitatId,
 			Long documentId) throws NotFoundException;
 	
-	/**
-	 * Actualitza l'estat d'un enviament de la notificació.
-	 * 
-	 * @param identificador
-	 * 			Identificador de la notificació 
-	 * @param referencia
-	 * 			Referència de l'enviament
-	 * 
-	 */
-	public void notificacioActualitzarEstat(String identificador, String referencia);
 
 	int enviamentsCount(Long entitatId,
 			Long expedientId, 

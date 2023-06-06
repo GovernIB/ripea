@@ -1103,16 +1103,23 @@ $(document).ready(function() {
 
 	    $.getJSON({
 	        url: getUrl,
-	        success: (notificacio) => {
-				var enviaments = notificacio.documentEnviamentInteressats;
-	            for (i = 0; i < enviaments.length; i++) {
-	                content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
-	            }
-	            if (content !== undefined && content != '') {
-	                content = "("+content.replace(/,\s*$/, "")+")";
-	            }
-	            $('.estat_' + notificacioId).html("");
-	            $('.estat_' + notificacioId).append(content);
+	        success: (json) => {
+
+				if (json.error) {
+					 $('.estat_' + notificacioId).append('<div class="viewer-padding"><div class="alert alert-danger"> ' + json.errorMsg + '</div></div>');
+				} else {
+					var notificacio = json.data;
+		        
+					var enviaments = notificacio.documentEnviamentInteressats;
+		            for (i = 0; i < enviaments.length; i++) {
+		                content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+		            }
+		            if (content !== undefined && content != '') {
+		                content = "("+content.replace(/,\s*$/, "")+")";
+		            }
+		            $('.estat_' + notificacioId).html("");
+		            $('.estat_' + notificacioId).append(content);
+				}
 	        },
 	        error: function(data){
 	        	console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId);

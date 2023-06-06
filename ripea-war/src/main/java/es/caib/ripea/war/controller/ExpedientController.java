@@ -76,6 +76,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -1408,12 +1409,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 
 
 
-	@RequestMapping(value = "/{expedientId}/enviament/{documentEnviamentTipus}/datatable", method = RequestMethod.GET)
+	@RequestMapping(value = "/{expedientId}/notificacio/datatable", method = RequestMethod.GET)
 	@ResponseBody
-	public DatatablesResponse enviamentDatatable(
+	public DatatablesResponse notificacioDatatable(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
-			@PathVariable DocumentEnviamentTipusEnumDto documentEnviamentTipus,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		return DatatablesHelper.getDatatableResponse(
@@ -1421,7 +1421,22 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				documentEnviamentService.findAmbExpedient(
 						entitatActual.getId(),
 						expedientId, 
-						documentEnviamentTipus));		
+						DocumentEnviamentTipusEnumDto.NOTIFICACIO));		
+	}
+	
+	@RequestMapping(value = "/{expedientId}/publicacio/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse publicacioDatatable(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		return DatatablesHelper.getDatatableResponse(
+				request,
+				documentEnviamentService.findAmbExpedient(
+						entitatActual.getId(),
+						expedientId, 
+						DocumentEnviamentTipusEnumDto.PUBLICACIO));		
 	}
 	
 	
@@ -1429,18 +1444,26 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/{expedientId}/enviaments/{notificacioId}", method = RequestMethod.GET)
 	@ResponseBody
-	public DocumentNotificacioDto enviamentList(
+	public JsonResponse enviamentList(
 			HttpServletRequest request, 
 			Model model,
 			@PathVariable Long expedientId,
 			@PathVariable Long notificacioId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentNotificacioDto notificacio = documentEnviamentService.notificacioFindAmbIdAndExpedient(
-				entitatActual.getId(),
-				expedientId,
-				notificacioId);
-		notificacio.setDocument(null); //to prevent circular depndency
-		return notificacio;
+		
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			DocumentNotificacioDto notificacio = documentEnviamentService.notificacioFindAmbIdAndExpedient(
+					entitatActual.getId(),
+					expedientId,
+					notificacioId);
+			notificacio.setDocument(null); //to prevent circular depndency
+			
+			return new JsonResponse(notificacio);
+			
+		} catch (Exception e) {
+			logger.error("Error descarregant enviaments", e);
+			return new JsonResponse(true, e.getMessage());
+		}
 	}
 	
 	@RequestMapping(value = "/{expedientId}/enviamentDetails/{notificacioId}/enviamentInfo/{enviamentId}", method = RequestMethod.GET)

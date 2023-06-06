@@ -169,6 +169,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@PathVariable Long notificacioId,
+			@RequestParam(value = "contingutNavigationId", required = true) Long contingutNavigationId,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
@@ -177,6 +178,9 @@ public class DocumentEnviamentController extends BaseUserController {
 						entitatActual.getId(),
 						documentId,
 						notificacioId));
+		model.addAttribute(
+				"contingutNavigationId",
+				contingutNavigationId);
 		return "notificacioInfo";
 	}
 	
@@ -186,48 +190,40 @@ public class DocumentEnviamentController extends BaseUserController {
 			HttpServletRequest request,
 			@PathVariable String identificador,
 			@PathVariable String referencia,
+			@RequestParam(value = "contingutNavigationId", required = true) Long contingutNavigationId,
 			Model model) {
-		getEntitatActualComprovantPermisos(request);
-		
-		documentService.notificacioActualitzarEstat(
-				identificador, 
-				referencia);
-		
-		MissatgesHelper.success(
-				request, 
-				"Estat actualitzat!");
-		 return modalUrlTancar();
+		try {
+			getEntitatActualComprovantPermisos(request);
+			
+			documentService.notificacioActualitzarEstat(
+					identificador, 
+					referencia);
+			
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:/contingut/" + contingutNavigationId + "#notificacions",
+					"contingut.enviament.actualitzar.estat.ok");
+		} catch (Exception e) {
+			logger.error("Error al actualitzar estat del enviament", e);
+			String msg = getMessage(request, "contingut.enviament.actualitzar.estat.error") + ": ";
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+
+			if (root instanceof ConnectException || root.getMessage().contains("timed out")){
+				msg += getMessage(request, "error.notib.connectTimedOut");
+			} else {
+				root.getMessage();
+				msg += root.getMessage();
+			}
+
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:/contingut/" + contingutNavigationId + "#notificacions",
+					msg,
+					e);
+		}
 	}
 
 	
-	
-	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/{enviamentId}/descarregarJustificant", method = RequestMethod.GET)
-	public String notificacioConsultarIDescarregarJustificant(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long documentId,
-			@PathVariable Long notificacioId,
-			@PathVariable Long enviamentId) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		NotificacioInfoRegistreDto registreInfo = documentService.notificacioConsultarIDescarregarJustificant(
-				entitatActual.getId(),
-				documentId,
-				enviamentId);
-		
-		if (registreInfo.getJustificant() != null) {
-			writeFileToResponse(
-					registreInfo.getNumRegistreFormatat() != null ? "justificant" + registreInfo.getNumRegistreFormatat() + ".pdf" : "justificant.pdf",
-					registreInfo.getJustificant(),
-					response);
-		} else {
-			return this.getModalControllerReturnValueError(
-					request,
-					"redirect:../" + documentId +"/notificacio/" + notificacioId + "/info",
-					"expedient.controller.notificacio.justificant.ko",
-					null);
-		}
-		return "notificacioForm";
-	}
 	
 	
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/descarregarJustificantEnviamentNotib", method = RequestMethod.GET)

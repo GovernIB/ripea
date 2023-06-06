@@ -36,7 +36,7 @@ $(document).ready(function() {
 <table
 	id="taulaPublicacions"
 	data-toggle="datatable"
-	data-url="<c:url value="/expedient/${expedientId}/enviament/PUBLICACIO/datatable"/>"
+	data-url="<c:url value="/expedient/${expedientId}/publicacio/datatable"/>"
 	data-paging-enabled="false"
 	class="table table-bordered table-striped"
 	style="width:100%"
@@ -81,7 +81,7 @@ $(document).ready(function() {
 				<div class="dropdown">
 					<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 					<ul class="dropdown-menu">
-						<li><a href="<c:url value="/document/{{:documentId}}/{{if notificacio}}notificacio{{else}}publicacio{{/if}}/{{:id}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+						<li><a href="<c:url value="/document/{{:documentId}}/publicacio/{{:id}}/info"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 						<li><a href="<c:url value="/document/{{:documentId}}/publicacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 						<li><a href="<c:url value="/document/{{:documentId}}/publicacio/{{:id}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.publicacio"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 					</ul>
