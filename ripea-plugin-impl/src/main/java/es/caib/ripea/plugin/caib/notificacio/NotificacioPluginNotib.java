@@ -38,6 +38,7 @@ import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
 import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
 import es.caib.notib.client.domini.NotificacioCanviClient;
 import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Registre;
 import es.caib.notib.client.domini.RespostaAltaV2;
 import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
 import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
@@ -302,6 +303,13 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			resposta.setError(respostaConsultaEstat.isError());
 			resposta.setErrorDescripcio(respostaConsultaEstat.getErrorDescripcio());
 			
+			if (respostaConsultaEstat.getRegistre() != null) {
+				Registre registre = respostaConsultaEstat.getRegistre();
+				resposta.setRegistreData(registre.getData());
+				resposta.setRegistreNumero(registre.getNumero());
+				resposta.setRegistreNumeroFormatat(registre.getNumeroFormatat());
+			}
+			
 			return resposta;
 			
 		} catch (Exception ex) {
@@ -353,9 +361,9 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		try {
 			DadesConsulta dadesConsulta = new DadesConsulta();
 			dadesConsulta.setAmbJustificant(ambJustificant);
-			dadesConsulta.setIdentificador(identificador);
 			dadesConsulta.setReferencia(referencia);
 			RespostaConsultaDadesRegistreV2  respostaConsultaInfoRegistre = getNotificacioRestClient().consultaDadesRegistre(dadesConsulta);
+			
 			if (respostaConsultaInfoRegistre != null) {
 				resposta.setDataRegistre(respostaConsultaInfoRegistre.getDataRegistre());
 				resposta.setNumRegistre(respostaConsultaInfoRegistre.getNumRegistre());
@@ -462,20 +470,13 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}	
 	
 	private NotificacioRestClientV2 getNotificacioRestClient() {
-		// If Notib server uses basic authentication set autenticacioBasic=true, if uses form authentication (as in Jboss CAIB) set autenticacioBasic=false
-		String autenticacioBasicString = getProperty("notificacio.autenticacioBasic");
-		boolean autenticacioBasic;
-		if (autenticacioBasicString != null) {
-			autenticacioBasic = new Boolean(autenticacioBasicString).booleanValue();
-		} else {
-			autenticacioBasic = false;
-		}
+
 		if (clientV2 == null) {
 			clientV2 = NotificacioRestClientFactory.getRestClientV2(
 					getUrl(),
 					getUsername(),
 					getPassword(),
-					autenticacioBasic);
+					true);
 		}
 		return clientV2;
 	}

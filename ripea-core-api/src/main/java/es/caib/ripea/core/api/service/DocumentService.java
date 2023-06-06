@@ -609,22 +609,6 @@ public interface DocumentService {
 
 	public byte[] notificacioConsultarIDescarregarCertificacio(Long documentEnviamentInteressatId);
 
-	/**
-	 * Recupera la informació d'un registre d'una notificació amb el justificant.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contenidor.
-	 * @param documentId
-	 *            Atribut id del document relacionat amb la notificació.
-	 * @param documentEnviamentId
-	 *            Atribut ID de l'enviament del qual es vol recuperar la informació.
-	 * @throws SistemaExternException
-	 *             Hi ha hagut algun error en la comunicació amb Notib.
-	 */
-	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(
-			Long entitatId,
-			Long documentId,
-			Long documentEnviamentId);
 	
 	/**
 	 * Actualitza l'estat d'un document de forma manual.

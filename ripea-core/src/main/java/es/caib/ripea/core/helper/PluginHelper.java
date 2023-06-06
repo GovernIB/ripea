@@ -3015,14 +3015,6 @@ public class PluginHelper {
 		return certificacio;
 	}
 
-	public RespostaConsultaInfoRegistre notificacioConsultarIDescarregarJustificant(DocumentEnviamentInteressatEntity documentEnviamentEtity) {
-
-		try {
-			return getNotificacioPlugin().consultarRegistreInfo(null, documentEnviamentEtity.getEnviamentReferencia(), true);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	public RespostaJustificantEnviamentNotib notificacioDescarregarJustificantEnviamentNotib(String identificador) {
 
@@ -3063,7 +3055,11 @@ public class PluginHelper {
 					resposta.isError(),
 					resposta.getErrorDescripcio());
 
-			actualitzarRegistreInfo(documentEnviamentInteressatEntity);
+			documentEnviamentInteressatEntity.updateEnviamentInfoRegistre(
+					resposta.getRegistreData(),
+					resposta.getRegistreNumero(),
+					resposta.getRegistreNumeroFormatat());
+			
 			
 			// ====================================== CONSULTAR NOTIFICACIO ==================================================
 			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(documentEnviamentInteressatEntity.getNotificacio().getEnviamentIdentificador());
@@ -3105,26 +3101,9 @@ public class PluginHelper {
 		notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
 		
 	}
-
-	public void actualitzarRegistreInfo(DocumentEnviamentInteressatEntity enviament) {
-
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(enviament.getNotificacio().getExpedient().getId()));
-		
-		String accioDescripcio = "Consulta dades registre de l'enviament amb referència: " + enviament.getEnviamentReferencia();
-		Map<String, String> accioParams = getAccioParams(enviament);
-		long t0 = System.currentTimeMillis();
-		try {
-			RespostaConsultaInfoRegistre respostaInfoRegistre = getNotificacioPlugin().consultarRegistreInfo(null, enviament.getEnviamentReferencia(),false);
-			if (respostaInfoRegistre != null) {
-				enviament.updateEnviamentInfoRegistre(respostaInfoRegistre.getDataRegistre(), respostaInfoRegistre.getNumRegistre(), respostaInfoRegistre.getNumRegistreFormatat());
-			}
-			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_NOTIFICACIO, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
-		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de notificacions";
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_NOTIFICACIO, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.RECEPCIO, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_NOTIFICACIO, errorDescripcio, ex);
-		}
-	}
+	
+	
+	
 	public String gestioDocumentalCreate(String agrupacio, InputStream contingut) {
 
 		try {

@@ -1698,24 +1698,6 @@ public class DocumentServiceImpl implements DocumentService {
 		return documentNotificacioHelper.getCertificacio(documentEnviamentInteressatId);
 	}
 	
-	@Override
-	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(
-			Long entitatId,
-			Long documentId,
-			Long docuemntEnviamentId) {
-		try {
-			DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
-					entitatId,
-					documentId,
-					false,
-					true);
-			return documentNotificacioHelper.notificacioConsultarIDescarregarJustificant(document, docuemntEnviamentId);
-		} catch (Exception ex) {
-			logger.error("No s'ha pogut recuperar la informació del registre", ex);
-		}
-		return new NotificacioInfoRegistreDto();
-	}
-	
 	
 	@Override
 	@Transactional

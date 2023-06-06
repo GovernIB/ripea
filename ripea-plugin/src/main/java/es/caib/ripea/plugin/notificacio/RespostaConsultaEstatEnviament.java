@@ -32,6 +32,10 @@ public class RespostaConsultaEstatEnviament {
 	private boolean error;
 	private String errorDescripcio;
 	
+	private Date registreData;
+	private Integer registreNumero;
+	private String registreNumeroFormatat;
+	
 	public boolean isFinalitzat() {
 		if (estat != null && 
 				(estat == EnviamentEstat.ABSENT || 

@@ -369,13 +369,6 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(Long entitatId, Long documentId,
-			Long documentNotificacioId) {
-		return delegate.notificacioConsultarIDescarregarJustificant(entitatId, documentId, documentNotificacioId);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
 	public void documentActualitzarEstat(Long entitatId, Long documentId, DocumentEstatEnumDto nouEstat) {
 		delegate.documentActualitzarEstat(
 				entitatId, 

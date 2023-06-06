@@ -33,7 +33,7 @@ public class NotibWsController {
 
 	@RequestMapping(value = "/notificaCanvi", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
-	public void enviarContingutPost(
+	public void notificaCanvi(
 			@RequestBody NotificacioCanviClient notificacioCanvi) {
 		documentService.notificacioActualitzarEstat(
 				notificacioCanvi.getIdentificador(), 

@@ -157,7 +157,7 @@ public class DocumentNotificacioHelper {
 					for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
 						if(documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
 							documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-							pluginHelper.actualitzarRegistreInfo(documentEnviamentInteressat);
+							//pluginHelper.actualitzarRegistreInfo(documentEnviamentInteressat);
 						}
 					}
 				}
@@ -347,33 +347,6 @@ public class DocumentNotificacioHelper {
 		return pluginHelper.notificacioConsultarIDescarregarCertificacio(documentEnviamentInteressatEntity);
 	}
 	
-	public NotificacioInfoRegistreDto notificacioConsultarIDescarregarJustificant(DocumentEntity document, Long documentEnviamentId) {
-		ExpedientEntity expedient = document.getExpedient();
-		if (expedient == null) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"El document no te cap expedient associat (documentId=" + document.getId() + ")");
-		}
-		DocumentEnviamentInteressatEntity enviament = documentEnviamentInteressatRepository.findOne(documentEnviamentId);
-		
-		RespostaConsultaInfoRegistre resposta = pluginHelper.notificacioConsultarIDescarregarJustificant(
-				enviament);
-		
-		NotificacioInfoRegistreDto infoRegistre = new NotificacioInfoRegistreDto();
-		if (!resposta.isError() && resposta != null) {
-			infoRegistre.setDataRegistre(resposta.getDataRegistre());
-			infoRegistre.setNumRegistreFormatat(resposta.getNumRegistreFormatat());
-			infoRegistre.setJustificant(resposta.getJustificant());
-		} else {
-			infoRegistre.setError(true);
-			infoRegistre.setErrorData(resposta.getErrorData());
-			infoRegistre.setErrorDescripcio(resposta.getErrorDescripcio());
-			
-		}
-		return infoRegistre;
-	}
-
 
 
 
