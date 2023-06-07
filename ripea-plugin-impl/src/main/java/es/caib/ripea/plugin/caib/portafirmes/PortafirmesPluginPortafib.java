@@ -499,7 +499,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			}
 			return carrecs;
 		} catch (Exception ex) {
-			throw new SistemaExternException("Hi ha hagut un problema recuperant els càrrecs per l'usuari aplicació " + getUsername(), ex);
+			throw new SistemaExternException("Hi ha hagut un problema recuperant els càrrecs per l'usuari aplicació " + getUsernameUsuariEntitatWS(), ex);
 		}
 	}
 	
@@ -527,7 +527,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			}
 			return carrec;
 		} catch (Exception ex) {
-			throw new SistemaExternException("Hi ha hagut un problema recuperant els càrrecs per l'usuari aplicació " + getUsername(), ex);
+			throw new SistemaExternException("Hi ha hagut un problema recuperant els càrrecs per l'usuari aplicació " + getUsernameUsuariEntitatWS(), ex);
 		}
 	}
 
@@ -905,7 +905,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut recuperar el id de la transacció (" +
-					"portafib=" + getBaseUrl() + ", " +					
+					"portafib=" + getUrlFirmaSimpleFlux() + ", " +					
 					"nom=" + nom + ", " +
 					"descripcio=" + descripcio + ")",
 					ex);
@@ -926,7 +926,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"No s'ha pogut iniciar la transacció (" +
-					"portafib=" + getBaseUrl() + ", " +			
+					"portafib=" + getUrlFirmaSimpleFlux() + ", " +			
 					"transactionId=" + idTransaccio + ", " +
 					"returnUrl=" + urlReturn + ")",
 					ex);
@@ -969,55 +969,29 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 	}
 
 	private ApiFirmaAsyncSimple getFirmaAsyncSimpleApi() throws MalformedURLException {
-		String apiRestUrl = getBaseUrl() + "/common/rest/apifirmaasyncsimple/v2";
+		String apiRestUrl = getUrlFirmaSimpleAsync();
 		ApiFirmaAsyncSimple api = new ApiFirmaAsyncSimpleJersey(
 				apiRestUrl,
-				getUsername(),
-				getPassword());
+				getUsernameFirmaSimpleAsync(),
+				getPasswordFirmaSimpleAsync());
 		return api;
 	}
 	
 	private ApiFlowTemplateSimple getFluxDeFirmaClient() throws MalformedURLException {
-		String apiRestUrl = getBaseUrl() + "/common/rest/apiflowtemplatesimple/v1";
+		String apiRestUrl = getUrlFirmaSimpleFlux();
 		ApiFlowTemplateSimple api = new ApiFlowTemplateSimpleJersey(
 				apiRestUrl,
-				getUsername(),
-				getPassword());
+				getUsernameFirmaSimpleFlux(),
+				getPasswordFirmaSimpleFlux());
 		return api;
 	}
 	
-	// currently doesn't exit equivalent in REST 
-	// email 2023.04.26 12:18: "A puntaré issue per afegir mètode a aquesta API per retornar informació de la Petició."
-	private PortaFIBPeticioDeFirmaWs getPeticioDeFirmaWs() throws MalformedURLException {
-		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBPeticioDeFirma";
-		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
-		PortaFIBPeticioDeFirmaWsService service = new PortaFIBPeticioDeFirmaWsService(wsdlUrl);
-		PortaFIBPeticioDeFirmaWs api = service.getPortaFIBPeticioDeFirmaWs();
-		BindingProvider bp = (BindingProvider)api;
-		Map<String, Object> reqContext = bp.getRequestContext();
-		reqContext.put(
-				BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-				webServiceUrl);
-		reqContext.put(
-				BindingProvider.USERNAME_PROPERTY,
-				getUsername());
-		reqContext.put(
-				BindingProvider.PASSWORD_PROPERTY,
-				getPassword());
-		if (isLogMissatgesActiu()) {
-			@SuppressWarnings("rawtypes")
-			List<Handler> handlerChain = new ArrayList<Handler>();
-			handlerChain.add(new LogMessageHandler());
-			bp.getBinding().setHandlerChain(handlerChain);
-		}
-		return api;
-	}
 
 	
 	// currently doesn't exit equivalent in REST
 	// email 2023.04.25 13:55: "(1.B) métodos del webservice /ws/v1/PortaFIBUsuariEntitat:  Com que aquest WS no afecta a Peticions de Firma encara no està migrat i el podeu fer servir sense problemes."
 	private PortaFIBUsuariEntitatWs getUsuariEntitatWs() throws MalformedURLException {
-		String webServiceUrl = getBaseUrl() + "/ws/v1/PortaFIBUsuariEntitat";
+		String webServiceUrl = getUrlUsuariEntitatWS();
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
 		PortaFIBUsuariEntitatWsService service = new PortaFIBUsuariEntitatWsService(wsdlUrl);
 		PortaFIBUsuariEntitatWs api = service.getPortaFIBUsuariEntitatWs();
@@ -1028,10 +1002,10 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 				webServiceUrl);
 		reqContext.put(
 				BindingProvider.USERNAME_PROPERTY,
-				getUsername());
+				getUsernameUsuariEntitatWS());
 		reqContext.put(
 				BindingProvider.PASSWORD_PROPERTY,
-				getPassword());
+				getPasswordUsuariEntitatWS());
 		if (isLogMissatgesActiu()) {
 			@SuppressWarnings("rawtypes")
 			List<Handler> handlerChain = new ArrayList<Handler>();
@@ -1041,18 +1015,45 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 		return api;
 	}
 
-	private String getBaseUrl() {
+	private String getUrlFirmaSimpleAsync() {
 		return getProperty(
-				"plugin.portafirmes.portafib.base.url");
+				"plugin.portafirmes.firmasimpleasync.url");
 	}
-	private String getUsername() {
+	private String getUsernameFirmaSimpleAsync() {
 		return getProperty(
-				"plugin.portafirmes.portafib.username");
+				"plugin.portafirmes.firmasimpleasync.username");
 	}
-	private String getPassword() {
+	private String getPasswordFirmaSimpleAsync() {
 		return getProperty(
-				"plugin.portafirmes.portafib.password");
+				"plugin.portafirmes.firmasimpleasync.password");
 	}
+	private String getUrlFirmaSimpleFlux() {
+		return getProperty(
+				"plugin.portafirmes.firmasimpleflux.url");
+	}
+	private String getUsernameFirmaSimpleFlux() {
+		return getProperty(
+				"plugin.portafirmes.firmasimpleflux.username");
+	}
+	private String getPasswordFirmaSimpleFlux() {
+		return getProperty(
+				"plugin.portafirmes.firmasimpleflux.password");
+	}
+	private String getUrlUsuariEntitatWS() {
+		return getProperty(
+				"plugin.portafirmes.usuarientitatws.url");
+	}
+	private String getUsernameUsuariEntitatWS() {
+		return getProperty(
+				"plugin.portafirmes.usuarientitatws.username");
+	}
+	private String getPasswordUsuariEntitatWS() {
+		return getProperty(
+				"plugin.portafirmes.usuarientitatws.password");
+	}
+	
+	
+	
 	private boolean isLogMissatgesActiu() {
 		return getAsBoolean(
 				"plugin.portafirmes.portafib.log.actiu");
