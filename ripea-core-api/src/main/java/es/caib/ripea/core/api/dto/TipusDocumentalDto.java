@@ -21,6 +21,9 @@ public class TipusDocumentalDto implements Serializable {
 	private String nom;
 	private EntitatDto entitat;
 	
+	public String getCodiNom() {
+		return codi + " - " + nom;
+	}
 
 	private static final long serialVersionUID = -139254994389509932L;
 

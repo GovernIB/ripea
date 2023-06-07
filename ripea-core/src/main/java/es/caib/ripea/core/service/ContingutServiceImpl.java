@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +53,7 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
@@ -68,6 +71,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DominiService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -81,6 +85,7 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
 import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.CacheHelper;
@@ -104,6 +109,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.URLInstruccioRepository;
@@ -159,6 +165,8 @@ public class ContingutServiceImpl implements ContingutService {
 	private ContingutsOrfesHelper contingutRepositoryHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Resource
+	private OrganGestorRepository organGestorRepository;
 	@Autowired
 	private DominiService dominiService;
 	@Autowired
@@ -1269,7 +1277,7 @@ public class ContingutServiceImpl implements ContingutService {
 					}
 				}
 				arxiuDetall.setEniInteressats(metadades.getInteressats());
-				arxiuDetall.setEniOrgans(metadades.getOrgans());
+				arxiuDetall.setEniOrgans(getOrgansAmbNoms(metadades.getOrgans()));
 				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());		
 			}
 			
@@ -1294,9 +1302,15 @@ public class ContingutServiceImpl implements ContingutService {
 
 				arxiuDetall.setEniEstatElaboracio(ArxiuConversions.getEstatElaboracio(metadades.getEstatElaboracio()));
 				
-				arxiuDetall.setEniTipusDocumental(ArxiuConversions.getTipusDocumentalEnum(metadades.getTipusDocumental()));
-				
-			
+				if (metadades.getTipusDocumental() != null) {
+					List<TipusDocumentalEntity> tipos = tipusDocumentalRepository.findByCodi(metadades.getTipusDocumental().toString());
+					if (Utils.isNotEmpty(tipos)) {
+						TipusDocumentalDto tipus = conversioTipusHelper.convertir(tipos.get(0), TipusDocumentalDto.class);
+						arxiuDetall.setEniTipusDocumental(tipus.getCodiNom());
+					} else {
+						arxiuDetall.setEniTipusDocumental(metadades.getTipusDocumental().toString());
+					}
+				}
 
 				if (metadades.getTipusDocumental() == null && metadades.getTipusDocumentalAddicional() != null) {
 					logger.info("Tipus documental addicional: " + metadades.getTipusDocumentalAddicional());
@@ -1319,7 +1333,7 @@ public class ContingutServiceImpl implements ContingutService {
 					arxiuDetall.setEniTipusDocumentalAddicional(tipusDocumental.getNomEspanyol());
 				}
 
-				arxiuDetall.setEniOrgans(metadades.getOrgans());
+				arxiuDetall.setEniOrgans(getOrgansAmbNoms(metadades.getOrgans()));
 				if (metadades.getFormat() != null) {
 					arxiuDetall.setEniFormat(metadades.getFormat().toString());
 				}
@@ -2110,6 +2124,22 @@ public class ContingutServiceImpl implements ContingutService {
 
 	public boolean isPropagarMetadadesActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
+	}
+	
+	private List<String> getOrgansAmbNoms(List<String> organsCodis) {
+		List<String> organsCodisNoms = new ArrayList<>();
+		if (Utils.isNotEmpty(organsCodis)) {
+			for (String organCodi : organsCodis) {
+				OrganGestorEntity organ = organGestorRepository.findByCodi(organCodi);
+				if (organ != null) {
+					organsCodisNoms.add(organ.getCodiINom());
+				} else {
+					organsCodisNoms.add(organCodi);
+				}
+			}
+		}
+
+		return organsCodisNoms;
 	}
 	
     private static final Logger logger = LoggerFactory.getLogger(ContingutServiceImpl.class);

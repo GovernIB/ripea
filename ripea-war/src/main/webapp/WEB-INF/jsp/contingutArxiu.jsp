@@ -142,7 +142,7 @@
 									<c:when  test="${not empty arxiuDetall.eniTipusDocumental}">
 										<tr>
 											<td><strong><spring:message code="contingut.arxiu.camp.eni.tipus.doc"/></strong></td>
-											<td><spring:message code="document.nti.tipdoc.enum.${arxiuDetall.eniTipusDocumental}"/></td>
+											<td>${arxiuDetall.eniTipusDocumental}</td>
 										</tr>
 									</c:when>
 									<c:when  test="${not empty arxiuDetall.eniTipusDocumentalAddicional}">

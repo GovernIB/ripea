@@ -28,7 +28,7 @@ public class ArxiuDetallDto extends ArxiuContingutDto {
 	private List<String> eniInteressats;
 	private Date eniDataCaptura;
 	private DocumentNtiEstadoElaboracionEnumDto eniEstatElaboracio;
-	private DocumentNtiTipoDocumentalEnumDto eniTipusDocumental;
+	private String eniTipusDocumental;
 	private String eniTipusDocumentalAddicional;
 	private String eniFormat;
 	private String eniDocumentOrigenId;
