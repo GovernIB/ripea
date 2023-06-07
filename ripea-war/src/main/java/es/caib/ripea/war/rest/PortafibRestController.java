@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.portafib.callback.beans.v1.Actor;
 import es.caib.portafib.callback.beans.v1.PortaFIBEvent;
+import es.caib.portafib.callback.beans.v1.SigningRequest;
 import es.caib.ripea.core.api.dto.IntegracioAccioBuilderDto;
 import es.caib.ripea.core.api.dto.PortafirmesCalbackDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
@@ -51,7 +52,7 @@ public class PortafibRestController {
 			Exception ex = null;
 			try {
 				ex = documentService.portafirmesCallback(
-						portafirmesCalback.getDocumentId(),
+						portafirmesCalback.getPortafirmesId(),
 						portafirmesCalback.getCallbackEstat(),
 						portafirmesCalback.getMotiuRebuig(),
 						portafirmesCalback.getAdministrationId(),
@@ -85,13 +86,27 @@ public class PortafibRestController {
 	private PortafirmesCalbackDto getPortafirmesCallback(PortaFIBEvent event) {
 		PortafirmesCalbackDto portafirmesCalbackDto = new PortafirmesCalbackDto();
 
-		portafirmesCalbackDto.setDocumentId(event.getSigningRequest().getID());
+		SigningRequest signingRequest = event.getSigningRequest();
+		if (signingRequest != null) {
+			portafirmesCalbackDto.setPortafirmesId(signingRequest.getID());
+			portafirmesCalbackDto.setTitle(signingRequest.getTitle());
+			portafirmesCalbackDto.setAdditionalInformation(signingRequest.getAdditionalInformation());
+			portafirmesCalbackDto.setCustodyURL(signingRequest.getCustodyURL());
+			
+		}
+
 		portafirmesCalbackDto.setEstat(event.getEventTypeID());
 		Actor actor = event.getActor();
 		if (actor != null) {
 			portafirmesCalbackDto.setAdministrationId(actor.getAdministrationID());
 			portafirmesCalbackDto.setName(actor.getName());
 		}
+		
+		portafirmesCalbackDto.setVersion(event.getVersion());
+		portafirmesCalbackDto.setEventDate(event.getEventDate());
+		portafirmesCalbackDto.setApplicationID(event.getApplicationID());
+		portafirmesCalbackDto.setEntityID(event.getEntityID());
+		
 
 		switch (event.getEventTypeID()) {
 		case 0:
@@ -105,8 +120,8 @@ public class PortafibRestController {
 			break;
 		case 70:
 			portafirmesCalbackDto.setCallbackEstat(PortafirmesCallbackEstatEnumDto.REBUTJAT);
-			if (event.getSigningRequest() != null) {
-				portafirmesCalbackDto.setMotiuRebuig(event.getSigningRequest().getRejectionReason());
+			if (signingRequest != null) {
+				portafirmesCalbackDto.setMotiuRebuig(signingRequest.getRejectionReason());
 			}
 			break;
 		case 80:
@@ -140,11 +155,32 @@ public class PortafibRestController {
 	private IntegracioAccioBuilderDto getIntegraccioAccio(PortafirmesCalbackDto portafirmesCalback) {
 		
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("documentId", String.valueOf(portafirmesCalback.getDocumentId()));
+		accioParams.put("portafirmesId", String.valueOf(portafirmesCalback.getPortafirmesId()));
 		accioParams.put("estat", String.valueOf(portafirmesCalback.getEstat()));
 		if (Utils.isNotEmpty(portafirmesCalback.getMotiuRebuig())) {
 			accioParams.put("motiuRebuig", String.valueOf(portafirmesCalback.getMotiuRebuig()));
 		}
+		
+		accioParams.put("versió", String.valueOf(portafirmesCalback.getVersion()));
+		
+		if (portafirmesCalback.getEventDate() != null) {
+			accioParams.put("eventData", String.valueOf(portafirmesCalback.getEventDate()));
+		}
+		if (Utils.isNotEmpty(portafirmesCalback.getApplicationID())) {
+			accioParams.put("aplicacioID", portafirmesCalback.getApplicationID());
+		}
+		if (Utils.isNotEmpty(portafirmesCalback.getEntityID())) {
+			accioParams.put("entitatID", portafirmesCalback.getEntityID());
+		}
+		if (Utils.isNotEmpty(portafirmesCalback.getTitle())) {
+			accioParams.put("títol",portafirmesCalback.getTitle());
+		}
+//		if (Utils.isNotEmpty(portafirmesCalback.getAdditionalInformation())) {
+//			accioParams.put("additionalInformation", String.valueOf(portafirmesCalback.getAdditionalInformation()));
+//		}
+//		if (Utils.isNotEmpty(portafirmesCalback.getCustodyURL())) {
+//			accioParams.put("custodyURL", String.valueOf(portafirmesCalback.getCustodyURL()));
+//		}
 		
 		return new IntegracioAccioBuilderDto("Processar petició rebuda al callback rest de portafirmes", accioParams);
 	}
