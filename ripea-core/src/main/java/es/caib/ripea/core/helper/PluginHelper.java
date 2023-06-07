@@ -1830,7 +1830,7 @@ public class PluginHelper {
 		String accioDescripcio = "Descarregar document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DocumentEntity document = documentPortafirmes.getDocument();
-		accioParams.put("documentVersioId", document.getId().toString());
+		accioParams.put("documentId", document.getId().toString());
 		accioParams.put("documentPortafirmesId", documentPortafirmes.getId().toString());
 		accioParams.put("portafirmesId", new Long(documentPortafirmes.getPortafirmesId()).toString());
 		long t0 = System.currentTimeMillis();
@@ -3197,7 +3197,7 @@ public class PluginHelper {
 		String accioDescripcio = "Descarregar document firmat";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		DocumentEntity document = documentViaFirma.getDocument();
-		accioParams.put("documentVersioId", document.getId().toString());
+		accioParams.put("documentId", document.getId().toString());
 		accioParams.put("documentPortafirmesId", documentViaFirma.getId().toString());
 		accioParams.put("messageCode", documentViaFirma.getMessageCode());
 		long t0 = System.currentTimeMillis();

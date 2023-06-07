@@ -20,6 +20,7 @@ import es.caib.portafib.ws.callback.api.v1.PortaFIBEvent;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.helper.IntegracioHelper;
 
 /**
@@ -56,8 +57,21 @@ public class PortaFIBCallBackWsImpl implements PortaFIBCallBackWs {
 				"estat:" + estat + ")");
 		String accioDescripcio = "Petició rebuda al callback";
 		Map<String, String> accioParams = new HashMap<String, String>();
-		accioParams.put("documentId", new Long(documentId).toString());
+		accioParams.put("portafirmesId", new Long(documentId).toString());
 		accioParams.put("estat", new Integer(estat).toString());
+		
+		if (event.getEventDate() != null) {
+			accioParams.put("eventData", String.valueOf(event.getEventDate()));
+		}
+		if (Utils.isNotEmpty(event.getApplicationID())) {
+			accioParams.put("aplicacioID", event.getApplicationID());
+		}
+		if (Utils.isNotEmpty(event.getEntityID())) {
+			accioParams.put("entitatID", event.getEntityID());
+		}
+		if (Utils.isNotEmpty(event.getSigningRequest().getTitle())) {
+			accioParams.put("títol", event.getSigningRequest().getTitle());
+		}
 		
 		PortafirmesCallbackEstatEnumDto estatEnum;
 		switch (estat) {
