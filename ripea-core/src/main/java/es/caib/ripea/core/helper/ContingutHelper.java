@@ -23,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -68,6 +69,7 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreInteressat;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ContingutMovimentEntity;
@@ -474,9 +476,9 @@ public class ContingutHelper {
 				dto.setFitxerNom(document.getFitxerNom());
 				dto.setFitxerNomEnviamentPortafirmes(
 						pluginHelper.conversioConvertirPdfArxiuNom(document.getFitxerNom()));
-				dto.setFitxerContentType(document.getFitxerContentType());
-				//dto.setFitxerContingut(document.getFitxerContingut());
 			}
+			dto.setFitxerContentType(document.getFitxerContentType());
+			dto.setFitxerTamany(document.getFitxerTamany());
 			dto.setDataCaptura(document.getDataCaptura());
 			dto.setVersioDarrera(document.getVersioDarrera());
 			dto.setVersioCount(document.getVersioCount());
@@ -509,7 +511,11 @@ public class ContingutHelper {
 						contingut.getEntitat());
 
 				if (tipusDocumental != null) {
-					dto.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
+	            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
+	            		dto.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
+					} else {
+						dto.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
+					}
 				} else {
 					List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
 
@@ -1027,6 +1033,7 @@ public class ContingutHelper {
 				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
 			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
+			dto.setFitxerTamany(new Long(resposta.getCertificacioContingut().length));
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
 
 //			## Comprovar si la certificació està firmada

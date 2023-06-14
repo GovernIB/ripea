@@ -172,7 +172,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				model.addAttribute("tasca", expedientTascaDto);
 			}
 			
-
+			// this is for old documents, for new documents it is saved in db on creation of document
+			if (contingut.isDocument()) {
+				Long tamany = ((DocumentDto) contingut).getFitxerTamany();
+				if (tamany == null) {
+					tamany = documentService.getAndSaveFitxerTamanyFromArxiu(contingut.getId());
+					((DocumentDto) contingut).setFitxerTamany(tamany);
+				}
+			}
 
 			omplirModelPerMostrarContingut(
 					request,
@@ -203,6 +210,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isConcatentarMultiplePDFs", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.notificacio.multiple.pdf.concatenar")));
 			model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
 			model.addAttribute("isFolderCollapsedDefault", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.contingut.contreure.carpetes")));
+			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
+			
 			
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {

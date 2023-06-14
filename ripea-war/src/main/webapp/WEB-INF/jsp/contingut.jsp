@@ -49,12 +49,12 @@
 			<c:when test="${isTasca}">&nbsp;<span>${tascaNom}&nbsp;</span><div title="${tascaDescripcio}" style="max-width: 60%; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: -3px; font-size: 20px; color: #666666;"> ${tascaDescripcio}</div></c:when>
 			<c:when test="${contingut.expedient}">&nbsp;${contingut.nom}</c:when>
 			<c:when test="${contingut.carpeta}">&nbsp;${expedient.nom}</c:when>
-			<c:when test="${contingut.document}">&nbsp;${expedient.nom}</c:when>
+			<c:when test="${contingut.document}">&nbsp;${contingut.nom}</c:when>
 		</c:choose>
 
 	</title>
 	
-	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${expedient}" nomesIconaNom="true"/></c:set>
+	<c:set var="titleIconClass"><rip:blocIconaContingut contingut="${contingut.document ? contingut : expedient}" nomesIconaNom="true"/></c:set>
 	<c:set var="titleIconClass" value="${fn:trim(titleIconClass)}"/>
 	<c:if test="${not empty titleIconClass}"><meta name="title-icon-class" content="fa ${titleIconClass}"/></c:if>
 		

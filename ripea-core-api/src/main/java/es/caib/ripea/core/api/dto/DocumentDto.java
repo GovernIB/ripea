@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.dto;
 import java.util.Date;
 import java.util.List;
 
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +30,7 @@ public class DocumentDto extends NodeDto {
 	private String fitxerNomEnviamentPortafirmes;
 	private String fitxerContentType;
 	private byte[] fitxerContingut;
+	private Long fitxerTamany;
 	private boolean ambFirma;
 	private String firmaNom;
 	private String firmaContentType;
@@ -124,6 +126,12 @@ public class DocumentDto extends NodeDto {
 		copia.setId(original.getId());
 		copia.setNom(original.getNom());
 		return copia;
+	}
+	
+	
+	
+	public String getFitxerTamanyStr() {
+		return Utils.getTamanyString(this.fitxerTamany);
 	}
 	
 	@Override

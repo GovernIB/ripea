@@ -75,6 +75,8 @@ public class DocumentEntity extends NodeEntity {
 	private String fitxerNom;
 	@Column(name = "fitxer_content_type", length = 256)
 	private String fitxerContentType;
+	@Column(name = "fitxer_tamany")
+	private Long fitxerTamany;
 	//@Lob
 	@Basic(fetch = FetchType.LAZY)
 	@Column(name = "fitxer_contingut")
@@ -334,10 +336,16 @@ public class DocumentEntity extends NodeEntity {
 	public void updateFitxer(
 			String fitxerNom,
 			String fitxerContentType,
-			byte[] fitxerContingut) {
+			byte[] fitxerContingut, 
+			Long fitxerTamany) {
 		this.fitxerNom = fitxerNom;
 		this.fitxerContentType = fitxerContentType;
 		this.fitxerContingut = fitxerContingut;
+		this.fitxerTamany = fitxerTamany;
+	}
+	public void updateFitxerTamany(
+			Long fitxerTamany) {
+		this.fitxerTamany = fitxerTamany;
 	}
 	public void updateVersio(
 			String versioDarrera,

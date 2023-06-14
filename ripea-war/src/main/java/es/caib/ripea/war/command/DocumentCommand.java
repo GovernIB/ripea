@@ -249,14 +249,17 @@ public class DocumentCommand extends ContenidorCommand {
 			dto.setFitxerNom(command.getArxiuTemporal().getNom());
 			dto.setFitxerContentType(command.getArxiuTemporal().getContentType());
 			dto.setFitxerContingut(command.getArxiuTemporal().getBytes());
+			dto.setFitxerTamany(new Long(command.getArxiuTemporal().getBytes().length));
 		} else if (command.getArxiu() != null && !command.getArxiu().isEmpty()) {
 			dto.setFitxerNom(command.getArxiu().getOriginalFilename());
 			dto.setFitxerContentType(command.getArxiu().getContentType());
 			dto.setFitxerContingut(command.getArxiu().getBytes());
+			dto.setFitxerTamany(new Long(command.getArxiu().getBytes().length));
 		} else {
 			dto.setFitxerNom(command.getFitxerNom());
 			dto.setFitxerContentType(command.getFitxerContentType());
 			dto.setFitxerContingut(command.getFitxerContingut());
+			dto.setFitxerTamany(command.getFitxerContingut() != null ? new Long(command.getFitxerContingut().length) : null);
 		}
 		
 		if (command.isAmbFirma()) {

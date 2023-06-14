@@ -153,7 +153,7 @@ public class DocumentHelper {
 		FitxerDto fitxer = new FitxerDto(
 				document.getFitxerNom(),
 				document.getFitxerContentType(),
-				document.getFitxerContingut());
+				document.getFitxerTamany());
 
 		actualitzarFitxerDB(
 				entity,
@@ -252,6 +252,8 @@ public class DocumentHelper {
 			dto.setId(entity.getId());
 		return dto;
 	}
+	
+
 	
 //	
 //	private void saveFirmaSeparadaOfEsborranyInGestioDocumental(
@@ -949,17 +951,20 @@ public class DocumentHelper {
 		}
 	}
 	
-	////
-	// FITXER DEL DOCUMENT - ARXIU
-	////
+	
+	
 	
 	public void actualitzarFitxerDB(
 			DocumentEntity document,
 			FitxerDto fitxer) {
-		document.updateFitxer(
-				fitxer.getNom(),
-				fitxer.getContentType(),
-				null);
+		if (fitxer != null) {
+			document.updateFitxer(
+					fitxer.getNom(),
+					fitxer.getContentType(),
+					null, 
+					fitxer.getTamany());
+		}
+
 	}
 
 	public FitxerDto getFitxerAssociat(
@@ -1249,6 +1254,7 @@ public class DocumentHelper {
 			if (documentEntity.getArxiuUuid() != null) { // concurrency check
 				throw new ArxiuJaGuardatException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
 			}
+			
 			
 			try {
 				
