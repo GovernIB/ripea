@@ -757,6 +757,21 @@ public class CacheHelper {
 	}
 	
 	
+	@Cacheable(value = "mostrarLogsCreacioContingut")
+	public boolean mostrarLogsCreacioContingut() {
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.creacio.contingut");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@CacheEvict(value = "mostrarLogsCreacioContingut")
+	public void evictMostrarLogsCreacioContingut() {
+	}
+	
+	
 	private ValidacioErrorDto crearValidacioError(
 			MetaDadaEntity metaDada,
 			MultiplicitatEnumDto multiplicitat) {

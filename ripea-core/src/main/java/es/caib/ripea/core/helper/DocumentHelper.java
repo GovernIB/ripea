@@ -1239,8 +1239,8 @@ public class DocumentHelper {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public Exception guardarDocumentArxiu(
 			Long docId) {
-		
-		logger.info("Guardar document arxiu (id=" + docId + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")");
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("Guardar document arxiu (id=" + docId + ", entitatCodi=" + configHelper.getEntitatActualCodi() + ")");
 		Exception exception = null;
 
 		DocumentEntity documentEntity = documentRepository.findOne(docId);
@@ -1249,9 +1249,11 @@ public class DocumentHelper {
 			if (documentEntity.getArxiuUuid() != null) { // concurrency check
 				throw new ArxiuJaGuardatException("El document ja s'ha guardat en arxiu per otra persona o el process en segon pla");
 			}
-			expedientHelper.concurrencyCheckExpedientJaTancat(documentEntity.getExpedient());
 			
 			try {
+				
+				expedientHelper.concurrencyCheckExpedientJaTancat(documentEntity.getExpedient());
+				
 				FitxerDto fitxer = new FitxerDto();
 				fitxer.setNom(documentEntity.getFitxerNom());
 				fitxer.setContentType(documentEntity.getFitxerContentType());

@@ -372,7 +372,8 @@ public class ExpedientHelper {
 	public boolean arxiuPropagarExpedientAmbInteressats(
 			Long expedientId) {
 
-		logger.info(
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
 				"Expedient crear ARXIU Helper START(" +
 						"expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
@@ -385,13 +386,13 @@ public class ExpedientHelper {
 		if (throwExcepcion) {
 			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
 		}
-		
-		logger.info(
-				"Expedient crear ARXIU Helper END(" +
-						"sequencia=" + expedient.getSequencia() + ", " +
-						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
-		
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
+					"Expedient crear ARXIU Helper END(" +
+							"sequencia=" + expedient.getSequencia() + ", " +
+							"any=" + expedient.getAny() + ", " +
+							"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
+			
 		return exception == null;
 	}
 

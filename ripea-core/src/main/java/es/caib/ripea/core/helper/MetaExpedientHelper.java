@@ -120,6 +120,8 @@ public class MetaExpedientHelper {
 	private MessageHelper messageHelper;
 	@Autowired
 	private MetaExpedientComentariRepository metaExpedientComentariRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
@@ -131,11 +133,13 @@ public class MetaExpedientHelper {
 			MetaExpedientEntity metaExpedient,
 			Integer any,
 			boolean incrementar) {
-		logger.info(
-				"Obtenir proxima sequencia expedient (" +
-						"metaExpedient=" + metaExpedient.getId() + " - " +metaExpedient.getCodi() + ", " +
-						"any=" + any + ", " +
-						"incrementar=" + incrementar + ")");
+		
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
+					"Obtenir proxima sequencia expedient (" +
+							"metaExpedient=" + metaExpedient.getId() + " - " +metaExpedient.getCodi() + ", " +
+							"any=" + any + ", " +
+							"incrementar=" + incrementar + ")");
 		
 		int anyExpedient;
 		if (any != null)
@@ -149,11 +153,13 @@ public class MetaExpedientHelper {
 		if (sequencia == null) {
 			sequencia = MetaExpedientSequenciaEntity.getBuilder(anyExpedient, metaExpedient).build();
 			metaExpedientSequenciaRepository.save(sequencia);
-			logger.info("Nou sequencia creada: "+ sequencia.getAny() + ", " + sequencia.getValor() + ", "  + sequencia.getMetaExpedient().getId()+ " - " +sequencia.getMetaExpedient().getCodi());
+			if (cacheHelper.mostrarLogsCreacioContingut())
+				logger.info("Nou sequencia creada: "+ sequencia.getAny() + ", " + sequencia.getValor() + ", "  + sequencia.getMetaExpedient().getId()+ " - " +sequencia.getMetaExpedient().getCodi());
 			return sequencia.getValor();
 		} else if (incrementar) {
 			sequencia.incrementar();
-			logger.info("Sequencia incrementada: " + sequencia.getAny() + ", " + sequencia.getValor() + ", " + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
+			if (cacheHelper.mostrarLogsCreacioContingut())
+				logger.info("Sequencia incrementada: " + sequencia.getAny() + ", " + sequencia.getValor() + ", " + sequencia.getMetaExpedient().getId() + " - " + sequencia.getMetaExpedient().getCodi());
 			Long max = expedientRepository.findMaxSequencia(metaExpedient, any);
 			long valor = sequencia.getValor();
 			if (max != null && max + 1 > valor) {

@@ -252,11 +252,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
 
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		logger.info(
-				"Expedient crear Service Middle(" +
-						"sequencia=" + expedient.getSequencia() + ", " +
-						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
+					"Expedient crear Service Middle(" +
+							"sequencia=" + expedient.getSequencia() + ", " +
+							"any=" + expedient.getAny() + ", " +
+							"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
 		ExpedientDto expedientDto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 
 		
@@ -323,13 +324,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		}
 
-		
-		logger.info(
-				"Expedient crear Service End(" +
-						"id=" + expedient.getId() + ", " +
-						"nom=" + expedient.getNom() + ", " +
-						"numero=" + expedient.getMetaExpedient().getCodi() + "/" +  expedient.getSequencia() + "/" + expedient.getAny() +
-						"metaExpedientId=" + expedient.getMetaExpedient().getId() + ")");
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
+					"Expedient crear Service End(" +
+							"id=" + expedient.getId() + ", " +
+							"nom=" + expedient.getNom() + ", " +
+							"numero=" + expedient.getMetaExpedient().getCodi() + "/" +  expedient.getSequencia() + "/" + expedient.getAny() +
+							"metaExpedientId=" + expedient.getMetaExpedient().getId() + ")");
 		
 		return expedientDto;
 	}
@@ -417,6 +418,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientPeticioEntity.getId(),
 					ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT);
 		} catch (Exception e) {
+			logger.error("Error al canviar estat de anotació a processat notificat: " + expedientPeticioId, e);
 			expedientPeticioEntity.setEstatCanviatDistribucio(false);
 			expedientHelper.updateNotificarError(expedientPeticioEntity.getId(), ExceptionUtils.getStackTrace(e)); // this will be replaced by expedientPeticioEntity.setPendentCanviarEstatDistribucio(true, false);
 		}
