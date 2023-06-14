@@ -201,18 +201,40 @@
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>
-						$('a[href = "#copy_${contingut.id}"]').click(function(){
-							$.get("../document/" + ${contingut.id} + "/urlValidacio", function(data) {
-								var dummy = $('<input>').val(data).appendTo('body').select();
-								document.execCommand("copy");
-								$(dummy).remove();				
-							});
-							$('.copy').remove();
-							$('.panel-body').prepend("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
-							setTimeout(function(){	
-								$('.copy').remove();
-							}, 2000);
-						}); 
+					$('a[href="#copy_${contingut.id}"]').click(function(){
+
+					    $.ajax({
+					        url: "../document/" + ${contingut.id} + "/urlValidacio",
+					        type: "GET",
+					        success: function(data) {
+					            var dummy = $('<input>').val(data).appendTo('body').select();
+					            document.execCommand("copy");
+					            $(dummy).remove();
+					            var successDiv = $("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
+
+					            $('.copy').remove();
+					            $('.panel-body').prepend(successDiv);
+
+					            setTimeout(function(){
+					                successDiv.remove();
+					            }, 2000);
+					        },
+					        error: function(xhr, status, error) {
+							    var errorDiv = $("<div class='copy alert alert-danger' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.error'/> " + error + "</div>");
+
+					        	var dummy = $('<input>').val("<spring:message code='comu.boto.urlValidacio.error'/>" + " " + error).appendTo('body').select();
+					            document.execCommand("copy");
+							    $(dummy).remove();
+							    
+					            $('.copy').remove();
+					            $('.panel-body').prepend(errorDiv);
+
+					            setTimeout(function(){
+					                errorDiv.remove();
+					            }, 2000);
+					        }
+					    });
+					});
 					</script>
 				</c:if>		
 				<c:set var="mostrarSeparador" value="${true}"/>
