@@ -313,7 +313,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		dto.setContentType("application/pdf");
 		dto.setContingut(
 				IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/ripea/core/arxiu.pdf")));
-		dto.setTamany(dto.getContingut().length);
+		dto.setTamany(new Long(dto.getContingut().length));
 		return dto;
 	}
 
@@ -323,7 +323,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		dto.setContentType("application/pdf");
 		dto.setContingut(
 				IOUtils.toByteArray(getClass().getResourceAsStream("/es/caib/ripea/core/firma.pdf")));
-		dto.setTamany(dto.getContingut().length);
+		dto.setTamany(new Long(dto.getContingut().length));
 		return dto;
 	}
 
