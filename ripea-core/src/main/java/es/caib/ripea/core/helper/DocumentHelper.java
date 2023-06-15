@@ -153,7 +153,7 @@ public class DocumentHelper {
 		FitxerDto fitxer = new FitxerDto(
 				document.getFitxerNom(),
 				document.getFitxerContentType(),
-				document.getFitxerTamany());
+				document.getFitxerContingut());
 
 		actualitzarFitxerDB(
 				entity,
