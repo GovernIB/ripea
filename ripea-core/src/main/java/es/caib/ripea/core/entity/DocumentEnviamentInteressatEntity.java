@@ -104,13 +104,13 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 	public boolean isFinalitzat() {
 		if (enviamentDatatEstat != null && (
 				enviamentDatatEstat.equals("ABSENT") || 
-				enviamentDatatEstat.equals("ADRESA_INCORRECTA ") || 
-				enviamentDatatEstat.equals("ERROR_ENTREGA ") || 
-				enviamentDatatEstat.equals("EXPIRADA ") || 
-				enviamentDatatEstat.equals("EXTRAVIADA ") || 
-				enviamentDatatEstat.equals("MORT ") || 
-				enviamentDatatEstat.equals("LLEGIDA ") || 
-				enviamentDatatEstat.equals("NOTIFICADA ") || 
+				enviamentDatatEstat.equals("ADRESA_INCORRECTA") || 
+				enviamentDatatEstat.equals("ERROR_ENTREGA") || 
+				enviamentDatatEstat.equals("EXPIRADA") || 
+				enviamentDatatEstat.equals("EXTRAVIADA") || 
+				enviamentDatatEstat.equals("MORT") || 
+				enviamentDatatEstat.equals("LLEGIDA") || 
+				enviamentDatatEstat.equals("NOTIFICADA") || 
 				enviamentDatatEstat.equals("REBUTJADA"))) {
 			return true;
 		} else {
