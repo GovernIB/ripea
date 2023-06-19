@@ -334,6 +334,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "fileUploadResult";
 		}
 		
+		String estatsElaboracioIdentificadorEniObligat = obtenirEstatsElaboracioIdentificadorEniObligat();
+		if ((estatsElaboracioIdentificadorEniObligat != null && !estatsElaboracioIdentificadorEniObligat.isEmpty() && command.getNtiEstadoElaboracion() != null && estatsElaboracioIdentificadorEniObligat.contains(command.getNtiEstadoElaboracion().name())) && (command.getNtiIdDocumentoOrigen()==null || command.getNtiIdDocumentoOrigen().isEmpty())) {
+			bindingResult.rejectValue("ntiIdDocumentoOrigen", "NotNull");
+		}
 		
 		//Recuperar document escanejat
 		if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
