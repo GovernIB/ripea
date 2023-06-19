@@ -49,7 +49,6 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 
 	//NEW
 	public static final String CODI_UNITAT_NEW1 = "A99999907";
-	public static final String CODI_UNITAT_NEW2 = "A99999908";
 	
 	//EXTINCT
 	public static final String CODI_UNITAT_EXTINCT = "A00000009";
@@ -69,17 +68,66 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	public List<UnitatOrganitzativa> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		
 		if (!pareCodi.equals(CODI_UNITAT_ARREL)) {
-			throw new RuntimeException("Use or create entitat with codiDir3=" + CODI_UNITAT_ARREL);
+			throw new RuntimeException("To run correctly this mock syncronization use or create entitat with codiDir3=" + CODI_UNITAT_ARREL);
 		}
 		
-		List<UnitatOrganitzativa> unitats = new ArrayList<>();
-		
+		SincronizationIterationEnum sincronizationIterationEnum = null;
 		if (dataActualitzacio == null && dataSincronitzacio == null) {
+			sincronizationIterationEnum = SincronizationIterationEnum.FIRST;
+		} else {
+			sincronizationIterationEnum = SincronizationIterationEnum.SECOND;
+		}
+		
+		
+		List<UnitatOrganitzativa> unitats = new ArrayList<>();
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
 			
-			//NEW
+			//UNITAT ARREL I UNITAT SUPERIOR
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_ARREL, name(CODI_UNITAT_ARREL), null, null, "V", null));
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_SUPERIOR, name(CODI_UNITAT_SUPERIOR), CODI_UNITAT_ARREL, CODI_UNITAT_ARREL, "V", null));
 			
+			ProcedimentPluginMock.secondSyncronization = false;
+
+		} else {
+			ProcedimentPluginMock.secondSyncronization = true;
+		}
+		
+		standardTest(sincronizationIterationEnum, unitats);
+		
+	//	testTask1298(sincronizationIterationEnum, unitats);
+
+		return unitats;
+		
+		
+	}
+	
+	private void testTask1298(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
+		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			
+			unitats.add(getUnitatOrganitzativa("A04032342", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04032358", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04032359", "V", null));
+		} else {
+			
+			unitats.add(getUnitatOrganitzativa("A04068486", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04032342", "E", Arrays.asList("A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04032359", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04032358", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04032359", "E", Arrays.asList("A04032359", "A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04032358", "E", Arrays.asList("A04032358", "A04068486")));
+			
+		}
+		
+	}
+	
+	
+	
+	
+	private void standardTest(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
+		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			// NEW
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, "V", null));
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_MERGE1, "V", null));
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_MERGE2, "V", null));
@@ -88,12 +136,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_PROPS_CHANGED, "V", null));
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_EXTINCT, "V", null));
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, "V", null));
-			
-
-			ProcedimentPluginMock.secondSyncronization = false;
-
 		} else {
-			
 			
 			//SPLIT
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SPLIT, "E", Arrays.asList(CODI_UNITAT_SPLITTED1, CODI_UNITAT_SPLITTED2)));
@@ -119,22 +162,16 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			
 			//NEW
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_NEW1, "V", null));
-			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_NEW2, "V", null));
 			
 			//EXTINCT
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_EXTINCT, "E", null));
 			
 			//SUBSTITUTION BY ITSLEF
-			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE, "E", Arrays.asList(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF)));
-			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF) + " substituted", CODI_UNITAT_SUPERIOR,CODI_UNITAT_ARREL, "V", null));			
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, "E", Arrays.asList(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF)));
+			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF, name(CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF) + " substituted", CODI_UNITAT_SUPERIOR,CODI_UNITAT_ARREL, "V", null));
 			
-			ProcedimentPluginMock.secondSyncronization = true;
-
 			
 		}
-
-		return unitats;
-		
 		
 	}
 
@@ -268,4 +305,10 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	public UnitatsOrganitzativesPluginMock(String propertyKeyBase, Properties properties) {
 		super(propertyKeyBase, properties);
 	}
+	
+	enum SincronizationIterationEnum {
+	    FIRST,
+	    SECOND;
+	}
+	
 }

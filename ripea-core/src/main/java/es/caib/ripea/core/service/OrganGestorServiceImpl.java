@@ -351,12 +351,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@SuppressWarnings("unchecked")
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 
 		boolean isFirstSincronization = entitat.getDataSincronitzacio() == null;
-		List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();
-
 		if (isFirstSincronization) {
 			return PrediccioSincronitzacio.builder()
 					.isFirstSincronization(isFirstSincronization)
@@ -384,19 +383,20 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				logger.debug(organVigent.toString());
 			}
 
-			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
-			List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = getObsoletesFromWS(entitat, unitatsWS, organsVigents);
-			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
+
+
 
 			// Distinció entre divisió i (substitució o fusió)
 			MultiMap splitMap = new MultiHashMap();
 			MultiMap mergeOrSubstMap = new MultiHashMap();
+			List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
 
+			// Obtenir unitats actualment vigents en BBDD, però marcades com a obsoletes en la sincronització
+			List<UnitatOrganitzativaDto> unitatsVigentObsoleteDto = getObsoletesFromWS(entitat, unitatsWS, organsVigents);
 			for (UnitatOrganitzativaDto vigentObsolete : unitatsVigentObsoleteDto) {
 				// Comprovam que no estigui extingida
 				int transicionsVigents = 0;
 				if (!vigentObsolete.getLastHistoricosUnitats().isEmpty()) {
-					boolean extingit = true;
 					for (UnitatOrganitzativaDto hist : vigentObsolete.getLastHistoricosUnitats()) {
 						if (OrganEstatEnumDto.V.name().equals(hist.getEstat())) {
 							transicionsVigents++;
@@ -405,12 +405,12 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				}
 
 				// En cas de no estar extingida comprovam el tipus de operació
-//				if (vigentObsolete.getLastHistoricosUnitats().size() > 1) {
+				// ====================  DIVISIONS ================
 				if (transicionsVigents > 1) {
 					for (UnitatOrganitzativaDto hist : vigentObsolete.getLastHistoricosUnitats()) {
 						splitMap.put(vigentObsolete, hist);
 					}
-//				} else if (vigentObsolete.getLastHistoricosUnitats().size() == 1) {
+				// ====================  FUSIONS / SUBSTITUCIONS  ===================
 				} else if (transicionsVigents == 1) {
 					// check if the map already contains key with this codi
 					UnitatOrganitzativaDto mergeOrSubstKeyWS = vigentObsolete.getLastHistoricosUnitats().get(0);
@@ -427,11 +427,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					} else {
 						mergeOrSubstMap.put(mergeOrSubstKeyWS, vigentObsolete);
 					}
+				// ====================  EXTINGINDES ===================
 				} else if (transicionsVigents == 0) {
 					unitatsExtingides.add(vigentObsolete);
 				}
 			}
 
+			
 			// Distinció entre substitució i fusió
 			Set<UnitatOrganitzativaDto> keysMergeOrSubst = mergeOrSubstMap.keySet();
 			MultiMap mergeMap = new MultiHashMap();
@@ -439,19 +441,24 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
 				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap
 						.get(mergeOrSubstKey);
+				// ==================== FUSIONS ===================
 				if (values.size() > 1) {
 					for (UnitatOrganitzativaDto value : values) {
 						mergeMap.put(mergeOrSubstKey, value);
 					}
+				// ==================== SUBSTITUCIONS ===================	
 				} else {
 					substMap.put(mergeOrSubstKey, values.get(0));
 				}
 			}
 
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
-			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
+			// ====================  CANVIS EN ATRIBUTS ===================
+			List<UnitatOrganitzativaDto> unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
 
+			
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
+			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, organsVigents);
 
 			return PrediccioSincronitzacio.builder()
