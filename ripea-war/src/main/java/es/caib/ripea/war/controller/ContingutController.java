@@ -343,12 +343,12 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	}
 	
 	
-	@RequestMapping(value = "/contingut/{isTasca}/{id}/canviVista/{vista}", method = RequestMethod.GET)
+	@RequestMapping(value = "/contingut/{contingutId}/canviVista/{vista}", method = RequestMethod.GET)
 	public String canviVista(
 			HttpServletRequest request,
-			@PathVariable boolean isTasca,
-			@PathVariable Long id,
+			@PathVariable Long contingutId,
 			@PathVariable ContingutVistaEnumDto vista,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = new HashSet<Long>();
@@ -361,13 +361,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		SessioHelper.updateContenidorVista(
 				request,
 				vista);
-		if (isTasca) {
-			return "redirect:/usuariTasca/" + id + "/tramitar";
-		} else {
-			return "redirect:/contingut/" + id;
-		}
 		
-
+		return "redirect:/contingut/" + contingutId + "?tascaId=" + (tascaId == null ? "" : tascaId);
 	}
 	
 

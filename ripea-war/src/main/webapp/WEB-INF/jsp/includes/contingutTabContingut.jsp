@@ -1441,23 +1441,23 @@ function getDetallsSignants(idTbody, contingutId, header) {
 			<div class="btn-group" id="vistes">
 				<c:if test="${!isTasca}">
 					<%---- Button treetable per estats  ----%>
-					<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/canviVista/TREETABLE_PER_ESTAT"/></c:set>
+					<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_ESTAT?tascaId=${tascaId}"/></c:set>
 					<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.estat"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerEstats ? 'active' : ''}" draggable="false">
 						<span class="fa fa-ellipsis-v" style="padding-left: 5px; padding-right: 5px;"></span>
 					</a>	
 				</c:if>		
 				<%---- Button treetable per tipus de documents  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT"/></c:set>
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT?tascaId=${tascaId}"/></c:set>
 				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.tipus.document"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
 					<span class="fa fa-bars"></span>
 				</a>
 				<%---- Button treetable per carpetes  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/TREETABLE_PER_CARPETA"/></c:set>
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/TREETABLE_PER_CARPETA?tascaId=${tascaId}"/></c:set>
 				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.carpeta"/>" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
 					<span class="fa fa-th-list"></span>
 				</a>
 				<%---- Button grid ----%>
-				<c:set var="iconesVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/GRID"/></c:set>					
+				<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/GRID?tascaId=${tascaId}"/></c:set>					
 				<a href="${iconesVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.grid"/>" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
 					<span class="fa fa-th" ></span>
 				</a>	
