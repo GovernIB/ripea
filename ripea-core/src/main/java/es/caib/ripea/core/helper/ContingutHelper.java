@@ -1704,12 +1704,17 @@ public class ContingutHelper {
 			ArxiuEstatEnumDto arxiuEstat) {
 		
 		pluginHelper.arxiuDocumentActualitzar(
-				(DocumentEntity) document,
+				document,
 				fitxer,
 				documentFirmaTipus,
 				firmes,
 				arxiuEstat);
 		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
+		
+		// Arxiu changes file size of some signed documents so we have to consult it after sending document to arxiu
+		Document documentArxiu = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
+		long tamany = documentArxiu.getContingut().getTamany();
+		document.updateFitxerTamany(tamany);
 		
 		if (arxiuEstat == ArxiuEstatEnumDto.DEFINITIU) {
 			boolean ambFirmes = firmes != null && ! firmes.isEmpty();
