@@ -48,6 +48,7 @@ import es.caib.ripea.core.api.dto.DadaDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
@@ -97,6 +98,8 @@ import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutMovimentRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -182,6 +185,10 @@ public class ContingutHelper {
 	private ExpedientInteressatHelper expedientInteressatHelper;
 	@Autowired
 	private MetaDocumentRepository metaDocumentRepository;
+	@Autowired
+	private DocumentPortafirmesRepository documentPortafirmesRepository;
+	@Autowired
+	private DocumentNotificacioRepository documentNotificacioRepository;
 
 
 
@@ -282,7 +289,10 @@ public class ContingutHelper {
 					MetaExpedientDto.class);
 			dto.setMetaNode(metaNode);
 
-			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
+//			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
+
+			Boolean conteDocumentsDefinitiusSelect = documentRepository.expedientHasDocumentsDefinitius(expedient);
+			dto.setConteDocumentsDefinitius(conteDocumentsDefinitiusSelect);
 
 			if (onlyForList) {
 				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
@@ -524,10 +534,17 @@ public class ContingutHelper {
 			dto.setNtiTipoFirma(document.getNtiTipoFirma());
 			dto.setNtiCsv(document.getNtiCsv());
 			dto.setNtiCsvRegulacion(document.getNtiCsvRegulacion());
-			dto.setAmbNotificacions(document.isAmbNotificacions());
-			dto.setEstatDarreraNotificacio(document.getEstatDarreraNotificacio());
-			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
-			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
+//			dto.setAmbNotificacions(document.isAmbNotificacions());
+			dto.setAmbNotificacions(documentNotificacioRepository.countByDocument(document) > 0);
+//			dto.setEstatDarreraNotificacio(document.getEstatDarreraNotificacio());
+			DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocument(document);
+			dto.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
+//			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
+			Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocument(document);
+			dto.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
+//			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
+			Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocument(document);
+			dto.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
 			dto.setGesDocFirmatId(document.getGesDocFirmatId());
 			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
 			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
@@ -598,7 +615,8 @@ public class ContingutHelper {
 								ambMapPerTipusDocument,
 								ambMapPerEstat));
 			
-			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
+//			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
+			Boolean conteDocsDef = documentRepository.carpetaHasDocumentsDefinitius(carpeta);
 			dto.setConteDocumentsDefinitius(conteDocsDef);
 			resposta = dto;
 			
@@ -642,7 +660,10 @@ public class ContingutHelper {
 			resposta.setEsborratData(contingut.getEsborratData());
 			resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
 
-			if (!contingut.getFills().isEmpty()) {
+			Boolean hasFills = contingutRepository.hasFills(
+					contingut, 
+					0);
+			if (hasFills) {
 				resposta.setHasFills(true);
 			} else {
 				resposta.setHasFills(false);
@@ -796,18 +817,12 @@ public class ContingutHelper {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
 				List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
-				List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-						contingut,
-						0,
-						isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-
-				List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-						contingut,
-						0,
-						new Sort("createdDate"));
-
-				fills.addAll(fillsOrder1);
-				fills.addAll(fillsOrder2);
+				
+				if (isOrdenacioPermesa()) {
+					fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(contingut, 0);
+				} else {
+					fills = contingutRepository.findByPareAndEsborratAndOrdenat(contingut, 0);
+				}
 				
 				List<ContingutDto> fillsDtos = new ArrayList<ContingutDto>();
 				for (ContingutEntity fill: fills) {
@@ -923,17 +938,11 @@ public class ContingutHelper {
 		resposta.setPath(pathCalculatPerThisContingut);
 
 		List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
-		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-				contingut,
-				0,
-				isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-				contingut,
-				0,
-				new Sort("createdDate"));
-
-		fills.addAll(fillsOrder1);
-		fills.addAll(fillsOrder2);
+		if (isOrdenacioPermesa()) {
+			fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(contingut, 0);
+		} else {
+			fills = contingutRepository.findByPareAndEsborratAndOrdenat(contingut, 0);
+		}
 		
 		List<ContingutDto> fillsDto = new ArrayList<ContingutDto>();
 		for (ContingutEntity fill: fills) {
@@ -2138,7 +2147,7 @@ public class ContingutHelper {
 				for (String name: signatureNames) {
 //					### comprovar si és una firma o un segell
 					PdfDictionary dictionary = fields.getSignatureDictionary(name);
-					if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/sig")) {
+					if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equalsIgnoreCase("/Sig")) {
 						hasFirma = true;
 						break;
 					}

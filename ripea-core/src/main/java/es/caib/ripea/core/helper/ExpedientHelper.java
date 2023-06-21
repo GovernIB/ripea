@@ -1189,18 +1189,11 @@ public class ExpedientHelper {
 //					0,
 //					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 			List<ContingutEntity> continguts = new ArrayList<ContingutEntity>();
-			List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-					expedient,
-					0,
-					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-			
-			List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-					expedient,
-					0,
-					new Sort("createdDate"));
-			
-			continguts.addAll(fillsOrder1);
-			continguts.addAll(fillsOrder2);
+			if (contingutHelper.isOrdenacioPermesa()) {
+				continguts = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(expedient, 0);
+			} else {
+				continguts = contingutRepository.findByPareAndEsborratAndOrdenat(expedient, 0);
+			}
 			BigDecimal num = new BigDecimal(0);
 			for (ContingutEntity contingut : continguts) {
 				if (num.scale() > 0)
@@ -1354,18 +1347,11 @@ public class ExpedientHelper {
 //				0, 
 //				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 		List<ContingutEntity> contingutsCarpetaActual = new ArrayList<ContingutEntity>();
-		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-				carpetaActual,
-				0,
-				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-		
-		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-				carpetaActual,
-				0,
-				new Sort("createdDate"));
-		
-		contingutsCarpetaActual.addAll(fillsOrder1);
-		contingutsCarpetaActual.addAll(fillsOrder2);
+		if (contingutHelper.isOrdenacioPermesa()) {
+			contingutsCarpetaActual = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(carpetaActual, 0);
+		} else {
+			contingutsCarpetaActual = contingutRepository.findByPareAndEsborratAndOrdenat(carpetaActual, 0);
+		}
 		
 		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
 			if (contingutCarpetaActual instanceof CarpetaEntity) {

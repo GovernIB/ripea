@@ -17,6 +17,7 @@ import es.caib.ripea.core.aggregation.MetaExpedientCountAggregation;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -628,7 +629,19 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("expedient") ExpedientEntity expedient,			
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
-
 	
+    @Query("select case when count(c) > 0 then true else false end " + 
+    		"from DocumentEntity d " +
+    		"join d.contingut c " +
+            "where c.expedient = :expedient " +
+            "and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.DEFINITIU")
+    Boolean expedientHasDocumentsDefinitius(@Param("expedient") ExpedientEntity expedient);
+    
+    @Query("select case when count(c) > 0 then true else false end " + 
+    		"from DocumentEntity d " +
+    		"join d.contingut c " +
+            "where c.pare = :carpeta " +
+            "and d.arxiuEstat = es.caib.ripea.core.api.dto.ArxiuEstatEnumDto.DEFINITIU")
+    Boolean carpetaHasDocumentsDefinitius(@Param("carpeta") CarpetaEntity carpeta);
 
 }

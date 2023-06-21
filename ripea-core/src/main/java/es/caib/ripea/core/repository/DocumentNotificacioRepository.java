@@ -50,7 +50,31 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			DocumentNotificacioEstatEnumDto[] estat,
 			boolean error);
 	
+	long countByDocument(DocumentEntity document);
 	
+	@Query( "select dn.notificacioEstat " +
+			"from " +
+			"	DocumentNotificacioEntity dn " +
+			"where dn.id = ( " +
+			"		select " +
+			"			max(n.id) " +
+			"		from " +
+			"			DocumentNotificacioEntity n " +
+			"		where " +
+			"			n.document = :document) ")
+	DocumentNotificacioEstatEnumDto findLastEstatNotificacioByDocument(@Param("document") DocumentEntity document);
+	
+	@Query( "select dn.error " +
+			"from " +
+			"	DocumentNotificacioEntity dn " +
+			"where dn.id = ( " +
+			"		select " +
+			"			max(n.id) " +
+			"		from " +
+			"			DocumentNotificacioEntity n " +
+			"		where " +
+			"			n.document = :document) ")
+	Boolean findErrorLastNotificacioByDocument(@Param("document") DocumentEntity document);
 	
 	@Query(	"from " +
 			"    DocumentNotificacioEntity dn " +

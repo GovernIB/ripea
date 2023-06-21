@@ -11,7 +11,6 @@ import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -35,32 +34,28 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 			ContingutEntity pare,
 			EntitatEntity entitat,
 			int esborrat);
+
+	@Query("select c " + 
+			"from ContingutEntity c " + 
+			"where c.pare = :pare " + 
+			"and c.esborrat = :esborrat " + 
+			"order by c.ordre asc, c.createdDate desc")
+	List<ContingutEntity> findByPareAndEsborratAndOrdenatOrdre(
+	        @Param("pare") ContingutEntity pare,
+	        @Param("esborrat") int esborrat);
 	
-	@Query(	"select " +
-			"    c " +
-			"from " +
-			"    ContingutEntity c " +
-			"where " +
-			"c.pare = :pare " +
-			"and c.esborrat = :esborrat " +
-			"and c.ordre != 0")
+	@Query("select c from ContingutEntity c " + 
+			"where c.pare = :pare " + 
+			"and c.esborrat = :esborrat " + 
+			"order by c.createdDate desc")
 	List<ContingutEntity> findByPareAndEsborratAndOrdenat(
-			@Param("pare") ContingutEntity pare,
-			@Param("esborrat") int esborrat,
-			Sort sort);
+	        @Param("pare") ContingutEntity pare,
+	        @Param("esborrat") int esborrat);
 	
-	@Query(	"select " +
-			"    c " +
-			"from " +
-			"    ContingutEntity c " +
-			"where " +
-			"c.pare = :pare " +
-			"and c.esborrat = :esborrat " +
-			"and c.ordre = 0")
-	List<ContingutEntity> findByPareAndEsborratSenseOrdre(
+	@Query("select case when count(c) > 0 then true else false end from ContingutEntity c where c.pare = :pare and c.esborrat = :esborrat")
+	Boolean hasFills(
 			@Param("pare") ContingutEntity pare,
-			@Param("esborrat") int esborrat,
-			Sort sort);
+	        @Param("esborrat") int esborrat);
 
 	List<ContingutEntity> findByPareAndNomOrderByEsborratAsc(
 			ContingutEntity pare,

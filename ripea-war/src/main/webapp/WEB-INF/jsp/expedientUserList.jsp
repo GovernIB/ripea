@@ -585,7 +585,7 @@ function hexToRgb(hex) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="20" 
+		data-default-order="19" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -606,7 +606,6 @@ function hexToRgb(hex) {
 				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
-				<th data-col-name="dataDarrerEnviament" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
 				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>	
