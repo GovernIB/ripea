@@ -48,6 +48,7 @@ import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.exception.ValidacioFirmaException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -190,12 +191,16 @@ public class DocumentHelper {
 					firmes = Arrays.asList(firma);
 					
 				} else if (document.isAmbFirma()) {
-					firmes = validaFirmaDocument(
-							entity, 
-							fitxer,
-							document.getFirmaContingut(), 
-							false, 
-							true);
+					try {
+						firmes = validaFirmaDocument(
+								entity, 
+								fitxer,
+								document.getFirmaContingut(), 
+								false, 
+								true);
+					} catch (Exception e) {
+						throw new ValidacioFirmaException(e.getMessage());
+					}
 				}
 				
 //				if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
@@ -240,6 +245,12 @@ public class DocumentHelper {
 					"id=" + entity.getId() + ")",
 					ex);
 			
+ 			if (ex instanceof ValidacioFirmaException) {
+ 				throw new ValidationException(
+ 						document.getId(),
+ 						DocumentEntity.class,
+ 						ex.getMessage());
+ 			}
 //			if (arxiuEstat == ArxiuEstatEnumDto.ESBORRANY && documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
 //				removeFirmaSeparadaOfEsborranyFromGestioDocumental(entity);
 //			}
