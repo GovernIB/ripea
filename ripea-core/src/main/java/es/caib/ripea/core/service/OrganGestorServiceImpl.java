@@ -351,6 +351,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@SuppressWarnings("unchecked")
 	public PrediccioSincronitzacio predictSyncDir3OrgansGestors(Long entitatId) throws Exception {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 
@@ -406,11 +407,13 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 				// En cas de no estar extingida comprovam el tipus de operació
 //				if (vigentObsolete.getLastHistoricosUnitats().size() > 1) {
+				// ====================  DIVISIONS ================
 				if (transicionsVigents > 1) {
 					for (UnitatOrganitzativaDto hist : vigentObsolete.getLastHistoricosUnitats()) {
 						splitMap.put(vigentObsolete, hist);
 					}
 //				} else if (vigentObsolete.getLastHistoricosUnitats().size() == 1) {
+				// ====================  FUSIONS / SUBSTITUCIONS  ===================
 				} else if (transicionsVigents == 1) {
 					// check if the map already contains key with this codi
 					UnitatOrganitzativaDto mergeOrSubstKeyWS = vigentObsolete.getLastHistoricosUnitats().get(0);
@@ -427,6 +430,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					} else {
 						mergeOrSubstMap.put(mergeOrSubstKeyWS, vigentObsolete);
 					}
+				// ====================  EXTINGINDES ===================
 				} else if (transicionsVigents == 0) {
 					unitatsExtingides.add(vigentObsolete);
 				}
@@ -439,21 +443,36 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			for (UnitatOrganitzativaDto mergeOrSubstKey : keysMergeOrSubst) {
 				List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeOrSubstMap
 						.get(mergeOrSubstKey);
+
+				// ==================== FUSIONS ===================
 				if (values.size() > 1) {
 					for (UnitatOrganitzativaDto value : values) {
-						mergeMap.put(mergeOrSubstKey, value);
+						
+						boolean isAlreadyAddedToMap = isAlreadyAddedToMap(mergeMap, mergeOrSubstKey, value);
+						
+						if (!isAlreadyAddedToMap) {
+							mergeMap.put(mergeOrSubstKey, value);
+						} else {
+							//normally this shoudn't duplicate, it is added to deal with the result of call to WS DIR3 PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+							logger.info("Detected duplication of organs in prediction of fusion. Unitat" + value.getCodi() + "already added to fusion into " + mergeOrSubstKey.getCodi() + ". Probably caused by error in DIR3");
+						}
+
 					}
+				// ==================== SUBSTITUCIONS ===================	
 				} else {
 					substMap.put(mergeOrSubstKey, values.get(0));
 				}
 			}
 
 			// Obtenir llistat d'unitats que ara estan vigents en BBDD, i després de la sincronització continuen vigents, però amb les propietats canviades
+			// ====================  CANVIS EN ATRIBUTS ===================
 			unitatsVigents = getVigentsFromWebService(entitat, unitatsWS, organsVigents);
 
 			// Obtenir el llistat d'unitats que son totalment noves (no existeixen en BBDD): Creació
+			// ====================  NOUS ===================
 			List<UnitatOrganitzativaDto> unitatsNew = getNewFromWS(entitat, unitatsWS, organsVigents);
 
+			
 			return PrediccioSincronitzacio.builder()
 					.unitatsVigents(unitatsVigents)
 					.unitatsNew(unitatsNew)
@@ -473,6 +492,31 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 
 	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	private boolean isAlreadyAddedToMap(
+			MultiMap mergeMap,
+			UnitatOrganitzativaDto key,
+			UnitatOrganitzativaDto value) {
+
+		boolean contains = false;
+		List<UnitatOrganitzativaDto> values = (List<UnitatOrganitzativaDto>) mergeMap.get(key);
+		if (values != null) {
+			for (UnitatOrganitzativaDto unitat : values) {
+				if (unitat.getCodi().equals(value.getCodi())) {
+					contains = true;
+				}
+			}
+		}
+
+		return contains;
+
+	}
+			
+
+	
 
 	@Override
 	public ProgresActualitzacioDto getProgresActualitzacio(String entitatCodi) {
@@ -647,9 +691,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			UnitatOrganitzativa unitat,
 			List<UnitatOrganitzativa> unitatsFromWebService,
 			List<UnitatOrganitzativa> lastHistorics) {
-
-		logger.debug("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
-
+		
+		logger.info("Coloca historics recursiu(" + "unitatCodi=" + unitat.getCodi() + ")");
+		
 		if (unitat.getHistoricosUO() == null || unitat.getHistoricosUO().isEmpty()) {
 			lastHistorics.add(unitat);
 		} else {
@@ -668,6 +712,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 								+ ") en el resultat de la consulta del WS ni en la BBDD.";
 						throw new SistemaExternException(IntegracioHelper.INTCODI_UNITATS, errorMissatge);
 					}
+				} else if (historicCodi.equals(unitat.getCodi())) {
+					// EXAMPLE:
+					//A04032359
+					//-A04032359
+					//-A04068486
+					// if it is transitioning to itself don't add it as last historic
+					//this probably shoudn't happen, it is added to deal with the result of call to WS made in PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+					logger.info("Detected organ division with transitioning to itself : " + historicCodi + ". Probably caused by error in DIR3");
 				} else {
 					getLastHistoricosRecursive(
 							unitatFromCodi,

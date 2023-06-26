@@ -20,6 +20,8 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script src="<c:url value="/js/printThis.js"/>"></script>
+	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	<rip:modalHead />
 	<script>
 		var itervalProgres;
@@ -234,11 +236,13 @@
 			});
 		}
 
+		let crearPdf = () => $('#divPredict').printThis();
+
 	</script>
 </head>
 <body>
 
-	<div class="panel-group prediccio">
+	<div id="divPredict" class="panel-group prediccio">
 	
 		<!-- If this is first sincronization it shows all currently vigent unitats that will be created in db  -->
 		<c:if test="${isFirstSincronization}">
@@ -484,6 +488,7 @@
 	</c:set>
 	<form:form id="formSync" action="${formAction}" method="post" cssClass="form-horizontal" role="form">
 		<div id="modal-botons">
+			<a id="pdfBtn" class="btn btn-default" onclick="crearPdf()"><spring:message code="comu.boto.descarregar.pdf" /></a>
 			<button type="submit" class="btn btn-success autobtn" data-noloading="true"
 				<c:if test="${isAllEmpty and !isFirstSincronization}"><c:out value="disabled='disabled'"/></c:if>>
 				<span class="fa fa-save"></span>

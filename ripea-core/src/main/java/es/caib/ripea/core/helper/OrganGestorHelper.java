@@ -639,10 +639,30 @@ public class OrganGestorHelper {
 		if (unidadWS.getHistoricosUO()!=null && !unidadWS.getHistoricosUO().isEmpty()) {
 			for (String historicoCodi : unidadWS.getHistoricosUO()) {
 				OrganGestorEntity nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
-				unitat.addNou(nova);
-				nova.addAntic(unitat);
+				
+				boolean isAlreadyAddedToList = isAlreadyAddedToList(unitat.getNous(), nova);
+				if (!isAlreadyAddedToList) {
+					unitat.addNou(nova);
+					nova.addAntic(unitat);
+				} else {
+					//normally this shoudn't duplicate, it is added to deal with the result of call to WS DIR3 PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+					logger.info("Detected duplication of transtition in DB. Unitat" + unitat.getCodi() + "already transitioned into " + nova.getCodi() + ". Probably caused by error in DIR3");
+				}
+
 			}
 		}
+	}
+	
+	private boolean isAlreadyAddedToList(
+			List<OrganGestorEntity> organs,
+			OrganGestorEntity organ) {
+		boolean contains = false;
+		for (OrganGestorEntity organGestorEntity : organs) {
+			if (organGestorEntity.getId().equals(organ.getId())) {
+				contains = true;
+			}
+		}
+		return contains;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(OrganGestorHelper.class);
