@@ -241,7 +241,11 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto canviarTascaEstat(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu) {
+	public ExpedientTascaDto canviarTascaEstat(
+			Long tascaId,
+			TascaEstatEnumDto tascaEstat,
+			String motiu,
+			String rolActual) {
 		logger.debug("Canviant estat del tasca " +
 				"tascaId=" + tascaId +", "+
 				"tascaEstat=" + tascaEstat +
@@ -249,7 +253,25 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
-		ExpedientTascaEntity tasca = tascaHelper.comprovarTasca(tascaId);
+		
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(tascaId);
+		
+		try {
+			tasca = tascaHelper.comprovarTasca(tascaId);
+		} catch (Exception e) {
+			contingutHelper.comprovarContingutDinsExpedientModificable(
+					tasca.getExpedient().getEntitat().getId(),
+					tasca.getExpedient().getId(),
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					true, 
+					rolActual);
+		}
+		
+		
 		TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
 		
 		if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {

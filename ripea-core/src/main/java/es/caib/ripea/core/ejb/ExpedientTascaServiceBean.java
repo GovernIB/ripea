@@ -134,11 +134,13 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	public ExpedientTascaDto canviarTascaEstat(
 			Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
-			String motiu) {
+			String motiu, 
+			String rolActual) {
 		return delegate.canviarTascaEstat(
 				expedientTascaId,
 				tascaEstatEnumDto,
-				motiu);
+				motiu, 
+				rolActual);
 	}
 	public ExpedientTascaDto updateResponsables(Long expedientTascaId, 
 			List<String> responsablesCodi) {

@@ -63,7 +63,8 @@ public interface ExpedientTascaService {
 	public ExpedientTascaDto canviarTascaEstat(
 			Long expedientTascaId,
 			TascaEstatEnumDto tascaEstatEnumDto,
-			String motiu);
+			String motiu, 
+			String rolActual);
 	
 	public ExpedientTascaDto updateResponsables(
 			Long expedientTascaId, 

@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -74,7 +75,11 @@ public class UsuariTascaController extends BaseUserController {
 			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarTascaEstat(expedientTascaId, TascaEstatEnumDto.INICIADA, null);
+		expedientTascaService.canviarTascaEstat(
+				expedientTascaId,
+				TascaEstatEnumDto.INICIADA,
+				null,
+				RolHelper.getRolActual(request));
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
@@ -117,7 +122,8 @@ public class UsuariTascaController extends BaseUserController {
 		expedientTascaService.canviarTascaEstat(
 				command.getId(),
 				TascaEstatEnumDto.REBUTJADA,
-				command.getMotiu());
+				command.getMotiu(), 
+				RolHelper.getRolActual(request));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/usuariTasca",
@@ -133,7 +139,11 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarTascaEstat(expedientTascaId, TascaEstatEnumDto.FINALITZADA, null);
+		expedientTascaService.canviarTascaEstat(
+				expedientTascaId,
+				TascaEstatEnumDto.FINALITZADA,
+				null,
+				RolHelper.getRolActual(request));
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
