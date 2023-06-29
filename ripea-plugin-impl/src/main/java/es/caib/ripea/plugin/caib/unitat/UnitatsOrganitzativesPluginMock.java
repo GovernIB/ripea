@@ -92,18 +92,37 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			ProcedimentPluginMock.secondSyncronization = true;
 		}
 		
-	//	standardTest(sincronizationIterationEnum, unitats);
+		standardTest(sincronizationIterationEnum, unitats);
 
-		test20230621(sincronizationIterationEnum, unitats);
+	//	test20230621(sincronizationIterationEnum, unitats);
 //		testMerge3(sincronizationIterationEnum, unitats);
 		
 		//test20230615(sincronizationIterationEnum, unitats);
 		//test20230621OnlyProblematicMerge(sincronizationIterationEnum, unitats);
+		
+		//testResendTheSameChanges(sincronizationIterationEnum, unitats);
 		return unitats;
 		
 		
 	}
 	
+	
+	private void testResendTheSameChanges(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
+		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			
+			unitats.add(getUnitatOrganitzativa("A04032359", "E", Arrays.asList("A04032359", "A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04068486", "V", null));
+
+		} else {
+			unitats.add(getUnitatOrganitzativa("A04032358", "E", Arrays.asList("A04032359", "A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04032359", "E", Arrays.asList("A04032359", "A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04068486", "V", null));
+
+			
+		}
+		
+	}
 
 	
 

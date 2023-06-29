@@ -774,6 +774,7 @@ public class PermisosHelper {
 		int nombreUnitatsTotal = obsoleteUnitats.size();
 		int nombreUnitatsProcessades = 0;
 
+		OrganGestorEntity organOrigen = null;
 		for (OrganGestorEntity unitat: obsoleteUnitats) {
 
 			if (hasAnyPermissions(unitat)) {
@@ -784,11 +785,8 @@ public class PermisosHelper {
 //			}
 			progres.setProgres(51 + (nombreUnitatsProcessades++ * 24)/nombreUnitatsTotal);
 
-			OrganGestorEntity organOrigen = getOrgan(organsDividits, unitat.getCodi());
+			organOrigen = getOrgan(organsDividits, unitat.getCodi());
 			if (organOrigen != null) {
-				for (OrganGestorEntity organDesti : organOrigen.getNous()) {
-					duplicaPermisos(organOrigen, organDesti);
-				}
 				continue;
 			}
 
@@ -808,7 +806,6 @@ public class PermisosHelper {
 			if (organOrigen != null) {
 				OrganGestorEntity organDesti = organOrigen.getNous().get(0);
 				duplicaPermisos(organOrigen, organDesti);
-				continue;
 			}
 		}
     }
