@@ -372,7 +372,8 @@ public class ExpedientHelper {
 	public boolean arxiuPropagarExpedientAmbInteressats(
 			Long expedientId) {
 
-		logger.info(
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
 				"Expedient crear ARXIU Helper START(" +
 						"expedientId=" + expedientId + ")");
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
@@ -385,13 +386,13 @@ public class ExpedientHelper {
 		if (throwExcepcion) {
 			throw new RuntimeException("Mock excepcion després de crear expedient en arxiu");
 		}
-		
-		logger.info(
-				"Expedient crear ARXIU Helper END(" +
-						"sequencia=" + expedient.getSequencia() + ", " +
-						"any=" + expedient.getAny() + ", " +
-						"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
-		
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info(
+					"Expedient crear ARXIU Helper END(" +
+							"sequencia=" + expedient.getSequencia() + ", " +
+							"any=" + expedient.getAny() + ", " +
+							"metaExpedient=" + expedient.getMetaExpedient().getId() + " - " + expedient.getMetaExpedient().getCodi() + ")");
+			
 		return exception == null;
 	}
 
@@ -621,18 +622,20 @@ public class ExpedientHelper {
 					registreAnnexEntity.getAnnexArxiuEstat(), 
 					documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()), 
 					expedientEntity.getEstatAdditional());
-			FitxerDto fitxer = new FitxerDto();
-			fitxer.setNom(documentDto.getFitxerNom());
-			fitxer.setContentType(documentDto.getFitxerContentType());
-			fitxer.setContingut(documentDto.getFitxerContingut());
-			if (documentDto.getFitxerContingut() != null) {
-				documentHelper.actualitzarFitxerDB(docEntity, fitxer);
-				if (documentDto.isAmbFirma()) {
-					documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
-				}
-			} else {
-				docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
-			}
+			
+			FitxerDto fitxer = new FitxerDto(
+					documentDto.getFitxerNom(),
+					documentDto.getFitxerContentType(),
+					documentDto.getFitxerTamany());
+			
+			documentHelper.actualitzarFitxerDB(
+					docEntity,
+					fitxer);
+			
+			if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
+				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
+			} 
+			
 			if (ArxiuEstatEnumDto.DEFINITIU.equals(registreAnnexEntity.getAnnexArxiuEstat()) || registreAnnexEntity.getAnnexArxiuEstat() == null) {
 				if (registreAnnexEntity.getFirmaTipus() != null) {
 					docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
@@ -814,19 +817,21 @@ public class ExpedientHelper {
 				null, 
 				documentHelper.getDocumentFirmaTipus(documentDto.getNtiTipoFirma()), 
 				expedientEntity.getEstatAdditional());
-		FitxerDto fitxer = new FitxerDto();
-		fitxer.setNom(documentDto.getFitxerNom());
-		fitxer.setContentType(documentDto.getFitxerContentType());
-		fitxer.setContingut(documentDto.getFitxerContingut());
-		if (documentDto.getFitxerContingut() != null) {
-			documentHelper.actualitzarFitxerDB(docEntity, fitxer);
-			if (documentDto.isAmbFirma()) {
-				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
-			}
-		} else {
-			docEntity.updateFitxer(fitxer.getNom(), fitxer.getContentType(), fitxer.getContingut());
+		
+		FitxerDto fitxer = new FitxerDto(
+				documentDto.getFitxerNom(),
+				documentDto.getFitxerContentType(),
+				documentDto.getFitxerTamany());
 
+		documentHelper.actualitzarFitxerDB(
+				docEntity,
+				fitxer);
+		
+		if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
+			documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
 		}
+
+
 		docEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
 		docEntity.setNtiTipoFirma(documentDto.getNtiTipoFirma());
 		
@@ -1507,6 +1512,7 @@ public class ExpedientHelper {
 		document.setData(new Date());
 		document.setNom(registreAnnexEntity.getTitol() + " - " + registreAnnexEntity.getRegistre().getIdentificador().replace('/', '_'));
 		document.setFitxerNom(registreAnnexEntity.getNom());
+		document.setFitxerTamany(registreAnnexEntity.getTamany());
 		document.setArxiuUuid(registreAnnexEntity.getUuid());
 		document.setDataCaptura(registreAnnexEntity.getNtiFechaCaptura());
 		document.setNtiOrigen(toNtiOrigenEnumDto(registreAnnexEntity.getNtiOrigen()));
@@ -1537,6 +1543,7 @@ public class ExpedientHelper {
 		document.setData(new Date());
 		document.setNom(nomDocument);
 		document.setFitxerNom(documentArxiu.getNom());
+		document.setFitxerTamany(documentArxiu.getContingut().getTamany());
 		document.setArxiuUuid(documentArxiu.getIdentificador());
 		document.setDataCaptura(documentArxiu.getMetadades().getDataCaptura());
 		document.setNtiOrigen(ArxiuConversions.getOrigen(documentArxiu));

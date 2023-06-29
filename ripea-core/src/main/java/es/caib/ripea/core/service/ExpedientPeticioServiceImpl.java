@@ -409,7 +409,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				fitxer.setNom(versioImprimible ? registreAnnex.getNom().replace(".pdf", "_imprimible.pdf") : registreAnnex.getNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
-				fitxer.setTamany(documentContingut.getContingut().length);
+				fitxer.setTamany(documentContingut.getContingut() != null ? Long.valueOf(documentContingut.getContingut().length) : null);
 			}
 		}
 		return fitxer;
@@ -433,7 +433,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				fitxer.setNom(documentContingut.getArxiuNom());
 				fitxer.setContentType(documentContingut.getTipusMime());
 				fitxer.setContingut(documentContingut.getContingut());
-				fitxer.setTamany(documentContingut.getContingut().length);
+				fitxer.setTamany(documentContingut.getContingut() != null ? Long.valueOf(documentContingut.getContingut().length) : null);
 			}
 		}
 		return fitxer;
@@ -629,7 +629,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					arxiu.setNom(annex.getFirmaNom());
 					arxiu.setContentType(firma.getTipusMime());
 					arxiu.setContingut(firma.getContingut());
-					arxiu.setTamany(firma.getContingut().length);
+					arxiu.setTamany(firma.getContingut() != null ? Long.valueOf(firma.getContingut().length) : null);
 				}
 			}
 		}

@@ -542,4 +542,10 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.recuperarUrlViewEstatFluxDeFirmes(portafirmesId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public Long getAndSaveFitxerTamanyFromArxiu(Long documentId) {
+		return delegate.getAndSaveFitxerTamanyFromArxiu(documentId);
+	}
+
 }

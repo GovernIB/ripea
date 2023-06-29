@@ -123,6 +123,7 @@ public class DocumentGenericCommand extends ContenidorCommand {
 			dto.setFitxerContingut(command.getFitxerContingut());
 			dto.setFitxerNom(command.getFitxerNom());
 			dto.setFitxerContentType(command.getFitxerContentType());	
+			dto.setFitxerTamany(new Long(command.getFitxerContingut().length));
 		}
 
 		if (command.getMetaNodeId() != null) {

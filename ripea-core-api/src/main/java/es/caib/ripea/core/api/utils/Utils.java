@@ -1,5 +1,6 @@
 package es.caib.ripea.core.api.utils;
 
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.List;
 
@@ -88,6 +89,30 @@ public class Utils {
 			return objects;
 		}
 	}
+	
+
+	public static String getTamanyString(Long value) {
+		String[] tamanyUnitats = {"B", "KB", "MB", "GB", "TB", "PB"};
+		String valueStr = null;
+		if (value != null) {
+			double valor = value;
+			int i = 0;
+			while (value > Math.pow(1024, i + 1) 
+					&& i < tamanyUnitats.length - 1) {
+				valor = valor / 1024;
+				i++;
+			}
+			DecimalFormat df = new DecimalFormat("#,###.##");
+			return df.format(valor) + " " + tamanyUnitats[i];
+		}
+		
+		return valueStr;
+		
+	}
+	
+
+	
+
 	
 	
 }

@@ -1,0 +1,41 @@
+databaseChangeLog:
+- changeSet:
+    id: 1686225166612-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: fitxer_tamany
+            type: INTEGER
+        tableName: ipa_document
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.concsv.base.url
+          - column:
+              name: value
+              value: ''
+          - column:
+              name: description
+              value: Url base al servei de CONCSV
+          - column:
+              name: group_code
+              value: ARXIU
+          - column:
+              name: position
+              value: 31
+          - column:
+              name: jboss_property
+              value: 1
+          - column:
+              name: type_code
+              value: TEXT
+          - column:
+              name: configurable
+              value: 1
+          - column:
+              name: configurable_organ
+              value: 1              

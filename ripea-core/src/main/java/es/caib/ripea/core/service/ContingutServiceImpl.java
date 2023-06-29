@@ -1973,10 +1973,13 @@ public class ContingutServiceImpl implements ContingutService {
 				creat.updateArxiu(uuidDocumentoOrigen);
 				creat.updateExpedient((ExpedientEntity)contingutDesti);
 				creat.updatePare(contingutDesti);
-				((DocumentEntity) creat).updateFitxer(
-						documentOrigen.getFitxerNom(),
-						documentOrigen.getFitxerContentType(),
-						null);
+				documentHelper.actualitzarFitxerDB(
+						(DocumentEntity) creat,
+						new FitxerDto(
+								documentOrigen.getFitxerNom(),
+								documentOrigen.getFitxerContentType(),
+								documentOrigen.getFitxerTamany()));
+
 			}
 			if (creat instanceof NodeEntity) {
 				NodeEntity nodeOrigen = (NodeEntity)contingutOrigen;

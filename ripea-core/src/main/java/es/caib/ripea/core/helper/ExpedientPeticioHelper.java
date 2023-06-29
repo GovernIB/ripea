@@ -76,8 +76,7 @@ public class ExpedientPeticioHelper {
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
 			
-		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-			logger.info("Creant l'anotació: " + anotacioRegistreId.getIndetificador());
+		logger.info("Creant comunicació de l'anotació: " + anotacioRegistreId.getIndetificador());
 		
 		ExpedientPeticioEntity expedientPeticioEntity = ExpedientPeticioEntity.getBuilder(
 				anotacioRegistreId.getIndetificador(),
@@ -93,13 +92,11 @@ public class ExpedientPeticioHelper {
 			
 		ExpedientPeticioEntity peticio = expedientPeticioRepository.findOne(peticioId);
 		
-		if (peticio.getEstat() == ExpedientPeticioEstatEnumDto.PENDENT) {
-			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-				logger.info("Anotació ja descarregada: " + peticio.getId() + ", " + peticio.getIdentificador());
+		if (peticio.getEstat() == ExpedientPeticioEstatEnumDto.PENDENT || peticio.getEstat() == ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT || peticio.getEstat() == ExpedientPeticioEstatEnumDto.PROCESSAT_NOTIFICAT) {
+			logger.info("No es pot netejar anotació en estat: " + peticio.getEstat() + ", " + peticio.getId() + ", " + peticio.getIdentificador());
 
 		} else {
-			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-				logger.info("Netejant l'anotació: " + peticio.getId() + ", " + peticio.getIdentificador());
+			logger.info("Netejant l'anotació: " + peticio.getId() + ", " + peticio.getIdentificador());
 			RegistreEntity registre = peticio.getRegistre();
 			if (registre != null) {
 				peticio.updateRegistre(null);

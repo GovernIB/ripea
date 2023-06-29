@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.dto;
 import java.text.DecimalFormat;
 import java.util.Date;
 
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -60,18 +61,9 @@ public class RegistreAnnexDto {
 		return this.documentId != null;
 	}
 	
-	private static String[] tamanyUnitats = {"b", "Kb", "Mb", "Gb", "Tb", "Pb"};
 	
 	public String getTamanyStr() {
-		double valor = this.tamany;
-		int i = 0;
-		while (this.tamany > Math.pow(1024, i + 1) 
-				&& i < tamanyUnitats.length - 1) {
-			valor = valor / 1024;
-			i++;
-		}
-		DecimalFormat df = new DecimalFormat("#,###.##");
-		return df.format(valor) + " " + tamanyUnitats[i];
+		return Utils.getTamanyString(this.tamany);
 	}
 
 }

@@ -89,3 +89,6 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 -- Changeset db/changelog/changes/0.9.99/930.yaml::1680608723206-1::limit
 ALTER TABLE ipa_usuari ADD email_alternatiu VARCHAR(200);
 
+-- Changeset db/changelog/changes/0.9.99/1282.yaml::1685627826297-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.mostrar.logs.rendiment.descarregar.anotacio', 'false', 'Generar logs de rendiment en la descàrrega d''anotacions de distribució', 'LOGS', '1', '0', 'BOOL', '0');
+

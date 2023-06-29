@@ -1281,8 +1281,8 @@ public class PluginHelper {
 		}
 	}
 	
-	public Document arxiuDocumentConsultar(DocumentEntity contingut, String nodeId, String versio, boolean ambContingut) {
-		return arxiuDocumentConsultar(contingut, nodeId, versio, ambContingut, false);
+	public Document arxiuDocumentConsultar(DocumentEntity contingut, String arxiuUuid, String versio, boolean ambContingut) {
+		return arxiuDocumentConsultar(contingut, arxiuUuid, versio, ambContingut, false);
 	}
 
 	public Document arxiuDocumentConsultar(DocumentEntity document, String arxiuUuid, String versio, boolean ambContingut, boolean ambVersioImprimible) {

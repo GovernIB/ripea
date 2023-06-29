@@ -90,7 +90,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 		logger.debug("Important documents de l'arxiu digital (" +
 				"numeroRegistre=" + params.getNumeroRegistre() + ")");
 		ExpedientEntity expedientSuperior;
-		FitxerDto fitxer = new FitxerDto();;
+		FitxerDto fitxer = new FitxerDto();
 		int documentsRepetits = 0;
 		boolean usingNumeroRegistre = params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE);
 		boolean crearNovaCarpeta = params.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA);
@@ -144,6 +144,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setNom(documentArxiu.getNom());
 			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
 			fitxer.setContingut(documentArxiu.getContingut().getContingut());
+			fitxer.setTamany(documentArxiu.getContingut().getTamany());
 
 			// COMPROVAR SI S'HA IMPORTAT PRÈVIAMENT I ES PERMET DUPLICAR CONTINGUT
 			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(documentArxiu.getIdentificador());
@@ -232,12 +233,11 @@ public class ImportacioServiceImpl implements ImportacioService {
 				null, 
 				documentHelper.getDocumentFirmaTipus(documentNtiTipoFirmaEnum), 
 				expedient.getEstatAdditional());
-		if (fitxer != null) {
-			entity.updateFitxer(
-					fitxer.getNom(),
-					fitxer.getContentType(),
-					null);
-		}
+		
+		documentHelper.actualitzarFitxerDB(
+				entity,
+				fitxer);
+
 		
 		// POSAR COM A CUSTODIAT O DEFINITIU
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {

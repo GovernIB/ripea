@@ -19,7 +19,7 @@ public class FitxerDto implements Serializable {
 	private String nom;
 	private String contentType;
 	private byte[] contingut;
-	private long tamany;
+	private Long tamany;
 	/*private String firmaNom;
 	private String firmaContentType;
 	private byte[] contingutFirma;
@@ -28,19 +28,23 @@ public class FitxerDto implements Serializable {
 	public FitxerDto() { }
 	
 	public FitxerDto(String nom, String contentType, byte[] contingut) {
-		super();
 		this.nom = nom;
 		this.contentType = contentType;
 		this.setContingut(contingut);
+	}
+	public FitxerDto(String nom, String contentType, Long tamany) {
+		this.nom = nom;
+		this.contentType = contentType;
+		this.tamany = tamany;
 	}
 
 	
 	public void setContingut(byte[] contingut) {
 		this.contingut = contingut;
 		if (contingut != null)
-			this.tamany = contingut.length;
+			this.tamany = Long.valueOf(contingut.length);
 		else
-			this.tamany = 0;
+			this.tamany = 0l;
 	}
 	
 	public String getExtensio() {

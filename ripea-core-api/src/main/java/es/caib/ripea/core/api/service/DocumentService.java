@@ -733,6 +733,10 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public FirmaResultatDto firmaSimpleWebEnd(String transactionID);
 
+	@PreAuthorize("hasRole('tothom')")
+	public Long getAndSaveFitxerTamanyFromArxiu(
+			Long documentId);
+
 
 	
 

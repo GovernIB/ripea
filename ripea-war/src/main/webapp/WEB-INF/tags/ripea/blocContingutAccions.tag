@@ -48,7 +48,7 @@
 				<c:otherwise>
 					<c:if test="${!isTasca}">
 						<%---- Consultar ----%>
-						<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+						<li class="${(contingut.document && contingut.gesDocAdjuntId!=null) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}"/>" data-toggle="modal" ><span class="fa fa-folder-open-o"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 					</c:if>
 				</c:otherwise>
 			</c:choose>
@@ -284,20 +284,17 @@
 				<c:if test="${(contingut.documentFirmaTipus != 'SENSE_FIRMA' && !empty contingut.arxiuUuid) and !isTasca or contingut.fitxerExtension=='zip'}">
 				
 					<%---- Notificar ----%>
-					<c:if test="${expedient.metaNode.notificacioActiva}"> 
-						<c:choose>
-							<c:when test="${!empty expedient.interessatsNotificable}">
-								<li>
-								<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
-								</li>
-							</c:when>
-							<c:otherwise>
-							
-								<li class="disabled"><a class="btnNotificar" href="#" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
-								<p style="font-size: 9px;padding: 1px 15px;">&nbsp;<spring:message code="comu.boto.notificar.comentari"/></p>
-							</c:otherwise>
-						</c:choose>
-					</c:if>
+					<c:choose>
+						<c:when test="${!empty expedient.interessatsNotificable}">
+							<li>
+							<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
+							</li>
+						</c:when>
+						<c:otherwise>
+							<li class="disabled"><a class="btnNotificar" href="#" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+							<p style="font-size: 9px;padding: 1px 15px;">&nbsp;<spring:message code="comu.boto.notificar.comentari"/></p>
+						</c:otherwise>
+					</c:choose>
 					
 					<%---- Publicar ----%>
 					<c:if test="${isMostrarPublicar}">

@@ -30,6 +30,7 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.war.command.EntitatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
 
@@ -156,7 +157,7 @@ public class EntitatController extends BaseUserController {
 	@RequestMapping(value = "/getEntitatLogo", method = RequestMethod.GET)
 	public String getEntitatLogo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = EntitatHelper.getEntitatActual(request, entitatService);
 		// If there is logo defined for entitat (in database) return it, if not return logo defined for application (in properties file)
 		byte [] logo = entitatActual.getLogoImgBytes() != null ? entitatActual.getLogoImgBytes() : entitatService.getLogo();
 		try {

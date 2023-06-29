@@ -1211,7 +1211,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 					<c:when test="${contingut.documentTipus == 'DIGITAL' || contingut.documentTipus == 'IMPORTAT'}">
 						<tr>
 							<td><strong><spring:message code="contingut.document.camp.arxiu"/></strong></td>
-							<td>${contingut.fitxerNom}</td>
+							<td>${contingut.fitxerNom} <c:if test="${not empty contingut.fitxerTamany}"> (${contingut.fitxerTamanyStr}) </c:if></td>
 						</tr>
 						<c:if test="${!empty contingut.descripcio}">
 							<tr> 
@@ -1239,7 +1239,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 				</c:if>
 				<tr>
 					<td><strong><spring:message code="contingut.info.data"/></strong></td>
-					<td><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy"/></td>
+					<td><fmt:formatDate value="${contingut.data}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 				</tr>
 				<tr>
 					<td><strong><spring:message code="contingut.info.estat"/></strong></td>
@@ -1247,7 +1247,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 				</tr>									
 				<tr>
 					<td><strong><spring:message code="contingut.info.nti.data.captura"/></strong></td>
-					<td><fmt:formatDate value="${contingut.dataCaptura}" pattern="dd/MM/yyyy"/></td>
+					<td><fmt:formatDate value="${contingut.dataCaptura}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 				</tr>
 				<tr>
 					<td><strong><spring:message code="contingut.info.nti.origen"/></strong></td>
@@ -1257,13 +1257,17 @@ function getDetallsSignants(idTbody, contingutId, header) {
 					<td><strong><spring:message code="contingut.info.nti.tipus.doc"/></strong></td>
 					<c:choose>
 						<c:when test="${not empty contingut.ntiTipoDocumentalNom}">
-							<td>${contingut.ntiTipoDocumentalNom}</td>
+							<td>${contingut.ntiTipoDocumental} - ${contingut.ntiTipoDocumentalNom}</td>
 						</c:when>
 						<c:otherwise>
 							<td><spring:message code="document.nti.tipdoc.enum.${contingut.ntiTipoDocumental}"/></td>
 						</c:otherwise>
 					</c:choose>
-				</tr>																		
+				</tr>	
+				<tr>
+					<td><strong><spring:message code="contingut.info.nti.estat.elab"/></strong></td>
+					<td><spring:message code="document.nti.estado.elaboracion.enum.${contingut.ntiEstadoElaboracion}"/></td>
+				</tr>				
 				<c:if test="${not empty contingut.ntiIdDocumentoOrigen}">
 					<td><strong><spring:message code="contingut.info.nti.doc.origen.id"/></strong></td>
 					<td>${contingut.ntiIdDocumentoOrigen}</td>
@@ -1271,7 +1275,12 @@ function getDetallsSignants(idTbody, contingutId, header) {
 				<c:if test="${!empty contingut.ntiCsv}">		
 					<tr>
 						<td><strong><spring:message code="contingut.document.camp.firma.csv" /></strong></td>
-						<td>${contingut.ntiCsv}</td>
+						<td>
+							${contingut.ntiCsv}
+							<c:if test="${not empty concsvBaseUrl}">
+								<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
+							</c:if>							
+						</td>
 					</tr>	
 				</c:if>										
 			</tbody>
@@ -1297,7 +1306,13 @@ function getDetallsSignants(idTbody, contingutId, header) {
 						</tr>
 						<tr>
 							<td><strong><spring:message code="contingut.document.camp.firma.csv"/></strong></td>
-							<td>${contingut.ntiCsv}</td>
+							<td>
+								${contingut.ntiCsv}
+								<c:if test="${not empty concsvBaseUrl}">
+									<a href="${concsvBaseUrl}/view.xhtml?hash=${contingut.ntiCsv}" target="_blank" title="<spring:message code="contingut.document.camp.firma.csv.enllac"/>"><span class="fa fa-external-link"></span></a>
+								</c:if>		
+							
+							</td>
 						</tr>
 						<tr>
 							<td><strong><spring:message code="contingut.document.camp.firma.csv.regulacio"/></strong></td>
@@ -1426,23 +1441,23 @@ function getDetallsSignants(idTbody, contingutId, header) {
 			<div class="btn-group" id="vistes">
 				<c:if test="${!isTasca}">
 					<%---- Button treetable per estats  ----%>
-					<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/canviVista/TREETABLE_PER_ESTAT"/></c:set>
+					<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_ESTAT?tascaId=${tascaId}"/></c:set>
 					<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.estat"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerEstats ? 'active' : ''}" draggable="false">
 						<span class="fa fa-ellipsis-v" style="padding-left: 5px; padding-right: 5px;"></span>
 					</a>	
 				</c:if>		
 				<%---- Button treetable per tipus de documents  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT"/></c:set>
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT?tascaId=${tascaId}"/></c:set>
 				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.tipus.document"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
 					<span class="fa fa-bars"></span>
 				</a>
 				<%---- Button treetable per carpetes  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/TREETABLE_PER_CARPETA"/></c:set>
+				<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/TREETABLE_PER_CARPETA?tascaId=${tascaId}"/></c:set>
 				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.carpeta"/>" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
 					<span class="fa fa-th-list"></span>
 				</a>
 				<%---- Button grid ----%>
-				<c:set var="iconesVistaUrl"><c:url value="/contingut/${isTasca}/${isTasca ? tascaId : contingut.id}/canviVista/GRID"/></c:set>					
+				<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/GRID?tascaId=${tascaId}"/></c:set>					
 				<a href="${iconesVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.grid"/>" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
 					<span class="fa fa-th" ></span>
 				</a>	

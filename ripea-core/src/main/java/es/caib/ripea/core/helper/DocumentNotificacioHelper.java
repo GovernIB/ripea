@@ -406,13 +406,7 @@ public class DocumentNotificacioHelper {
 					DocumentEntity.class,
 					"El document no te cap expedient associat (documentId=" + document.getId() + ")");
 		}
-		if (	!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioTipus) &&
-				!expedient.getMetaExpedient().isNotificacioActiva()) {
-			throw new ValidationException(
-					document.getId(),
-					DocumentEntity.class,
-					"El document pertany a un expedient que no te activades les notificacions electròniques");
-		}
+
 		return expedient;
 	}
 	

@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.plugins.arxiu.api.ArxiuNotFoundException;
@@ -436,6 +437,24 @@ public class DocumentServiceImpl implements DocumentService {
 	}
 	
 	
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	@Override
+	public Long getAndSaveFitxerTamanyFromArxiu(Long documentId) {
+		DocumentEntity documentEntity = null;
+		try {
+			documentEntity = documentRepository.findOne(documentId);
+			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(documentEntity.getArxiuUuid());
+			long tamany = documentArxiu.getContingut().getTamany();
+			documentEntity.updateFitxerTamany(tamany);
+			return tamany;
+		} catch (Throwable t) {
+			logger.error("Error al descarregar fitxer tamany, documentId=" + documentId + "docuemntNom=" + (documentEntity != null ? documentEntity.getNom() : "") + "documentUuid=" + (documentEntity != null ? documentEntity.getArxiuUuid() : ""));
+			return null;
+		}
+		
+	}
+	
+	
 	@Override
 	public String firmaSimpleWebStart(
 			FitxerDto fitxerPerFirmar,
@@ -814,6 +833,7 @@ public class DocumentServiceImpl implements DocumentService {
 		document.setFitxerNom(justificant.getNom());
 		document.setFitxerContentType(justificant.getContentType());
 		document.setFitxerContingut(justificant.getContingut());
+		document.setFitxerTamany(justificant.getContingut() != null ? new Long(justificant.getContingut().length) : null);
 		document.setAmbFirma(true);
 		document.setFirmaSeparada(false);
 		document.setPinbalIdpeticion(idPeticion);
