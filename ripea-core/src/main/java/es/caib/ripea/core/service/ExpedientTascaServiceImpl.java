@@ -458,14 +458,25 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
 
-		entityComprovarHelper.comprovarExpedient(
-				tasca.getExpedient().getId(),
-				false,
-				false,
-				true,
-				false,
-				false,
-				rolActual);
+		Exception exception = null;
+		try {
+			entityComprovarHelper.comprovarExpedient(
+					tasca.getExpedient().getId(),
+					false,
+					false,
+					true,
+					false,
+					false,
+					rolActual);
+		} catch (Exception e) {
+			exception = e;
+		}
+		
+		if (exception != null) {
+			contingutHelper.comprovarContingutPertanyTascaAccesible(
+					expedientTascaId,
+					tasca.getExpedient().getId());
+		}
 
 		// truncam a 1024 caracters
 		if (text.length() > 1024)
@@ -486,15 +497,27 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
 
-		entityComprovarHelper.comprovarExpedient(
-				tasca.getExpedient().getId(),
-				false,
-				true,
-				false,
-				false,
-				false,
-				null);
+		Exception exception = null;
+		try {
+			entityComprovarHelper.comprovarExpedient(
+					tasca.getExpedient().getId(),
+					false,
+					true,
+					false,
+					false,
+					false,
+					null);
+		} catch (Exception e) {
+			exception = e;
+		}
+		
+		if (exception != null) {
+			contingutHelper.comprovarContingutPertanyTascaAccesible(
+					expedientTascaId,
+					tasca.getExpedient().getId());
+		}
 
+		
 		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
 
 		return conversioTipusHelper.convertirList(tascacoms, ExpedientTascaComentariDto.class);
