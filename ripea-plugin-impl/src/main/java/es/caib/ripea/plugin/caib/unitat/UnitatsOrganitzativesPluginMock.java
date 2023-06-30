@@ -64,6 +64,8 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 //	update ipa_entitat set data_sincronitzacio = null, data_actualitzacio = null where id = (select id from ipa_entitat where unitat_arrel = 'A00000000');
 
 	
+
+	
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
 		
@@ -92,22 +94,61 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			ProcedimentPluginMock.secondSyncronization = true;
 		}
 		
-	//	standardTest(sincronizationIterationEnum, unitats);
+		switch (testNumber) {
+		  case 1:
+			  standardTest(sincronizationIterationEnum, unitats);
+		    break;
+		  case 2:
+			  testResendTheSameChanges(sincronizationIterationEnum, unitats);
+		    break;
+		  case 3:
+			  testSplittingToItself(sincronizationIterationEnum, unitats);
+		    break;
+		  case 4:
+			  test20230621OnlyProblematicMerge(sincronizationIterationEnum, unitats);
+		    break;
+		  case 5:
+			  testSplittingToItself(sincronizationIterationEnum, unitats);
+		    break;
 
-		test20230621(sincronizationIterationEnum, unitats);
-//		testMerge3(sincronizationIterationEnum, unitats);
-		
-		//test20230615(sincronizationIterationEnum, unitats);
-		//test20230621OnlyProblematicMerge(sincronizationIterationEnum, unitats);
+		}
+
 		return unitats;
+	}
+	Integer testNumber = 1;//testNumber = 2;
+
+	
+	private void testResendTheSameChanges(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
 		
-		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			
+			unitats.add(getUnitatOrganitzativa("A04032342", "E", Arrays.asList("A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04032359", "E", Arrays.asList("A04032359", "A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04068486", "V", null));
+
+		} else {
+			unitats.add(getUnitatOrganitzativa("A04032358", "E", Arrays.asList("A04032359", "A04068486")));
+			
+			unitats.add(getUnitatOrganitzativa("A04032342", "E", Arrays.asList("A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04032359", "E", Arrays.asList("A04032359", "A04068486")));
+			unitats.add(getUnitatOrganitzativa("A04068486", "V", null));
+			
+		}
 	}
 	
+	private void testSplittingToItself(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
+		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			
+			unitats.add(getUnitatOrganitzativa("A04032359", "V", null));
 
-	
-
-	
+		} else {
+			unitats.add(getUnitatOrganitzativa("A04032359", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04068486", "V", null));
+			unitats.add(getUnitatOrganitzativa("A04032359", "E", Arrays.asList("A04032359", "A04068486")));
+			
+		}
+	}
 	
 	
 	private void test20230621(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
