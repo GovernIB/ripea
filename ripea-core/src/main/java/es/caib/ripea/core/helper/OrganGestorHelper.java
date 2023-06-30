@@ -450,14 +450,9 @@ public class OrganGestorHelper {
 				}
 			}
 			
-			/*			 
-             UnitatOrganitzativa(codi=A, estat=V, historicosUO=[B, C])
-			 UnitatOrganitzativa(codi=B, estat=V, historicosUO=null)
-			 UnitatOrganitzativa(codi=C, estat=V, historicosUO=null)
-			 */
 			List<OrganGestorEntity> nous = obsoleteUnitat.getNous();
 			if (nous != null && !contains(nous, obsoleteUnitat)) {
-				logger.info("Unitat came as vigent but transitioning to others " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom() + "This is probably the error of DIR3CAIB");
+				logger.info("Unitat extinguit " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom() + "This is probably the error of DIR3CAIB");
 				obsoleteUnitat.setEstat(OrganEstatEnumDto.E);
 			}
 			
