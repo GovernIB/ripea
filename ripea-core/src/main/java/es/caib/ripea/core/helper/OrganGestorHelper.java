@@ -422,6 +422,16 @@ public class OrganGestorHelper {
 			if (obsoleteUnitat.getNous().size() > 1) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
 				organsDividits.add(obsoleteUnitat);
+				
+				// EXAMPLE:
+				//A04032359
+				//-A04032359
+				//-A04068486
+				// if it is transitioning to itself change it to be vigent
+				//this probably shoudn't happen, it is added to deal with the result of call to WS made in PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
+				if (contains(obsoleteUnitat.getNous(), obsoleteUnitat)) {
+					obsoleteUnitat.setEstat(OrganEstatEnumDto.V);
+				}
 				infoText = msg("unitat.synchronize.info.transicio.divisio", obsoleteUnitat.getCodi(), organsToCodiList(obsoleteUnitat.getNous()));
 			} else {
 				if (obsoleteUnitat.getNous().size() == 1) {
@@ -439,6 +449,18 @@ public class OrganGestorHelper {
 					infoText = msg("unitat.synchronize.info.transicio.extincio");
 				}
 			}
+			
+			/*			 
+             UnitatOrganitzativa(codi=A, estat=V, historicosUO=[B, C])
+			 UnitatOrganitzativa(codi=B, estat=V, historicosUO=null)
+			 UnitatOrganitzativa(codi=C, estat=V, historicosUO=null)
+			 */
+			List<OrganGestorEntity> nous = obsoleteUnitat.getNous();
+			if (nous != null && !contains(nous, obsoleteUnitat)) {
+				logger.info("Unitat came as vigent but transitioning to others " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom() + "This is probably the error of DIR3CAIB");
+				obsoleteUnitat.setEstat(OrganEstatEnumDto.E);
+			}
+			
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.transicio", obsoleteUnitat.getCodi(), obsoleteUnitat.getNom())).infoText(infoText).build());
 			progres.setProgres(22 + (nombreUnitatsProcessades++ * 5 / nombreUnitatsTotal));
 		}
@@ -640,7 +662,7 @@ public class OrganGestorHelper {
 			for (String historicoCodi : unidadWS.getHistoricosUO()) {
 				OrganGestorEntity nova = organGestorRepository.findByEntitatAndCodi(entitat, historicoCodi);
 				
-				boolean isAlreadyAddedToList = isAlreadyAddedToList(unitat.getNous(), nova);
+				boolean isAlreadyAddedToList = contains(unitat.getNous(), nova);
 				if (!isAlreadyAddedToList) {
 					unitat.addNou(nova);
 					nova.addAntic(unitat);
@@ -652,8 +674,8 @@ public class OrganGestorHelper {
 			}
 		}
 	}
-	
-	private boolean isAlreadyAddedToList(
+	// TODO add equals method to OrganGestorEntity and replace by List#contains
+	private boolean contains(
 			List<OrganGestorEntity> organs,
 			OrganGestorEntity organ) {
 		boolean contains = false;
