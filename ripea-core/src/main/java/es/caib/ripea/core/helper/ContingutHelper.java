@@ -1251,7 +1251,7 @@ public class ContingutHelper {
 				contingutId);
 		
 		entityComprovarHelper.comprovarEntitat(
-				contingut.getId(),
+				contingut.getEntitat().getId(),
 				true,
 				false,
 				false, 
