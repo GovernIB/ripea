@@ -147,7 +147,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		
 		ContingutEntity contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					contingutId);
 		
@@ -417,7 +416,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + documentId + ")");
 		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
 				tascaId,
 				documentId);
 		return toDocumentDto(document);
@@ -436,7 +434,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				+ "contingutId=" + contingutId + ")");
 		
 		ContingutEntity contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
 				tascaId,
 				contingutId);
 		

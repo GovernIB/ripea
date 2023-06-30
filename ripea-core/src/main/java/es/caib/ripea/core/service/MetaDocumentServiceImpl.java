@@ -652,7 +652,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				false, 
 				true, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, contingutId);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
 		ExpedientEntity expedientSuperior;
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			expedientSuperior = (ExpedientEntity)contingut;
@@ -694,7 +694,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<>();
 		if (contingutId != null) {
 			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-					entitat,
 					contingutId);
 			ExpedientEntity expedient = contenidorHelper.getExpedientSuperior(
 					contingut,

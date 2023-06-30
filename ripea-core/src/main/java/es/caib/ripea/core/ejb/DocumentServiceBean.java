@@ -490,8 +490,14 @@ public class DocumentServiceBean implements DocumentService {
 	@Override
 	@RolesAllowed("tothom")
 	public DocumentDto findAmbId(
-			Long documentId, String rolActual, PermissionEnumDto permission) {
-		return delegate.findAmbId(documentId, rolActual, permission);
+			Long documentId,
+			String rolActual,
+			PermissionEnumDto permission,
+			Long tascaId) {
+		return delegate.findAmbId(documentId,
+				rolActual,
+				permission,
+				tascaId);
 	}
 
 	@Override

@@ -2015,9 +2015,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (!isImportacioRelacionatsActiva()) {
 			throw new ValidationException("La importació d'expedients relacionats no està activa");
 		}
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		ContingutEntity contingutPare = entityComprovarHelper.comprovarContingut(
-				entitat,
 				pareId);
 		ExpedientEntity expedientFill = entityComprovarHelper.comprovarExpedient(
 				expedientId,

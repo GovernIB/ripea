@@ -209,7 +209,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			pare = contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					pareId);
 			
@@ -290,7 +289,6 @@ public class DocumentServiceImpl implements DocumentService {
 			} 
 		} else {
 			documentEntity = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentDto.getId());
 		}
@@ -340,7 +338,6 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		if (tascaId != null) {
 			document = contingutHelper.comprovarDocumentPerTasca(
-					entitatId,
 					tascaId,
 					documentId);
 		} else {
@@ -389,7 +386,6 @@ public class DocumentServiceImpl implements DocumentService {
 					false);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -641,7 +637,6 @@ public class DocumentServiceImpl implements DocumentService {
 						false);
 			} else {
 				document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-						entitatId,
 						tascaId,
 						id);
 			}
@@ -882,7 +877,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -937,7 +931,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -1032,7 +1025,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -1626,7 +1618,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 			} else {
 				document = contingutHelper.comprovarDocumentPerTasca(
-						entitatId,
 						tascaId,
 						documentId);
 			}
@@ -1653,14 +1644,23 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto findAmbId(
 			Long documentId, 
 			String rolActual, 
-			PermissionEnumDto permission) {
+			PermissionEnumDto permission, 
+			Long tascaId) {
 		
 		if (permission != null) {
-			contingutHelper.checkIfPermitted(
-					documentId,
-					rolActual,
-					permission);
+			if (tascaId == null) {
+				contingutHelper.checkIfPermitted(
+						documentId,
+						rolActual,
+						permission);
+
+			} else {
+				contingutHelper.comprovarDocumentPerTasca(
+						tascaId,
+						documentId);
+			}
 		}
+		
 		ContingutEntity contingut = documentRepository.findOne(documentId);
 		ContingutDto contingutDto = contingutHelper.toContingutDto(
 				contingut,

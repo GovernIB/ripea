@@ -546,16 +546,14 @@ public class EntityComprovarHelper {
 		}
 		return metaDada;
 	}
-
-	public ContingutEntity comprovarContingut(EntitatEntity entitat, Long id) {
+	
+	
+	public ContingutEntity comprovarContingut(Long id) {
 		ContingutEntity contingut = contingutRepository.findOne(id);
 		if (contingut == null) {
 			throw new NotFoundException(id, ContingutEntity.class);
 		}
-		if (!contingut.getEntitat().getId().equals(entitat.getId())) {
-			throw new ValidationException(id, ContingutEntity.class, "L'entitat especificada (id="
-			        + entitat.getId() + ") no coincideix amb l'entitat del contingut");
-		}
+
 		return contingut;
 	}
 
@@ -566,12 +564,7 @@ public class EntityComprovarHelper {
 		if (node == null) {
 			throw new NotFoundException(nodeId, NodeEntity.class);
 		}
-		if (!entitat.getId().equals(node.getEntitat().getId())) {
-			throw new ValidationException(
-					nodeId,
-					NodeEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del node");
-		}
+
 		return node;
 	}
 
@@ -580,10 +573,7 @@ public class EntityComprovarHelper {
 		if (carpeta == null) {
 			throw new NotFoundException(id, CarpetaEntity.class);
 		}
-		if (!entitat.equals(carpeta.getEntitat())) {
-			throw new ValidationException(id, CarpetaEntity.class, "L'entitat especificada (id="
-			        + entitat.getId() + ") no coincideix amb l'entitat de la carpeta");
-		}
+
 		return carpeta;
 	}
 	

@@ -246,7 +246,6 @@ public class ContingutServiceImpl implements ContingutService {
 					rolActual);
 		} else {
 		  contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					contingutId);
 		}
@@ -271,13 +270,12 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Esborrant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		// No es comproven permisos perquè això només ho pot fer l'administrador
 		ContingutDto dto = contingutHelper.toContingutDto(
@@ -321,13 +319,12 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Recuperant el contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		// No es comproven permisos perquè això només ho pot fer l'administrador
 		if (contingut.getEsborrat() == 0) {
@@ -928,13 +925,12 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint contingut amb id per admin ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		return contingutHelper.toContingutDto(
 				contingut,
@@ -1006,13 +1002,12 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre d'accions pel contingut usuari admin ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		return contingutLogHelper.findLogsContingut(contingut);
 	}
@@ -1088,13 +1083,12 @@ public class ContingutServiceImpl implements ContingutService {
 		logger.debug("Obtenint registre de moviments pel contingut usuari admin ("
 				+ "entitatId=" + entitatId + ", "
 				+ "nodeId=" + contingutId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				true, false, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		return contingutLogHelper.findMovimentsContingut(contingut);
 	}
@@ -1799,7 +1793,7 @@ public class ContingutServiceImpl implements ContingutService {
 			Integer ordre = fill.getKey();
 			Long fillId = fill.getValue();
 			
-			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, fillId);
+			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(fillId);
 			contingut.updateOrdre(ordre);
 		}
 	}

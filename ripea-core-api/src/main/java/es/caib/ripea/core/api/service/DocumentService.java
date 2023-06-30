@@ -701,8 +701,11 @@ public interface DocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto findAmbId(
-			Long documentId, String rolActual, PermissionEnumDto permission);
-	
+			Long documentId,
+			String rolActual,
+			PermissionEnumDto permission,
+			Long tascaId);
+
 	/**
 	 * Recupera url per visualitzar l'estat d'un flux de firmes d'una petició.
 	 *

@@ -1107,14 +1107,13 @@ public class ContingutHelper {
 			boolean checkPerMassiuAdmin,
 			boolean comprovarAgafatPerUsuariActual, 
 			String rolActual) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				false,
 				true, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		contingut = HibernateHelper.deproxy(contingut);
 		// Comprova el permís de modificació de l'expedient superior
@@ -1202,14 +1201,13 @@ public class ContingutHelper {
 			Long contingutId,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite) {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				false,
 				true, false);
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		// Comprova el permís de lectura de l'expedient superior
 		getExpedientSuperior(
@@ -1235,12 +1233,10 @@ public class ContingutHelper {
 
 	
 	public DocumentEntity comprovarDocumentPerTasca(
-			Long entitatId,
 			Long tascaId,
 			Long documentId) {
-
 		
-		comprovarContingutPertanyTascaAccesible(entitatId, tascaId, documentId);
+		comprovarContingutPertanyTascaAccesible(tascaId, documentId);
 		DocumentEntity document = documentRepository.findOne(
 				documentId);
 
@@ -1248,21 +1244,22 @@ public class ContingutHelper {
 	}
 
 	public ContingutEntity comprovarContingutPertanyTascaAccesible(
-			Long entitatId,
 			Long tascaId,
 			Long contingutId) {
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
+				contingutId);
+		
+		entityComprovarHelper.comprovarEntitat(
+				contingut.getId(),
 				true,
 				false,
-				false, false, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
-				contingutId);
+				false, 
+				false, 
+				false);
+		
 		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(tascaId);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
 
 		if (!expedientTascaEntity.getExpedient().getId().equals(contingut.getExpedientPare().getId())) {
 			throw new SecurityException("Contingut no pertany a la tasca accesible("

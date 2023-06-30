@@ -170,14 +170,13 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
 				+ "urlInstruccioId=" + urlInstruccioId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
 		
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		String urlValor = "";
 		if (contingut instanceof ExpedientEntity) {

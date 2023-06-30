@@ -109,7 +109,8 @@ public class DocumentHelper {
 			Set<Long> docsIdx,
 			ByteArrayOutputStream baos,
 			HttpServletRequest request,
-			Long metaDocumentId) {
+			Long metaDocumentId, 
+			Long tascaId) {
 		
 		DocumentGenericCommand command = new DocumentGenericCommand();
 		
@@ -136,7 +137,8 @@ public class DocumentHelper {
 					DocumentDto document = documentService.findAmbId(
 							docId,
 							RolHelper.getRolActual(request),
-							PermissionEnumDto.READ);
+							PermissionEnumDto.READ, 
+							tascaId);
 						fitxer = documentService.descarregar(
 								entitatActual.getId(),
 								docId,
