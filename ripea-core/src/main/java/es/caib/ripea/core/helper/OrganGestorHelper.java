@@ -1,17 +1,12 @@
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.repository.*;
+import es.caib.ripea.core.security.ExtendedPermission;
+import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,39 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ActualitzacioInfo;
-import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
-import es.caib.ripea.core.api.dto.ArbreNodeDto;
-import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
-import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.AvisEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientOrganPareEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.RegistreAnnexEntity;
-import es.caib.ripea.core.repository.AvisRepository;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.*;
 
 @Component
 public class OrganGestorHelper {
@@ -419,19 +384,11 @@ public class OrganGestorHelper {
 		nombreUnitatsTotal = obsoleteUnitats.size();
 		for (OrganGestorEntity obsoleteUnitat : obsoleteUnitats) {
 			String infoText = "";
+			obsoleteUnitat.setEstat(OrganEstatEnumDto.E);
+
 			if (obsoleteUnitat.getNous().size() > 1) {
 				obsoleteUnitat.setTipusTransicio(TipusTransicioEnumDto.DIVISIO);
 				organsDividits.add(obsoleteUnitat);
-				
-				// EXAMPLE:
-				//A04032359
-				//-A04032359
-				//-A04068486
-				// if it is transitioning to itself change it to be vigent
-				//this probably shoudn't happen, it is added to deal with the result of call to WS made in PRE in day 2023-06-21 with fechaActualizacion=[2023-06-15] which was probably incorrect
-				if (contains(obsoleteUnitat.getNous(), obsoleteUnitat)) {
-					obsoleteUnitat.setEstat(OrganEstatEnumDto.V);
-				}
 				infoText = msg("unitat.synchronize.info.transicio.divisio", obsoleteUnitat.getCodi(), organsToCodiList(obsoleteUnitat.getNous()));
 			} else {
 				if (obsoleteUnitat.getNous().size() == 1) {
@@ -451,9 +408,9 @@ public class OrganGestorHelper {
 			}
 			
 			List<OrganGestorEntity> nous = obsoleteUnitat.getNous();
-			if (nous != null && !contains(nous, obsoleteUnitat)) {
-				logger.info("Unitat extinguit " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom() + "This is probably the error of DIR3CAIB");
-				obsoleteUnitat.setEstat(OrganEstatEnumDto.E);
+			if (nous != null && contains(nous, obsoleteUnitat)) {
+				logger.info("Unitat dividida o fusionada cap a ella mateixa " + obsoleteUnitat.getCodi() + " - " + obsoleteUnitat.getNom() + "This is probably the error of DIR3CAIB");
+				obsoleteUnitat.setEstat(OrganEstatEnumDto.V);
 			}
 			
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("unitat.synchronize.titol.transicio", obsoleteUnitat.getCodi(), obsoleteUnitat.getNom())).infoText(infoText).build());
