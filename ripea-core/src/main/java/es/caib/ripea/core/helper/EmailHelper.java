@@ -612,7 +612,7 @@ public class EmailHelper {
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
 				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
-				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat anterior:" + estatAnterior + "\n" +
 				"Estat actual:" + estat + "\n" + 
@@ -658,7 +658,7 @@ public class EmailHelper {
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
 				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
-				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat anterior:" + estatAnterior.toString() + "\n" +
 				"Estat actual:" + estat + "\n" +

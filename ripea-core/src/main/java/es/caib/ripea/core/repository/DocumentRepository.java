@@ -39,6 +39,11 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			DocumentEstatEnumDto estat,
 			int esborrat);
 
+	List<DocumentEntity> findByExpedientAndEstatInAndEsborrat(
+			ExpedientEntity expedient,
+			DocumentEstatEnumDto[] estat,
+			int esborrat);
+	
 	int countByExpedient(ExpedientEntity expedient);
 
 	int countByExpedientAndEstat(

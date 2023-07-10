@@ -211,7 +211,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
 			model.addAttribute("isFolderCollapsedDefault", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.contingut.contreure.carpetes")));
 			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
-			
+			model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
 			
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
