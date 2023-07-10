@@ -348,11 +348,15 @@
 						<%---- Índex PDF i exportació ENI... ----%>
 						<c:choose>
 							<c:when test="${contingut.conteDocumentsDefinitius}">
-			 					<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
 								<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+			 					<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
+			 					<c:if test="${isExportacioInsideActiva}">
+			 						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni?ambDocuments=true"/>"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+			 					</c:if>
 			 				</c:when>
 			 				<c:otherwise>
 			 					<li><a class="disabled" href="#"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+								<li><a class="disabled" href="#"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
 							</c:otherwise>
 						</c:choose>
 					</c:when>

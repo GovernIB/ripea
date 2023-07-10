@@ -407,12 +407,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/{expedientId}/exportarEni", method = RequestMethod.GET)
 	public void exportarEni(
 			@PathVariable Long expedientId,
+			@RequestParam(required = false) boolean ambDocuments,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportarEniExpedient(
 				entitatActual.getId(), 
-				new HashSet<>(Arrays.asList(expedientId)));
+				new HashSet<>(Arrays.asList(expedientId)),
+				ambDocuments);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 		
@@ -424,6 +426,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/exportarEni", method = RequestMethod.GET)
 	public String exportarEniMassiu(
+			@RequestParam(required = false) boolean ambDocuments,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		@SuppressWarnings("unchecked")
@@ -443,7 +446,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			FitxerDto fitxer = expedientService.exportarEniExpedient(
 					entitatActual.getId(), 
-					seleccio);
+					seleccio,
+					ambDocuments);
 	
 			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 			

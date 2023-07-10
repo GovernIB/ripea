@@ -433,13 +433,16 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param expedientIds
 	 *            Els expedients dels que vol generar l'índex
+	 * @param ambDocuments
+	 *            Indica si fer la expoprtació ENI dels documents (importació INSIDE)
 	 * @return Document exportat ENI.
 	 * @throws IOException 
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportarEniExpedient(
 			Long entitatId, 
-			Set<Long> expedientIds) throws IOException;
+			Set<Long> expedientIds,
+			boolean ambDocuments) throws IOException;
 	
 	
 	@PreAuthorize("hasRole('tothom')")

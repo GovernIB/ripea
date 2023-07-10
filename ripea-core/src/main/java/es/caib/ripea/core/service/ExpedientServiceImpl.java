@@ -45,6 +45,8 @@ import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
@@ -69,6 +71,7 @@ import es.caib.ripea.core.auxiliary.ExpedientFiltreCalculat;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -1379,7 +1382,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds) throws IOException {
+	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds, boolean ambDocuments) throws IOException {
 		logger.debug(
 				"Exportant ENI dels expedients (" + "entitatId=" + entitatId + ", " + "expedientIds=" + expedientIds + ")");
 		entityComprovarHelper.comprovarEntitat(
@@ -1392,6 +1395,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
 		FitxerDto resultat = new FitxerDto();
+		boolean isMassiu = expedientIds.size() > 1;
 //		comprovar accés expedients
 		for (Long expedientId : expedientIds) {
 			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
@@ -1402,27 +1406,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 					false,
 					false,
 					null);
-
-			if (expedientIds.size() > 1) {
-				String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
-				if (expedientExportacioEni != null) {
-					FitxerDto exportacioEni = new FitxerDto();
-					exportacioEni.setNom(expedient.getNom() + "_exportació_ENI.xml");
-					exportacioEni.setContentType("application/xml");
-					exportacioEni.setContingut(expedientExportacioEni.getBytes());
-					contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
-				}
-			} else {
-				String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
-				if (expedientExportacioEni != null) {
-					resultat.setNom(expedient.getNom() + "_exportació_ENI.xml");
-					resultat.setContentType("application/xml");
-					resultat.setContingut(expedientExportacioEni.getBytes());
-				}
-			}
+			resultat = expedientHelper.exportarEniExpedientPerInside(
+					isMassiu, 
+					expedient, 
+					zos, 
+					ambDocuments);
 		}
 		
-		if (expedientIds.size() > 1) {
+		if (isMassiu || ambDocuments) {
 			zos.close();
 			
 			resultat.setNom(messageHelper.getMessage("expedient.service.exportacio.eni") + ".zip");
