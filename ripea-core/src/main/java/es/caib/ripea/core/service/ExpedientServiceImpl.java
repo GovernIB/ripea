@@ -1653,6 +1653,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getExpedientsToBeExluded(),
 					filtre.getInteressat() == null,
 					filtre.getInteressat(),
+					filtre.getMetaExpedientDominiCodi(),
 					filtre.getMetaExpedientDominiValor() == null,
 					filtre.getMetaExpedientDominiValor(),
 					rolsCurrentUser == null,

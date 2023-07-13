@@ -119,7 +119,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.raoSocial) like lower('%'||:interessat||'%')" +
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
-			"		or  (select count(*) from DadaEntity dada where dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
+			"		or  (select count(*) from DadaEntity dada where dada.metaDada.codi = :metaExpedientDominiCodi and dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
 			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
@@ -170,6 +170,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("expedientsToBeExluded") List<ExpedientEntity> expedientsToBeExluded,
 			@Param("esNullInteressat") boolean esNullInteressat,
 			@Param("interessat") String interessat,
+			@Param("metaExpedientDominiCodi") String metaExpedientDominiCodi,
 			@Param("esNullMetaExpedientDominiValor") boolean esNullMetaExpedientDominiValor,
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,

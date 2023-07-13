@@ -175,7 +175,6 @@ $(document).ready(function() {
 	$('#metaExpedientId').on('change', function() {
 		metaExpedientId = $(this).val();
 		if (counter != 0) {
-			debugger
 			if (metaExpedientId) {
 				$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
 				.done(function(data) {
@@ -263,6 +262,20 @@ $(document).ready(function() {
 		        minimumInputLength: 0
 	    };
 		selDomini.select2(select2Options);
+		
+		console.log('${expedientFiltreCommand.metaExpedientDominiValor}');
+		
+		if ('${expedientFiltreCommand.metaExpedientDominiValor}') {
+			$.get("<c:url value="/metaExpedient/metaDada/domini/${expedientFiltreCommand.metaExpedientDominiCodi}/valor?dadaValor=${expedientFiltreCommand.metaExpedientDominiValor}"/>")
+			.done(function(data) {
+				var $option = $('<option selected>' + data.text + '</option>').val(data.id);
+				selDomini.append($option).trigger('change');
+			})
+			.fail(function() {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+		}
+		
 	});
 	
 	$('#organGestorId').on('change', function() {
@@ -502,14 +515,14 @@ function hexToRgb(hex) {
 		
 		<div class="row">
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
-			<c:if test="${isDominisEnabled}">
-				<div class="col-md-3">
-					<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
-				</div>
-				<div class="col-md-3">
-					<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
-				</div>
-			</c:if>
+			<div class="col-md-3">
+			<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
+				<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+			</div>
+			
 			<c:choose>
 			 	<c:when test="${rolActual!='tothom'}">
 					<div class="col-md-3">
