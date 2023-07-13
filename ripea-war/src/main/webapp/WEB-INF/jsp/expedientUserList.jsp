@@ -263,8 +263,6 @@ $(document).ready(function() {
 	    };
 		selDomini.select2(select2Options);
 		
-		console.log('${expedientFiltreCommand.metaExpedientDominiValor}');
-		
 		if ('${expedientFiltreCommand.metaExpedientDominiValor}') {
 			$.get("<c:url value="/metaExpedient/metaDada/domini/${expedientFiltreCommand.metaExpedientDominiCodi}/valor?dadaValor=${expedientFiltreCommand.metaExpedientDominiValor}"/>")
 			.done(function(data) {

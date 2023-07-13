@@ -504,7 +504,7 @@ public class CacheHelper {
 				logger.error("Hi ha hagut un error tancant la connexió JDBC", ex);
 			}
 		}
-		return resultat.get(0);
+		return !resultat.isEmpty() ? resultat.get(0) : new ResultatConsultaDto();
 	}
 	
 	@CacheEvict(value = "resultatConsultaDominis", allEntries=true)
