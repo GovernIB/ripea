@@ -290,7 +290,7 @@ $(document).ready(function() {
 			$('#municipi').prop("disabled", true);
 		}
  	});
- 	
+ 	var municipiActual = $('#municipi').val();
  	$('select#provincia').change(function(valor) {
  		if ($(this).val() != '') {
  			$.ajax({
@@ -317,7 +317,11 @@ $(document).ready(function() {
 						selMunicipi.val(munOrgan);
 						selMunicipi.change();
 					}
-					selMunicipi.val("407");
+					
+					if (municipiActual)
+						selMunicipi.val(municipiActual);
+					else
+						selMunicipi.val("407");
 					selMunicipi.change();
 				}
 			});
