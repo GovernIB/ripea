@@ -699,7 +699,7 @@ function removeCookie(cname) {
 							<ul class="list-unstyled">
 								<c:forEach var="expedientRelacionat" items="${relacionats}">
 									<c:if test="${!expedientRelacionat.esborrat}">
-										<li style="font-size:14px; line-height: 25px;">
+										<li style="font-size:14px; line-height: 25px;" title="[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] ${expedientRelacionat.nom}">
 											<span style="width:10%" class="fa ${iconaExpedientObert}"></span>
 											<span style="width:76%" class="ellipsis">
 												<a href="${expedientRelacionat.id}">
