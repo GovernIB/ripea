@@ -1,0 +1,98 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1689325988450-1
+      author: limit
+      changes:
+        - addColumn:
+            tableName: ipa_expedient
+            columns:
+              - column:
+                  name: tancat_programat
+                  type: date
+        - createIndex:
+                columns:
+                - column:
+                    name: tancat_programat
+                indexName: ipa_expedient_tancat_prog_i
+                tableName: ipa_expedient
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.expedient.tancament.logic
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Habilitar tancament lògic dels expedients
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 39
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 1
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.expedient.tancament.logic.dies
+              - column:
+                  name: value
+                  value: 60
+              - column:
+                  name: description
+                  value: Dies per tancar un expedient a l'arxiu des del seu tancament a Ripea
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 40
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: INT
+              - column:
+                  name: configurable
+                  value: 1
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.expedient.tancament.logic.cron
+              - column:
+                  name: value
+                  value: 0 0 20 * * *
+              - column:
+                  name: description
+                  value: Consulta diaria dels expedients pendents de tancar i si ha arribat la data programada
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 41
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: 1

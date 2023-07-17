@@ -685,6 +685,18 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 
+	@Query(	"from" +
+			"    ExpedientEntity e "
+			+ "where " + 
+			"e.esborrat = 0 " +
+			"and e.estat = :estat " +
+			"and e.entitat = :entitat " +
+			"and e.tancatData is null " +
+			"and e.tancatProgramat = :tancatProgramat ORDER BY e.tancatProgramat DESC")
+	List<ExpedientEntity> findByEstatAndTancatLogicOrderByTancatProgramat(
+			@Param("estat") ExpedientEstatEnumDto estat,
+			@Param("entitat") EntitatEntity entitat,
+			@Param("tancatProgramat") Date tancatProgramat);
 	
 	@Lock(LockModeType.PESSIMISTIC_READ)
 	@Query(	"select " +

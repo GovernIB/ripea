@@ -348,6 +348,33 @@ public class SchedulingConfig implements SchedulingConfigurer {
                     }
                 }
         );
+        
+        // Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada
+        taskRegistrar.addTriggerTask(
+                new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        segonPlaService.tancarExpedientsArxiu();
+                    }
+                },
+                new Trigger() {
+                    @Override
+                    public Date nextExecutionTime(TriggerContext triggerContext) {
+                        CronTrigger trigger = null;
+						try {
+	                        String cron = configHelper.getConfig(PropertiesConstants.TANCAMENT_LOGIC_CRON);
+	                        if (cron == null)
+	                            cron = "0 0 20 * * *";
+							trigger = new CronTrigger(cron);
+						} catch (Exception e) {
+                            log.error("Error getting next execution date for tancarExpedientsArxiu()", e);
+						}
+                        Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        return nextExecution;
+                    }
+                }
+        );
 
     }
 }

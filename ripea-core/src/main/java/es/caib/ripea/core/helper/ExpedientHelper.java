@@ -911,6 +911,10 @@ public class ExpedientHelper {
 		return expedientsWithImportacio;
 	}
 	
+	public List<ExpedientEntity> consultaExpedientsPendentsTancarArxiu(EntitatEntity entitat) {
+		return expedientRepository.findByEstatAndTancatLogicOrderByTancatProgramat(ExpedientEstatEnumDto.TANCAT, entitat, new Date());
+	}
+	
 	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
 		contingutHelper.comprovarNomValid(expedient.getPare(), nom, expedient.getId(), ExpedientEntity.class);
 		String nomOriginal = expedient.getNom();
