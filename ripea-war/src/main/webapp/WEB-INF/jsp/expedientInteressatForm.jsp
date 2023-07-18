@@ -317,6 +317,8 @@ $(document).ready(function() {
 						selMunicipi.val(munOrgan);
 						selMunicipi.change();
 					}
+					selMunicipi.val("407");
+					selMunicipi.change();
 				}
 			});
  	 	} else {
@@ -325,7 +327,9 @@ $(document).ready(function() {
  	 		$('#municipi').select2(select2Options);
  	 	}
  	});
- 	 	 	
+ 	
+ 	$('select#provincia').trigger('change');
+ 	
 	$('select#filtreComunitat').change(function(valor) {
 		var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
  		if ($(this).val() != '') {
