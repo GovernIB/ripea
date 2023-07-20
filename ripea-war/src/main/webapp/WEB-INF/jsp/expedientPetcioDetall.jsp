@@ -333,19 +333,21 @@ tr.clicable {
 					<tbody>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.docfis"/></strong></td>
-							<td>${registre.docFisicaCodi} - ${registre.docFisicaDescripcio}</td>
+							<td colspan="3">${registre.docFisicaCodi} - ${registre.docFisicaDescripcio}</td>
 						</tr>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.desti"/></strong></td>
-							<td>${registre.destiDescripcio} (${registre.destiCodi})</td>
+							<td colspan="3">${registre.destiDescripcio} (${registre.destiCodi})</td>
 						</tr>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.refext"/></strong></td>
-							<td>${registre.refExterna}</td>
-							</tr>
+							<td colspan="3">${registre.refExterna}</td>
+						</tr>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.numexp"/></strong></td>
 							<td>${registre.expedientNumero}</td>
+							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.procediment"/></strong></td>
+							<td>${registre.procedimentCodi} - ${peticio.metaExpedientNom}</td>
 						</tr>
 					</tbody>
 				</table>
