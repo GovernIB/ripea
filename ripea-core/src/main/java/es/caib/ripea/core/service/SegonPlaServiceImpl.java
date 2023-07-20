@@ -298,6 +298,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Noves anotacions pendents";
 			} else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {
 				header = "Canvi de responsables de tasques";
+			} else if (entry.getKey() == EventTipusEnumDto.ALLIBERAT) {
+				header = "Elements de l'escriptori alliberats";
 			}
 			
 			text += header + "\n";

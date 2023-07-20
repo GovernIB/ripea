@@ -118,6 +118,23 @@ public class EmailHelper {
 		
 	}
 
+	public void contingutAlliberat(ExpedientEntity expedient, UsuariEntity usuariCreador, UsuariEntity usuariActual) {
+		String tipus = "expedient";
+		String subject = PREFIX_RIPEA + " Element de l'escriptori s'ha alliberat per un usuari: (" + tipus + ") " + expedient.getNom();
+		String text = 
+				"Informació de l'element de l'escriptori:\n" +
+				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+				"\tTipus: " + tipus + "\n" +
+				"\tNom: " + expedient.getNom() + "\n\n" + 
+				"\tPersona que ho ha alliberat: " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ").";
+		
+
+		sendOrSaveEmail(
+				usuariCreador.getCodi(),
+				subject,
+				text,
+				EventTipusEnumDto.ALLIBERAT);
+	}
 
 	public void execucioMassivaFinalitzada(
 			ExecucioMassivaEntity em) {

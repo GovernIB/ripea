@@ -1155,9 +1155,15 @@ public class ExpedientHelper {
 	}
 	
 	public void alliberar(ExpedientEntity expedient) {
-		UsuariEntity prevUserAgafat = expedient.getAgafatPer();
-		expedient.updateAgafatPer(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
+		UsuariEntity usuariActual = expedient.getAgafatPer();
+		UsuariEntity usuariCreador = expedient.getCreatedBy();
+		
+		expedient.updateAgafatPer(usuariCreador);
+		if (usuariCreador != null) {
+			// Avisa a l'usuari que li han retornat
+			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
+		}
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, usuariActual.getCodi(), null, false, false);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
