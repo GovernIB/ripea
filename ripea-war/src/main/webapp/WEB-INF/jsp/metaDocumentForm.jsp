@@ -320,7 +320,8 @@ function removeLoading() {
 					emptyOptionTextKey="contingut.document.form.camp.nti.cap"
 					textKey="contingut.document.form.camp.nti.tipdoc"
 					optionItems="${ntiTipusDocumentalOptions}"
-					optionValueAttribute="codi" optionTextAttribute="nom"
+					optionValueAttribute="codi" 
+					optionTextAttribute="codiNom"
 					required="true" 
 					optionMinimumResultsForSearch="3"/>
 				<rip:inputSelect name="ntiEstadoElaboracion" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.estela" optionItems="${ntiEstatElaboracioOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>

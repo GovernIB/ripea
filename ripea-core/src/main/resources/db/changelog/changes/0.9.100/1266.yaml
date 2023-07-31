@@ -40,6 +40,8 @@ databaseChangeLog:
             update ipa_tipus_documental set nom_catala = 'Factura' where codi = 'TD19';
             update ipa_tipus_documental set nom_catala = 'Altres incautats' where codi = 'TD20';
             update ipa_tipus_documental set nom_catala = 'Altres' where codi = 'TD99';
+            update ipa_config set description = 'Activar gestió de tipus documentals NTI' where key like '%habilitar.tipusdocument';
+            delete from ipa_config where key like '%.arxiu.metadocumental.addicional.actiu';    
 # It was decided to suspend for now funcionality of codi especific (email 2023.05.30 13:00). Probably there will be another issue in the future to add it.
 #    - addColumn:
 #        columns:
@@ -109,3 +111,4 @@ databaseChangeLog:
 #                    ipa_metadocument.id = md.id
 #            )
 #    );
+

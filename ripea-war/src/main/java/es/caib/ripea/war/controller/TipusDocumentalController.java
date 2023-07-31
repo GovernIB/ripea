@@ -41,8 +41,7 @@ public class TipusDocumentalController extends BaseAdminController {
 	public String get(
 			HttpServletRequest request,
 			Model model) {
-		getEntitatActualComprovantPermisAdminEntitat(request);
-		model.addAttribute("suportaMetaDocumentalsAddicionals", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.arxiu.metadocumental.addicional.actiu")));
+		getEntitatActualComprovantPermisAdminEntitat(request); 
 		model.addAttribute("tipusDocumentalsNtiCodiEspecific", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.tipus.documentals.nti.codi.especific")));
 		return "tipusDocumentalList";
 	}
