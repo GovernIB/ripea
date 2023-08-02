@@ -302,43 +302,9 @@ public class DocumentNotificacioHelper {
 	}
 	
 	public void actualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
-		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
-		DocumentNotificacioEstatEnumDto estatAnterior = notificacio.getNotificacioEstat();
-		logger.debug("Estat anterior: " + estatAnterior);
-		RespostaConsultaEstatEnviament resposta = pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
-		if (getPropertyGuardarCertificacioExpedient() && documentEnviamentInteressatEntity.getEnviamentCertificacioData() == null && resposta.getCertificacioData() != null) {
-			logger.debug("[CERT] Guardant certificació rebuda de Notib...");
-			MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
-					true, 
-					null, 
-					MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
-			DocumentDto document = certificacioToDocumentDto(
-					documentEnviamentInteressatEntity,
-					metaDocument,
-					resposta);
-			DocumentDto documentCreat = documentHelper.crearDocument(
-					document, 
-					documentEnviamentInteressatEntity.getNotificacio().getDocument().getPare(), 
-					documentEnviamentInteressatEntity.getNotificacio().getDocument().getExpedient(), 
-					metaDocument,
-					false);
-			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
-			
-			DocumentEntity documentEntity = documentRepository.findOne(documentCreat.getId());
-			documentEntity.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
-			logger.debug("[CERT] La certificació s'ha guardat correctament...");
-		} else {
-			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null); //  this is wrong, because it logs as rebutjada even if notification was accepted if property getPropertyGuardarCertificacioExpedient() is false
-		}
-		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
-		DocumentNotificacioEstatEnumDto estatDespres = documentEnviamentInteressatEntity.getNotificacio().getNotificacioEstat();
-		logger.debug("Estat després: " + estatDespres);
-		if (estatAnterior != estatDespres 
-				&& (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
-			emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
-		}
-		cacheHelper.evictErrorsValidacioPerNode(documentEnviamentInteressatEntity.getNotificacio().getExpedient());
-		cacheHelper.evictNotificacionsPendentsPerExpedient(documentEnviamentInteressatEntity.getNotificacio().getExpedient());
+
+		pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
+
 	}
 		
 	public byte[] getCertificacio(Long documentEnviamentInteressatId) {
@@ -348,20 +314,6 @@ public class DocumentNotificacioHelper {
 	}
 	
 
-
-
-
-	
-	private boolean getPropertyGuardarCertificacioExpedient() {
-		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
-	}
-	
-	private DocumentDto certificacioToDocumentDto(
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
-			MetaDocumentEntity metaDocument,
-			RespostaConsultaEstatEnviament resposta) {
-		return contingutHelper.generarDocumentDto(documentEnviamentInteressatEntity, metaDocument, resposta);
-	}
 	
 	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {
 		logAll(notificacioEntity, tipusLog, param1, notificacioEntity.getAssumpte());

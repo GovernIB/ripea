@@ -1702,6 +1702,25 @@ public class DocumentServiceImpl implements DocumentService {
 		}
 	}	
 	
+	@Transactional
+	@Override
+	public void notificacioActualitzarEstat(
+			String identificador) {
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByEnviamentIdentificador(
+				identificador);
+		try {
+
+			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacio.getDocumentEnviamentInteressats()) {
+				documentNotificacioHelper.actualitzarEstat(documentEnviamentInteressatEntity);
+			}
+			
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de notificacions";
+			logger.error(errorDescripcio, ex);
+			throw new RuntimeException(ex);
+		}
+	}
+	
 	
 	
 	

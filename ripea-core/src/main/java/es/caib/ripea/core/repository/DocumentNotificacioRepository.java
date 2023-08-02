@@ -50,6 +50,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			DocumentNotificacioEstatEnumDto[] estat,
 			boolean error);
 	
+	DocumentNotificacioEntity findByEnviamentIdentificador(String enviamentIdentificador);
 	
 	
 	@Query(	"from " +

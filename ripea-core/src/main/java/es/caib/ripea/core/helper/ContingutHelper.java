@@ -1031,7 +1031,7 @@ public class ContingutHelper {
 				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom + ".pdf");
 			else
 				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
-			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
+			dto.setFitxerContentType("application/pdf");
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			dto.setFitxerTamany(new Long(resposta.getCertificacioContingut().length));
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());
@@ -2150,7 +2150,7 @@ public class ContingutHelper {
 				for (String name: signatureNames) {
 //					### comprovar si és una firma o un segell
 					PdfDictionary dictionary = fields.getSignatureDictionary(name);
-					if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/sig")) {
+					if (dictionary != null && (dictionary.get(PdfName.TYPE).toString().equals("/sig") || dictionary.get(PdfName.TYPE).toString().equals("/Sig"))) {
 						hasFirma = true;
 						break;
 					}
