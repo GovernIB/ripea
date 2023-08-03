@@ -954,8 +954,7 @@ public class ExpedientHelper {
 		
 		// Actualitza les relacions expedients i organs pare
 		organGestorHelper.removeOldExpedientOrganPares(
-				expedient,
-				organGestorEntity);
+				expedient);
 		organGestorHelper.crearExpedientOrganPares(
 				expedient,
 				organGestorEntity);

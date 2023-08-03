@@ -1,10 +1,32 @@
 package es.caib.ripea.core.helper;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
@@ -33,25 +55,6 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class OrganGestorHelper {
@@ -203,7 +206,7 @@ public class OrganGestorHelper {
 		for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
 			MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientAndOrganGestor(
 					expedient.getMetaExpedient(),
-					organGestorActual);
+					organGestorActual); 
 			if (metaExpedientOrganGestor == null) {
 				logger.debug("meteaxp-organ created,  metaexp: " + expedient.getMetaExpedient().getId() + ", organ: " + organGestorActual.getId() + " " + organGestorActual.getNom());
 				metaExpedientOrganGestor = metaExpedientOrganGestorRepository.save(
@@ -221,8 +224,7 @@ public class OrganGestorHelper {
 	}
 	
 	public void removeOldExpedientOrganPares(
-			ExpedientEntity expedient,
-			OrganGestorEntity organGestor) {
+			ExpedientEntity expedient) {
 		
 		for (ExpedientOrganPareEntity expOrgPare : expedient.getOrganGestorPares()) {
 			expedientOrganPareRepository.delete(expOrgPare);
@@ -475,6 +477,35 @@ public class OrganGestorHelper {
 
 	}
 	
+	
+    public void actualitzarExpedientsObertsAmbOrgansObsolets(
+			List<OrganGestorEntity> organsFusionatsISubstituits,
+			ProgresActualitzacioDto progres) {
+
+		int nombreOrgansTotal = organsFusionatsISubstituits.size();
+		int nombreOrgansProcessades = 0;
+
+		for (OrganGestorEntity organFusionatISubstituit : organsFusionatsISubstituits) {
+			
+			OrganGestorEntity organDesti = organFusionatISubstituit.getNous().get(0);
+			List<ExpedientEntity> expedients = expedientRepository.findByOrganGestorAndEstat(organFusionatISubstituit, ExpedientEstatEnumDto.OBERT);
+			
+			logger.info("Modifying organ of expedients from " + organFusionatISubstituit.getCodi() + " to " + organDesti);
+			for (ExpedientEntity expedient : expedients) {
+				
+				logger.info("Modifying organ of expedient " + expedient.getId() + " " + expedient.getNumero() + " " + expedient.getNom());
+				expedient.updateOrganGestor(organDesti);
+				removeOldExpedientOrganPares(
+						expedient);
+				crearExpedientOrganPares(
+						expedient,
+						organDesti);
+			}
+			
+			progres.setProgres(75 + (24 * nombreOrgansProcessades++ / nombreOrgansTotal));
+		}
+    }
+
 	public void actualitzarOrganCodi(String organCodi) {
 		if (organCodi != null) {
 			ConfigHelper.setOrganCodi(organCodi);

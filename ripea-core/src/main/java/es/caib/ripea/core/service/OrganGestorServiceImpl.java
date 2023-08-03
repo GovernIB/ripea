@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.slf4j.Logger;
@@ -262,6 +263,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				OrganGestorDto.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Object[] syncDir3OrgansGestors(EntitatDto entitatDto, Locale locale) throws Exception {
@@ -304,7 +306,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organigrama")).infoText(unitatsWs.isEmpty() ? msg("unitat.synchronize.info.organigrama.fi.buid") : msg("unitat.synchronize.info.organigrama.fi", unitatsWs.size())).build());
 
 			// Sincronitzar òrgans
-			progres.setFase(1);
+			progres.setFase(1); 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.organs")).infoText(msg("unitat.synchronize.info.organs.inici")).build());
 			organGestorHelper.sincronitzarOrgans(entitatDto.getId(), unitatsWs, obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
 			progres.setProgres(27);
@@ -324,6 +326,15 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				permisosHelper.actualitzarPermisosOrgansObsolets(obsoleteUnitats, organsDividits, organsFusionats, organsSubstituits, progres);
 				progres.setProgres(75);
 				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.permisos")).infoText(msg("unitat.synchronize.info.permisos.fi")).build());
+				
+				// Actualitzar expedients oberts
+				progres.setFase(4);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.inici")).build());
+				organGestorHelper.actualitzarExpedientsObertsAmbOrgansObsolets(
+						ListUtils.union(organsSubstituits, organsFusionats),
+						progres);
+				progres.setProgres(99);
+				progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoClass("panel-warning").infoTitol(msg("unitat.synchronize.titol.expedients")).infoText(msg("unitat.synchronize.info.expedients.fi")).build());
 
 			}
 

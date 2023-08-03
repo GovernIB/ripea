@@ -861,7 +861,9 @@ public class MetaExpedientHelper {
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.fi")).infoText(msg("procediment.synchronize.info.fi", modificats, fallat)).build());
 
 			progres.setProgres(100);
-			progres.setFinished(true);
+			if (progresActualitzacioDto == null) {
+				progres.setFinished(true);
+			}
 
 //			metaExpedientsAmbOrganNoSincronitzat.put(entitat.getId(), organsNoSincronitzats);
 

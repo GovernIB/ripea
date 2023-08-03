@@ -316,6 +316,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	
 	List<ExpedientEntity> findByOrganGestor(
 			OrganGestorEntity organGestor);
+	
+	List<ExpedientEntity> findByOrganGestorAndEstat(
+			OrganGestorEntity organGestor,
+			ExpedientEstatEnumDto estat);
 
 	@Query(	"select" +
 			"    e " +
