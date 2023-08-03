@@ -363,7 +363,7 @@ public interface ExpedientService {
 	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual, Long organActualId);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
+	RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId);

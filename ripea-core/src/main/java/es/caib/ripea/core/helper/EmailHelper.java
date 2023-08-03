@@ -732,6 +732,27 @@ public class EmailHelper {
 						expedientTascaEntity.getResponsables()));
 
 	}	
+
+	public void sendEmailAvisMencionatComentari(
+			String emailDestinatari, 
+			UsuariEntity usuariActual, 
+			ExpedientEntity expedient,
+			String comentari) {
+		logger.debug("Enviament email comentari a destinatari");
+		
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setTo(emailDestinatari);
+		missatge.setFrom(getRemitent());
+		missatge.setSubject(PREFIX_RIPEA + " Mencionat al comentari d'un expedient [" + expedient.getNom() + "]");
+		EntitatEntity entitat = expedient.getEntitat();
+		missatge.setText(
+				"L'usuari " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ") t'ha mencionat al comentari d'un expedient [" + expedient.getNom() + "]: \n" +
+				"\tEntitat: " + (entitat != null ? entitat.getNom() : "") + "\n" +
+				"\tNom expedient: " + (expedient != null ? expedient.getNom() : "") + "\n" +
+				"\tComentari: " + comentari + "\n");
+		
+		mailSender.send(missatge);
+	}
 	
 	private String getEnllacExpedient(Long expedientId) {
 		String baseUrl = configHelper.getConfig("es.caib.ripea.base.url");

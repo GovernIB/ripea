@@ -59,6 +59,7 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -96,6 +97,7 @@ import es.caib.ripea.core.helper.CsvHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DistribucioHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
@@ -197,7 +199,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	private GrupRepository grupRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
-
+	@Autowired
+	private EmailHelper emailHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	public Object lock = new Object();
@@ -563,10 +566,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
+	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
 		logger.debug(
 				"Obtenint els comentaris pel contingut (" + "entitatId=" + entitatId + ", " + "nodeId=" + expedientId +
 						")");
+		RespostaPublicacioComentariDto<ExpedientComentariDto> resposta = new RespostaPublicacioComentariDto<ExpedientComentariDto>();
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				expedientId,
@@ -579,9 +583,44 @@ public class ExpedientServiceImpl implements ExpedientService {
 		// truncam a 1024 caracters
 		if (text.length() > 1024)
 			text = text.substring(0, 1024);
+		
+		String origianlText = text;
+		String[] textArr = text.split(" ");
+		for (String paraula: textArr) {
+			if (paraula.startsWith("@")) {
+				String codiUsuari = paraula.substring(paraula.indexOf("@") + 1, paraula.length());
+				UsuariEntity usuariActual = usuariHelper.getUsuariAutenticat();
+				UsuariEntity usuariMencionat = usuariRepository.findByCodi(codiUsuari);
+				if (usuariMencionat == null) {
+					resposta.getErrorsDescripcio().add(
+							messageHelper.getMessage(
+									"expedient.publicar.comentari.error.notfound", 
+									new Object[] {codiUsuari}));
+				} else if (usuariMencionat != null && usuariMencionat.getEmail() == null) {
+					resposta.getErrorsDescripcio().add(
+							messageHelper.getMessage(
+									"expedient.publicar.comentari.error.email", 
+									new Object[] {codiUsuari}));
+				} else {
+					emailHelper.sendEmailAvisMencionatComentari(
+						usuariMencionat.getEmail(),
+						usuariActual, 
+						expedient, 
+						origianlText);
+				}
+				text = text.replace(paraula, "<span class='codi_usuari'>" + paraula + "</span>");
+			}
+		}
+		
+		if (!resposta.getErrorsDescripcio().isEmpty()) {
+			resposta.setError(true);
+		}
+		
 		ExpedientComentariEntity comentari = ExpedientComentariEntity.getBuilder(expedient, text).build();
 		expedientComentariRepository.save(comentari);
-		return true;
+		
+		resposta.setPublicat(true);
+		return resposta;
 	}
 
 	@Transactional(readOnly = true)

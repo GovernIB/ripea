@@ -242,7 +242,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
+	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
 		return delegate.publicarComentariPerExpedient(
 				entitatId,
 				expedientId,

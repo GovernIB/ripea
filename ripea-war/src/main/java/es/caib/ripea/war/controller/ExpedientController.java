@@ -51,6 +51,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
@@ -965,20 +966,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 
 	@RequestMapping(value = "/{contingutId}/comentaris/publicar", method = RequestMethod.POST)
 	@ResponseBody
-	public List<ExpedientComentariDto> publicarComentari(
+	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentari(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@RequestParam String text,
 			Model model) {
+		RespostaPublicacioComentariDto<ExpedientComentariDto> resposta = new RespostaPublicacioComentariDto<ExpedientComentariDto>();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (text != null && !text.isEmpty()) {
-			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text, RolHelper.getRolActual(request));
+			resposta = expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text, RolHelper.getRolActual(request));
 		}
 			
-		return expedientService.findComentarisPerContingut(
+		List<ExpedientComentariDto> comentaris = expedientService.findComentarisPerContingut(
 				entitatActual.getId(), 
 				contingutId);
+		resposta.setComentaris(comentaris);
+		return resposta;
 	}
 
 	@RequestMapping(value = "/{expedientId}/alliberar", method = RequestMethod.GET)
