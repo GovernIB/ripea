@@ -111,7 +111,7 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 	public String comunicadaConsultar(
 			HttpServletRequest request,
 			@PathVariable Long expedientPeticioId,
-			Model model) {
+			Model model) throws Throwable {
 		try {
 			expedientPeticioService.comunicadaReprocessar(expedientPeticioId);
 			
@@ -197,7 +197,7 @@ public class ExpedientPeticioComunicadesController extends BaseUserOAdminOOrganC
 	
 	   @RequestMapping(value = "/comunicadaConsultarMassiu", method = RequestMethod.GET)
 		public String comunicadaConsultarMassiu(
-				HttpServletRequest request) {
+				HttpServletRequest request) throws Throwable {
 			
 			
 			@SuppressWarnings("unchecked")

@@ -23,8 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.domini.Estat;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Firma;
@@ -282,7 +282,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 	@Transactional
 	@Override
-	public void comunicadaReprocessar(Long expedientPeticioId) {
+	public void comunicadaReprocessar(Long expedientPeticioId) throws Throwable {
 
 		synchronized (SynchronizationHelper.get0To99Lock(expedientPeticioId, SynchronizationHelper.locksAnnotacions)) {
 			expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);

@@ -32,10 +32,11 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
-import es.caib.distribucio.rest.client.domini.DocumentTipus;
-import es.caib.distribucio.rest.client.domini.NtiEstadoElaboracion;
-import es.caib.distribucio.rest.client.domini.NtiOrigen;
-import es.caib.distribucio.rest.client.domini.NtiTipoDocumento;
+import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
+import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
+import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
@@ -1948,7 +1949,7 @@ public class ExpedientHelper {
 
 	
 	
-	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(es.caib.distribucio.rest.client.domini.FirmaTipus firmaTipus) {
+	private DocumentNtiTipoFirmaEnumDto toNtiTipoFirma(FirmaTipus firmaTipus) {
 		DocumentNtiTipoFirmaEnumDto documentNtiTipoFirmaEnumDto = null;
 		
 		if (firmaTipus != null) {
