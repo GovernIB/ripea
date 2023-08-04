@@ -490,10 +490,10 @@ public class OrganGestorHelper {
 			OrganGestorEntity organDesti = organFusionatISubstituit.getNous().get(0);
 			List<ExpedientEntity> expedients = expedientRepository.findByOrganGestorAndEstat(organFusionatISubstituit, ExpedientEstatEnumDto.OBERT);
 			
-			logger.info("Modifying organ of expedients from " + organFusionatISubstituit.getCodi() + " to " + organDesti);
+			logger.info("Modifying organ of expedients from " + organFusionatISubstituit.getCodi() + " to " + organDesti.getCodi());
 			for (ExpedientEntity expedient : expedients) {
 				
-				logger.info("Modifying organ of expedient " + expedient.getId() + " " + expedient.getNumero() + " " + expedient.getNom());
+				logger.info("Organ of expedient " + expedient.getId() + " " + expedient.getNumero() + " " + expedient.getNom());
 				expedient.updateOrganGestor(organDesti);
 				removeOldExpedientOrganPares(
 						expedient);
