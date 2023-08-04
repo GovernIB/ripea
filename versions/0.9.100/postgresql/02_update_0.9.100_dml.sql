@@ -50,6 +50,9 @@ update ipa_tipus_documental set nom_catala = 'Altres incautats' where codi = 'TD
 
 update ipa_tipus_documental set nom_catala = 'Altres' where codi = 'TD99';
 
+update ipa_config set description = 'Activar gestió de tipus documentals NTI' where key like '%habilitar.tipusdocument';
+delete from ipa_config where key like '%.arxiu.metadocumental.addicional.actiu';  
+
 -- Changeset db/changelog/changes/0.9.100/1272.yaml::1686225166612-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.concsv.base.url', '', 'Url base al servei de CONCSV', 'ARXIU', '31', '1', 'TEXT', '1', '1');
 
