@@ -70,9 +70,11 @@ import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
@@ -84,7 +86,10 @@ import es.caib.ripea.core.api.dto.ImportacioDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
@@ -108,6 +113,7 @@ import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -123,9 +129,14 @@ import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
+import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.conversio.ConversioArxiu;
 import es.caib.ripea.plugin.conversio.ConversioPlugin;
@@ -150,7 +161,6 @@ import es.caib.ripea.plugin.notificacio.NotificacioPlugin;
 import es.caib.ripea.plugin.notificacio.Persona;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
@@ -227,6 +237,33 @@ public class PluginHelper {
 	private ExpedientRepository expedientRepository;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
+	
+	
+
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private DocumentNotificacioRepository documentNotificacioRepository;
+
+	@Autowired
+	private ContingutLogHelper contingutLogHelper;
+	@Autowired
+	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
+
+	@Autowired
+	private DadesExternesService dadesExternesService;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
+	@Autowired
+	private EmailHelper emailHelper;
+
+	@Autowired
+	private DocumentRepository documentRepository;
+	@Autowired
+	private ContingutHelper contingutHelper;
+
 
 	public List<String> rolsUsuariFindAmbCodi(String usuariCodi) {
 
@@ -3025,11 +3062,18 @@ public class PluginHelper {
 		}
 	}
 	
+	
+
+	
 
 	public RespostaConsultaEstatEnviament notificacioConsultarIActualitzarEstat(DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity) {
 		
-		ConfigHelper.setEntitat(conversioTipusHelper.convertir(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getEntitat(), EntitatDto.class));
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEnviamentInteressatEntity.getNotificacio().getExpedient().getId()));
+		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		ExpedientEntity expedient = notificacio.getExpedient();
+		DocumentNotificacioEstatEnumDto estatAnterior = notificacio.getNotificacioEstat();
+
+		ConfigHelper.setEntitat(conversioTipusHelper.convertir(expedient.getEntitat(), EntitatDto.class));
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		
 		IntegracioAccioDto integracioAccio = getIntegracioAccio(
 				"Consulta d'estat d'una notificació electrònica",
@@ -3041,10 +3085,6 @@ public class PluginHelper {
 			
 			// ====================================== CONSULTAR ENVIAMENT ==================================================
 			RespostaConsultaEstatEnviament resposta = getNotificacioPlugin().consultarEnviament(documentEnviamentInteressatEntity.getEnviamentReferencia());
-			
-			guardarCertificacio(
-					documentEnviamentInteressatEntity,
-					resposta);
 			
 			documentEnviamentInteressatEntity.updateEnviamentEstat(
 					resposta.getEstat(),
@@ -3060,10 +3100,13 @@ public class PluginHelper {
 					resposta.getRegistreNumero(),
 					resposta.getRegistreNumeroFormatat());
 			
+			guardarCertificacio(
+					documentEnviamentInteressatEntity,
+					resposta);
+			
 			
 			// ====================================== CONSULTAR NOTIFICACIO ==================================================
-			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(documentEnviamentInteressatEntity.getNotificacio().getEnviamentIdentificador());
-			DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(notificacio.getEnviamentIdentificador());
 			notificacio.updateNotificacioEstat(
 					respostaNotificioEstat.getEstat(),
 					resposta.getEstatData(),
@@ -3073,6 +3116,16 @@ public class PluginHelper {
 					respostaNotificioEstat.getDataFinalitzada());
 			
 			accioOk(integracioAccio);
+
+			DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
+			if (estatAnterior != estatDespres && (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
+				emailHelper.canviEstatNotificacio(notificacio, estatAnterior);
+			}
+
+			cacheHelper.evictErrorsValidacioPerNode(expedient);
+			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
+			
+			
 			return resposta;
 			
 		} catch (Exception ex) {
@@ -3083,25 +3136,98 @@ public class PluginHelper {
 		}
 	}
 	
+	
 	public void guardarCertificacio(
 			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
 			RespostaConsultaEstatEnviament resposta) {
 		DocumentNotificacioEntity notificacio = documentEnviamentInteressatEntity.getNotificacio();
+		ExpedientEntity expedient = notificacio.getExpedient();
 		
-		String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
-		if (!getPropertyGuardarCertificacioExpedient() && resposta.getCertificacioData() != null) {
-			byte[] certificacio = resposta.getCertificacioContingut();
-			if (gestioDocumentalId != null && documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
-				gestioDocumentalDelete(notificacio.getEnviamentCertificacioArxiuId(), GESDOC_AGRUPACIO_CERTIFICACIONS);
+		boolean certificacioRetornat = resposta.getCertificacioData() != null;
+		
+		if (certificacioRetornat) {
+			
+			if (getPropertyGuardarCertificacioExpedient()) {
+				boolean certificacioJaGuardat = documentEnviamentInteressatEntity.getEnviamentCertificacioData() != null;
+				if (!certificacioJaGuardat) {
+					MetaDocumentEntity metaDocument = metaDocumentRepository.findByEntitatAndTipusGeneric(
+							true, 
+							null, 
+							MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
+					
+					DocumentDto document = certificacioToDocumentDto(
+							documentEnviamentInteressatEntity,
+							metaDocument,
+							resposta);
+					documentHelper.crearDocument(
+							document, 
+							notificacio.getDocument().getPare(), 
+							expedient, 
+							metaDocument,
+							false);
+				}
+				
+			} else {
+				// saves in gestio documental but never uses it?
+				byte[] certificacio = resposta.getCertificacioContingut();
+				String gestioDocumentalId = notificacio.getEnviamentCertificacioArxiuId();
+				if (gestioDocumentalId != null && documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+					gestioDocumentalDelete(notificacio.getEnviamentCertificacioArxiuId(), GESDOC_AGRUPACIO_CERTIFICACIONS);
+				}
+				if (gestioDocumentalId == null || documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
+					gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
+				}
+				notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
 			}
-			if (gestioDocumentalId == null || documentEnviamentInteressatEntity.getEnviamentCertificacioData().before(resposta.getCertificacioData())) {
-				gestioDocumentalId = gestioDocumentalCreate(PluginHelper.GESDOC_AGRUPACIO_CERTIFICACIONS, new ByteArrayInputStream(certificacio));
-			}
+			
 		}
-		notificacio.setEnviamentCertificacioArxiuId(gestioDocumentalId);
+		
+		if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.NOTIFICADA) {
+			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_CERTIFICADA, null);
+		} else if (resposta.getEstat() == es.caib.ripea.plugin.notificacio.EnviamentEstat.REBUTJADA) {
+			logAll(notificacio, LogTipusEnumDto.NOTIFICACIO_REBUTJADA, null);
+		}
+
+		documentEnviamentInteressatEntity.updateEnviamentCertificacioData(resposta.getCertificacioData());
 		
 	}
 	
+	
+	private DocumentDto certificacioToDocumentDto(
+			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity,
+			MetaDocumentEntity metaDocument,
+			RespostaConsultaEstatEnviament resposta) {
+		return contingutHelper.generarDocumentDto(documentEnviamentInteressatEntity, metaDocument, resposta);
+	}
+	
+	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {
+		logAll(notificacioEntity, tipusLog, param1, notificacioEntity.getAssumpte());
+	}
+	
+	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1, String param2) {
+		contingutLogHelper.log(
+				notificacioEntity.getDocument(),
+				LogTipusEnumDto.MODIFICACIO,
+				notificacioEntity,
+				LogObjecteTipusEnumDto.NOTIFICACIO,
+				tipusLog,
+				param1,
+				param2,
+				false,
+				false);	
+		contingutLogHelper.log(
+				notificacioEntity.getDocument().getExpedient(),
+				LogTipusEnumDto.MODIFICACIO,
+				notificacioEntity,
+				LogObjecteTipusEnumDto.NOTIFICACIO,
+				tipusLog,
+				param1,
+				param2,
+				false,
+				false);
+
+	}
+
 	
 	
 	public String gestioDocumentalCreate(String agrupacio, InputStream contingut) {

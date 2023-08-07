@@ -18,7 +18,6 @@ import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
@@ -739,6 +738,10 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public Long getAndSaveFitxerTamanyFromArxiu(
 			Long documentId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void notificacioActualitzarEstat(
+			String identificador);
 
 
 	

@@ -51,6 +51,9 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			boolean error);
 	
 	long countByDocument(DocumentEntity document);
+
+	DocumentNotificacioEntity findByEnviamentIdentificador(String enviamentIdentificador);
+
 	
 	@Query( "select dn.notificacioEstat " +
 			"from " +

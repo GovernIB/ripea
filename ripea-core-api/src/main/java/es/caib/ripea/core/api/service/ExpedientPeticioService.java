@@ -116,5 +116,5 @@ public interface ExpedientPeticioService {
 
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public void comunicadaReprocessar(
-			Long expedientPeticioId);
+			Long expedientPeticioId) throws Throwable;
  }

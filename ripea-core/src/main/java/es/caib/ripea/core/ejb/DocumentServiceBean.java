@@ -554,4 +554,11 @@ public class DocumentServiceBean implements DocumentService {
 		return delegate.getAndSaveFitxerTamanyFromArxiu(documentId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void notificacioActualitzarEstat(
+			String identificador) {
+		delegate.notificacioActualitzarEstat(identificador);
+	}
+
 }

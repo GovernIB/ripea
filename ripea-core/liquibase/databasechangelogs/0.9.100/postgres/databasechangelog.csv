@@ -328,7 +328,7 @@
 "1680260169203-1","limit","db/changelog/changes/0.9.99/833.yaml","2023-05-16T10:14:21.276","326","EXECUTED","8:2275abad50eabf77799923f3dcff0704","insert tableName=ipa_config","","","4.4.3","()","","4224860394"
 "1680608723206-1","limit","db/changelog/changes/0.9.99/930.yaml","2023-05-16T10:14:21.339","327","EXECUTED","8:6fb2fa6297fc5f1e1646efff480de3f1","addColumn tableName=ipa_usuari","","","4.4.3","()","","4224860394"
 "1685627826297-1","limit","db/changelog/changes/0.9.99/1282.yaml","2023-06-27T12:26:27.25","335","EXECUTED","8:ad34cc22f1da34c1c119c6ff1566c08f","insert tableName=ipa_config","","","4.4.3","()","","7861586408"
-"1685347347557-1","limit","db/changelog/changes/0.9.100/1266.yaml","2023-06-27T12:27:37.253","336","EXECUTED","8:be683f6d734a6688410a4870f6e0971d","addColumn tableName=ipa_tipus_documental; sql","","","4.4.3","()","","7861656924"
+"1685347347557-1","limit","db/changelog/changes/0.9.100/1266.yaml","2023-08-04T10:52:08.926","343","EXECUTED","8:0123faa86d6baf13950f362bef2e0454","addColumn tableName=ipa_tipus_documental; sql",,"","4.4.3","()","","1139128641"
 "1686225166612-1","limit","db/changelog/changes/0.9.100/1272.yaml","2023-06-27T12:27:37.327","337","EXECUTED","8:09496ebe6960932f2a7e0c6178d66130","addColumn tableName=ipa_document; insert tableName=ipa_config","","","4.4.3","()","","7861656924"
 "1684938156277-1","limit","db/changelog/changes/0.9.100/1277.yaml","2023-06-27T12:27:37.399","338","EXECUTED","8:b5b227f4c51c51fbb6682d9adff5daf9","insert tableName=ipa_config","","","4.4.3","()","","7861656924"
 "1685959664822-1","limit","db/changelog/changes/0.9.100/1279.yaml","2023-06-27T12:27:37.467","339","EXECUTED","8:f9ad0b7e4b9258c8cbaf6bc298617244","insert tableName=ipa_config","","","4.4.3","()","","7861656924"

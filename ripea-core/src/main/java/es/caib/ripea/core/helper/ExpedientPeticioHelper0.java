@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.domini.Estat;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -63,7 +63,7 @@ public class ExpedientPeticioHelper0 {
 
 	public void consultarIGuardarAnotacioPeticioPendent(
 			Long expedientPeticioId,
-			boolean throwException) {
+			boolean throwException) throws Throwable {
 
 		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())

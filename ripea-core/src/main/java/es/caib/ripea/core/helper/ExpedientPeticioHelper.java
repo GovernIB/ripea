@@ -16,11 +16,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.distribucio.rest.client.domini.Annex;
-import es.caib.distribucio.rest.client.domini.AnnexEstat;
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreEntrada;
-import es.caib.distribucio.rest.client.domini.AnotacioRegistreId;
-import es.caib.distribucio.rest.client.domini.Interessat;
+import es.caib.distribucio.rest.client.integracio.domini.Annex;
+import es.caib.distribucio.rest.client.integracio.domini.AnnexEstat;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
+import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
+import es.caib.distribucio.rest.client.integracio.domini.Estat;
+import es.caib.distribucio.rest.client.integracio.domini.Interessat;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
@@ -289,22 +290,22 @@ public class ExpedientPeticioHelper {
 		anotacio.setClauAcces(pendent.getClauAcces());
 		try {
 			
-			es.caib.distribucio.rest.client.domini.Estat estat = null;
+			Estat estat = null;
 			String observacions = "";
 			switch (pendent.getEstat()) {
 			case CREAT:
-				estat = es.caib.distribucio.rest.client.domini.Estat.ERROR;
+				estat = Estat.ERROR;
 				observacions = pendent.getConsultaWsErrorDesc();
 				break;
 			case PENDENT:
-				estat = es.caib.distribucio.rest.client.domini.Estat.REBUDA;
+				estat = Estat.REBUDA;
 				break;
 			case PROCESSAT_PENDENT:
 			case PROCESSAT_NOTIFICAT:
-				estat = es.caib.distribucio.rest.client.domini.Estat.PROCESSADA;
+				estat = Estat.PROCESSADA;
 				break;
 			case REBUTJAT:
-				estat = es.caib.distribucio.rest.client.domini.Estat.REBUTJADA;
+				estat = Estat.REBUTJADA;
 				break;
 			}
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())

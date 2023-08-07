@@ -246,7 +246,7 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	@Override
 	@RolesAllowed("IPA_SUPER")
 	public void comunicadaReprocessar(
-			Long expedientPeticioId) {
+			Long expedientPeticioId) throws Throwable {
 		delegate.comunicadaReprocessar(expedientPeticioId);
 	}
 

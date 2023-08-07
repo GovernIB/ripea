@@ -300,16 +300,7 @@ $(document).ready(function(){
 						    <td>
 						    	<c:if test="${not empty enviament.enviamentDatatEstat}">
 						    	 	<spring:message code="notificacio.enviamentEstat.enum.${enviament.enviamentDatatEstat}"/>
-						    	 </c:if>
-						    	<c:if test="${!enviament.finalitzat}">
-							    	<a href="<c:url value="/modal/document/notificacio/actualitzarEstat/${notificacio.enviamentIdentificador}/${enviament.enviamentReferencia}?contingutNavigationId=${contingutNavigationId}"/>" 
-							    	    class="btn btn-default btn-sm pull-right" 
-							    	    title="<spring:message code="enviament.info.accio.ectualitzar.estat"/>"
-							    	    style="margin-right: 8px;">
-							    			<span class="fa fa-refresh"></span>
-							    	</a>
-						    	 </c:if>						    	 
-
+						    	 </c:if>						    
 						   	</td>					    
 						  </tr>
 						  <!------- ESTAT DATA ------->	

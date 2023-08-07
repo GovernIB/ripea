@@ -3,23 +3,37 @@
  */
 package es.caib.ripea.core.entity;
 
-import es.caib.distribucio.rest.client.domini.FirmaPerfil;
-import es.caib.distribucio.rest.client.domini.FirmaTipus;
-import es.caib.distribucio.rest.client.domini.NtiEstadoElaboracion;
-import es.caib.distribucio.rest.client.domini.NtiOrigen;
-import es.caib.distribucio.rest.client.domini.NtiTipoDocumento;
-import es.caib.distribucio.rest.client.domini.SicresTipoDocumento;
-import es.caib.distribucio.rest.client.domini.SicresValidezDocumento;
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
-import es.caib.ripea.core.audit.RipeaAuditable;
-import lombok.Getter;
+
+import java.util.Date;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
-import java.util.Date;
+import es.caib.distribucio.rest.client.integracio.domini.FirmaPerfil;
+import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
+import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
+import es.caib.distribucio.rest.client.integracio.domini.SicresTipoDocumento;
+import es.caib.distribucio.rest.client.integracio.domini.SicresValidezDocumento;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un document

@@ -132,11 +132,6 @@ $(document).ready(function() {
 						tableBody += ' <span class="fa fa-warning text-danger" title="' + escaped + '"></span>';
 					}
 
-					if (!enviaments[i].finalitzat) {
-						tableBody += '<a href="<c:url value="/document/notificacio/actualitzarEstat/' + notificacio.enviamentIdentificador + '/' + enviaments[i].enviamentReferencia + '?contingutNavigationId=${contingut.id}"/>" class="btn btn-default btn-sm pull-right" title="<spring:message code="enviament.info.accio.ectualitzar.estat"/>"><span class="fa fa-refresh"></span></a>';
-					} 
-
-					
 					tableBody += '</td>';
 
 					
@@ -182,6 +177,7 @@ $(document).ready(function() {
 			<th data-col-name="error" data-visible="false"></th>
 			<th data-col-name="notificacio" data-visible="false"></th>
 			<th data-col-name="publicacio" data-visible="false"></th>
+			<th data-col-name="enviamentIdentificador" data-visible="false"></th>
 			<th data-col-name="tipus" data-orderable="false" data-template="#cellNotficicacioTipusTemplate" width="15%">
 				<spring:message code="contingut.enviament.columna.tipus"/>
 				<script id="cellNotficicacioTipusTemplate" type="text/x-jsrender">
@@ -248,6 +244,9 @@ $(document).ready(function() {
 						<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 						<ul class="dropdown-menu">
 							<li><a href="<c:url value="/document/{{:documentId}}/notificacio/{{:id}}/info?contingutNavigationId=${contingut.id}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
+							{{if notificacioEstat != 'PROCESSADA'}}
+								<li><a href="<c:url value="/document/notificacio/actualitzarEstat/{{:enviamentIdentificador}}?contingutNavigationId=${contingut.id}"/>"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.ectualitzar.estat"/></a></li>
+							{{/if}}
 							{{if tipus == 'MANUAL'}}
 								<li><a href="<c:url value="/expedient/${expedientId}/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="<c:url value="/expedient/${expedientId}/notificacio/{{:id}}/delete"/>" data-toggle="ajax" data-confirm="<spring:message code="contingut.confirmacio.esborrar.notificacio"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>

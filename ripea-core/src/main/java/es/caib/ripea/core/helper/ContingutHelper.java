@@ -1040,7 +1040,7 @@ public class ContingutHelper {
 				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + "-" + interessatNif + "-" + interessatNom + ".pdf");
 			else
 				dto.setFitxerNom("Certificació_" + notificacio.getAssumpte().replaceAll("\\s+","_") + ".pdf");
-			dto.setFitxerContentType(resposta.getCertificacioTipusMime());
+			dto.setFitxerContentType("application/pdf");
 			dto.setFitxerContingut(resposta.getCertificacioContingut());
 			dto.setFitxerTamany(new Long(resposta.getCertificacioContingut().length));
 			logger.debug("[CERT] El fitxer s'ha generat correctament amb nom: " + dto.getFitxerNom());

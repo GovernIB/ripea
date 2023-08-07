@@ -122,7 +122,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
 	 */
 	@Override
-	public void consultarIGuardarAnotacionsPeticionsPendents() {
+	public void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
 
 		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 			logger.info("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");

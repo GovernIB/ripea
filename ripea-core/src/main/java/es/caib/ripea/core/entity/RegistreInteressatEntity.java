@@ -3,13 +3,24 @@
  */
 package es.caib.ripea.core.entity;
 
-import es.caib.distribucio.rest.client.domini.DocumentTipus;
-import es.caib.distribucio.rest.client.domini.InteressatTipus;
-import es.caib.ripea.core.audit.RipeaAuditable;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.*;
+import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
+import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
+import es.caib.ripea.core.audit.RipeaAuditable;
 
 /**
  * Classe del model de dades que representa un interessat

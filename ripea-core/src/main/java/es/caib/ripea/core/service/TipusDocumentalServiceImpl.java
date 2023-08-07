@@ -57,11 +57,6 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true,
 				false, false, false);
-		if (! suportaMetaDocumentalsAddicionals())
-			throw new ValidationException(
-					"<creacio>",
-					TipusDocumentalService.class,
-					"La versió actual de l'aplicació no suporta la creació de nous tipus documentals");
 		
 		TipusDocumentalEntity entity = TipusDocumentalEntity.getBuilder(
 				tipusDocumental.getCodi(),
@@ -88,11 +83,6 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true,
 				false, false, false);
-		if (! suportaMetaDocumentalsAddicionals())
-			throw new ValidationException(
-					"<creacio>",
-					TipusDocumentalService.class,
-					"La versió actual de l'aplicació no permet la modificació de tipus documentals");
 		
 		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.findOne(tipusDocumental.getId());
 
@@ -126,11 +116,6 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				false,
 				true,
 				false, false, false);
-		if (! suportaMetaDocumentalsAddicionals())
-			throw new ValidationException(
-					"<creacio>",
-					TipusDocumentalService.class,
-					"La versió actual de l'aplicació no permet esborrar tipus documentals");
 		
 		TipusDocumentalEntity tipusDocumentalEntity = tipusDocumentalRepository.findOne(id);
 
@@ -214,10 +199,6 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 				codi, 
 				entitat);
 		return conversioTipusHelper.convertir(tipusDocumental, TipusDocumentalDto.class);
-	}
-	
-	private boolean suportaMetaDocumentalsAddicionals() {
-		return configHelper.getAsBoolean("es.caib.ripea.arxiu.metadocumental.addicional.actiu");
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(TipusDocumentalServiceImpl.class);

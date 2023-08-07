@@ -19,7 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import es.caib.distribucio.rest.client.domini.InteressatTipus;
+import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
 import es.caib.ripea.core.aggregation.HistoricAggregation;
 import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
 import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;

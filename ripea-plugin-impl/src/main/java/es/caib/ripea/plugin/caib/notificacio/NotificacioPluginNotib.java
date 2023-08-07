@@ -3,47 +3,13 @@
  */
 package es.caib.ripea.plugin.caib.notificacio;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-
 import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.client.NotificacioRestClientV2;
-import es.caib.notib.client.domini.Certificacio;
-import es.caib.notib.client.domini.DadesConsulta;
-import es.caib.notib.client.domini.DocumentV2;
-import es.caib.notib.client.domini.EntregaDeh;
-import es.caib.notib.client.domini.EntregaPostal;
-import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
-import es.caib.notib.client.domini.EnviamentReferenciaV2;
-import es.caib.notib.client.domini.EnviamentTipusEnum;
-import es.caib.notib.client.domini.InteressatTipusEnumDto;
-import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
-import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
-import es.caib.notib.client.domini.NotificacioCanviClient;
-import es.caib.notib.client.domini.NotificacioV2;
-import es.caib.notib.client.domini.Registre;
-import es.caib.notib.client.domini.RespostaAltaV2;
-import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
-import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
-import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
-import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.notib.client.domini.*;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
@@ -59,6 +25,19 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementació de del plugin d'enviament de notificacions
@@ -286,9 +265,12 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			resposta.setEstat(respostaConsultaEstat.getEstat() != null ? EnviamentEstat.valueOf(respostaConsultaEstat.getEstat().toString()) : null);
 			resposta.setEstatData(respostaConsultaEstat.getEstatData());
 			resposta.setEstatDescripcio(respostaConsultaEstat.getEstatDescripcio());
-			resposta.setEstatOrigen(respostaConsultaEstat.getDatat() != null ? respostaConsultaEstat.getDatat().getOrigen() : null);
-			resposta.setReceptorNif(respostaConsultaEstat.getDatat() != null ? respostaConsultaEstat.getDatat().getReceptorNif() : null);
-			resposta.setReceptorNom(respostaConsultaEstat.getDatat() != null ? respostaConsultaEstat.getDatat().getReceptorNom() : null);
+			if (respostaConsultaEstat.getDatat() != null) {
+				Datat datat = respostaConsultaEstat.getDatat();
+				resposta.setEstatOrigen(datat.getOrigen());
+				resposta.setReceptorNif(datat.getReceptorNif());
+				resposta.setReceptorNom(datat.getReceptorNom());
+			}
 			if (respostaConsultaEstat.getCertificacio() != null) {
 				Certificacio certificacio = respostaConsultaEstat.getCertificacio();
 				resposta.setCertificacioData(certificacio.getData());

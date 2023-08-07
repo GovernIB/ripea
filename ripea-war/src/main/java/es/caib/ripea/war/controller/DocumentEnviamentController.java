@@ -185,19 +185,17 @@ public class DocumentEnviamentController extends BaseUserController {
 	}
 	
 	
-	@RequestMapping(value = "/notificacio/actualitzarEstat/{identificador}/{referencia}")
+	@RequestMapping(value = "/notificacio/actualitzarEstat/{identificador}")
 	public String notificacioActualitzarEstat(
 			HttpServletRequest request,
 			@PathVariable String identificador,
-			@PathVariable String referencia,
 			@RequestParam(value = "contingutNavigationId", required = true) Long contingutNavigationId,
 			Model model) {
 		try {
 			getEntitatActualComprovantPermisos(request);
 			
 			documentService.notificacioActualitzarEstat(
-					identificador, 
-					referencia);
+					identificador);
 			
 			return getModalControllerReturnValueSuccess(
 					request,

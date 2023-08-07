@@ -56,15 +56,22 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 	//SUBSTITUTION BY ITSLEF
 	public static final String CODI_UNITAT_TO_SUBSTITUTE_BY_ITSELF = "A00000010";
 	
-
-	//script to clear syncronization
+	
+//  -------- script to clear syncronization -------
+//	-- clear expedients --	
+//	delete from ipa_expedient_organpare where meta_expedient_organ_id in (select id from ipa_metaexp_organ where organ_gestor_id in (select id from ipa_organ_gestor where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000')));
+//	delete from ipa_metaexp_organ where organ_gestor_id in (select id from ipa_organ_gestor where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000'));
+//	delete from ipa_metaexp_seq where meta_expedient_id in (select id from ipa_metaexpedient where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000'));
+//	delete from ipa_expedient where id in (select id from ipa_contingut where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000'));
+//	delete from ipa_node where id in (select id from ipa_contingut where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000'));
+//	delete from ipa_contingut where id in (select id from ipa_contingut where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000'));
+//  -- basic clear --	 	
 //	delete from ipa_metaexpedient where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000');
 //	delete from ipa_og_sinc_rel where antic_og in (select id from ipa_organ_gestor where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000')) or nou_og in (select id from ipa_organ_gestor where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000'));
 //	delete from ipa_organ_gestor where entitat_id = (select id from ipa_entitat where unitat_arrel = 'A00000000');
 //	update ipa_entitat set data_sincronitzacio = null, data_actualitzacio = null where id = (select id from ipa_entitat where unitat_arrel = 'A00000000');
 
 	
-
 	
 	@Override
 	public List<UnitatOrganitzativa> findAmbPare(String pareCodi, Date dataActualitzacio, Date dataSincronitzacio) throws SistemaExternException {
@@ -86,7 +93,6 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			
 			//UNITAT ARREL I UNITAT SUPERIOR
 			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_ARREL, name(CODI_UNITAT_ARREL), null, null, "V", null));
-			unitats.add(getUnitatOrganitzativa(CODI_UNITAT_SUPERIOR, name(CODI_UNITAT_SUPERIOR), CODI_UNITAT_ARREL, CODI_UNITAT_ARREL, "V", null));
 			
 			ProcedimentPluginMock.secondSyncronization = false;
 
@@ -110,13 +116,93 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 		  case 5:
 			  testSplittingToItself(sincronizationIterationEnum, unitats);
 		    break;
+		  case 6:
+			  testSyncronizeExpedientsOrgansSubstitution(sincronizationIterationEnum, unitats);
+		    break;
+		  case 7:
+			  testSyncronizeExpedientsOrgansFusion(sincronizationIterationEnum, unitats);
+		    break;		    
 
 		}
 
 		return unitats;
 	}
-	Integer testNumber = 1;//testNumber = 2;
+	Integer testNumber = 1;//testNumber = 7;
 
+	
+	// -----------
+	// A1
+	// - A2
+	// 	 - A3
+	// 	 	- A4
+	// -----------	
+	// A1 -> B1
+	// A2 -> B2
+	// A3 -> B3
+	// A4 -> B4
+	// -----------
+	// B1
+	// - B2
+	// 	 - B3
+	// 	 	- B4
+	// -----------
+	private void testSyncronizeExpedientsOrgansSubstitution(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
+		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			
+			unitats.add(getUnitatOrganitzativa("A1", CODI_UNITAT_ARREL, "V", null));
+			unitats.add(getUnitatOrganitzativa("A2", "A1", "V", null));
+			unitats.add(getUnitatOrganitzativa("A3", "A2", "V", null));
+			unitats.add(getUnitatOrganitzativa("A4", "A3", "V", null));
+
+		} else {
+			unitats.add(getUnitatOrganitzativa("A1", CODI_UNITAT_ARREL, "E", Arrays.asList("B1")));
+			unitats.add(getUnitatOrganitzativa("B1", CODI_UNITAT_ARREL, "V", null));
+			
+			unitats.add(getUnitatOrganitzativa("A2", "A1", "E", Arrays.asList("B2")));
+			unitats.add(getUnitatOrganitzativa("B2", "B1", "V", null));
+			
+			unitats.add(getUnitatOrganitzativa("A3", "A2", "E", Arrays.asList("B3")));
+			unitats.add(getUnitatOrganitzativa("B3", "B2", "V", null));
+			
+			unitats.add(getUnitatOrganitzativa("A4", "A3", "E", Arrays.asList("B4")));
+			unitats.add(getUnitatOrganitzativa("B4", "B3", "V", null));
+			
+		}
+	}
+
+	
+	// -----------
+	// A1
+	// - A2
+	// - A3
+	// -----------	
+	// A1 -> B1
+	// A2, A3 -> B2
+	// -----------
+	// B1
+	// - B2
+	// -----------
+	private void testSyncronizeExpedientsOrgansFusion(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
+		
+		if (sincronizationIterationEnum == SincronizationIterationEnum.FIRST) {
+			
+			unitats.add(getUnitatOrganitzativa("A1", CODI_UNITAT_ARREL, "V", null));
+			unitats.add(getUnitatOrganitzativa("A2", "A1", "V", null));
+			unitats.add(getUnitatOrganitzativa("A3", "A1", "V", null));
+
+		} else {
+			unitats.add(getUnitatOrganitzativa("A1", CODI_UNITAT_ARREL, "E", Arrays.asList("B1")));
+			unitats.add(getUnitatOrganitzativa("B1", CODI_UNITAT_ARREL, "V", null));
+			
+			unitats.add(getUnitatOrganitzativa("A2", "A1", "E", Arrays.asList("B2")));
+			unitats.add(getUnitatOrganitzativa("A3", "A1", "E", Arrays.asList("B2")));
+			unitats.add(getUnitatOrganitzativa("B2", "B1", "V", null));
+			
+		}
+	}
+	
+	
 	
 	private void testResendTheSameChanges(SincronizationIterationEnum sincronizationIterationEnum, List<UnitatOrganitzativa> unitats) {
 		
@@ -436,7 +522,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 			additonal = " (" + additonal + ")";
 		}
 		
-		return "Unitat amb codi " + name + additonal;
+		return "Unitat " + name + additonal;
 	}
 	
 	public String nameCatalan(String name) {
@@ -452,7 +538,7 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 				codi,
 				name(codi),
 				nameCatalan(codi),
-				CODI_UNITAT_SUPERIOR,
+				CODI_UNITAT_ARREL,
 				CODI_UNITAT_ARREL,
 				estat,
 				historicosUO);
@@ -471,6 +557,21 @@ public class UnitatsOrganitzativesPluginMock extends RipeaAbstractPluginProperti
 				nameCatalan(codi),
 				codiUnitatSuperior,
 				codiUnitatArrel,
+				estat,
+				historicosUO);
+	}
+	
+	private UnitatOrganitzativa getUnitatOrganitzativa(
+			String codi,
+			String codiUnitatSuperior,
+			String estat, 
+			List<String> historicosUO) {
+		return new UnitatOrganitzativa(
+				codi,
+				name(codi),
+				name(codi),
+				codiUnitatSuperior,
+				CODI_UNITAT_ARREL,
 				estat,
 				historicosUO);
 	}

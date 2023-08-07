@@ -27,7 +27,7 @@ public class SegonPlaServiceBean implements SegonPlaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void consultarIGuardarAnotacionsPeticionsPendents() {
+	public void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
 		delegate.consultarIGuardarAnotacionsPeticionsPendents();	
 	}
 
