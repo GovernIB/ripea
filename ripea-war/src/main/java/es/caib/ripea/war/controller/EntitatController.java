@@ -131,14 +131,13 @@ public class EntitatController extends BaseUserController {
 		if (bindingResult.hasErrors()) {
 			
 			if (bindingResult.getAllErrors().size() == 1 && bindingResult.getAllErrors().get(0).getDefaultMessage().contains("Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile'")) {
-
-//				When selected file is cleared in the view [Netejar] (in this case it is made using Jasny bootstrap implementation with attribute data-dismiss="fileinput") then on form submit this cleared file is passed as an empty string.
+          
+//				When file is cleared in the form [Netejar] (in this case it is made using Jasny bootstrap implementation with attribute data-dismiss="fileinput") then on form submit this cleared file is passed as an empty string.
 //				Spring MVC doesn't allow file to be passed as an empty string for which it gives error in bindingResult: 
 //					Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile' for property 'logoImg'; nested exception is java.lang.IllegalStateException: 
 //					Cannot convert value of type [java.lang.String] to required type [org.springframework.web.multipart.MultipartFile] for property 'logoImg': no matching editors or conversion strategy found
-//		        Because it is not possible to remove error from bindingResult we supress it.
-//				In the case of multiple validation errors we cannot supress it in order to show other legitimate validation errors, that's why we use property doNotShowErrors of inputFile.tag to not show errors on this field in the view
-             
+//		        Because it is not possible to remove error from bindingResult we ignore it.
+             				
 			} else {
 				return "entitatForm";
 			}

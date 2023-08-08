@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -219,10 +220,19 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getPinbalServeiDocsPermesos(), 
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		if (plantillaContingut != null) {
+			if (Utils.isNotEmpty(plantillaContingut)) { // file was changed
+				entity.updatePlantilla(
+						plantillaNom,
+						plantillaContentType,
+						plantillaContingut);
+			} else {
+				// file was not changed
+			}
+		} else { // file was removed
 			entity.updatePlantilla(
-					plantillaNom,
-					plantillaContentType,
-					plantillaContingut);
+					null,
+					null,
+					null);
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {

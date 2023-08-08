@@ -491,7 +491,7 @@ function removeLoading() {
 				<rip:inputText name="nom" textKey="metadocument.form.camp.nom" required="true" readonly="${bloquejarCamps}"/>
 				<rip:inputTextarea name="descripcio" textKey="metadocument.form.camp.descripcio" disabled="${bloquejarCamps}"/>
 				<rip:inputSelect name="multiplicitat" textKey="metadocument.form.camp.multiplicitat" optionItems="${multiplicitatEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
-				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}" disabled="${bloquejarCamps}"/>
+				<rip:inputFile name="plantilla" textKey="metadocument.form.camp.plantilla" fileName="${metaDocumentCommand.plantillaNom}" disabled="${bloquejarCamps}" doNotShowErrors="1"/>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="dades-nti">
 				<rip:inputSelect name="ntiOrigen" emptyOption="true" emptyOptionTextKey="contingut.document.form.camp.nti.cap" textKey="contingut.document.form.camp.nti.origen" optionItems="${ntiOrigenOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" required="true" disabled="${bloquejarCamps}"/>

@@ -200,8 +200,19 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			bindingResult.rejectValue("pinbalFinalitat", "NotNull");
 		}
 		if (bindingResult.hasErrors()) {
-			emplenarModelForm(request, model);
-			return "metaExpedientMetaDocumentForm";
+			
+			if (bindingResult.getAllErrors().size() == 1 && bindingResult.getAllErrors().get(0).getDefaultMessage().contains("Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile'")) {
+
+//				When file is cleared in the form [Netejar] (in this case it is made using Jasny bootstrap implementation with attribute data-dismiss="fileinput") then on form submit this cleared file is passed as an empty string.
+//				Spring MVC doesn't allow file to be passed as an empty string for which it gives error in bindingResult: 
+//					Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile' for property 'plantilla'; nested exception is java.lang.IllegalStateException: 
+//					Cannot convert value of type [java.lang.String] to required type [org.springframework.web.multipart.MultipartFile] for property 'plantilla': no matching editors or conversion strategy found
+//		        Because it is not possible to remove error from bindingResult we ignore it.
+             
+			} else {
+				emplenarModelForm(request, model);
+				return "metaExpedientMetaDocumentForm";
+			}
 		}
 		
 		if (command.getId() != null) {
@@ -209,9 +220,11 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					entitatActual.getId(),
 					metaExpedientId,
 					MetaDocumentCommand.asDto(command),
-					command.getPlantilla().getOriginalFilename(),
-					command.getPlantilla().getContentType(),
-					command.getPlantilla().getBytes(), rolActual, organActual != null ? organActual.getId() : null);
+					command.getPlantilla() != null ? command.getPlantilla().getOriginalFilename() : null,
+					command.getPlantilla() != null ? command.getPlantilla().getContentType() : null,
+					command.getPlantilla() != null ? command.getPlantilla().getBytes() : null, 
+					rolActual, 
+					organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
