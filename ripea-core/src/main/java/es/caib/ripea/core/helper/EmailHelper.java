@@ -571,6 +571,53 @@ public class EmailHelper {
 		
 	}
 	
+	public void firmaParcialDocumentPortafirmes(
+			DocumentPortafirmesEntity documentPortafirmes) {
+		logger.debug("Enviant correu electrònic avís firma parcial de document al portafirmes (" +
+			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
+		
+		DocumentEntity document = documentPortafirmes.getDocument();
+		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
+		ExpedientEntity expedient = document.getExpedient();
+
+		String subject = PREFIX_RIPEA + " Firma parcial de document enviat a portafirmes";
+		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
+		String text = 
+				"Informació del document:\n" +
+						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+						"\tExpedient nom: " + expedient.getNom() + "\n" +
+						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
+						"\tDocument nom: " + document.getNom() + "\n" +
+						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+						"Estat del document:" + estat + "\n" +
+						getEnllacExpedient(expedient.getId());
+						
+		
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				enviamentCreatedByCodi,
+				null);
+
+		
+		for (DadesUsuari dadesUsuari : responsables) {
+			if (dadesUsuari != null) {
+				String to = dadesUsuari.getEmail();
+				if (Utils.isNotEmpty(to)) {
+					SimpleMailMessage missatge = new SimpleMailMessage();
+					missatge.setFrom(getRemitent());
+					missatge.setTo(to);
+					missatge.setSubject(subject);
+					missatge.setText(text);
+					mailSender.send(missatge);
+				}
+			}
+		}
+		
+	}
+	
 	public void canviEstatDocumentViaFirma(
 			DocumentViaFirmaEntity documentViaFirma) {
 		logger.debug("Enviant correu electrònic per a canvi d'estat de document a ViaFirma (" +

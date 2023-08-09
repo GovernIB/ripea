@@ -132,6 +132,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isNouEnviament", true);
 		model.addAttribute("tascaId", tascaId);
 		model.addAttribute(command);
+		model.addAttribute("isHabilitarAvisFirmaParcialActiu", isHabilitarAvisFirmaParcialActiu());
 		return "portafirmesForm";
 	}
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.POST)
@@ -202,7 +203,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					command.getAnnexos(),
 					transaccioId, 
 					RolHelper.getRolActual(request), 
-					tascaId); //nou flux
+					tascaId,
+					command.isAvisFirmaParcial());
 			
 			return this.getModalControllerReturnValueSuccess(
 					request,
@@ -763,6 +765,9 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.viafirma.caib.dispositius.enabled"));
 	}
 	
+	private boolean isHabilitarAvisFirmaParcialActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
+	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
 }

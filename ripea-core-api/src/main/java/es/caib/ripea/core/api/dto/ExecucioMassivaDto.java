@@ -43,6 +43,8 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private List<Long> contingutIds = new ArrayList<Long>();
 	private String rolActual;
 	
+	private Boolean portafirmesAvisFirmaParcial;
+	
 	private int errors;
 	private double executades;
 

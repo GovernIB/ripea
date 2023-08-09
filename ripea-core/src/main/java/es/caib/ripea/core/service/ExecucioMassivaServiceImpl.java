@@ -107,7 +107,8 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					dto.getDataCaducitat(), 
 					dto.getEnviarCorreu(),
 					entitat,
-					dto.getRolActual()).build();
+					dto.getRolActual(),
+					dto.getPortafirmesAvisFirmaParcial()).build();
 		}
 		
 		int ordre = 0;

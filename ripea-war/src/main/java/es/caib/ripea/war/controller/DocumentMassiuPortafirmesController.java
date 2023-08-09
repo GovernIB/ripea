@@ -159,6 +159,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 					command);
 
 			model.addAttribute("metadocumentId", metaDocument.getId());
+			model.addAttribute("isHabilitarAvisFirmaParcialActiu", isHabilitarAvisFirmaParcialActiu());
 		} else {
 			return getModalControllerReturnValueError(
 					request,
@@ -224,7 +225,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		dto.setPortafirmesTransaccioId(transaccioId);
 		dto.setContingutIds(new ArrayList<Long>(seleccio));
 		dto.setRolActual((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL));
-
+		dto.setPortafirmesAvisFirmaParcial(command.isAvisFirmaParcial());
+		
 		execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto);
 		
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
@@ -483,4 +485,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		return filtreCommand;
 	}
 
+	private boolean isHabilitarAvisFirmaParcialActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
+	}
+	
 }
