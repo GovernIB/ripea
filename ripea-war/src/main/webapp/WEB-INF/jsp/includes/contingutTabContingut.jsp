@@ -775,9 +775,12 @@ $(document).ready(function() {
 			resumViewer.slideDown(500);
 		} else if (previousDocumentId == undefined || previousDocumentId == documentId) {
 			closeViewer();
+			event.srcElement.parentElement.closest('tr').style = "background: #fffff";
 			previousDocumentId = documentId;
 			return;
 		}
+		resetBackground();
+		event.srcElement.parentElement.closest('tr').style = "background: #c1c0c0";
 		previousDocumentId = documentId;
 		
 	    // Mostrar contingut capçalera visor
@@ -815,6 +818,13 @@ $(document).ready(function() {
 		$([document.documentElement, document.body]).animate({
 	        scrollTop: $("#resum-viewer").offset().top - 110
 	    }, 500);
+	}
+	
+	function resetBackground() {
+		var tableAnnexos = $('#table-documents');
+		tableAnnexos.find('tr').each(function() {
+	    	$(this).removeAttr('style');
+	    });
 	}
 	
 	function showDocument(arxiuUrl) {
