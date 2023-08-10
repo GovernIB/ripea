@@ -687,6 +687,11 @@ function removeCookie(cname) {
 								</c:otherwise>
 							</c:choose>	
 								
+							<c:if test="${expedientTancat}">
+								<dt><spring:message code="contingut.info.motiu"/></dt>
+								<dd>${contingut.tancatMotiu}</dd>
+							</c:if>
+							
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
 							<dd>${contingut.ntiClasificacionSia}</dd>
 
