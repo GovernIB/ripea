@@ -1582,7 +1582,41 @@ public class PluginHelper {
 			if (throwException) {
 				throw new RuntimeException("Mock excepcion moving document ");
 			}
-			ContingutArxiu nouDocumentArxiu = getArxiuPlugin().documentMoure(uuid, uuidDesti, uuidExpedientDesti);
+			ContingutArxiu nouDocumentArxiu = null;
+			try {
+				nouDocumentArxiu = getArxiuPlugin().documentMoure(uuid, uuidDesti, uuidExpedientDesti);
+			} catch (Exception e) {
+				
+				if (e.getMessage().contains("Duplicate child name not allowed") || e.getMessage().contains("Petición mal formada")) {
+					logger.info("Document already moved in arxiu:" + e.getMessage());
+					
+					Document document = getArxiuPlugin().documentDetalls(uuid, null, false);
+					logger.info("Document to move name=" + document.getNom() + ", uuid=" + document.getIdentificador());
+					Carpeta carpeta = getArxiuPlugin().carpetaDetalls(uuidDesti);
+
+					String uuidDocumentMovido = null;
+					for (ContingutArxiu contingutArxiu : carpeta.getContinguts()) {
+						logger.info("Searching document moved: name=" + contingutArxiu.getNom() + ", uuid=" + contingutArxiu.getIdentificador());
+						if (document.getNom().equals(contingutArxiu.getNom())) {
+							logger.info("Document moved found: name=" + contingutArxiu.getNom() + ", uuid=" + contingutArxiu.getIdentificador());
+							uuidDocumentMovido = contingutArxiu.getIdentificador();
+							break;
+						}
+					}
+					if (uuidDocumentMovido != null) {
+						return uuidDocumentMovido;
+					} else {
+						throw e;
+					}
+				} else {
+					throw e;
+				}
+			}
+			
+			boolean throwException1 = false;//throwException1 = true
+			if (throwException1) {
+				throw new RuntimeException("Mock excepcion after moving document ");
+			}
 			integracioHelper.addAccioOk(IntegracioHelper.INTCODI_ARXIU, accioDescripcio, accioParams, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0);
 			if (nouDocumentArxiu != null) {
 				return nouDocumentArxiu.getIdentificador();
