@@ -98,6 +98,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	private ContingutHelper contingutHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+    @Autowired
+	private ConfigHelper configHelper;
 	
 	public void portafirmesEnviar(
 			Long entitatId,
@@ -155,12 +157,16 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 					DocumentEntity.class,
 					"El document no te activada la firma amb portafirmes");
 		}
+		
+		// Activar l'ús del tipus de document de portafirmes
+		boolean tipusDocumentPortafirmes = configHelper.getAsBoolean("es.caib.ripea.activar.tipus.document.portafirmes");
+		
 		DocumentPortafirmesEntity documentPortafirmes = DocumentPortafirmesEntity.getBuilder(
 				DocumentEnviamentEstatEnumDto.PENDENT,
 				assumpte,
 				prioritat,
 				dataCaducitat,
-				StringUtils.stripStart(document.getMetaDocument().getNtiTipoDocumental(), "TD0"),
+				tipusDocumentPortafirmes ? document.getMetaDocument().getPortafirmesDocumentTipus() : StringUtils.stripStart(document.getMetaDocument().getNtiTipoDocumental(), "TD0"),
 				portafirmesResponsables,
 				portafirmesSeqTipus,
 				portafirmesFluxTipus,

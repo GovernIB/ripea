@@ -123,14 +123,17 @@ body.loading .rmodal {
 			}
 		});
         if($("#firmaPortafirmesActiva").prop("checked") == true){
+        	$("label[for='portafirmesDocumentTipus']").append( " *" );
         	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
         }
 
 		$("#firmaPortafirmesActiva").on('change', function(){
 	            if($(this).prop("checked") == true){
+	            	$("label[for='portafirmesDocumentTipus']").append( " *" );
 	            	$($("label[for='portafirmesResponsables']")[1]).append( " *" );
 	            }
 	            else if($(this).prop("checked") == false){
+	            	$("label[for='portafirmesDocumentTipus']").text( $("label[for='portafirmesDocumentTipus']").text().replace(' *', '') );
 	            	$($("label[for='portafirmesResponsables']")[1]).text( $($("label[for='portafirmesResponsables']")[1]).text().replace(' *', '') );
 	            }			
 		});
@@ -328,7 +331,9 @@ function removeLoading() {
 			</div>
 			<div role="tabpanel" class="tab-pane" id="firma-portafirmes">
 				<rip:inputCheckbox name="firmaPortafirmesActiva" textKey="metadocument.form.camp.firma.portafirmes.activa"/>
-
+				<c:if test="${isPortafirmesDocumentTipusSuportat}">
+					<rip:inputSelect name="portafirmesDocumentTipus" textKey="metadocument.form.camp.portafirmes.document.tipus" optionItems="${portafirmesDocumentTipus}" optionValueAttribute="id" optionTextAttribute="codiNom" emptyOption="true" optionMinimumResultsForSearch="0" disabled="${bloquejarCamps}"/>
+				</c:if>
 				<%--rip:inputText name="portafirmesFluxId" textKey="metadocument.form.camp.portafirmes.flux.id"/--%>
 				<%--<rip:inputText name="portafirmesResponsables" textKey="metadocument.form.camp.portafirmes.responsables" multiple="true"/>--%>
 				<rip:inputSelect name="portafirmesFluxTipus" textKey="metadocument.form.camp.portafirmes.fluxtip" optionItems="${metadocumentFluxtipEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>

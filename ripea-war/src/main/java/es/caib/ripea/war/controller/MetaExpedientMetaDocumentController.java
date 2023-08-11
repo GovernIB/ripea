@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.core.api.service.TipusDocumentalService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.MetaDocumentCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -196,6 +197,11 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		if (command.isFirmaPortafirmesActiva() && tipusDocumentPortafirmes && Utils.isEmpty(command.getPortafirmesDocumentTipus())) {
+			bindingResult.rejectValue("portafirmesDocumentTipus", "NotNull");
+		}
+		
 		if (command.isPinbalActiu() && (command.getPinbalFinalitat() == null || command.getPinbalFinalitat().isEmpty())) {
 			bindingResult.rejectValue("pinbalFinalitat", "NotNull");
 		}
@@ -490,11 +496,19 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
+		
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		if (tipusDocumentPortafirmes) {
+			List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
+			model.addAttribute("portafirmesDocumentTipus", tipus);
+		}
+		model.addAttribute("isPortafirmesDocumentTipusSuportat", tipusDocumentPortafirmes);
+
 		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",
 				EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
+		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
 		model.addAttribute("ntiTipusDocumentalOptions", tipusDocumental);
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",
