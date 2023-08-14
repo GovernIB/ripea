@@ -1,0 +1,36 @@
+databaseChangeLog:
+- changeSet:
+    id: 1691745729154-1
+    author: limit
+    changes:
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.activar.tipus.document.portafirmes
+          - column:
+              name: value
+              value: false
+          - column:
+              name: description
+              value: Activar l'ús del tipus de document de portafirmes
+          - column:
+              name: group_code
+              value: ALTRES
+          - column:
+              name: position
+              value: 13
+          - column:
+              name: jboss_property
+              value: 0
+          - column:
+              name: type_code
+              value: BOOL
+          - column:
+              name: configurable
+              value: 1         
+          - column:
+              name: configurable_organ
+              value: 1
+              

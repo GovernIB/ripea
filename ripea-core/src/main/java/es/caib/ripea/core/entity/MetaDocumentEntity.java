@@ -50,6 +50,8 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	private MultiplicitatEnumDto multiplicitat;
 	@Column(name = "firma_pfirma")
 	private boolean firmaPortafirmesActiva;
+	@Column(name = "portafirmes_doctip", length = 64)
+	private String portafirmesDocumentTipus;
 	@Column(name = "portafirmes_fluxid", length = 64)
 	private String portafirmesFluxId;
 	@Column(name = "portafirmes_respons", length = 512)
@@ -147,7 +149,9 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 	public boolean isFirmaPortafirmesActiva() {
 		return firmaPortafirmesActiva;
 	}
-
+	public String getPortafirmesDocumentTipus() {
+		return portafirmesDocumentTipus;
+	}
 	public String getPortafirmesFluxId() {
 		return portafirmesFluxId;
 	}
@@ -260,6 +264,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			String descripcio,
 			MultiplicitatEnumDto multiplicitat,
 			boolean firmaPortafirmesActiva,
+			String portafirmesDocumentTipus,
 			String portafirmesFluxId,
 			String[] portafirmesResponsables,
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus,
@@ -283,6 +288,7 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 				descripcio);
 		this.multiplicitat = multiplicitat;
 		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
+		this.portafirmesDocumentTipus = portafirmesDocumentTipus;
 		this.portafirmesFluxId = portafirmesFluxId;
 		this.portafirmesResponsables = getResponsablesFromArray(portafirmesResponsables);
 		this.portafirmesSequenciaTipus = portafirmesSequenciaTipus;
@@ -423,7 +429,10 @@ public class MetaDocumentEntity extends MetaNodeEntity {
 			built.descripcio = descripcio;
 			return this;
 		}
-
+		public Builder portafirmesDocumentTipus(String portafirmesDocumentTipus) {
+			built.portafirmesDocumentTipus = portafirmesDocumentTipus;
+			return this;
+		}
 		public Builder portafirmesFluxId(String portafirmesFluxId) {
 			built.portafirmesFluxId = portafirmesFluxId;
 			return this;

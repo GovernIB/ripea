@@ -83,6 +83,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentCreate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
 		metaDocumentCreate.setGlobalReadOnly(false);*/
 		metaDocumentCreate.setFirmaPortafirmesActiva(false);
+		metaDocumentCreate.setPortafirmesDocumentTipus("1234");
 		metaDocumentCreate.setPortafirmesFluxId("1234");
 		metaDocumentCreate.setPortafirmesResponsables(new String[] {"123456789Z"});
 		metaDocumentCreate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
@@ -98,6 +99,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaDocumentUpdate.setGlobalMultiplicitat(MultiplicitatEnumDto.M_0_1);
 		metaDocumentUpdate.setGlobalReadOnly(true);*/
 		metaDocumentUpdate.setFirmaPortafirmesActiva(true);
+		metaDocumentUpdate.setPortafirmesDocumentTipus("12341");
 		metaDocumentUpdate.setPortafirmesFluxId("12342");
 		metaDocumentUpdate.setPortafirmesResponsables(new String[] {"00000000T"});
 		metaDocumentUpdate.setPortafirmesFluxTipus(MetaDocumentFirmaFluxTipusEnumDto.SIMPLE);
@@ -335,6 +337,9 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		assertEquals(
 				original.isFirmaPortafirmesActiva(),
 				perComprovar.isFirmaPortafirmesActiva());
+		assertEquals(
+				original.getPortafirmesDocumentTipus(),
+				perComprovar.getPortafirmesDocumentTipus());
 		assertEquals(
 				original.getPortafirmesFluxId(),
 				perComprovar.getPortafirmesFluxId());

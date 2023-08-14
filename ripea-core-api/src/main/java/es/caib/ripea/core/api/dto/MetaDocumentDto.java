@@ -27,6 +27,7 @@ public class MetaDocumentDto extends MetaNodeAmbMetaDadesDto implements Serializ
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	private String portafirmesCustodiaTipus;
 	private boolean firmaPassarelaActiva;
+	private String portafirmesDocumentTipus;
 	private String firmaPassarelaCustodiaTipus;
 	private String plantillaNom;
 	private String plantillaContentType;

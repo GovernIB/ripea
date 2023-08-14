@@ -150,6 +150,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
 				descripcio(metaDocument.getDescripcio()).
+				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
 				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
 				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
 				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
@@ -202,6 +203,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getDescripcio(),
 				metaDocument.getMultiplicitat(),
 				metaDocument.isFirmaPortafirmesActiva(),
+				metaDocument.getPortafirmesDocumentTipus(),
 				metaDocument.getPortafirmesFluxId(),
 				metaDocument.getPortafirmesResponsables(),
 				metaDocument.getPortafirmesSequenciaTipus(),
@@ -272,6 +274,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getDescripcio(),
 				metaDocument.getMultiplicitat(),
 				metaDocument.isFirmaPortafirmesActiva(),
+				metaDocument.getPortafirmesDocumentTipus(),
 				metaDocument.getPortafirmesFluxId(),
 				metaDocument.getPortafirmesResponsables(),
 				metaDocument.getPortafirmesSequenciaTipus(),

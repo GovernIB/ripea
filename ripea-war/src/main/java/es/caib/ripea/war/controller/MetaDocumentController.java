@@ -1,22 +1,12 @@
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.MetaDocumentService;
-import es.caib.ripea.core.api.service.PortafirmesFluxService;
-import es.caib.ripea.core.api.service.TipusDocumentalService;
-import es.caib.ripea.war.command.MetaDocumentCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +21,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
+import es.caib.ripea.core.api.dto.TipusDocumentalDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.service.PortafirmesFluxService;
+import es.caib.ripea.core.api.service.TipusDocumentalService;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.war.command.MetaDocumentCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
 
 /**
  * Controlador per al manteniment de meta-documents no asociats a cap
@@ -105,6 +109,12 @@ public class MetaDocumentController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		if (command.isFirmaPortafirmesActiva() && tipusDocumentPortafirmes && Utils.isEmpty(command.getPortafirmesDocumentTipus())) {
+			bindingResult.rejectValue("portafirmesDocumentTipus", "NotNull");
+		}
+		
 		if (bindingResult.hasErrors()) {
 			emplenarModelForm(request, model);
 			return "metaDocumentForm";
@@ -264,13 +274,23 @@ public class MetaDocumentController extends BaseAdminController {
 		return portafirmesFluxService.esborrarPlantilla(plantillaId);
 	}
 
-	private void emplenarModelForm(HttpServletRequest request, Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
+	public void emplenarModelForm(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		
+		boolean tipusDocumentPortafirmes = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.activar.tipus.document.portafirmes");
+		if (tipusDocumentPortafirmes) {
+			List<PortafirmesDocumentTipusDto> tipus = metaDocumentService.portafirmesFindDocumentTipus();
+			model.addAttribute("portafirmesDocumentTipus", tipus);
+		}
+		model.addAttribute("isPortafirmesDocumentTipusSuportat", tipusDocumentPortafirmes);
+
 		// Dades nti
 		model.addAttribute(
 				"ntiOrigenOptions",
 				EnumHelper.getOptionsForEnum(NtiOrigenEnumDto.class, "document.nti.origen.enum."));
+		List<TipusDocumentalDto> tipusDocumental = tipusDocumentalService.findByEntitat(entitatActual.getId());
 		model.addAttribute("ntiTipusDocumentalOptions", tipusDocumental);
 		model.addAttribute(
 				"ntiEstatElaboracioOptions",
@@ -279,6 +299,10 @@ public class MetaDocumentController extends BaseAdminController {
 				"isFirmaBiometrica",
 				Boolean.parseBoolean(
 						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
+		model.addAttribute(
+				"pinbalServeiEnumOptions",
+				EnumHelper.getOptionsForEnum(MetaDocumentPinbalServeiEnumDto.class, "pinbal.servei.enum."));
+
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetaDocumentController.class);

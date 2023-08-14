@@ -51,6 +51,8 @@ public class MetaDocumentCommand {
 	private MultiplicitatEnumDto multiplicitat;
 	private boolean firmaPortafirmesActiva;
 	@Size(max=64)
+	private String portafirmesDocumentTipus;
+	@Size(max=64)
 	private String portafirmesFluxId;
 	private String[] portafirmesResponsables;
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
@@ -140,6 +142,10 @@ public class MetaDocumentCommand {
 
 	public void setFirmaPortafirmesActiva(boolean firmaPortafirmesActiva) {
 		this.firmaPortafirmesActiva = firmaPortafirmesActiva;
+	}
+
+	public void setPortafirmesDocumentTipus(String portafirmesDocumentTipus) {
+		this.portafirmesDocumentTipus = portafirmesDocumentTipus != null ? portafirmesDocumentTipus.trim() : null;
 	}
 
 	public void setPortafirmesFluxId(String portafirmesFluxId) {

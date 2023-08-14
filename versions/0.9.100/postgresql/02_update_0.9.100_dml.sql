@@ -99,3 +99,5 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 -- Changeset db/changelog/changes/0.9.100/1296.yaml::1686745220463-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.mostrar.logs.creacio.contingut', 'false', 'Activar logs per creació de contingut', 'LOGS', '2', '0', 'BOOL', '0', '0');
 
+-- Changeset db/changelog/changes/0.9.100/1326.yaml::1691745729154-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.activar.tipus.document.portafirmes', 'false', 'Activar l''ús del tipus de document de portafirmes', 'ALTRES', '13', '0', 'BOOL', '1', '1');

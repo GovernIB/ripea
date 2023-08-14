@@ -91,6 +91,7 @@ public class MetaDocumentHelper {
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
 				firmaPortafirmesActiva(metaDocument.isFirmaPortafirmesActiva()).
 				descripcio(metaDocument.getDescripcio()).
+				portafirmesDocumentTipus(metaDocument.getPortafirmesDocumentTipus()).
 				portafirmesFluxId(metaDocument.getPortafirmesFluxId()).
 				portafirmesResponsables(metaDocument.getPortafirmesResponsables()).
 				portafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus()).
