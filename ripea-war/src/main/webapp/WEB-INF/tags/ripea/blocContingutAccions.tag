@@ -165,7 +165,7 @@
 			<c:set var="permDeleteCarpeta">${contingut.carpeta && isCreacioCarpetesActiva && expedient.usuariActualWrite}</c:set>
 			<c:set var="permDeleteDocument">${(contingut.document && !contingut.documentDeAnotacio && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) && (expedient.usuariActualWrite || isTasca)}</c:set>
 
-			<c:if test="${(permDeleteExpedient || deleteConditionpermDeleteCarpetaCarpeta  || permDeleteDocument) && expedientObert}">
+			<c:if test="${(permDeleteExpedient || permDeleteCarpeta  || permDeleteDocument) && expedientObert}">
 				<li><a href="<c:url value="/contingut/${contingut.id}/delete?contingutNavigationId=${contingutNavigationId}&tascaId=${tascaId}"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 			</c:if>
 			<c:set var="mostrarSeparador" value="${true}"/>

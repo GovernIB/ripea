@@ -23,6 +23,44 @@
 	right: 10px;
 	top: 10px;
 }
+.rmodal_loading {
+    background: rgba( 255, 255, 255, .8 ) 
+                url('<c:url value="/img/loading.gif"/>') 
+                50% 50% 
+                no-repeat;
+}
+.annex-viewer {
+	display: none;
+	width: 100%;
+}
+.viewer-content {
+	width: 100%;
+	padding-top: 1% !important;
+}
+
+.viewer-content > .dl-horizontal, .viewer-firmes-container > .dl-horizontal {
+	margin-bottom: 0;
+}
+
+.viewer-firmes hr {
+	margin-top: 5px !important;
+	margin-bottom: 5px !important;
+}
+
+.viewer-padding {
+	padding: 0% 2% 0% 2%;
+	padding-top: 1%;
+}
+
+
+.form-control {
+	cursor: pointer !important;
+}
+
+.disabled-icon .form-control:hover {
+    cursor: not-allowed !important;
+}
+
 </style>
 <script>
 
@@ -85,6 +123,120 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 	    return true;
 	});		
 });
+
+
+
+var previousAnnex;
+function showViewer(event, annexId, observacions, dataCaptura, origen) {
+    var resumViewer = $('#annex-viewer-' + annexId);
+	// Mostrar/amagar visor
+	if (!resumViewer.is(':visible')) {
+		resumViewer.slideDown(500);
+	} else if (previousAnnex == undefined || previousAnnex == annexId) {
+		closeViewer(annexId);
+		event.srcElement.parentElement.style = "background: #fffff";
+		previousAnnex = annexId;
+		return;
+	}
+	event.srcElement.parentElement.style = "background: #f9f9f9";
+	previousAnnex = annexId;
+	
+    // Mostrar contingut capçalera visor
+    resumViewer.find('*').not('#container-previs-' + annexId).remove();
+    var viewerContent = '<div class="panel-heading"><spring:message code="registre.detalls.pipella.previsualitzacio"/> \
+    					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer(' + annexId + ')"></span>\
+    					 </div>\
+    					 <div class="viewer-content viewer-padding">\
+    						<dl class="dl-horizontal">\
+	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.eni.data.captura"/>: </dt><dd>' + dataCaptura + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.eni.origen"/>: </dt><dd>' + origen + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.observacions"/>: </dt><dd>' + observacions + '</dd>\
+        					</dl>\
+    					 </div>';
+    resumViewer.prepend(viewerContent);
+    
+    // Recupera i mostrar contingut firmes
+    $.get(
+			"<c:url value="/expedientPeticio/firmaInfo/"/>" + annexId + "/content",
+			function(firmes) {
+				if (firmes && firmes.length > 0) {
+					var nieList = "", nomList = "";
+					var viewerContent = '<div class="viewer-firmes viewer-padding">\
+											<hr>\
+				    						<div class="viewer-firmes-container">';
+				    firmes.forEach(function(firma) {
+    					nieList += '[';
+    					firma.detalls.forEach(function(firmaDetall, index) {
+							if (firmaDetall.responsableNif != undefined && firmaDetall.responsableNif != null)	
+								nieList += firmaDetall.responsableNif + (index !== (firma.detalls.length -1) ? ', ' : '');
+							if (firmaDetall.responsableNom != undefined && firmaDetall.responsableNom != null)
+								nomList += firmaDetall.responsableNom + (index !== (firma.detalls.length -1) ? ', ' : '');
+							if (firmaDetall.responsableNif == null && firma.autofirma != null)
+								nieList += '<spring:message code="registre.annex.detalls.camp.firma.autoFirma"/> <span class="fa fa-info-circle" title="<spring:message code="registre.annex.detalls.camp.firma.autoFirma.info" />"></span>';
+							
+						});
+    					nieList += ']';
+				    });
+
+					viewerContent += '<dl class="dl-horizontal">\
+						   				<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.firmants"/>:</dt>\
+						   				<dd>' + nieList + (nomList != "" ? ' - ' +  nomList : '') + '</dd>\
+						   			  </dl>\
+						   			  </div><hr></div>';
+						$(viewerContent).insertAfter('.viewer-content');
+				}
+			}
+	);
+
+
+    // Recuperar i mostrar document al visor
+	var urlDescarrega = "<c:url value="/expedientPeticio/annex/"/>" + annexId + "/content";
+	$('#container-previs-' + annexId).attr('src', '');
+	$('#container-previs-' + annexId).addClass('rmodal_loading');
+	showDocument(urlDescarrega, annexId);
+}
+
+function showDocument(arxiuUrl, annexId) {
+	// Fa la petició a la url de l'arxiu
+	$.ajax({
+		type: 'GET',
+		url: arxiuUrl,
+		responseType: 'arraybuffer',
+		success: function(json) {
+			
+			if (json.error) {
+				$('#container-previs-' + annexId).removeClass('rmodal_loading');
+				$('#annex-viewer-' + annexId  + ' .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
+			} else if (json.warning) {
+				$('#container-previs-' + annexId).removeClass('rmodal_loading');
+				$('#annex-viewer-' + annexId  + ' .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
+			} else {
+				response = json.data;
+				var blob = base64toBlob(response.contingut, response.contentType);
+	            var file = new File([blob], response.contentType, {type: response.contentType});
+	            link = URL.createObjectURL(file);
+	            
+	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+			    $('#container-previs-' + annexId).removeClass('rmodal_loading');
+			    $('#container-previs-' + annexId).attr('src', viewerUrl);
+			}
+		    
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			$('#container-previs-' + annexId).removeClass('rmodal_loading');
+			alert(thrownError);
+		}
+	});
+}
+
+// Amagar visor
+function closeViewer(annexId) {
+	$('#annex-viewer-' + annexId).slideUp(500, function(){
+	});
+}
+
+
+
 </script>
 
 </head>
@@ -106,12 +258,29 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 		
 		<c:choose>
 			<c:when test="${!empty expedientPeticioAcceptarCommand.annexos}">
-				<c:forEach items="${expedientPeticioAcceptarCommand.annexos}" varStatus="vs">
+				<c:forEach items="${expedientPeticioAcceptarCommand.annexos}" varStatus="vs" var="annex">
 					<div class="well"> 
 						<form:hidden path="annexos[${vs.index}].id" />
-						<rip:inputText name="annexos[${vs.index}].titolINom" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
+						
+						<div <c:choose>
+								<c:when test="${annex.tipusMime == 'application/pdf' }">
+									onclick="showViewer(event, ${annex.id}, '${annex.observacions}', '${annex.ntiFechaCaptura}', '${annex.ntiOrigen}')"
+									title="<spring:message code="registre.annex.detalls.previsualitzar"/>" 
+								</c:when>
+								<c:otherwise>
+									title="<spring:message code="registre.annex.detalls.previsualitzar.no"/>"
+									class="disabled-icon"
+								</c:otherwise>
+							 </c:choose>>
+							<rip:inputText name="annexos[${vs.index}].titolINom" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
+						</div>
 						<rip:inputSelect name="annexos[${vs.index}].metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
 					</div>
+					
+					<div class="panel panel-default annex-viewer" id="annex-viewer-${annex.id}">
+						<iframe id="container-previs-${annex.id}" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
+					</div>  
+					
 				</c:forEach>
 			</c:when>
 			<c:otherwise>

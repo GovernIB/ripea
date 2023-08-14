@@ -1325,6 +1325,11 @@ public class PluginHelper {
 	public Document arxiuDocumentConsultar(DocumentEntity document, String arxiuUuid, String versio, boolean ambContingut, boolean ambVersioImprimible) {
 
 		
+		boolean throwException = false; // throwException = true;
+		if (throwException) {
+			throw new RuntimeException("Mock exception al consultar document arxiu");
+		}
+		
 		String accioDescripcio = "Consulta d'un document";
 		Map<String, String> accioParams = new HashMap<String, String>();
 		if (document != null) {

@@ -70,6 +70,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -647,15 +648,18 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
 	@ResponseBody
-	public FitxerDto descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
+	public JsonResponse descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
 
 		try {
-			return expedientPeticioService.getAnnexContent(annexId, true);
-		} catch (Exception ex) {
-			System.out.println("Errol al descarregarBase64:" +  ExceptionUtils.getStackTrace(ex));
-			logger.error("Errol al descarregarBase64", ex);
-			throw ex;
+			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, true);
+			return new JsonResponse(fitxer);
+				
+		} catch (Exception e) {
+			logger.error("Errol al descarregarBase64", e);
+			return new JsonResponse(true, e.getMessage());
 		}
+		
+		
 	}
 	
 	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)

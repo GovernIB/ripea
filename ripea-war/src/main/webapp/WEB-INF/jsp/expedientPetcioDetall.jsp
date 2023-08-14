@@ -215,14 +215,25 @@ tr.clicable {
 			type: 'GET',
 			url: arxiuUrl,
 			responseType: 'arraybuffer',
-			success: function(response) {
-	            var blob = base64toBlob(response.contingut, response.contentType);
-	            var file = new File([blob], response.contentType, {type: response.contentType});
-	            link = URL.createObjectURL(file);
-	            
-	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-			    $('#container').removeClass('rmodal_loading');
-			    $('#container').attr('src', viewerUrl);
+			success: function(json) {
+				
+				if (json.error) {
+					$('#container').removeClass('rmodal_loading');
+					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
+				} else if (json.warning) {
+					$('#container').removeClass('rmodal_loading');
+					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
+				} else {
+					response = json.data;
+					var blob = base64toBlob(response.contingut, response.contentType);
+		            var file = new File([blob], response.contentType, {type: response.contentType});
+		            link = URL.createObjectURL(file);
+		            
+		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+				    $('#container').removeClass('rmodal_loading');
+				    $('#container').attr('src', viewerUrl);
+				}
+			    
 			},
 			error: function(xhr, ajaxOptions, thrownError) {
 				$('#container').removeClass('rmodal_loading');
