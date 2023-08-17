@@ -44,7 +44,6 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;

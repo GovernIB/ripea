@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class Utils {
 
@@ -111,7 +112,13 @@ public class Utils {
 	}
 	
 
-	
+	public static Throwable getRootCauseOrItself(Throwable e) {
+		if (e != null) {
+			return ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
+		} else {
+			return null;
+		}
+	}
 
 	
 	

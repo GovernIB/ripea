@@ -3,13 +3,50 @@
  */
 package es.caib.ripea.plugin.caib.notificacio;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+
 import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.client.NotificacioRestClientV2;
-import es.caib.notib.client.domini.*;
+import es.caib.notib.client.domini.Certificacio;
+import es.caib.notib.client.domini.DadesConsulta;
+import es.caib.notib.client.domini.Datat;
+import es.caib.notib.client.domini.DocumentV2;
+import es.caib.notib.client.domini.EntregaDeh;
+import es.caib.notib.client.domini.EntregaPostal;
+import es.caib.notib.client.domini.EntregaPostalViaTipusEnum;
+import es.caib.notib.client.domini.EnviamentReferenciaV2;
+import es.caib.notib.client.domini.EnviamentTipusEnum;
+import es.caib.notib.client.domini.InteressatTipusEnumDto;
+import es.caib.notib.client.domini.NotificaDomiciliConcretTipusEnumDto;
+import es.caib.notib.client.domini.NotificaServeiTipusEnumDto;
+import es.caib.notib.client.domini.NotificacioCanviClient;
+import es.caib.notib.client.domini.NotificacioV2;
+import es.caib.notib.client.domini.Registre;
+import es.caib.notib.client.domini.RespostaAltaV2;
+import es.caib.notib.client.domini.RespostaConsultaDadesRegistreV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatEnviamentV2;
+import es.caib.notib.client.domini.RespostaConsultaEstatNotificacioV2;
+import es.caib.notib.client.domini.RespostaConsultaJustificantEnviament;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.plugin.NotibRepostaException;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
@@ -25,19 +62,6 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementació de del plugin d'enviament de notificacions
@@ -142,12 +166,21 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				}
 			}
 
-			ObjectMapper mapper  = new ObjectMapper();
-			String body = mapper.writeValueAsString(notificacioNotib);
-			System.out.println(body);
 
 			//####### ALTA NOTIFICACIO ####################
-			RespostaAltaV2 respostaAlta = getNotificacioRestClient().alta(notificacioNotib);
+			RespostaAltaV2 respostaAlta = null;
+			try {
+				respostaAlta = getNotificacioRestClient().alta(notificacioNotib);
+			} catch (Exception e1) {
+				Throwable rootCause = Utils.getRootCauseOrItself(e1);
+				if (rootCause != null && rootCause instanceof UniformInterfaceException) {
+					logger.info("UniformInterfaceException on getNotificacioRestClient().alta(notificacioNotib)" +  rootCause.getMessage() + ". Resetting client and retrying...");
+					getNotificacioRestClient().resetClient();
+					respostaAlta = getNotificacioRestClient().alta(notificacioNotib);
+				} else {
+					throw e1;
+				}
+			}
 			
 			String referenciesString ="";
 			if(respostaAlta.getReferencies()!=null){
@@ -206,12 +239,7 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			}
 			
 		} catch (Exception ex) {
-			logger.error(
-					"No s'ha pogut enviar la notificació (" +
-					"emisorDir3Codi=" + notificacio.getEmisorDir3Codi() + ", " +
-					"enviamentTipus=" + notificacio.getEnviamentTipus() + ", " +
-					"concepte=" + notificacio.getConcepte() + ")",
-					ex);
+	
 			throw new SistemaExternException(
 					"No s'ha pogut enviar la notificació (" +
 					"emisorDir3Codi=" + notificacio.getEmisorDir3Codi() + ", " +
@@ -230,7 +258,19 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				identificador = testIdentificador;
 			}
 			
-			RespostaConsultaEstatNotificacioV2 respostaConsultaEstat = getNotificacioRestClient().consultaEstatNotificacio(identificador);
+			RespostaConsultaEstatNotificacioV2 respostaConsultaEstat = null;
+			try {
+				respostaConsultaEstat = getNotificacioRestClient().consultaEstatNotificacio(identificador);
+			} catch (Exception e1) {
+				Throwable rootCause = Utils.getRootCauseOrItself(e1);
+				if (rootCause != null && rootCause instanceof UniformInterfaceException) {
+					logger.info("UniformInterfaceException on getNotificacioRestClient().consultaEstatNotificacio(identificador)" +  rootCause.getMessage() + ". Resetting client and retrying...");
+					getNotificacioRestClient().resetClient();
+					respostaConsultaEstat = getNotificacioRestClient().consultaEstatNotificacio(identificador);
+				} else {
+					throw e1;
+				}
+			}
 
 			RespostaConsultaEstatNotificacio resposta = new RespostaConsultaEstatNotificacio();
 			resposta.setEstat(respostaConsultaEstat.getEstat() != null ? NotificacioEstat.valueOf(respostaConsultaEstat.getEstat().toString()) : null);
@@ -257,8 +297,20 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			if (test) {
 				referencia = testReferencia;
 			}
-			
-			RespostaConsultaEstatEnviamentV2 respostaConsultaEstat = getNotificacioRestClient().consultaEstatEnviament(referencia);
+			RespostaConsultaEstatEnviamentV2 respostaConsultaEstat = null;
+			try {
+				respostaConsultaEstat = getNotificacioRestClient().consultaEstatEnviament(referencia);
+			} catch (Exception e1) {
+				Throwable rootCause = Utils.getRootCauseOrItself(e1);
+				if (rootCause != null && rootCause instanceof UniformInterfaceException) {
+					logger.info("UniformInterfaceException on getNotificacioRestClient().consultaEstatEnviament(referencia);" +  rootCause.getMessage() + ". Resetting client and retrying...");
+					getNotificacioRestClient().resetClient();
+					respostaConsultaEstat = getNotificacioRestClient().consultaEstatEnviament(referencia);
+				} else {
+					throw e1;
+				}
+			}
+
 
 			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
 			
@@ -392,7 +444,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 	}
 
 
-
 	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
 		if (date == null) {
 			return null;
@@ -458,10 +509,12 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 					getUrl(),
 					getUsername(),
 					getPassword(),
-					true);
+					isDebug());
+
 		}
 		return clientV2;
 	}
+	
 
 	private String getUrl() {
 		return getProperty(
@@ -475,6 +528,14 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		return getProperty(
 				"plugin.notificacio.password");
 	}
+	
+	private boolean isDebug() {
+		return getAsBoolean(
+				"plugin.notificacio.debug");
+	}
+	
+	
+
 
 	
 	private static final Logger logger = LoggerFactory.getLogger(NotificacioPluginNotib.class);

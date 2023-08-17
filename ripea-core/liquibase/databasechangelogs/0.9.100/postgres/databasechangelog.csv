@@ -336,3 +336,4 @@
 "1685959676540-1","limit","db/changelog/changes/0.9.100/1287.yaml","2023-06-27T12:27:37.617","341","EXECUTED","8:9c0ede3d83084e28d9783be914dbc4ac","insert tableName=ipa_config","","","4.4.3","()","","7861656924"
 "1686745220463-1","limit","db/changelog/changes/0.9.100/1296.yaml","2023-06-27T12:27:37.683","342","EXECUTED","8:e944090c11b45ad5a6d89e38c67b4603","insert tableName=ipa_config",,"","4.4.3","()","","7861656924"
 "1691745729154-1","limit","db/changelog/changes/0.9.100/1326.yaml","2023-08-11T12:22:13.07","343","EXECUTED","8:c87cf89912e8b0049c728b2ea0c184c5","insert tableName=ipa_config","","","4.4.3","()","","1749332694"
+"1692195649405-1","limit","db/changelog/changes/0.9.100/1328.yaml","2023-08-16T16:38:31.064","251","EXECUTED","8:99249f3ab92d8b54d221ee0b7f8be963","insert tableName=ipa_config","","","4.4.3","()","","2196707964"

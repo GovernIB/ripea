@@ -467,21 +467,24 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				null,
 				true);
 
-		for (Firma arxiuFirma : document.getFirmes()) {
+		if (document != null) {
+			for (Firma arxiuFirma : document.getFirmes()) {
 
-			if (!FirmaTipus.CSV.equals(arxiuFirma.getTipus())) {
+				if (!FirmaTipus.CSV.equals(arxiuFirma.getTipus())) {
 
-				byte[] documentContingut = document.getContingut() != null ? document.getContingut().getContingut() : null;
-				byte[] firmaContingut = arxiuFirma.getContingut();
-				String contentType = document.getContingut().getTipusMime();
+					byte[] documentContingut = document.getContingut() != null ? document.getContingut().getContingut() : null;
+					byte[] firmaContingut = arxiuFirma.getContingut();
+					String contentType = document.getContingut().getTipusMime();
 
-				return pluginHelper.validaSignaturaObtenirFirmes(
-						documentContingut,
-						firmaContingut,
-						contentType, 
-						false);
+					return pluginHelper.validaSignaturaObtenirFirmes(
+							documentContingut,
+							firmaContingut,
+							contentType, 
+							false);
+				}
 			}
 		}
+
 		return null;
 	}
 	
