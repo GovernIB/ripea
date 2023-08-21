@@ -183,8 +183,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:organGestorIComu = false or (me.organGestor = :organ or me.organGestor is null)) " +
 			"and (:esAdminEntitat = true " +
 			" 	  or (:esAdminOrgan = true and (me.organGestor is null or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos))) " +
-			"     or (:esNullIdPermesos = false and me.id in (:idPermesos)) " +
-			"     or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos)) " +
+			"     or (:esNullMetaExpedientIdPermesos = false and me.id in (:metaExpedientIdPermesos)) " +
+			"     or (me.organGestor is not null and :esNullOrganIdPermesos = false and (me.organGestor.id) in (:organIdPermesos)) " +
 			"     or (me.organGestor is null and :esNullMetaExpedientOrganIdPermesos = false and meog.id in (:metaExpedientOrganIdPermesos)) " +
 			"	  or (:allComuns = true and me.organGestor is null)))")
 	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
@@ -195,17 +195,16 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("filtre") String filtre,
 			@Param("esAdminEntitat") boolean esAdminEntitat,
 			@Param("esAdminOrgan") boolean esAdminOrgan,
-			@Param("esNullIdPermesos") boolean hiHaIdPermesos,
-			@Param("idPermesos") List<Long> idPermesos,
-			@Param("esNullOrganIdPermesos") boolean hiHaOrganIdPermesos,
+			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos,
+			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
+			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos,
 			@Param("organIdPermesos") List<Long> organIdPermesos,
-			@Param("esNullMetaExpedientOrganIdPermesos") boolean hiHaMetaExpedientOrganIdPermesos,
+			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos,
 			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos, 
 			@Param("revisioActiva") boolean revisioActiva,
 			@Param("organGestorIComu") boolean organGestorIComu,
 			@Param("organ") OrganGestorEntity organ,
 			@Param("allComuns") boolean allComuns);
-	
 	
 	
 

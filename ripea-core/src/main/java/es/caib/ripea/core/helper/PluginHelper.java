@@ -3154,7 +3154,6 @@ public class PluginHelper {
 					respostaNotificioEstat.getDataEnviada(), 
 					respostaNotificioEstat.getDataFinalitzada());
 			
-			accioOk(integracioAccio);
 
 			DocumentNotificacioEstatEnumDto estatDespres = notificacio.getNotificacioEstat();
 			if (estatAnterior != estatDespres && (estatAnterior != DocumentNotificacioEstatEnumDto.FINALITZADA && estatDespres != DocumentNotificacioEstatEnumDto.PROCESSADA)) {
@@ -3164,7 +3163,7 @@ public class PluginHelper {
 			cacheHelper.evictErrorsValidacioPerNode(expedient);
 			cacheHelper.evictNotificacionsPendentsPerExpedient(expedient);
 			
-			
+			accioOk(integracioAccio);
 			return resposta;
 			
 		} catch (Exception ex) {

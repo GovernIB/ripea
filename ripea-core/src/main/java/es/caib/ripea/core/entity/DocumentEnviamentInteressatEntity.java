@@ -130,7 +130,7 @@ public class DocumentEnviamentInteressatEntity extends RipeaAuditable<Long> {
 			String enviamentCertificacioOrigen,
 			Boolean error,
 			String errorDescripcio) {
-		this.enviamentDatatEstat = enviamentDatatEstat.name();
+		this.enviamentDatatEstat = enviamentDatatEstat != null ? enviamentDatatEstat.name() : null;
 		this.enviamentDatatData = enviamentDatatData;
 		this.enviamentDatatOrigen = enviamentDatatOrigen;
 		this.enviamentCertificacioData = enviamentCertificacioData;
