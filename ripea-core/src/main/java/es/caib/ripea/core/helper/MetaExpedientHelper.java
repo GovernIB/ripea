@@ -48,6 +48,7 @@ import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.AvisEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
@@ -340,6 +341,7 @@ public class MetaExpedientHelper {
 				false, 
 				true, 
 				false);
+		
 		// Cercam els metaExpedients amb permisos assignats directament
 		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaNodeEntity.class,
@@ -348,12 +350,15 @@ public class MetaExpedientHelper {
 		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis));
+		organIds = organGestorRepository.findIdsByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organIds));
 		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
+		organIds = Utils.getUniqueValues(organIds);
+		
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaExpedientOrganGestorEntity.class,
 				permis));
-		organGestorHelper.afegirOrganGestorFillsIds(entitat, metaExpedientOrganIds);
+		// there is no need to find descendants because for the query to find procediments it doesn't matter  
 		
 		// Cercam els òrgans amb permisos per procediemnts comuns
 		List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
@@ -361,9 +366,27 @@ public class MetaExpedientHelper {
 				ExtendedPermission.COMU,
 				permis);
 		boolean accessAllComu = false;
-		if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
+		if (Utils.isNotEmpty(organProcedimentsComunsIds)) {
 			accessAllComu = true;
 		}
+		
+		
+		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+		// in issue #1330 unnecessary ids were removed from the lists
+		// but if despite it there are still 1000+ values new solution must be implemented to not truncate lists.
+		if (Utils.isBiggerThan(metaExpedientIds, 1000)) {
+			logger.info("Truncating metaExpedientIds to 1000 to avoid ORA-01795");
+			metaExpedientIds = metaExpedientIds.subList(0, 1000); 
+		}
+		if (Utils.isBiggerThan(organIds, 1000)) {
+			logger.info("Truncating organIds to 1000 to avoid ORA-01795");
+			organIds = organIds.subList(0, 1000);
+		}
+		if (Utils.isBiggerThan(metaExpedientOrganIds, 1000)) {
+			logger.info("Truncating metaExpedientOrganIds to 1000 to avoid ORA-01795");
+			metaExpedientOrganIds = metaExpedientOrganIds.subList(0, 1000);
+		}
+			
 
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(
 				entitat,
@@ -373,71 +396,19 @@ public class MetaExpedientHelper {
 				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
 				isAdminEntitat,
 				isAdminOrgan,
-				metaExpedientIds == null || metaExpedientIds.isEmpty(),
-				metaExpedientIds == null || metaExpedientIds.isEmpty() ? null : metaExpedientIds,
-				organIds == null || organIds.isEmpty(),
-				organIds == null || organIds.isEmpty() ? null : organIds,
-				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty(),
-				metaExpedientOrganIds == null || metaExpedientOrganIds.isEmpty() ? null : metaExpedientOrganIds, 
+				Utils.isEmpty(metaExpedientIds),
+				Utils.getNullIfEmpty(metaExpedientIds),
+				Utils.isEmpty(organIds),
+				Utils.getNullIfEmpty(organIds),
+				Utils.isEmpty(metaExpedientOrganIds),
+				Utils.getNullIfEmpty(metaExpedientOrganIds), 
 				isRevisioActiva(),
 				comu && organId != null,
 				organId != null ? organGestorRepository.findOne(organId) : null,
 				accessAllComu);
 		
 		
-/*		boolean onlyToCheckReadPermission = onlyToCheckReadPermission(permisos);
 
-		
-		if (onlyToCheckReadPermission || checkPerMassiuAdmin) {
-			if (rolActual.equals("tothom")) { 
-				permisosHelper.filterGrantedAll(
-						metaExpedients,
-						new ObjectIdentifierExtractor<MetaNodeEntity>() {
-							public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-								return metaNode.getId();
-							}
-						},
-						MetaNodeEntity.class,
-						permisos,
-						auth);
-					
-			} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-				permisosHelper.filterGrantedAll(
-						metaExpedients,
-						new ObjectIdentifierExtractor<MetaNodeEntity>() {
-							public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-								return metaNode.getId();
-							}
-						},
-						MetaNodeEntity.class,
-						permisos,
-						auth);
-
-				List<OrganGestorEntity> organs = organGestorHelper.findOrganismesEntitatAmbPermis(entitat.getId());
-				if (organs != null && !organs.isEmpty()) {
-					List<MetaExpedientEntity> metaExpedientsOfOrgans = metaExpedientRepository.findByOrganGestors(
-							entitat,
-							organs);
-					
-					metaExpedients.addAll(metaExpedientsOfOrgans);
-					// remove duplicates
-					metaExpedients = new ArrayList<MetaExpedientEntity>(new HashSet<MetaExpedientEntity>(metaExpedients));
-					
-				} 
-			}
-			
-		} else {
-			permisosHelper.filterGrantedAll(
-					metaExpedients,
-					new ObjectIdentifierExtractor<MetaNodeEntity>() {
-						public Long getObjectIdentifier(MetaNodeEntity metaNode) {
-							return metaNode.getId();
-						}
-					},
-					MetaNodeEntity.class,
-					permisos,
-					auth);
-		}*/
 		
 		return metaExpedients;
 	}

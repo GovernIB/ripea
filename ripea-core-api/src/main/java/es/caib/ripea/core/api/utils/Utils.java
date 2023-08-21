@@ -1,7 +1,9 @@
 package es.caib.ripea.core.api.utils;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -34,11 +36,25 @@ public class Utils {
 		return !StringUtils.equals(str1, str2);
 	}
 	
+    public static boolean isEmpty(final Collection<?> coll) {
+        return CollectionUtils.isEmpty(coll);
+     }
 
     public static boolean isNotEmpty(final Collection<?> coll) {
        return CollectionUtils.isNotEmpty(coll);
     }
-    
+    public static boolean isBiggerThan(final Collection<?> coll, int size) {
+        return CollectionUtils.isNotEmpty(coll) && coll.size() > size;
+    }
+
+	public static <T> List<T> getUniqueValues(List<T> objects) {
+		if (CollectionUtils.isNotEmpty(objects)) {
+			return new ArrayList<T>(new HashSet<T>(objects));
+		} else {
+			return null;
+		}
+	}
+
 	public static boolean isNotEmpty(final byte[] array) {
 		return ArrayUtils.isNotEmpty(array);
 	}
