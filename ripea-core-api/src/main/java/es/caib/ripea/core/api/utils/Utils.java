@@ -54,6 +54,45 @@ public class Utils {
 			return null;
 		}
 	}
+	
+	public static <T> T getFirst(List<T> objects) {
+		if (isNotEmpty(objects)) {
+			return objects.get(0);
+		} else {
+			return null;
+		}
+	}
+	
+	public static <T> T getLast(List<T> objects) {
+		if (isNotEmpty(objects)) {
+			return objects.get(objects.size() - 1);
+		} else {
+			return null;
+		}
+	}
+	
+	public static <S extends Enum<S>, D extends Enum<D>> D convertEnum(S source, Class<D> destinationClass) {
+		try {
+			if (source != null) {
+				return Enum.valueOf(destinationClass, source.toString());
+			} else {
+				return null;
+			}
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+	
+	
+    public static String toString(Object obj) {
+        return String.valueOf(obj);
+    }
+	
+	public static <T> void removeLast(List<T> objects) {
+		if (isNotEmpty(objects)) {
+			objects.remove(objects.size() - 1);
+		}
+	}
 
 	public static boolean isNotEmpty(final byte[] array) {
 		return ArrayUtils.isNotEmpty(array);

@@ -116,7 +116,7 @@ public class DocumentHelper {
 		
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
-			metaDocument = metaDocumentService.findById(entitatId, metaDocumentId);
+			metaDocument = metaDocumentService.findById(metaDocumentId);
 		} else {
 			metaDocument = metaDocumentService.findByTipusGeneric(
 					entitatId, 

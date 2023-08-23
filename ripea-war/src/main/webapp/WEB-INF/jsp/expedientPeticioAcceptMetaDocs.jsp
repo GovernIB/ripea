@@ -6,6 +6,10 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:set var="titol">
 	<spring:message code="expedient.peticio.form.acceptar.titol" /> - <spring:message code="expedient.peticio.form.acceptar.escollir.metadocs.titol" />
+	<c:if test="${size!=0}">
+		(${index + 1} / ${size})
+	</c:if>
+	
 </c:set>
 <html>
 <head>
@@ -66,56 +70,6 @@
 
 $(document).ready(function(){
 
-var metaDocs = [];
-<c:forEach var="metaDoc" items="${metaDocuments}" varStatus="status">
-metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple}, 'nom': '${metaDoc.nom}'});
-</c:forEach>
-
-	var listOfSelectedNotMultiple = [];
-	$("[id$=metaDocumentId]").on('change', function(e) {
-
-		elementWithChange = $(this);
-		elementWithChangeId = $(this).val();
-		
-		listOfSelectedNotMultiple = [];
-		$("[id$=metaDocumentId]").each( function() {
-			elemeId = $(this).val();
-			for (var md in metaDocs) {
-				if (elemeId == metaDocs[md].id && metaDocs[md].permetMultiple==false) {
-					listOfSelectedNotMultiple.push(metaDocs[md]);
-				}
-			}
-		});
-		
-		$("[id$=metaDocumentId]").each( function() {
-			var other = $(this);
-			var otherId = $(this).val();
-			if (!other.is(elementWithChange)) {
-				var thisList = [];
-				for (var md in metaDocs) {
-					var addToList = true;
-					for (var nm in listOfSelectedNotMultiple) {
-						if (listOfSelectedNotMultiple[nm].id == metaDocs[md].id && listOfSelectedNotMultiple[nm].id != otherId) {
-							addToList = false;
-						}
-					}
-					if (addToList) {
-						thisList.push(metaDocs[md]);
-					}
-				}
-				var idElem = other.attr('id');
-				idElem = idElem.replace(/\[/g, '\\[').replace(/\]/g, '\\]').replace(/\./g, '\\.');
-				$('#' + idElem + ' option[value!=""]').remove();
-				for (var i = 0; i < thisList.length; i++) {
-					other.append('<option value="' + thisList[i].id + '">' + thisList[i].nom + '</option>');
-				}
-				$(other).val(otherId);
-				
-			}
-		});
-	});
-
-	$("[id$=metaDocumentId]").trigger( "change" );
 	
 	$("button#btnSave").submit(function (e) {
 	    e.preventDefault();
@@ -128,7 +82,7 @@ metaDocs.push({'id': ${metaDoc.id}, 'permetMultiple': ${metaDoc.permetMultiple},
 
 var previousAnnex;
 function showViewer(event, annexId, observacions, dataCaptura, origen) {
-    var resumViewer = $('#annex-viewer-' + annexId);
+    var resumViewer = $('#annex-viewer');
 	// Mostrar/amagar visor
 	if (!resumViewer.is(':visible')) {
 		resumViewer.slideDown(500);
@@ -142,9 +96,9 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 	previousAnnex = annexId;
 	
     // Mostrar contingut capçalera visor
-    resumViewer.find('*').not('#container-previs-' + annexId).remove();
+    resumViewer.find('*').not('#container-previs').remove();
     var viewerContent = '<div class="panel-heading"><spring:message code="registre.detalls.pipella.previsualitzacio"/> \
-    					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer(' + annexId + ')"></span>\
+    					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
     					 </div>\
     					 <div class="viewer-content viewer-padding">\
     						<dl class="dl-horizontal">\
@@ -191,8 +145,8 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 
     // Recuperar i mostrar document al visor
 	var urlDescarrega = "<c:url value="/expedientPeticio/annex/"/>" + annexId + "/content";
-	$('#container-previs-' + annexId).attr('src', '');
-	$('#container-previs-' + annexId).addClass('rmodal_loading');
+	$('#container-previs').attr('src', '');
+	$('#container-previs').addClass('rmodal_loading');
 	showDocument(urlDescarrega, annexId);
 }
 
@@ -205,11 +159,11 @@ function showDocument(arxiuUrl, annexId) {
 		success: function(json) {
 			
 			if (json.error) {
-				$('#container-previs-' + annexId).removeClass('rmodal_loading');
-				$('#annex-viewer-' + annexId  + ' .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
+				$('#container-previs').removeClass('rmodal_loading');
+				$('#annex-viewer .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
 			} else if (json.warning) {
-				$('#container-previs-' + annexId).removeClass('rmodal_loading');
-				$('#annex-viewer-' + annexId  + ' .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
+				$('#container-previs-').removeClass('rmodal_loading');
+				$('#annex-viewer .viewer-padding:last').before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
 			} else {
 				response = json.data;
 				var blob = base64toBlob(response.contingut, response.contentType);
@@ -217,21 +171,21 @@ function showDocument(arxiuUrl, annexId) {
 	            link = URL.createObjectURL(file);
 	            
 	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-			    $('#container-previs-' + annexId).removeClass('rmodal_loading');
-			    $('#container-previs-' + annexId).attr('src', viewerUrl);
+			    $('#container-previs').removeClass('rmodal_loading');
+			    $('#container-previs').attr('src', viewerUrl);
 			}
 		    
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
-			$('#container-previs-' + annexId).removeClass('rmodal_loading');
+			$('#container-previs').removeClass('rmodal_loading');
 			alert(thrownError);
 		}
 	});
 }
 
 // Amagar visor
-function closeViewer(annexId) {
-	$('#annex-viewer-' + annexId).slideUp(500, function(){
+function closeViewer() {
+	$('#annex-viewer').slideUp(500, function(){
 	});
 }
 
@@ -243,24 +197,23 @@ function closeViewer(annexId) {
 <body>
 
 	<c:set var="formAction">
-		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
+	<c:choose>
+		<c:when test="${lastOne}">
+			<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
+		</c:when>
+		<c:otherwise>
+			<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/getNextAnnex" />
+		</c:otherwise>
+	</c:choose>
+		
 	</c:set>
-	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
-		<form:hidden path="id" />
-		<form:hidden path="accio"/>
-		<form:hidden path="metaExpedientId"/>
-		<form:hidden path="expedientId"/>
-		<form:hidden path="organGestorId"/>
-		<form:hidden path="any"/> 			
-		<form:hidden path="associarInteressats"/> 
-		<form:hidden path="agafarExpedient"/>
-		<form:hidden path="newExpedientTitol"/>
+	<form:form id="annexForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="registreAnnexCommand">
+
 		
 		<c:choose>
-			<c:when test="${!empty expedientPeticioAcceptarCommand.annexos}">
-				<c:forEach items="${expedientPeticioAcceptarCommand.annexos}" varStatus="vs" var="annex">
+			<c:when test="${!empty registreAnnexCommand}">
 					<div class="well"> 
-						<form:hidden path="annexos[${vs.index}].id" />
+						<form:hidden path="id" />
 						
 						<div <c:choose>
 								<c:when test="${annex.tipusMime == 'application/pdf' }">
@@ -272,16 +225,22 @@ function closeViewer(annexId) {
 									class="disabled-icon"
 								</c:otherwise>
 							 </c:choose>>
-							<rip:inputText name="annexos[${vs.index}].titolINom" textKey="expedient.peticio.form.acceptar.camp.annex.nom" required="true" readonly = "true"/>
+							<rip:inputText name="titolINom" textKey="${registreAnnexCommand.id == -1 ? 'expedient.peticio.form.acceptar.camp.justificnat.nom' : 'expedient.peticio.form.acceptar.camp.annex.nom'}" readonly = "true"/>
 						</div>
-						<rip:inputSelect name="annexos[${vs.index}].metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
+						<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
+						<rip:inputDate name="ntiFechaCaptura" textKey="registre.annex.detalls.camp.eni.data.captura" readonly="true" required="true"/>
+						<rip:inputText name="ntiOrigen" textKey="registre.annex.detalls.camp.eni.origen" readonly="true"/>
+						<rip:inputSelect name="ntiTipoDocumental" textKey="registre.annex.detalls.camp.eni.tipus.documental" disabled="true" optionEnum="NtiTipoDocumentoEnumDto"/>
+						<rip:inputSelect name="sicresTipoDocumento" textKey="registre.annex.detalls.camp.sicres.tipus.document" disabled="true" optionEnum="SicresTipoDocumentoEnumDto"/>
+						<rip:inputText name="observacions" textKey="registre.annex.detalls.camp.observacions" readonly = "true"/>
+						<rip:inputSelect name="annexArxiuEstat" textKey="registre.annex.detalls.camp.estat.arxiu" disabled="true" optionEnum="ArxiuEstatEnumDto"/>
+
 					</div>
 					
-					<div class="panel panel-default annex-viewer" id="annex-viewer-${annex.id}">
-						<iframe id="container-previs-${annex.id}" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
+					<div class="panel panel-default annex-viewer" id="annex-viewer">
+						<iframe id="container-previs" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
 					</div>  
 					
-				</c:forEach>
 			</c:when>
 			<c:otherwise>
 				<div class="well"> 
@@ -291,16 +250,17 @@ function closeViewer(annexId) {
 			</c:otherwise>
 		</c:choose>
 		
-		<c:if test="${!empty expedientPeticioAcceptarCommand.justificant}">
-			<c:set var="justificant" value="${expedientPeticioAcceptarCommand.justificant}"></c:set>
-			<div class="well"> 
-				<form:hidden path="justificant.id" />
-				<rip:inputText name="justificant.titolINom" textKey="expedient.peticio.form.acceptar.camp.justificnat.nom" required="true" readonly = "true"/>
-				<rip:inputSelect name="justificant.metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
-			</div>
-		</c:if>
 		<div id="modal-botons" class="well">
-			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" /></button>
+			<button id="btnSave" type="submit" class="btn btn-success">
+			<c:choose>
+				<c:when test="${lastOne}">
+					<span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" />
+				</c:when>
+				<c:otherwise>
+					<span class="fa fa-arrow-right"></span> <spring:message code="comu.boto.next" />
+				</c:otherwise>
+			</c:choose>			
+			</button>
 			<a href="<c:url value="/expedientPeticio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
 		</div>
 	</form:form>

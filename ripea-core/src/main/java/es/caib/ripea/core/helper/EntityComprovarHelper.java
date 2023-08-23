@@ -325,18 +325,6 @@ public class EntityComprovarHelper {
 	
 
 
-	
-	public MetaExpedientEntity comprovarMetaExpedient(Long entitatId, Long metaExpedientId) {
-		EntitatEntity entitat = comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				false,
-				false);
-		return comprovarMetaExpedient(entitat, metaExpedientId);
-	}
-
 	public MetaExpedientEntity comprovarMetaExpedient(EntitatEntity entitat, Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
 		if (metaExpedient == null) {
@@ -445,20 +433,12 @@ public class EntityComprovarHelper {
 	public MetaDocumentEntity comprovarMetaDocument(
 			Long entitatId,
 			Long metaDocumentId) {
-		EntitatEntity entitat = comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				false,
-				false);
 
 		return comprovarMetaDocument(
-				entitat,
 				metaDocumentId);
 	}
 
-	public MetaDocumentEntity comprovarMetaDocument(EntitatEntity entitat, Long metaDocumentId) {
+	public MetaDocumentEntity comprovarMetaDocument(Long metaDocumentId) {
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(metaDocumentId);
 		if (metaDocument == null) {
 			throw new NotFoundException(metaDocumentId, MetaDocumentEntity.class);
@@ -470,13 +450,9 @@ public class EntityComprovarHelper {
 		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
 			metaDocumentEntitat = HibernateHelper.deproxy(metaDocumentEntitat);
 		}
-		if (!entitat.equals(metaDocumentEntitat)) {
-			throw new ValidationException(metaDocumentId, MetaDocumentEntity.class,
-			        "L'entitat especificada (id=" + entitat.getId()
-			                + ") no coincideix amb l'entitat del meta-document");
-		}
+
 		if (metaDocument.getMetaExpedient() != null) {
-			comprovarMetaExpedient(entitat, metaDocument.getMetaExpedient().getId());
+			comprovarMetaExpedient(metaDocument.getMetaExpedient().getId());
 		}
 
 		return metaDocument;
@@ -519,7 +495,6 @@ public class EntityComprovarHelper {
 					id);
 		} else {
 			metaDocument = comprovarMetaDocument(
-					entitat,
 					id);
 		}
 		if (comprovarActiu) {

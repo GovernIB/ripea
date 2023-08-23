@@ -119,7 +119,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				" [" + document.getExpedientPare().getNom() + "]");
 		
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
-				entitatActual.getId(),
 				document.getMetaDocument().getId());		
 		
 		command.setPortafirmesSequenciaTipus(metaDocument.getPortafirmesSequenciaTipus());
@@ -149,7 +148,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				documentId, 
 				tascaId);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(
-				entitatActual.getId(),
 				document.getMetaDocument().getId());
 		
 		if (command.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && (command.getPortafirmesResponsables() == null || command.getPortafirmesResponsables().length == 0)) {

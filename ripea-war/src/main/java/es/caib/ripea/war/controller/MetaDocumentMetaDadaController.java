@@ -80,7 +80,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		model.addAttribute(
 				"esRevisor",
 				rolActual.equals("IPA_REVISIO"));
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		if (metaDocument.getMetaExpedientId() != null) {
 			MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaDocument.getMetaExpedientId());
 			if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
@@ -138,7 +138,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		model.addAttribute(command);
 		
 		model.addAttribute("existContingut",  documentService.countByMetaDocument(entitatActual.getId(), metaDocumentId) != 0);
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		if (metaDocument.getMetaExpedientId() != null) {
 			MetaExpedientDto metaExpedient = comprovarAccesMetaExpedient(request, metaDocument.getMetaExpedientId());
 			if (metaExpedient != null && metaExpedientService.isRevisioActiva()) { // es tracta d'una modificació
@@ -175,7 +175,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			return "metaDadaForm";
 		}
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		boolean metaExpedientPendentRevisio = metaDocument.getMetaExpedientId() != null ? metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId()) : false;
 		
 		if (command.getId() != null) {
@@ -205,7 +205,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true, rolActual, organActual != null ? organActual.getId() : null);
 		
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		
 		if (metaDocument.getMetaExpedientId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
@@ -230,7 +230,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false, rolActual, organActual != null ? organActual.getId() : null);
 		
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		
 		if (metaDocument.getMetaExpedientId() != null) {
 			boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId());
@@ -253,7 +253,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 			metaDadaService.delete(entitatActual.getId(), metaDocumentId, metaDadaId, rolActual, organActual != null ? organActual.getId() : null);
 			
-			MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metaDocumentId);
+			MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 			boolean metaExpedientPendentRevisio = metaDocument.getMetaExpedientId() != null ? metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId()) : false;
 
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {

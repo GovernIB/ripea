@@ -2083,7 +2083,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long metaExpedientId) {
 		
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitatId,
 				metaExpedientId);
 		
 		List<ExpedientEntity> expedients = expedientRepository.findByMetaExpedient(metaExpedient);

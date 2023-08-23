@@ -1105,7 +1105,6 @@ public class DocumentServiceImpl implements DocumentService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaDocumentId());
 		}
 		
@@ -1194,7 +1193,6 @@ public class DocumentServiceImpl implements DocumentService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaDocumentId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
@@ -1774,7 +1772,6 @@ public class DocumentServiceImpl implements DocumentService {
 			Long metaDocumentId) {
 		
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
-				entitatId,
 				metaDocumentId);
 		
 		List<DocumentEntity> documents = documentRepository.findByMetaNode(entity);

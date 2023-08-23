@@ -265,7 +265,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, false, false);
 
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
 				metaDocument.getId());
 		
 		entity.update(
@@ -458,21 +457,21 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Transactional(readOnly = true)
 	@Override
 	public MetaDocumentDto findById(
-			Long entitatId,
 			Long metaDocumentId) {
 		logger.debug("Consulta del meta-document (" +
-				"entitatId=" + entitatId + ", " +
 				"metaDocumentId=" + metaDocumentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
+
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
+				metaDocumentId);
+		
+		entityComprovarHelper.comprovarEntitat(
+				metaDocument.getEntitat().getId(),
 				false,
 				false,
 				false, 
 				true, 
 				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				metaDocumentId);
+		
 		
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
 				metaDocument,
@@ -641,7 +640,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				false,
 				true, false, false);
-		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(entitat, id);
+		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(id);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(metaDocumentEntitiy.getPlantillaNom());
 		fitxer.setContentType(metaDocumentEntitiy.getPlantillaContentType());
@@ -928,7 +927,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, 
 				true);
 		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat, 
 				metaDocumentId);
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
 				entitat, 
@@ -948,18 +946,19 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Transactional
 	@Override
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
-			Long entitatId, 
 			Long metaExpedientId) throws NotFoundException {
 		
+		
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
+		
 		entityComprovarHelper.comprovarEntitat(
-				entitatId,
+				metaExpedientEntity.getEntitat().getId(),
 				false,
 				false,
 				false, 
 				true, 
 				false);
 		
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(metaExpedientEntity);
 		return conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
 	}

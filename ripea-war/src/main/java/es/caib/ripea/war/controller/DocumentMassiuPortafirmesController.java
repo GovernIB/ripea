@@ -308,7 +308,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
 
-			MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metadocumentId);
+			MetaDocumentDto metaDocument = metaDocumentService.findById(metadocumentId);
 			String fluxPerDefecteId = metaDocument.getPortafirmesFluxId();
 			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
 				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId);

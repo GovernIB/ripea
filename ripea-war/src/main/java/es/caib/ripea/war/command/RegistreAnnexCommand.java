@@ -7,6 +7,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,10 +29,16 @@ public class RegistreAnnexCommand {
 	private String nom;
 	private String titolINom;
 
-	private String observacions;
+	private String tipusMime;
+	
+	
 	private Date ntiFechaCaptura;
 	private String ntiOrigen;
-	private String tipusMime;
+	private String ntiTipoDocumental;
+	private String sicresTipoDocumento;
+	private String ntiEstadoElaboracion;
+	private String observacions;
+	private ArxiuEstatEnumDto annexArxiuEstat;
 
 
 	public String getTitolINom() {

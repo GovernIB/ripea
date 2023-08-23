@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.MetaDadaDto;
 import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.NtiTipoDocumentoEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
@@ -52,6 +53,8 @@ import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
+import es.caib.ripea.core.api.dto.SicresTipoDocumentoEnumDto;
+import es.caib.ripea.core.api.dto.SicresValidezDocumentoEnumDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.dto.config.OrganConfigDto;
@@ -696,6 +699,8 @@ public class ConversioTipusHelper {
 					}
 				});
 		
+		
+		
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<RegistreAnnexEntity, RegistreAnnexDto>() {
 					@Override
@@ -707,11 +712,14 @@ public class ConversioTipusHelper {
 						target.setFirmaTipus(source.getFirmaTipus() != null ? source.getFirmaTipus().toString() : null);
 						target.setNtiFechaCaptura(source.getNtiFechaCaptura());
 						target.setNtiOrigen(source.getNtiOrigen() != null ? source.getNtiOrigen().toString() : null);
-						target.setNtiTipoDocumental(source.getNtiTipoDocumental() != null ? source.getNtiTipoDocumental().toString() : null);
-						target.setNtiEstadoElaboracion(source.getNtiEstadoElaboracion() != null ? source.getNtiEstadoElaboracion().toString() : null);
+						target.setNtiTipoDocumental(Utils.convertEnum(source.getNtiTipoDocumental(), NtiTipoDocumentoEnumDto.class));
+						
+						target.setNtiEstadoElaboracion(Utils.toString(source.getNtiEstadoElaboracion()));
+						
 						target.setObservacions(source.getObservacions());
-						target.setSicresTipoDocumento(source.getSicresTipoDocumento() != null ? source.getSicresTipoDocumento().toString() : null);
-						target.setSicresValidezDocumento(source.getSicresValidezDocumento() != null ? source.getSicresValidezDocumento().toString() : null);
+						
+						target.setSicresTipoDocumento(Utils.convertEnum(source.getSicresTipoDocumento(), SicresTipoDocumentoEnumDto.class));
+						target.setSicresValidezDocumento(Utils.convertEnum(source.getSicresValidezDocumento(), SicresValidezDocumentoEnumDto.class));
 						target.setTamany(source.getTamany());
 						target.setTipusMime(source.getTipusMime());
 						target.setTitol(source.getTitol());

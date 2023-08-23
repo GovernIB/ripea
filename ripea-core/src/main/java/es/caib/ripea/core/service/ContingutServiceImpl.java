@@ -1574,7 +1574,6 @@ public class ContingutServiceImpl implements ContingutService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaDocumentId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
@@ -1655,7 +1654,6 @@ public class ContingutServiceImpl implements ContingutService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaExpedientId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
@@ -1721,7 +1719,6 @@ public class ContingutServiceImpl implements ContingutService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaDocumentId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);

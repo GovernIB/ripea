@@ -233,9 +233,8 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@Override
 	@RolesAllowed("tothom")
 	public MetaDocumentDto findById(
-			Long entitatId,
 			Long metaDocumentId) {
-		return delegate.findById(entitatId, metaDocumentId);
+		return delegate.findById(metaDocumentId);
 	}
 
 	@Override
@@ -263,10 +262,8 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 	@Override
 	@RolesAllowed("tothom")
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
-			Long entitatId,
 			Long metaExpedientId) throws NotFoundException {
 		return delegate.findByMetaExpedientAndPerDefecteTrue(
-				entitatId, 
 				metaExpedientId);
 	}
 

@@ -93,7 +93,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			Model model) {
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), command.getMetaDocumentId());
+		MetaDocumentDto metaDocument = metaDocumentService.findById(command.getMetaDocumentId());
 	
 		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
 			if (StringUtils.isEmpty(command.getDataNaixementObligatori())) {
@@ -147,7 +147,6 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = metaDocumentService.findById(
-				entitatActual.getId(),
 				metaDocumentId).
 				getPinbalServeiDocsPermesos();
 

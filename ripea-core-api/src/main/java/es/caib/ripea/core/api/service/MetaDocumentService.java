@@ -357,16 +357,13 @@ public interface MetaDocumentService {
 	
 	/**
 	 * Consulta la llista de tipus de document del plugin de portafirmes.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
 	 * @param metaDocumentId
 	 *            Id del tipus de document.
+	 * 
 	 * @return El tipus de document o null si el plugin no suporta la consulta.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	MetaDocumentDto findById(
-			Long entitatId,
 			Long metaDocumentId);
 	
 	/**
@@ -419,7 +416,6 @@ public interface MetaDocumentService {
 	
 	@PreAuthorize("hasRole('tothom')")
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
-			Long entitatId,
 			Long metaExpedientId) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
