@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -212,9 +213,16 @@ public class MetaExpedientHelper {
 				return procedimentIds;
 			}
 			OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);
-			List<Long> procedimentsByOrganGestor = metaExpedientRepository.findByOrgansGestors(organGestor.getAllChildren());
-			if (procedimentsByOrganGestor != null)
-				procedimentIds.addAll(procedimentsByOrganGestor);
+			
+			List<OrganGestorEntity> all = organGestor.getAllChildren();
+			// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+			List<List<OrganGestorEntity>> sublists = ListUtils.partition(all, 1000);
+			List<Long> procedimentsByOrganGestor = new ArrayList<>();
+			for (List<OrganGestorEntity> sublist : sublists) {
+				procedimentsByOrganGestor.addAll(metaExpedientRepository.findByOrgansGestors(sublist));
+			}
+
+			procedimentIds.addAll(procedimentsByOrganGestor);
 			return procedimentIds;
 		}
 	}
