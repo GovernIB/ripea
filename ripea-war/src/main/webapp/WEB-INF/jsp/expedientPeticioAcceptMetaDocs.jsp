@@ -148,6 +148,11 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 	$('#container-previs').attr('src', '');
 	$('#container-previs').addClass('rmodal_loading');
 	showDocument(urlDescarrega, annexId);
+
+	// scroll down
+	$([document.documentElement, document.body]).animate({
+        scrollTop: $("#annex-viewer").offset().top - 40
+    }, 500);
 }
 
 function showDocument(arxiuUrl, annexId) {
@@ -209,15 +214,15 @@ function closeViewer() {
 	</c:set>
 	<form:form id="annexForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="registreAnnexCommand">
 
-		
 		<c:choose>
 			<c:when test="${!empty registreAnnexCommand}">
 					<div class="well"> 
 						<form:hidden path="id" />
+						<form:hidden path="tipusMime" />
 						
 						<div <c:choose>
-								<c:when test="${annex.tipusMime == 'application/pdf' }">
-									onclick="showViewer(event, ${annex.id}, '${annex.observacions}', '${annex.ntiFechaCaptura}', '${annex.ntiOrigen}')"
+								<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf' }">
+									onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}')"
 									title="<spring:message code="registre.annex.detalls.previsualitzar"/>" 
 								</c:when>
 								<c:otherwise>

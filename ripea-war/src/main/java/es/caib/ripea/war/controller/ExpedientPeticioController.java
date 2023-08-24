@@ -394,7 +394,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			RegistreAnnexCommand registreAnnexCommand,
 			Model model,
 			BindingResult bindingResult,
-			boolean isNext) {
+			boolean isThereNext) {
 		
 		
 		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
@@ -414,17 +414,23 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			bindingResult.rejectValue("metaDocumentId", "NotNull");
 		}	
 
+		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_INDEX);	
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("metaDocuments", tipusDocsDisponibles);
-		} else {
 			
-			Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
+			setIndexAndSize(
 					request,
-					SESSION_ATTRIBUTE_INDEX);	
+					model,
+					index,
+					expedientPeticioAcceptarCommand.getAnnexos().size());
+		} else {
 			
 			expedientPeticioAcceptarCommand.getAnnexos().get(index).setMetaDocumentId(registreAnnexCommand.getMetaDocumentId());
 			
-			if (isNext) {
+			if (isThereNext) {
 				
 				index++;
 				setIndexAndSize(
