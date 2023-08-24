@@ -5,7 +5,6 @@ package es.caib.ripea.core.helper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
@@ -301,8 +301,17 @@ public class EntityComprovarHelper {
 			organIdPermesos.addAll(organsIdsPerMetaExpedientOrganIdPermesos);
 		}
 		
-		List<Long> organsWithoutDuplicates = !organIdPermesos.isEmpty() ? new ArrayList<Long>(new HashSet<Long>(organIdPermesos)) : null;
-	    List<OrganGestorEntity> organGestors = organGestorRepository.findByEntitatAndIds(entitat, organsWithoutDuplicates);
+		organIdPermesos = Utils.getUniqueValues(organIdPermesos);
+		
+		List<OrganGestorEntity> organGestors = new ArrayList<>();
+		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+		List<List<Long>> sublists = org.apache.commons.collections4.ListUtils.partition(organIdPermesos, 1000);
+
+		for (List<Long> sublist : sublists) {
+			organGestors.addAll(organGestorRepository.findByEntitatAndIds(entitat, sublist));
+		}
+		
+		
 	    return organGestors;
 		
 	}

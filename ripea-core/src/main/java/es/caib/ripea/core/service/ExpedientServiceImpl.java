@@ -1820,15 +1820,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		long t3 = System.currentTimeMillis();
 		OrganGestorEntity organGestorFiltre = null;
 		if (filtre.getOrganGestorId() != null) {
-			if (rolActual.equals("IPA_ADMIN")) {
-				organGestorFiltre = entityComprovarHelper.comprovarOrganGestorAdmin(
-						entitat.getId(),
-						filtre.getOrganGestorId());
-			} else {
-				organGestorFiltre = entityComprovarHelper.comprovarOrganGestorPerRolUsuari(
-						entitat,
-						filtre.getOrganGestorId());
-			}
+			organGestorFiltre = organGestorRepository.findOne(filtre.getOrganGestorId());
 		}
 		expedientFiltreCalculat.setOrganGestorFiltre(organGestorFiltre);
 		if (cacheHelper.mostrarLogsRendiment())

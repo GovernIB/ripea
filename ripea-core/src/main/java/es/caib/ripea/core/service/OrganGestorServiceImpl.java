@@ -42,6 +42,7 @@ import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
@@ -798,8 +799,18 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 		}
 		OrganGestorEntity organGestor = organGestorRepository.findOne(organGestorId);			
 		List<OrganGestorEntity> organGestorsCanditats = organGestor.getAllChildren();
-		List<OrganGestorEntity> filtrats = organGestorRepository.findByCanditatsAndFiltre(
-				organGestorsCanditats, filter == null || filter.isEmpty(), filter);
+		
+		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+		List<List<OrganGestorEntity>> sublists = org.apache.commons.collections4.ListUtils.partition(organGestorsCanditats, 1000);
+		List<OrganGestorEntity> filtrats = new ArrayList<>();
+		for (List<OrganGestorEntity> list : sublists) {
+			filtrats.addAll(
+					organGestorRepository.findByCanditatsAndFiltre(
+							list,
+							filter == null || filter.isEmpty(),
+							filter));
+		}
+
 		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
 	}
 	
@@ -833,7 +844,21 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			
 			List<OrganGestorEntity> organGestorsCanditats = entityComprovarHelper.getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
 			organGestorsCanditats = !organGestorsCanditats.isEmpty() ? organGestorsCanditats : null;
-			filtrats = organGestorRepository.findByCanditatsAndFiltre(organGestorsCanditats, filter == null || filter.isEmpty(), filter);
+			
+			if (Utils.isNotEmpty(organGestorsCanditats)) {
+				
+				// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+				List<List<OrganGestorEntity>> sublists = org.apache.commons.collections4.ListUtils.partition(organGestorsCanditats, 1000);
+
+				for (List<OrganGestorEntity> sublist : sublists) {
+					filtrats.addAll(
+							organGestorRepository.findByCanditatsAndFiltre(
+									sublist,
+									filter == null || filter.isEmpty(),
+									filter));
+				}
+			}
+			
 		}
 		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
 	}

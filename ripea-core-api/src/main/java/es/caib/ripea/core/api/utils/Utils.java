@@ -48,7 +48,7 @@ public class Utils {
     }
 
 	public static <T> List<T> getUniqueValues(List<T> objects) {
-		if (CollectionUtils.isNotEmpty(objects)) {
+		if (objects != null) {
 			return new ArrayList<T>(new HashSet<T>(objects));
 		} else {
 			return null;
