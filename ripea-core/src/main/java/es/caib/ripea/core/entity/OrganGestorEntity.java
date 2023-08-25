@@ -54,6 +54,9 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     
     @Column(name = "cif", length = 10)
     private String cif;
+    
+    @Column(name = "utilitzar_cif_pinbal")
+    private boolean utilitzarCifPinbal;
 
     @Column(name = "estat", length = 1)
     @Enumerated(EnumType.STRING)
@@ -176,12 +179,14 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 			String nom,
 			OrganGestorEntity pare,
 			boolean gestioDirect, 
-			String cif) {
+			String cif,
+			boolean utilitzarCifPinbal) {
 		this.codi = codi;
 		this.nom = nom;
 		this.pare = pare;
 		this.gestioDirect = gestioDirect;
 		this.cif = cif;
+		this.utilitzarCifPinbal = utilitzarCifPinbal;
 	}
 	
 	public void updateEstat(

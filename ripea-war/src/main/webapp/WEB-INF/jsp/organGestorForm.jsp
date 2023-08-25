@@ -41,6 +41,7 @@
 				labelSize="2"/>
 				
 		<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2"/>
+		<rip:inputCheckbox name="utilitzarCifPinbal" textKey="organgestor.form.camp.utilitzar.cif.pinbal" labelSize="2" />
 				
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

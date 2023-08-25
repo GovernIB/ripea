@@ -695,6 +695,7 @@ public class ConversioTipusHelper {
 						target.setEstat(source.getEstat());
 						target.setTipusTransicio(source.getTipusTransicio());
 						target.setCif(source.getCif());
+						target.setUtilitzarCifPinbal(source.isUtilitzarCifPinbal());
 						return target;
 					}
 				});

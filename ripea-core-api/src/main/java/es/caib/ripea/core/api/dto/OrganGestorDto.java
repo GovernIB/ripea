@@ -33,6 +33,7 @@ public class OrganGestorDto extends AuditoriaDto {
     private TipusTransicioEnumDto tipusTransicio;
     
     private String cif;
+    private boolean utilitzarCifPinbal;
     
     public int getPermisosCount() {
         if (permisos == null)
