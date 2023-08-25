@@ -187,7 +187,7 @@ public class DocumentHelper {
 				
 				List<ArxiuFirmaDto> firmes = null;
 				if (isDocumentFromPinbal(entity)) {
-					ArxiuFirmaDto firma = getArxiuFirmaPades(null, null);
+					ArxiuFirmaDto firma = getArxiuFirmaPades(fitxer.getNom(), fitxer.getContingut());
 					firmes = Arrays.asList(firma);
 					
 				} else if (document.isAmbFirma()) {
