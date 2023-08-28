@@ -8,7 +8,7 @@
 <rip:blocIconaContingutNoms/>
 <html>
 <head>
-	<title><spring:message code="massiu.procesar.annexos.pendents"/></title>
+	<title><spring:message code="accio.massiva.titol"/>: <spring:message code="massiu.procesar.annexos.pendents"/></title>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
@@ -119,10 +119,18 @@ function enableDisableSelection($this, tipus) {
 
 </head>
 <body>
+
+
+
+	<div class="alert well-sm alert-info" style="min-height: 40px;">
+		<span class="fa fa-info-circle"></span> <spring:message code="massiu.procesar.annexos.pendents.info"/> 
+	</div>
+
+
 	<form:form action="" method="post" cssClass="well" commandName="massiuAnnexProcesarFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
+				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.column.nom.annex"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputText name="numero" inline="true" placeholderKey="accio.massiva.list.column.numero"/>
@@ -137,10 +145,21 @@ function enableDisableSelection($this, tipus) {
 			<div class="col-md-4">					
 				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="1" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>		
-						
+			<div class="col-md-4">					
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpLlistat"/>
+				<rip:inputSuggest 
+ 					name="expedientId"  
+ 					urlConsultaInicial="${urlConsultaExpInicial}"
+ 					urlConsultaLlistat="${urlConsultaExpLlistat}"
+ 					usePathVariable="false"
+					placeholderKey="contingut.admin.filtre.expedient"
+ 					suggestValue="id"
+ 					suggestText="nomINumero"
+					inline="true"/>	
+			</div>						
 			
-		</div>
-		<div class="row">
+
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button style="display:none" type="submit" name="accio" value="filtrar" ><span class="fa fa-filter"></span></button>
@@ -177,7 +196,7 @@ function enableDisableSelection($this, tipus) {
 				<tr>
 					<th data-col-name="expedientId" data-visible="false"></th>
 					<th data-col-name="expedientPeticioId" data-visible="false"></th>
-					<th data-col-name="titol"><spring:message code="accio.massiva.list.column.nom"/></th>
+					<th data-col-name="titol"><spring:message code="accio.massiva.list.column.nom.annex"/></th>
 					<th data-col-name="registreNumero" data-orderable="false"><spring:message code="accio.massiva.list.column.numero"/></th>
 					
 					<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false"><spring:message code="accio.massiva.list.column.expedient"/>
@@ -190,7 +209,7 @@ function enableDisableSelection($this, tipus) {
 					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if documentId==null}}
-							<a href="<c:url value="/expedientPeticio/{{:id}}/{{:expedientPeticioId}}/reintentar"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><spring:message code="massiu.list.column.btn.crear.db"/></a>	
+							<a href="<c:url value="/expedientPeticio/{{:id}}/{{:expedientPeticioId}}/reintentar"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-share"></span>&nbsp;<spring:message code="massiu.list.column.btn.crear.db"/></a>	
 						{{/if}}
 					</script>
 					</th>

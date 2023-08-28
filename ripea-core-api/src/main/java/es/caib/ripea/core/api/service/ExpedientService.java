@@ -474,10 +474,11 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public Exception guardarExpedientArxiu(Long expId);
 
-	@PreAuthorize("hasRole('IPA_SUPER')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
-			String text);
+			String text, 
+			String rolActual);
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")

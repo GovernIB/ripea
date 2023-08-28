@@ -13,36 +13,36 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.utils.Utils;
 
-/**
- * Controlador per a les consultes ajax dels expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+
 @Controller
-@RequestMapping("/expedientajax") // No podem posar "/ajaxuser" per mor del AjaxInterceptor
+@RequestMapping("/expedientajax") 
 public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 
 	@Autowired
 	private ExpedientService expedientService;
 
+
 	
-	@RequestMapping(value = "/expedient/{text}", method = RequestMethod.GET)
+	@RequestMapping(value = "/expedient", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ExpedientDto> get(
 			HttpServletRequest request,
-			@PathVariable String text,
+			@RequestParam String term, // you can't use "/" that is part of Número of expedient in @PathVariable even encoded version "%2F" so it was changed to use @RequestParam instead
 			Model model) {
 
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		List<ExpedientDto> expedients = expedientService.findByText(
 				entitat.getId(), 
-				text);
+				Utils.trim(term), 
+				getRolActual(request));
 		
 		return expedients;
 	}

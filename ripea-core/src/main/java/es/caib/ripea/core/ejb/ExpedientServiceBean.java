@@ -370,11 +370,15 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.guardarExpedientArxiu(expId);
 	}
 	@Override
-	@RolesAllowed("IPA_SUPER")
+	@RolesAllowed("tothom")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
-			String text){
-		return delegate.findByText(entitatId, text);
+			String text, 
+			String rolActual){
+		return delegate.findByText(
+				entitatId,
+				text,
+				rolActual);
 	}
 
 	@Override

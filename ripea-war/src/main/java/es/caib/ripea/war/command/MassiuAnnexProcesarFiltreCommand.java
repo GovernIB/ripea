@@ -9,9 +9,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.MassiuAnnexEstatProcessamentEnumDto;
 import es.caib.ripea.core.api.dto.MassiuAnnexProcesarFiltreDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
+import lombok.Getter;
 
-
+@Getter
 public class MassiuAnnexProcesarFiltreCommand {
 
 	private String nom;
@@ -20,6 +22,7 @@ public class MassiuAnnexProcesarFiltreCommand {
 	private Date dataFi;	
 	private MassiuAnnexEstatProcessamentEnumDto estatProcessament;
 	private Long metaExpedientId;
+	private Long expedientId;
 	
 	
 	public static MassiuAnnexProcesarFiltreCommand asCommand(MassiuAnnexProcesarFiltreDto dto) {
@@ -40,42 +43,30 @@ public class MassiuAnnexProcesarFiltreCommand {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	
-	public String getNom() {
-		return nom;
-	}
 	public void setNom(String nom) {
-		this.nom = nom;
-	}
-	public Date getDataInici() {
-		return dataInici;
+		this.nom = Utils.trim(nom);
 	}
 	public void setDataInici(Date dataInici) {
 		this.dataInici = dataInici;
 	}
-	public Date getDataFi() {
-		return dataFi;
-	}
 	public void setDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
-	public String getNumero() {
-		return numero;
-	}
+
 	public void setNumero(String numero) {
-		this.numero = numero;
+		this.numero = Utils.trim(numero);
 	}
-	public MassiuAnnexEstatProcessamentEnumDto getEstatProcessament() {
-		return estatProcessament;
-	}
+
 	public void setEstatProcessament(MassiuAnnexEstatProcessamentEnumDto estatProcessament) {
 		this.estatProcessament = estatProcessament;
-	}
-	public Long getMetaExpedientId() {
-		return metaExpedientId;
 	}
 	public void setMetaExpedientId(Long metaExpedientId) {
 		this.metaExpedientId = metaExpedientId;
 	}
+	
+	public void setExpedientId(Long expedientId) {
+		this.expedientId = expedientId;
+	}
+	
 	
 }

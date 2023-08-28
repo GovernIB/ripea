@@ -19,6 +19,7 @@
 <%@ attribute name="suggestText" required="false" rtexprvalue="true"%>
 <%@ attribute name="suggestTextAddicional" required="false" rtexprvalue="true"%>
 <%@ attribute name="urlParamAddicional" required="false" rtexprvalue="true"%>
+<%@ attribute name="usePathVariable" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon2" required="false" rtexprvalue="true"%>
 <%@ attribute name="multiple" required="false" rtexprvalue="true"%>
@@ -67,6 +68,7 @@
 							data-suggest-text="${suggestText}"
 							data-suggest-text-addicional="${suggestTextAddicional}" 
 							data-url-param-addicional="${urlParamAddicional}" 
+							data-use-path-variable="${usePathVariable}" 
 							multiple="${multiple}"
 							data-idioma="${idioma}"/>
 							<c:if test="${not empty icon2}">
@@ -89,6 +91,7 @@
 							data-suggest-text="${suggestText}"
 							data-suggest-text-addicional="${suggestTextAddicional}" 
 							data-url-param-addicional="${urlParamAddicional}" 
+							data-use-path-variable="${usePathVariable}" 
 							multiple="${multiple}"
 							data-idioma="${idioma}"/>
 						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
@@ -109,6 +112,7 @@
 			data-suggest-text="${suggestText}"
 			data-suggest-text-addicional="${suggestTextAddicional}" 
 			data-url-param-addicional="${urlParamAddicional}"
+			data-use-path-variable="${usePathVariable}"
 			data-idioma="${idioma}"/>
 	</c:otherwise>
 </c:choose>

@@ -1232,7 +1232,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientDto> findByText(Long entitatId, String text) {
+	public List<ExpedientDto> findByText(
+			Long entitatId,
+			String text,
+			String rolActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -1240,7 +1243,32 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, 
 				false, 
 				false);
-		List<ExpedientEntity> expedients = expedientRepository.findByText(entitat, text);
+		
+		
+		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
+				entitatId,
+				rolActual);
+				
+			
+		List<String> rolsCurrentUser = RolHelper.getRolsCurrentUser();
+
+		List<ExpedientEntity> expedients = expedientRepository.findByTextAndFiltre(
+				entitat,
+				permisosPerExpedients.getIdsMetaExpedientsPermesos() == null,
+				permisosPerExpedients.getIdsMetaExpedientsPermesos(),
+				permisosPerExpedients.getIdsOrgansPermesos() == null,
+				permisosPerExpedients.getIdsOrgansPermesos(),
+				permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos() == null,
+				permisosPerExpedients.getIdsMetaExpedientOrganPairsPermesos(),
+				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
+				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
+				permisosPerExpedients.getIdsProcedimentsComuns(),
+				text,
+				rolsCurrentUser == null,
+				rolsCurrentUser,
+				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
+		
+		
 		List<ExpedientDto> expedientsDto = new ArrayList<ExpedientDto>();
 		for (ExpedientEntity expedientEntity : expedients) {
 			ExpedientDto expedientDto = new ExpedientDto();

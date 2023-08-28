@@ -647,6 +647,42 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("text") String text);
 	
 	
+	
+	@Query(	"select " +
+			"    distinct e " +
+			"from " +
+			"    ExpedientEntity e " +
+			"    left join e.metaexpedientOrganGestorPares meogp " +
+			"where " +
+			"    e.esborrat = 0 " +
+			"and e.entitat = :entitat " +
+			"and (" +
+			"     (:esNullIdsMetaExpedientsPermesos = false and e.metaExpedient.id in (:idsMetaExpedientsPermesos)) " +
+			"     or (:esNullIdsOrgansPermesos = false and meogp.organGestor.id in (:idsOrgansPermesos)) " +
+			"     or (:esNullIdsMetaExpedientOrganPairsPermesos = false and meogp.id in (:idsMetaExpedientOrganPairsPermesos)) " +
+			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
+		//TODO if organ is in :idsOrgansAmbProcedimentsComunsPermesos it is also already in :idsOrgansPermesos as well so check :idsOrgansAmbProcedimentsComunsPermesos doesn't do anything, probably :idsOrgansPermesos check should be only allowed for procediments no comuns
+			"and (lower(e.nom) like lower('%'||:text||'%') or lower(e.numero) like lower('%'||:text||'%')) " +
+			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " 
+			)
+	List<ExpedientEntity> findByTextAndFiltre(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullIdsMetaExpedientsPermesos") boolean esNullIdsMetaExpedientsPermesos, 
+			@Param("idsMetaExpedientsPermesos") List<Long> idsMetaExpedientsPermesos,
+			@Param("esNullIdsOrgansPermesos") boolean esNullIdsOrgansPermesos, 
+			@Param("idsOrgansPermesos") List<Long> idsOrgansPermesos,
+			@Param("esNullIdsMetaExpedientOrganPairsPermesos") boolean esNullIdsMetaExpedientOrganPairsPermesos, 
+			@Param("idsMetaExpedientOrganPairsPermesos") List<Long> idsMetaExpedientOrganPairsPermesos,
+			@Param("esNullIdsOrgansAmbProcedimentsComunsPermesos") boolean esNullIdsOrgansAmbProcedimentsComunsPermesos, 
+			@Param("idsOrgansAmbProcedimentsComunsPermesos") List<Long> idsOrgansAmbProcedimentsComunsPermesos,
+			@Param("idsProcedimentsComuns") List<Long> idsProcedimentsComuns,
+			@Param("text") String text,
+			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
+			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
+			@Param("isAdmin") boolean isAdmin);
+	
+	
+	
 	@Query(	"select" +
 			"    e " +
 			"from" +

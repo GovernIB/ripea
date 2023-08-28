@@ -6,6 +6,8 @@ package es.caib.ripea.war.controller;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.ModalHelper;
+import es.caib.ripea.war.helper.RolHelper;
+
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -300,6 +302,10 @@ public class BaseController implements MessageSourceAware {
 	}
 
 
+	protected String getRolActual(
+			HttpServletRequest request) {
+		return RolHelper.getRolActual(request);
+	}
 
 	public void setMessageSource(MessageSource messageSource) {
 		this.messageSource = messageSource;
