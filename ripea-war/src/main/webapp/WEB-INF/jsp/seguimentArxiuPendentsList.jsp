@@ -180,6 +180,14 @@ $(document).ready(function() {
 					<div class="col-md-4">					
 						<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
+					</div>
+					<div class="col-md-4">
+						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
+					</div>						
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
 							<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -219,7 +227,8 @@ $(document).ready(function() {
 								<a href="<c:url value="/contingut/{{:id}}"/>">{{:expedientNumeroNom}}</a>	
 							</script>
 						</th>
-						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
+						<th data-col-name="metaExpedientCodiNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
+						<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsExpedientsTemplate" width="10%">
 							<script id="cellAccionsExpedientsTemplate" type="text/x-jsrender">
@@ -246,6 +255,7 @@ $(document).ready(function() {
 		 					name="expedientId2"  
 		 					urlConsultaInicial="${urlConsultaInicial}"
 		 					urlConsultaLlistat="${urlConsultaLlistat}"
+		 					usePathVariable="false"
 		 					placeholderKey="seguiment.list.filtre.camp.expedient"
 		 					suggestValue="id"
 		 					suggestText="nomINumero"
@@ -254,6 +264,14 @@ $(document).ready(function() {
 					<div class="col-md-4">					
 						<rip:inputSelect name="metaExpedientId2" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
+					</div>
+					<div class="col-md-4">
+						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
+					</div>						
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
 							<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -295,7 +313,8 @@ $(document).ready(function() {
 								<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
 							</script>
 						</th>
-						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
+						<th data-col-name="metaExpedientCodiNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
+						<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<!--<th data-col-name="annex" data-orderable="false" data-template="#cellAnnex" width="1%">
 							<spring:message code="seguiment.list.columna.annex"/>
@@ -336,6 +355,7 @@ $(document).ready(function() {
 		 					name="expedientId3"  
 		 					urlConsultaInicial="${urlConsultaInicial}"
 		 					urlConsultaLlistat="${urlConsultaLlistat}"
+		 					usePathVariable="false"
 		 					placeholderKey="seguiment.list.filtre.camp.expedient"
 		 					suggestValue="id"
 		 					suggestText="nomINumero"
@@ -344,6 +364,14 @@ $(document).ready(function() {
 					<div class="col-md-4">					
 						<rip:inputSelect name="metaExpedientId3" optionItems="${metaExpedients}" optionMinimumResultsForSearch="0" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="seguiment.list.filtre.camp.metaExpedient" inline="true"/>
 					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<rip:inputDate name="dataCreacioInici" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.inici"/>
+					</div>
+					<div class="col-md-4">
+						<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
+					</div>						
 					<div class="col-md-4 pull-right">
 						<div class="pull-right">
 							<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
@@ -385,7 +413,8 @@ $(document).ready(function() {
 								<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
 							</script>
 						</th>						
-						<th data-col-name="metaExpedientNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
+						<th data-col-name="metaExpedientCodiNom" data-orderable="false"><spring:message code="seguiment.list.columna.metaExpedient"/></th>
+						<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
 						<th data-col-name="dataDarrerIntent" data-type="datetime" data-converter="datetime"><spring:message code="seguiment.list.columna.dataDarrerIntent"/></th>
 						<th data-col-name="id" data-orderable="false" data-template="#cellAccionsInteressatsTemplate" width="10%">
 							<script id="cellAccionsInteressatsTemplate" type="text/x-jsrender">

@@ -350,6 +350,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 						metaExpedient == null,
 						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 				result.setPagina(paginacioHelper.toPaginaDto(exps, SeguimentArxiuPendentsDto.class));
 
@@ -363,7 +367,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
 						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 						metaExpedient == null,
-						metaExpedient);
+						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
 				result.setIds(exps);
 			}
 
@@ -392,6 +400,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient,
 						metaExpedient == null,
 						metaExpedient, 
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 				
 				
@@ -431,7 +443,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient == null,
 						expedient,
 						metaExpedient == null,
-						metaExpedient);
+						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
 				result.setIds(docs);
 			}
 
@@ -457,6 +473,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient,
 						metaExpedient == null,
 						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 
 				result.setPagina(paginacioHelper.toPaginaDto(ints, SeguimentArxiuPendentsDto.class));
@@ -473,7 +493,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient == null,
 						expedient,
 						metaExpedient == null,
-						metaExpedient);
+						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
 
 				result.setIds(ints);
 

@@ -115,6 +115,7 @@ $(document).ready(function() {
  					name="expedientId"  
  					urlConsultaInicial="${urlConsultaExpInicial}"
  					urlConsultaLlistat="${urlConsultaExpLlistat}"
+ 					usePathVariable="false"
 					placeholderKey="contingut.admin.filtre.expedient"
  					suggestValue="id"
  					suggestText="nomINumero"

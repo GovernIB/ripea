@@ -599,7 +599,8 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setElementNom(source.getNom());
 						target.setExpedientNumeroNom(source.getNom() + " (" + source.getNumero() + ")");
-						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
+						target.setMetaExpedientCodiNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getClassificacioSia() + " - " + source.getMetaExpedient().getNom() : null);
+						target.setCreatedDate(source.getCreatedDate().toDate());
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						return target;
 					}
@@ -614,7 +615,8 @@ public class ConversioTipusHelper {
 						target.setExpedientId(source.getExpedient().getId());
 						target.setElementNom(source.getNom());
 						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
-						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacioSia() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setCreatedDate(source.getCreatedDate().toDate());
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
 						target.setAnnex(source.getAnnexos() != null && !source.getAnnexos().isEmpty());
@@ -638,7 +640,8 @@ public class ConversioTipusHelper {
 							target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
 						} 
 						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
-						target.setMetaExpedientNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacioSia() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setCreatedDate(source.getCreatedDate().toDate());
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
 						return target;

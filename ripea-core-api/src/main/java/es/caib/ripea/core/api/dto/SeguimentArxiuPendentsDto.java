@@ -24,8 +24,9 @@ public class SeguimentArxiuPendentsDto implements Serializable {
 	private Long expedientId;
 	private String elementNom;
 	private String expedientNumeroNom;
-	private String metaExpedientNom;
+	private String metaExpedientCodiNom;
 	private Date dataDarrerIntent;
+	private Date createdDate;
 	private boolean expedientArxiuPropagat;
 	
 	private boolean annex;

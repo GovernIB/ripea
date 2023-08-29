@@ -1,5 +1,7 @@
 package es.caib.ripea.war.command;
 
+import java.util.Date;
+
 import org.apache.commons.lang.StringUtils;
 
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
@@ -16,6 +18,8 @@ public class SeguimentArxiuPendentsFiltreCommand {
 	private String elementNom;
 	private Long expedientId;
 	private Long metaExpedientId;
+	private Date dataCreacioInici;
+	private Date dataCreacioFi;
 	
 	
 	public static SeguimentArxiuPendentsFiltreCommand asCommand(SeguimentArxiuPendentsFiltreDto dto) {
@@ -77,11 +81,13 @@ public class SeguimentArxiuPendentsFiltreCommand {
 		this.metaExpedientId = metaExpedientId;
 	}
 
+	public void setDataCreacioInici(Date dataCreacioInici) {
+		this.dataCreacioInici = dataCreacioInici;
+	}
 
-
-	
-	
-	
+	public void setDataCreacioFi(
+			Date dataCreacioFi) {this.dataCreacioFi = dataCreacioFi;
+	}
 
 	
 

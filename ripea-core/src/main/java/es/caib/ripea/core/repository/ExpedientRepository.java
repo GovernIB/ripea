@@ -594,11 +594,14 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where " +
 			"	 e.arxiuUuid = null " +
 			"and e.esborrat = 0 " +
+			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and e.entitat = :entitat " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +			
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " +
+			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
+			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) ")
 	public Page<ExpedientEntity> findArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -608,6 +611,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("nom") String nom,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullCreacioInici") boolean esNullCreacioInici,
+			@Param("creacioInici") Date creacioInici,
+			@Param("esNullCreacioFi") boolean esNullCreacioFi,
+			@Param("creacioFi") Date creacioFi,
 			Pageable pageable);	
 	
 	
@@ -617,12 +624,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    ExpedientEntity e " +
 			"where " +
 			"	 e.arxiuUuid = null " +
+			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or e.agafatPer.codi = :usuariActual) " +			
 			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) ")
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) " + 
+			"and (:esNullCreacioInici = true or e.createdDate >= :creacioInici) " +
+			"and (:esNullCreacioFi = true or e.createdDate <= :creacioFi) ")
 	public List<Long> findIdsArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -631,7 +641,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient);	
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullCreacioInici") boolean esNullCreacioInici,
+			@Param("creacioInici") Date creacioInici,
+			@Param("esNullCreacioFi") boolean esNullCreacioFi,
+			@Param("creacioFi") Date creacioFi);	
 
 
 

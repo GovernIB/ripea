@@ -578,6 +578,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d " +
 			"from " +
 			"    DocumentEntity d inner join d.contingut c1 " + // d.contingut c1 is used in ordenacioMap
+			"    inner join d.expedient e " +
 			"	 left join d.annexos a " + 
 			"where " +
 			"	 c1.esborrat = 0 " +
@@ -585,11 +586,14 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
 			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
 			"and d.entitat = :entitat " +
+			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullExpedient = true or c1.expedient = :expedient) " +
-			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) ")
+			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullCreacioInici = true or d.createdDate >= :creacioInici) " +
+			"and (:esNullCreacioFi = true or d.createdDate <= :creacioFi) ")
 	public Page<DocumentEntity> findArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -601,6 +605,10 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("expedient") ExpedientEntity expedient,			
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullCreacioInici") boolean esNullCreacioInici,
+			@Param("creacioInici") Date creacioInici,
+			@Param("esNullCreacioFi") boolean esNullCreacioFi,
+			@Param("creacioFi") Date creacioFi,
 			Pageable pageable);
 	
 	
@@ -608,8 +616,10 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"    d.id " +
 			"from " +
 			"    DocumentEntity d inner join d.contingut c left join d.annexos a " +
+			"    inner join d.expedient e " +
 			"where " +
 			"    d.entitat = :entitat " +
+			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +			
 			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
 			"and (d.arxiuUuid = null " +
@@ -622,7 +632,9 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"and d.esborrat = 0 " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
 			"and (:esNullExpedient = true or d.expedient = :expedient) " +
-			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) ")
+			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullCreacioInici = true or d.createdDate >= :creacioInici) " +
+			"and (:esNullCreacioFi = true or d.createdDate <= :creacioFi) ")
 	public List<Long> findIdsArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -633,7 +645,11 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,			
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullCreacioInici") boolean esNullCreacioInici,
+			@Param("creacioInici") Date creacioInici,
+			@Param("esNullCreacioFi") boolean esNullCreacioFi,
+			@Param("creacioFi") Date creacioFi);
 	
     @Query("select case when count(c) > 0 then true else false end " + 
     		"from DocumentEntity d " +

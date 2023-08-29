@@ -24,6 +24,8 @@ public class SeguimentArxiuPendentsFiltreDto implements Serializable {
 	private Long expedientId;
 	private Long metaExpedientId;
 	private Date dataDarrerIntent;
+	private Date dataCreacioInici;
+	private Date dataCreacioFi;
 	
 
 	@Override
