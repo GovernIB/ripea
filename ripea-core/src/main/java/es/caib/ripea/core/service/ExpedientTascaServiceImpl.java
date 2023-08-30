@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,10 @@ import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -114,8 +117,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientTascaDto> findAmbAuthentication(
+	public PaginaDto<ExpedientTascaDto> findAmbAuthentication(
 			Long entitatId, 
+			UsuariTascaFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -124,11 +128,16 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		UsuariEntity usuariEntity = usuariRepository.findByCodi(auth.getName());
 		
-		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
+		Page<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
 				usuariEntity,
+				filtre.getEstat() == null,
+				filtre.getEstat(), 
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams));
-		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
+		
+		
+		return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
+		
 	}
 
 	@Transactional(readOnly = true)

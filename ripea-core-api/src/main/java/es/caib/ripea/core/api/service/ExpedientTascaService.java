@@ -8,8 +8,10 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariTascaFiltreDto;
 
 public interface ExpedientTascaService {
 
@@ -32,8 +34,9 @@ public interface ExpedientTascaService {
 	public MetaExpedientTascaDto findMetaExpedientTascaById(
 			Long metaExpedientTascaId);
 
-	public List<ExpedientTascaDto> findAmbAuthentication(
+	public PaginaDto<ExpedientTascaDto> findAmbAuthentication(
 			Long entitatId, 
+			UsuariTascaFiltreDto filtre, 
 			PaginacioParamsDto paginacioParam);
 
 	public long countTasquesPendents();

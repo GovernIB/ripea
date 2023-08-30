@@ -18,8 +18,10 @@ import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 
 /**
@@ -76,8 +78,14 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientTascaDto> findAmbAuthentication(Long entitatId, PaginacioParamsDto paginacioParam) {
-		return delegate.findAmbAuthentication(entitatId, paginacioParam);
+	public PaginaDto<ExpedientTascaDto> findAmbAuthentication(
+			Long entitatId,
+			UsuariTascaFiltreDto filtre,
+			PaginacioParamsDto paginacioParam) {
+		return delegate.findAmbAuthentication(
+				entitatId,
+				filtre,
+				paginacioParam);
 	}
 
 	@Override
