@@ -45,14 +45,16 @@ public  class SeguimentServiceBean implements SeguimentService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<SeguimentDto> findNotificacionsEnviaments(
+	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		return delegate.findNotificacionsEnviaments(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, 
+				resultEnum);
 	}
 
 	@Override

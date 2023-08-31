@@ -1706,7 +1706,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void notificacioActualitzarEstat(
 			String identificador) {
-		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByEnviamentIdentificador(
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByNotificacioIdentificador(
 				identificador);
 		try {
 
@@ -1720,6 +1720,25 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(ex);
 		}
 	}
+	
+	@Transactional
+	@Override
+	public void notificacioActualitzarEstat(
+			Long id) {
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findOne(id);
+		try {
+
+			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacio.getDocumentEnviamentInteressats()) {
+				documentNotificacioHelper.actualitzarEstat(documentEnviamentInteressatEntity);
+			}
+			
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de notificacions";
+			logger.error(errorDescripcio, ex);
+			throw new RuntimeException(ex);
+		}
+	}
+	
 	
 	
 	
@@ -1744,7 +1763,7 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		DocumentNotificacioEntity documentNotificacioEntity = documentNotificacioRepository.findOne(notificacioId);
 
-		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getEnviamentIdentificador());
+		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getNotificacioIdentificador());
 		return conversioTipusHelper.convertir(resposta, RespostaJustificantEnviamentNotibDto.class);
 	}
 

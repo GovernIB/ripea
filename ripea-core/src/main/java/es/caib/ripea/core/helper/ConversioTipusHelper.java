@@ -548,7 +548,7 @@ public class ConversioTipusHelper {
 						target.setDocumentNom(source.getDocument().getNom());
 						target.setNotificacioEstat(source.getNotificacioEstat());
 						target.setDataEnviament(source.getCreatedDate().toDate());
-						
+						target.setNotificacioIdentificador(source.getNotificacioIdentificador());
 						
 						InteressatEntity destinatari = !source.getDocumentEnviamentInteressats().isEmpty() ? HibernateHelper.deproxy(source.getDocumentEnviamentInteressats().iterator().next().getInteressat()) : null;
 						String destinatariNom = "";

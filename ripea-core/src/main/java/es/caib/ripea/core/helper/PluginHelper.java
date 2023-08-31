@@ -3145,7 +3145,7 @@ public class PluginHelper {
 			
 			
 			// ====================================== CONSULTAR NOTIFICACIO ==================================================
-			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(notificacio.getEnviamentIdentificador());
+			RespostaConsultaEstatNotificacio respostaNotificioEstat = getNotificacioPlugin().consultarNotificacio(notificacio.getNotificacioIdentificador());
 			notificacio.updateNotificacioEstat(
 					respostaNotificioEstat.getEstat(),
 					resposta.getEstatData(),

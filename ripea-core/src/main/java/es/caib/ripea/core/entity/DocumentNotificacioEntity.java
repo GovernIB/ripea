@@ -53,7 +53,7 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	@Temporal(TemporalType.DATE)
 	private Date dataCaducitat;
 	@Column(name = "not_env_id", length = 100)
-	private String enviamentIdentificador;
+	private String notificacioIdentificador;
 	@Column(name = "not_env_cert_arxiuid", length = 50)
 	private String enviamentCertificacioArxiuId;
 	@Enumerated(EnumType.STRING)
@@ -107,9 +107,9 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	public void updateEnviat(
 			Date enviatData,
 			NotificacioEstat estat,
-			String enviamentIdentificador) {
+			String notificacioIdentificador) {
 		super.updateEnviat(enviatData);
-		this.enviamentIdentificador = enviamentIdentificador;
+		this.notificacioIdentificador = notificacioIdentificador;
 		this.enviatData = enviatData;
 		this.notificacioEstat = estat != null ? DocumentNotificacioEstatEnumDto.valueOf(estat.toString()) : null;
 
@@ -117,8 +117,8 @@ public class DocumentNotificacioEntity extends DocumentEnviamentEntity {
 	
 	public void updateEnviatError(
 			String errorDescripcio,
-			String enviamentIdentificador) {
-		this.enviamentIdentificador = enviamentIdentificador;
+			String notificacioIdentificador) {
+		this.notificacioIdentificador = notificacioIdentificador;
 		super.updateEnviatError(
 				errorDescripcio,
 				null);

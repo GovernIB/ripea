@@ -177,7 +177,7 @@ $(document).ready(function() {
 			<th data-col-name="error" data-visible="false"></th>
 			<th data-col-name="notificacio" data-visible="false"></th>
 			<th data-col-name="publicacio" data-visible="false"></th>
-			<th data-col-name="enviamentIdentificador" data-visible="false"></th>
+			<th data-col-name="notificacioIdentificador" data-visible="false"></th>
 			<th data-col-name="tipus" data-orderable="false" data-template="#cellNotficicacioTipusTemplate" width="15%">
 				<spring:message code="contingut.enviament.columna.tipus"/>
 				<script id="cellNotficicacioTipusTemplate" type="text/x-jsrender">
@@ -245,7 +245,7 @@ $(document).ready(function() {
 						<ul class="dropdown-menu">
 							<li><a href="<c:url value="/document/{{:documentId}}/notificacio/{{:id}}/info?contingutNavigationId=${contingut.id}"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 							{{if notificacioEstat != 'PROCESSADA'}}
-								<li><a href="<c:url value="/document/notificacio/actualitzarEstat/{{:enviamentIdentificador}}?contingutNavigationId=${contingut.id}"/>"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.ectualitzar.estat"/></a></li>
+								<li><a href="<c:url value="/document/notificacio/actualitzarEstat/{{:notificacioIdentificador}}?contingutNavigationId=${contingut.id}"/>"><span class="fa fa-refresh"></span>&nbsp;&nbsp;<spring:message code="enviament.info.accio.ectualitzar.estat"/></a></li>
 							{{/if}}
 							{{if tipus == 'MANUAL'}}
 								<li><a href="<c:url value="/expedient/${expedientId}/notificacio/{{:id}}"/>" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>

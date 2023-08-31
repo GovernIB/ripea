@@ -71,7 +71,7 @@
 						<c:choose>
 							<c:when test="${not empty notificacio.id}">
 								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.identificador"/></strong></td>
-								<td>${notificacio.enviamentIdentificador}</td>
+								<td>${notificacio.notificacioIdentificador}</td>
 								<td width="1%"><strong><spring:message code="enviament.info.dada.identificadors.referencia"/></strong></td>
 								<td>${enviament.enviamentReferencia}</td>
 							</c:when>

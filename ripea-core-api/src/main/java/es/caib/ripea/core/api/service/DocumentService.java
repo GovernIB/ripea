@@ -746,6 +746,9 @@ public interface DocumentService {
 	public void notificacioActualitzarEstat(
 			String identificador);
 
+	@PreAuthorize("hasRole('tothom')")
+	public void notificacioActualitzarEstat(Long id);
+
 
 	
 

@@ -52,7 +52,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 	
 	long countByDocument(DocumentEntity document);
 
-	DocumentNotificacioEntity findByEnviamentIdentificador(String enviamentIdentificador);
+	DocumentNotificacioEntity findByNotificacioIdentificador(String notificacioIdentificador);
 
 	
 	@Query( "select dn.notificacioEstat " +
@@ -102,4 +102,28 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			@Param("estatEnviament") DocumentNotificacioEstatEnumDto estatEnviament,
 			Pageable paginacio);
 	
+	
+	@Query("select " +
+			"	dn.id " +
+			"from " +
+			"    DocumentNotificacioEntity dn " +
+			"where " +
+			"    (dn.document.entitat = :entitat) " +
+			"and (:esNullExpedientNom = true or lower(dn.expedient.nom) like lower('%'||:expedientNom||'%')) " +
+			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
+			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
+			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
+			"and (:esNullEstatEnviament = true or dn.notificacioEstat = :estatEnviament) ")
+	public List<Long> findIdsAmbFiltrePaginat(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullExpedientNom") boolean esNullExpedientNom,
+			@Param("expedientNom") String expedientNom,
+			@Param("esNullDocumentNom") boolean esNullDocumentNom,
+			@Param("documentNom") String documentNom,
+			@Param("esNullDataEnviamentInici") boolean esNullDataEnviamentInici,
+			@Param("dataEnviamentInici") Date dataEnviamentInici,
+			@Param("esNullDataEnviamentFinal") boolean esNullDataEnviamentFinal,
+			@Param("dataEnviamentFinal") Date dataEnviamentFinal,
+			@Param("esNullEstatEnviament") boolean esNullEstatEnviament,
+			@Param("estatEnviament") DocumentNotificacioEstatEnumDto estatEnviament);
 }

@@ -563,4 +563,10 @@ public class DocumentServiceBean implements DocumentService {
 		delegate.notificacioActualitzarEstat(identificador);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void notificacioActualitzarEstat(Long id) {
+		delegate.notificacioActualitzarEstat(id);
+	}
+
 }
