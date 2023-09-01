@@ -351,9 +351,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:nomesAgafats = false or e.agafatPer = :usuariActual) " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
-			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullExpedient = true or e = :expedient) " +
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " + 
+			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaExpedient = true))) " +
+			"and (:esNullEstat = true or e.estatAdditional = :estat) ")
 	public Page<ExpedientEntity> findExpedientsPerCanviEstatMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("nomesAgafats") boolean nomesAgafats,
@@ -361,12 +363,16 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
-			@Param("esNullNom") boolean esNullNom,
-			@Param("nom") String nom,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientEstatEntity estat,
 			Pageable pageable);
 
 	@Query(	"select " +
@@ -380,9 +386,11 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"and (:nomesAgafats = false or e.agafatPer = :usuariActual) " +
 			"and (e.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:esNullMetaExpedient = true or e.metaNode = :metaExpedient) " +
-			"and (:esNullNom = true or lower(e.nom) like lower('%'||:nom||'%')) " +
+			"and (:esNullExpedient = true or e = :expedient) " +
 			"and (:esNullDataInici = true or e.createdDate >= :dataInici) " +
-			"and (:esNullDataFi = true or e.createdDate <= :dataFi) ")
+			"and (:esNullDataFi = true or e.createdDate <= :dataFi) " +
+			"and (:esNullEstatEnum = true or (e.estat = :estatEnum and (e.estatAdditional is null or :esNullMetaExpedient = true))) " +
+			"and (:esNullEstat = true or e.estatAdditional = :estat) ")
 	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("nomesAgafats") boolean nomesAgafats,
@@ -390,12 +398,16 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaNodeEntity metaExpedient,	
-			@Param("esNullNom") boolean esNullNom,
-			@Param("nom") String nom,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
 			@Param("esNullDataInici") boolean esNullDataInici,
 			@Param("dataInici") Date dataInici,
 			@Param("esNullDataFi") boolean esNullDataFi,
-			@Param("dataFi") Date dataFi);
+			@Param("dataFi") Date dataFi,
+			@Param("esNullEstatEnum") boolean esNullEstatEnum,
+			@Param("estatEnum") ExpedientEstatEnumDto estatEnum,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") ExpedientEstatEntity estat);
 
 //	@Query(	"select" +
 //			"    count(e) " +

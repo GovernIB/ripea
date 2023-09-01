@@ -3,17 +3,16 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.service.ExpedientEstatService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
-import es.caib.ripea.war.command.ExpedientMassiuCanviEstatCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -26,13 +25,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.ExpedientEstatService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
+import es.caib.ripea.war.command.ExpedientMassiuCanviEstatCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 
 /**
  * Controlador per canvi estat massiu del expedients
@@ -85,6 +90,16 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+		
+		
+		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
+		List<ExpedientEstatDto> expedientEstatsOptions = new ArrayList<>();
+		Long metaExpedientId = filtreCommand != null ? filtreCommand.getMetaExpedientId() : null;
+		expedientEstatsOptions.add(new ExpedientEstatDto(getMessage(request, "expedient.estat.enum." + ExpedientEstatEnumDto.values()[0].name()), Long.valueOf(0)));
+		expedientEstatsOptions.addAll(expedientEstatService.findExpedientEstatsByMetaExpedient(entitatActual.getId(), metaExpedientId));
+		model.addAttribute(
+				"expedientEstatsOptions",
+				expedientEstatsOptions);
 
 		return "expedientMassiuCanviEstatList";
 	}
@@ -123,7 +138,9 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 					 expedientEstatService.findExpedientsPerCanviEstatMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request), rolActual),
+								DatatablesHelper.getPaginacioDtoFromRequest(request), 
+								rolActual, 
+								ResultEnumDto.PAGE).getPagina(),
 					 "id",
 					 getSessionAttributeSelecio(request));
 		} catch (Exception e) {
@@ -161,10 +178,12 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 					SESSION_ATTRIBUTE_ROL_ACTUAL);
 			
 			seleccio.addAll(
-					expedientEstatService.findIdsExpedientsPerCanviEstatMassiu(
+					expedientEstatService.findExpedientsPerCanviEstatMassiu(
 							entitatActual.getId(),
 							ContingutMassiuFiltreCommand.asDto(filtreCommand), 
-							rolActual));
+							null,
+							rolActual,
+							ResultEnumDto.IDS).getIds());
 		}
 		return seleccio.size();
 	}
@@ -278,9 +297,6 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 				"redirect:../expedient",
 				"expedient.controller.estatsModificats.ok");
 	}
-	
-	
-	
 	
 	
 	

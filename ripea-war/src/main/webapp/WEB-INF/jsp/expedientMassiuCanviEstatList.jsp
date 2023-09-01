@@ -97,6 +97,33 @@ $(document).ready(function() {
 
 	});	
 
+
+
+	$('#metaExpedientId').on('change', function() {
+		metaExpedientId = $(this).val();
+
+		if (!metaExpedientId) {
+			metaExpedientId = 0;
+		}
+		
+		$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
+		.done(function(data) {
+			
+			$('#expedientEstatId').select2('val', '', true);
+			$('#expedientEstatId option[value!=""]').remove();
+
+			let listSize = data.length > 1 ? data.length - 1 : data.length; // don't add last estat 'TANCAT'
+			for (var i = 0; i < listSize; i++) {
+				$('#expedientEstatId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
+			}
+		})
+		.fail(function() {
+			alert("<spring:message code="error.jquery.ajax"/>");
+		});
+	});
+
+
+
 							
 
 });
@@ -130,10 +157,20 @@ function enableDisableSelection($this, tipus) {
 	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="codiSiaINom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true"/>
 			</div>
-			<div class="col-md-4">
-				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
+			<div class="col-md-4">					
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpLlistat"/>
+				<rip:inputSuggest 
+ 					name="expedientId"  
+ 					urlConsultaInicial="${urlConsultaExpInicial}"
+ 					urlConsultaLlistat="${urlConsultaExpLlistat}"
+ 					usePathVariable="false"
+					placeholderKey="contingut.admin.filtre.expedient"
+ 					suggestValue="id"
+ 					suggestText="nomINumero"
+					inline="true"/>	
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
@@ -143,6 +180,17 @@ function enableDisableSelection($this, tipus) {
 			</div>			
 		</div>
 		<div class="row">
+
+			<div class="col-md-4">
+				<rip:inputSelect 
+					name="expedientEstatId" 
+					optionItems="${expedientEstatsOptions}"
+					optionValueAttribute="id"
+					emptyOption="true" 
+					optionTextAttribute="nom"
+					placeholderKey="expedient.list.user.placeholder.estat" 
+					inline="true" />
+			</div>
 
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
@@ -170,7 +218,7 @@ function enableDisableSelection($this, tipus) {
 		data-url="<c:url value="/massiu/canviEstat/datatable"/>"
 		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
-		data-default-order="6" 
+		data-default-order="5" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
@@ -178,10 +226,14 @@ function enableDisableSelection($this, tipus) {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<th data-col-name="expedient" data-visible="false"></th>
 				<th data-col-name="expedientEstat" data-visible="false"></th>
-				<th data-col-name="metaExpedient.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
-				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
+				
+				<th data-col-name="numeroINom" data-template="#cellExpedientLink" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.expedient"/>
+					<script id="cellExpedientLink" type="text/x-jsrender">
+						<a href="<c:url value="/contingut/{{:id}}"/>">{{:numeroINom}}</a>	
+					</script>
+				</th>
+				<th data-col-name="metaExpedient.codiSiaINom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
 				<th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -202,6 +254,11 @@ function enableDisableSelection($this, tipus) {
 				</th>				
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
 				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<a href="<c:url value="/expedient/{{:id}}/canviarEstat"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/></a>	
+					</script>
+				</th>				
 			</tr>
 		</thead>
 	</table>

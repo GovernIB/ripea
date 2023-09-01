@@ -30,6 +30,7 @@ public class ContingutMassiuFiltreDto implements Serializable {
 	private Date dataInici;
 	private Date dataFi;
 	private String identificador;
+	private Long expedientEstatId;
 	
 	private boolean bloquejarTipusElement;
 	private boolean bloquejarMetaDada;
