@@ -215,7 +215,7 @@
 						$(this).closest('.dataTables_wrapper').webutilAjaxEval();
 					$('tr[data-href]', $taula).each(function() {
 						$(this).mousedown(function(event) {
-							if ($(this).prop("tagName") == 'TR' && event.target.tagName == 'TD') {
+							if ($(this).prop("tagName") == 'TR' && event.target.tagName == 'TD' && !($(this).hasClass('selectable') && event.target._DT_CellIndex.column == 0)) {
 								if (event.which == 2) {
 									window.open($(this).data('href'), '_blank');
 									return false;

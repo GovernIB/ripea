@@ -64,6 +64,8 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.ResultatConsultaDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
@@ -435,6 +437,16 @@ public class ContingutServiceImpl implements ContingutService {
 
 		return dto;
 	}
+	
+	
+	@Transactional
+	@Override
+	public boolean isDeleted(Long contingutId) {
+
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		return contingut.getEsborrat() != 0;
+	}
+	
 
 	@Transactional
 	@Override
@@ -1111,10 +1123,11 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ContingutDto> findAdmin(
+	public ResultDto<ContingutDto> findAdmin(
 			Long entitatId,
 			ContingutFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		logger.debug("Consulta de continguts per usuari admin ("
 				+ "entitatId=" + entitatId + ", "
 				+ "filtre=" + filtre + ")");
@@ -1175,46 +1188,86 @@ public class ContingutServiceImpl implements ContingutService {
 			}
 		}
 		
-		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 		
+		ResultDto<ContingutDto> result = new ResultDto<ContingutDto>();
 		
+		if (resultEnum == ResultEnumDto.PAGE) {
 		
-		return paginacioHelper.toPaginaDto(
-				contingutRepository.findByFiltrePaginat(
-						entitat,
-						tipusCarpeta,
-						tipusDocument,
-						tipusExpedient,
-						(filtre.getNom() == null),
-						filtre.getNom() != null ? filtre.getNom().trim() : "",
-						(filtre.getCreador() == null), filtre.getCreador() != null ?
-						filtre.getCreador().trim() : "",
-						(metaNode == null),
-						metaNode,
-						(dataCreacioInici == null),
-						dataCreacioInici,
-						(dataCreacioFi == null),
-						dataCreacioFi,
-						(dataEsborratInici == null),
-						dataEsborratInici,
-						(dataEsborratFi == null),
-						dataEsborratFi,
-						filtre.isMostrarEsborrats(),
-						filtre.isMostrarNoEsborrats(),
-						(expedient == null),
-						expedient,
-						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
-				ContingutDto.class,
-				new Converter<ContingutEntity, ContingutDto>() {
-					@Override
-					public ContingutDto convert(ContingutEntity source) {
-						return contingutHelper.toContingutDto(
-								source,
-								true, 
-								false);
-					}
-				});
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			
+			
+			// ================================  RETURNS PAGE (DATATABLE) ==========================================
+			PaginaDto<ContingutDto> paginaDto = paginacioHelper.toPaginaDto(
+					contingutRepository.findByFiltrePaginat(
+							entitat,
+							tipusCarpeta,
+							tipusDocument,
+							tipusExpedient,
+							(filtre.getNom() == null),
+							filtre.getNom() != null ? filtre.getNom().trim() : "",
+							(filtre.getCreador() == null), filtre.getCreador() != null ?
+							filtre.getCreador().trim() : "",
+							(metaNode == null),
+							metaNode,
+							(dataCreacioInici == null),
+							dataCreacioInici,
+							(dataCreacioFi == null),
+							dataCreacioFi,
+							(dataEsborratInici == null),
+							dataEsborratInici,
+							(dataEsborratFi == null),
+							dataEsborratFi,
+							filtre.isMostrarEsborrats(),
+							filtre.isMostrarNoEsborrats(),
+							(expedient == null),
+							expedient,
+							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
+					ContingutDto.class,
+					new Converter<ContingutEntity, ContingutDto>() {
+						@Override
+						public ContingutDto convert(ContingutEntity source) {
+							return contingutHelper.toContingutDto(
+									source,
+									true, 
+									false);
+						}
+					});
+	
+			result.setPagina(paginaDto);
+			
+		} else {
+			
+			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
+			List<Long> ids = contingutRepository.findIdsByFiltre(
+					entitat,
+					tipusCarpeta,
+					tipusDocument,
+					tipusExpedient,
+					(filtre.getNom() == null),
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					(filtre.getCreador() == null),
+					filtre.getCreador() != null ? filtre.getCreador().trim() : "",
+					(metaNode == null),
+					metaNode,
+					(dataCreacioInici == null),
+					dataCreacioInici,
+					(dataCreacioFi == null),
+					dataCreacioFi,
+					(dataEsborratInici == null),
+					dataEsborratInici,
+					(dataEsborratFi == null),
+					dataEsborratFi,
+					filtre.isMostrarEsborrats(),
+					filtre.isMostrarNoEsborrats(),
+					(expedient == null),
+					expedient);	
+			
+			result.setIds(ids);
+		}
+
+		return result;
+		
 	}
 
 

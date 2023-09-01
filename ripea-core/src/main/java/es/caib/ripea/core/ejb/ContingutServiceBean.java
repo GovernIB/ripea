@@ -28,6 +28,8 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -219,14 +221,16 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ContingutDto> findAdmin(
+	public ResultDto<ContingutDto> findAdmin(
 			Long entitatId,
 			ContingutFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		return delegate.findAdmin(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, 
+				resultEnum);
 	}
 
 
@@ -401,6 +405,12 @@ public class ContingutServiceBean implements ContingutService {
 	@RolesAllowed("tothom")
 	public Long getExpedientId(Long contingutId) {
 		return delegate.getExpedientId(contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean isDeleted(Long contingutId) {
+		return delegate.isDeleted(contingutId);
 	}
 
 }

@@ -23,6 +23,8 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -409,15 +411,17 @@ public interface ContingutService {
 	 *            El filtre de la consulta.
 	 * @param paginacioParams
 	 *            Paràmetres per a dur a terme la paginació del resultats.
+	 * @param resultEnum
 	 * @return Una pàgina amb els continguts trobats.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<ContingutDto> findAdmin(
+	public ResultDto<ContingutDto> findAdmin(
 			Long entitatId,
 			ContingutFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) throws NotFoundException;
 	
 
 
@@ -564,5 +568,9 @@ public interface ContingutService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public Long getExpedientId(Long contingutId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public boolean isDeleted(
+			Long contingutId);
 	
 }

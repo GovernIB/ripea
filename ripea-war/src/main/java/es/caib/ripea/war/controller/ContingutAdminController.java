@@ -6,6 +6,8 @@ package es.caib.ripea.war.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -30,11 +32,13 @@ import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.ContingutFiltreCommand;
 import es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum;
 import es.caib.ripea.war.command.ExpedientAssignarCommand;
@@ -42,18 +46,23 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador per a la consulta d'arxius pels administradors.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/contingutAdmin")
 public class ContingutAdminController extends BaseAdminController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ContingutAdminController.session.filtre";
+	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutAdminController.session.seleccio";
+	
 
 	@Autowired
 	private ContingutService contingutService;
@@ -61,6 +70,8 @@ public class ContingutAdminController extends BaseAdminController {
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private ExpedientService expedientService;
+	@Autowired
+	private OrganGestorService organGestorService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -79,6 +90,13 @@ public class ContingutAdminController extends BaseAdminController {
 					"metaNodes",
 					metaDocumentService.findByEntitat(entitatActual.getId()));*/
 		}
+		
+		model.addAttribute(
+				"seleccio",
+				RequestSessionHelper.obtenirObjecteSessio(
+						request,
+						getSessionAttributeSelecio(request)));
+		
 		return "contingutAdminList";
 	}
 	@RequestMapping(method = RequestMethod.POST)
@@ -114,8 +132,10 @@ public class ContingutAdminController extends BaseAdminController {
 				contingutService.findAdmin(
 						entitatActual.getId(),
 						ContingutFiltreCommand.asDto(filtreCommand),
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
-				"id");
+						DatatablesHelper.getPaginacioDtoFromRequest(request),
+						ResultEnumDto.PAGE).getPagina(),
+				"id",
+				getSessionAttributeSelecio(request));
 	}
 
 	@RequestMapping(value = "/{contingutId}/info", method = RequestMethod.GET)
@@ -187,6 +207,7 @@ public class ContingutAdminController extends BaseAdminController {
 			@PathVariable Long contingutId,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
 		try {
 			contingutService.undelete(
 					entitatActual.getId(),
@@ -271,8 +292,8 @@ public class ContingutAdminController extends BaseAdminController {
 
 	}
 
-	@RequestMapping(value = "/{contingutId}/delete", method = RequestMethod.GET)
-	public String delete(
+	@RequestMapping(value = "/{contingutId}/deleteDefinitiu", method = RequestMethod.GET)
+	public String deleteDefinitiu(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			Model model) {
@@ -294,6 +315,206 @@ public class ContingutAdminController extends BaseAdminController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/select", method = RequestMethod.GET)
+	@ResponseBody
+	public int select(
+			HttpServletRequest request,
+			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		
+		
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request));
+		if (seleccio == null) {
+			seleccio = new HashSet<Long>();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					getSessionAttributeSelecio(request),
+					seleccio);
+		}
+		if (ids != null) {
+			for (Long id: ids) {
+				seleccio.add(id);
+			}
+		} else {
+			
+			seleccio.addAll(
+					contingutService.findAdmin(
+							getEntitatActualComprovantPermisAdminEntitat(request).getId(),
+							ContingutFiltreCommand.asDto(getFiltreCommand(request)),
+							null,
+							ResultEnumDto.IDS).getIds());
+		}
+		return seleccio.size();
+	}
+
+	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
+	@ResponseBody
+	public int deselect(
+			HttpServletRequest request,
+			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request));
+		if (seleccio == null) {
+			seleccio = new HashSet<Long>();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					getSessionAttributeSelecio(request),
+					seleccio);
+		}
+		if (ids != null) {
+			for (Long id: ids) {
+				seleccio.remove(id);
+			}
+		} else {
+			seleccio.clear();
+		}
+		return seleccio.size();
+	}
+	
+    
+
+	
+	
+
+   @RequestMapping(value = "/recuperarMassiu", method = RequestMethod.GET)
+	public String recuperarMassiu(
+			HttpServletRequest request) throws Throwable {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request)));
+		
+		if (seleccio == null || seleccio.isEmpty()) {
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:/contingutAdmin",
+					"accio.massiva.seleccio.buida",
+					null);
+		}
+		
+		int errors = 0;
+		int warnings = 0;
+		int correctes = 0;
+		
+		for (Long id : seleccio) {
+			
+			if (contingutService.isDeleted(id)) {
+				
+				try {
+					organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(id));
+					contingutService.undelete(
+							entitatActual.getId(),
+							id);
+					correctes++;
+				} catch (Exception ex) {
+					log.error("Error al recuperar contingut massiu", ex);
+					errors++;
+				}
+			} else {
+				warnings++;
+			}
+		}
+		
+		if (correctes > 0){
+			MissatgesHelper.success(request, getMessage(request, "contingut.admin.controller.recuperar.massiu.ok", new Object[]{correctes}));
+		} 
+		if (warnings > 0){
+			MissatgesHelper.warning(request, getMessage(request, "contingut.admin.controller.recuperar.massiu.warning", new Object[]{warnings}));
+		}
+		if (errors > 0) {
+			MissatgesHelper.error(request, getMessage(request, "contingut.admin.controller.recuperar.massiu.error", new Object[]{errors}), null);
+		} 
+		
+		seleccio.clear();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request),
+				seleccio);
+		
+		return "redirect:/contingutAdmin";
+	}
+   
+   
+   
+   
+   @RequestMapping(value = "/deleteDefinitiuMassiu", method = RequestMethod.GET)
+	public String deleteDefinitiuMassiu(
+			HttpServletRequest request) throws Throwable {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request)));
+		
+		if (seleccio == null || seleccio.isEmpty()) {
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:/contingutAdmin",
+					"accio.massiva.seleccio.buida",
+					null);
+		}
+		
+		int errors = 0;
+		int warnings = 0;
+		int correctes = 0;
+		
+		for (Long id : seleccio) {
+			
+			if (contingutService.isDeleted(id)) {
+				
+				try {
+					organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(id));
+					contingutService.deleteDefinitiu(
+							entitatActual.getId(),
+							id);
+					correctes++;
+				} catch (Exception ex) {
+					log.error("Error al esborrar definitivament massiu", ex);
+					errors++;
+				}
+			} else {
+				warnings++;
+			}
+		}
+		
+		if (correctes > 0){
+			MissatgesHelper.success(request, getMessage(request, "contingut.admin.controller.esborrar.massiu.ok", new Object[]{correctes}));
+		} 
+		if (warnings > 0){
+			MissatgesHelper.warning(request, getMessage(request, "contingut.admin.controller.esborrar.massiu.warning", new Object[]{warnings}));
+		}
+		if (errors > 0) {
+			MissatgesHelper.error(request, getMessage(request, "contingut.admin.controller.esborrar.massiu.error", new Object[]{errors}), null);
+		} 
+		
+		seleccio.clear();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request),
+				seleccio);
+		
+		return "redirect:/contingutAdmin";
+	}
+    
+
+	
+	
+    
+    
+	private String getSessionAttributeSelecio(HttpServletRequest request) {
+		return SESSION_ATTRIBUTE_SELECCIO;
+	}
+
 
 	private ContingutFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {

@@ -18,6 +18,8 @@ pageContext.setAttribute(
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<script src="<c:url value="/webjars/datatables.net-select/1.3.1/js/dataTables.select.min.js"/>"></script>
+	<link href="<c:url value="/webjars/datatables.net-select-bs/1.2.3/css/select.bootstrap.min.css"/>" rel="stylesheet"></link>
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
@@ -29,6 +31,12 @@ pageContext.setAttribute(
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+<style>
+	table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+	    color: #333;
+	}
+</style>	
+		
 <script>
 $(document).ready(function() {
 	$('#tipus').on('change', function() {
@@ -70,6 +78,40 @@ $(document).ready(function() {
 	});
 	
 	$('#tipus').trigger('change');
+
+
+	$('#taula').on('selectionchange.dataTable', function (e, accio, ids) {
+		$.get(
+				"contingutAdmin/" + accio,
+				{ids: ids},
+				function(data) {
+					$("#seleccioCount").html(data);
+				}
+		);
+	});
+	$('#taula').one('draw.dt', function () {
+		$('#seleccioAll').on('click', function() {
+			$.get(
+					"contingutAdmin/select",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taula').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+		$('#seleccioNone').on('click', function() {
+			$.get(
+					"contingutAdmin/deselect",
+					function(data) {
+						$("#seleccioCount").html(data);
+						$('#taula').webutilDatatable('select-none');
+						$('#taula').webutilDatatable('refresh');
+					}
+			);
+			return false;
+		});
+	});			
 });
 </script>
 </head>
@@ -138,14 +180,37 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</form:form>
+	
+	
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="text-right">
+			<div class="btn-group">
+				<button id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></button>
+				<button id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></button>
+				<div class="btn-group">
+					<button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  						<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="expedient.list.user.opcions"/> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a href="contingutAdmin/recuperarMassiu"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="contingut.admin.boto.recuperar"/></a></li>							
+						<li><a href="contingutAdmin/deleteDefinitiuMassiu"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</script>	
+	
+	
 	<script id="rowhrefTemplate" type="text/x-jsrender">contingutAdmin/{{:id}}/info</script>
 	<table
-		id="taulaDades"
+		id="taula"
 		data-toggle="datatable"
 		data-url="<c:url value="/contingutAdmin/datatable"/>"
 		data-default-order="11"
 		data-default-dir="desc"
 		class="table table-bordered table-striped"
+		data-botons-template="#botonsTemplate"
+		data-selection-enabled="true"
 		data-rowhref-template="#rowhrefTemplate"
 		data-rowhref-toggle="modal">
 		<thead>
@@ -190,7 +255,7 @@ $(document).ready(function() {
 								{{if esborrat}}
 								<li><a href="contingutAdmin/{{:id}}/undelete" data-toggle="ajax"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="contingut.admin.boto.recuperar"/></a></li>
 							
-	<li><a href="contingutAdmin/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
+								<li><a href="contingutAdmin/{{:id}}/deleteDefinitiu" data-toggle="ajax" data-confirm="<spring:message code="contingut.admin.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								<%--	{{if hasFills}}
 									<li class="disabled"><a data-toggle="ajax" ><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 									{{else}}
