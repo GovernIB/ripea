@@ -759,7 +759,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				baos,
 				request, 
 				null, 
-				tascaId);
+				tascaId,
+				null,
+				null);
 		
 		reportContent = baos.toByteArray();
 		response.setHeader("Content-Disposition", "attachment; filename=" + pare.getNom().replaceAll(" ", "_") + ".zip");
@@ -834,7 +836,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 
 		
-		return concatenarOGenerarZip(request, expedientId, command.getMetaNodeId(), model);
+		return concatenarOGenerarZip(
+				request,
+				expedientId,
+				command.getMetaNodeId(),
+				command.getNtiOrigen(),
+				command.getNtiEstadoElaboracion(),
+				model);
 
 	}
 	
@@ -844,6 +852,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Long metaDocumentId,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			Model model) {
 		
 		try {
@@ -914,7 +924,9 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						null,
 						request, 
 						metaDocumentId, 
-						null);
+						null,
+						ntiOrigen,
+						ntiEstadoElaboracion);
 				
 				float sizeMB = (command.getFitxerContingut().length / 1024f) / 1024f;
 				if (sizeMB > 10) {

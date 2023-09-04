@@ -182,7 +182,12 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+			addDestinatari(
+					dadesUsuari.getCodi(),
+					emailsNoAgrupats,
+					emailsAgrupats,
+					null,
+					"Email canviEstatRevisioMetaExpedient. Permission: Rol IPA_REVISIO: " + ", user: " + dadesUsuari.getCodi());
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -194,7 +199,12 @@ public class EmailHelper {
 					dadesUsuari.getCodi());
 
 			if (granted) {
-				addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+				addDestinatari(
+						dadesUsuari.getCodi(),
+						emailsNoAgrupats,
+						emailsAgrupats,
+						null,
+						"Email canviEstatRevisioMetaExpedient. Permission: Administració de entitat: " + entitatId + ", user: " + dadesUsuari.getCodi());
 			}
 		}
 		
@@ -224,7 +234,6 @@ public class EmailHelper {
 	public void comentariMetaExpedient(
 			MetaExpedientComentariEntity metaExpComnt) {
 		
-		logger.debug("Enviant correu electrònic per nou comentari");
 		String comentari = metaExpComnt.getText();
 		MetaExpedientEntity metaExpedientEntity = metaExpComnt.getMetaExpedient();
 		Long entitatId = metaExpedientEntity.getEntitat().getId();
@@ -232,7 +241,12 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+			addDestinatari(
+					dadesUsuari.getCodi(),
+					emailsNoAgrupats,
+					emailsAgrupats,
+					null,
+					"Email comentariMetaExpedient. Permission: IPA_REVISIO, user: " + dadesUsuari.getCodi());
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -243,7 +257,12 @@ public class EmailHelper {
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
 			if (granted) {
-				addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+				addDestinatari(
+						dadesUsuari.getCodi(),
+						emailsNoAgrupats,
+						emailsAgrupats,
+						null,
+						"Email comentariMetaExpedient. Permission: Administració de entitat: " + entitatId + ", user: " + dadesUsuari.getCodi());
 			}
 		}
 		
@@ -259,7 +278,12 @@ public class EmailHelper {
 							new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU},
 							dadesUsuari.getCodi());
 					if (granted) {
-						addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+						addDestinatari(
+								dadesUsuari.getCodi(),
+								emailsNoAgrupats,
+								emailsAgrupats,
+								null,
+								"Email comentariMetaExpedient. Permission: Administració órgan comuns: " + organ.getId() + ", user: " + dadesUsuari.getCodi());
 					}
 				}
 			}
@@ -272,7 +296,12 @@ public class EmailHelper {
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						dadesUsuari.getCodi());
 				if (granted) {
-					addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+					addDestinatari(
+							dadesUsuari.getCodi(),
+							emailsNoAgrupats,
+							emailsAgrupats,
+							null,
+							"Email comentariMetaExpedient. Permission: Administració órgan : " + organGestor.getId() + ", user: " + dadesUsuari.getCodi());
 				}
 			}
 		}
@@ -494,13 +523,17 @@ public class EmailHelper {
 	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(
 			MetaExpedientEntity metaExpedientEntity, 
 			Long entitatId) {
-		logger.debug("Enviant correu electrònic a administrador d'organ que ha creat procediment degut a canvi d'estat de revisio");
 		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
 		
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
 		
-		addDestinatari(organAdminCreador.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+		addDestinatari(
+				organAdminCreador.getCodi(),
+				emailsNoAgrupats,
+				emailsAgrupats,
+				null,
+				"Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
 		
 		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
@@ -524,8 +557,7 @@ public class EmailHelper {
 
 	public void canviEstatDocumentPortafirmes(
 			DocumentPortafirmesEntity documentPortafirmes) {
-		logger.debug("Enviant correu electrònic per a canvi d'estat de document al portafirmes (" +
-			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
+
 		
 		DocumentEntity document = documentPortafirmes.getDocument();
 		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();

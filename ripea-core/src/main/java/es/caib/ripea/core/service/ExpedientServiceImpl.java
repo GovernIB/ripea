@@ -1829,24 +1829,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual) {
 		
 		ExpedientFiltreCalculat expedientFiltreCalculat = new ExpedientFiltreCalculat();
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
-		
 
 		MetaExpedientEntity metaExpedientFiltre = null;
-		
 		long t2 = System.currentTimeMillis();
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false,
-					false, 
-					rolActual, 
-					null);
+			metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		expedientFiltreCalculat.setMetaExpedientFiltre(metaExpedientFiltre);
 		if (cacheHelper.mostrarLogsRendiment())
