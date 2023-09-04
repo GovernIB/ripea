@@ -29,11 +29,17 @@
 		<c:otherwise>false</c:otherwise>
 	</c:choose>
 </c:set>
+<c:set var="isTascaObert" scope="request">
+	<c:choose>
+		<c:when test="${isTasca and (tascaEstat == 'PENDENT' or tascaEstat == 'INICIADA')}">true</c:when>
+		<c:otherwise>false</c:otherwise>
+	</c:choose>
+</c:set>
 
 <c:set var="permissionWrite" scope="request" value="${expedient.usuariActualWrite}"/>
 <c:set var="potModificar" scope="request">
 	<c:choose>
-		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTasca or contingut.admin) and expedientObert}">true</c:when>
+		<c:when test="${((expedientAgafatPerUsuariActual and permissionWrite) or isTascaObert or contingut.admin) and expedientObert}">true</c:when>
 		<c:otherwise>false</c:otherwise>
 	</c:choose>
 </c:set>
@@ -687,6 +693,11 @@ function removeCookie(cname) {
 								</c:otherwise>
 							</c:choose>	
 								
+							<c:if test="${expedientTancat}">
+								<dt><spring:message code="contingut.info.motiu"/></dt>
+								<dd>${contingut.tancatMotiu}</dd>
+							</c:if>
+							
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
 							<dd>${contingut.ntiClasificacionSia}</dd>
 
@@ -699,7 +710,7 @@ function removeCookie(cname) {
 							<ul class="list-unstyled">
 								<c:forEach var="expedientRelacionat" items="${relacionats}">
 									<c:if test="${!expedientRelacionat.esborrat}">
-										<li style="font-size:14px; line-height: 25px;">
+										<li style="font-size:14px; line-height: 25px;" title="[${expedientRelacionat.sequencia}/${expedientRelacionat.any}] ${expedientRelacionat.nom}">
 											<span style="width:10%" class="fa ${iconaExpedientObert}"></span>
 											<span style="width:76%" class="ellipsis">
 												<a href="${expedientRelacionat.id}">

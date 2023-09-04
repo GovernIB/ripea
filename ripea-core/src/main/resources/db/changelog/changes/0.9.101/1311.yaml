@@ -1,0 +1,13 @@
+databaseChangeLog:
+- changeSet:
+    id: 1692879211491-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: utilitzar_cif_pinbal
+            type: boolean
+            defaultValueBoolean:  false     
+        tableName: ipa_organ_gestor
+

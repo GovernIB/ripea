@@ -184,7 +184,8 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organGestorDto.getNom(),
 				organPareEntity,
 				true, 
-				organGestorDto.getCif());
+				organGestorDto.getCif(),
+				organGestorDto.isUtilitzarCifPinbal());
 
 		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
 	}

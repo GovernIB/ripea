@@ -315,7 +315,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 		
 		RegistreAnnexCommand registreAnnexCommand = new RegistreAnnexCommand();
 		
-		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), filtreCommand.getMetaExpedientId());
+		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(filtreCommand.getMetaExpedientId());
 		if (metaDocPerDefecte != null) {
 			registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
 		}

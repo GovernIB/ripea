@@ -37,6 +37,16 @@
 
 $(document).ready(function() {
 
+	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
+		$.get(
+				"relacionarList/" + accio,
+				{ids: ids},
+				function(data) {
+					$("#seleccioCount").html(data);
+				}
+		);
+	});
+	
 	$('#taulaDades').on('draw.dt', function () {
 
 		$("span[class^='stateColor-']").each(function( index ) {
@@ -99,7 +109,14 @@ $(document).ready(function() {
 			</div>
 		</div>
 	</form:form>
-
+	
+	<script id="botonsTemplate" type="text/x-jsrender">
+		<div class="text-right">
+			<div class="btn-group">
+				<a href="relacionar/" class="btn btn-success"><span id="seleccioCount" class="badge">${fn:length(seleccioRelacionar)}</span> <spring:message code="comu.boto.relacionar"/> <span class="fa fa-link"></span></a>
+			</div>
+		</div>
+	</script>
 	<table
 		id="taulaDades"
 		data-toggle="datatable" 
@@ -107,6 +124,8 @@ $(document).ready(function() {
 		class="table table-bordered table-striped table-hover" 
 		data-default-order="7" 
 		data-default-dir="desc"
+		data-botons-template="#botonsTemplate"
+		data-selection-enabled="true"
 		data-save-state="true"
 		style="width:100%">
 		<thead>

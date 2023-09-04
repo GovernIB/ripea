@@ -84,7 +84,9 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Column(name = "rol_actual")
 	private String rolActual;
 	
-
+	@Column(name = "pfirmes_avis_firma_parcial")
+	private Boolean portafirmesAvisFirmaParcial;
+	
 	public ExecucioMassivaTipus getTipus() {
 		return tipus;
 	}
@@ -128,7 +130,10 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public String getRolActual() {
 		return rolActual;
 	}
-
+	public Boolean getPortafirmesAvisFirmaParcial() {
+		return portafirmesAvisFirmaParcial;
+	}
+	
 	public void addContingut(ExecucioMassivaContingutEntity contingut) {
 		getContinguts().add(contingut);
 	}
@@ -153,7 +158,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			Date dataCaducitat,
 			boolean enviarCorreu,
 			EntitatEntity entitat,
-			String rolActual) {
+			String rolActual,
+			boolean portafirmesAvisFirmaParcial) {
 		return new Builder(
 				tipus,
 				dataInici,
@@ -166,7 +172,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				dataCaducitat,
 				enviarCorreu,
 				entitat,
-				rolActual);
+				rolActual,
+				portafirmesAvisFirmaParcial);
 	}
 	public static class Builder {
 		ExecucioMassivaEntity built;
@@ -181,7 +188,8 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				Date dataCaducitat,
 				boolean enviarCorreu,
 				EntitatEntity entitat,
-				String rolActual) {
+				String rolActual,
+				boolean portafirmesAvisFirmaParcial) {
 			built = new ExecucioMassivaEntity();
 			built.tipus = tipus;
 			built.dataInici = dataInici;
@@ -195,6 +203,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			built.enviarCorreu = enviarCorreu;
 			built.entitat = entitat;
 			built.rolActual = rolActual;
+			built.portafirmesAvisFirmaParcial = portafirmesAvisFirmaParcial;
 		}
 		public ExecucioMassivaEntity build() {
 			return built;

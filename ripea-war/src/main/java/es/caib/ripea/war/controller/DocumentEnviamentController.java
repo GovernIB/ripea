@@ -188,8 +188,14 @@ public class DocumentEnviamentController extends BaseUserController {
 	public String notificacioActualitzarEstat(
 			HttpServletRequest request,
 			@PathVariable String identificador,
-			@RequestParam(value = "contingutNavigationId", required = true) Long contingutNavigationId,
+			@RequestParam(value = "contingutNavigationId", required = false) Long contingutNavigationId,
 			Model model) {
+		String url = null;
+		if (contingutNavigationId != null) {
+			url = "redirect:/contingut/" + contingutNavigationId + "#notificacions";
+		} else {
+			url = "redirect:/seguimentNotificacions";
+		}
 		try {
 			getEntitatActualComprovantPermisos(request);
 			
@@ -198,7 +204,7 @@ public class DocumentEnviamentController extends BaseUserController {
 			
 			return getModalControllerReturnValueSuccess(
 					request,
-					"redirect:/contingut/" + contingutNavigationId + "#notificacions",
+					url,
 					"contingut.enviament.actualitzar.estat.ok");
 		} catch (Exception e) {
 			logger.error("Error al actualitzar estat del enviament", e);
@@ -214,7 +220,7 @@ public class DocumentEnviamentController extends BaseUserController {
 
 			return getModalControllerReturnValueErrorMessageText(
 					request,
-					"redirect:/contingut/" + contingutNavigationId + "#notificacions",
+					url,
 					msg,
 					e);
 		}

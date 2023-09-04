@@ -37,6 +37,18 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			DocumentEnviamentEstatEnumDto[] estat,
 			boolean error);
 	
+	@Query( "select dp.error " +
+			"from " +
+			"	DocumentPortafirmesEntity dp " +
+			"where dp.id = ( " +
+			"		select " +
+			"			max(p.id) " +
+			"		from " +
+			"			DocumentPortafirmesEntity p " +
+			"		where " +
+			"			p.document = :document) ")
+	Boolean findErrorLastEnviamentPortafirmesByDocument(@Param("document") DocumentEntity document);
+	
 	DocumentPortafirmesEntity findByPortafirmesId(
 			String portafirmesId);
 

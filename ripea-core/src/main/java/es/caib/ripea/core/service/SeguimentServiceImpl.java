@@ -127,34 +127,65 @@ public class SeguimentServiceImpl implements SeguimentService {
 	
 	@Override
 	@Transactional(readOnly = true)
-	public PaginaDto<SeguimentDto> findNotificacionsEnviaments(
+	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		
-		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-		ordenacioMap.put("expedientNom", new String[] { "expedient.nom" });
-		ordenacioMap.put("documentNom", new String[] { "document.nom" });
-		ordenacioMap.put("estatEnviament", new String[] { "estat" });
-		ordenacioMap.put("dataEnviament", new String[] { "createdDate" });
-		
-		Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
-				entitat,
-				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
-				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
-				filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
-				filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
-				filtre.getDataEnviamentInici() == null, 
-				filtre.getDataEnviamentInici(), 
-				filtre.getDataEnviamentFinal() == null, 
-				DateHelper.toDateFinalDia(filtre.getDataEnviamentFinal()), 
-				filtre.getNotificacioEstat() == null, 
-				filtre.getNotificacioEstat(), 
-				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
-		
-		return paginacioHelper.toPaginaDto(docsEnvs, SeguimentDto.class);
+		ResultDto<SeguimentDto> result = new ResultDto<SeguimentDto>();
+
+		if (resultEnum == ResultEnumDto.PAGE) {
+			
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("expedientNom", new String[] { "expedient.nom" });
+			ordenacioMap.put("documentNom", new String[] { "document.nom" });
+			ordenacioMap.put("estatEnviament", new String[] { "estat" });
+			ordenacioMap.put("dataEnviament", new String[] { "createdDate" });
+			
+			// ================================  RETURNS PAGE (DATATABLE) ==========================================
+			Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
+					entitat,
+					filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
+					filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
+					filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
+					filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
+					filtre.getDataEnviamentInici() == null, 
+					filtre.getDataEnviamentInici(), 
+					filtre.getDataEnviamentFinal() == null, 
+					DateHelper.toDateFinalDia(filtre.getDataEnviamentFinal()), 
+					filtre.getNotificacioEstat() == null, 
+					filtre.getNotificacioEstat(), 
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+			
+	
+	
+			PaginaDto<SeguimentDto> paginaDto = paginacioHelper.toPaginaDto(
+					docsEnvs,
+					SeguimentDto.class);
+			result.setPagina(paginaDto);
+		} else {
+			
+			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
+			List<Long> idsDocsEnvs = documentNotificacioRepository.findIdsAmbFiltrePaginat(
+					entitat,
+					filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
+					filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
+					filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
+					filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
+					filtre.getDataEnviamentInici() == null, 
+					filtre.getDataEnviamentInici(), 
+					filtre.getDataEnviamentFinal() == null, 
+					DateHelper.toDateFinalDia(filtre.getDataEnviamentFinal()), 
+					filtre.getNotificacioEstat() == null, 
+					filtre.getNotificacioEstat());			
+			
+			result.setIds(idsDocsEnvs);
+		}
+
+		return result;
 		
 	}
 	
@@ -350,6 +381,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 						metaExpedient == null,
 						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 				result.setPagina(paginacioHelper.toPaginaDto(exps, SeguimentArxiuPendentsDto.class));
 
@@ -363,7 +398,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
 						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
 						metaExpedient == null,
-						metaExpedient);
+						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
 				result.setIds(exps);
 			}
 
@@ -392,6 +431,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient,
 						metaExpedient == null,
 						metaExpedient, 
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 				
 				
@@ -431,7 +474,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient == null,
 						expedient,
 						metaExpedient == null,
-						metaExpedient);
+						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
 				result.setIds(docs);
 			}
 
@@ -457,6 +504,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient,
 						metaExpedient == null,
 						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 
 				result.setPagina(paginacioHelper.toPaginaDto(ints, SeguimentArxiuPendentsDto.class));
@@ -473,7 +524,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 						expedient == null,
 						expedient,
 						metaExpedient == null,
-						metaExpedient);
+						metaExpedient,
+						filtre.getDataCreacioInici() == null,
+						filtre.getDataCreacioInici(),
+						filtre.getDataCreacioFi() == null,
+						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
 
 				result.setIds(ints);
 

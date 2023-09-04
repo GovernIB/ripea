@@ -9,6 +9,8 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 
@@ -43,14 +45,12 @@ public interface ExpedientEstatService {
 	List<ExpedientEstatDto> findExpedientEstatsByMetaExpedient(Long entitatId, Long metaExpedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
+	ResultDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, 
+			String rolActual, 
+			ResultEnumDto resultEnum) throws NotFoundException;
 
-	@PreAuthorize("hasRole('tothom')")
-	List<Long> findIdsExpedientsPerCanviEstatMassiu(
-			Long entitatId,
-			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException;
 
 }

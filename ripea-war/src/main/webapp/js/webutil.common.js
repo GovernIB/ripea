@@ -562,15 +562,19 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    	delay: 500,
 		    	url: function(params){
 		    		
-		    		var additionalParam = (this).data('urlParamAddicional');
+		    		var usePathVariable = (this).data('usePathVariable') != false;
 		    		
+		    		var additionalParam = (this).data('urlParamAddicional');
+		    		var url = $(this).data('urlLlistat');
+		    		
+		    		if (usePathVariable) {
+		    			url += "/" + encodeURIComponent(params.term);
+					}
 		    		if (additionalParam) {
-		    			return $(this).data('urlLlistat') + "/" + encodeURIComponent(params.term) + "/" + additionalParam;
-					} else {
-						return $(this).data('urlLlistat') + "/" + encodeURIComponent(params.term);
+		    			url += "/" + additionalParam;
 					}
 		    		
-					
+		    		return url;
 				},
 				processResults: function (data) {
 					results = [];

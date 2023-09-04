@@ -334,18 +334,6 @@ public class EntityComprovarHelper {
 	
 
 
-	
-	public MetaExpedientEntity comprovarMetaExpedient(Long entitatId, Long metaExpedientId) {
-		EntitatEntity entitat = comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				false,
-				false);
-		return comprovarMetaExpedient(entitat, metaExpedientId);
-	}
-
 	public MetaExpedientEntity comprovarMetaExpedient(EntitatEntity entitat, Long metaExpedientId) {
 		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
 		if (metaExpedient == null) {
@@ -454,20 +442,12 @@ public class EntityComprovarHelper {
 	public MetaDocumentEntity comprovarMetaDocument(
 			Long entitatId,
 			Long metaDocumentId) {
-		EntitatEntity entitat = comprovarEntitat(
-				entitatId,
-				false,
-				false,
-				false,
-				false,
-				false);
 
 		return comprovarMetaDocument(
-				entitat,
 				metaDocumentId);
 	}
 
-	public MetaDocumentEntity comprovarMetaDocument(EntitatEntity entitat, Long metaDocumentId) {
+	public MetaDocumentEntity comprovarMetaDocument(Long metaDocumentId) {
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(metaDocumentId);
 		if (metaDocument == null) {
 			throw new NotFoundException(metaDocumentId, MetaDocumentEntity.class);
@@ -479,13 +459,9 @@ public class EntityComprovarHelper {
 		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
 			metaDocumentEntitat = HibernateHelper.deproxy(metaDocumentEntitat);
 		}
-		if (!entitat.equals(metaDocumentEntitat)) {
-			throw new ValidationException(metaDocumentId, MetaDocumentEntity.class,
-			        "L'entitat especificada (id=" + entitat.getId()
-			                + ") no coincideix amb l'entitat del meta-document");
-		}
+
 		if (metaDocument.getMetaExpedient() != null) {
-			comprovarMetaExpedient(entitat, metaDocument.getMetaExpedient().getId());
+			comprovarMetaExpedient(metaDocument.getMetaExpedient().getId());
 		}
 
 		return metaDocument;
@@ -528,7 +504,6 @@ public class EntityComprovarHelper {
 					id);
 		} else {
 			metaDocument = comprovarMetaDocument(
-					entitat,
 					id);
 		}
 		if (comprovarActiu) {
@@ -555,16 +530,14 @@ public class EntityComprovarHelper {
 		}
 		return metaDada;
 	}
-
-	public ContingutEntity comprovarContingut(EntitatEntity entitat, Long id) {
+	
+	
+	public ContingutEntity comprovarContingut(Long id) {
 		ContingutEntity contingut = contingutRepository.findOne(id);
 		if (contingut == null) {
 			throw new NotFoundException(id, ContingutEntity.class);
 		}
-		if (!contingut.getEntitat().getId().equals(entitat.getId())) {
-			throw new ValidationException(id, ContingutEntity.class, "L'entitat especificada (id="
-			        + entitat.getId() + ") no coincideix amb l'entitat del contingut");
-		}
+
 		return contingut;
 	}
 
@@ -575,12 +548,7 @@ public class EntityComprovarHelper {
 		if (node == null) {
 			throw new NotFoundException(nodeId, NodeEntity.class);
 		}
-		if (!entitat.getId().equals(node.getEntitat().getId())) {
-			throw new ValidationException(
-					nodeId,
-					NodeEntity.class,
-					"L'entitat especificada (id=" + entitat.getId() + ") no coincideix amb l'entitat del node");
-		}
+
 		return node;
 	}
 
@@ -589,10 +557,7 @@ public class EntityComprovarHelper {
 		if (carpeta == null) {
 			throw new NotFoundException(id, CarpetaEntity.class);
 		}
-		if (!entitat.equals(carpeta.getEntitat())) {
-			throw new ValidationException(id, CarpetaEntity.class, "L'entitat especificada (id="
-			        + entitat.getId() + ") no coincideix amb l'entitat de la carpeta");
-		}
+
 		return carpeta;
 	}
 	

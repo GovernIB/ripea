@@ -23,5 +23,7 @@ public interface SegonPlaService {
 	void enviarEmailPerComentariMetaExpedient();
 
 	void restartSchedulledTasks();
+	
+	void tancarExpedientsArxiu();
 
 }

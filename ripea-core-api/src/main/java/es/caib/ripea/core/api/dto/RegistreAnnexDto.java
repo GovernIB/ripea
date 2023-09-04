@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.text.DecimalFormat;
 import java.util.Date;
 
 import es.caib.ripea.core.api.utils.Utils;
@@ -25,11 +24,14 @@ public class RegistreAnnexDto {
 	private Date ntiFechaCaptura;
 	
 	private String ntiOrigen;
-	private String ntiTipoDocumental;
+	private NtiTipoDocumentoEnumDto ntiTipoDocumental;
 	private String ntiEstadoElaboracion;
 	private String observacions;
-	private String sicresTipoDocumento;
-	private String sicresValidezDocumento;
+
+
+	private SicresTipoDocumentoEnumDto sicresTipoDocumento;
+	private SicresValidezDocumentoEnumDto sicresValidezDocumento;
+	
 	private long tamany;
 	private String tipusMime;
 	private String titol;

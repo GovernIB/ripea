@@ -209,7 +209,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			pare = contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					pareId);
 			
@@ -290,7 +289,6 @@ public class DocumentServiceImpl implements DocumentService {
 			} 
 		} else {
 			documentEntity = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentDto.getId());
 		}
@@ -340,7 +338,6 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		if (tascaId != null) {
 			document = contingutHelper.comprovarDocumentPerTasca(
-					entitatId,
 					tascaId,
 					documentId);
 		} else {
@@ -389,7 +386,6 @@ public class DocumentServiceImpl implements DocumentService {
 					false);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -641,7 +637,6 @@ public class DocumentServiceImpl implements DocumentService {
 						false);
 			} else {
 				document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-						entitatId,
 						tascaId,
 						id);
 			}
@@ -860,7 +855,8 @@ public class DocumentServiceImpl implements DocumentService {
 			Long[] annexosIds,
 			String transaccioId, 
 			String rolActual, 
-			Long tascaId) {
+			Long tascaId,
+			boolean avisFirmaParcial) {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentId));
 		logger.debug("Enviant document a portafirmes (" +
@@ -882,7 +878,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -901,7 +896,8 @@ public class DocumentServiceImpl implements DocumentService {
 					portafirmesSeqTipus,
 					portafirmesFluxTipus,
 					annexosIds,
-					transaccioId);
+					transaccioId,
+					avisFirmaParcial);
 		} catch (Exception e) {
 			Throwable wsValidationException = ExceptionHelper.findThrowableInstance(e, WsValidationException.class, 6);
 			if (wsValidationException != null && (wsValidationException.getMessage().contains("Destinatari ID") || wsValidationException.getMessage().contains("ha trobat cap usuari"))
@@ -937,7 +933,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -1032,7 +1027,6 @@ public class DocumentServiceImpl implements DocumentService {
 					rolActual);
 		} else {
 			document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					documentId);
 		}
@@ -1111,7 +1105,6 @@ public class DocumentServiceImpl implements DocumentService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaDocumentId());
 		}
 		
@@ -1200,7 +1193,6 @@ public class DocumentServiceImpl implements DocumentService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					entitat,
 					filtre.getMetaDocumentId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
@@ -1626,7 +1618,6 @@ public class DocumentServiceImpl implements DocumentService {
 
 			} else {
 				document = contingutHelper.comprovarDocumentPerTasca(
-						entitatId,
 						tascaId,
 						documentId);
 			}
@@ -1653,14 +1644,23 @@ public class DocumentServiceImpl implements DocumentService {
 	public DocumentDto findAmbId(
 			Long documentId, 
 			String rolActual, 
-			PermissionEnumDto permission) {
+			PermissionEnumDto permission, 
+			Long tascaId) {
 		
 		if (permission != null) {
-			contingutHelper.checkIfPermitted(
-					documentId,
-					rolActual,
-					permission);
+			if (tascaId == null) {
+				contingutHelper.checkIfPermitted(
+						documentId,
+						rolActual,
+						permission);
+
+			} else {
+				contingutHelper.comprovarDocumentPerTasca(
+						tascaId,
+						documentId);
+			}
 		}
+		
 		ContingutEntity contingut = documentRepository.findOne(documentId);
 		ContingutDto contingutDto = contingutHelper.toContingutDto(
 				contingut,
@@ -1706,7 +1706,7 @@ public class DocumentServiceImpl implements DocumentService {
 	@Override
 	public void notificacioActualitzarEstat(
 			String identificador) {
-		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByEnviamentIdentificador(
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findByNotificacioIdentificador(
 				identificador);
 		try {
 
@@ -1720,6 +1720,25 @@ public class DocumentServiceImpl implements DocumentService {
 			throw new RuntimeException(ex);
 		}
 	}
+	
+	@Transactional
+	@Override
+	public void notificacioActualitzarEstat(
+			Long id) {
+		DocumentNotificacioEntity documentNotificacio = documentNotificacioRepository.findOne(id);
+		try {
+
+			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity : documentNotificacio.getDocumentEnviamentInteressats()) {
+				documentNotificacioHelper.actualitzarEstat(documentEnviamentInteressatEntity);
+			}
+			
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al accedir al plugin de notificacions";
+			logger.error(errorDescripcio, ex);
+			throw new RuntimeException(ex);
+		}
+	}
+	
 	
 	
 	
@@ -1744,7 +1763,7 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		DocumentNotificacioEntity documentNotificacioEntity = documentNotificacioRepository.findOne(notificacioId);
 
-		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getEnviamentIdentificador());
+		RespostaJustificantEnviamentNotib resposta = pluginHelper.notificacioDescarregarJustificantEnviamentNotib(documentNotificacioEntity.getNotificacioIdentificador());
 		return conversioTipusHelper.convertir(resposta, RespostaJustificantEnviamentNotibDto.class);
 	}
 
@@ -1772,7 +1791,6 @@ public class DocumentServiceImpl implements DocumentService {
 			Long metaDocumentId) {
 		
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
-				entitatId,
 				metaDocumentId);
 		
 		List<DocumentEntity> documents = documentRepository.findByMetaNode(entity);

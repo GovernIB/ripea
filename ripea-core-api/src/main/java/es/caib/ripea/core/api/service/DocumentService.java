@@ -303,6 +303,8 @@ public interface DocumentService {
 	 *            La prioritat de l'enviament.
 	 * @param rolActual TODO
 	 * @param tascaId TODO
+	 * @param avisFirmaParcial 
+	 * 			  Indicar si rebre correus canvi estat de firmes parcials
 	 * @param dataCaducitat
 	 *            La data màxima per a firmar el document.
 	 * @throws NotFoundException
@@ -325,7 +327,8 @@ public interface DocumentService {
 			Long[] annexosIds,
 			String transaccioId, 
 			String rolActual, 
-			Long tascaId) throws NotFoundException, IllegalStateException, SistemaExternException;
+			Long tascaId,
+			boolean avisFirmaParcial) throws NotFoundException, IllegalStateException, SistemaExternException;
 	
 	/**
 	 * Recupera els dispositius disponibles per un usuari
@@ -700,8 +703,11 @@ public interface DocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public DocumentDto findAmbId(
-			Long documentId, String rolActual, PermissionEnumDto permission);
-	
+			Long documentId,
+			String rolActual,
+			PermissionEnumDto permission,
+			Long tascaId);
+
 	/**
 	 * Recupera url per visualitzar l'estat d'un flux de firmes d'una petició.
 	 *
@@ -739,6 +745,9 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public void notificacioActualitzarEstat(
 			String identificador);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void notificacioActualitzarEstat(Long id);
 
 
 	

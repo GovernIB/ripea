@@ -250,6 +250,8 @@ public class ArxiuConversions {
 		} else if (document.getMetadades().getTipusDocumentalAddicional() != null) {
 			tipusDocumental = document.getMetadades().getTipusDocumentalAddicional();
 		}
+		if (tipusDocumental == null && document.getMetadades().getTipusDocumental() != null)
+			tipusDocumental = document.getMetadades().getTipusDocumental().toString();
 	
 		return tipusDocumental;
 	}

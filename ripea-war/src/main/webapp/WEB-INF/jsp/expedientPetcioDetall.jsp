@@ -215,14 +215,25 @@ tr.clicable {
 			type: 'GET',
 			url: arxiuUrl,
 			responseType: 'arraybuffer',
-			success: function(response) {
-	            var blob = base64toBlob(response.contingut, response.contentType);
-	            var file = new File([blob], response.contentType, {type: response.contentType});
-	            link = URL.createObjectURL(file);
-	            
-	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-			    $('#container').removeClass('rmodal_loading');
-			    $('#container').attr('src', viewerUrl);
+			success: function(json) {
+				
+				if (json.error) {
+					$('#container').removeClass('rmodal_loading');
+					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
+				} else if (json.warning) {
+					$('#container').removeClass('rmodal_loading');
+					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-warning"><spring:message code="contingut.previsualitzacio.warning"/>' + '</div></div>');
+				} else {
+					response = json.data;
+					var blob = base64toBlob(response.contingut, response.contentType);
+		            var file = new File([blob], response.contentType, {type: response.contentType});
+		            link = URL.createObjectURL(file);
+		            
+		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+				    $('#container').removeClass('rmodal_loading');
+				    $('#container').attr('src', viewerUrl);
+				}
+			    
 			},
 			error: function(xhr, ajaxOptions, thrownError) {
 				$('#container').removeClass('rmodal_loading');
@@ -333,19 +344,21 @@ tr.clicable {
 					<tbody>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.docfis"/></strong></td>
-							<td>${registre.docFisicaCodi} - ${registre.docFisicaDescripcio}</td>
+							<td colspan="3">${registre.docFisicaCodi} - ${registre.docFisicaDescripcio}</td>
 						</tr>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.desti"/></strong></td>
-							<td>${registre.destiDescripcio} (${registre.destiCodi})</td>
+							<td colspan="3">${registre.destiDescripcio} (${registre.destiCodi})</td>
 						</tr>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.refext"/></strong></td>
-							<td>${registre.refExterna}</td>
-							</tr>
+							<td colspan="3">${registre.refExterna}</td>
+						</tr>
 						<tr>
 							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.numexp"/></strong></td>
 							<td>${registre.expedientNumero}</td>
+							<td style="width:16%;"><strong><spring:message code="registre.detalls.camp.procediment"/></strong></td>
+							<td>${registre.procedimentCodi} - ${peticio.metaExpedientNom}</td>
 						</tr>
 					</tbody>
 				</table>

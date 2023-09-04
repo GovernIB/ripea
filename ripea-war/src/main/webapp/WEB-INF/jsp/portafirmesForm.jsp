@@ -638,6 +638,9 @@ function isDniNie(value) {
 		<rip:inputText name="motiu" textKey="contenidor.document.portafirmes.camp.motiu" required="true"/>
 		<rip:inputSelect name="prioritat" textKey="contenidor.document.portafirmes.camp.prioritat" optionEnum="PortafirmesPrioritatEnumDto" required="true"/>
 		<%--<rip:inputDate name="dataCaducitat" textKey="contenidor.document.portafirmes.camp.data.caducitat" required="true"/> --%>
+		<c:if test="${isHabilitarAvisFirmaParcialActiu}">
+			<rip:inputCheckbox name="avisFirmaParcial" textKey="contenidor.document.portafirmes.camp.avis"/>
+		</c:if>
 		<form:hidden name="portafirmesFluxTipus" path="portafirmesFluxTipus"/>
 		<c:choose>
 		<c:when test="${fluxTipus == 'SIMPLE'}">

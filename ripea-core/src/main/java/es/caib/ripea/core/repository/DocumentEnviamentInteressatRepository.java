@@ -20,10 +20,10 @@ public interface DocumentEnviamentInteressatRepository extends JpaRepository<Doc
 	@Query(	"from" +
 			"    DocumentEnviamentInteressatEntity e "
 			+ "where "
-			+ "	 e.notificacio.enviamentIdentificador = :enviamentIdentificador " +
+			+ "	 e.notificacio.notificacioIdentificador = :notificacioIdentificador " +
 			"and e.enviamentReferencia = :enviamentReferencia")
 	DocumentEnviamentInteressatEntity findByIdentificadorIReferencia(
-			@Param("enviamentIdentificador") String enviamentIdentificador,
+			@Param("notificacioIdentificador") String notificacioIdentificador,
 			@Param("enviamentReferencia") String enviamentReferencia);
 	
 	

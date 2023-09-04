@@ -268,18 +268,12 @@ public class IndexHelper {
 //			0, 
 //			contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 		List<ContingutEntity> continguts = new ArrayList<ContingutEntity>();
-		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-				expedient,
-				0,
-				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-		
-		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-				expedient,
-				0,
-				new Sort("createdDate"));
-		
-		continguts.addAll(fillsOrder1);
-		continguts.addAll(fillsOrder2);
+		if (contingutHelper.isOrdenacioPermesa()) {
+			continguts = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(expedient, 0);
+		} else {
+			continguts = contingutRepository.findByPareAndEsborratAndOrdenat(expedient, 0);
+		}
+
 		BigDecimal num = new BigDecimal(0);
 		BigDecimal sum = new BigDecimal(1);
 		for (ContingutEntity contingut : continguts) {
@@ -334,19 +328,12 @@ public class IndexHelper {
 //				0, 
 //				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 		List<ContingutEntity> contingutsCarpetaActual = new ArrayList<ContingutEntity>();
-		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-				carpetaActual,
-				0,
-				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-		
-		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-				carpetaActual,
-				0,
-				new Sort("createdDate"));
-		
-		contingutsCarpetaActual.addAll(fillsOrder1);
-		contingutsCarpetaActual.addAll(fillsOrder2);
-		
+		if (contingutHelper.isOrdenacioPermesa()) {
+			contingutsCarpetaActual = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(carpetaActual, 0);
+		} else {
+			contingutsCarpetaActual = contingutRepository.findByPareAndEsborratAndOrdenat(carpetaActual, 0);
+		}
+
 		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
 			if (contingutCarpetaActual instanceof CarpetaEntity) {
 				CarpetaEntity subCarpeta = (CarpetaEntity)contingutCarpetaActual;
@@ -544,7 +531,7 @@ public class IndexHelper {
 			for (String name: signatureNames) {
 //				### comprovar si és una firma o un segell
 				PdfDictionary dictionary = fields.getSignatureDictionary(name);
-				if (dictionary != null && dictionary.get(PdfName.TYPE).toString().equals("/Sig")) {
+				if (dictionary != null && dictionary.get(PdfName.TYPE) != null && dictionary.get(PdfName.TYPE).toString().equalsIgnoreCase("/Sig")) {
 					String dataFirmaStr = dictionary.get(PdfName.M) != null ? dictionary.get(PdfName.M).toString() : null;
 					Date dataFirma = dataFirmaStr != null ? PdfDate.decode(dataFirmaStr).getTime() : null;
 					datesFirmes.put(idx, dataFirma);

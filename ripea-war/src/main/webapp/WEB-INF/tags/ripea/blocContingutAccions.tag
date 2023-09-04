@@ -165,7 +165,7 @@
 			<c:set var="permDeleteCarpeta">${contingut.carpeta && isCreacioCarpetesActiva && expedient.usuariActualWrite}</c:set>
 			<c:set var="permDeleteDocument">${(contingut.document && !contingut.documentDeAnotacio && (!contingut.arxiuEstatDefinitiu || (contingut.arxiuEstatDefinitiu && isPermesEsborrarFinals))) && (expedient.usuariActualWrite || isTasca)}</c:set>
 
-			<c:if test="${(permDeleteExpedient || deleteConditionpermDeleteCarpetaCarpeta  || permDeleteDocument) && expedientObert}">
+			<c:if test="${(permDeleteExpedient || permDeleteCarpeta  || permDeleteDocument) && expedientObert}">
 				<li><a href="<c:url value="/contingut/${contingut.id}/delete?contingutNavigationId=${contingutNavigationId}&tascaId=${tascaId}"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 			</c:if>
 			<c:set var="mostrarSeparador" value="${true}"/>
@@ -201,18 +201,40 @@
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>
-						$('a[href = "#copy_${contingut.id}"]').click(function(){
-							$.get("../document/" + ${contingut.id} + "/urlValidacio", function(data) {
-								var dummy = $('<input>').val(data).appendTo('body').select();
-								document.execCommand("copy");
-								$(dummy).remove();				
-							});
-							$('.copy').remove();
-							$('.panel-body').prepend("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
-							setTimeout(function(){	
-								$('.copy').remove();
-							}, 2000);
-						}); 
+					$('a[href="#copy_${contingut.id}"]').click(function(){
+
+					    $.ajax({
+					        url: "../document/" + ${contingut.id} + "/urlValidacio",
+					        type: "GET",
+					        success: function(data) {
+					            var dummy = $('<input>').val(data).appendTo('body').select();
+					            document.execCommand("copy");
+					            $(dummy).remove();
+					            var successDiv = $("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
+
+					            $('.copy').remove();
+					            $('.panel-body').prepend(successDiv);
+
+					            setTimeout(function(){
+					                successDiv.remove();
+					            }, 2000);
+					        },
+					        error: function(xhr, status, error) {
+							    var errorDiv = $("<div class='copy alert alert-danger' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.error'/> " + error + "</div>");
+
+					        	var dummy = $('<input>').val("<spring:message code='comu.boto.urlValidacio.error'/>" + " " + error).appendTo('body').select();
+					            document.execCommand("copy");
+							    $(dummy).remove();
+							    
+					            $('.copy').remove();
+					            $('.panel-body').prepend(errorDiv);
+
+					            setTimeout(function(){
+					                errorDiv.remove();
+					            }, 2000);
+					        }
+					    });
+					});
 					</script>
 				</c:if>		
 				<c:set var="mostrarSeparador" value="${true}"/>
@@ -326,11 +348,17 @@
 						<%---- Índex PDF i exportació ENI... ----%>
 						<c:choose>
 							<c:when test="${contingut.conteDocumentsDefinitius}">
-			 					<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
 								<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+			 					<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
+			 					<c:if test="${isExportacioInsideActiva}">
+			 						<li><a class="fileDownload" href="<c:url value="/expedient/${contingut.id}/exportarEni?ambDocuments=true"/>"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+			 					</c:if>
 			 				</c:when>
 			 				<c:otherwise>
 			 					<li><a class="disabled" href="#"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+								<c:if test="${isExportacioInsideActiva}">
+									<li><a class="disabled" href="#"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+								</c:if>
 							</c:otherwise>
 						</c:choose>
 					</c:when>

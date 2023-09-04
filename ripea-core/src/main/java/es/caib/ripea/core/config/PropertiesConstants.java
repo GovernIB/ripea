@@ -31,4 +31,7 @@ public class PropertiesConstants {
 
     // 8. Consulta de canvis en l'organigrama
     public static final String CONSULTA_CANVIS_ORGANIGRAMA = "es.caib.ripea.organs.consulta.canvis";
+    
+    // 9. Consulta expedients pendents de tancar a l'arxiu
+    public static final String TANCAMENT_LOGIC_CRON = "es.caib.ripea.expedient.tancament.logic.cron";
 }

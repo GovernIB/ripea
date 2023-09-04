@@ -8,8 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,7 @@ import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.core.api.dto.SiNoEnumDto;
 import es.caib.ripea.core.api.exception.PinbalException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
@@ -53,6 +55,7 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +74,8 @@ public class PinbalHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Resource
+	private OrganGestorHelper organGestorHelper;
 
 	/** SVDDGPCIWS02 - Consulta de datos de identidad */
 	public String novaPeticioSvddgpciws02(
@@ -388,13 +393,25 @@ public class PinbalHelper {
 
 		String identificadorSolicitante;
 		String nombreSolicitante;
-		if (metaDocument.isPinbalUtilitzarCifOrgan() && StringUtils.isNotEmpty(expedient.getOrganGestor().getCif())) {
-			identificadorSolicitante = expedient.getOrganGestor().getCif();
-			nombreSolicitante = expedient.getOrganGestor().getNom();
+		OrganGestorEntity organGestorCIF = null;
+		if (metaDocument.isPinbalUtilitzarCifOrgan()) {
+			List<OrganGestorEntity> organsAmbPares = organGestorHelper.findPares(expedient.getOrganGestor(), true);
+			
+			for (OrganGestorEntity organ : organsAmbPares) {
+				if (organ.isUtilitzarCifPinbal() && Utils.isNotEmpty(organ.getCif())) {
+					organGestorCIF = organ;
+					break;
+				}
+			}
+		}
+		if (organGestorCIF != null) {
+			identificadorSolicitante = organGestorCIF.getCif();
+			nombreSolicitante = organGestorCIF.getNom();
 		} else {
 			identificadorSolicitante = entitat.getCif();
 			nombreSolicitante = entitat.getNom();
 		}
+		
 		solicitud.setIdentificadorSolicitante(identificadorSolicitante);
 		solicitud.setNombreSolicitante(nombreSolicitante);
 		

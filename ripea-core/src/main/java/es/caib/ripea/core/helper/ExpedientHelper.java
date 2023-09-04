@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
@@ -911,6 +912,10 @@ public class ExpedientHelper {
 		return expedientsWithImportacio;
 	}
 	
+	public List<ExpedientEntity> consultaExpedientsPendentsTancarArxiu(EntitatEntity entitat) {
+		return expedientRepository.findByEstatAndTancatLogicOrderByTancatProgramat(ExpedientEstatEnumDto.TANCAT, entitat, new Date());
+	}
+	
 	public ExpedientEntity updateNomExpedient(ExpedientEntity expedient, String nom) {
 		contingutHelper.comprovarNomValid(expedient.getPare(), nom, expedient.getId(), ExpedientEntity.class);
 		String nomOriginal = expedient.getNom();
@@ -1150,9 +1155,15 @@ public class ExpedientHelper {
 	}
 	
 	public void alliberar(ExpedientEntity expedient) {
-		UsuariEntity prevUserAgafat = expedient.getAgafatPer();
-		expedient.updateAgafatPer(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, prevUserAgafat.getCodi(), null, false, false);
+		UsuariEntity usuariActual = expedient.getAgafatPer();
+		UsuariEntity usuariCreador = expedient.getCreatedBy();
+		
+		expedient.updateAgafatPer(usuariCreador);
+		if (usuariCreador != null) {
+			// Avisa a l'usuari que li han retornat
+			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
+		}
+		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, usuariActual.getCodi(), null, false, false);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
@@ -1176,7 +1187,80 @@ public class ExpedientHelper {
 		return exception;
 	}
 	
-	
+	public FitxerDto exportarEniExpedientPerInside(boolean massiu, ExpedientEntity expedient, ZipOutputStream zos, boolean ambDocuments) throws IOException {
+		if (massiu) {
+			String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+			if (expedientExportacioEni != null) {
+				FitxerDto exportacioEni = new FitxerDto();
+				exportacioEni.setNom(expedient.getNom() + "_exportació_ENI.xml");
+				exportacioEni.setContentType("application/xml");
+				exportacioEni.setContingut(expedientExportacioEni.getBytes());
+				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+			}
+		} else {
+			String expedientExportacioEni = pluginHelper.arxiuExpedientExportar(expedient);
+			if (expedientExportacioEni != null && !ambDocuments) {
+				// Exportar només ENI expedient
+				FitxerDto resultat = new FitxerDto();
+				resultat.setNom(expedient.getNom() + "_exportació_ENI.xml");
+				resultat.setContentType("application/xml");
+				resultat.setContingut(expedientExportacioEni.getBytes());
+				
+				return resultat;
+			} else {
+				FitxerDto exportacioEni = new FitxerDto();
+				exportacioEni.setNom(expedient.getNom() + "_exportació_ENI.xml");
+				exportacioEni.setContentType("application/xml");
+				exportacioEni.setContingut(expedientExportacioEni.getBytes());
+				contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+			}
+			
+			if (ambDocuments) {
+				List<DocumentEntity> documentsDefinitius = documentRepository.findByExpedientAndEstatInAndEsborrat(
+						expedient, 
+						new DocumentEstatEnumDto[] {
+								DocumentEstatEnumDto.FIRMAT,
+								DocumentEstatEnumDto.CUSTODIAT,
+								DocumentEstatEnumDto.DEFINITIU
+							},
+						0);
+				
+				Map<String, Integer> duplicateCountMap = new HashMap<>();
+				for (DocumentEntity document: documentsDefinitius) {
+					if (document.getArxiuUuid() != null) {
+						String documentExportacioEni = pluginHelper.arxiuDocumentExportar(document);
+						FitxerDto exportacioEni = new FitxerDto();
+						String documentNom = document.getNom() + "_exportació_ENI.xml";
+						
+						if (duplicateCountMap.containsKey(documentNom)) {
+							int count = duplicateCountMap.get(documentNom);
+		                    count++;
+		                    duplicateCountMap.put(documentNom, count);
+		                    
+		                    documentNom = removeExtension(documentNom) + "_" + count + ".xml";
+						} else {
+		                    duplicateCountMap.put(documentNom, 0);
+		                }
+		                
+						exportacioEni.setNom(documentNom);
+						exportacioEni.setContentType("application/xml");
+						exportacioEni.setContingut(documentExportacioEni.getBytes());
+						contingutHelper.crearNovaEntrada(exportacioEni.getNom(), exportacioEni, zos);
+					}
+				}
+			}
+		}
+		return new FitxerDto();
+	}
+
+    private String removeExtension(String filename) {
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex == -1)
+            return filename;
+        
+        return filename.substring(0, dotIndex);
+    }
+    
 	public FitxerDto exportarExpedient(
 			EntitatEntity entitatActual, 
 			List<ExpedientEntity> expedients,
@@ -1194,18 +1278,11 @@ public class ExpedientHelper {
 //					0,
 //					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 			List<ContingutEntity> continguts = new ArrayList<ContingutEntity>();
-			List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-					expedient,
-					0,
-					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-			
-			List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-					expedient,
-					0,
-					new Sort("createdDate"));
-			
-			continguts.addAll(fillsOrder1);
-			continguts.addAll(fillsOrder2);
+			if (contingutHelper.isOrdenacioPermesa()) {
+				continguts = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(expedient, 0);
+			} else {
+				continguts = contingutRepository.findByPareAndEsborratAndOrdenat(expedient, 0);
+			}
 			BigDecimal num = new BigDecimal(0);
 			for (ContingutEntity contingut : continguts) {
 				if (num.scale() > 0)
@@ -1359,18 +1436,11 @@ public class ExpedientHelper {
 //				0, 
 //				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 		List<ContingutEntity> contingutsCarpetaActual = new ArrayList<ContingutEntity>();
-		List<ContingutEntity> fillsOrder1 = contingutRepository.findByPareAndEsborratAndOrdenat(
-				carpetaActual,
-				0,
-				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
-		
-		List<ContingutEntity> fillsOrder2 = contingutRepository.findByPareAndEsborratSenseOrdre(
-				carpetaActual,
-				0,
-				new Sort("createdDate"));
-		
-		contingutsCarpetaActual.addAll(fillsOrder1);
-		contingutsCarpetaActual.addAll(fillsOrder2);
+		if (contingutHelper.isOrdenacioPermesa()) {
+			contingutsCarpetaActual = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(carpetaActual, 0);
+		} else {
+			contingutsCarpetaActual = contingutRepository.findByPareAndEsborratAndOrdenat(carpetaActual, 0);
+		}
 		
 		for (ContingutEntity contingutCarpetaActual : contingutsCarpetaActual) {
 			if (contingutCarpetaActual instanceof CarpetaEntity) {

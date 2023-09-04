@@ -114,7 +114,6 @@ public class ImportacioServiceImpl implements ImportacioService {
 		List<ContingutArxiu> documentsTrobats = cercarDocumentsArxiu(params);
 
 		// IMPORTAR DETALLS DE CADA DOCUMENT I CREACIÓ DOCUMENT A L'EXPEDIENT
-		int idx = 1;
 		List<Document> documents = new ArrayList<Document>();
 		expedientsWithImportacio = new ArrayList<DocumentDto>();
 		
@@ -127,7 +126,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			carpetaEntity = carpetaRepository.findOne(carpeta.getId());
 		}
 		
-		outerloop: for (ContingutArxiu contingutArxiu : documentsTrobats) {
+		for (ContingutArxiu contingutArxiu : documentsTrobats) {
 			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
 					null,
 					contingutArxiu.getIdentificador(), 
@@ -135,9 +134,12 @@ public class ImportacioServiceImpl implements ImportacioService {
 					true, 
 					false);
 			documents.add(documentArxiu);
-			documents = findAndCorrectDuplicates(
-					documents,
-					idx);	
+		}
+		
+		documents = findAndCorrectDuplicates(documents);
+		
+		outerloop: for (Document documentArxiu : documents) {
+
 			String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
 			fitxer.setNom(documentArxiu.getNom());
 			fitxer.setContentType(documentArxiu.getContingut().getTipusMime());
@@ -145,7 +147,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			fitxer.setTamany(documentArxiu.getContingut().getTamany());
 
 			// COMPROVAR SI S'HA IMPORTAT PRÈVIAMENT I ES PERMET DUPLICAR CONTINGUT
-			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(contingutArxiu.getIdentificador());
+			List<DocumentDto> documentsAlreadyImported = documentHelper.findByArxiuUuid(documentArxiu.getIdentificador());
 			if (documentsAlreadyImported != null && !documentsAlreadyImported.isEmpty() && ! isIncorporacioDuplicadaPermesa()) {
 				for (DocumentDto documentAlreadyImported: documentsAlreadyImported) {
 					expedientsWithImportacio.add(documentAlreadyImported);
@@ -301,9 +303,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 		return organs;
 	}
 	private List<Document> findAndCorrectDuplicates(
-			List<Document> documents,
-			int idx) {
+			List<Document> documents) {
 
+		int idx = 1;
 	    List<Document> corrected = new ArrayList<Document>();
 	    Set<String> uniques = new HashSet<>();
 
@@ -311,6 +313,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 	    	String tituloDoc = (String)document.getMetadades().getMetadadaAddicional("tituloDoc");
 	        if(!uniques.add(tituloDoc)) {
 	            document.getMetadades().addMetadadaAddicional("tituloDoc", tituloDoc + "_" + idx);
+	            idx++;
 	        }
 	        corrected.add(document);
 	    }

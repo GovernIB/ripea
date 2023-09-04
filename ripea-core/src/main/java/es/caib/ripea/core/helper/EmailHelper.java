@@ -118,6 +118,23 @@ public class EmailHelper {
 		
 	}
 
+	public void contingutAlliberat(ExpedientEntity expedient, UsuariEntity usuariCreador, UsuariEntity usuariActual) {
+		String tipus = "expedient";
+		String subject = PREFIX_RIPEA + " Element de l'escriptori s'ha alliberat per un usuari: (" + tipus + ") " + expedient.getNom();
+		String text = 
+				"Informació de l'element de l'escriptori:\n" +
+				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+				"\tTipus: " + tipus + "\n" +
+				"\tNom: " + expedient.getNom() + "\n\n" + 
+				"\tPersona que ho ha alliberat: " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ").";
+		
+
+		sendOrSaveEmail(
+				usuariCreador.getCodi(),
+				subject,
+				text,
+				EventTipusEnumDto.ALLIBERAT);
+	}
 
 	public void execucioMassivaFinalitzada(
 			ExecucioMassivaEntity em) {
@@ -165,7 +182,12 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+			addDestinatari(
+					dadesUsuari.getCodi(),
+					emailsNoAgrupats,
+					emailsAgrupats,
+					null,
+					"Email canviEstatRevisioMetaExpedient. Permission: Rol IPA_REVISIO: " + ", user: " + dadesUsuari.getCodi());
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdmin = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -177,7 +199,12 @@ public class EmailHelper {
 					dadesUsuari.getCodi());
 
 			if (granted) {
-				addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+				addDestinatari(
+						dadesUsuari.getCodi(),
+						emailsNoAgrupats,
+						emailsAgrupats,
+						null,
+						"Email canviEstatRevisioMetaExpedient. Permission: Administració de entitat: " + entitatId + ", user: " + dadesUsuari.getCodi());
 			}
 		}
 		
@@ -207,7 +234,6 @@ public class EmailHelper {
 	public void comentariMetaExpedient(
 			MetaExpedientComentariEntity metaExpComnt) {
 		
-		logger.debug("Enviant correu electrònic per nou comentari");
 		String comentari = metaExpComnt.getText();
 		MetaExpedientEntity metaExpedientEntity = metaExpComnt.getMetaExpedient();
 		Long entitatId = metaExpedientEntity.getEntitat().getId();
@@ -215,7 +241,12 @@ public class EmailHelper {
 		List<String> emailsAgrupats = new ArrayList<>();
 		List<DadesUsuari> dadesUsuarisRevisio = pluginHelper.dadesUsuariFindAmbGrup("IPA_REVISIO");
 		for (DadesUsuari dadesUsuari : dadesUsuarisRevisio) {
-			addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+			addDestinatari(
+					dadesUsuari.getCodi(),
+					emailsNoAgrupats,
+					emailsAgrupats,
+					null,
+					"Email comentariMetaExpedient. Permission: IPA_REVISIO, user: " + dadesUsuari.getCodi());
 		}
 		
 		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
@@ -226,7 +257,12 @@ public class EmailHelper {
 					new Permission[] { ExtendedPermission.ADMINISTRATION },
 					dadesUsuari.getCodi());
 			if (granted) {
-				addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+				addDestinatari(
+						dadesUsuari.getCodi(),
+						emailsNoAgrupats,
+						emailsAgrupats,
+						null,
+						"Email comentariMetaExpedient. Permission: Administració de entitat: " + entitatId + ", user: " + dadesUsuari.getCodi());
 			}
 		}
 		
@@ -242,7 +278,12 @@ public class EmailHelper {
 							new Permission[] { ExtendedPermission.ADMINISTRATION, ExtendedPermission.ADM_COMU},
 							dadesUsuari.getCodi());
 					if (granted) {
-						addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+						addDestinatari(
+								dadesUsuari.getCodi(),
+								emailsNoAgrupats,
+								emailsAgrupats,
+								null,
+								"Email comentariMetaExpedient. Permission: Administració órgan comuns: " + organ.getId() + ", user: " + dadesUsuari.getCodi());
 					}
 				}
 			}
@@ -255,7 +296,12 @@ public class EmailHelper {
 						new Permission[] { ExtendedPermission.ADMINISTRATION },
 						dadesUsuari.getCodi());
 				if (granted) {
-					addDestinatari(dadesUsuari.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+					addDestinatari(
+							dadesUsuari.getCodi(),
+							emailsNoAgrupats,
+							emailsAgrupats,
+							null,
+							"Email comentariMetaExpedient. Permission: Administració órgan : " + organGestor.getId() + ", user: " + dadesUsuari.getCodi());
 				}
 			}
 		}
@@ -477,13 +523,17 @@ public class EmailHelper {
 	public void canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador(
 			MetaExpedientEntity metaExpedientEntity, 
 			Long entitatId) {
-		logger.debug("Enviant correu electrònic a administrador d'organ que ha creat procediment degut a canvi d'estat de revisio");
 		UsuariEntity organAdminCreador = metaExpedientEntity.getCreatedBy();
 		
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
 		
-		addDestinatari(organAdminCreador.getCodi(), emailsNoAgrupats, emailsAgrupats, null, null);
+		addDestinatari(
+				organAdminCreador.getCodi(),
+				emailsNoAgrupats,
+				emailsAgrupats,
+				null,
+				"Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
 		
 		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
@@ -507,8 +557,7 @@ public class EmailHelper {
 
 	public void canviEstatDocumentPortafirmes(
 			DocumentPortafirmesEntity documentPortafirmes) {
-		logger.debug("Enviant correu electrònic per a canvi d'estat de document al portafirmes (" +
-			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
+
 		
 		DocumentEntity document = documentPortafirmes.getDocument();
 		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
@@ -551,6 +600,53 @@ public class EmailHelper {
 				subject,
 				text,
 				EventTipusEnumDto.CANVI_ESTAT_PORTAFIRMES);
+		
+	}
+	
+	public void firmaParcialDocumentPortafirmes(
+			DocumentPortafirmesEntity documentPortafirmes) {
+		logger.debug("Enviant correu electrònic avís firma parcial de document al portafirmes (" +
+			"documentPortafirmesId=" + documentPortafirmes.getId() + ")");
+		
+		DocumentEntity document = documentPortafirmes.getDocument();
+		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
+		ExpedientEntity expedient = document.getExpedient();
+
+		String subject = PREFIX_RIPEA + " Firma parcial de document enviat a portafirmes";
+		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
+		String text = 
+				"Informació del document:\n" +
+						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
+						"\tExpedient nom: " + expedient.getNom() + "\n" +
+						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
+						"\tDocument nom: " + document.getNom() + "\n" +
+						"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+						"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
+						"Estat del document:" + estat + "\n" +
+						getEnllacExpedient(expedient.getId());
+						
+		
+		Set<DadesUsuari> responsables = getGestors(
+				false,
+				false,
+				expedient,
+				enviamentCreatedByCodi,
+				null);
+
+		
+		for (DadesUsuari dadesUsuari : responsables) {
+			if (dadesUsuari != null) {
+				String to = dadesUsuari.getEmail();
+				if (Utils.isNotEmpty(to)) {
+					SimpleMailMessage missatge = new SimpleMailMessage();
+					missatge.setFrom(getRemitent());
+					missatge.setTo(to);
+					missatge.setSubject(subject);
+					missatge.setText(text);
+					mailSender.send(missatge);
+				}
+			}
+		}
 		
 	}
 	
@@ -612,7 +708,7 @@ public class EmailHelper {
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
 				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
-				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat anterior:" + estatAnterior + "\n" +
 				"Estat actual:" + estat + "\n" + 
@@ -658,7 +754,7 @@ public class EmailHelper {
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
 				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
-				"\tDocument tipus.: " + document.getMetaDocument().getNom() + "\n" +
+				(document.getMetaDocument() != null ? "\tDocument tipus.: " + document.getMetaDocument().getNom() : "" ) + "\n" +
 				"\tDocument fitxer: " + document.getFitxerNom() + "\n\n" +
 				"Estat anterior:" + estatAnterior.toString() + "\n" +
 				"Estat actual:" + estat + "\n" +
@@ -715,6 +811,27 @@ public class EmailHelper {
 						expedientTascaEntity.getResponsables()));
 
 	}	
+
+	public void sendEmailAvisMencionatComentari(
+			String emailDestinatari, 
+			UsuariEntity usuariActual, 
+			ExpedientEntity expedient,
+			String comentari) {
+		logger.debug("Enviament email comentari a destinatari");
+		
+		SimpleMailMessage missatge = new SimpleMailMessage();
+		missatge.setTo(emailDestinatari);
+		missatge.setFrom(getRemitent());
+		missatge.setSubject(PREFIX_RIPEA + " Mencionat al comentari d'un expedient [" + expedient.getNom() + "]");
+		EntitatEntity entitat = expedient.getEntitat();
+		missatge.setText(
+				"L'usuari " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ") t'ha mencionat al comentari d'un expedient [" + expedient.getNom() + "]: \n" +
+				"\tEntitat: " + (entitat != null ? entitat.getNom() : "") + "\n" +
+				"\tNom expedient: " + (expedient != null ? expedient.getNom() : "") + "\n" +
+				"\tComentari: " + comentari + "\n");
+		
+		mailSender.send(missatge);
+	}
 	
 	private String getEnllacExpedient(Long expedientId) {
 		String baseUrl = configHelper.getConfig("es.caib.ripea.base.url");

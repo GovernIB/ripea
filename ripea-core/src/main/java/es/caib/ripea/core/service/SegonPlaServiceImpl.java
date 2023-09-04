@@ -42,6 +42,7 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.ExpedientHelper2;
 import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper;
 import es.caib.ripea.core.helper.ExpedientPeticioHelper0;
@@ -86,6 +87,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private ExpedientHelper expedientHelper;
+	@Autowired
+	private ExpedientHelper2 expedientHelper2;
 	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
@@ -295,6 +298,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Noves anotacions pendents";
 			} else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {
 				header = "Canvi de responsables de tasques";
+			} else if (entry.getKey() == EventTipusEnumDto.ALLIBERAT) {
+				header = "Elements de l'escriptori alliberats";
 			}
 			
 			text += header + "\n";
@@ -418,8 +423,26 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
 			organGestorHelper.consultaCanvisOrganigrama(entitat);
 		}
-	}
+	} 
 
+	@Override
+	@Transactional
+	public void tancarExpedientsArxiu() {
+		
+		List<EntitatEntity> entitats = entitatRepository.findAll();
+
+		for (EntitatEntity entitat : entitats) {
+			List<ExpedientEntity> expedientsPendentsTancar = expedientHelper.consultaExpedientsPendentsTancarArxiu(entitat);
+			ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
+			
+			for (ExpedientEntity expedient : expedientsPendentsTancar) {
+				synchronized (SynchronizationHelper.get0To99Lock(expedient.getId(), SynchronizationHelper.locksExpedients)) {
+					expedientHelper2.closeExpedientArxiu(expedient);
+				}
+			}
+		}
+		
+	}
 	
 	@Override
 	public void restartSchedulledTasks() {

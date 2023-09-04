@@ -79,6 +79,11 @@ public class UsuariEntity implements Serializable {
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
 	}
+	
+	public String getCodiAndNom() {
+		return nom + " (" + codi + ")";
+	}
+	
 	public void updateVistaActual(ContingutVistaEnumDto vistaActual) {
 		this.vistaActual = vistaActual;
 	}

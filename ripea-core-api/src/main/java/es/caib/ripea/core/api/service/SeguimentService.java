@@ -25,10 +25,11 @@ public interface SeguimentService {
 			PaginacioParamsDto paginacioParams);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public PaginaDto<SeguimentDto> findNotificacionsEnviaments(
+	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre,
-			PaginacioParamsDto paginacioParams);
+			PaginacioParamsDto paginacioParams,
+			ResultEnumDto resultEnum);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public PaginaDto<SeguimentDto> findTasques(

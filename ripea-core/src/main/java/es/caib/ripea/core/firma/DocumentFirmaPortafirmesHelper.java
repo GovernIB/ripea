@@ -112,7 +112,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 			MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSeqTipus,
 			MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus,
 			Long[] annexosIds,
-			String transaccioId) {
+			String transaccioId,
+			boolean avisFirmaParcial) {
 		logger.debug("Enviant document a portafirmes (" +
 				"entitatId=" + entitatId + ", " +
 				"id=" + document.getId() + ", " +
@@ -172,7 +173,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 				portafirmesFluxTipus,
 				(portafirmesFluxId != null && !portafirmesFluxId.isEmpty()) ? portafirmesFluxId : document.getMetaDocument().getPortafirmesFluxId(),
 				document.getExpedient(),
-				document).build();
+				document,
+				avisFirmaParcial).build();
 
 		if (annexosIds != null) {
 			for (Long annexId : annexosIds) {
@@ -451,6 +453,8 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						null,
 						document.getExpedient().getId());
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
+			} else if (PortafirmesCallbackEstatEnumDto.PARCIAL.equals(callbackEstat) && documentPortafirmes.getAvisFirmaParcial()) {
+				emailHelper.firmaParcialDocumentPortafirmes(documentPortafirmes);
 			}
 			return null;
 		} catch (Exception e) {

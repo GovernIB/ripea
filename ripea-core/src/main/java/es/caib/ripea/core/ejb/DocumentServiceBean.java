@@ -177,7 +177,8 @@ public class DocumentServiceBean implements DocumentService {
 			Long[] annexosIds,
 			String transaccioId, 
 			String rolActual, 
-			Long tascaId) {
+			Long tascaId,
+			boolean avisFirmaParcial) {
 		delegate.portafirmesEnviar(
 				entitatId,
 				id,
@@ -190,7 +191,8 @@ public class DocumentServiceBean implements DocumentService {
 				annexosIds,
 				transaccioId, 
 				rolActual, 
-				tascaId);
+				tascaId,
+				avisFirmaParcial);
 	}
 
 	@Override
@@ -490,8 +492,14 @@ public class DocumentServiceBean implements DocumentService {
 	@Override
 	@RolesAllowed("tothom")
 	public DocumentDto findAmbId(
-			Long documentId, String rolActual, PermissionEnumDto permission) {
-		return delegate.findAmbId(documentId, rolActual, permission);
+			Long documentId,
+			String rolActual,
+			PermissionEnumDto permission,
+			Long tascaId) {
+		return delegate.findAmbId(documentId,
+				rolActual,
+				permission,
+				tascaId);
 	}
 
 	@Override
@@ -553,6 +561,12 @@ public class DocumentServiceBean implements DocumentService {
 	public void notificacioActualitzarEstat(
 			String identificador) {
 		delegate.notificacioActualitzarEstat(identificador);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void notificacioActualitzarEstat(Long id) {
+		delegate.notificacioActualitzarEstat(id);
 	}
 
 }

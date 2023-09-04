@@ -26,7 +26,7 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private Date dataProgramada;
 	private Integer retard;
 	private Date dataCaducitat;
-	private String enviamentIdentificador;
+	private String notificacioIdentificador;
 	private String enviamentReferencia;
 	private List<Long> interessatsIds = new ArrayList<Long>();
 	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();

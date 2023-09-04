@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -11,8 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
@@ -243,6 +242,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"	 i.arxiuPropagat = false " +
 			"and i.expedient.esborrat = 0 " +
 			"and i.expedient.entitat = :entitat " +
+			"and i.expedient.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (i.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or i.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true " +
@@ -250,7 +250,9 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"				or lower(i.raoSocial) like lower('%'||:nom||'%')" +
 			"				or lower(i.organNom) like lower('%'||:nom||'%'))) " + 
 			"and (:esNullExpedient = true or i.expedient = :expedient) " +
-			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) ")
+			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullCreacioInici = true or i.createdDate >= :creacioInici) " +
+			"and (:esNullCreacioFi = true or i.createdDate <= :creacioFi) ")
 	public Page<InteressatEntity> findArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -262,6 +264,10 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("expedient") ExpedientEntity expedient,			
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullCreacioInici") boolean esNullCreacioInici,
+			@Param("creacioInici") Date creacioInici,
+			@Param("esNullCreacioFi") boolean esNullCreacioFi,
+			@Param("creacioFi") Date creacioFi,
 			Pageable pageable);
 	
 	
@@ -273,6 +279,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"	 i.arxiuPropagat = false " +
 			"and i.expedient.esborrat = 0 " +
 			"and i.expedient.entitat = :entitat " +
+			"and i.expedient.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +			
 			"and (i.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or i.expedient.agafatPer.codi = :usuariActual) " +
 			"and (:esNullNom = true " +
@@ -280,7 +287,9 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"				or lower(i.raoSocial) like lower('%'||:nom||'%')" +
 			"				or lower(i.organNom) like lower('%'||:nom||'%'))) " + 
 			"and (:esNullExpedient = true or i.expedient = :expedient) " +
-			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) ")
+			"and (:esNullMetaExpedient = true or i.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullCreacioInici = true or i.createdDate >= :creacioInici) " +
+			"and (:esNullCreacioFi = true or i.createdDate <= :creacioFi) ")
 	public List<Long> findIdsArxiuPendents(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("metaExpedientsPermesos") List<? extends MetaNodeEntity> metaExpedientsPermesos,
@@ -291,9 +300,12 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullExpedient") boolean esNullExpedient,
 			@Param("expedient") ExpedientEntity expedient,			
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullCreacioInici") boolean esNullCreacioInici,
+			@Param("creacioInici") Date creacioInici,
+			@Param("esNullCreacioFi") boolean esNullCreacioFi,
+			@Param("creacioFi") Date creacioFi);
 
 
-	
 	
 }

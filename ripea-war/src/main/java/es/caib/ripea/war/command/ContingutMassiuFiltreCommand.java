@@ -33,6 +33,7 @@ public class ContingutMassiuFiltreCommand {
 	private Date dataInici;
 	private Date dataFi;
 	private String identificador;
+	private Long expedientEstatId;
 	
 	private boolean bloquejarTipusElement;
 	private boolean bloquejarMetaDada;
@@ -134,4 +135,6 @@ public class ContingutMassiuFiltreCommand {
 	public String getExpedientNom() {
 		return expedientNom;
 	}
+	
+	
 }

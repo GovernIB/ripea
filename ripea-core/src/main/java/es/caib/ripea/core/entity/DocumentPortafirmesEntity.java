@@ -57,6 +57,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 	private PortafirmesCallbackEstatEnumDto callbackEstat;
 	@Column(name = "pf_motiu_rebuig")
 	private String motiuRebuig;
+	@Column(name = "pf_avis_firma_parcial")
+	private Boolean avisFirmaParcial;
 	
 	@Transient
 	private String name;
@@ -108,7 +110,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
 			String fluxId,
 			ExpedientEntity expedient,
-			DocumentEntity document) {
+			DocumentEntity document,
+			Boolean avisFirmaParcial) {
 		return new Builder(
 				estat,
 				assumpte,
@@ -120,7 +123,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				fluxTipus,
 				fluxId,
 				expedient,
-				document);
+				document,
+				avisFirmaParcial);
 	}
 
 	public static class Builder {
@@ -136,7 +140,8 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 				MetaDocumentFirmaFluxTipusEnumDto fluxTipus,
 				String fluxId,
 				ExpedientEntity expedient,
-				DocumentEntity document) {
+				DocumentEntity document,
+				Boolean avisFirmaParcial) {
 			built = new DocumentPortafirmesEntity();
 			built.inicialitzar();
 			built.estat = estat;
@@ -150,6 +155,7 @@ public class DocumentPortafirmesEntity extends DocumentEnviamentEntity {
 			built.fluxId = fluxId;
 			built.expedient = expedient;
 			built.document = document;
+			built.avisFirmaParcial = avisFirmaParcial;
 		}
 		public Builder observacions(String observacions) {
 			built.observacions = observacions;

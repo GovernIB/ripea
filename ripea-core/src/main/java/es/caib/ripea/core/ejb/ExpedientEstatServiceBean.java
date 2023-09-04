@@ -14,6 +14,8 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 
@@ -86,24 +88,20 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
+	public ResultDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException {
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			ResultEnumDto resultEnum) throws NotFoundException {
 		return delegate.findExpedientsPerCanviEstatMassiu(
 				entitatId,
 				filtre,
-				paginacioParams, rolActual);
+				paginacioParams,
+				rolActual,
+				resultEnum);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
-			Long entitatId,
-			ContingutMassiuFiltreDto filtre, String rolActual) throws NotFoundException {
-		return delegate.findIdsExpedientsPerCanviEstatMassiu(
-				entitatId,
-				filtre, rolActual);
-	}
+
 
 }

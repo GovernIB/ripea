@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -221,10 +222,19 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getPinbalServeiDocsPermesos(), 
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		if (plantillaContingut != null) {
+			if (Utils.isNotEmpty(plantillaContingut)) { // file was changed
+				entity.updatePlantilla(
+						plantillaNom,
+						plantillaContentType,
+						plantillaContingut);
+			} else {
+				// file was not changed
+			}
+		} else { // file was removed
 			entity.updatePlantilla(
-					plantillaNom,
-					plantillaContentType,
-					plantillaContingut);
+					null,
+					null,
+					null);
 		}
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
@@ -255,7 +265,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, false, false);
 
 		MetaDocumentEntity entity = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
 				metaDocument.getId());
 		
 		entity.update(
@@ -448,21 +457,21 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Transactional(readOnly = true)
 	@Override
 	public MetaDocumentDto findById(
-			Long entitatId,
 			Long metaDocumentId) {
 		logger.debug("Consulta del meta-document (" +
-				"entitatId=" + entitatId + ", " +
 				"metaDocumentId=" + metaDocumentId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
+
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
+				metaDocumentId);
+		
+		entityComprovarHelper.comprovarEntitat(
+				metaDocument.getEntitat().getId(),
 				false,
 				false,
 				false, 
 				true, 
 				false);
-		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat,
-				metaDocumentId);
+		
 		
 		MetaDocumentDto resposta = conversioTipusHelper.convertir(
 				metaDocument,
@@ -631,7 +640,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				false,
 				true, false, false);
-		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(entitat, id);
+		MetaDocumentEntity metaDocumentEntitiy = entityComprovarHelper.comprovarMetaDocument(id);
 		FitxerDto fitxer = new FitxerDto();
 		fitxer.setNom(metaDocumentEntitiy.getPlantillaNom());
 		fitxer.setContentType(metaDocumentEntitiy.getPlantillaContentType());
@@ -655,7 +664,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false,
 				false, 
 				true, false);
-		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(entitat, contingutId);
+		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
 		ExpedientEntity expedientSuperior;
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			expedientSuperior = (ExpedientEntity)contingut;
@@ -697,7 +706,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		List<MetaDocumentEntity> metaDocuments = new ArrayList<>();
 		if (contingutId != null) {
 			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-					entitat,
 					contingutId);
 			ExpedientEntity expedient = contenidorHelper.getExpedientSuperior(
 					contingut,
@@ -919,7 +927,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				false, 
 				true);
 		MetaDocumentEntity currentMetaDocument = entityComprovarHelper.comprovarMetaDocument(
-				entitat, 
 				metaDocumentId);
 		MetaExpedientEntity metaExpedientEntity = entityComprovarHelper.comprovarMetaExpedient(
 				entitat, 
@@ -939,18 +946,19 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	@Transactional
 	@Override
 	public MetaDocumentDto findByMetaExpedientAndPerDefecteTrue(
-			Long entitatId, 
 			Long metaExpedientId) throws NotFoundException {
 		
+		
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
+		
 		entityComprovarHelper.comprovarEntitat(
-				entitatId,
+				metaExpedientEntity.getEntitat().getId(),
 				false,
 				false,
 				false, 
 				true, 
 				false);
 		
-		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(metaExpedientEntity);
 		return conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
 	}

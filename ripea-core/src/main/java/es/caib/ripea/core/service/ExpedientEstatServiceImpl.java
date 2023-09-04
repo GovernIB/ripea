@@ -1,6 +1,5 @@
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +21,12 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
@@ -397,11 +399,15 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
+	public ResultDto<ExpedientDto> findExpedientsPerCanviEstatMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
-			String rolActual) throws NotFoundException {
+			String rolActual, 
+			ResultEnumDto resultEnum) throws NotFoundException {
+		
+		ResultDto<ExpedientDto> result = new ResultDto<ExpedientDto>();
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -412,35 +418,60 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = expedientRepository.findOne(filtre.getExpedientId());
+		}
 		boolean nomesAgafats = true;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			nomesAgafats = false;
 		} 
 		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
-		if (!metaExpedientsPermesos.isEmpty()) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
 		
-			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+		
+		// estats
+		ExpedientEstatEnumDto chosenEstatEnum = null;
+		ExpedientEstatEntity chosenEstat = null;
+		Long estatId = filtre.getExpedientEstatId();
+		if (estatId != null) {
+			if (estatId.intValue() <= 0) { // if estat is 0 or less the given estat is enum
+				int estatIdInt = -estatId.intValue();
+				chosenEstatEnum = ExpedientEstatEnumDto.values()[estatIdInt];
+			} else { // given estat is estat from database
+				chosenEstat = expedientEstatRepository.findOne(estatId);
+			}
+		}
+		
+		
+		if (resultEnum == ResultEnumDto.PAGE) {
+			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
 					usuariActual,
-					metaExpedientsPermesos, 
+					Utils.getNullIfEmpty(metaExpedientsPermesos), 
 					metaExpedient == null,
 					metaExpedient,
-					filtre.getNom() == null,
-					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					expedient == null,
+					expedient,
 					dataInici == null,
 					dataInici,
 					dataFi == null,
 					dataFi,
+					chosenEstatEnum == null,
+					chosenEstatEnum,
+					chosenEstat == null,
+					chosenEstat,
 					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
-			return paginacioHelper.toPaginaDto(
+			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
 					paginaDocuments,
 					ExpedientDto.class,
 					new Converter<ExpedientEntity, ExpedientDto>() {
@@ -453,58 +484,35 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 							return dto;
 						}
 					});
+			
+			result.setPagina(paginaDto);
+		
 		} else {
-			return paginacioHelper.getPaginaDtoBuida(
-					ExpedientDto.class);
-		}
-	}
-	
-	
-	@Transactional(readOnly = true)
-	@Override
-	public List<Long> findIdsExpedientsPerCanviEstatMassiu(
-			Long entitatId,
-			ContingutMassiuFiltreDto filtre,
-			String rolActual) throws NotFoundException {
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId,
-				true,
-				false,
-				false, false, false);
-		MetaExpedientEntity metaExpedient = null;
-		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
-		}
-		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
-		
-		boolean nomesAgafats = true;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			nomesAgafats = false;
-		} 
-		
-		if (!metaExpedientsPermesos.isEmpty()) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			UsuariEntity usuariActual = usuariRepository.findOne(auth.getName());
-			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
-			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
 					usuariActual,
-					metaExpedientsPermesos,
+					Utils.getNullIfEmpty(metaExpedientsPermesos),
 					metaExpedient == null,
 					metaExpedient,
-					filtre.getNom() == null,
-					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					expedient == null,
+					expedient,
 					dataInici == null,
 					dataInici,
 					dataFi == null,
-					dataFi);
-			return idsDocuments;
-		} else {
-			return new ArrayList<>();
+					dataFi,
+					chosenEstatEnum == null,
+					chosenEstatEnum,
+					chosenEstat == null,
+					chosenEstat);
+		
+		result.setIds(idsDocuments);
 		}
+		return result;
+		
 	}
+
 
 
 

@@ -31,11 +31,16 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"from " +
 			"    ExpedientTascaEntity tasca " +
 			"inner join tasca.responsables responsable " +
-			"where responsable = :responsable " +
-			"      and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
-	List<ExpedientTascaEntity> findByResponsableAndEstat(
+			"where " +
+			"	 responsable = :responsable " +
+			"and (:esNullEstat = true or tasca.estat = :estat)")
+	Page<ExpedientTascaEntity> findByResponsableAndEstat(
 			@Param("responsable") UsuariEntity responsable,
+			@Param("esNullEstat") boolean esNullEstat,
+			@Param("estat") TascaEstatEnumDto estat,
 			Pageable pageable);
+	
+	
 	
 	@Query(	"select " +
             "    new es.caib.ripea.core.aggregation.ContingutLogCountAggregation( " +

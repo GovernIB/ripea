@@ -29,6 +29,7 @@ public class OrganGestorCommand {
     private Long pareId;
     @Size(max=9)
     private String cif;
+    private boolean utilitzarCifPinbal;
 
 
 	public static OrganGestorCommand asCommand(OrganGestorDto dto) {
@@ -61,6 +62,9 @@ public class OrganGestorCommand {
 	}
 	public void setCif(String cif) {
 		this.cif = StringUtils.trim(cif);
+	}
+	public void setUtilitzarCifPinbal(boolean utilitzarCifPinbal) {
+		this.utilitzarCifPinbal = utilitzarCifPinbal;
 	}
 
 }

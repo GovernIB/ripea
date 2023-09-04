@@ -39,6 +39,8 @@ public class PortafirmesEnviarCommand {
 	private MetaDocumentFirmaFluxTipusEnumDto portafirmesFluxTipus;
 	private Long[] annexos;
 	
+	private boolean avisFirmaParcial;
+	
 	public String[] getPortafirmesResponsables() {
 		return portafirmesResponsables;
 	}
@@ -108,6 +110,14 @@ public class PortafirmesEnviarCommand {
 	public String getMotiu() {
 		return motiu;
 	}
+	public boolean isAvisFirmaParcial() {
+		return avisFirmaParcial;
+	}
+
+	public void setAvisFirmaParcial(boolean avisFirmaParcial) {
+		this.avisFirmaParcial = avisFirmaParcial;
+	}
+
 	public void setMotiu(String motiu) {
 		if (motiu != null && motiu.length() > 255)
 			motiu = motiu.substring(0, 251).trim() + "...]";

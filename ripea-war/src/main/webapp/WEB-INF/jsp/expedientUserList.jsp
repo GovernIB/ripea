@@ -175,7 +175,6 @@ $(document).ready(function() {
 	$('#metaExpedientId').on('change', function() {
 		metaExpedientId = $(this).val();
 		if (counter != 0) {
-			debugger
 			if (metaExpedientId) {
 				$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
 				.done(function(data) {
@@ -263,6 +262,18 @@ $(document).ready(function() {
 		        minimumInputLength: 0
 	    };
 		selDomini.select2(select2Options);
+		
+		if ('${expedientFiltreCommand.metaExpedientDominiValor}') {
+			$.get("<c:url value="/metaExpedient/metaDada/domini/${expedientFiltreCommand.metaExpedientDominiCodi}/valor?dadaValor=${expedientFiltreCommand.metaExpedientDominiValor}"/>")
+			.done(function(data) {
+				var $option = $('<option selected>' + data.text + '</option>').val(data.id);
+				selDomini.append($option).trigger('change');
+			})
+			.fail(function() {
+				alert("<spring:message code="error.jquery.ajax"/>");
+			});
+		}
+		
 	});
 	
 	$('#organGestorId').on('change', function() {
@@ -502,14 +513,14 @@ function hexToRgb(hex) {
 		
 		<div class="row">
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
-			<c:if test="${isDominisEnabled}">
-				<div class="col-md-3">
-					<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
-				</div>
-				<div class="col-md-3">
-					<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
-				</div>
-			</c:if>
+			<div class="col-md-3">
+			<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
+				<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+			</div>
+			
 			<c:choose>
 			 	<c:when test="${rolActual!='tothom'}">
 					<div class="col-md-3">
@@ -585,7 +596,7 @@ function hexToRgb(hex) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="20" 
+		data-default-order="19" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -606,7 +617,6 @@ function hexToRgb(hex) {
 				<th data-col-name="errorLastNotificacio" data-visible="false"></th>
 				<th data-col-name="ambEnviamentsPendents" data-visible="false"></th>
 				<th data-col-name="ambNotificacionsPendents" data-visible="false"></th>
-				<th data-col-name="dataDarrerEnviament" data-visible="false"></th>
 				<th data-col-name="arxiuUuid" data-visible="false"></th>
 				<th data-col-name="conteDocumentsDefinitius" data-visible="false"></th>			
 				<th data-col-name="numero" width="${separadorDefinit ? '10%' : ''}"><spring:message code="expedient.list.user.columna.numero"/></th>	

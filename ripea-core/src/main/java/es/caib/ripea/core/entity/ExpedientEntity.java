@@ -4,6 +4,7 @@
 package es.caib.ripea.core.entity;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,6 +55,9 @@ public class ExpedientEntity extends NodeEntity {
 	protected Date tancatData;
 	@Column(name = "tancat_motiu", length = 1024)
 	protected String tancatMotiu;
+	@Temporal(TemporalType.DATE)
+	@Column(name = "tancat_programat")
+	protected Date tancatProgramat;
 	@Column(name = "anio", nullable = false)
 	protected int any;
 	@Column(name = "sequencia", nullable = false)
@@ -322,6 +326,21 @@ public class ExpedientEntity extends NodeEntity {
 		if (ExpedientEstatEnumDto.TANCAT.equals(estat))
 			this.tancatData = new Date();
 	}
+	public void updateEstat(
+			ExpedientEstatEnumDto estat,
+			String tancatMotiu,
+			int diesRestants) {
+		Calendar dataTancament = Calendar.getInstance();
+		dataTancament.add(Calendar.DATE, diesRestants);
+		
+		this.estat = estat;
+		this.tancatMotiu = tancatMotiu;
+		if (ExpedientEstatEnumDto.TANCAT.equals(estat))
+			this.tancatProgramat = dataTancament.getTime();;
+	}
+	public void updateTancatData() {
+		this.tancatData = new Date();
+	}
 	public void updateEstatAdditional(
 			ExpedientEstatEntity estatAdditional) {
 		this.estatAdditional = estatAdditional;
@@ -377,6 +396,11 @@ public class ExpedientEntity extends NodeEntity {
 	public void updateNumero(String numero) {
 		this.numero = numero;
 	}
+	
+	public String getNumeroINom() {
+		return this.numero + " - " + this.nom;
+	}
+	
 	public static Builder getBuilder(
 			String nom,
 			MetaExpedientEntity metaExpedient,

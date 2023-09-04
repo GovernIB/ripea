@@ -25,6 +25,7 @@ import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
@@ -59,7 +60,8 @@ public class ExpedientHelper2 {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
-
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -127,13 +129,26 @@ public class ExpedientHelper2 {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void closeExpedientDbAndArxiu(Long expedientId, String motiu) {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
-		expedient.updateEstatAdditional(null);
-		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-
-		pluginHelper.arxiuExpedientTancar(expedient);
+		
+		if (! isTancamentLogicActiu()) {
+			expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
+			expedient.updateEstatAdditional(null);
+			contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
+	
+			pluginHelper.arxiuExpedientTancar(expedient);
+		} else {
+			expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu, getDiesPerTancament());
+			expedient.updateEstatAdditional(null);
+			contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT_LOGIC, null, null, false, false);
+		}
 	}
 	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void closeExpedientArxiu(ExpedientEntity expedient) {
+		expedient.updateTancatData();
+		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
+		pluginHelper.arxiuExpedientTancar(expedient);
+	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void markAllDocumentsEsborranysAsDefinitiusArxiu(Long expedientId) {
@@ -179,6 +194,15 @@ public class ExpedientHelper2 {
 		}
 	}
 	
+	private boolean isTancamentLogicActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic"));
+	}
+	
+	private int getDiesPerTancament() {
+		String dies = aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic.dies");
+		
+		return dies != null ? Integer.parseInt(dies) : 60;
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper2.class);
 

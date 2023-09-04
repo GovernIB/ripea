@@ -86,4 +86,9 @@ public class SegonPlaServiceBean implements SegonPlaService {
 		delegate.restartSchedulledTasks();		
 	}
 
+	@Override
+	public void tancarExpedientsArxiu() {
+		delegate.tancarExpedientsArxiu();
+	}
+
 }

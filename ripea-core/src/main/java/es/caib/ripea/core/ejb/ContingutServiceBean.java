@@ -20,6 +20,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -28,6 +29,8 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -219,14 +222,16 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public PaginaDto<ContingutDto> findAdmin(
+	public ResultDto<ContingutDto> findAdmin(
 			Long entitatId,
 			ContingutFiltreDto filtre,
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams, 
+			ResultEnumDto resultEnum) {
 		return delegate.findAdmin(
 				entitatId,
 				filtre,
-				paginacioParams);
+				paginacioParams, 
+				resultEnum);
 	}
 
 
@@ -266,12 +271,12 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
+	public PaginaDto<DocumentDto> findDocumentsMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
 			String rolActual) throws NotFoundException {
-		return delegate.findDocumentsPerFirmaMassiu(
+		return delegate.findDocumentsMassiu(
 				entitatId,
 				filtre,
 				paginacioParams, 
@@ -401,6 +406,27 @@ public class ContingutServiceBean implements ContingutService {
 	@RolesAllowed("tothom")
 	public Long getExpedientId(Long contingutId) {
 		return delegate.getExpedientId(contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean isDeleted(Long contingutId) {
+		return delegate.isDeleted(contingutId);
+	}
+
+	
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<ContingutMassiuDto> findDocumentsPerFirmaMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual) throws NotFoundException {
+		return delegate.findDocumentsPerFirmaMassiu(
+				entitatId,
+				filtre,
+				paginacioParams,
+				rolActual);
 	}
 
 }

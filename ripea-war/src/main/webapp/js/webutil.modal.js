@@ -34,6 +34,9 @@
 				if ((elementPerEvaluar.attr('href') || elementPerEvaluar.data('href')) && elementPerEvaluar.data('toggle') == 'modal') {
 					obrirNovaFinestra = true;
 				}
+				if (elementPerEvaluar.prop("tagName") == 'TR' && event.target.tagName == 'TD' && elementPerEvaluar.hasClass('selectable') && event.target._DT_CellIndex.column == 0) {
+					obrirNovaFinestra = false;
+				}	
 				if (obrirNovaFinestra) {
 					var href = elementPerEvaluar.attr('href');
 					if (!href)

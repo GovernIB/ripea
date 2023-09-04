@@ -21,11 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -109,13 +111,16 @@ public class DocumentHelper {
 			Set<Long> docsIdx,
 			ByteArrayOutputStream baos,
 			HttpServletRequest request,
-			Long metaDocumentId) {
+			Long metaDocumentId, 
+			Long tascaId,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion) {
 		
 		DocumentGenericCommand command = new DocumentGenericCommand();
 		
 		MetaDocumentDto metaDocument = null;
 		if (metaDocumentId != null) {
-			metaDocument = metaDocumentService.findById(entitatId, metaDocumentId);
+			metaDocument = metaDocumentService.findById(metaDocumentId);
 		} else {
 			metaDocument = metaDocumentService.findByTipusGeneric(
 					entitatId, 
@@ -136,7 +141,8 @@ public class DocumentHelper {
 					DocumentDto document = documentService.findAmbId(
 							docId,
 							RolHelper.getRolActual(request),
-							PermissionEnumDto.READ);
+							PermissionEnumDto.READ, 
+							tascaId);
 						fitxer = documentService.descarregar(
 								entitatActual.getId(),
 								docId,
@@ -160,9 +166,9 @@ public class DocumentHelper {
 				command.setNom("notificacio_" + randomUUID());
 				command.setData(new Date());
 				command.setMetaNodeId(metaDocument.getId()); //Notificació
-				command.setNtiEstadoElaboracion(metaDocument.getNtiEstadoElaboracion());
+				command.setNtiEstadoElaboracion(ntiEstadoElaboracion != null ? ntiEstadoElaboracion : metaDocument.getNtiEstadoElaboracion());
 				command.setNtiIdDocumentoOrigen(metaDocument.getNtiOrigen().name());
-				command.setNtiOrigen(metaDocument.getNtiOrigen());
+				command.setNtiOrigen(ntiOrigen != null ? ntiOrigen : metaDocument.getNtiOrigen());
 				command.setDocumentTipus(metaDocumentId != null ? DocumentTipusEnumDto.DIGITAL : DocumentTipusEnumDto.VIRTUAL);
 				command.setFitxerNom(command.getNom() + ".zip");
 				command.setFitxerContentType("application/zip");

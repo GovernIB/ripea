@@ -63,6 +63,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"and e.expedient.esborrat = 0 " +
 			"and (a.document is null) " +
 			"and (:esNullMetaExpedient = true or e.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullExpedient = true or e.expedient = :expedient) " +
 			"and (:esNullNom = true or lower(a.titol) like lower('%'||:nom||'%')) " +
 			"and (:esNullNumero = true or lower(a.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInici = true or e.expedient.createdDate >= :dataInici) " +
@@ -83,6 +84,8 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("dataFi") Date dataFi,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
 			Pageable pageable);
 	
 	
@@ -101,6 +104,7 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			"and e.expedient.esborrat = 0 " +
 			"and (a.document is null) " +
 			"and (:esNullMetaExpedient = true or e.expedient.metaExpedient = :metaExpedient) " +
+			"and (:esNullExpedient = true or e.expedient = :expedient) " +
 			"and (:esNullNom = true or lower(a.titol) like lower('%'||:nom||'%')) " +
 			"and (:esNullNumero = true or lower(a.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullDataInici = true or e.expedient.createdDate >= :dataInici) " +
@@ -120,7 +124,9 @@ public interface RegistreAnnexRepository extends JpaRepository<RegistreAnnexEnti
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient);
 
 
 	@Query(	"select a.id " +

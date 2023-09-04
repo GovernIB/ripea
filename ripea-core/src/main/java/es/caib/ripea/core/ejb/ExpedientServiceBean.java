@@ -242,7 +242,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
+	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual) {
 		return delegate.publicarComentariPerExpedient(
 				entitatId,
 				expedientId,
@@ -370,11 +370,17 @@ public class ExpedientServiceBean implements ExpedientService {
 		return delegate.guardarExpedientArxiu(expId);
 	}
 	@Override
-	@RolesAllowed("IPA_SUPER")
+	@RolesAllowed("tothom")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
-			String text){
-		return delegate.findByText(entitatId, text);
+			String text, 
+			String rolActual, 
+			Long procedimentId){
+		return delegate.findByText(
+				entitatId,
+				text,
+				rolActual, 
+				procedimentId);
 	}
 
 	@Override
@@ -455,7 +461,7 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 	@Override
 	@RolesAllowed("tothom")
-	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds) throws IOException {
-		return delegate.exportarEniExpedient(entitatId, expedientIds);
+	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds, boolean ambDocuments) throws IOException {
+		return delegate.exportarEniExpedient(entitatId, expedientIds, ambDocuments);
 	}
 }

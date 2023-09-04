@@ -76,6 +76,7 @@ import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DigitalitzacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
@@ -138,6 +139,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private ExpedientService expedientService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private ExpedientTascaService expedientTascaService;
 	
 	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
@@ -714,14 +717,30 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	public void descarregarMultiple(
 			HttpServletRequest request,
 			HttpServletResponse response,
-			@PathVariable Long pareId) throws IOException {
+			@PathVariable Long pareId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
-		ContingutDto expedient = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				pareId,
-				true,
-				false, null, null);
+
+		ContingutDto pare = null;
+		if (tascaId == null) {
+			pare = contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					pareId,
+					true,
+					false, 
+					null, 
+					null);
+		} else {
+
+			pare = expedientTascaService.findTascaExpedient(
+					entitatActual.getId(),
+					pareId,
+					tascaId,
+					true,
+					true);
+		}
+		
 		
 		byte[] reportContent = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -738,10 +757,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				entitatActual, 
 				docsIdx,
 				baos,
-				request, null);
+				request, 
+				null, 
+				tascaId,
+				null,
+				null);
 		
 		reportContent = baos.toByteArray();
-		response.setHeader("Content-Disposition", "attachment; filename=" + expedient.getNom().replaceAll(" ", "_") + ".zip");
+		response.setHeader("Content-Disposition", "attachment; filename=" + pare.getNom().replaceAll(" ", "_") + ".zip");
 		response.getOutputStream().write(reportContent);
 		response.getOutputStream().flush();
 	}
@@ -813,7 +836,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		}
 
 		
-		return concatenarOGenerarZip(request, expedientId, command.getMetaNodeId(), model);
+		return concatenarOGenerarZip(
+				request,
+				expedientId,
+				command.getMetaNodeId(),
+				command.getNtiOrigen(),
+				command.getNtiEstadoElaboracion(),
+				model);
 
 	}
 	
@@ -823,6 +852,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Long metaDocumentId,
+			NtiOrigenEnumDto ntiOrigen,
+			DocumentNtiEstadoElaboracionEnumDto ntiEstadoElaboracion,
 			Model model) {
 		
 		try {
@@ -839,7 +870,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 				DocumentDto document = documentService.findAmbId(
 						docId,
 						RolHelper.getRolActual(request),
-						PermissionEnumDto.WRITE);
+						PermissionEnumDto.WRITE, null);
 
 				
 				if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
@@ -892,7 +923,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 						docsIdx,
 						null,
 						request, 
-						metaDocumentId);
+						metaDocumentId, 
+						null,
+						ntiOrigen,
+						ntiEstadoElaboracion);
 				
 				float sizeMB = (command.getFitxerContingut().length / 1024f) / 1024f;
 				if (sizeMB > 10) {

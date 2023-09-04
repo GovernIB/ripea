@@ -55,6 +55,8 @@
 		    	$('#id', $('#panellInfo')).val(organ.id);
 		        $('#codi1', $('#panellInfo')).val(organ.codi);
 		        $('#nom1', $('#panellInfo')).val(organ.nom);
+		        $('#cif', $('#panellInfo')).val(organ.cif);
+		        $('#utilitzarCifPinbal', $('#panellInfo')).prop( "checked", organ.utilitzarCifPinbal );
 
 		        $('#pareId1', $('#panellInfo')).append ('<option value="' + organ.pareId + '">' + organ.pareCodiNom + '</option>')
 		        $('#pareId1', $('#panellInfo')).val(organ.pareId);
@@ -196,6 +198,9 @@
 								suggestValue="id"
 								suggestText="codiINom"
 								labelSize="2"/>
+								
+						<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2"/>
+						<rip:inputCheckbox name="utilitzarCifPinbal" textKey="organgestor.form.camp.utilitzar.cif.pinbal" labelSize="2" />
 						
 						
 						<!------------------------- PERMISOS ------------------------>

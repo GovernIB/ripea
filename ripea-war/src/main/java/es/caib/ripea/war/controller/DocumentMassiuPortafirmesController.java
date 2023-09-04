@@ -62,10 +62,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-		filtreCommand.setBloquejarTipusElement(true);
-		filtreCommand.setBloquejarMetaDada(true);
-		filtreCommand.setBloquejarMetaExpedient(false);
+
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -86,13 +83,14 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
-
-		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
-		model.addAttribute(
-				"expedients",
-				expedients);
+		
+		
+		if (filtreCommand.getMetaExpedientId() != null) {
+			model.addAttribute(
+					"metaDocuments",
+					 metaDocumentService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatActual.getId(), filtreCommand.getMetaExpedientId()));
+		}
+		
 
 		MissatgesHelper.info(
 				request,
@@ -121,6 +119,37 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		
 		return "redirect:/massiu/portafirmes";
 	}
+	
+	
+	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse datatable(
+			HttpServletRequest request) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
+
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		try {
+			return DatatablesHelper.getDatatableResponse(
+					request,
+					 contingutService.findDocumentsPerFirmaMassiu(
+								entitatActual.getId(), 
+								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
+								DatatablesHelper.getPaginacioDtoFromRequest(request), 
+								rolActual),
+					 "id",
+					 SESSION_ATTRIBUTE_SELECCIO);
+		} catch (Exception e) {
+			throw e;
+		}
+		
+	}
+	
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/crear", method = RequestMethod.GET)
@@ -159,6 +188,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 					command);
 
 			model.addAttribute("metadocumentId", metaDocument.getId());
+			model.addAttribute("isHabilitarAvisFirmaParcialActiu", isHabilitarAvisFirmaParcialActiu());
 		} else {
 			return getModalControllerReturnValueError(
 					request,
@@ -224,7 +254,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		dto.setPortafirmesTransaccioId(transaccioId);
 		dto.setContingutIds(new ArrayList<Long>(seleccio));
 		dto.setRolActual((String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL));
-
+		dto.setPortafirmesAvisFirmaParcial(command.isAvisFirmaParcial());
+		
 		execucioMassivaService.crearExecucioMassiva(entitatActual.getId(), dto);
 		
 		RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
@@ -235,32 +266,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 				"accio.massiva.creat.ok");
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
-		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
-		try {
-			return DatatablesHelper.getDatatableResponse(
-					request,
-					 contingutService.findDocumentsPerFirmaMassiu(
-								entitatActual.getId(), 
-								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual),
-					 "id",
-					 SESSION_ATTRIBUTE_SELECCIO);
-		} catch (Exception e) {
-			throw e;
-		}
-		
-	}
 
 	@RequestMapping(value = "/expedients/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -306,7 +312,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
 
-			MetaDocumentDto metaDocument = metaDocumentService.findById(entitatActual.getId(), metadocumentId);
+			MetaDocumentDto metaDocument = metaDocumentService.findById(metadocumentId);
 			String fluxPerDefecteId = metaDocument.getPortafirmesFluxId();
 			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
 				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId);
@@ -483,4 +489,8 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		return filtreCommand;
 	}
 
+	private boolean isHabilitarAvisFirmaParcialActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
+	}
+	
 }

@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,18 +57,19 @@ import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ExpedientPeticioAcceptarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.command.ExpedientPeticioModificarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
 import es.caib.ripea.war.command.RegistreAnnexCommand;
-import es.caib.ripea.war.command.RegistreJustificantCommand;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -84,6 +84,10 @@ import es.caib.ripea.war.helper.RolHelper;
 public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
+	
+	private static final String SESSION_ATTRIBUTE_COMMAND = "ExpedientPeticioController.session.command";
+	private static final String SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES = "ExpedientPeticioController.session.tipusDocsDisponibles";
+	private static final String SESSION_ATTRIBUTE_INDEX = "ExpedientPeticioController.session.index";
 
 	@Autowired
 	private ExpedientPeticioService expedientPeticioService;
@@ -175,7 +179,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientPeticioId", expedientPeticioId);
 		RegistreAnnexCommand registreAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioService.findAnnexById(registreAnnexId), RegistreAnnexCommand.class);
 		ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null);
-		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), expedientDto.getMetaExpedient().getId());
+		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(expedientDto.getMetaExpedient().getId());
 		if (metaDocPerDefecte != null) {
 			boolean potCrearMetaDocPerDefecte = false;
 			for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
@@ -295,15 +299,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	}
 
-	@RequestMapping(value = "/acceptar/{expedientPeticioId}/next", method = RequestMethod.POST)
-	public String acceptarPostNext(
-			HttpServletRequest request,
-			@Valid ExpedientPeticioAcceptarCommand command,
-			@PathVariable Long expedientPeticioId,
-			BindingResult bindingResult,
-			Model model) {
+	private void validateExpedient(
+			ExpedientPeticioAcceptarCommand command,
+			BindingResult bindingResult) {
 		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (command.getMetaExpedientId() == null) {
 			bindingResult.rejectValue("metaExpedientId", "NotNull");
 		}
@@ -321,107 +320,254 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (command.getNewExpedientTitol().contains(".")) {
 			bindingResult.rejectValue("newExpedientTitol", "ExpedientODocumentNom");
 		}
-		if (bindingResult.hasErrors()) {
-			omplirModel(expedientPeticioId, request, model, command);
-			return "expedientPeticioAccept";
-		}
-
-		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = new ArrayList<>();
-		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
-			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), null, command.getMetaExpedientId(), false);
-		} else {
-			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), command.getExpedientId(), null, false);
-		}
-		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
-		model.addAttribute("metaDocuments", metaDocumentsQueQuedenPerCreacio);
-		command.setAnnexos(ConversioTipusHelper.convertirList(registre.getAnnexos(), RegistreAnnexCommand.class));
-		if (isIncorporacioJustificantActiva()) {
-			command.setJustificant(ConversioTipusHelper.convertir(registre.getJustificant(), RegistreJustificantCommand.class));
-		}
-		MetaDocumentDto metaDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(entitatActual.getId(), command.getMetaExpedientId());
-		if (metaDocPerDefecte == null) {
-			return "expedientPeticioAcceptMetaDocs";
-		}
-		boolean potCrearMetaDocPerDefecte = false;
-		for (MetaDocumentDto metaDocumentDto : metaDocumentsQueQuedenPerCreacio) {
-			if (metaDocumentDto.getId().equals(metaDocPerDefecte.getId())) {
-				potCrearMetaDocPerDefecte = true;
-			}
-		}
-		if (potCrearMetaDocPerDefecte) {
-			boolean potCrearNomesUnMetaDocPerDefecte = !metaDocPerDefecte.isPermetMultiple();
-			if (potCrearNomesUnMetaDocPerDefecte && command.getAnnexos().size() > 1) {
-				command.getAnnexos().get(0).setMetaDocumentId(metaDocPerDefecte.getId());
-				Object [] o = new Object[] { metaDocPerDefecte.getNom() };
-				MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptar.warning.pot.crear.nomes.un.metadoc.per.defecte", o));
-
-			} else {
-				for (RegistreAnnexCommand registreAnnexCommand : command.getAnnexos()) {
-					registreAnnexCommand.setMetaDocumentId(metaDocPerDefecte.getId());
-				}
-			}
-
-		} else {
-			Object [] o = new Object[] { metaDocPerDefecte.getNom() };
-			MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", o));
-		}
-		return "expedientPeticioAcceptMetaDocs";
+		
 	}
 	
-	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
-	public String acceptarPost(
+
+	@RequestMapping(value = "/acceptar/{expedientPeticioId}/getFirstAnnex", method = RequestMethod.POST)
+	public String acceptarPostGetFirstAnnex(
 			HttpServletRequest request,
-			@Valid ExpedientPeticioAcceptarCommand command,
+			@Valid ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand,
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
-
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		for (int i = 0; i < command.getAnnexos().size(); i++) {
-			RegistreAnnexCommand registreAnnexCommand = command.getAnnexos().get(i);
-			if (registreAnnexCommand.getMetaDocumentId() == null) {
-				bindingResult.rejectValue("annexos[" + i + "].metaDocumentId", "NotNull");
+		
+		validateExpedient(expedientPeticioAcceptarCommand, bindingResult);
+		if (bindingResult.hasErrors()) {
+			omplirModel(expedientPeticioId, request, model, expedientPeticioAcceptarCommand);
+			return "expedientPeticioAccept";
+		}
+		
+		// find tipus docs disponibles
+		List<MetaDocumentDto> tipusDocsDisponibles = new ArrayList<>();
+		if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+			tipusDocsDisponibles = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), null, expedientPeticioAcceptarCommand.getMetaExpedientId(), false);
+		} else {
+			tipusDocsDisponibles = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), expedientPeticioAcceptarCommand.getExpedientId(), null, false);
+		}
+		model.addAttribute("metaDocuments", tipusDocsDisponibles);
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES, tipusDocsDisponibles);
+		
+		
+		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
+		// set annexos
+		expedientPeticioAcceptarCommand.setAnnexos(ConversioTipusHelper.convertirList(registre.getAnnexos(), RegistreAnnexCommand.class));
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_COMMAND, expedientPeticioAcceptarCommand);
+		
+		// set justificant
+		if (isIncorporacioJustificantActiva() && registre.getJustificant() != null) {
+			RegistreAnnexCommand justificant = ConversioTipusHelper.convertir(registre.getJustificant(), RegistreAnnexCommand.class);
+			justificant.setId(-1L); // to differenciate justificant from annexes
+			expedientPeticioAcceptarCommand.getAnnexos().add(justificant);
+		}
+
+		// set first annex
+		RegistreAnnexCommand registreAnnexCommand = null;
+		if (Utils.isNotEmpty(expedientPeticioAcceptarCommand.getAnnexos())) {
+			registreAnnexCommand =  Utils.getFirst(expedientPeticioAcceptarCommand.getAnnexos());
+			tipusPerDefecte(
+					request,
+					expedientPeticioAcceptarCommand.getMetaExpedientId(),
+					tipusDocsDisponibles,
+					registreAnnexCommand);
+		}
+		model.addAttribute("registreAnnexCommand", registreAnnexCommand);
+		
+		
+		Integer index = 0;
+		setIndexAndSize(
+				request,
+				model,
+				index,
+				expedientPeticioAcceptarCommand.getAnnexos().size());
+		
+
+		return "expedientPeticioAcceptMetaDocs";
+
+		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ExpedientPeticioAcceptarCommand processAnnex(
+			HttpServletRequest request,
+			RegistreAnnexCommand registreAnnexCommand,
+			Model model,
+			BindingResult bindingResult,
+			boolean isThereNext) {
+		
+		
+		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
+		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_COMMAND);	
+		
+		
+		boolean noAnnexos = Utils.isEmpty(expedientPeticioAcceptarCommand.getAnnexos());
+		if (noAnnexos) {
+			return expedientPeticioAcceptarCommand;
+		}
+		
+		if (registreAnnexCommand.getMetaDocumentId() == null) {
+			bindingResult.rejectValue("metaDocumentId", "NotNull");
+		}	
+
+		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_INDEX);	
+		
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("metaDocuments", tipusDocsDisponibles);
+			
+			setIndexAndSize(
+					request,
+					model,
+					index,
+					expedientPeticioAcceptarCommand.getAnnexos().size());
+		} else {
+			
+			expedientPeticioAcceptarCommand.getAnnexos().get(index).setMetaDocumentId(registreAnnexCommand.getMetaDocumentId());
+			
+			if (isThereNext) {
+				
+				index++;
+				setIndexAndSize(
+						request,
+						model,
+						index,
+						expedientPeticioAcceptarCommand.getAnnexos().size());
+
+
+				
+				MetaDocumentDto metaDocument = metaDocumentService.findById(registreAnnexCommand.getMetaDocumentId());
+				if (!metaDocument.isPermetMultiple()) {
+					tipusDocsDisponibles.remove(metaDocument);
+				}
+				model.addAttribute("metaDocuments", tipusDocsDisponibles);
+				
+				RegistreAnnexCommand nextAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioAcceptarCommand.getAnnexos().get(index), RegistreAnnexCommand.class);
+				tipusPerDefecte(
+						request,
+						expedientPeticioAcceptarCommand.getMetaExpedientId(),
+						tipusDocsDisponibles,
+						nextAnnexCommand);
+				model.addAttribute("registreAnnexCommand", nextAnnexCommand);
+				
+				
+			}
+			
+		}
+		return expedientPeticioAcceptarCommand;
+		
+	}
+	
+	private void setIndexAndSize(
+			HttpServletRequest request,
+			Model model,
+			Integer index,
+			int size) {
+		model.addAttribute("index", index);
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INDEX, index);
+		model.addAttribute("size", size);
+		boolean lastOne = (index + 1 == size) || size == 0;
+		model.addAttribute("lastOne", lastOne);
+	}
+	
+	
+	private void tipusPerDefecte(
+			HttpServletRequest request,
+			Long metaExpedientId,
+			List<MetaDocumentDto> tipusDocsDisponibles,
+			RegistreAnnexCommand registreAnnexCommand) {
+		
+		MetaDocumentDto tipusDocPerDefecte = metaDocumentService.findByMetaExpedientAndPerDefecteTrue(metaExpedientId);
+		if (tipusDocPerDefecte != null) {
+			boolean isTipusDocPerDefecteDisponible = tipusDocsDisponibles.contains(tipusDocPerDefecte);
+			if (isTipusDocPerDefecteDisponible) {
+				registreAnnexCommand.setMetaDocumentId(tipusDocPerDefecte.getId());
+			} else {
+				MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptar.warning.no.pot.crear.metadoc.per.defecte", new Object[] { tipusDocPerDefecte.getNom() }));
 			}
 		}
 		
-		RegistreJustificantCommand justificant = command.getJustificant();
-		if (isIncorporacioJustificantActiva() && justificant.getMetaDocumentId() == null) {
-			bindingResult.rejectValue("justificant.metaDocumentId", "NotNull");
-		}
+	}
+	
+	@RequestMapping(value = "/acceptar/{expedientPeticioId}/getNextAnnex", method = RequestMethod.POST)
+	public String acceptarPostNextAnnex(
+			HttpServletRequest request,
+			@Valid RegistreAnnexCommand registreAnnexCommand,
+			@PathVariable Long expedientPeticioId,
+			BindingResult bindingResult,
+			Model model) {
 		
-		List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = new ArrayList<>();
-		if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
-			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), null, command.getMetaExpedientId(), false);
-		} else {
-			metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), command.getExpedientId(), null, false);
-		}
+
+		processAnnex(
+				request,
+				registreAnnexCommand,
+				model,
+				bindingResult,
+				true);
+		
+		
+		return "expedientPeticioAcceptMetaDocs";
+		
+	}
+	
+
+	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
+	public String acceptarPost(
+			HttpServletRequest request,
+			@Valid RegistreAnnexCommand registreAnnexCommand,
+			@PathVariable Long expedientPeticioId,
+			BindingResult bindingResult,
+			Model model) {
+		
+		
+		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = processAnnex(
+				request,
+				registreAnnexCommand,
+				model,
+				bindingResult,
+				false);
+
 		if (bindingResult.hasErrors()) {
-			model.addAttribute("metaDocuments", metaDocumentsQueQuedenPerCreacio);
 			return "expedientPeticioAcceptMetaDocs";
 		}
+		
+
+		RegistreAnnexCommand last = Utils.getLast(expedientPeticioAcceptarCommand.getAnnexos());
+		Long justificantIdMetaDoc = null;
+		if (last != null && last.getId() == -1) { // if is justificant
+			justificantIdMetaDoc = last.getMetaDocumentId();
+			Utils.removeLast(expedientPeticioAcceptarCommand.getAnnexos());
+		}
+		
+		
 		Map<Long, Long> anexosIdsMetaDocsIdsMap = new HashMap<Long, Long>();
-		for (RegistreAnnexCommand registreAnnex : command.getAnnexos()) {
+		for (RegistreAnnexCommand registreAnnex : expedientPeticioAcceptarCommand.getAnnexos()) {
 			anexosIdsMetaDocsIdsMap.put(registreAnnex.getId(), registreAnnex.getMetaDocumentId());
 		}
-		Long justificantIdMetaDoc = justificant != null ? justificant.getMetaDocumentId() : null;
+
 		boolean processatOk = true;
 		boolean expCreatArxiuOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
 		try {
 
-			if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+			if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 				ExpedientDto expedientDto = expedientService.create(
 						entitat.getId(),
-						command.getMetaExpedientId(),
+						expedientPeticioAcceptarCommand.getMetaExpedientId(),
 						null,
-						command.getOrganGestorId(),
+						expedientPeticioAcceptarCommand.getOrganGestorId(),
 						null,
-						command.getAny(),
+						expedientPeticioAcceptarCommand.getAny(),
 						null,
-						command.getNewExpedientTitol(),
+						expedientPeticioAcceptarCommand.getNewExpedientTitol(),
 						expedientPeticioDto.getId(),
-						command.isAssociarInteressats(),
+						expedientPeticioAcceptarCommand.isAssociarInteressats(),
 						null, 
 						RolHelper.getRolActual(request), 
 						anexosIdsMetaDocsIdsMap,
@@ -431,21 +577,21 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				
 				logger.info("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
 				
-			} else if (command.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
+			} else if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 					processatOk = expedientService.incorporar(
 							entitat.getId(),
-							command.getExpedientId(),
+							expedientPeticioAcceptarCommand.getExpedientId(),
 							expedientPeticioDto.getId(),
-							command.isAssociarInteressats(), 
+							expedientPeticioAcceptarCommand.isAssociarInteressats(), 
 							RolHelper.getRolActual(request), 
 							anexosIdsMetaDocsIdsMap, 
 							justificantIdMetaDoc,
-							command.isAgafarExpedient());
+							expedientPeticioAcceptarCommand.isAgafarExpedient());
 					
 				logger.info("Expedient incorporat per anotacio: " + processatOk);
 			}
 		} catch (Exception ex) {
-			if (command.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+			if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 				logger.error("Error al crear expedient per anotacio", ex);
 			} else {
 				logger.error("Error al incorporar anotacio al expedient", ex);
@@ -647,15 +793,18 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/annex/{annexId}/content", method = RequestMethod.GET)
 	@ResponseBody
-	public FitxerDto descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
+	public JsonResponse descarregarBase64(HttpServletRequest request, HttpServletResponse response, @PathVariable Long annexId) throws Exception {
 
 		try {
-			return expedientPeticioService.getAnnexContent(annexId, true);
-		} catch (Exception ex) {
-			System.out.println("Errol al descarregarBase64:" +  ExceptionUtils.getStackTrace(ex));
-			logger.error("Errol al descarregarBase64", ex);
-			throw ex;
+			FitxerDto fitxer = expedientPeticioService.getAnnexContent(annexId, true);
+			return new JsonResponse(fitxer);
+				
+		} catch (Exception e) {
+			logger.error("Errol al descarregarBase64", e);
+			return new JsonResponse(true, e.getMessage());
 		}
+		
+		
 	}
 	
 	@RequestMapping(value = "/firmaInfo/{annexId}/content", method = RequestMethod.GET)

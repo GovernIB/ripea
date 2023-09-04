@@ -787,6 +787,11 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = expedientRepository.findOne(filtre.getExpedientId());
+		}
+		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
 				rolActual, 
@@ -794,6 +799,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		
 
 		if (resultEnum == ResultEnumDto.PAGE) {
+			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Page<RegistreAnnexEntity> pagina = registreAnnexRepository.findPendentsProcesar(
 					entitat,
 					rolActual,
@@ -810,6 +816,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					dataFi,
 					metaExpedient == null,
 					metaExpedient,
+					expedient == null,
+					expedient,
 					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			PaginaDto<RegistreAnnexDto> paginaDto = paginacioHelper.toPaginaDto(
 					pagina,
@@ -817,7 +825,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			result.setPagina(paginaDto);
 			
 		} else {
-			
+			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> documentsIds = registreAnnexRepository.findIdsPendentsProcesar(
 					entitat,
 					rolActual,
@@ -833,7 +841,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 					dataFi == null,
 					dataFi,
 					metaExpedient == null,
-					metaExpedient);
+					metaExpedient,
+					expedient == null,
+					expedient);
 			
 			result.setIds(documentsIds);
 		}

@@ -122,7 +122,8 @@ public class ExecucioMassivaHelper{
 //					((DocumentEntity) contingut).getMetaDocument().getPortafirmesSequenciaTipus(),
 					((DocumentEntity) contingut).getMetaDocument().getPortafirmesFluxTipus(),
 					null,
-					em.getPortafirmesTransaccioId());
+					em.getPortafirmesTransaccioId(),
+					em.getPortafirmesAvisFirmaParcial());
 			
 				
 			emc.updateFinalitzat(new Date());

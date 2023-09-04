@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,10 @@ import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -114,8 +117,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ExpedientTascaDto> findAmbAuthentication(
+	public PaginaDto<ExpedientTascaDto> findAmbAuthentication(
 			Long entitatId, 
+			UsuariTascaFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -124,11 +128,16 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		UsuariEntity usuariEntity = usuariRepository.findByCodi(auth.getName());
 		
-		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
+		Page<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
 				usuariEntity,
+				filtre.getEstat() == null,
+				filtre.getEstat(), 
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams));
-		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
+		
+		
+		return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
+		
 	}
 
 	@Transactional(readOnly = true)
@@ -147,7 +156,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		
 		ContingutEntity contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-					entitatId,
 					tascaId,
 					contingutId);
 		
@@ -241,7 +249,11 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto canviarTascaEstat(Long tascaId, TascaEstatEnumDto tascaEstat, String motiu) {
+	public ExpedientTascaDto canviarTascaEstat(
+			Long tascaId,
+			TascaEstatEnumDto tascaEstat,
+			String motiu,
+			String rolActual) {
 		logger.debug("Canviant estat del tasca " +
 				"tascaId=" + tascaId +", "+
 				"tascaEstat=" + tascaEstat +
@@ -249,7 +261,25 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity responsableActual = usuariHelper.getUsuariByCodiDades(auth.getName(), true, true);
-		ExpedientTascaEntity tasca = tascaHelper.comprovarTasca(tascaId);
+		
+		ExpedientTascaEntity tasca = expedientTascaRepository.findOne(tascaId);
+		
+		try {
+			tasca = tascaHelper.comprovarTasca(tascaId);
+		} catch (Exception e) {
+			contingutHelper.comprovarContingutDinsExpedientModificable(
+					tasca.getExpedient().getEntitat().getId(),
+					tasca.getExpedient().getId(),
+					false,
+					true,
+					false,
+					false, 
+					false, 
+					true, 
+					rolActual);
+		}
+		
+		
 		TascaEstatEnumDto tascaEstatAnterior = tasca.getEstat();
 		
 		if (tascaEstat == TascaEstatEnumDto.REBUTJADA) {
@@ -395,7 +425,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + documentId + ")");
 		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
 				tascaId,
 				documentId);
 		return toDocumentDto(document);
@@ -414,7 +443,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				+ "contingutId=" + contingutId + ")");
 		
 		ContingutEntity contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
-				entitatId,
 				tascaId,
 				contingutId);
 		
@@ -439,14 +467,25 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
 
-		entityComprovarHelper.comprovarExpedient(
-				tasca.getExpedient().getId(),
-				false,
-				false,
-				true,
-				false,
-				false,
-				rolActual);
+		Exception exception = null;
+		try {
+			entityComprovarHelper.comprovarExpedient(
+					tasca.getExpedient().getId(),
+					false,
+					false,
+					true,
+					false,
+					false,
+					rolActual);
+		} catch (Exception e) {
+			exception = e;
+		}
+		
+		if (exception != null) {
+			contingutHelper.comprovarContingutPertanyTascaAccesible(
+					expedientTascaId,
+					tasca.getExpedient().getId());
+		}
 
 		// truncam a 1024 caracters
 		if (text.length() > 1024)
@@ -467,15 +506,27 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			throw new NotFoundException(expedientTascaId, ExpedientTascaEntity.class);
 		}
 
-		entityComprovarHelper.comprovarExpedient(
-				tasca.getExpedient().getId(),
-				false,
-				true,
-				false,
-				false,
-				false,
-				null);
+		Exception exception = null;
+		try {
+			entityComprovarHelper.comprovarExpedient(
+					tasca.getExpedient().getId(),
+					false,
+					true,
+					false,
+					false,
+					false,
+					null);
+		} catch (Exception e) {
+			exception = e;
+		}
+		
+		if (exception != null) {
+			contingutHelper.comprovarContingutPertanyTascaAccesible(
+					expedientTascaId,
+					tasca.getExpedient().getId());
+		}
 
+		
 		List<ExpedientTascaComentariEntity> tascacoms = expedientTascaComentariRepository.findByExpedientTascaOrderByCreatedDateAsc(tasca);
 
 		return conversioTipusHelper.convertirList(tascacoms, ExpedientTascaComentariDto.class);

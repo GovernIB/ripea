@@ -194,7 +194,7 @@ $(document).ready(function(){
 </head>
 <body>
 	<c:set var="formAction">
-		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/next" />
+		<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/getFirstAnnex" />
 	</c:set>
 	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioAcceptarCommand">
 		<form:hidden path="id" />

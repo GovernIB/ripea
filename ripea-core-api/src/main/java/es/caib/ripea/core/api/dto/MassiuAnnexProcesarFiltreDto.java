@@ -22,6 +22,7 @@ public class MassiuAnnexProcesarFiltreDto implements Serializable {
 	private Date dataFi;
 	private MassiuAnnexEstatProcessamentEnumDto estatProcessament;
 	private Long metaExpedientId;
+	private Long expedientId;
 	
 	@Override
 	public String toString() {

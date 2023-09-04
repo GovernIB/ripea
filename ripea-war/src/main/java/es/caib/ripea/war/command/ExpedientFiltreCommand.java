@@ -99,7 +99,7 @@ public class ExpedientFiltreCommand {
 		this.interessat = Utils.trim(interessat);
 	}
 	public void setMetaExpedientDominiValor(String metaExpedientDominiValor) {
-		this.metaExpedientDominiValor = Utils.trim(nom);
+		this.metaExpedientDominiValor = Utils.trim(metaExpedientDominiValor);
 	}
 	public void setAgafatPer(String agafatPer) {
 		this.agafatPer = Utils.trim(agafatPer);

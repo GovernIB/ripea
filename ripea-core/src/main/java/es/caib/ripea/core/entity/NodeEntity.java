@@ -47,7 +47,7 @@ public abstract class NodeEntity extends ContingutEntity {
 	public String toString() {
 		return "NodeEntity: [" +
 				"contingut: " + super.toString() + ", " +
-				"metanode: " + this.metaNode.toString() + "]";
+				"metanode: " + (this.metaNode != null ? this.metaNode.toString() : null) + "]";
 	}
 	
 	private static final long serialVersionUID = -2299453443943600172L;

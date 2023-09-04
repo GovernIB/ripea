@@ -3,7 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -151,12 +150,10 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 	@Override
 	public List<URLInstruccioDto> findByEntitat(Long entitatId) throws NotFoundException {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId, 
-				false, 
-				true, 
-				false, 
-				false, 
-				true);
+				entitatId,
+				true,
+				false,
+				false, false, false);
 		
 		return conversioTipusHelper.convertirList(
 				urlInstruccionRepository.findByEntitat(entitat), 
@@ -170,14 +167,13 @@ public class URLInstruccioServiceImpl implements URLInstruccioService {
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ", "
 				+ "urlInstruccioId=" + urlInstruccioId + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				true,
 				false,
 				false, false, false);
 		
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
-				entitat,
 				contingutId);
 		String urlValor = "";
 		if (contingut instanceof ExpedientEntity) {

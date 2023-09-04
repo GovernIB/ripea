@@ -51,6 +51,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
@@ -92,6 +93,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
 	public static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
+	public static final String SESSION_ATTRIBUTE_RELACIONAR_SELECCIO = "ExpedientUserController.relacionar.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 	private static final String COOKIE_FIRMA_PENDENT = "firma_pendent";
@@ -407,12 +409,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/{expedientId}/exportarEni", method = RequestMethod.GET)
 	public void exportarEni(
 			@PathVariable Long expedientId,
+			@RequestParam(required = false) boolean ambDocuments,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = expedientService.exportarEniExpedient(
 				entitatActual.getId(), 
-				new HashSet<>(Arrays.asList(expedientId)));
+				new HashSet<>(Arrays.asList(expedientId)),
+				ambDocuments);
 
 		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 		
@@ -424,6 +428,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(value = "/exportarEni", method = RequestMethod.GET)
 	public String exportarEniMassiu(
+			@RequestParam(required = false) boolean ambDocuments,
 			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		@SuppressWarnings("unchecked")
@@ -443,7 +448,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 			FitxerDto fitxer = expedientService.exportarEniExpedient(
 					entitatActual.getId(), 
-					seleccio);
+					seleccio,
+					ambDocuments);
 	
 			response.setHeader("Set-cookie", "contentLoaded=true; path=/");
 			
@@ -961,20 +967,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 
 	@RequestMapping(value = "/{contingutId}/comentaris/publicar", method = RequestMethod.POST)
 	@ResponseBody
-	public List<ExpedientComentariDto> publicarComentari(
+	public RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentari(
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@RequestParam String text,
 			Model model) {
+		RespostaPublicacioComentariDto<ExpedientComentariDto> resposta = new RespostaPublicacioComentariDto<ExpedientComentariDto>();
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		if (text != null && !text.isEmpty()) {
-			expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text, RolHelper.getRolActual(request));
+			resposta = expedientService.publicarComentariPerExpedient(entitatActual.getId(), contingutId, text, RolHelper.getRolActual(request));
 		}
 			
-		return expedientService.findComentarisPerContingut(
+		List<ExpedientComentariDto> comentaris = expedientService.findComentarisPerContingut(
 				entitatActual.getId(), 
 				contingutId);
+		resposta.setComentaris(comentaris);
+		return resposta;
 	}
 
 	@RequestMapping(value = "/{expedientId}/alliberar", method = RequestMethod.GET)
@@ -1279,7 +1288,69 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				"redirect:../expedient",
 				"expedient.controller.estatModificat.ok");
 	}
-
+	
+	@RequestMapping(value = "/{expedientId}/relacionarList/select", method = RequestMethod.GET)
+	@ResponseBody
+	public int relacionarSelect(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
+		if (seleccio == null) {
+			seleccio = new HashSet<Long>();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId,
+					seleccio);
+		}
+		if (ids != null) {
+			for (Long id: ids) {
+				seleccio.add(id);
+			}
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
+			seleccio.addAll(
+					expedientService.findIdsAmbFiltre(
+							entitatActual.getId(),
+							ExpedientFiltreCommand.asDto(filtreCommand), rolActual));
+		}
+		return seleccio.size();
+	}
+	
+	@RequestMapping(value = "/{expedientId}/relacionarList/deselect", method = RequestMethod.GET)
+	@ResponseBody
+	public int relacionarDeselect(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@RequestParam(value="ids[]", required = false) Long[] ids) {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
+		if (seleccio == null) {
+			seleccio = new HashSet<Long>();
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId,
+					seleccio);
+		}
+		if (ids != null) {
+			for (Long id: ids) {
+				seleccio.remove(id);
+			}
+		} else {
+			seleccio.clear();
+		}
+		return seleccio.size();
+	}
+	
 	@RequestMapping(value = "/{expedientId}/relacionarList", method = RequestMethod.GET)
 	public String expedientRelacionarGetList(
 			HttpServletRequest request,
@@ -1320,6 +1391,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			RequestSessionHelper.esborrarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_RELACIONAR_FILTRE);
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
 		} else {
 			if (!bindingResult.hasErrors()) {
 				RequestSessionHelper.actualitzarObjecteSessio(
@@ -1331,6 +1405,53 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		return "redirect:/modal/expedient/"+expedientId+"/relacionarList";
 	}
 
+	@RequestMapping(value = "/{expedientId}/relacionar", method = RequestMethod.GET)
+	public String expedientRelacionar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId) throws IOException {
+
+		try {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+			@SuppressWarnings("unchecked")
+			Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
+			if (seleccio == null || seleccio.isEmpty()) {
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:/../../contingut/" + expedientId,
+						"expedient.controller.relacio.seleccio.buida");
+			} else {
+				for (Long relacionatId : seleccio) {
+					expedientService.relacioCreate(
+							entitatActual.getId(),
+							expedientId,
+							relacionatId, 
+							RolHelper.getRolActual(request));
+				}
+				
+				RequestSessionHelper.esborrarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
+				
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:/../../contingut/" + expedientId,
+						"expedient.controller.relacionat.ok");
+			}
+			
+		} catch (Exception e) {
+			logger.error("Error al relacionar expedients", e);
+			return getModalControllerReturnValueErrorMessageText(
+					request,
+					"redirect:../../esborrat",
+					e.getMessage(),
+					e);
+
+		}
+	}
+	
 	@RequestMapping(value = "/{expedientId}/relacionar/{relacionatId}", method = RequestMethod.GET)
 	public String expedientRelacionar(
 			HttpServletRequest request,
@@ -1345,6 +1466,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					expedientId,
 					relacionatId, 
 					RolHelper.getRolActual(request));
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:/../../contingut/" + expedientId,
@@ -1376,7 +1501,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						ExpedientFiltreCommand.asDto(filtreCommand), 
 						expedientId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						RolHelper.getRolActual(request)));		
+						RolHelper.getRolActual(request)),
+				"id",
+				SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
+		
 	}
 
 	@RequestMapping(value = "/{expedientId}/relacio/{relacionatId}/delete", method = RequestMethod.GET)

@@ -363,7 +363,7 @@ public interface ExpedientService {
 	List<ExpedientDto> findByEntitatAndMetaExpedient(Long entitatId, Long metaExpedientId, String rolActual, Long organActualId);
 
 	@PreAuthorize("hasRole('tothom')")
-	boolean publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
+	RespostaPublicacioComentariDto<ExpedientComentariDto> publicarComentariPerExpedient(Long entitatId, Long expedientId, String text, String rolActual);
 
 	@PreAuthorize("hasRole('tothom')")
 	List<ExpedientComentariDto> findComentarisPerContingut(Long entitatId, Long expedientId);
@@ -433,13 +433,16 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param expedientIds
 	 *            Els expedients dels que vol generar l'índex
+	 * @param ambDocuments
+	 *            Indica si fer la expoprtació ENI dels documents (importació INSIDE)
 	 * @return Document exportat ENI.
 	 * @throws IOException 
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public FitxerDto exportarEniExpedient(
 			Long entitatId, 
-			Set<Long> expedientIds) throws IOException;
+			Set<Long> expedientIds,
+			boolean ambDocuments) throws IOException;
 	
 	
 	@PreAuthorize("hasRole('tothom')")
@@ -471,10 +474,12 @@ public interface ExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public Exception guardarExpedientArxiu(Long expId);
 
-	@PreAuthorize("hasRole('IPA_SUPER')")
+	@PreAuthorize("hasRole('tothom')")
 	public List<ExpedientDto> findByText(
 			Long entitatId,
-			String text);
+			String text, 
+			String rolActual,
+			Long procedimentId);
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")

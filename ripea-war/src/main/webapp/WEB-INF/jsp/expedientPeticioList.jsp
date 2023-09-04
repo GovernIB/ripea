@@ -46,7 +46,7 @@ table.dataTable td {
 
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.placeholder.numero"/>
+				<rip:inputText name="numero" inline="true" placeholderKey="expedient.peticio.list.columna.numero.registre"/>
 			</div>	
 			<div class="col-md-4">
 				<rip:inputText name="extracte" inline="true" placeholderKey="expedient.peticio.list.placeholder.extracte"/>
@@ -105,7 +105,7 @@ table.dataTable td {
 		</div>
 	</form:form>
 	
-	<script id="rowhrefTemplate" type="text/x-jsrender">expedientPeticio/{{:id}}</script> 
+	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/expedientPeticio/{{:id}}</script> 
 	<table
 		id="taulaDades"
 		data-toggle="datatable" 
@@ -113,11 +113,14 @@ table.dataTable td {
 		class="table table-bordered table-striped table-hover" 
 		data-default-order="1" <%-- default column number to be sorted  --%>
 		data-default-dir="desc" <%-- default ordering direction  --%>
+		data-rowhref-template="#rowhrefTemplate"
+		data-rowhref-toggle="modal"
+		data-rowhref-maximized="true"
 		data-save-state="true" 
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="registre.identificador"><spring:message code="expedient.peticio.list.columna.numero"/></th>
+				<th data-col-name="registre.identificador" width="10%"><spring:message code="expedient.peticio.list.columna.numero.registre"/></th>
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
 				<th data-col-name="registre.extracte" width="15%"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiCodiINom"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
