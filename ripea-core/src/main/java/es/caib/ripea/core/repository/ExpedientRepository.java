@@ -689,7 +689,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"     or (:esNullIdsOrgansAmbProcedimentsComunsPermesos = false and meogp.organGestor.id in (:idsOrgansAmbProcedimentsComunsPermesos) and e.metaExpedient.id in (:idsProcedimentsComuns))) " +
 		//TODO if organ is in :idsOrgansAmbProcedimentsComunsPermesos it is also already in :idsOrgansPermesos as well so check :idsOrgansAmbProcedimentsComunsPermesos doesn't do anything, probably :idsOrgansPermesos check should be only allowed for procediments no comuns
 			"and (lower(e.nom) like lower('%'||:text||'%') or lower(e.numero) like lower('%'||:text||'%')) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " 
+			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " +
+			"and (:esNullMetaExpedient = true or e.metaExpedient = :metaExpedient) "
 			)
 	List<ExpedientEntity> findByTextAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -705,7 +706,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("text") String text,
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
-			@Param("isAdmin") boolean isAdmin);
+			@Param("isAdmin") boolean isAdmin,
+			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
 	
 	

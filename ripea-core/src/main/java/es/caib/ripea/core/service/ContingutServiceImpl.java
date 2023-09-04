@@ -47,13 +47,13 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DominiDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
@@ -1591,7 +1591,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
+	public PaginaDto<DocumentDto> findDocumentsMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
@@ -1603,11 +1603,6 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true, false);
 
-		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
 
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
@@ -1671,6 +1666,93 @@ public class ContingutServiceImpl implements ContingutService {
 					DocumentDto.class);
 		}
 	}
+	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PaginaDto<ContingutMassiuDto> findDocumentsPerFirmaMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams, 
+			String rolActual) throws NotFoundException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true, 
+				false);
+
+
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
+		}
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+		}
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					filtre.getMetaDocumentId());
+		}
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
+			Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+			
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("metaDocument.nom", new String[] {"metaNode.nom"});
+			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
+					entitat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos), 
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					filtre.getNom() != null ? filtre.getNom().trim() : "",
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+			
+			return paginacioHelper.toPaginaDto(
+					paginaDocuments,
+					ContingutMassiuDto.class,
+					new Converter<DocumentEntity, ContingutMassiuDto>() {
+						@Override
+						public ContingutMassiuDto convert(DocumentEntity source) {
+							
+							ContingutMassiuDto dto = new ContingutMassiuDto();
+							dto.setId(source.getId());
+							dto.setNom(source.getNom());
+							dto.setTipusDocumentNom(source.getMetaDocument() != null ? source.getMetaDocument().getNom() : null);
+							dto.setExpedientId(source.getExpedient().getId());
+							dto.setExpedientNumeroNom(source.getExpedient().getNumeroINom());
+							dto.setCreatedDate(source.getCreatedDate().toDate());
+							dto.setCreatedByCodiAndNom(source.getCreatedBy().getCodiAndNom());
+							return dto;
+						}
+					});
+		
+	}
+	
+	
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1683,11 +1765,7 @@ public class ContingutServiceImpl implements ContingutService {
 				true,
 				false,
 				false, false, false);
-		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
+
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
@@ -1707,7 +1785,7 @@ public class ContingutServiceImpl implements ContingutService {
 		MetaDocumentEntity metaDocument = null;
 		if (filtre.getMetaDocumentId() != null) {
 			metaDocument = entityComprovarHelper.comprovarMetaDocument(
-					filtre.getMetaExpedientId());
+					filtre.getMetaDocumentId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 		if (!metaExpedientsPermesos.isEmpty()) {
@@ -1748,11 +1826,6 @@ public class ContingutServiceImpl implements ContingutService {
 				false,
 				true, false);
 
-		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
 
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {

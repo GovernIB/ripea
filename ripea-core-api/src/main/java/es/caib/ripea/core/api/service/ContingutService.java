@@ -15,6 +15,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -485,7 +486,7 @@ public interface ContingutService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
+	public PaginaDto<DocumentDto> findDocumentsMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
@@ -572,5 +573,12 @@ public interface ContingutService {
 	@PreAuthorize("hasRole('tothom')")
 	public boolean isDeleted(
 			Long contingutId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public PaginaDto<ContingutMassiuDto> findDocumentsPerFirmaMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual) throws NotFoundException;
 	
 }

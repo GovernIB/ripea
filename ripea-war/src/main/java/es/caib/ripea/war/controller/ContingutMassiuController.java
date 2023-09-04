@@ -331,7 +331,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 		try {
 			return DatatablesHelper.getDatatableResponse(
 					request,
-					 contingutService.findDocumentsPerFirmaMassiu(
+					 contingutService.findDocumentsMassiu(
 								entitatActual.getId(), 
 								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
 								DatatablesHelper.getPaginacioDtoFromRequest(request), 

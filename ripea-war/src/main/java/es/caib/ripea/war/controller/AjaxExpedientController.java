@@ -29,6 +29,25 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 	@Autowired
 	private ExpedientService expedientService;
 
+	
+	
+	@RequestMapping(value = "/expedient/{procedimentId}", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ExpedientDto> get(
+			HttpServletRequest request,
+			@PathVariable Long procedimentId,
+			@RequestParam String term, // you can't use "/" that is part of Número of expedient in @PathVariable even encoded version "%2F" so it was changed to use @RequestParam instead
+			Model model) {
+
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
+		List<ExpedientDto> expedients = expedientService.findByText(
+				entitat.getId(), 
+				Utils.trim(term), 
+				getRolActual(request), 
+				procedimentId);
+		
+		return expedients;
+	}
 
 	
 	@RequestMapping(value = "/expedient", method = RequestMethod.GET)
@@ -42,7 +61,8 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 		List<ExpedientDto> expedients = expedientService.findByText(
 				entitat.getId(), 
 				Utils.trim(term), 
-				getRolActual(request));
+				getRolActual(request), 
+				null);
 		
 		return expedients;
 	}

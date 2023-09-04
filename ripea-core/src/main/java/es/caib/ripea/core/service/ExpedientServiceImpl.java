@@ -1235,7 +1235,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text,
-			String rolActual) {
+			String rolActual, 
+			Long procedimentId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -1248,7 +1249,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
 				entitatId,
 				rolActual);
-				
+		
+		MetaExpedientEntity metaExpedient = null;
+		if (procedimentId != null) {
+			metaExpedient = metaExpedientRepository.findOne(procedimentId);
+		}
 			
 		List<String> rolsCurrentUser = RolHelper.getRolsCurrentUser();
 
@@ -1266,7 +1271,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 				text,
 				rolsCurrentUser == null,
 				rolsCurrentUser,
-				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
+				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
+				metaExpedient == null,
+				metaExpedient);
 		
 		
 		List<ExpedientDto> expedientsDto = new ArrayList<ExpedientDto>();

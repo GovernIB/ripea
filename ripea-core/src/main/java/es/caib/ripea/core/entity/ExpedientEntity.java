@@ -396,6 +396,11 @@ public class ExpedientEntity extends NodeEntity {
 	public void updateNumero(String numero) {
 		this.numero = numero;
 	}
+	
+	public String getNumeroINom() {
+		return this.numero + " - " + this.nom;
+	}
+	
 	public static Builder getBuilder(
 			String nom,
 			MetaExpedientEntity metaExpedient,

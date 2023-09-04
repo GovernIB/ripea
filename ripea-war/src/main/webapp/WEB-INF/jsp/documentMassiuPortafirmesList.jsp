@@ -36,28 +36,29 @@
 	}
 </style>
 <script>
+
+
+//################################################## document ready START ##############################################################
 $(document).ready(function() {
-		var tipus = $('#metaDocumentId').val();
 
 		
 		$('#metaExpedientId').on('change', function() {
 
 			var tipus = $(this).val();
 			
+			if (tipus) {
+				$("#expedientId").data('urlParamAddicional', tipus);
+			} else {
+				$("#expedientId").data('urlParamAddicional', null);
+			}
+
 			$('#expedientId option[value!=""]').remove();
 			$('#expedientId').select2('val', '', true);
+
 			
 			$('#metaDocumentId option[value!=""]').remove();
 			$('#metaDocumentId').select2('val', '', true);
 			if (tipus != undefined && tipus != "") {
-				$.get("<c:url value="/massiu/expedients/"/>" + tipus).done(function(data){
-					
-					for (var i = 0; i < data.length; i++) {
-						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].nom + '</option>');
-					}
-				}).fail(function() {
-					alert("<spring:message code="error.jquery.ajax"/>");
-				});
 
 				$.get("<c:url value="/massiu/metaDocuments/"/>" + tipus).done(function(data){
 					
@@ -115,9 +116,10 @@ $(document).ready(function() {
 			updateSelectionForTipusDocument(tipus);
 		});
 
-		$('#metaExpedientId').trigger('change');
-		$('#metaDocumentId').trigger('change');
-});
+});//################################################## document ready END ##############################################################
+
+
+
 
 function enableDisableSelection($this, tipus) {
     if (tipus != undefined && tipus != "") {
@@ -181,21 +183,45 @@ function removeTransactionId(idModal) {
 	<form:form action="" method="post" cssClass="well" commandName="contingutMassiuFiltreCommand">
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="tipusElement"  optionEnum="ContingutTipusEnumDto" placeholderKey="accio.massiva.list.filtre.tipuselement" emptyOption="true" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarTipusElement}" netejar="${not contingutMassiuFiltreCommand.bloquejarTipusElement}"/>
+				<rip:inputSelect 
+					name="metaExpedientId" 
+					optionItems="${metaExpedients}"
+					optionValueAttribute="id" 
+					optionTextAttribute="codiSiaINom"
+					optionMinimumResultsForSearch="3" 
+					emptyOption="true"
+					placeholderKey="accio.massiva.list.filtre.tipusexpedient" 
+					inline="true"/>
+			</div>
+			<div class="col-md-4">					
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpLlistat"/>
+				<rip:inputSuggest 
+ 					name="expedientId"  
+ 					urlConsultaInicial="${urlConsultaExpInicial}"
+ 					urlConsultaLlistat="${urlConsultaExpLlistat}"
+ 					usePathVariable="false"
+					placeholderKey="contingut.admin.filtre.expedient"
+ 					suggestValue="id"
+ 					suggestText="nomINumero"
+					inline="true"
+					urlParamAddicional="${contingutMassiuFiltreCommand.metaExpedientId}"/>	
 			</div>
 			<div class="col-md-4">
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusexpedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaExpedient}"/>
-			</div>
-			<div class="col-md-4">
-				<rip:inputSelect name="expedientId" optionItems="${expedients}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.expedient" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
+				<rip:inputSelect 
+					name="metaDocumentId" 
+					optionItems="${metaDocuments}"
+					optionValueAttribute="id" 
+					optionTextAttribute="nom" 
+					optionMinimumResultsForSearch="3"
+					emptyOption="true" 
+					placeholderKey="accio.massiva.list.filtre.tipusdocument"
+					inline="true" />
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-4">
-				<rip:inputSelect name="metaDocumentId" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" optionMinimumResultsForSearch="3" emptyOption="true" placeholderKey="accio.massiva.list.filtre.tipusdocument" inline="true" disabled="${contingutMassiuFiltreCommand.bloquejarMetaDocument}"/>
-			</div>
-			<div class="col-md-4">
-				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.nom"/>
+				<rip:inputText name="nom" inline="true" placeholderKey="accio.massiva.list.filtre.documentNom"/>
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
@@ -203,8 +229,6 @@ function removeTransactionId(idModal) {
 			<div class="col-md-2">
 				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
 			</div>
-		</div>
-		<div class="row">
 			<div class="col-md-4 pull-right">
 				<div class="pull-right">
 					<button style="display:none" type="submit" name="accio" value="filtrar" ><span class="fa fa-filter"></span></button>
@@ -220,17 +244,17 @@ function removeTransactionId(idModal) {
 			<button type="button" id="seleccioAll" title="<spring:message code="expedient.list.user.seleccio.tots"/>" class="btn btn-default"><span class="fa fa-check-square-o"></span></a>
 			<button type="button" id="seleccioNone" title="<spring:message code="expedient.list.user.seleccio.cap"/>" class="btn btn-default"><span class="fa fa-square-o"></span></a>
 				<button type="button" class="btn btn-default" href="./portafirmes/crear" data-toggle="modal" data-refresh-pagina="false">
-					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> ${botoMassiu}
+					<span id="seleccioCount" class="badge">${fn:length(seleccio)}</span> <spring:message code="accio.massiva.boto.crear.portafirmes"/>
 				</button>
 		</div>
 	</script>
+
 		
 	<table id="taulaDades" 
 		data-toggle="datatable" 
 		data-url="<c:url value="/massiu/portafirmes/datatable"/>"
-		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
-		data-default-order="7" 
+		data-default-order="5" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-selection-enabled="true"
@@ -238,23 +262,22 @@ function removeTransactionId(idModal) {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<th data-col-name="expedient" data-visible="false"></th>
-				<th data-col-name="carpeta" data-visible="false"></th>
-				<th data-col-name="document" data-visible="false"></th>
-				<th data-col-name="metaDocument.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
-				<th data-col-name="path" data-template="#cellPathTemplate" data-orderable="false">
-					<spring:message code="accio.massiva.list.column.ubicacio"/>
-					<script id="cellPathTemplate" type="text/x-jsrender">
-						{{if path}}{{for path}}/
-							{{if expedient}}<a href="../contingut/{{:id}}"><span class="fa ${iconaExpedient}" title="<spring:message code="contingut.icona.expedient"/>"></span> {{:nom}}</a>
-							{{else carpeta}}<span class="fa ${iconaCarpeta}" title="<spring:message code="contingut.icona.carpeta"/>"></span> {{:nom}}
-							{{else document}}<span class="fa ${iconaDocument}" title="<spring:message code="contingut.icona.document"/>"></span> {{:nom}} {{/if}}
-						{{/for}}{{/if}}
+				<th data-col-name="expedientId" data-visible="false"></th>
+				<th data-col-name="nom" data-ordenable="true" width="20%"><spring:message code="accio.massiva.list.column.nomDocument"/></th>
+				<th data-col-name="tipusDocumentNom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metadocument"/></th>
+				
+				<th data-col-name="expedientNumeroNom" data-template="#cellExpedientLink" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.expedient"/>
+					<script id="cellExpedientLink" type="text/x-jsrender">
+						<a href="<c:url value="/contingut/{{:expedientId}}"/>">{{:expedientNumeroNom}}</a>	
 					</script>
 				</th>
-				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
-				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+				<th data-col-name="createdByCodiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
+					<script id="cellAccionsTemplate" type="text/x-jsrender">
+						<a href="<c:url value="/document/{{:id}}/portafirmes/upload"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="accio.massiva.boto.crear.portafirmes"/></a>	
+					</script>
+				</th>					
 			</tr>
 		</thead>
 	</table>

@@ -374,11 +374,13 @@ public class ExpedientServiceBean implements ExpedientService {
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text, 
-			String rolActual){
+			String rolActual, 
+			Long procedimentId){
 		return delegate.findByText(
 				entitatId,
 				text,
-				rolActual);
+				rolActual, 
+				procedimentId);
 	}
 
 	@Override

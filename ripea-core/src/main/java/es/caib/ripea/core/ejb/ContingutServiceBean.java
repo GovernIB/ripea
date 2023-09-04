@@ -20,6 +20,7 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
 import es.caib.ripea.core.api.dto.ContingutLogDto;
+import es.caib.ripea.core.api.dto.ContingutMassiuDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutMovimentDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -270,12 +271,12 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PaginaDto<DocumentDto> findDocumentsPerFirmaMassiu(
+	public PaginaDto<DocumentDto> findDocumentsMassiu(
 			Long entitatId,
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
 			String rolActual) throws NotFoundException {
-		return delegate.findDocumentsPerFirmaMassiu(
+		return delegate.findDocumentsMassiu(
 				entitatId,
 				filtre,
 				paginacioParams, 
@@ -411,6 +412,21 @@ public class ContingutServiceBean implements ContingutService {
 	@RolesAllowed("tothom")
 	public boolean isDeleted(Long contingutId) {
 		return delegate.isDeleted(contingutId);
+	}
+
+	
+	@Override
+	@RolesAllowed("tothom")
+	public PaginaDto<ContingutMassiuDto> findDocumentsPerFirmaMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual) throws NotFoundException {
+		return delegate.findDocumentsPerFirmaMassiu(
+				entitatId,
+				filtre,
+				paginacioParams,
+				rolActual);
 	}
 
 }

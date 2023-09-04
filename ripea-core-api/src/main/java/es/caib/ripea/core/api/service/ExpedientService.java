@@ -478,7 +478,8 @@ public interface ExpedientService {
 	public List<ExpedientDto> findByText(
 			Long entitatId,
 			String text, 
-			String rolActual);
+			String rolActual,
+			Long procedimentId);
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")

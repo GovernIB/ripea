@@ -62,10 +62,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
-		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-		filtreCommand.setBloquejarTipusElement(true);
-		filtreCommand.setBloquejarMetaDada(true);
-		filtreCommand.setBloquejarMetaExpedient(false);
+
 		model.addAttribute(
 				"seleccio",
 				RequestSessionHelper.obtenirObjecteSessio(
@@ -86,13 +83,14 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		model.addAttribute(
 				"metaExpedients",
 				metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
-
-		List<ExpedientSelectorDto> expedients = new ArrayList<ExpedientSelectorDto>();
-		if (filtreCommand.getMetaExpedientId() != null)
-			expedients = expedientService.findPerUserAndProcediment(entitatActual.getId(), filtreCommand.getMetaExpedientId(), rolActual);
-		model.addAttribute(
-				"expedients",
-				expedients);
+		
+		
+		if (filtreCommand.getMetaExpedientId() != null) {
+			model.addAttribute(
+					"metaDocuments",
+					 metaDocumentService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatActual.getId(), filtreCommand.getMetaExpedientId()));
+		}
+		
 
 		MissatgesHelper.info(
 				request,
@@ -121,6 +119,37 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		
 		return "redirect:/massiu/portafirmes";
 	}
+	
+	
+	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesResponse datatable(
+			HttpServletRequest request) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
+
+		String rolActual = (String)request.getSession().getAttribute(
+				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		
+		try {
+			return DatatablesHelper.getDatatableResponse(
+					request,
+					 contingutService.findDocumentsPerFirmaMassiu(
+								entitatActual.getId(), 
+								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
+								DatatablesHelper.getPaginacioDtoFromRequest(request), 
+								rolActual),
+					 "id",
+					 SESSION_ATTRIBUTE_SELECCIO);
+		} catch (Exception e) {
+			throw e;
+		}
+		
+	}
+	
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/crear", method = RequestMethod.GET)
@@ -237,32 +266,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 				"accio.massiva.creat.ok");
 	}
 
-	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
-	@ResponseBody
-	public DatatablesResponse datatable(
-			HttpServletRequest request) {
-		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
 
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		
-		try {
-			return DatatablesHelper.getDatatableResponse(
-					request,
-					 contingutService.findDocumentsPerFirmaMassiu(
-								entitatActual.getId(), 
-								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
-								DatatablesHelper.getPaginacioDtoFromRequest(request), 
-								rolActual),
-					 "id",
-					 SESSION_ATTRIBUTE_SELECCIO);
-		} catch (Exception e) {
-			throw e;
-		}
-		
-	}
 
 	@RequestMapping(value = "/expedients/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody

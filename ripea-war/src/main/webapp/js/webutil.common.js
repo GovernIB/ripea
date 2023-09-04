@@ -571,12 +571,7 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		    			url += "/" + encodeURIComponent(params.term);
 					}
 		    		if (additionalParam) {
-			    		
-			    		if (usePathVariable) {
-			    			url += "/" + encodeURIComponent(params.term);
-						} else {
-							url += "&" + additionalParam;
-						}
+		    			url += "/" + additionalParam;
 					}
 		    		
 		    		return url;
