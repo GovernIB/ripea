@@ -36,6 +36,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.ExpedientMassiuCanviEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 
@@ -101,6 +102,10 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 				"expedientEstatsOptions",
 				expedientEstatsOptions);
 
+		MissatgesHelper.info(
+				request,
+				getMessage(request, "accio.massiva.list.filtre.procediment.comment"));
+		
 		return "expedientMassiuCanviEstatList";
 	}
 	
