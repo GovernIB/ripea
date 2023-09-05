@@ -104,18 +104,25 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 			HttpServletRequest request,
 			@Valid ContingutMassiuFiltreCommand filtreCommand,
 			BindingResult bindingResult,
-			Model model) {
-		if (!bindingResult.hasErrors()) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					filtreCommand);
-		}
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
 		
-		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
-		filtreCommand.setBloquejarTipusElement(true);
-		filtreCommand.setBloquejarMetaDada(true);
-		filtreCommand.setBloquejarMetaExpedient(false);
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE);
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_SELECCIO);
+
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_FILTRE,
+						filtreCommand);
+			}
+		}
 		
 		return "redirect:/massiu/portafirmes";
 	}

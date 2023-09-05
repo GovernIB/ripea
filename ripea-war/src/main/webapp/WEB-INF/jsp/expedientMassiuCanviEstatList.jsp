@@ -36,11 +36,12 @@
 	}
 </style>
 <script>
+
+
+//################################################## document ready START ##############################################################
 $(document).ready(function() {
 
 	
-	
-
 	
 	$('#metaExpedientId').on('change', function() {
 		
@@ -102,7 +103,10 @@ $(document).ready(function() {
 	$('#metaExpedientId').on('change', function() {
 		metaExpedientId = $(this).val();
 
-		if (!metaExpedientId) {
+		if (metaExpedientId) {
+			$("#expedientId").data('urlParamAddicional', metaExpedientId);
+		} else {
+			$("#expedientId").data('urlParamAddicional', null);
 			metaExpedientId = 0;
 		}
 		
@@ -123,10 +127,7 @@ $(document).ready(function() {
 	});
 
 
-
-							
-
-});
+});//################################################## document ready END ##############################################################
 
 	
 function enableDisableSelection($this, tipus) {
@@ -170,7 +171,8 @@ function enableDisableSelection($this, tipus) {
 					placeholderKey="contingut.admin.filtre.expedient"
  					suggestValue="id"
  					suggestText="nomINumero"
-					inline="true"/>	
+					inline="true"
+					urlParamAddicional="${contingutMassiuFiltreCommand.metaExpedientId}"/>	
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
