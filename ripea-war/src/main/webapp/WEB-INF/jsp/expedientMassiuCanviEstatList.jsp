@@ -43,13 +43,6 @@ $(document).ready(function() {
 
 	
 	
-	$('#metaExpedientId').on('change', function() {
-		
-		$('button[type="submit"][value="filtrar"]')[0].click();
-		$('#seleccioNone').click();
-	});
-					
-	
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
 				"canviEstat/" + accio,
@@ -109,6 +102,9 @@ $(document).ready(function() {
 			$("#expedientId").data('urlParamAddicional', null);
 			metaExpedientId = 0;
 		}
+
+		$('#expedientId option[value!=""]').remove();
+		$('#expedientId').select2('val', '', true);
 		
 		$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
 		.done(function(data) {
@@ -124,6 +120,7 @@ $(document).ready(function() {
 		.fail(function() {
 			alert("<spring:message code="error.jquery.ajax"/>");
 		});
+		
 	});
 
 
@@ -235,7 +232,7 @@ function enableDisableSelection($this, tipus) {
 						<a href="<c:url value="/contingut/{{:id}}"/>">{{:numeroINom}}</a>	
 					</script>
 				</th>
-				<th data-col-name="metaExpedient.codiSiaINom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
+				<th data-col-name="metaExpedient.codiSiaINom" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
 				<th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">

@@ -120,7 +120,7 @@ table.dataTable td {
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="registre.identificador" width="10%"><spring:message code="expedient.peticio.list.columna.numero.registre"/></th>
+				<th data-col-name="registre.identificador" width="13%"><spring:message code="expedient.peticio.list.columna.numero.registre"/></th>
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
 				<th data-col-name="registre.extracte" width="15%"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiCodiINom"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
