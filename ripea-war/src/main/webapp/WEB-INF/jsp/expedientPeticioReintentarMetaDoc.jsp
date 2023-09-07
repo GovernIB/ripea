@@ -54,14 +54,35 @@
 	padding-top: 1%;
 }
 
-
-.form-control {
-	cursor: pointer !important;
-}
-
 .disabled-icon .form-control:hover {
     cursor: not-allowed !important;
 }
+
+#titolINom {
+	cursor: pointer !important;
+}
+
+.titolINom_btn {
+	cursor: pointer !important;
+}
+
+.disabled-icon .titolINom_btn:hover {
+    cursor: not-allowed !important;
+}
+
+.customIcon {
+	font-size: 10px;
+	background-color: transparent !important;
+} 
+
+.titolINom_btn {
+	background-color: #ccc !important;
+}
+.titolINom_btn:hover {
+	background-color: #b6b6b6 !important;
+	border-color: #999;
+}
+
 </style>
 
 
@@ -92,8 +113,13 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 	
     // Mostrar contingut capçalera visor
     resumViewer.find('*').not('#container-previs').remove();
-    var viewerContent = '<div class="panel-heading"><spring:message code="registre.detalls.pipella.previsualitzacio"/> \
-    					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
+    var viewerContent = '<div class="panel-heading">\
+							<span class="fa-stack customIcon" style="font-size: 10px;margin-top: -5px;">\
+							  <i class="fa fa-file-o fa-stack-2x"></i>\
+							  <i class="fa fa-search fa-1x" style="margin-left: 4px;margin-top: 7px;"></i>\
+							</span>\
+        					 <spring:message code="registre.detalls.pipella.previsualitzacio"/>\
+    						 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
     					 </div>\
     					 <div class="viewer-content viewer-padding">\
     						<dl class="dl-horizontal">\
@@ -206,6 +232,12 @@ function closeViewer() {
 			<form:hidden path="id" />
 			<form:hidden path="tipusMime" />
 			
+			<c:set var="customIcon">
+				<span class="fa-stack customIcon">
+				  <i class="fa fa-file-o fa-stack-2x"></i>
+				  <i class="fa fa-search fa-1x" style="padding-right: 1px;margin-top: 8px;"></i>
+				</span>						
+			</c:set>
 			<div <c:choose>
 					<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf' }">
 						onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}')"
@@ -216,7 +248,13 @@ function closeViewer() {
 						class="disabled-icon"
 					</c:otherwise>
 				 </c:choose>>
-				<rip:inputText name="titolINom" textKey="${registreAnnexCommand.id == -1 ? 'expedient.peticio.form.acceptar.camp.justificnat.nom' : 'expedient.peticio.form.acceptar.camp.annex.nom'}" readonly = "true"/>
+				<rip:inputText 
+					name="titolINom"
+					textKey="${registreAnnexCommand.id == -1 ? 'expedient.peticio.form.acceptar.camp.justificnat.nom' : 'expedient.peticio.form.acceptar.camp.annex.nom'}"
+					readonly="true" 
+					button="true" 
+					buttonMsg="${registreAnnexCommand.tipusMime == 'application/pdf' ? 'registre.annex.detalls.previsualitzar' : 'registre.annex.detalls.previsualitzar.no'}"
+					customIcon="${customIcon}" />
 			</div>
 			<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
 			<rip:inputDate name="ntiFechaCaptura" textKey="registre.annex.detalls.camp.eni.data.captura" readonly="true" required="true"/>

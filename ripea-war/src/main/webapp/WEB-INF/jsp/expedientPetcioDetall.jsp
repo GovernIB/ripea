@@ -151,8 +151,13 @@ tr.clicable {
 		
         // Mostrar contingut capçalera visor
         resumViewer.find('*').not('#container').remove();
-        var viewerContent = '<div class="panel-heading"><spring:message code="registre.detalls.pipella.previsualitzacio"/> \
-        					 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
+        var viewerContent = '<div class="panel-heading">\
+								<span class="fa-stack customIcon" style="font-size: 10px;margin-top: -5px;">\
+								  <i class="fa fa-file-o fa-stack-2x"></i>\
+								  <i class="fa fa-search fa-1x" style="margin-left: 4px;margin-top: 7px;"></i>\
+								</span>\
+           						<spring:message code="registre.detalls.pipella.previsualitzacio"/> \
+        					 	<span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
         					 </div>\
         					 <div class="viewer-content viewer-padding">\
         						<dl class="dl-horizontal">\
