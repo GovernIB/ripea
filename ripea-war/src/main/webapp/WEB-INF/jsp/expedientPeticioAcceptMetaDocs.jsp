@@ -65,6 +65,14 @@
     cursor: not-allowed !important;
 }
 
+.titolINom_btn {
+	cursor: pointer !important;
+}
+
+.disabled-icon .titolINom_btn:hover {
+    cursor: not-allowed !important;
+}
+
 </style>
 <script>
 
@@ -201,6 +209,7 @@ function closeViewer() {
 </head>
 <body>
 
+
 	<c:set var="formAction">
 	<c:choose>
 		<c:when test="${lastOne}">
@@ -221,7 +230,7 @@ function closeViewer() {
 						<form:hidden path="tipusMime" />
 						
 						<div <c:choose>
-								<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf' }">
+								<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf'}">
 									onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}')"
 									title="<spring:message code="registre.annex.detalls.previsualitzar"/>" 
 								</c:when>
@@ -230,8 +239,14 @@ function closeViewer() {
 									class="disabled-icon"
 								</c:otherwise>
 							 </c:choose>>
-							<rip:inputText name="titolINom" textKey="${registreAnnexCommand.id == -1 ? 'expedient.peticio.form.acceptar.camp.justificnat.nom' : 'expedient.peticio.form.acceptar.camp.annex.nom'}" readonly = "true"/>
-						</div>
+						<rip:inputText 
+							name="titolINom"
+							textKey="${registreAnnexCommand.id == -1 ? 'expedient.peticio.form.acceptar.camp.justificnat.nom' : 'expedient.peticio.form.acceptar.camp.annex.nom'}"
+							readonly="true" 
+							button="true" 
+							buttonMsg="${registreAnnexCommand.tipusMime == 'application/pdf' ? 'registre.annex.detalls.previsualitzar' : 'registre.annex.detalls.previsualitzar.no'}"
+							icon="fa fa-file" />
+					</div>
 						<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
 						<rip:inputDate name="ntiFechaCaptura" textKey="registre.annex.detalls.camp.eni.data.captura" readonly="true" required="true"/>
 						<rip:inputText name="ntiOrigen" textKey="registre.annex.detalls.camp.eni.origen" readonly="true"/>
