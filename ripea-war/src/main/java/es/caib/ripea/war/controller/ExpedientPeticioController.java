@@ -540,8 +540,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		
 		RegistreAnnexCommand previousAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioAcceptarCommand.getAnnexos().get(index), RegistreAnnexCommand.class);
-		
-		
+
 		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
@@ -551,18 +550,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		
 		model.addAttribute("metaDocuments", tipusDocsDisponibles);
-
-		tipusPerDefecte(
-				request,
-				expedientPeticioAcceptarCommand.getMetaExpedientId(),
-				tipusDocsDisponibles,
-				previousAnnexCommand);
 		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
-		
-		
 		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
-		
-		
+
 		return "expedientPeticioAcceptMetaDocs";
 	}
 	
