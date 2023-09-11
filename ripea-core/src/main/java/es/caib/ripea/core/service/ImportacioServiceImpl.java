@@ -124,6 +124,9 @@ public class ImportacioServiceImpl implements ImportacioService {
 					expedientSuperior.getId(),
 					params.getCarpetaNom());
 			carpetaEntity = carpetaRepository.findOne(carpeta.getId());
+			carpetaEntity.updateNumeroRegistre(numeroRegistre);
+		} else {
+			pareActual.updateNumeroRegistre(numeroRegistre);
 		}
 		
 		for (ContingutArxiu contingutArxiu : documentsTrobats) {
@@ -178,9 +181,13 @@ public class ImportacioServiceImpl implements ImportacioService {
 					expedientSuperior,
 					fitxer,
 					usingNumeroRegistre,
-					params.getCodiEni());
+					params.getCodiEni(),
+					numeroRegistre);
 			
 		}
+		
+		expedientSuperior.updateRegistresImportats(numeroRegistre);
+		
 		return documentsRepetits;
 	}
 
@@ -206,7 +213,8 @@ public class ImportacioServiceImpl implements ImportacioService {
 			ExpedientEntity expedient,
 			FitxerDto fitxer,
 			boolean usingNumeroRegistre,
-			String codiEniOrigen) {
+			String codiEniOrigen,
+			String numeroRegistre) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedient.getId()));
 		// TIPUS DE DOCUMENT PER DEFECTE
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findByMetaExpedientAndPerDefecteTrue(expedient.getMetaExpedient());
@@ -238,6 +246,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 				entity,
 				fitxer);
 
+		entity.updateNumeroRegistre(numeroRegistre);
 		
 		// POSAR COM A CUSTODIAT O DEFINITIU
 		if (documentArxiu.getFirmes() != null && !documentArxiu.getFirmes().isEmpty()) {

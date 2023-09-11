@@ -127,7 +127,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			from DocumentPortafirmesEntity dp " + 
 			"			where (dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
 			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
-			"				   and dp.error = false))"
+			"				   and dp.error = false)) " +
+			"and (:esNullNumeroRegistre = true " +
+			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))"
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -177,6 +179,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			@Param("isAdmin") boolean isAdmin,
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
+			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
+			@Param("numeroRegistre") String numeroRegistre,
 			Pageable pageable);
 
 	
@@ -228,8 +232,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"			select dp.expedient.id " + 
 			"			from DocumentPortafirmesEntity dp " + 
 			"			where (dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.PENDENT or " + 
-			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT)"
-			+ "				   and dp.error = false))"
+			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT)" + 
+			"				   and dp.error = false)) " +
+			"and (:esNullNumeroRegistre = true " +
+			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))"
 			)
 	List<Long> findIdsByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -278,7 +284,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
 			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
 			@Param("isAdmin") boolean isAdmin,
-			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent);
+			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
+			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
+			@Param("numeroRegistre") String numeroRegistre);
 	
 	
 	@Query(	"select " +

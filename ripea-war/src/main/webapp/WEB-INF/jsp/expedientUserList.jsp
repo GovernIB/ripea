@@ -520,10 +520,12 @@ function hexToRgb(hex) {
 			<div class="col-md-3">
 				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
 			</div>
-			
+			<div class="col-md-2">
+				<rip:inputText name="numeroRegistre" inline="true" placeholderKey="expedient.list.user.placeholder.numeroregistre"/>
+			</div>
 			<c:choose>
 			 	<c:when test="${rolActual!='tothom'}">
-					<div class="col-md-3">
+					<div class="col-md-2">
 						<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 						<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 						<rip:inputSuggest 
@@ -538,18 +540,18 @@ function hexToRgb(hex) {
 					</div>
 			 	</c:when>
 			 	<c:otherwise>
-					<div class="col-md-3">
+					<div class="col-md-2">
 						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-						<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+						<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span></button>
 					</div>		
 			 	</c:otherwise>
 			 </c:choose>
 
 			<rip:inputHidden name="meusExpedients"/>
 			<rip:inputHidden name="ambFirmaPendent"/>
-			<div class="col-md-3 pull-right">
+			<div class="col-md-2 pull-right">
 				<c:if test="${rolActual!='tothom'}">
-					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
+					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span></button>
 				</c:if>
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

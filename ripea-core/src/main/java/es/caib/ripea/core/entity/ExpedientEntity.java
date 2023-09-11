@@ -85,6 +85,8 @@ public class ExpedientEntity extends NodeEntity {
 	protected String sistraUnitatAdministrativa;
 	@Column(name = "sistra_clau", length = 100)
 	protected String sistraClau;
+	@Column(name = "registres_importats", length = 1024)
+	protected String registresImportats;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "agafat_per_codi")
 	@ForeignKey(name = "ipa_agafatper_expedient_fk")
@@ -281,6 +283,9 @@ public class ExpedientEntity extends NodeEntity {
 	public String getNumero() {
 		return numero;
 	}
+	public String getRegistresImportats() {
+		return registresImportats;
+	}
 	public void updateNom(
 			String nom) {
 		this.nom = nom;
@@ -399,6 +404,17 @@ public class ExpedientEntity extends NodeEntity {
 	
 	public String getNumeroINom() {
 		return this.numero + " - " + this.nom;
+	}
+	
+	public void updateRegistresImportats(String numeroRegistre) {
+		if (registresImportats != null)
+			this.registresImportats += "," + numeroRegistre;
+		else
+			this.registresImportats = numeroRegistre;
+	}
+	
+	public void removeRegistresImportats() {
+		this.registresImportats = null;
 	}
 	
 	public static Builder getBuilder(

@@ -39,7 +39,8 @@ public class ExpedientFiltreCommand {
 	private String metaExpedientDominiValor;
 
 	private boolean ambFirmaPendent;
-
+	private String numeroRegistre;
+	
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
@@ -106,6 +107,9 @@ public class ExpedientFiltreCommand {
 	}
 	public void setAmbFirmaPendent(boolean ambFirmaPendent) {
 		this.ambFirmaPendent = ambFirmaPendent;
+	}
+	public void setNumeroRegistre(String numeroRegistre) {
+		this.numeroRegistre = numeroRegistre;
 	}
 
 }

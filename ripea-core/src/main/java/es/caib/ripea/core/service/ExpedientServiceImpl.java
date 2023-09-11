@@ -314,6 +314,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				}
 				if (processatOk) {
 					notificarICanviEstatToProcessatNotificat(expedientPeticioEntity.getId());
+					expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
 				}
 				expedientDto.setProcessatOk(processatOk);
 
@@ -358,7 +359,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		synchronized (lock) {
 			expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId, rolActual, entitatId, associarInteressats, agafarExpedient);
 		}
-
+		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientHelper.inicialitzarExpedientsWithImportacio();
 		boolean processatOk = true;
 		
@@ -397,6 +398,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		if (processatOk) {
 			notificarICanviEstatToProcessatNotificat(expedientPeticioId);
+			expedientHelper.updateRegistresImportats(expedientId, expedientPeticioEntity.getIdentificador());
 		}
 		return processatOk;
 	}
@@ -1733,6 +1735,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolsCurrentUser,
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
+					filtre.getNumeroRegistre() == null,
+					filtre.getNumeroRegistre(),
 					pageable);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
@@ -1807,7 +1811,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolsCurrentUser == null,
 					rolsCurrentUser,
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
-					filtre.isAmbFirmaPendent());				
+					filtre.isAmbFirmaPendent(),
+					filtre.getNumeroRegistre() == null,
+					filtre.getNumeroRegistre());				
 
 			result.setIds(expedientsIds);
 			if (cacheHelper.mostrarLogsRendiment())

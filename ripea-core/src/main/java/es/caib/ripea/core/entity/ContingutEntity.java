@@ -102,6 +102,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 	@Column(name = "ordre")
 	protected int ordre;
 	
+	@Column(name = "numero_registre")
+	protected String numeroRegistre;
+	
 	@Version
 	private long version = 0;
 
@@ -162,6 +165,9 @@ public abstract class ContingutEntity extends RipeaAuditable<Long> {
 		this.arxiuReintents++;
 	}
 	
+	public void updateNumeroRegistre(String numeroRegistre) {
+		this.numeroRegistre = numeroRegistre;
+	}
 
 	@Override
 	public int hashCode() {

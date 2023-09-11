@@ -56,6 +56,14 @@ public interface ContingutRepository extends JpaRepository<ContingutEntity, Long
 	Boolean hasFills(
 			@Param("pare") ContingutEntity pare,
 	        @Param("esborrat") int esborrat);
+	
+	@Query("select case when count(c) > 1 then true else false end from ContingutEntity c " + 
+			"where c.expedient = :expedient " + 
+			"and c.esborrat = 0 " + 
+			"and c.numeroRegistre like :numeroRegistre")
+	Boolean hasMultiplesDocumentsImportatsRegistre(
+			@Param("expedient") ExpedientEntity expedient,
+	        @Param("numeroRegistre") String numeroRegistre);
 
 	List<ContingutEntity> findByPareAndNomOrderByEsborratAsc(
 			ContingutEntity pare,

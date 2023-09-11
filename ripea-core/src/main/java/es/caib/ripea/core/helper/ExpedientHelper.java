@@ -570,6 +570,8 @@ public class ExpedientHelper {
 					rolActual);
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
 		
+			carpetaEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
+			
 			// ########################### CREATE DOCUMENT IN DB ########################
 			DocumentDto documentDto = toDocumentDto(registreAnnexEntity);
 			
@@ -633,6 +635,8 @@ public class ExpedientHelper {
 			documentHelper.actualitzarFitxerDB(
 					docEntity,
 					fitxer);
+			
+			docEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 			
 			if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
 				documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
@@ -777,6 +781,8 @@ public class ExpedientHelper {
 					entitat.getId(),
 					"Registre entrada: " + expedientPeticioEntity.getRegistre().getIdentificador(), null);
 			carpetaEntity = carpetaRepository.findOne(carpetaId);
+			
+			carpetaEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 		}
 
 		// ############################## CREATE DOCUMENT IN DB
@@ -828,6 +834,8 @@ public class ExpedientHelper {
 		documentHelper.actualitzarFitxerDB(
 				docEntity,
 				fitxer);
+		
+		docEntity.updateNumeroRegistre(expedientPeticioEntity.getIdentificador());
 		
 		if (fitxer.getContingut() != null && documentDto.isAmbFirma()) {
 			documentHelper.validaFirmaDocument(docEntity, fitxer, documentDto.getFirmaContingut(), true, false);
@@ -902,6 +910,15 @@ public class ExpedientHelper {
 		documentRepository.save(docEntity);
 		contingutLogHelper.logCreacio(docEntity, true, true);
 		return docEntity;
+	}
+	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void updateRegistresImportats(
+			Long expedientId, 
+			String numeroRegistre) {
+		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
+		
+		expedientEntity.updateRegistresImportats(numeroRegistre);
 	}
 	
 	public void inicialitzarExpedientsWithImportacio() {

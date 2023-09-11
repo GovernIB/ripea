@@ -1309,6 +1309,40 @@ public class ContingutHelper {
 					"Aquest contingut ja està esborrat");
 		}
 
+		// Actualitza camp registres importats per no deixar informació inconsistent durant la cerca per número de registre
+		ExpedientEntity expedientPare = contingut.getExpedientPare();
+		if (contingut.getNumeroRegistre() != null && expedientPare != null && expedientPare.getRegistresImportats() != null) { // Importat
+			String[] registresImportatsArr = expedientPare.getRegistresImportats().split(",");
+			
+			List<String> registresImportats = new ArrayList<>();
+			
+			if (registresImportatsArr.length > 1)
+				registresImportats = new ArrayList<>(Arrays.asList(registresImportatsArr));
+			else	
+				registresImportats.add(registresImportatsArr[0]);
+				
+			// Si és carpeta, esborrar número registre de l'expedient
+			if (contingut instanceof CarpetaEntity)
+				registresImportats.remove(contingut.getNumeroRegistre());
+			
+			// Si és document, comprovar que no hi ha hagi més documents relacionats amb el mateix registre
+			if (contingut instanceof DocumentEntity) {
+				boolean hasMultiplesDocumentsImportats = contingutRepository.hasMultiplesDocumentsImportatsRegistre(
+						expedientPare, 
+						contingut.getNumeroRegistre());
+				
+				// Si només hi ha un document importat, llavors esborrar el seu número de l'expedient
+				if (! hasMultiplesDocumentsImportats) 
+					registresImportats.remove(contingut.getNumeroRegistre());
+			}
+				
+			expedientPare.removeRegistresImportats();
+			
+			for (String numeroRegistre : registresImportats) {
+				expedientPare.updateRegistresImportats(numeroRegistre);
+			}
+		}
+		
 		if ((conteDocumentsDefinitius(contingut) && isPermesEsborrarFinals()) || !conteDocumentsDefinitius(contingut)) {
 			// Marca el contingut i tots els seus fills com a esborrats
 			//  de forma recursiva
@@ -1330,7 +1364,7 @@ public class ContingutHelper {
 						document, rolActual);
 			}
 		}
-
+		
 		// Valida si conté documents definitius
 		if (!conteDocumentsDefinitius(contingut)) {
 
