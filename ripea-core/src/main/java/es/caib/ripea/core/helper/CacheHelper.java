@@ -4,6 +4,7 @@
 package es.caib.ripea.core.helper;
 
 import java.io.Serializable;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -397,15 +399,16 @@ public class CacheHelper {
 			String consulta,
 			String filtre,
 			int iniciCerca,
-			int finalCerca) {
+			int finalCerca) throws SQLException {
 		ResultatDominiDto resultat = new ResultatDominiDto();
+		Connection connection = jdbcTemplate.getDataSource().getConnection();
 		try {
-			if (jdbcTemplate.getDataSource().getConnection() == null)
+			if (connection == null)
 				throw new DominiException("La hi ha cap connexió establerta amb el domini configurat.");
-			if (jdbcTemplate.getDataSource().getConnection().isClosed())
+			if (connection.isClosed())
 				throw new DominiException("La connexió amb el domini està tancada.");
 
-   			boolean isMySql = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName().toLowerCase().contains("mysql");
+   			boolean isMySql = connection.getMetaData().getDatabaseProductName().toLowerCase().contains("mysql");
 			jdbcTemplate.setMaxRows(finalCerca);
 			boolean compatible = true;
 			
@@ -428,9 +431,9 @@ public class CacheHelper {
    			
    			if (!isMySql && filtre.isEmpty()) {
 //   			### ORACLE > 12C OR ORACLE < 12C
-   				if (isOracleVersionGtOrEq12c(jdbcTemplate)) {
+   				if (isOracleVersionGtOrEq12c(jdbcTemplate, connection)) {
 					consulta += " OFFSET " + iniciCerca + " ROWS FETCH NEXT " + finalCerca + " ROWS ONLY";
-				} else if (!isOracleVersionGtOrEq12c(jdbcTemplate)) {
+				} else if (!isOracleVersionGtOrEq12c(jdbcTemplate, connection)) {
 					StringBuilder consultaBuilder = new StringBuilder(consulta);
 					consultaBuilder.insert(consulta.toLowerCase().indexOf("valor") + 5, ", ROWNUM AS RW ");
 					consulta = "SELECT * FROM (" + consultaBuilder + ") WHERE RW  >= " + iniciCerca + " AND RW <= " + finalCerca;
@@ -452,7 +455,7 @@ public class CacheHelper {
 					e.getCause());
 		} finally {
 			try {
-				jdbcTemplate.getDataSource().getConnection().close();
+				connection.close();
 			} catch (SQLException ex) {
 				logger.error("Hi ha hagut un error tancant la connexió JDBC", ex);
 			}
@@ -464,15 +467,16 @@ public class CacheHelper {
 	public ResultatConsultaDto getValueSelectedDomini(
 			JdbcTemplate jdbcTemplate,
 			String consulta,
-			String dadaValor) {
+			String dadaValor) throws SQLException {
 		List<ResultatConsultaDto> resultat = new ArrayList<ResultatConsultaDto>();
+		Connection connection = jdbcTemplate.getDataSource().getConnection();
 		try {
-			if (jdbcTemplate.getDataSource().getConnection() == null)
+			if (connection == null)
 				throw new DominiException("La hi ha cap connexió establerta amb el domini configurat.");
-			if (jdbcTemplate.getDataSource().getConnection().isClosed())
+			if (connection.isClosed())
 				throw new DominiException("La connexió amb el domini està tancada.");
 
-   			boolean isMySql = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName().toLowerCase().contains("mysql");
+   			boolean isMySql = connection.getMetaData().getDatabaseProductName().toLowerCase().contains("mysql");
 			boolean compatible = true;
 			
 //   		### SI ÉS UNA BBDD MYSQL I HI HA FILTRE
@@ -499,7 +503,7 @@ public class CacheHelper {
 					e.getCause());
 		} finally {
 			try {
-				jdbcTemplate.getDataSource().getConnection().close();
+				connection.close();
 			} catch (SQLException ex) {
 				logger.error("Hi ha hagut un error tancant la connexió JDBC", ex);
 			}
@@ -794,8 +798,8 @@ public class CacheHelper {
 		
 	}
 	
-	private boolean isOracleVersionGtOrEq12c(JdbcTemplate jdbcTemplate) throws SQLException {
-		DatabaseMetaData databaseMetaData = jdbcTemplate.getDataSource().getConnection().getMetaData();
+	private boolean isOracleVersionGtOrEq12c(JdbcTemplate jdbcTemplate, Connection connection) throws SQLException {
+		DatabaseMetaData databaseMetaData = connection.getMetaData();
 		int versionMajor = databaseMetaData.getDatabaseMajorVersion();
 		int versionMinnor = databaseMetaData.getDatabaseMinorVersion();
 		

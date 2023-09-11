@@ -209,8 +209,9 @@ public class DominiServiceImpl implements DominiService {
 				true,
 				false,
 				false, false, false);
+		ResultatDominiDto resultat = new ResultatDominiDto();
 		if (domini == null) {
-			return new ResultatDominiDto();
+			return resultat;
 		}
 		JdbcTemplate jdbcTemplate = null;
 		Properties conProps = dominiHelper.getProperties(domini);
@@ -224,12 +225,22 @@ public class DominiServiceImpl implements DominiService {
 		int start = (((page - 1) * resultCount != 0 && filter.isEmpty()) ? ((page - 1) * resultCount + 1) : (page - 1) * resultCount);
 		int addToEnd = (page - 1) * resultCount;
 		int end = resultCount + addToEnd;
-		return cacheHelper.findDominisByConsutla(
+		try {
+			resultat = cacheHelper.findDominisByConsutla(
 				jdbcTemplate,
 				domini.getConsulta(),
 				filter,
 				start,
 				end);
+		} catch (Exception ex) {
+			logger.error(
+					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
+					ex);
+			throw new RuntimeException(
+					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
+					ex);
+		}
+		return resultat;
 	}
 	
 	public ResultatConsultaDto getSelectedDomini(
@@ -242,8 +253,9 @@ public class DominiServiceImpl implements DominiService {
 				false, 
 				false, 
 				true, false);
+		ResultatConsultaDto resultat = new ResultatConsultaDto();
 		if (domini == null) {
-			return new ResultatConsultaDto();
+			return resultat;
 		}
 		JdbcTemplate jdbcTemplate = null;
 		Properties conProps = dominiHelper.getProperties(domini);
@@ -255,10 +267,20 @@ public class DominiServiceImpl implements DominiService {
 			jdbcTemplate = dominiHelper.setDataSource(dataSource);
 		}
 		
-		return cacheHelper.getValueSelectedDomini(
-				jdbcTemplate,
-				domini.getConsulta(),
-				dadaValor);
+		try {
+			resultat = cacheHelper.getValueSelectedDomini(
+					jdbcTemplate,
+					domini.getConsulta(),
+					dadaValor);
+		} catch (Exception ex) {
+			logger.error(
+					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
+					ex);
+			throw new RuntimeException(
+					"Hi ha hagut un error creant la connexió del domini " + domini.getNom(),
+					ex);
+		}
+		return resultat;
 	}
 	
 	@Override
