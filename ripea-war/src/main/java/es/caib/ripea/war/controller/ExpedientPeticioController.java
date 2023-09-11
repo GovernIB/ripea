@@ -471,8 +471,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("index", index);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INDEX, index);
 		model.addAttribute("size", size);
-		boolean lastOne = (index + 1 == size) || size == 0;
-		model.addAttribute("lastOne", lastOne);
+		boolean isLast = (index + 1 == size) || size == 0;
+		model.addAttribute("isLast", isLast);
+		
+		boolean isFirst = (index == 0);
+		model.addAttribute("isFirst", isFirst);
 	}
 	
 	
@@ -513,6 +516,54 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		return "expedientPeticioAcceptMetaDocs";
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/previousPage", method = RequestMethod.GET)
+	public String previousPage(
+			HttpServletRequest request,
+			Model model) {
+
+		
+		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_COMMAND);	
+		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_INDEX);
+		index--;
+		setIndexAndSize(
+				request,
+				model,
+				index,
+				expedientPeticioAcceptarCommand.getAnnexos().size());
+
+		
+		RegistreAnnexCommand previousAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioAcceptarCommand.getAnnexos().get(index), RegistreAnnexCommand.class);
+		
+		
+		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
+		MetaDocumentDto metaDocument = metaDocumentService.findById(previousAnnexCommand.getMetaDocumentId());
+		if (!metaDocument.isPermetMultiple()) {
+			tipusDocsDisponibles.add(metaDocument);
+		}
+		
+		model.addAttribute("metaDocuments", tipusDocsDisponibles);
+
+		tipusPerDefecte(
+				request,
+				expedientPeticioAcceptarCommand.getMetaExpedientId(),
+				tipusDocsDisponibles,
+				previousAnnexCommand);
+		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
+		
+		
+		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
+		
+		
+		return "expedientPeticioAcceptMetaDocs";
 	}
 	
 

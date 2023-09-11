@@ -86,34 +86,45 @@
 	border-color: #999;
 }
 
+
+.dl-horizontal dt {
+    width: 200px !important;
+}
+
+
 </style>
 <script>
 
 $(document).ready(function(){
 
+	$("button[name=previousPage]").click(function() {
+		window.location.href = '<c:url value="/modal/expedientPeticio/previousPage"/>';
+	});
 	
 	$("button#btnSave").submit(function (e) {
 	    e.preventDefault();
 	    $("button#btnSave").attr("disabled", true);
 	    return true;
 	});		
+
+	$("#divNomAnnex").click();
+
+
 });
 
 
 
 var previousAnnex;
-function showViewer(event, annexId, observacions, dataCaptura, origen) {
+function showViewer(event, annexId, observacions, dataCaptura, origen, ntiTipoDocumental, sicresTipoDocumento, annexArxiuEstat) {
     var resumViewer = $('#annex-viewer');
 	// Mostrar/amagar visor
 	if (!resumViewer.is(':visible')) {
 		resumViewer.slideDown(500);
 	} else if (previousAnnex == undefined || previousAnnex == annexId) {
 		closeViewer(annexId);
-		event.srcElement.parentElement.style = "background: #fffff";
 		previousAnnex = annexId;
 		return;
 	}
-	event.srcElement.parentElement.style = "background: #f9f9f9";
 	previousAnnex = annexId;
 	
     // Mostrar contingut capçalera visor
@@ -127,10 +138,13 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
     						<span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
     					 </div>\
     					 <div class="viewer-content viewer-padding">\
-    						<dl class="dl-horizontal">\
-	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.eni.data.captura"/>: </dt><dd>' + dataCaptura + '</dd>\
-	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.eni.origen"/>: </dt><dd>' + origen + '</dd>\
+    						<dl class="dl-horizontal" style="columns: 2">\
+	        					<dt style="text-align: left;"><spring:message code="contingut.info.nti.data.captura"/>: </dt><dd>' + dataCaptura + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="contingut.info.nti.origen"/>: </dt><dd>' + origen + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="contingut.admin.info.camp.eni.tipus.doc"/>: </dt><dd>' + ntiTipoDocumental + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.sicres.tipus.document"/>: </dt><dd>' + sicresTipoDocumento + '</dd>\
 	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.observacions"/>: </dt><dd>' + observacions + '</dd>\
+	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.estat.arxiu"/>: </dt><dd>' + annexArxiuEstat + '</dd>\
         					</dl>\
     					 </div>';
     resumViewer.prepend(viewerContent);
@@ -176,9 +190,9 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 	showDocument(urlDescarrega, annexId);
 
 	// scroll down
-	$([document.documentElement, document.body]).animate({
-        scrollTop: $("#annex-viewer").offset().top - 40
-    }, 500);
+// 	$([document.documentElement, document.body]).animate({
+//         scrollTop: $("#annex-viewer").offset().top - 40
+//     }, 500);
 }
 
 function showDocument(arxiuUrl, annexId) {
@@ -230,7 +244,7 @@ function closeViewer() {
 
 	<c:set var="formAction">
 	<c:choose>
-		<c:when test="${lastOne}">
+		<c:when test="${isLast}">
 			<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
 		</c:when>
 		<c:otherwise>
@@ -254,9 +268,10 @@ function closeViewer() {
 							</span>						
 						</c:set>
 						
-						<div <c:choose>
+						<div id="divNomAnnex" 
+							<c:choose>
 								<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf'}">
-									onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}')"
+									onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}', '${registreAnnexCommand.ntiTipoDocumental}', '${registreAnnexCommand.sicresTipoDocumento}', '${registreAnnexCommand.annexArxiuEstat}')"
 									title="<spring:message code="registre.annex.detalls.previsualitzar"/>" 
 								</c:when>
 								<c:otherwise>
@@ -273,12 +288,6 @@ function closeViewer() {
 							customIcon="${customIcon}" />
 					</div>
 						<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
-						<rip:inputDate name="ntiFechaCaptura" textKey="registre.annex.detalls.camp.eni.data.captura" readonly="true" required="true"/>
-						<rip:inputText name="ntiOrigen" textKey="registre.annex.detalls.camp.eni.origen" readonly="true"/>
-						<rip:inputSelect name="ntiTipoDocumental" textKey="registre.annex.detalls.camp.eni.tipus.documental" disabled="true" optionEnum="NtiTipoDocumentoEnumDto"/>
-						<rip:inputSelect name="sicresTipoDocumento" textKey="registre.annex.detalls.camp.sicres.tipus.document" disabled="true" optionEnum="SicresTipoDocumentoEnumDto"/>
-						<rip:inputText name="observacions" textKey="registre.annex.detalls.camp.observacions" readonly = "true"/>
-						<rip:inputSelect name="annexArxiuEstat" textKey="registre.annex.detalls.camp.estat.arxiu" disabled="true" optionEnum="ArxiuEstatEnumDto"/>
 
 					</div>
 					
@@ -296,15 +305,19 @@ function closeViewer() {
 		</c:choose>
 		
 		<div id="modal-botons" class="well">
+			<c:if test="${!isFirst}">
+				<button type="button" name="previousPage" class="btn btn-default"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.previous"/></button>
+			</c:if>
+				
 			<button id="btnSave" type="submit" class="btn btn-success">
-			<c:choose>
-				<c:when test="${lastOne}">
-					<span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" />
-				</c:when>
-				<c:otherwise>
-					<span class="fa fa-arrow-right"></span> <spring:message code="comu.boto.next" />
-				</c:otherwise>
-			</c:choose>			
+				<c:choose>
+					<c:when test="${isLast}">
+						<span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" />
+					</c:when>
+					<c:otherwise>
+						<span class="fa fa-arrow-right"></span> <spring:message code="comu.boto.next" />
+					</c:otherwise>
+				</c:choose>			
 			</button>
 			<a href="<c:url value="/expedientPeticio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar" /></a>
 		</div>

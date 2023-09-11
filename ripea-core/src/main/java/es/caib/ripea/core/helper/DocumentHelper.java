@@ -245,7 +245,7 @@ public class DocumentHelper {
 					"id=" + entity.getId() + ")",
 					ex);
 			
- 			if (ex instanceof ValidacioFirmaException) {
+ 			if (ex instanceof ValidacioFirmaException && !configHelper.getAsBoolean("es.caib.ripea.document.deteccio.firma.automatica")) {
  				throw new ValidationException(
  						document.getId(),
  						DocumentEntity.class,
