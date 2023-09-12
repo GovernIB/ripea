@@ -83,6 +83,11 @@
 	border-color: #999;
 }
 
+.dl-horizontal dt {
+    width: 200px !important;
+}
+
+
 </style>
 
 
@@ -93,22 +98,26 @@ $(document).ready(function(){
 	    $("button#btnSave").attr("disabled", true);
 	    return true;
 	});		
+
+	// in firefox doesn't open previsualization when it is without setTimeout
+	setTimeout(function() {
+	    $("#divNomAnnex").click();
+	}, 100);
 });
 
 
 var previousAnnex;
-function showViewer(event, annexId, observacions, dataCaptura, origen) {
+function showViewer(event, annexId, observacions, dataCaptura, origen, ntiTipoDocumental, sicresTipoDocumento, annexArxiuEstat) {
     var resumViewer = $('#annex-viewer');
 	// Mostrar/amagar visor
 	if (!resumViewer.is(':visible')) {
 		resumViewer.slideDown(500);
 	} else if (previousAnnex == undefined || previousAnnex == annexId) {
 		closeViewer(annexId);
-		event.srcElement.parentElement.style = "background: #fffff";
 		previousAnnex = annexId;
 		return;
 	}
-	event.srcElement.parentElement.style = "background: #f9f9f9";
+
 	previousAnnex = annexId;
 	
     // Mostrar contingut capçalera visor
@@ -118,16 +127,19 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 							  <i class="fa fa-file-o fa-stack-2x"></i>\
 							  <i class="fa fa-search fa-1x" style="margin-left: 4px;margin-top: 7px;"></i>\
 							</span>\
-        					 <spring:message code="registre.detalls.pipella.previsualitzacio"/>\
-    						 <span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
-    					 </div>\
-    					 <div class="viewer-content viewer-padding">\
-    						<dl class="dl-horizontal">\
-	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.eni.data.captura"/>: </dt><dd>' + dataCaptura + '</dd>\
-	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.eni.origen"/>: </dt><dd>' + origen + '</dd>\
-	        					<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.observacions"/>: </dt><dd>' + observacions + '</dd>\
-        					</dl>\
-    					 </div>';
+							<spring:message code="registre.detalls.pipella.previsualitzacio"/> \
+							<span class="fa fa-close" style="float: right; cursor: pointer;" onClick="closeViewer()"></span>\
+						 </div>\
+						 <div class="viewer-content viewer-padding">\
+							<dl class="dl-horizontal" style="columns: 2">\
+								<dt style="text-align: left;"><spring:message code="contingut.info.nti.data.captura"/>: </dt><dd>' + dataCaptura + '</dd>\
+								<dt style="text-align: left;"><spring:message code="contingut.info.nti.origen"/>: </dt><dd>' + origen + '</dd>\
+								<dt style="text-align: left;"><spring:message code="contingut.admin.info.camp.eni.tipus.doc"/>: </dt><dd>' + ntiTipoDocumental + '</dd>\
+								<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.sicres.tipus.document"/>: </dt><dd>' + sicresTipoDocumento + '</dd>\
+								<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.observacions"/>: </dt><dd>' + observacions + '</dd>\
+								<dt style="text-align: left;"><spring:message code="registre.annex.detalls.camp.estat.arxiu"/>: </dt><dd>' + annexArxiuEstat + '</dd>\
+							</dl>\
+						 </div>';
     resumViewer.prepend(viewerContent);
     
     // Recupera i mostrar contingut firmes
@@ -171,9 +183,9 @@ function showViewer(event, annexId, observacions, dataCaptura, origen) {
 	showDocument(urlDescarrega, annexId);
 
 	// scroll down
-	$([document.documentElement, document.body]).animate({
-        scrollTop: $("#annex-viewer").offset().top - 40
-    }, 500);
+// 	$([document.documentElement, document.body]).animate({
+//         scrollTop: $("#annex-viewer").offset().top - 40
+//     }, 500);
 }
 
 function showDocument(arxiuUrl, annexId) {
@@ -204,7 +216,6 @@ function showDocument(arxiuUrl, annexId) {
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
 			$('#container-previs').removeClass('rmodal_loading');
-			alert(thrownError);
 		}
 	});
 }
@@ -228,26 +239,29 @@ function closeViewer() {
 		<rip:modalUrl value="/expedientPeticio/${expedientPeticioId}/reintentar" />
 	</c:set>
 	<form:form id="expedientPeticioAcceptarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="registreAnnexCommand">
-		<div class="well"> 
+	
+		<div class="well">
 			<form:hidden path="id" />
 			<form:hidden path="tipusMime" />
-			
+
 			<c:set var="customIcon">
-				<span class="fa-stack customIcon">
-				  <i class="fa fa-file-o fa-stack-2x"></i>
-				  <i class="fa fa-search fa-1x" style="padding-right: 1px;margin-top: 8px;"></i>
-				</span>						
+				<span class="fa-stack customIcon"> 
+					<i class="fa fa-file-o fa-stack-2x"></i>
+					<i class="fa fa-search fa-1x" style="padding-right: 1px; margin-top: 8px;"></i>
+				</span>
 			</c:set>
-			<div <c:choose>
-					<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf' }">
-						onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}')"
-						title="<spring:message code="registre.annex.detalls.previsualitzar"/>" 
-					</c:when>
-					<c:otherwise>
-						title="<spring:message code="registre.annex.detalls.previsualitzar.no"/>"
-						class="disabled-icon"
-					</c:otherwise>
-				 </c:choose>>
+				
+			<div id="divNomAnnex" 
+					<c:choose>
+						<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf'}">
+							onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}', '${registreAnnexCommand.ntiTipoDocumental}', '${registreAnnexCommand.sicresTipoDocumento}', '${registreAnnexCommand.annexArxiuEstat}')"
+							title="<spring:message code="registre.annex.detalls.previsualitzar"/>" 
+						</c:when>
+						<c:otherwise>
+							title="<spring:message code="registre.annex.detalls.previsualitzar.no"/>"
+							class="disabled-icon"
+						</c:otherwise>
+					 </c:choose>>
 				<rip:inputText 
 					name="titolINom"
 					textKey="${registreAnnexCommand.id == -1 ? 'expedient.peticio.form.acceptar.camp.justificnat.nom' : 'expedient.peticio.form.acceptar.camp.annex.nom'}"
@@ -256,14 +270,22 @@ function closeViewer() {
 					buttonMsg="${registreAnnexCommand.tipusMime == 'application/pdf' ? 'registre.annex.detalls.previsualitzar' : 'registre.annex.detalls.previsualitzar.no'}"
 					customIcon="${customIcon}" />
 			</div>
-			<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
-			<rip:inputDate name="ntiFechaCaptura" textKey="registre.annex.detalls.camp.eni.data.captura" readonly="true" required="true"/>
-			<rip:inputText name="ntiOrigen" textKey="registre.annex.detalls.camp.eni.origen" readonly="true"/>
-			<rip:inputSelect name="ntiTipoDocumental" textKey="registre.annex.detalls.camp.eni.tipus.documental" disabled="true" optionEnum="NtiTipoDocumentoEnumDto"/>
-			<rip:inputSelect name="sicresTipoDocumento" textKey="registre.annex.detalls.camp.sicres.tipus.document" disabled="true" optionEnum="SicresTipoDocumentoEnumDto"/>
-			<rip:inputText name="observacions" textKey="registre.annex.detalls.camp.observacions" readonly = "true"/>
-			<rip:inputSelect name="annexArxiuEstat" textKey="registre.annex.detalls.camp.estat.arxiu" disabled="true" optionEnum="ArxiuEstatEnumDto"/>
-
+			<rip:inputSelect 
+				name="metaDocumentId"
+				textKey="contingut.document.form.camp.metanode" 
+				optionItems="${metaDocuments}"
+				optionValueAttribute="id" 
+				optionTextAttribute="nom"
+				emptyOption="${fn:length(metaDocuments) > 1 ? true : false}"
+				emptyOptionTextKey="contingut.document.form.camp.nti.cap" 
+				required="true" />
+				
+			<form:hidden path="ntiFechaCaptura" />
+			<form:hidden path="ntiOrigen" />
+			<form:hidden path="ntiTipoDocumental" />
+			<form:hidden path="sicresTipoDocumento" />
+			<form:hidden path="observacions" />
+			<form:hidden path="annexArxiuEstat" />				
 		</div>
 		
 		<div class="panel panel-default annex-viewer" id="annex-viewer">

@@ -211,6 +211,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null, false);
 			model.addAttribute("metaDocuments", metaDocumentsQueQuedenPerCreacio);
 			model.addAttribute("expedientPeticioId", expedientPeticioId);
+			command.setNtiFechaCaptura(expedientPeticioService.findAnnexById(command.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp 
 			return "expedientPeticioReintentarMetaDoc";
 		}
 		Exception exception = expedientService.retryCreateDocFromAnnex(command.getId(), command.getMetaDocumentId(), RolHelper.getRolActual(request));
@@ -420,12 +421,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("metaDocuments", tipusDocsDisponibles);
-			
 			setIndexAndSize(
 					request,
 					model,
 					index,
 					expedientPeticioAcceptarCommand.getAnnexos().size());
+			registreAnnexCommand.setNtiFechaCaptura(expedientPeticioService.findAnnexById(registreAnnexCommand.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp 
+			
 		} else {
 			
 			expedientPeticioAcceptarCommand.getAnnexos().get(index).setMetaDocumentId(registreAnnexCommand.getMetaDocumentId());
@@ -447,7 +449,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				}
 				model.addAttribute("metaDocuments", tipusDocsDisponibles);
 				
-				RegistreAnnexCommand nextAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioAcceptarCommand.getAnnexos().get(index), RegistreAnnexCommand.class);
+				RegistreAnnexCommand nextAnnexCommand = expedientPeticioAcceptarCommand.getAnnexos().get(index);
 				tipusPerDefecte(
 						request,
 						expedientPeticioAcceptarCommand.getMetaExpedientId(),
@@ -538,8 +540,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				index,
 				expedientPeticioAcceptarCommand.getAnnexos().size());
 
-		
-		RegistreAnnexCommand previousAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioAcceptarCommand.getAnnexos().get(index), RegistreAnnexCommand.class);
+		RegistreAnnexCommand previousAnnexCommand = expedientPeticioAcceptarCommand.getAnnexos().get(index);
 
 		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
 				request,

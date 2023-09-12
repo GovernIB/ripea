@@ -107,8 +107,11 @@ $(document).ready(function(){
 	    return true;
 	});		
 
-	$("#divNomAnnex").click();
 
+	// in firefox doesn't open previsualization when it is without setTimeout
+	setTimeout(function() {
+	    $("#divNomAnnex").click();
+	}, 100);
 
 });
 
@@ -223,7 +226,6 @@ function showDocument(arxiuUrl, annexId) {
 		},
 		error: function(xhr, ajaxOptions, thrownError) {
 			$('#container-previs').removeClass('rmodal_loading');
-			alert(thrownError);
 		}
 	});
 }
@@ -257,18 +259,18 @@ function closeViewer() {
 
 		<c:choose>
 			<c:when test="${!empty registreAnnexCommand}">
-					<div class="well"> 
-						<form:hidden path="id" />
-						<form:hidden path="tipusMime" />
+				<div class="well">
+					<form:hidden path="id" />
+					<form:hidden path="tipusMime" />
+
+					<c:set var="customIcon">
+						<span class="fa-stack customIcon"> 
+							<i class="fa fa-file-o fa-stack-2x"></i>
+							<i class="fa fa-search fa-1x" style="padding-right: 1px; margin-top: 8px;"></i>
+						</span>
+					</c:set>
 						
-						<c:set var="customIcon">
-							<span class="fa-stack customIcon">
-							  <i class="fa fa-file-o fa-stack-2x"></i>
-							  <i class="fa fa-search fa-1x" style="padding-right: 1px;margin-top: 8px;"></i>
-							</span>						
-						</c:set>
-						
-						<div id="divNomAnnex" 
+					<div id="divNomAnnex" 
 							<c:choose>
 								<c:when test="${registreAnnexCommand.tipusMime == 'application/pdf'}">
 									onclick="showViewer(event, ${registreAnnexCommand.id}, '${registreAnnexCommand.observacions}', '${registreAnnexCommand.ntiFechaCaptura}', '${registreAnnexCommand.ntiOrigen}', '${registreAnnexCommand.ntiTipoDocumental}', '${registreAnnexCommand.sicresTipoDocumento}', '${registreAnnexCommand.annexArxiuEstat}')"
@@ -287,14 +289,29 @@ function closeViewer() {
 							buttonMsg="${registreAnnexCommand.tipusMime == 'application/pdf' ? 'registre.annex.detalls.previsualitzar' : 'registre.annex.detalls.previsualitzar.no'}"
 							customIcon="${customIcon}" />
 					</div>
-						<rip:inputSelect name="metaDocumentId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
+					<rip:inputSelect 
+						name="metaDocumentId"
+						textKey="contingut.document.form.camp.metanode" 
+						optionItems="${metaDocuments}"
+						optionValueAttribute="id" 
+						optionTextAttribute="nom"
+						emptyOption="${fn:length(metaDocuments) > 1 ? true : false}"
+						emptyOptionTextKey="contingut.document.form.camp.nti.cap" 
+						required="true" />
+						
+					<form:hidden path="ntiFechaCaptura" />
+					<form:hidden path="ntiOrigen" />
+					<form:hidden path="ntiTipoDocumental" />
+					<form:hidden path="sicresTipoDocumento" />
+					<form:hidden path="observacions" />
+					<form:hidden path="annexArxiuEstat" />
+	
+				</div>
 
-					</div>
-					
-					<div class="panel panel-default annex-viewer" id="annex-viewer">
-						<iframe id="container-previs" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
-					</div>  
-					
+				<div class="panel panel-default annex-viewer" id="annex-viewer">
+					<iframe id="container-previs" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
+				</div>
+
 			</c:when>
 			<c:otherwise>
 				<div class="well"> 
