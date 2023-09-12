@@ -19,6 +19,7 @@
 <%@ attribute name="button" required="false" rtexprvalue="true"%>
 <%@ attribute name="buttonMsg" required="false" rtexprvalue="true"%>
 <%@ attribute name="icon" required="false" rtexprvalue="true"%>
+<%@ attribute name="customIcon" required="false" rtexprvalue="true"%>
 <%@ attribute name="readonly" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
 <%@ attribute name="exemple" required="false" rtexprvalue="true"%>
@@ -51,7 +52,16 @@
 					<c:set var="buttonMsg"><spring:message code="${buttonMsg}"/></c:set>
 					<div class="input-group mb-3">
 					<form:input path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
-					<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
+					<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}">
+						<c:choose>
+							<c:when test="${not empty customIcon}">
+								${customIcon}
+							</c:when>
+							<c:otherwise>
+								<i class="${icon}"></i>
+							</c:otherwise>
+						</c:choose>
+					</span>
 					</div>
 				</c:when>
 				<c:when test="${button && tooltip}">
@@ -59,7 +69,16 @@
 					<div class="input-group mb-3">
 						<c:set var="tooltipMsg"><spring:message code="${tooltipMsg}"/></c:set>
 						<form:input path="${campPath}" cssClass="form-control" id="${campId}" disabled="${disabled}" data-toggle="tooltip" data-placement="bottom" title="${tooltipMsg}" readonly="${myReadonly}" />
-						<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}"><i class="${icon}"></i></span>
+						<span class="input-group-addon ${campPath}_btn" title="${buttonMsg}">
+							<c:choose>
+								<c:when test="${not empty customIcon}">
+									${customIcon}
+								</c:when>
+								<c:otherwise>
+									<i class="${icon}"></i>
+								</c:otherwise>
+							</c:choose>
+						</span>
 					</div>
 				</c:when>
 				<c:otherwise>

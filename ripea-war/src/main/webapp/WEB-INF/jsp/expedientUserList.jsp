@@ -508,18 +508,19 @@ function hexToRgb(hex) {
 			<div class="col-md-3">
 				<rip:inputDate name="dataCreacioFi" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.fi"/>
 			</div>	
-		
 		</div>
 		
 		<div class="row">
 			<button type="submit" name="accio" value="filtrar" class="btn btn-primary" style="display:none;"></button>
-			<div class="col-md-3">
-			<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
-				<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
-			</div>
-			<div class="col-md-3">
-				<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
-			</div>
+			<c:if test="${isDominisEnabled}">
+				<div class="col-md-3">
+				<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
+					<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
+				</div>
+				<div class="col-md-3">
+					<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+				</div>
+			</c:if>
 			<div class="col-md-2">
 				<rip:inputText name="numeroRegistre" inline="true" placeholderKey="expedient.list.user.placeholder.numeroregistre"/>
 			</div>

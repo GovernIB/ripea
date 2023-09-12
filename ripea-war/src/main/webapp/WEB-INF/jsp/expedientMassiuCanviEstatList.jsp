@@ -36,18 +36,12 @@
 	}
 </style>
 <script>
+
+
+//################################################## document ready START ##############################################################
 $(document).ready(function() {
 
 	
-	
-
-	
-	$('#metaExpedientId').on('change', function() {
-		
-		$('button[type="submit"][value="filtrar"]')[0].click();
-		$('#seleccioNone').click();
-	});
-					
 	
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
@@ -102,9 +96,15 @@ $(document).ready(function() {
 	$('#metaExpedientId').on('change', function() {
 		metaExpedientId = $(this).val();
 
-		if (!metaExpedientId) {
+		if (metaExpedientId) {
+			$("#expedientId").data('urlParamAddicional', metaExpedientId);
+		} else {
+			$("#expedientId").data('urlParamAddicional', null);
 			metaExpedientId = 0;
 		}
+
+		$('#expedientId option[value!=""]').remove();
+		$('#expedientId').select2('val', '', true);
 		
 		$.get("<c:url value="/expedient/estatValues/"/>" + metaExpedientId)
 		.done(function(data) {
@@ -120,13 +120,11 @@ $(document).ready(function() {
 		.fail(function() {
 			alert("<spring:message code="error.jquery.ajax"/>");
 		});
+		
 	});
 
 
-
-							
-
-});
+});//################################################## document ready END ##############################################################
 
 	
 function enableDisableSelection($this, tipus) {
@@ -170,7 +168,8 @@ function enableDisableSelection($this, tipus) {
 					placeholderKey="contingut.admin.filtre.expedient"
  					suggestValue="id"
  					suggestText="nomINumero"
-					inline="true"/>	
+					inline="true"
+					urlParamAddicional="${contingutMassiuFiltreCommand.metaExpedientId}"/>	
 			</div>
 			<div class="col-md-2">
 				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
@@ -233,7 +232,7 @@ function enableDisableSelection($this, tipus) {
 						<a href="<c:url value="/contingut/{{:id}}"/>">{{:numeroINom}}</a>	
 					</script>
 				</th>
-				<th data-col-name="metaExpedient.codiSiaINom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
+				<th data-col-name="metaExpedient.codiSiaINom" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
 				<th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">

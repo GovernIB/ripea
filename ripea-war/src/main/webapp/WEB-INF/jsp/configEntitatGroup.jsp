@@ -11,7 +11,7 @@
     </div>
     <div class="panel-body flex-column no-side-padding">
         <c:forEach items="${ group.configs }" var="config" varStatus="status_group">
-            <c:set var = "configKey" value = "${fn:replace(config.key,'.','_')}"/>
+            <c:set var = "configKey" value = "${fn:replace(config.key,'.','-')}"/>
             <c:set var = "textGray" value = "${not empty config.value ? '' : 'text-gray'}"/>
             <c:set var = "disabled" value = "${config.jbossProperty || empty config.value ? 'disabled' : ''}"/>
             <div class="padding-top-bottom">

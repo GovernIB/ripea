@@ -56,6 +56,7 @@ import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 
+
 @Component
 public class OrganGestorHelper {
 

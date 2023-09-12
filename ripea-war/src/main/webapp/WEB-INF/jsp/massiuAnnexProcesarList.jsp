@@ -209,7 +209,7 @@ function enableDisableSelection($this, tipus) {
 					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">
 						{{if documentId==null}}
-							<a href="<c:url value="/expedientPeticio/{{:id}}/{{:expedientPeticioId}}/reintentar"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-share"></span>&nbsp;<spring:message code="massiu.list.column.btn.crear.db"/></a>	
+							<a href="<c:url value="/expedientPeticio/{{:id}}/{{:expedientPeticioId}}/reintentar"/>" class="btn btn-default" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-share"></span>&nbsp;<spring:message code="massiu.list.column.btn.crear.db"/></a>	
 						{{/if}}
 					</script>
 					</th>

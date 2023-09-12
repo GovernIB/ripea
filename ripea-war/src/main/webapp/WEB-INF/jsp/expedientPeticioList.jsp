@@ -120,7 +120,7 @@ table.dataTable td {
 		style="width:100%">
 		<thead>
 			<tr>
-				<th data-col-name="registre.identificador" width="10%"><spring:message code="expedient.peticio.list.columna.numero.registre"/></th>
+				<th data-col-name="registre.identificador" width="13%"><spring:message code="expedient.peticio.list.columna.numero.registre"/></th>
 				<th data-col-name="registre.data" data-type="datetime" data-converter="datetime"><spring:message code="expedient.peticio.list.columna.data"/></th>
 				<th data-col-name="registre.extracte" width="15%"><spring:message code="expedient.peticio.list.columna.extracte"/></th>
 				<th data-col-name="registre.destiCodiINom"><spring:message code="expedient.peticio.list.columna.destiNom"/></th>
@@ -147,7 +147,7 @@ table.dataTable td {
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/expedientPeticio/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 								{{if estatView == 'PENDENT' && !pendentEnviarDistribucio}}
-									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
+									<li><a href="<c:url value="/expedientPeticio/acceptar/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.acceptar"/></a></li>
 									<li><a href="<c:url value="/expedientPeticio/rebutjar/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-times"></span>&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
 									<li><a href="<c:url value="/expedientPeticio/canviarProcediment/{{:id}}"/>" data-toggle="modal" data-maximized="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								{{/if}}

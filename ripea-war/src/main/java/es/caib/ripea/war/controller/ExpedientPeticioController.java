@@ -211,6 +211,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			List<MetaDocumentDto> metaDocumentsQueQuedenPerCreacio = metaDocumentService.findActiusPerCreacio(entitatActual.getId(), expedientPeticioDto.getExpedientId(), null, false);
 			model.addAttribute("metaDocuments", metaDocumentsQueQuedenPerCreacio);
 			model.addAttribute("expedientPeticioId", expedientPeticioId);
+			command.setNtiFechaCaptura(expedientPeticioService.findAnnexById(command.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp 
 			return "expedientPeticioReintentarMetaDoc";
 		}
 		Exception exception = expedientService.retryCreateDocFromAnnex(command.getId(), command.getMetaDocumentId(), RolHelper.getRolActual(request));
@@ -420,12 +421,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("metaDocuments", tipusDocsDisponibles);
-			
 			setIndexAndSize(
 					request,
 					model,
 					index,
 					expedientPeticioAcceptarCommand.getAnnexos().size());
+			registreAnnexCommand.setNtiFechaCaptura(expedientPeticioService.findAnnexById(registreAnnexCommand.getId()).getNtiFechaCaptura()); //in POST it is passed as date without time, we want timpestamp 
+			
 		} else {
 			
 			expedientPeticioAcceptarCommand.getAnnexos().get(index).setMetaDocumentId(registreAnnexCommand.getMetaDocumentId());
@@ -447,7 +449,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				}
 				model.addAttribute("metaDocuments", tipusDocsDisponibles);
 				
-				RegistreAnnexCommand nextAnnexCommand = ConversioTipusHelper.convertir(expedientPeticioAcceptarCommand.getAnnexos().get(index), RegistreAnnexCommand.class);
+				RegistreAnnexCommand nextAnnexCommand = expedientPeticioAcceptarCommand.getAnnexos().get(index);
 				tipusPerDefecte(
 						request,
 						expedientPeticioAcceptarCommand.getMetaExpedientId(),
@@ -471,8 +473,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("index", index);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INDEX, index);
 		model.addAttribute("size", size);
-		boolean lastOne = (index + 1 == size) || size == 0;
-		model.addAttribute("lastOne", lastOne);
+		boolean isLast = (index + 1 == size) || size == 0;
+		model.addAttribute("isLast", isLast);
+		
+		boolean isFirst = (index == 0);
+		model.addAttribute("isFirst", isFirst);
 	}
 	
 	
@@ -513,6 +518,43 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		return "expedientPeticioAcceptMetaDocs";
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/previousPage", method = RequestMethod.GET)
+	public String previousPage(
+			HttpServletRequest request,
+			Model model) {
+
+		
+		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_COMMAND);	
+		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_INDEX);
+		index--;
+		setIndexAndSize(
+				request,
+				model,
+				index,
+				expedientPeticioAcceptarCommand.getAnnexos().size());
+
+		RegistreAnnexCommand previousAnnexCommand = expedientPeticioAcceptarCommand.getAnnexos().get(index);
+
+		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
+		MetaDocumentDto metaDocument = metaDocumentService.findById(previousAnnexCommand.getMetaDocumentId());
+		if (!metaDocument.isPermetMultiple()) {
+			tipusDocsDisponibles.add(metaDocument);
+		}
+		
+		model.addAttribute("metaDocuments", tipusDocsDisponibles);
+		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
+		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
+
+		return "expedientPeticioAcceptMetaDocs";
 	}
 	
 

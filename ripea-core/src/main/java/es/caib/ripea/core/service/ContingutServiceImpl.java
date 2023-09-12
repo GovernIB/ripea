@@ -1710,8 +1710,8 @@ public class ContingutServiceImpl implements ContingutService {
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
-			ordenacioMap.put("metaDocument.nom", new String[] {"metaNode.nom"});
+			ordenacioMap.put("createdByCodiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("tipusDocumentNom", new String[] {"metaNode.nom"});
 			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaMassiu(
 					entitat,
 					Utils.getNullIfEmpty(metaExpedientsPermesos), 
