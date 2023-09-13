@@ -68,6 +68,11 @@ body.loading .rmodal {
 /* Adapt font color if the background is light or dark  */
 /* .dark-color { color: black }
 .light-color { color: white }	 */
+
+
+table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+    color: #333;
+}
 </style>
 <script>
 
