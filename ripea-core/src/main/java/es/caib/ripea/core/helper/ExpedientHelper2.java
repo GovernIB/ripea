@@ -73,9 +73,6 @@ public class ExpedientHelper2 {
 		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}
-		if (cacheHelper.hasNotificacionsPendentsPerExpedient(expedient)) {
-			throw new ValidationException("No es pot tancar un expedient amb notificacions pendents");
-		}
 		if (CollectionUtils.isEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0))) {
 			throw new ValidationException("No es pot tancar un expedient sense cap document");
 		}

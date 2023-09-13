@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.dto.TipusViaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.DominiException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -296,7 +297,7 @@ public class CacheHelper {
 			}
 			
 			for (DocumentEntity document : documents) {
-				if (hasNotificacionsNoFinalitzades(document)) {
+				if (hasNotificacionsNoFinalitzadesINoPendentsAmbError(document)) {
 					errors.add(
 							crearValidacioError(
 									null,
@@ -634,6 +635,21 @@ public class CacheHelper {
 		}
 		return false;
 	}
+	
+	
+	private boolean hasNotificacionsNoFinalitzadesINoPendentsAmbError(DocumentEntity document) {
+		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
+				DocumentNotificacioEstatEnumDto.FINALITZADA, 
+				DocumentNotificacioEstatEnumDto.PROCESSADA));
+		List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
+		//Si la darrera notificació del document no està finalitzada
+		if (Utils.isNotEmpty(notificacionsPendents) && !estatsFinals.contains(notificacionsPendents.get(0).getNotificacioEstat()) && !notificacionsPendents.get(0).isError()) {
+			return true;
+		}
+		return false;
+	}
+	
+	
 	
 	@CacheEvict(value = "notificacionsPendentsPerExpedient", key="#expedient")
 	public void evictNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {
