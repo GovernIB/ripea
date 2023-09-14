@@ -72,6 +72,7 @@ import es.caib.ripea.core.api.service.URLInstruccioService;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
+import es.caib.ripea.war.helper.CustomDatesEditor;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
@@ -853,6 +854,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	    		new CustomDateEditor(
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
+	    
+	    
+	    binder.registerCustomEditor(
+	    		Date[].class,
+	    		new CustomDatesEditor());
 	}
 
 

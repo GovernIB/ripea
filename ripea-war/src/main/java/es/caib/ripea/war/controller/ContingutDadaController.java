@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.war.helper.AjaxHelper;
 import es.caib.ripea.war.helper.AjaxHelper.AjaxFormResponse;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
+import es.caib.ripea.war.helper.CustomDatesEditor;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -191,6 +192,9 @@ public class ContingutDadaController extends BaseUserOAdminOOrganController {
 	    				Double.class,
 	    				NumberFormat.getInstance(new Locale("es","ES")),
 	    				true));
+	    binder.registerCustomEditor(
+	    		Date[].class,
+	    		new CustomDatesEditor());	    
 	}
 
 }
