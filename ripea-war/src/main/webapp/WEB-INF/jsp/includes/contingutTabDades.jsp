@@ -328,7 +328,12 @@ function setCheckboxTrue($checkbox)
 									</script>
 								</c:when>
 								<c:otherwise>
-									${dadaValor}
+									<c:choose>
+										<c:when test="${metaDada.tipus == 'BOOLEA'}">
+											<spring:message code="comu.${dadaValor}"/>
+										</c:when>
+										<c:otherwise>${dadaValor}</c:otherwise>
+									</c:choose>
 								</c:otherwise>
 							</c:choose>
 						</td>
