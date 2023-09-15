@@ -58,7 +58,6 @@ import es.caib.ripea.plugin.usuari.DadesUsuari;
 @Component
 public class EmailHelper {
 
-	private static final String PREFIX_RIPEA = "[RIPEA]";
 
 	@Autowired
 	private CacheHelper cacheHelper;
@@ -100,7 +99,7 @@ public class EmailHelper {
 		} else if (contingut instanceof CarpetaEntity) {
 			tipus = "carpeta";
 		}
-		String subject = PREFIX_RIPEA + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom();
+		String subject = getPrefixRipea() + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom();
 		String text = 
 				"Informació de l'element de l'escriptori:\n" +
 				"\tEntitat: " + contingut.getEntitat().getNom() + "\n" +
@@ -120,7 +119,7 @@ public class EmailHelper {
 
 	public void contingutAlliberat(ExpedientEntity expedient, UsuariEntity usuariCreador, UsuariEntity usuariActual) {
 		String tipus = "expedient";
-		String subject = PREFIX_RIPEA + " Element de l'escriptori s'ha alliberat per un usuari: (" + tipus + ") " + expedient.getNom();
+		String subject = getPrefixRipea() + " Element de l'escriptori s'ha alliberat per un usuari: (" + tipus + ") " + expedient.getNom();
 		String text = 
 				"Informació de l'element de l'escriptori:\n" +
 				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
@@ -143,7 +142,7 @@ public class EmailHelper {
 			"execucioMassivaId=" + em.getId() + ")");
 
 		String from = getRemitent();		
-		String subject = PREFIX_RIPEA + " Execucio massiva finalitzada: " + em.getTipus();
+		String subject = getPrefixRipea() + " Execucio massiva finalitzada: " + em.getTipus();
 		String text = 
 				"Execució massiva finalitzada:\n" +
 				"\tId: " + em.getId() + "\n" +
@@ -208,7 +207,7 @@ public class EmailHelper {
 			}
 		}
 		
-		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
+		String subject = getPrefixRipea() + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
 			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
@@ -307,7 +306,7 @@ public class EmailHelper {
 		}
 		
 		
-		String subject = PREFIX_RIPEA + " Nou comentari per procediment";
+		String subject = getPrefixRipea() + " Nou comentari per procediment";
 		String text = 
 				"Informació del procediment:\n" +
 						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
@@ -494,7 +493,7 @@ public class EmailHelper {
 		}
 
 		
-		String subject = PREFIX_RIPEA + " Nova anotació pendent";
+		String subject = getPrefixRipea() + " Nova anotació pendent";
 		String text = 
 				"Informació d'anotació:\n" +
 						"\tEntitat: " + entitat.getNom() + "\n" +
@@ -535,7 +534,7 @@ public class EmailHelper {
 				null,
 				"Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
 		
-		String subject = PREFIX_RIPEA + " Canvi d'estat de revisio de procediment";
+		String subject = getPrefixRipea() + " Canvi d'estat de revisio de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
 			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
@@ -563,7 +562,7 @@ public class EmailHelper {
 		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 
-		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a portafirmes";
+		String subject = getPrefixRipea() + " Canvi d'estat de document enviat a portafirmes";
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String rebutjMotiu = "";
 		String responsableRebuig = "";
@@ -612,7 +611,7 @@ public class EmailHelper {
 		String enviamentCreatedByCodi = documentPortafirmes.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 
-		String subject = PREFIX_RIPEA + " Firma parcial de document enviat a portafirmes";
+		String subject = getPrefixRipea() + " Firma parcial de document enviat a portafirmes";
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String text = 
 				"Informació del document:\n" +
@@ -659,7 +658,7 @@ public class EmailHelper {
 		String enviamentCreatedByCodi = documentViaFirma.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 		
-		String subject = PREFIX_RIPEA + " Canvi d'estat de document enviat a ViaFirma";
+		String subject = getPrefixRipea() + " Canvi d'estat de document enviat a ViaFirma";
 		String estat = (documentViaFirma.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentViaFirma.getEstat().toString();
 
 		String text = 
@@ -700,7 +699,7 @@ public class EmailHelper {
 		String notificacioCreatedByCodi = documentNotificacio.getCreatedBy().getCodi();
 		ExpedientEntity expedient = document.getExpedient();
 
-		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
+		String subject = getPrefixRipea() + " Canvi d'estat de notificació";
 		String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
 		String text = 
 				"Informació del document:\n" +
@@ -746,7 +745,7 @@ public class EmailHelper {
 		ExpedientEntity expedient = document.getExpedient();
 
 		
-		String subject = PREFIX_RIPEA + " Canvi d'estat de notificació";
+		String subject = getPrefixRipea() + " Canvi d'estat de notificació";
 		String estat = documentNotificacio.getNotificacioEstat() != null ? documentNotificacio.getNotificacioEstat().toString() : "";
 		String text = 
 				"Informació del document:\n" +
@@ -822,7 +821,7 @@ public class EmailHelper {
 		SimpleMailMessage missatge = new SimpleMailMessage();
 		missatge.setTo(emailDestinatari);
 		missatge.setFrom(getRemitent());
-		missatge.setSubject(PREFIX_RIPEA + " Mencionat al comentari d'un expedient [" + expedient.getNom() + "]");
+		missatge.setSubject(getPrefixRipea() + " Mencionat al comentari d'un expedient [" + expedient.getNom() + "]");
 		EntitatEntity entitat = expedient.getEntitat();
 		missatge.setText(
 				"L'usuari " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ") t'ha mencionat al comentari d'un expedient [" + expedient.getNom() + "]: \n" +
@@ -933,7 +932,7 @@ public class EmailHelper {
 			enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n";
 		}
 		if (estatAnterior == null) {
-			subject = PREFIX_RIPEA + " Nova tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+			subject = getPrefixRipea() + " Nova tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 			text = 					
 					"S'ha creat una nova tasca a RIPEA:\n" +
 					"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
@@ -942,7 +941,7 @@ public class EmailHelper {
 					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 					enllacTramitar;
 		} else {
-			subject = PREFIX_RIPEA + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+			subject = getPrefixRipea() + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 			text = 			
 					"S'ha modificat l'estat de la tasca a RIPEA:\n" +
 							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
@@ -969,7 +968,7 @@ public class EmailHelper {
 		logger.debug("Enviant correu electrònic per a reassignar responsable de tasca (" +
 				"tascaId=" + expedientTascaEntity.getId() + ")");
 		
-		String subject = PREFIX_RIPEA + " Canvi de responsable de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+		String subject = getPrefixRipea() + " Canvi de responsable de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 		String text = 			
 					"S'ha modificat el responsable de la tasca a RIPEA:\n" +
 							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
@@ -1006,6 +1005,16 @@ public class EmailHelper {
 		
 	}
 	
+	private String getPrefixRipea() {
+		String entorn = configHelper.getConfig("es.caib.ripea.entorn");
+		String prefix;
+		if (entorn == null || entorn.equals("PRO")) {
+			prefix = "[RIPEA]";
+		} else {
+			prefix = "[RIPEA-" + entorn + "]";		
+		}
+		return prefix;
+	}
 	
 	private void sendOrSaveEmail(
 			Set<DadesUsuari> responsables,
