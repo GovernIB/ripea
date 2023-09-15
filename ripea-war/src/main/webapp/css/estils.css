@@ -307,3 +307,13 @@ div.exemple {
 	border-color: #EBCCD1;
 	color: #A94442;
 }
+
+.dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+.dropdown {
+	max-width: fit-content;
+}
+
