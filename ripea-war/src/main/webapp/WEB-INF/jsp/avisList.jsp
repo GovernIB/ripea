@@ -20,7 +20,7 @@
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<th data-col-name="assumpte" width="10px"><spring:message code="avis.list.columna.assumpte"/></th>
+				<th data-col-name="assumpte" width="50%"><spring:message code="avis.list.columna.assumpte"/></th>
 				<th data-col-name="dataInici" data-converter="date"><spring:message code="avis.list.columna.dataInici"/></th>
 				<th data-col-name="dataFinal" data-converter="date"><spring:message code="avis.list.columna.dataFinal"/></th>
 				<th data-col-name="actiu" data-template="#cellActivaTemplate">
