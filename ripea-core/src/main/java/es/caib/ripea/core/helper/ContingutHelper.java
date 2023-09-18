@@ -40,6 +40,7 @@ import com.lowagie.text.pdf.PdfReader;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.caib.ArxiuCaibException;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
@@ -68,6 +69,7 @@ import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSe
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
+import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreInteressat;
 import es.caib.ripea.core.api.utils.Utils;
@@ -1743,12 +1745,27 @@ public class ContingutHelper {
 			List<ArxiuFirmaDto> firmes,
 			ArxiuEstatEnumDto arxiuEstat) {
 		
-		pluginHelper.arxiuDocumentActualitzar(
-				document,
-				fitxer,
-				documentFirmaTipus,
-				firmes,
-				arxiuEstat);
+		try {
+			pluginHelper.arxiuDocumentActualitzar(
+					document,
+					fitxer,
+					documentFirmaTipus,
+					firmes,
+					arxiuEstat);
+		} catch (Exception e) {
+			Exception root = ExceptionHelper.getRootCauseException(e);
+			boolean exceptionJaFirmatEnArxiu = false;
+			if (root instanceof ArxiuCaibException) {
+				ArxiuCaibException ace = (ArxiuCaibException) root;
+				if (ace.getMessage().contains("Can not add the draft aspect to the node because is a final document")) {
+					exceptionJaFirmatEnArxiu = true;
+				}
+			}
+			if (!exceptionJaFirmatEnArxiu) {
+				throw e;
+			}
+		}
+		
 		documentHelper.actualitzarVersionsDocument((DocumentEntity) document);
 		
 		// Arxiu changes file size of some signed documents so we have to consult it after sending document to arxiu

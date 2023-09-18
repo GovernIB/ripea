@@ -1279,6 +1279,10 @@ public class PluginHelper {
 
 	public Document arxiuDocumentConsultar(String arxiuUuid) {
 
+		boolean throwException = false; // throwException = true;
+		if (throwException) {
+			throw new RuntimeException("Mock exception al consultar document arxiu");
+		}
 		
 		IntegracioAccioDto integracioAccio = getIntegracioAccioArxiu(
 				arxiuUuid,

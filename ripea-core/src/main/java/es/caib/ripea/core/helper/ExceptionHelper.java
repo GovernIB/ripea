@@ -53,8 +53,13 @@ public class ExceptionHelper {
 	
 	
 	public static Throwable getRootCauseOrItself(Throwable e) {
-
 		return ExceptionUtils.getRootCause(e) != null ? ExceptionUtils.getRootCause(e) : e;
+	}
+	
+	
+	public static Exception getRootCauseException(Throwable e) {
+		Throwable throwable = getRootCauseOrItself(e);
+		return throwable != null ? (Exception) throwable : null;
 	}
 	
 }

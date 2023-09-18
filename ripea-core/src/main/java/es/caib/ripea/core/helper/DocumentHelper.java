@@ -1343,18 +1343,11 @@ public class DocumentHelper {
 					documentEntity.setGesDocAdjuntFirmaId(null);
 				}
 			} catch (Exception ex) {
+				
 				logger.error("Error al custodiar en arxiu document adjunt  (" +
 						"id=" + documentEntity.getId() + ")",
 						ex);
-
-				Throwable e = ExceptionHelper.findThrowableInstance(ex, SistemaExternException.class, 3);
-				if (e != null) {
-					exception = (Exception) e;
-				} else {
-					exception = (Exception) ExceptionUtils.getRootCause(ex);
-					if (exception == null)
-						exception = ex;
-				}
+				exception = ExceptionHelper.getRootCauseException(ex);;
 			}
 		} else {
 			exception = new RuntimeException("Expedient de aquest document no es guardat en arxiu");
