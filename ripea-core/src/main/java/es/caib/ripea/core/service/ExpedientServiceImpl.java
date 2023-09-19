@@ -1351,18 +1351,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<MetaDadaEntity> metaDades = dadaRepository.findDistinctMetaDadaByNodeIdInOrderByMetaDadaCodiAsc(
 				expedientIds);
 		List<DadaEntity> dades = dadaRepository.findByNodeIdInOrderByNodeIdAscMetaDadaCodiAsc(expedientIds);
-		int numColumnes = 7 + metaDades.size();
+		int numColumnes = 10 + metaDades.size();
 		String[] columnes = new String[numColumnes];
 		columnes[0] = messageHelper.getMessage("expedient.service.exportacio.numero");
 		columnes[1] = messageHelper.getMessage("expedient.service.exportacio.titol");
 		columnes[2] = messageHelper.getMessage("expedient.service.exportacio.estat");
 		columnes[3] = messageHelper.getMessage("expedient.service.exportacio.datcre");
 		columnes[4] = messageHelper.getMessage("expedient.service.exportacio.idnti");
-		columnes[5] = messageHelper.getMessage("expedient.service.exportacio.procediment");
-		columnes[6] = messageHelper.getMessage("expedient.service.exportacio.interessats");
+		columnes[5] = messageHelper.getMessage("expedient.service.exportacio.codi.sia");
+		columnes[6] = messageHelper.getMessage("expedient.service.exportacio.procediment");
+		columnes[7] = messageHelper.getMessage("expedient.service.exportacio.interessats");
+		columnes[8] = messageHelper.getMessage("expedient.service.exportacio.organ.codi");
+		columnes[9] = messageHelper.getMessage("expedient.service.exportacio.organ.nom");
 		for (int i = 0; i < metaDades.size(); i++) {
 			MetaDadaEntity metaDada = metaDades.get(i);
-			columnes[7 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
+			columnes[10 + i] = metaDada.getNom() + " (" + metaDada.getCodi() + ")";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		List<String[]> files = new ArrayList<String[]>();
@@ -1378,7 +1381,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
 			fila[4] = expedient.getNtiIdentificador();
-			fila[5] = expedient.getMetaExpedient().getNom();
+			fila[5] = expedient.getMetaExpedient().getClassificacioSia();
+			fila[6] = expedient.getMetaExpedient().getNom();
 			
 			String intressatsString = "";
 			for (InteressatEntity interessat : expedient.getInteressatsORepresentants()) {
@@ -1390,7 +1394,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 			if (index != -1) {
 				intressatsString = intressatsString.substring(0, index);
 			}
-			fila[6] = intressatsString;
+			fila[7] = intressatsString;
+			
+			fila[8] = expedient.getOrganGestor().getCodi();
+			fila[9] = expedient.getOrganGestor().getNom();
 			
 			if (!dades.isEmpty() && dadesIndex < dades.size()) {
 				DadaEntity dadaActual = dades.get(dadesIndex);
@@ -1411,7 +1418,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 							dadaActual = dades.get(dadesIndex + dadesIndexIncrement);
 						}
 						if (dadaActual.getMetaDada().getId().equals(metaDada.getId()) && dadaActual.getNode().getId().equals(expedient.getId())) {
-							fila[7 + i] = dadaActual.getValorComString();
+							fila[10 + i] = dadaActual.getValorComString();
 						} else {
 							dadaActual = dades.get(dadesIndex);
 						}
