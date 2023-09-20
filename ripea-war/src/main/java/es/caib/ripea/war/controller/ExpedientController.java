@@ -1280,9 +1280,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		expedientEstatService.changeExpedientEstat(
 				entitatActual.getId(),
 				command.getId(),
-				command.getExpedientEstatId(), 
-				false
-				);
+				command.getExpedientEstatId());
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../expedient",

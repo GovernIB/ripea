@@ -23,6 +23,7 @@ import javax.persistence.TemporalType;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
@@ -35,13 +36,11 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 
 	private static final int MOTIU_TAMANY = 256;
 
-	public enum ExecucioMassivaTipus {
-		PORTASIGNATURES
-	}
+
 
 	@Column(name = "tipus")
 	@Enumerated(EnumType.STRING)
-	private ExecucioMassivaTipus tipus;
+	private ExecucioMassivaTipusDto tipus;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_inici")
 	private Date dataInici;
@@ -87,7 +86,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Column(name = "pfirmes_avis_firma_parcial")
 	private Boolean portafirmesAvisFirmaParcial;
 	
-	public ExecucioMassivaTipus getTipus() {
+	public ExecucioMassivaTipusDto getTipus() {
 		return tipus;
 	}
 	public Date getDataInici() {
@@ -147,7 +146,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	}
 
 	public static Builder getBuilder(
-			ExecucioMassivaTipus tipus,
+			ExecucioMassivaTipusDto tipus,
 			Date dataInici,
 			String motiu,
 			PortafirmesPrioritatEnumDto prioritat,
@@ -177,7 +176,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	}
 	public static class Builder {
 		ExecucioMassivaEntity built;
-		Builder(ExecucioMassivaTipus tipus,
+		Builder(ExecucioMassivaTipusDto tipus,
 				Date dataInici,
 				String motiu,
 				PortafirmesPrioritatEnumDto prioritat,
@@ -205,10 +204,41 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			built.rolActual = rolActual;
 			built.portafirmesAvisFirmaParcial = portafirmesAvisFirmaParcial;
 		}
+		
+		Builder(ExecucioMassivaTipusDto tipus,
+				Date dataInici,
+				Date dataFi,
+				EntitatEntity entitat,
+				String rolActual) {
+			built = new ExecucioMassivaEntity();
+			built.tipus = tipus;
+			built.dataInici = dataInici;
+			built.dataFi = dataFi;
+			built.entitat = entitat;
+			built.rolActual = rolActual;
+		}
+		
+		
 		public ExecucioMassivaEntity build() {
 			return built;
 		}
 	}
+	
+	
+	public static Builder getBuilder(
+			ExecucioMassivaTipusDto tipus,
+			Date dataInici,
+			Date dataFi,
+			EntitatEntity entitat,
+			String rolActual) {
+		return new Builder(
+				tipus,
+				dataInici,
+				dataFi,
+				entitat,
+				rolActual);
+	}
+
 
 	private static final long serialVersionUID = -2077000626779456363L;
 

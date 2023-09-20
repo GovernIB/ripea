@@ -30,8 +30,8 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
@@ -138,8 +138,8 @@ public class ConversioTipusHelper {
 						target.setError(source.getError());
 						target.setOrdre(source.getOrdre());
 						target.setExecucioMassiva(convertir(source.getExecucioMassiva(), ExecucioMassivaDto.class));
-						if (source.getContingut() instanceof DocumentEntity)
-							target.setDocumentNom(((DocumentEntity)source.getContingut()).getNom());
+						target.setElementNom(source.getElementNom());
+						target.setElementTipus(source.getElementTipus());
 						return target;
 					}
 				});
@@ -654,7 +654,7 @@ public class ConversioTipusHelper {
 					public ExecucioMassivaDto convert(ExecucioMassivaEntity source, Type<? extends ExecucioMassivaDto> destinationType) {
 						ExecucioMassivaDto target = new ExecucioMassivaDto();
 						target.setId(source.getId());
-						target.setTipus(source.getTipus() != null ? ExecucioMassivaDto.ExecucioMassivaTipusDto.valueOf(source.getTipus().name()): null);
+						target.setTipus(source.getTipus());
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
 						target.setMotiu(source.getMotiu());

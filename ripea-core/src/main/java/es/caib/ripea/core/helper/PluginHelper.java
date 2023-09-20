@@ -1874,6 +1874,12 @@ public class PluginHelper {
 	public String portafirmesUpload(DocumentEntity document, String motiu, PortafirmesPrioritatEnum prioritat, Date dataCaducitat, String documentTipus,
 									String[] responsables, MetaDocumentFirmaSequenciaTipusEnumDto fluxTipus, String fluxId, List<DocumentEntity> annexos, String transaccioId) {
 
+		
+		boolean throwException = false; // throwException = true;
+		if (throwException) {
+			throw new RuntimeException("Mock exception enviar portafirmes ");
+		}
+		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
 		long t0 = System.currentTimeMillis();
 		Map<String, String> accioParams = getAccioParamsPerPortaFirmesUpload(document, motiu, prioritat, dataCaducitat, documentTipus, responsables, fluxTipus, fluxId, annexos);

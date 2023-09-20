@@ -76,8 +76,14 @@ public class ExpedientEstatServiceBean implements ExpedientEstatService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ExpedientDto changeExpedientEstat(Long entitatId, Long expedientId, Long expedientEstatId, boolean checkPerMassiuAdmin) {
-		return delegate.changeExpedientEstat(entitatId, expedientId, expedientEstatId, checkPerMassiuAdmin);
+	public ExpedientDto changeExpedientEstat(
+			Long entitatId,
+			Long expedientId,
+			Long expedientEstatId) {
+		return delegate.changeExpedientEstat(
+				entitatId,
+				expedientId,
+				expedientEstatId);
 	}
 
 	@Override

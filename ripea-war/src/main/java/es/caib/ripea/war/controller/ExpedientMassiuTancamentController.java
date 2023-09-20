@@ -25,11 +25,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
@@ -65,6 +70,8 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	private ContingutService contingutService;
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private ExecucioMassivaService execucioMassivaService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -255,9 +262,12 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			int errors = 0;
 			int nodefinitius = 0;
 			int correctes = 0;
+			Date dataInici = new Date();
+			List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 			
 			for (ExpedientTancarCommand expedientTancar : command.getExpedientsTancar()) {
-				
+				Date dataIniciElement = new Date();
+				Throwable throwable = null;
 				try {
 					expedientService.tancar(
 							entitatActual.getId(),
@@ -269,16 +279,35 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					correctes++;
 				} catch (Exception e) {
 					logger.error("Error al tancament massiu de expedient amb id=" + expedientTancar.getId(), e);
-					Throwable throwable = ExceptionHelper.getRootCauseOrItself(e);
+					throwable = ExceptionHelper.getRootCauseOrItself(e);
 					if (throwable.getClass() == ExpedientTancarSenseDocumentsDefinitiusException.class) {
 						nodefinitius++;
 					} else {
 						errors++;
-						ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientTancar.getId(), RolHelper.getRolActual(request));
-						MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.error", new Object[]{expedientDto.getNom(), throwable.getMessage()}), throwable);
+//						ExpedientDto expedientDto = expedientService.findById(entitatActual.getId(), expedientTancar.getId(), RolHelper.getRolActual(request));
+//						MissatgesHelper.error(request, getMessage(request, "expedient.controller.tancar.massiu.error", new Object[]{expedientDto.getNom(), throwable.getMessage()}), throwable);
 					}
 				}
+				
+				
+				execucioMassivaElements.add(
+						new ExecucioMassivaContingutDto(
+								dataIniciElement,
+								new Date(),
+								expedientTancar.getId(),
+								throwable));
 			}
+			
+			
+			execucioMassivaService.saveExecucioMassiva(
+					entitatActual.getId(),
+					new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.TANCAMENT,
+							dataInici,
+							new Date(),
+							RolHelper.getRolActual(request)),
+					execucioMassivaElements,
+					ElementTipusEnumDto.EXPEDIENT);
 			
 			seleccio.clear();
 			RequestSessionHelper.actualitzarObjecteSessio(

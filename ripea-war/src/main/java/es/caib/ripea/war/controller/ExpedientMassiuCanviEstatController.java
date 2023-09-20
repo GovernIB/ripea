@@ -25,26 +25,35 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.ExpedientMassiuCanviEstatCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Controlador per canvi estat massiu del expedients
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Slf4j
 @Controller
 @RequestMapping("/massiu/canviEstat")
 public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganController {
@@ -59,6 +68,8 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private ExpedientService expedientService;
+	@Autowired
+	private ExecucioMassivaService execucioMassivaService;
 
 	
 	@Autowired
@@ -269,9 +280,9 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 			ExpedientMassiuCanviEstatCommand command,
 			BindingResult bindingResult,
 			Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-
 			return "expedientEstatsForm";
 		}
 		
@@ -279,28 +290,56 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 				request,
 				getSessionAttributeSelecio(request));
 		
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
-		boolean checkPerMassiuAdmin = false;
-		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
-			checkPerMassiuAdmin = true;
-		} 
+		int errors = 0;
+		int correctes = 0;
+		Date dataInici = new Date();
+		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 		
 		for (Long expedientId : seleccio) {
-			expedientEstatService.changeExpedientEstat(
-					entitatActual.getId(),
-					expedientId,
-					command.getExpedientEstatId(), 
-					checkPerMassiuAdmin
-					);
+			Date dataIniciElement = new Date();
+			Throwable throwable = null;
+			
+			try {
+				expedientEstatService.changeExpedientEstat(
+						entitatActual.getId(),
+						expedientId,
+						command.getExpedientEstatId());
+				correctes++;
+				
+			} catch (Exception e) {
+				log.error("Error al canviar estat de expedient massiu amb id=" + expedientId, e);
+				errors++;
+				throwable = ExceptionHelper.getRootCauseOrItself(e);
+			}
+			
+			execucioMassivaElements.add(
+					new ExecucioMassivaContingutDto(
+							dataIniciElement,
+							new Date(),
+							expedientId,
+							throwable));
 		}
 		
 		
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../expedient",
-				"expedient.controller.estatsModificats.ok");
+		execucioMassivaService.saveExecucioMassiva(
+				entitatActual.getId(),
+				new ExecucioMassivaDto(
+						ExecucioMassivaTipusDto.CANVI_ESTAT,
+						dataInici,
+						new Date(),
+						RolHelper.getRolActual(request)),
+				execucioMassivaElements, 
+				ElementTipusEnumDto.EXPEDIENT);
+		
+		if (correctes > 0) {
+			MissatgesHelper.success(request, getMessage(request, "expedient.controller.estatsModificats.ok", new Object[]{correctes}));
+		}  
+		if (errors > 0) {
+			MissatgesHelper.error(request, getMessage(request, "expedient.controller.estatsModificats.error", new Object[]{errors}), null);
+		} 
+		
+		return modalUrlTancar();
 	}
 	
 	

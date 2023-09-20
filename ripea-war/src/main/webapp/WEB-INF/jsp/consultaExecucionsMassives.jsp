@@ -59,26 +59,45 @@
 		});
 	});
 	function mostrarContinguts(continguts, exm_id) {
+
+		let elementTipus = continguts[0].elementTipus;
+		let elementTipusTranslated;
+
+		if (elementTipus == 'EXPEDIENT') {
+			elementTipusTranslated = "<spring:message code='element.tipus.enum.EXPEDIENT'/>"
+		} else if (elementTipus == 'DOCUMENT') {
+			elementTipusTranslated = "<spring:message code='element.tipus.enum.DOCUMENT'/>"
+		} else if (elementTipus == 'INTERESSAT') {
+			elementTipusTranslated = "<spring:message code='element.tipus.enum.INTERESSAT'/>"
+		} else if (elementTipus == 'ANOTACIO') {
+			elementTipusTranslated = "<spring:message code='element.tipus.enum.ANOTACIO'/>"
+		} else if (elementTipus == 'ANNEX') {
+			elementTipusTranslated = "<spring:message code='element.tipus.enum.ANNEX'/>"
+		} 
+
+		
 		$('#continguts_' + exm_id).empty();
 		var html_cont =
 			'<table class="table table-striped table-bordered" id="taula_cont_' + exm_id + '">' + 
 			'<thead>' +
 			'  <tr>' +
-			'    <th class="massiu-contingut">Contingut</th>' +
+			'    <th class="massiu-contingut">' + elementTipusTranslated + '</th>' +
 			'    <th class="massiu-estat">Estat</th>' +
 			'    <th class="massiu-contingut">Data</th>' +
 			'  </tr>' +
 			'</thead>' +
 			'<tbody>';
+
 		for (var i in continguts) {
 			var contingut = continguts[i];
 			html_cont += '<tr class="' + (contingut.estat == "ESTAT_ERROR" ? ' danger' : '') + '">';
-			html_cont += '<td>' + contingut.documentNom + '</td>';
+			html_cont += '<td>' + contingut.elementNom + '</td>';
 			var estat = "";
 			if (contingut.estat == "ESTAT_CANCELAT"){
 				estat = "<span class='fa fa-check-circle'></span><label style='padding-left: 10px'><spring:message code='accio.massiva.estat.ESTAT_CANCELAT'/></label>";
 			} else if (contingut.estat == "ESTAT_ERROR"){
-				estat = "<span class='fa fa-exclamation-circle'></span><label class='msg-error' data-msg-error='" + contingut.error + "' style='cursor: pointer;padding-left: 10px'><spring:message code='accio.massiva.estat.ESTAT_ERROR'/></label>";					
+				var escaped = contingut.error.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&apos;').replace(/"/g, '&quot;');
+				estat = "<span class='fa fa-exclamation-circle'></span><label class='msg-error' data-msg-error='" + escaped + "' style='cursor: pointer;padding-left: 10px'><spring:message code='accio.massiva.estat.ESTAT_ERROR'/></label>";					
 			} else if (contingut.estat == "ESTAT_FINALITZAT"){
 				estat = "<span class='fa fa-check-circle'></span><label style='padding-left: 10px'><spring:message code='accio.massiva.estat.ESTAT_FINALITZAT'/></label>";
 			} else if (contingut.estat == "ESTAT_PENDENT"){

@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -26,11 +27,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -59,7 +65,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	private ExpedientService expedientService;
 	@Autowired
 	private MetaDocumentService metaDocumentService;
-
+	@Autowired
+	private ExecucioMassivaService execucioMassivaService;
 	
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -340,7 +347,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			BindingResult bindingResult,
 			Model model) {
 		model.addAttribute("mantenirPaginacio", true);
-		getEntitatActualComprovantPermisos(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			return "expedientPeticioReintentarMetaDocMassiu";
 		}
@@ -353,8 +360,11 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 			
 			int errors = 0;
 			int correctes = 0;
+			Date dataInici = new Date();
+			List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 			
 			for (Long id : seleccio) {
+				Date dataIniciElement = new Date();
 				Exception exception = null;
 				try {
 					exception = expedientService.retryCreateDocFromAnnex(
@@ -377,7 +387,24 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 				} else {
 					correctes++;
 				}
+				
+				execucioMassivaElements.add(
+						new ExecucioMassivaContingutDto(
+								dataIniciElement,
+								new Date(),
+								id,
+								exception));
 			}
+			
+			execucioMassivaService.saveExecucioMassiva(
+					entitatActual.getId(),
+					new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.ADJUNTAR_ANNEXOS_PENDENTS,
+							dataInici,
+							new Date(),
+							RolHelper.getRolActual(request)),
+					execucioMassivaElements,
+					ElementTipusEnumDto.ANNEX);
 			
 			if (correctes > 0){
 				MissatgesHelper.success(request, getMessage(request, "massiu.controller.annex.procesar.correctes", new Object[]{correctes}));

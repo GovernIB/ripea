@@ -1,7 +1,9 @@
 package es.caib.ripea.war.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,11 +17,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -27,6 +34,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
@@ -38,6 +46,8 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 
     @Autowired
     private ExpedientPeticioService expedientPeticioService;
+	@Autowired
+	private ExecucioMassivaService execucioMassivaService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -167,8 +177,11 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 		
 		int errors = 0;
 		int correctes = 0;
+		Date dataInici = new Date();
+		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 		
 		for (Long id : seleccio) {
+			Date dataIniciElement = new Date();
 			Exception exception = null;
 			try {
 				exception = expedientPeticioService.canviarEstatAnotacioDistribucio(
@@ -193,7 +206,23 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 			} else {
 				correctes++;
 			}
-		
+			
+			execucioMassivaElements.add(
+					new ExecucioMassivaContingutDto(
+							dataIniciElement,
+							new Date(),
+							id,
+							exception));
+			
+			execucioMassivaService.saveExecucioMassiva(
+					entitatActual.getId(),
+					new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.ACTUALITZAR_ESTAT_ANOTACIONS,
+							dataInici,
+							new Date(),
+							RolHelper.getRolActual(request)),
+					execucioMassivaElements,
+					ElementTipusEnumDto.ANOTACIO);
 		}
 		
 		if (correctes > 0){

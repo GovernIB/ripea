@@ -482,11 +482,6 @@ body {
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 							<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
 							<li><a href="<c:url value="/seguimentArxiuPendents"/>"><spring:message code="decorator.menu.pendents.arxiu"/></a></li>
-							<li>
-								<a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
-									<spring:message code="decorator.menu.accions.massives.user"/>
-								</a>
-							</li>
 							<c:if test="${isUrlValidacioDefinida}">
 								<li><a href="<c:url value="/massiu/csv"/>"><spring:message code="massiu.documents.csv"/></a></li>
 							</c:if>
@@ -494,6 +489,10 @@ body {
 							<c:if test="${isRolActualAdministrador}">
 								<li><a href="<c:url value="/massiu/expedientPeticioCanviEstatDistribucio"/>"><spring:message code="massiu.anotacions.pendents.canvi.estat"/></a></li>
 							</c:if>
+							<li class="divider"></li>		
+							<li><a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
+									<spring:message code="decorator.menu.accions.massives.user"/>
+							</a></li>												
 						</ul>
 					</div>
 				</c:if>

@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ExecucioMassivaException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -45,8 +45,15 @@ public interface ExecucioMassivaService {
 	
 	public List<ExecucioMassivaDto> findExecucionsMassivesGlobals() throws NotFoundException;
 	
-	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException, ExecucioMassivaException;
+	public List<ExecucioMassivaContingutDto> findContingutPerExecucioMassiva(Long exm_id) throws NotFoundException;
 
 	public void comprovarExecucionsMassives();
+
+	@PreAuthorize("hasRole('tothom')")
+	public void saveExecucioMassiva(
+			Long entitatId,
+			ExecucioMassivaDto dto,
+			List<ExecucioMassivaContingutDto> exc,
+			ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException;
 
 }

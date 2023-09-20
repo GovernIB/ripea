@@ -16,21 +16,19 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.ExecucioMassivaException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity.ExecucioMassivaEstat;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity.ExecucioMassivaTipus;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
@@ -43,6 +41,10 @@ import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaRepository;
+import es.caib.ripea.core.repository.ExpedientPeticioRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
+import es.caib.ripea.core.repository.RegistreAnnexRepository;
+import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
@@ -73,7 +75,14 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	private MessageHelper messageHelper;
 	@Autowired
 	private EmailHelper emailHelper;
-
+	@Autowired
+	private InteressatRepository interessatRepository;
+	@Autowired
+	private RegistreRepository registreRepository;
+	@Autowired
+	private RegistreAnnexRepository registreAnnexRepository;
+	@Autowired
+	private ExpedientPeticioRepository expedientPeticioRepository;
 
 	@Transactional
 	@Override
@@ -96,7 +105,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		
 		if (dto.getTipus() == ExecucioMassivaTipusDto.PORTASIGNATURES) {
 			execucioMassiva = ExecucioMassivaEntity.getBuilder(
-					ExecucioMassivaTipus.valueOf(dto.getTipus().toString()),
+					ExecucioMassivaTipusDto.PORTASIGNATURES,
 					dataInici,
 					dto.getMotiu(), 
 					dto.getPrioritat(),
@@ -113,10 +122,11 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		
 		int ordre = 0;
 		for (Long contingutId: dto.getContingutIds()) {
-			ContingutEntity contingut = contingutRepository.findOne(contingutId);
 			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
 					execucioMassiva, 
-					contingut, 
+					contingutId, 
+					contingutRepository.findOne(contingutId).getNom(),
+					ElementTipusEnumDto.DOCUMENT, 
 					ordre++).build();
 			
 			execucioMassiva.addContingut(emc);
@@ -125,6 +135,71 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		execucioMassivaRepository.save(execucioMassiva);
 	}
 	
+	
+	@Transactional
+	@Override
+	public void saveExecucioMassiva(
+			Long entitatId,
+			ExecucioMassivaDto exec,
+			List<ExecucioMassivaContingutDto> execElements,
+			ElementTipusEnumDto elementTipus) throws NotFoundException, ValidationException {
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				true, 
+				false);
+	
+		ExecucioMassivaEntity execucioMassiva = ExecucioMassivaEntity.getBuilder(
+				exec.getTipus(),
+				exec.getDataInici(),
+				exec.getDataFi(),
+				entitat,
+				exec.getRolActual()).build();
+	
+		int ordre = 0;
+		for (ExecucioMassivaContingutDto execElement: execElements) {
+			
+			String elementName = null;
+			if (elementTipus == ElementTipusEnumDto.EXPEDIENT || elementTipus == ElementTipusEnumDto.DOCUMENT) {
+				elementName = contingutRepository.findOne(execElement.getElementId()).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.INTERESSAT) {
+				elementName = interessatRepository.findOne(execElement.getElementId()).getNom();
+			} else if (elementTipus == ElementTipusEnumDto.ANOTACIO) {
+				elementName = expedientPeticioRepository.findOne(execElement.getElementId()).getIdentificador();
+			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
+				elementName = registreAnnexRepository.findOne(execElement.getElementId()).getNom();
+			}
+			
+			
+			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
+					execucioMassiva, 
+					execElement.getElementId(), 
+					elementName,
+					elementTipus, 
+					ordre++).build();
+			
+			execucioMassiva.addContingut(emc);
+			emc.updateEstatDataFi(
+					execElement.getEstat(),
+					execElement.getDataFi());
+			
+			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(execElement.getThrowable());
+			if (excepcioRetorn != null) {
+				String error = ExecucioMassivaHelper.getExceptionString(
+						emc,
+						excepcioRetorn);
+				
+				emc.updateError(
+						new Date(), 
+						error);
+			}
+			execucioMassivaContingutRepository.save(emc);
+		}
+		
+		execucioMassivaRepository.save(execucioMassiva);
+	}
 
 	
 	@Override
@@ -222,18 +297,14 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			ExecucioMassivaContingutEntity emc = execucioMassivaContingutRepository.findOne(execucioMassivaContingutId);
 			
 			Throwable excepcioRetorn = ExceptionHelper.getRootCauseOrItself(throwable);
-			ExecucioMassivaException execucioMassivaException = new ExecucioMassivaException(
-					emc.getContingut().getId(),
-					emc.getContingut().getNom(),
-					emc.getContingut().getTipus(),
-					emc.getExecucioMassiva().getId(),
-					emc.getId(),
-					excepcioRetorn);
 			
+			String error = ExecucioMassivaHelper.getExceptionString(
+					emc,
+					excepcioRetorn);
 			
 			emc.updateError(
 					new Date(), 
-					execucioMassivaException.getMessage().length() < 2045 ? execucioMassivaException.getMessage() : execucioMassivaException.getMessage().substring(0, 2045));
+					error);
 			
 			execucioMassivaContingutRepository.save(emc);
 			
@@ -241,13 +312,16 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 					messageHelper.getMessage(
 							"alertes.segon.pla.executar.execucio.massiva.error",
 							new Object[] {execucioMassivaContingutId}),
-					execucioMassivaException,
-					emc.getContingut().getId());
-
+					error,
+					false,
+					emc.getElementId());
 			}
 
 		return throwable;
 	}
+	
+	
+	
 	
 
 
@@ -260,7 +334,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			int errors = 0;
 			Long pendents = 0L;
 			for (ExecucioMassivaContingutEntity emc: exm.getContinguts()) {
-				if (emc.getEstat() == ExecucioMassivaEstat.ESTAT_ERROR)
+				if (emc.getEstat() == ExecucioMassivaEstatDto.ESTAT_ERROR)
 					errors ++;
 				if (emc.getDataFi() == null)
 					pendents++;

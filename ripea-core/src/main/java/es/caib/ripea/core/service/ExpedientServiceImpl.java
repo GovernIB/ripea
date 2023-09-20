@@ -45,8 +45,6 @@ import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
@@ -67,11 +65,11 @@ import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.auxiliary.ExpedientFiltreCalculat;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientComentariEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -1742,7 +1740,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolsCurrentUser,
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
-					filtre.getNumeroRegistre() == null,
+					Utils.isEmpty(filtre.getNumeroRegistre()),
 					filtre.getNumeroRegistre(),
 					pageable);
 			if (cacheHelper.mostrarLogsRendiment())
@@ -1819,7 +1817,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolsCurrentUser,
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
-					filtre.getNumeroRegistre() == null,
+					Utils.isEmpty(filtre.getNumeroRegistre()),
 					filtre.getNumeroRegistre());				
 
 			result.setIds(expedientsIds);

@@ -235,8 +235,13 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	public ExpedientDto changeExpedientEstat(
 			Long entitatId,
 			Long expedientId,
-			Long estatId,
-			boolean checkPerMassiuAdmin) {
+			Long estatId) {
+		
+		boolean throwException = false; // throwException = true;
+		if (throwException) {
+			throw new RuntimeException("Mock exception change estat ");
+		}
+		
 		logger.debug("Canviant estat del expedient (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +

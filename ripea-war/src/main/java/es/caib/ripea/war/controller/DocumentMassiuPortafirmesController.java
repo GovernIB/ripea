@@ -4,8 +4,7 @@
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto.ExecucioMassivaTipusDto;
-import es.caib.ripea.core.api.service.*;
+	import es.caib.ripea.core.api.service.*;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -438,15 +437,6 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		return "consultaExecucionsMassives";
 	}
 
-	@RequestMapping(value = "/consultaContingut/{execucioMassivaId}", method = RequestMethod.GET)
-	@ResponseBody
-	public List<ExecucioMassivaContingutDto> getConsultaContinguts(
-			HttpServletRequest request,
-			@PathVariable Long execucioMassivaId) {
-		if (RolHelper.isRolActualUsuari(request)) 
-			getEntitatActualComprovantPermisos(request);
-		return execucioMassivaService.findContingutPerExecucioMassiva(execucioMassivaId);
-	}
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

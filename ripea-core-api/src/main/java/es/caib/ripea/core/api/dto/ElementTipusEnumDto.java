@@ -1,14 +1,10 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
 
-public enum ArxiuPendentTipusEnumDto {
+public enum ElementTipusEnumDto {
 	EXPEDIENT,
 	DOCUMENT,
 	INTERESSAT,
-	ANNEX,
-	ANOTACIO
-	
+	ANOTACIO,
+	ANNEX
 }

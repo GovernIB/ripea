@@ -203,6 +203,21 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		this.arxiuIntentData = new Date();
 	}
 
+	
+	public String getNom() {
+		if (this instanceof InteressatAdministracioEntity) {
+			return ((InteressatAdministracioEntity) this).getOrganNom();
+		} else if (this instanceof InteressatPersonaFisicaEntity) {
+			InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity) this;
+			return fis.getNom() + " " + fis.getLlinatge1() + " " + fis.getLlinatge2();
+		} else if (this instanceof InteressatPersonaJuridicaEntity) {
+			return ((InteressatPersonaJuridicaEntity) this).getRaoSocial();
+		}
+		return null;
+	}
+	
+
+	
 //	public InteressatEntity getRepresentat() {
 //		return !CollectionUtils.isEmpty(representats) ? representats.get(0) : null;
 //	}

@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import lombok.Data;
 
 /**
  * DTO amb informació d'una execució massiva
@@ -19,9 +19,6 @@ import java.util.List;
 @Data
 public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 
-	public enum ExecucioMassivaTipusDto {
-		PORTASIGNATURES
-	}
 
 	private Long id;
 	private ExecucioMassivaTipusDto tipus;
@@ -48,6 +45,21 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private int errors;
 	private double executades;
 
+
+	public ExecucioMassivaDto() {
+	}
+
+	public ExecucioMassivaDto(
+			ExecucioMassivaTipusDto tipus,
+			Date dataInici,
+			Date dataFi,
+			String rolActual) {
+		this.tipus = tipus;
+		this.dataInici = dataInici;
+		this.dataFi = dataFi;
+		this.rolActual = rolActual;
+	}
+	
 	public String getPortafirmesResponsablesString() {
 		if (portafirmesResponsables == null || portafirmesResponsables.length == 0) {
 			return null;

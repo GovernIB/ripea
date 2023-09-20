@@ -23,10 +23,7 @@ import java.util.List;
  */
 public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 
-	Page<AlertaEntity> findByLlegidaAndContingutId(
-			boolean llegida,
-			Long id,
-			Pageable pageable);
+
 	
 	List<AlertaEntity> findByLlegidaAndContingutId(
 			boolean llegida,

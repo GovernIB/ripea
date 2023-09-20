@@ -32,6 +32,9 @@
 .tab-content {
     margin-top: .8em;
 }
+table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
+    color: #333;
+}	
 </style>
 <script>
 $(document).ready(function() {

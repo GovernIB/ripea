@@ -4,6 +4,8 @@
 package es.caib.ripea.war.controller;
 
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,13 +26,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -68,7 +75,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private MetaExpedientService metaExpedientService;
-
+	@Autowired
+	private ExecucioMassivaService execucioMassivaService;
 
 
     @RequestMapping(method = RequestMethod.GET)
@@ -509,6 +517,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	public String expedientsReintentar(
 			HttpServletRequest request) {
 
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -524,8 +534,12 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 
 		int errors = 0;
 		int correctes = 0;
+		Date dataInici = new Date();
+		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 
 		for (Long expedientId : seleccio) {
+			Date dataIniciElement = new Date();
+			
 			Exception exception = expedientService.guardarExpedientArxiu(expedientId);
 
 			if (exception instanceof ArxiuJaGuardatException) {
@@ -537,8 +551,25 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 			} else {
 				correctes++;
 			}
+			
+			execucioMassivaElements.add(
+					new ExecucioMassivaContingutDto(
+							dataIniciElement,
+							new Date(),
+							expedientId,
+							exception));
 
 		}
+		
+		execucioMassivaService.saveExecucioMassiva(
+				entitatActual.getId(),
+				new ExecucioMassivaDto(
+						ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
+						dataInici,
+						new Date(),
+						RolHelper.getRolActual(request)),
+				execucioMassivaElements, 
+				ElementTipusEnumDto.EXPEDIENT);
 
 		if (correctes > 0){
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.expedients.massiu.correctes", new Object[]{correctes}));
@@ -577,9 +608,11 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 
 		int errors = 0;
 		int correctes = 0;
-		
+		Date dataInici = new Date();
+		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 		
 		for (Long documentId : seleccio) {
+			Date dataIniciElement = new Date();
 			
 			DocumentDto document = documentService.findById(entitatActual.getId(), documentId, null);
 			Exception exception = null;
@@ -628,8 +661,24 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				}				
 
 			}
+			execucioMassivaElements.add(
+					new ExecucioMassivaContingutDto(
+							dataIniciElement,
+							new Date(),
+							documentId,
+							exception));
 		}
-
+		
+		execucioMassivaService.saveExecucioMassiva(
+				entitatActual.getId(),
+				new ExecucioMassivaDto(
+						ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
+						dataInici,
+						new Date(),
+						RolHelper.getRolActual(request)),
+				execucioMassivaElements, 
+				ElementTipusEnumDto.DOCUMENT);
+		
 		if (correctes > 0){
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.documents.massiu.correctes", new Object[]{correctes}));
 		}
@@ -650,6 +699,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	public String interessatsReintentar(
 			HttpServletRequest request) {
 
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		@SuppressWarnings("unchecked")
 		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -665,8 +716,11 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 
 		int errors = 0;
 		int correctes = 0;
+		Date dataInici = new Date();
+		List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
 
 		for (Long interessatId : seleccio) {
+			Date dataIniciElement = new Date();
 			Exception exception = null;
 			try {
 				Long expedientId = expedientInteressatService.findExpedientIdByInteressat(interessatId);
@@ -680,8 +734,24 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 			} else {
 				correctes++;
 			}
-
+			
+			execucioMassivaElements.add(
+					new ExecucioMassivaContingutDto(
+							dataIniciElement,
+							new Date(),
+							interessatId,
+							exception));
 		}
+		
+		execucioMassivaService.saveExecucioMassiva(
+				entitatActual.getId(),
+				new ExecucioMassivaDto(
+						ExecucioMassivaTipusDto.CUSTODIAR_ELEMENTS_PENDENTS,
+						dataInici,
+						new Date(),
+						RolHelper.getRolActual(request)),
+				execucioMassivaElements, 
+				ElementTipusEnumDto.INTERESSAT);
 
 		if (correctes > 0){
 			MissatgesHelper.success(request, getMessage(request, "seguiment.controller.interessats.massiu.correctes", new Object[]{correctes}));

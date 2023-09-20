@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,13 +21,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity.ExecucioMassivaTipus;
 import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
+import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
 
 
@@ -45,6 +49,8 @@ public class ExecucioMassivaHelper{
 	private DocumentFirmaPortafirmesHelper firmaPortafirmesHelper;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private ContingutRepository contingutRepository;
 	
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -55,7 +61,7 @@ public class ExecucioMassivaHelper{
 		if (emc == null)
 			throw new NotFoundException(execucioMassivaContingutId, ExecucioMassivaContingutEntity.class);
 		ExecucioMassivaEntity exm = emc.getExecucioMassiva();
-		ExecucioMassivaTipus tipus = exm.getTipus();
+		ExecucioMassivaTipusDto tipus = exm.getTipus();
 		try {
 			Authentication orgAuthentication = SecurityContextHolder.getContext().getAuthentication();
 			final String user = exm.getCreatedBy().getCodi();
@@ -78,7 +84,7 @@ public class ExecucioMassivaHelper{
 					"N/A",
 					authorities);
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
-			if (tipus == ExecucioMassivaTipus.PORTASIGNATURES){
+			if (tipus == ExecucioMassivaTipusDto.PORTASIGNATURES){
 				exc = enviarPortafirmes(emc);
 			}
 			SecurityContextHolder.getContext().setAuthentication(orgAuthentication);
@@ -89,7 +95,7 @@ public class ExecucioMassivaHelper{
 								"alertes.segon.pla.execucio.massiva",
 								new Object[] {execucioMassivaContingutId}),
 						null,
-						emc.getContingut().getId());
+						emc.getElementId());
 			}
 			
 		} catch (Throwable e) {
@@ -101,8 +107,7 @@ public class ExecucioMassivaHelper{
 	
 	public Throwable enviarPortafirmes(ExecucioMassivaContingutEntity emc) throws Exception {
 		
-
-		ContingutEntity contingut = emc.getContingut();
+		ContingutEntity contingut = contingutRepository.findOne(emc.getElementId());
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 		Throwable exc = null;
 		try {
@@ -135,7 +140,28 @@ public class ExecucioMassivaHelper{
 		return exc;
 	}
 	
-	
+	public static String getExceptionString(
+			ExecucioMassivaContingutEntity emc,
+			Throwable cause) {
+
+		String finalMessage = "Error al executar la acció massiva (";
+		if (emc.getElementId() != null)
+			finalMessage += "elementId: " + emc.getElementId() + ", ";
+		if (emc.getElementNom() != null)
+			finalMessage += "elementNom: " + emc.getElementNom() + ", ";
+		if (emc.getElementTipus() != null)
+			finalMessage += "elementTipus: " + emc.getElementTipus() + ", ";
+		if (emc.getExecucioMassiva().getId() != null)
+			finalMessage += "execucioMassivaId: " + emc.getExecucioMassiva().getId() + ", ";
+		if (emc.getId() != null)
+			finalMessage += "execucioMassivaContingutId: " + emc.getId();
+		finalMessage += ") ===> \r\n";
+		StringWriter out = new StringWriter();
+		cause.printStackTrace(new PrintWriter(out));
+		finalMessage += out.toString();
+		
+		return Utils.abbreviate(finalMessage, 2045);
+	}
 
 	
 	
