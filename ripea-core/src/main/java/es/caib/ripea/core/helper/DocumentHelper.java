@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +47,9 @@ import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidacioFirmaException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -976,6 +976,33 @@ public class DocumentHelper {
 					fitxer.getTamany());
 		}
 
+	}
+	
+	
+	public void actualitzarFitxerFormatDB(
+			DocumentEntity document,
+			FitxerDto fitxer) {
+		if (fitxer != null) {
+			if (Utils.isNotEmpty(fitxer.getContentType())) {
+				document.updateFitxerContentType(fitxer.getContentType());
+			}
+			String newExtension = fitxer.getExtensio();
+			if (Utils.isNotEmpty(newExtension)) {
+				String oldNameWithoutExtension = FilenameUtils.removeExtension(document.getFitxerNom());
+				if (Utils.isNotEmpty(oldNameWithoutExtension)) {
+					document.updateFitxerNom(oldNameWithoutExtension + "." + newExtension);
+				}
+			}
+		}
+	}
+	
+	public void actualitzarFitxerFormatAPdf(DocumentEntity document) {
+		
+		document.updateFitxerContentType("application/pdf");
+		String oldNameWithoutExtension = FilenameUtils.removeExtension(document.getFitxerNom());
+		if (Utils.isNotEmpty(oldNameWithoutExtension)) {
+			document.updateFitxerNom(oldNameWithoutExtension + ".pdf");
+		}
 	}
 
 	public FitxerDto getFitxerAssociat(

@@ -343,6 +343,16 @@ public class DocumentEntity extends NodeEntity {
 		this.fitxerContingut = fitxerContingut;
 		this.fitxerTamany = fitxerTamany;
 	}
+	
+	public void updateFitxerNom(
+			String fitxerNom) {
+		this.fitxerNom = fitxerNom;
+	}
+	
+	public void updateFitxerContentType(
+			String fitxerContentType) {
+		this.fitxerContentType = fitxerContentType;
+	}
 	public void updateFitxerTamany(
 			Long fitxerTamany) {
 		this.fitxerTamany = fitxerTamany;

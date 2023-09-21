@@ -73,6 +73,8 @@ public class DocumentFirmaAppletHelper extends DocumentFirmaHelper {
 		
 		document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
 		
+		documentHelper.actualitzarFitxerFormatAPdf(document);
+		
 		ArxiuEstatEnumDto arxiuEstat = documentHelper.getArxiuEstat(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA, null);
 		contingutHelper.arxiuPropagarModificacio(
 				document,
