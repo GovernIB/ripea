@@ -90,7 +90,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		if (!rolActual.equals("IPA_REVISIO")) {
 			comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
-		MetaExpedientDto metaExpedient = metaExpedientService.findById(
+		MetaExpedientDto metaExpedient = metaExpedientService.findByIdAmbElements(
 				entitatActual.getId(),
 				metaExpedientId);
 		model.addAttribute(

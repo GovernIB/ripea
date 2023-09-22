@@ -62,7 +62,7 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				rolActual.equals("IPA_REVISIO"));
 		model.addAttribute(
 				"metaExpedient",
-				metaExpedientService.findById(
+				metaExpedientService.findByIdAmbElements(
 						entitatActual.getId(),
 						metaExpedientId));
 		

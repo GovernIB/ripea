@@ -18,6 +18,9 @@
 </head>
 <body>
 
+	<c:set var="element" scope="request" value="grup"/>
+	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
+
 	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/grup/datatable"/>" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
 		<thead>
 			<tr>
