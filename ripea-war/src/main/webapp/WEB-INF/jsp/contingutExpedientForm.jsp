@@ -118,6 +118,7 @@ function refrescarGrups() {
 		let metaExpedientId = $('#metaNodeId').val();
 		if (metaExpedientId != undefined && metaExpedientId != "") {
 			const gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
+			$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
 			if (gestioAmbGrupsActiva) {
 				$("#grupsActiu").removeClass("hidden");
 				$.ajax({
@@ -132,6 +133,7 @@ function refrescarGrups() {
 					}
 				});
 			} else {
+				$('#grupId option[value!=""]').remove();
 				$("#grupsActiu").addClass("hidden");
 			}
 		}
@@ -196,7 +198,6 @@ $(document).ready(function() {
 		refrescarSequencia();
 	});
 	refrescarSequencia();
-	refrescarGrups();
 	refrescarOrgan();
 	$('input#any').trigger('change');
 });

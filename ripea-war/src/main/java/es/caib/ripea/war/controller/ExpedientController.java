@@ -509,15 +509,20 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ExpedientDto expedient = null;
+
+		ExpedientCommand command = null;
 		if (expedientId != null) {
-			expedient = expedientService.findById(
+			ExpedientDto expedient = expedientService.findById(
 					entitatActual.getId(),
 					expedientId, null);
-		}
-		ExpedientCommand command = null;
-		if (expedient != null) {
 			command = ExpedientCommand.asCommand(expedient);
+			
+			List<GrupDto> grups = metaExpedientService.findGrupsAmbMetaExpedient(
+					entitatActual.getId(),
+					command.getMetaNodeId(),
+					rolActual);
+			model.addAttribute("grups", grups);
+			command.setGestioAmbGrupsActiva(expedient.getMetaExpedient().isGestioAmbGrupsActiva());
 		} else {
 			command = new ExpedientCommand();
 			command.setAny(Calendar.getInstance().get(Calendar.YEAR));
@@ -533,17 +538,6 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		}
 		
 		model.addAttribute("metaExpedients", metaExpedients);
-		List<GrupDto> grups = new ArrayList<>();
-		if (metaExpedients != null && !metaExpedients.isEmpty()) {
-			grups = metaExpedientService.findGrupsAmbMetaExpedient(
-					entitatActual.getId(),
-					expedientId != null ? command.getMetaNodeId() : metaExpedients.get(0).getId(), 
-					rolActual);
-			command.setGestioAmbGrupsActiva(expedientId != null ? expedient.getMetaExpedient().isGestioAmbGrupsActiva() : metaExpedients.get(0).isGestioAmbGrupsActiva());
-		}
-		model.addAttribute(
-				"grups",
-				grups);
 		
 		return "contingutExpedientForm";
 	}
@@ -563,6 +557,15 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), RolHelper.getRolActual(request)));
+			
+			if (command.getMetaNodeId() != null) {
+				List<GrupDto> grups = metaExpedientService.findGrupsAmbMetaExpedient(
+						entitatActual.getId(),
+						command.getMetaNodeId(),
+						RolHelper.getRolActual(request));
+				model.addAttribute("grups", grups);
+			}
+			
 			return "contingutExpedientForm";
 		}
 		try {
@@ -648,6 +651,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			model.addAttribute(
 					"metaExpedients",
 					metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), "tothom"));
+			
+			List<GrupDto> grups = metaExpedientService.findGrupsAmbMetaExpedient(
+					entitatActual.getId(),
+					command.getMetaNodeId(),
+					RolHelper.getRolActual(request));
+			model.addAttribute("grups", grups);
+			
 			return "contingutExpedientForm";
 		}
 		try {
