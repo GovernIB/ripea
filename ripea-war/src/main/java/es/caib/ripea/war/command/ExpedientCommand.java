@@ -8,12 +8,14 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.ExpedientGrup;
 import es.caib.ripea.war.validation.ExpedientNomUnique;
 import es.caib.ripea.war.validation.ExpedientODocumentNom;
+import lombok.Getter;
 
 /**
  * Command per al manteniment d'expedients.
@@ -31,6 +33,7 @@ import es.caib.ripea.war.validation.ExpedientODocumentNom;
 		campPareId = "pareId",
 		campOrganGestorId = "organGestorId")
 @ExpedientODocumentNom(groups = {Create.class, Update.class})
+@Getter
 public class ExpedientCommand extends ContenidorCommand {
 
 	@NotNull(groups = {Create.class})
@@ -45,27 +48,15 @@ public class ExpedientCommand extends ContenidorCommand {
 	private Long grupId;
 
 	private boolean gestioAmbGrupsActiva;
-	
-	public Long getMetaNodeId() {
-		return metaNodeId;
-	}
+
 	public void setMetaNodeId(Long metaNodeId) {
 		this.metaNodeId = metaNodeId;
 	}
-	public String getTancatMotiu() {
-		return tancatMotiu;
-	}
 	public void setTancatMotiu(String tancatMotiu) {
-		this.tancatMotiu = tancatMotiu != null ? tancatMotiu.trim() : null;
-	}
-	public int getAny() {
-		return any;
+		this.tancatMotiu = Utils.trim(tancatMotiu);
 	}
 	public void setAny(int any) {
 		this.any = any;
-	}
-	public Long getSequencia() {
-		return sequencia;
 	}
 	public void setSequencia(Long sequencia) {
 		this.sequencia = sequencia;
@@ -76,23 +67,20 @@ public class ExpedientCommand extends ContenidorCommand {
 	public void setExpedientEstatId(Long expedientEstatId) {
 		this.expedientEstatId = expedientEstatId;
 	}
-	public Long getMetaNodeDominiId() {
-		return metaNodeDominiId;
-	}
 	public void setMetaNodeDominiId(Long metaNodeDominiId) {
 		this.metaNodeDominiId = metaNodeDominiId;
-	}
-	public Long getOrganGestorId() {
-		return organGestorId;
 	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;
 	}
-	public Long getGrupId() {
-		return grupId;
-	}
 	public void setGrupId(Long grupId) {
 		this.grupId = grupId;
+	}
+	public void setGestioAmbGrupsActiva(boolean gestioAmbGrupsActiva) {
+		this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
+	}
+	public void setNom(String nom) {
+		this.nom = Utils.trim(nom);
 	}
 
 	public static ExpedientCommand asCommand(ExpedientDto dto) {
@@ -117,11 +105,7 @@ public class ExpedientCommand extends ContenidorCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
 	}
-	public boolean isGestioAmbGrupsActiva() {
-		return gestioAmbGrupsActiva;
-	}
-	public void setGestioAmbGrupsActiva(boolean gestioAmbGrupsActiva) {
-		this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
-	}
+
+
 
 }

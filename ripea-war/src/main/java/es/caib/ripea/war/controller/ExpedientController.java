@@ -66,6 +66,7 @@ import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
 import es.caib.ripea.war.command.ExpedientAssignarCommand;
@@ -553,6 +554,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (Utils.isBiggerThan(command.getNom(), 239)) {
+			bindingResult.rejectValue("nom", "Size", new Object[] { null, 239, 0 }, null);
+		}
+		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",
@@ -635,6 +641,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (Utils.isBiggerThan(command.getNom(), 239)) {
+			bindingResult.rejectValue("nom", "Size", new Object[] { null, 239, 0 }, null);
+		}
 		if (bindingResult.hasErrors()) {
 			model.addAttribute(
 					"metaExpedients",

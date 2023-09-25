@@ -39,9 +39,6 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
 
 import es.caib.plugins.arxiu.api.Carpeta;
-import es.caib.plugins.arxiu.api.ConsultaFiltre;
-import es.caib.plugins.arxiu.api.ConsultaOperacio;
-import es.caib.plugins.arxiu.api.ConsultaResultat;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -553,84 +550,25 @@ public class PluginHelper {
 					interessats.add(interessat.getDocumentNum());
 				}
 			}
+			
 			if (expedient.getArxiuUuid() == null) {
 				
-				String nomArxiu = ArxiuConversioHelper.revisarContingutNom(expedient.getNom());
-				List<ConsultaFiltre> filtre = new ArrayList<ConsultaFiltre>();
-				ConsultaFiltre consultaFiltre = new ConsultaFiltre();
-				consultaFiltre.setOperacio(ConsultaOperacio.IGUAL);
-				consultaFiltre.setMetadada("cm:name");
-				consultaFiltre.setValorOperacio1(nomArxiu);
-				filtre.add(consultaFiltre);
-				ConsultaFiltre consultaFiltre2 = new ConsultaFiltre();
-				consultaFiltre2.setOperacio(ConsultaOperacio.IGUAL);
-				consultaFiltre2.setMetadada("eni:cod_clasificacion");
-				consultaFiltre2.setValorOperacio1(expedient.getMetaExpedient().getSerieDocumental());
-				filtre.add(consultaFiltre2);
-				ConsultaFiltre consultaFiltre3 = new ConsultaFiltre();
-				consultaFiltre3.setOperacio(ConsultaOperacio.IGUAL);
-				consultaFiltre3.setMetadada("eni:id_tramite");
-				consultaFiltre3.setValorOperacio1(expedient.getMetaExpedient().getClassificacioSia());
-				filtre.add(consultaFiltre3);
-				ConsultaResultat consultaResultat = getArxiuPlugin().expedientConsulta(filtre, 0, 10);
-				List<ContingutArxiu> contingutsArxiu = consultaResultat.getResultats();
-				if (contingutsArxiu != null && !contingutsArxiu.isEmpty()) {
-					String arxiuUuidsNoms = "";
-					for (ContingutArxiu contingutArxiu : contingutsArxiu) {
-						arxiuUuidsNoms += contingutArxiu.getNom() + "=" + contingutArxiu.getIdentificador() + ", ";
-					}
-					logger.info("Arxius trobats per nom " + nomArxiu + ": " + arxiuUuidsNoms);
-					Iterator<ContingutArxiu> it = contingutsArxiu.iterator();
-					while (it.hasNext()) {
-						ContingutArxiu i = it.next();
-						if (!i.getNom().equals(nomArxiu)) {
-							it.remove();
-						}
-					}
-				}
+				ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
+						toArxiuExpedient(
+								null,
+								expedient.getNom() + " (" + System.currentTimeMillis() + ")",
+								null,
+								Arrays.asList(organCodiDir3),
+								expedient.getCreatedDate().toDate(),
+								classificacio,
+								expedient.getEstat(),
+								interessats,
+								metaExpedient.getSerieDocumental(),
+								expedient.getNumero()));
+				Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(expedientCreat.getIdentificador(), null);
+				propagarMetadadesExpedient(expedientDetalls, expedient);
+				expedient.updateArxiu(expedientCreat.getIdentificador());
 				
-				if (contingutsArxiu != null && !contingutsArxiu.isEmpty()) {
-					if (contingutsArxiu.size() > 1) {
-						String arxiuUuids = "";
-						for (ContingutArxiu contingutArxiu : contingutsArxiu) {
-							arxiuUuids += contingutArxiu.getIdentificador() + ", ";
-						}
-						logger.error("Hi ha multiple expedients amb aquest nom en arxiu: id=" + expedient.getId() + ", titol=" + expedient.getNom() + ", arxiuUuids=" + arxiuUuids);
-						throw new RuntimeException("Hi ha multiple expedients amb aquest nom en arxiu: " + arxiuUuids);
-					}
-					
-					ContingutArxiu contingutArxiu = contingutsArxiu.get(0);
-					List<ExpedientEntity> expedients = expedientRepository.findByArxiuUuid(contingutArxiu.getIdentificador());
-					if (expedients != null && !expedients.isEmpty()) {
-						throw new RuntimeException("Expedient amb aquest nom ja s'ha creat en ripea. Per favor, canvieu el nom d'expedient en ripea"); // this should never happen, if it happens there is some problem of concurrency in ripea
-					}
-					expedient.updateArxiu(contingutArxiu.getIdentificador());
-					logger.info("Expedient ja s'ha creat en arxiu. Enllaçant existent en arxiu amb existent en db: id=" + expedient.getId() + ",idArxiu=" + contingutArxiu.getIdentificador() + ", titol=" + expedient.getNom());
-				} else {
-					try {
-						ContingutArxiu expedientCreat = getArxiuPlugin().expedientCrear(
-								toArxiuExpedient(
-										null,
-										expedient.getNom(),
-										null,
-										Arrays.asList(organCodiDir3),
-										expedient.getCreatedDate().toDate(),
-										classificacio,
-										expedient.getEstat(),
-										interessats,
-										metaExpedient.getSerieDocumental(),
-										expedient.getNumero()));
-						Expedient expedientDetalls = getArxiuPlugin().expedientDetalls(expedientCreat.getIdentificador(), null);
-						propagarMetadadesExpedient(expedientDetalls, expedient);
-						expedient.updateArxiu(expedientCreat.getIdentificador());
-					} catch (Exception e) {
-						if (e.getMessage().contains("Duplicate child name not allowed")) {
-							logger.error("Error al crear expedient en arxiu. Duplicate child name not allowed", e);
-							throw new RuntimeException("Ja s'ha creat un expedient amb el mateix nom a l'arxiu. Per restriccions pròpies de l'Arxiu, no és possible crear expedients amb el mateix nom el mateix dia. Per favor, canvieu el nom de l'expedient a Ripea, o proveu de guardar l'arxiu més tard.");
-						}
-						throw e;
-					}
-				}
 			} else {
 				if (interessats.isEmpty()) {
 					interessats = null;
@@ -638,7 +576,7 @@ public class PluginHelper {
 				getArxiuPlugin().expedientModificar(
 						toArxiuExpedient(
 								expedient.getArxiuUuid(),
-								expedient.getNom(),
+								expedient.getNom() + " (" + System.currentTimeMillis() + ")",
 								expedient.getNtiIdentificador(),
 								Arrays.asList(organCodiDir3),
 								expedient.getCreatedDate().toDate(),
