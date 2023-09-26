@@ -308,12 +308,12 @@ div.exemple {
 	color: #A94442;
 }
 
-.dropdown-menu {
+table .dropdown-menu {
     right: 0;
     left: auto;
 }
 
-.dropdown {
+table .dropdown {
 	max-width: fit-content;
 }
 

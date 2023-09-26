@@ -29,14 +29,11 @@ public class ExpedientGrupValidator implements ConstraintValidator<ExpedientGrup
 	@Override
 	public boolean isValid(final ExpedientCommand expedientCommand, final ConstraintValidatorContext context) {
 		try {
-			if (expedientCommand.getId() == null) {
-				if (expedientCommand.isGestioAmbGrupsActiva() && expedientCommand.getGrupId() == null) {
-					return false;
-				} else {
-					return true;
-				}
-			} else
+			if (expedientCommand.isGestioAmbGrupsActiva() && expedientCommand.getGrupId() == null) {
+				return false;
+			} else {
 				return true;
+			}
 
         } catch (final Exception ex) {
         	LOGGER.error("Error al validar si el grup es mandatori", ex);

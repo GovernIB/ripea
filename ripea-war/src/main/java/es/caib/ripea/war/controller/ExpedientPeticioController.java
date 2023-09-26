@@ -321,7 +321,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (command.getNewExpedientTitol().contains(".")) {
 			bindingResult.rejectValue("newExpedientTitol", "ExpedientODocumentNom");
 		}
-		
+		if (Utils.isBiggerThan(command.getNewExpedientTitol(), 239)) {
+			bindingResult.rejectValue("newExpedientTitol", "Size", new Object[] { null, 239, 0 }, null);
+		}
 	}
 	
 

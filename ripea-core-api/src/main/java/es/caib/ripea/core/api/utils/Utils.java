@@ -46,6 +46,10 @@ public class Utils {
     public static boolean isBiggerThan(final Collection<?> coll, int size) {
         return CollectionUtils.isNotEmpty(coll) && coll.size() > size;
     }
+    
+    public static boolean isBiggerThan( String string, int size) {
+		return isNotEmpty(string) && string.length() > size;
+    }
 
 	public static <T> List<T> getUniqueValues(List<T> objects) {
 		if (objects != null) {
