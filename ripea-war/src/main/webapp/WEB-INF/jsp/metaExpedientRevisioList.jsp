@@ -122,6 +122,12 @@
 						{{if comu}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
+				<th data-col-name="gestioAmbGrupsActiva" data-template="#cellGrupTemplate" width="1%">
+					<spring:message code="metaexpedient.list.columna.grup"/>
+					<script id="cellGrupTemplate" type="text/x-jsrender">
+						{{if gestioAmbGrupsActiva}}<span class="fa fa-check"></span>{{/if}}
+					</script>
+				</th>				
 				<th data-col-name="actiu" data-template="#cellActiuTemplate" width="1%">
 					<spring:message code="metaexpedient.list.columna.actiu"/>
 					<script id="cellActiuTemplate" type="text/x-jsrender">
