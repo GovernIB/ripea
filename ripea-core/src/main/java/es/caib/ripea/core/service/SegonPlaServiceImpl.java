@@ -116,7 +116,6 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Autowired
 	private ExpedientPeticioHelper0 expedientPeticioHelper0;
 
-	private static final String PREFIX_RIPEA = "[RIPEA]";
 
 	/*
 	 * Obtain registres from DISTRIBUCIO for created peticions and save them in DB
@@ -259,7 +258,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		SimpleMailMessage missatge = new SimpleMailMessage();
 		missatge.setTo(emailDestinatari);
 		missatge.setFrom(emailPendents.get(0).getRemitent());
-		missatge.setSubject(PREFIX_RIPEA + " Emails agrupats");
+		missatge.setSubject(emailHelper.getPrefixRipea() + " Emails agrupats");
 		
 		
 		// Agrupa per event tipus

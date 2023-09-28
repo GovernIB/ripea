@@ -317,3 +317,13 @@ table .dropdown {
 	max-width: fit-content;
 }
 
+.botons .dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+.botons .dropdown {
+	max-width: fit-content;
+}
+
+

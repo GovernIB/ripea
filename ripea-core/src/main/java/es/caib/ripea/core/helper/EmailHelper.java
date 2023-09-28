@@ -1005,7 +1005,7 @@ public class EmailHelper {
 		
 	}
 	
-	private String getPrefixRipea() {
+	public String getPrefixRipea() {
 		String entorn = configHelper.getConfig("es.caib.ripea.entorn");
 		String prefix;
 		if (entorn == null || entorn.equals("PRO")) {

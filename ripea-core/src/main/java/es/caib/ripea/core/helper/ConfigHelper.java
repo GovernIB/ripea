@@ -18,6 +18,7 @@ import com.google.common.base.Strings;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.exception.NotDefinedConfigException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.entity.config.ConfigGroupEntity;
@@ -72,10 +73,12 @@ public class ConfigHelper {
         if (config.isConfigurableOrganActiu()) {
             // Propietat a nivell d'organ
             String keyOrgan = getKeyOrgan(entitatCodi, getOrganActualCodi(), keyGeneral);
-            ConfigEntity configOrganEntity = configRepository.findOne(keyOrgan);
-            if (configOrganEntity != null) {
-                value = getValue(configOrganEntity);
-            }
+			if (keyOrgan != null) {
+	            ConfigEntity configOrganEntity = configRepository.findOne(keyOrgan);
+	            if (configOrganEntity != null) {
+	                value = getValue(configOrganEntity);
+	            }
+			}
         } else if (config.isConfigurableEntitatActiu() && !Strings.isNullOrEmpty(entitatCodi)) {
             // Propietat a nivell d'entitat
             String keyEntitat = getKeyEntitat(entitatCodi, keyGeneral);
@@ -283,8 +286,10 @@ public class ConfigHelper {
     }
     
     public String getKeyOrgan(String entitatCodi, String organCodi, String key) {
-
-        if (Strings.isNullOrEmpty(entitatCodi) || Strings.isNullOrEmpty(organCodi) || Strings.isNullOrEmpty(key)) {
+    	if (Utils.isEmpty(organCodi)) {
+			return null;
+		}
+        if (Utils.isEmpty(entitatCodi) || Utils.isEmpty(key)) {
             String msg = "Codi entitat " + entitatCodi + " i/o key " + key + " no contenen valor";
             log.error(msg);
             throw new RuntimeException(msg);
