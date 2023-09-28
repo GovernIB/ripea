@@ -90,31 +90,17 @@ public interface ExpedientService {
 
 	/**
 	 * Consulta un expedient donat el seu id.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany l'expedient.
 	 * @param metaExpedientId
 	 *            Atribut id del meta-expedient a partir del qual es vol crear l'expedient.
-	 * @param pareId
-	 *            Contenidor pare a on es vol crear l'expedient. Pot ser null. Si no és
-	 *            null es crearà com a subexpedient d'un expedient superior.
 	 * @param nom
 	 *            Nom de l'expedient cercat            
-	 * @param esborrat
-	 *            Atribut id de l'expedient que es vol trobar.
-	 * @param rolActual TODO
-	 * @param organId TODO
+	 * 
 	 * @return L'expedient.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
-			Long entitatId,
+	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
-			Long pareId,
-			String nom,
-			int esborrat, 
-			String rolActual, 
-			Long organId);
+			String nom);
 
 	/**
 	 * Consulta els expedients segons el filtre.

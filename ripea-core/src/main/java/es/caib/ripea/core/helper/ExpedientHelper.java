@@ -243,19 +243,14 @@ public class ExpedientHelper {
 						"Aquesta anotació ja està relacionada amb algun expedient");
 			}
 		}
-		ExpedientDto exp = findByMetaExpedientAndPareAndNomAndEsborrat(
-				entitatId,
+		boolean exists = checkIfExistsByMetaExpedientAndNom(
 				metaExpedientId,
-				pareId,
-				nom,
-				0,
-				rolActual,
-				organGestorId);
-		if (exp != null) {
+				nom) != null;
+		if (exists) {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
-					"Ja existeix expedient amb aquest nom");
+					"Ja existeix un altre expedient amb el mateix tipus i nom");
 		}
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
@@ -987,45 +982,18 @@ public class ExpedientHelper {
 	
 
 
-	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
-			Long entitatId,
+	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
-			Long pareId,
-			String nom,
-			int esborrat,
-			String rolActual,
-			Long organId) {
-		logger.debug(
-				"Consultant expedient (" + "entitatId=" + entitatId + ", " + "metaExpedientId=" + metaExpedientId +
-						", " + "pareId=" + pareId + ", " + "nom=" + nom + ", " + "esborrat=" + esborrat + "organId=" + organId + "rolActual=" + rolActual + ")");
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
-				false,
-				false,
-				true,
-				false,
-				false,
-				rolActual,
-				organId);
+			String nom) {
 
-		ContingutEntity contingutPare = null;
-		if (pareId != null) {
-			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
-					entitatId,
-					pareId,
-					false,
-					false,
-					true,
-					false, false, true, null);
-		}
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
+
 		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
 				metaExpedient,
-				contingutPare,
+				null,
 				nom,
-				esborrat);
-		return expedient == null ? null : toExpedientDto(expedient, false, false, null, false);
+				0);
+		return expedient != null ? expedient.getId() : null;
 	}
 
 

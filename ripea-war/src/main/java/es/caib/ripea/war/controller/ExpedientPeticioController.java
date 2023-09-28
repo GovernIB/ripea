@@ -321,9 +321,18 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (command.getNewExpedientTitol().contains(".")) {
 			bindingResult.rejectValue("newExpedientTitol", "ExpedientODocumentNom");
 		}
+		
+		boolean exists = expedientService.checkIfExistsByMetaExpedientAndNom(
+				command.getMetaExpedientId(),
+				command.getNewExpedientTitol()) != null;
+		if (exists) {
+			bindingResult.rejectValue("newExpedientTitol", "NomExpedienteRepetit");
+		}
+		
 		if (Utils.isBiggerThan(command.getNewExpedientTitol(), 239)) {
 			bindingResult.rejectValue("newExpedientTitol", "Size", new Object[] { null, 239, 0 }, null);
 		}
+
 	}
 	
 

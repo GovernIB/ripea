@@ -109,7 +109,7 @@ public class ExpedientFiltreCommand {
 		this.ambFirmaPendent = ambFirmaPendent;
 	}
 	public void setNumeroRegistre(String numeroRegistre) {
-		this.numeroRegistre = numeroRegistre;
+		this.numeroRegistre = Utils.trim(numeroRegistre);
 	}
 
 }

@@ -64,22 +64,12 @@ public class ExpedientServiceBean implements ExpedientService {
 				anexosIdsMetaDocsIdsMap,
 				justificantIdMetaDoc);
 	}
-	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
-			Long entitatId,
+	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
-			Long pareId,
-			String nom,
-			int esborrat, 
-			String rolActual, 
-			Long organId) {
-		return delegate.findByMetaExpedientAndPareAndNomAndEsborrat(
-				entitatId,
+			String nom) {
+		return delegate.checkIfExistsByMetaExpedientAndNom(
 				metaExpedientId,
-				pareId,
-				nom,
-				esborrat,
-				rolActual,
-				organId);
+				nom);
 	}
 
 	@Override
