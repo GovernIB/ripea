@@ -11,6 +11,8 @@ update ipa_massiva_contingut set element_tipus = 'DOCUMENT';
 
 update ipa_massiva_contingut set element_nom = (select nom from ipa_contingut where ipa_contingut.id = ipa_massiva_contingut.contingut_id);
 
+update ipa_expedient e set e.registres_importats = ( select listagg(ep.identificador, ',') within group (order by ep.identificador) from ipa_expedient_peticio ep where ep.expedient_id is not null and ep.expedient_id = e.id );
+
 -- Changeset db/changelog/changes/0.9.102/1332.yaml::1693899071612-1::limit
 ALTER TABLE ipa_expedient ADD registres_importats VARCHAR(1024);
 
