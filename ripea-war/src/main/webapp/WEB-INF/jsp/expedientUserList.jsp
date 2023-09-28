@@ -478,7 +478,7 @@ function hexToRgb(hex) {
 			--%>
 
 			<div class="col-md-2">
-				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero"/>
+				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero.expedient"/>
 			</div>
 			<div class="col-md-4">
 				<rip:inputText name="nom" inline="true" placeholderKey="expedient.list.user.placeholder.titol"/>
@@ -522,9 +522,18 @@ function hexToRgb(hex) {
 				<!-- rip:inputSelect name="metaExpedientDominiId" optionItems="${metaExpedientDominisOptions}"  emptyOption="true" placeholderKey="expedient.list.user.placeholder.domini" optionValueAttribute="id" optionTextAttribute="nom" inline="true"/-->
 					<rip:inputSelect name="metaExpedientDominiCodi" placeholderKey="expedient.list.user.placeholder.domini" emptyOption="true" inline="true"/>
 				</div>
-				<div class="col-md-3">
-					<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
-				</div>
+				<c:choose>
+					<c:when test="${rolActual!='tothom'}">
+						<div class="col-md-2">
+							<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+						</div>
+				 	</c:when>
+				 	<c:otherwise>
+						<div class="col-md-3">
+							<rip:inputSelect name="metaExpedientDominiValor" placeholderKey="expedient.list.user.placeholder.domini.value" emptyOption="true" inline="true"/>
+						</div>	
+				 	</c:otherwise>
+			 	</c:choose>
 			</c:if>
 			<div class="col-md-2">
 				<rip:inputText name="numeroRegistre" inline="true" placeholderKey="expedient.list.user.placeholder.numeroregistre"/>
@@ -546,18 +555,18 @@ function hexToRgb(hex) {
 					</div>
 			 	</c:when>
 			 	<c:otherwise>
-					<div class="col-md-2">
+					<div class="col-md-2" style="width: auto;">
 						<button id="meusExpedientsBtn" title="<spring:message code="expedient.list.user.meus"/>" class="btn btn-default <c:if test="${meusExpedients}">active</c:if>" data-toggle="button"><span class="fa fa-lock"></span> <spring:message code="expedient.list.user.meus"/></button>
-						<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span></button>
+						<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
 					</div>		
 			 	</c:otherwise>
 			 </c:choose>
 
 			<rip:inputHidden name="meusExpedients"/>
 			<rip:inputHidden name="ambFirmaPendent"/>
-			<div class="col-md-2 pull-right">
+			<div class="col-md-3 pull-right" style="${rolActual == 'tothom' ? 'width:auto;' : ''}">
 				<c:if test="${rolActual!='tothom'}">
-					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span></button>
+					<button id="ambFirmaPendentBtn" title="<spring:message code="expedient.list.user.pendent"/>" class="btn btn-default <c:if test="${firmaPendent}">active</c:if>" data-toggle="button"><span class="fa fa-pencil-square"></span> <spring:message code="expedient.list.user.pendent"/></button>
 				</c:if>
 				<div class="pull-right">
 					<button type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>
