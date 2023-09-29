@@ -608,13 +608,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						expedientPeticioAcceptarCommand.getOrganGestorId(),
 						null,
 						expedientPeticioAcceptarCommand.getAny(),
-						null,
 						expedientPeticioAcceptarCommand.getNewExpedientTitol(),
 						expedientPeticioDto.getId(),
 						expedientPeticioAcceptarCommand.isAssociarInteressats(),
-						null, 
+						null,
 						RolHelper.getRolActual(request), 
-						anexosIdsMetaDocsIdsMap,
+						anexosIdsMetaDocsIdsMap, 
 						justificantIdMetaDoc);
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();

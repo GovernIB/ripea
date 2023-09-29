@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+\<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -105,6 +105,7 @@ $(document).ready(function(){
 		}
 
 		refrescarOrgan();
+		refrescarSequencia();
 
 		var createPermis;
 		var writePermis;
@@ -189,6 +190,26 @@ $(document).ready(function(){
 	});		
 			
 });
+
+
+
+function refrescarSequencia() {
+	let metaExpedientId = $('#metaExpedientId').val();
+	let any = $('input#any').val();
+	if (metaExpedientId != undefined && metaExpedientId != "" && any != undefined && any != "") {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
+			success: function(sequencia) {
+				$('input#sequencia').val(sequencia);
+			}
+		});
+	} else {
+		$('input#sequencia').val(undefined);
+	}
+}
+
+
 </script>
 
 </head>
@@ -220,6 +241,7 @@ $(document).ready(function(){
 			<div id="organSelect" style="display: none;">
 				<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true"/>
 			</div>			
+			<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" disabled="true"/>
 			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 			
 		</div>
 		

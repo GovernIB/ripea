@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 
 /**
@@ -25,6 +26,7 @@ public class ExpedientPeticioAcceptarCommand {
 	
 	private String newExpedientTitol;
 	private int any;
+	private Long sequencia;
 	private boolean associarInteressats;
 	private ExpedientPeticioAccioEnumDto accio;
 	private boolean agafarExpedient;
@@ -46,7 +48,7 @@ public class ExpedientPeticioAcceptarCommand {
 		this.expedientId = expedientId;
 	}
 	public void setNewExpedientTitol(String newExpedientTitol) {
-		this.newExpedientTitol = newExpedientTitol != null ? newExpedientTitol.trim() : null;
+		this.newExpedientTitol = Utils.trim(newExpedientTitol);
 	}
 	public void setAny(int any) {
 		this.any = any;
@@ -68,6 +70,9 @@ public class ExpedientPeticioAcceptarCommand {
 	public String toString() {
 		return ToStringBuilder.reflectionToString(
 				this);
+	}
+	public void setSequencia(Long sequencia) {
+		this.sequencia = sequencia;
 	}
 
 }

@@ -211,13 +211,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long organGestorId,
 			Long pareId,
 			Integer any,
-			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, 
+			Long grupId,
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc) {
 		
 		
@@ -230,7 +229,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"organGestorId=" + organGestorId + ", " +
 						"pareId=" + pareId + ", " +
 						"any=" + any + ", " +
-						"sequencia=" + sequencia + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
 
@@ -244,7 +242,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 					organGestorId,
 					pareId,
 					any,
-					sequencia,
 					nom,
 					expedientPeticioId,
 					associarInteressats,

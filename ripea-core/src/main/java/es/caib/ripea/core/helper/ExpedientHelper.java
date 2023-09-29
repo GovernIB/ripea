@@ -201,11 +201,10 @@ public class ExpedientHelper {
 			Long organGestorId,
 			Long pareId,
 			Integer any,
-			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, 
+			Long grupId,
 			String rolActual) {
 
 		logger.info(
@@ -216,7 +215,6 @@ public class ExpedientHelper {
 						"organGestorId=" + organGestorId + ", " +
 						"pareId=" + pareId + ", " +
 						"any=" + any + ", " +
-						"sequencia=" + sequencia + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
 
@@ -307,7 +305,6 @@ public class ExpedientHelper {
 				metaExpedient.getEntitat().getUnitatArrel(),
 				new Date(),
 				any,
-				sequencia,
 				true,
 				grupId);
 		contingutLogHelper.logCreacio(expedient, false, false);
