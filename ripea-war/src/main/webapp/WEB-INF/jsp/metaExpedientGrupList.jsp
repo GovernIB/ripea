@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <html>
 <head>
-	<title><spring:message code="metaexpedient.grup.titol"/></title>
+	<title><spring:message code="metaexpedient.grup.titol"/>:  ${metaExpedient.nom}</title>
 	<meta name="subtitle" content="${metaExpedient.nom}"/>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>

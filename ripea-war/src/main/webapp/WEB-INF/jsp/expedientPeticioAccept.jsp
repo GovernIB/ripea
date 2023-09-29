@@ -28,8 +28,10 @@
 </style>
 <script>
 var metaExpedientOrgan = {};
+var metaExpedientGrup = {};
 <c:forEach var="metaExpedient" items="${metaExpedients}">
 <c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${fn:escapeXml(metaExpedient.organGestor.nom)}'};</c:if>
+metaExpedientGrup['${metaExpedient.id}'] = {gestioAmbGrupsActiva: ${metaExpedient.gestioAmbGrupsActiva}};
 </c:forEach>
 
 
@@ -106,6 +108,7 @@ $(document).ready(function(){
 
 		refrescarOrgan();
 		refrescarSequencia();
+		refrescarGrups();
 
 		var createPermis;
 		var writePermis;
@@ -209,6 +212,33 @@ function refrescarSequencia() {
 	}
 }
 
+function refrescarGrups() {
+
+	let metaExpedientId = $('#metaExpedientId').val();
+	if (metaExpedientId != undefined && metaExpedientId != "") {
+		const gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
+		$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
+		if (gestioAmbGrupsActiva) {
+			$("#grupsActiu").removeClass("hidden");
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+				success: function(data) {
+					$('#grupId').closest('.form-group').show();
+					$('#grupId option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+					}
+				}
+			});
+		} else {
+			$('#grupId option[value!=""]').remove();
+			$("#grupsActiu").addClass("hidden");
+		}
+	}
+
+}
+
 
 </script>
 
@@ -242,7 +272,11 @@ function refrescarSequencia() {
 				<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true"/>
 			</div>			
 			<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" disabled="true"/>
-			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 			
+			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 	
+			<form:hidden path="gestioAmbGrupsActiva"/>
+			<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
+				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup"/>
+			</div>					
 		</div>
 		
 		<rip:inputCheckbox name="associarInteressats"

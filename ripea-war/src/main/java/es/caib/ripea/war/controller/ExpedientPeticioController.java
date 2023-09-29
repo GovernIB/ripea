@@ -324,6 +324,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (Utils.isBiggerThan(command.getNewExpedientTitol(), 239)) {
 			bindingResult.rejectValue("newExpedientTitol", "Size", new Object[] { null, 239, 0 }, null);
 		}
+		if (command.isGestioAmbGrupsActiva() && command.getGrupId() == null) {
+			bindingResult.rejectValue("grupId", "NotNull");
+		}
 	}
 	
 
@@ -611,7 +614,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						expedientPeticioAcceptarCommand.getNewExpedientTitol(),
 						expedientPeticioDto.getId(),
 						expedientPeticioAcceptarCommand.isAssociarInteressats(),
-						null,
+						expedientPeticioAcceptarCommand.getGrupId(),
 						RolHelper.getRolActual(request), 
 						anexosIdsMetaDocsIdsMap, 
 						justificantIdMetaDoc);

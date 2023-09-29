@@ -33,6 +33,9 @@ public class ExpedientPeticioAcceptarCommand {
 	
 	private Long organGestorId;
     private List<RegistreAnnexCommand> annexos = new ArrayList<>();
+    
+	private Long grupId;
+	private boolean gestioAmbGrupsActiva;
 	
     
 	public void setAccio(ExpedientPeticioAccioEnumDto accio) {
@@ -65,14 +68,19 @@ public class ExpedientPeticioAcceptarCommand {
 	public void setAgafarExpedient(boolean agafarExpedient) {
 		this.agafarExpedient = agafarExpedient;
 	}
+	public void setSequencia(Long sequencia) {
+		this.sequencia = sequencia;
+	}
+	public void setGrupId(Long grupId) {
+		this.grupId = grupId;
+	}
+	public void setGestioAmbGrupsActiva(boolean gestioAmbGrupsActiva) {
+		this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
+	}
 	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(
 				this);
 	}
-	public void setSequencia(Long sequencia) {
-		this.sequencia = sequencia;
-	}
-
 }
