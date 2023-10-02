@@ -16,6 +16,7 @@
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<rip:modalHead/>
 <script>
 const metaDocumentServeiScsp = [];
@@ -48,6 +49,8 @@ $(document).ready(function() {
 			$('#divEmail').hide();
 			$('#divDataNaixementObligatori').hide();
 			
+			$('#divAnysHistoric').hide();
+			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCDDWS01") { // SVDSCDDWS01 - Servei de consulta de dades de discapacitat
 			$('#bloc-datos-especificos').show();
@@ -70,6 +73,8 @@ $(document).ready(function() {
 			$('#divTelefon').hide();
 			$('#divEmail').hide();
 			$('#divDataNaixementObligatori').hide();
+			
+			$('#divAnysHistoric').hide();
 				
 				
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de padró de convivència
@@ -94,6 +99,8 @@ $(document).ready(function() {
 			$('#divEmail').hide();
 			$('#divDataNaixementObligatori').hide();
 			
+			$('#divAnysHistoric').hide();
+			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCTFNWS01") { // SVDSCTFNWS01 - Servei de consulta de família nombrosa
 			$('#bloc-datos-especificos').show();
@@ -116,6 +123,8 @@ $(document).ready(function() {
 			$('#divTelefon').hide();
 			$('#divEmail').hide();
 			$('#divDataNaixementObligatori').hide();
+			
+			$('#divAnysHistoric').hide();
 			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPCWS01") { // SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA
@@ -140,6 +149,8 @@ $(document).ready(function() {
 			$('#divEmail').hide();
 			$('#divDataNaixementObligatori').hide();
 			
+			$('#divAnysHistoric').hide();
+			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDDELSEXWS01") { // SVDDELSEXWS01 - Consulta de inexistencia de delitos sexuales por datos de filiación
 			$('#bloc-datos-especificos').show();
@@ -162,7 +173,33 @@ $(document).ready(function() {
 			$('#divTelefon').show();
 			$('#divEmail').show();
 			$('#divDataNaixementObligatori').show();
-															
+			
+			$('#divAnysHistoric').hide();
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDHPAJU") { // SCDHPAJU - Servei de consulta de padró històric
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').hide();
+			$('#divProvinciaCodi').show();
+			$('#divMunicipiCodi').show();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+			
+			$('#divAnysHistoric').show();
+														
 		} else {
 			$('#bloc-datos-especificos').hide();
 		}
@@ -227,6 +264,8 @@ $(document).ready(function() {
 					<div id="divDataNaixementObligatori"><rip:inputDate name="dataNaixementObligatori" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/></div>
 					<div id="divTelefon"><rip:inputText name="telefon" textKey="contingut.pinbal.form.camp.telefon"/></div>
 					<div id="divEmail"><rip:inputText name="email" textKey="contingut.pinbal.form.camp.email"/></div>
+					
+					<div id="divAnysHistoric"><rip:inputNumber name="nombreAnysHistoric" textKey="contingut.pinbal.form.camp.data.nombre.anys.historic" nombreDecimals="0"/></div>
 			
 					
 				</div>

@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -57,6 +58,9 @@ public class PinbalConsultaCommand {
 	private String dataNaixementObligatori;
 	private String telefon;
 	private String email;
+	
+	@Max(value=99)
+	private Integer nombreAnysHistoric;
 	
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {

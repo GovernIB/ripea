@@ -25,6 +25,8 @@ import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001
 import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001.SolicitudQ2827003atgss001;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
+import es.caib.pinbal.client.recobriment.scdhpaju.ClientScdhpaju;
+import es.caib.pinbal.client.recobriment.scdhpaju.ClientScdhpaju.SolicitudScdhpaju;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01;
@@ -271,6 +273,7 @@ public class PinbalHelper {
 		}
 	}
 	
+
 	
 	/** Q2827003ATGSS001  - Estar al corriente de pago con la Seguridad Social */
 	public String novaPeticioQ2827003atgss001(
@@ -334,6 +337,40 @@ public class PinbalHelper {
 		}
 	}
 	
+	
+	/** SCDHPAJU - Servei de consulta de padró històric */
+	public String novaPeticioScdhpaju(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudScdhpaju solicitud = new SolicitudScdhpaju();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		solicitud.setProvinciaSolicitud(pinbalConsulta.getProvinciaCodi());
+		solicitud.setMunicipioSolicitud(pinbalConsulta.getMunicipiCodi());
+		if (pinbalConsulta.getNombreAnysHistoric() != null) {
+			solicitud.setNumeroAnyos(String.valueOf(pinbalConsulta.getNombreAnysHistoric()));
+		}
+		solicitud.setConsultaPerDocumentIdentitat(
+				solicitud.getTitular().getTipoDocumentacion().toString(),
+				solicitud.getTitular().getDocumentacion(),
+				null);
+
+		try {
+			ScspRespuesta respuesta = getClientScdhpaju().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SCDHPAJU", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SCDHPAJU", t0);
+		}
+	}
 	
 	
 	
@@ -710,6 +747,19 @@ public class PinbalHelper {
 
 	private ClientSvddelsexws01 getClientSvddelsexws01() {
 		ClientSvddelsexws01 client = new ClientSvddelsexws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
+	private ClientScdhpaju getClientScdhpaju() {
+		ClientScdhpaju client = new ClientScdhpaju(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),
