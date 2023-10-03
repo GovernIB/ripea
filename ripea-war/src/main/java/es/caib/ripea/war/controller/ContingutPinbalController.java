@@ -109,6 +109,12 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 				bindingResult.rejectValue("nomPare", "NotEmpty");
 			}
 		}
+		
+		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
+			if (command.getExercici() == null) {
+				bindingResult.rejectValue("exercici", "NotEmpty");
+			}
+		}
 			
 		if (bindingResult.hasErrors()) {
 			omplirModelFormulari(request, pareId, model);

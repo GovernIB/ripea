@@ -21,6 +21,8 @@ import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimient
 import es.caib.pinbal.client.recobriment.model.ScspTitular;
 import es.caib.pinbal.client.recobriment.model.ScspTitular.ScspTipoDocumentacion;
 import es.caib.pinbal.client.recobriment.model.SolicitudBase;
+import es.caib.pinbal.client.recobriment.nivrenti.ClientNivrenti;
+import es.caib.pinbal.client.recobriment.nivrenti.ClientNivrenti.SolicitudNivrenti;
 import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001;
 import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001.SolicitudQ2827003atgss001;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
@@ -372,6 +374,31 @@ public class PinbalHelper {
 		}
 	}
 	
+	/** NIVRENTI - Consulta del nivel de renta */
+	public String novaPeticioNivrenti(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudNivrenti solicitud = new SolicitudNivrenti();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+
+		solicitud.setEjercicio(pinbalConsulta.getExercici());
+
+		try {
+			ScspRespuesta respuesta = getClientNivrenti().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SCDHPAJU", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SCDHPAJU", t0);
+		}
+	}
 	
 	
 	private String toSNString(SiNoEnumDto consentimentTipusDiscapacitat) {
@@ -760,6 +787,19 @@ public class PinbalHelper {
 	
 	private ClientScdhpaju getClientScdhpaju() {
 		ClientScdhpaju client = new ClientScdhpaju(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
+	private ClientNivrenti getClientNivrenti() {
+		ClientNivrenti client = new ClientNivrenti(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),

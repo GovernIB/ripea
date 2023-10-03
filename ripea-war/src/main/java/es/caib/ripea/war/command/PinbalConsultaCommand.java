@@ -62,6 +62,7 @@ public class PinbalConsultaCommand {
 	@Max(value=99)
 	private Integer nombreAnysHistoric;
 	
+	private Integer exercici;
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(

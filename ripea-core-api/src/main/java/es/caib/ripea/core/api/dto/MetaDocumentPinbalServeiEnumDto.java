@@ -18,5 +18,6 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDCCAACPCWS01, // Estar al corriente de obligaciones tributarias para contratación con la CCAA
 	Q2827003ATGSS001, // Estar al corriente de pago con la Seguridad Social
 	SVDDELSEXWS01, // Consulta de inexistencia de delitos sexuales por datos de filiación
-	SCDHPAJU // Servei de consulta de padró històric
+	SCDHPAJU, // Servei de consulta de padró històric
+	NIVRENTI // Consulta del nivel de renta
 }

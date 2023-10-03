@@ -42,4 +42,6 @@ public class PinbalConsultaDto {
 	
 	private Integer nombreAnysHistoric;
 	
+	private Integer exercici;
+	
 }
