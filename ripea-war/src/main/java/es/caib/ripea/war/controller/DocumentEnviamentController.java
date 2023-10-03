@@ -5,11 +5,15 @@ package es.caib.ripea.war.controller;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,6 +87,7 @@ public class DocumentEnviamentController extends BaseUserController {
 	private DadesExternesService dadesExternesService;
 	@Autowired
 	private AplicacioService aplicacioService;
+    DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 	@RequestMapping(value = "/{documentId}/notificar", method = RequestMethod.GET)
 	public String notificarGet(
@@ -90,6 +95,11 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			Model model) throws JsonProcessingException {
 		DocumentNotificacionsCommand command = new DocumentNotificacionsCommand();
+		
+		Integer numDies = 10;
+		command.setCaducitatDiesNaturals(numDies.toString());
+		command.setDataCaducitat(sumarDiesNaturals(numDies));
+	
 		command.setDocumentId(documentId);
 		model.addAttribute(command);
 		emplenarModelNotificacio(
@@ -108,6 +118,10 @@ public class DocumentEnviamentController extends BaseUserController {
 			BindingResult bindingResult,
 			Model model) throws JsonProcessingException {
 
+		if (command.getDataCaducitat() == null) {
+			bindingResult.rejectValue("dataCaducitat", "NotEmpty");
+		}
+		
 		if (bindingResult.hasErrors()) {
 			emplenarModelNotificacio(
 					request,
@@ -547,6 +561,43 @@ public class DocumentEnviamentController extends BaseUserController {
 			return lastEnviament.getEstat().name();
 		}
 		return null;
+	}
+	
+	
+    @RequestMapping(value = "/notificacio/caducitatDiesNaturals/{dia}/{mes}/{any}", method = RequestMethod.GET)
+    @ResponseBody
+    private long getDiesCaducitat(@PathVariable String dia, @PathVariable String mes, @PathVariable String any) throws ParseException {
+        Date data = df.parse(dia + "/" + mes + "/" + any);
+        return getDiesEntreDates(data);
+    }
+
+    @RequestMapping(value = "/notificacio/caducitatData/{dies}", method = RequestMethod.GET)
+    @ResponseBody
+    private String getDataCaducitat(@PathVariable int dies) {
+        return df.format(sumarDiesNaturals(dies));
+    }
+    
+	public Date sumarDiesNaturals(
+			int diesCaducitat) {
+		return sumarDiesNaturals(new Date(), diesCaducitat);
+	}
+
+	public Date sumarDiesNaturals(
+			Date dataCaducitat,
+			int diesCaducitat) {
+		Calendar diaActual = Calendar.getInstance();
+		diaActual.setTime(dataCaducitat);
+		diaActual.add(Calendar.DATE, diesCaducitat);
+		return diaActual.getTime();
+	}
+    
+	public int getDiesEntreDates(Date fi) {
+		return getDiesEntreDates(new Date(), fi);
+	}
+
+	public int getDiesEntreDates(Date inici, Date fi) {
+		long diff = fi.getTime() - inici.getTime();
+		return new Long(TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1).intValue();
 	}
 
 	private ExpedientDto emplenarModelNotificacio(

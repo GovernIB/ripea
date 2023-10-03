@@ -186,6 +186,19 @@ $(document).ready(function() {
 		}
 	})
 	$('#interessatsIds').trigger('change');
+
+
+	// Data caducitat
+	$("#dataCaducitat").change( () => updateCaducitatDiesNaturals($("#dataCaducitat").val()));
+
+	$("#caducitatDiesNaturals").keyup(function () {
+		let val = $("#caducitatDiesNaturals").val();
+		val = val > 99999999 ? 99999999 : val;
+		$("#caducitatDiesNaturals").val(val);
+		updateCaducitatAmbDies($("#caducitatDiesNaturals").val());
+	});
+
+	
 });
 
 function getNotificacionsSenseNif() {
@@ -541,6 +554,43 @@ function destinitarisNoResults() {
 	return '<spring:message code="notificacio.form.camp.destinatari.buit"/>';
 }
 
+
+function updateCaducitatDiesNaturals(data) {
+	if (data) {
+		var campsData = data.split("/");
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/document/notificacio/caducitatDiesNaturals/"/>" + campsData[0] + "/" + campsData[1] + "/" + campsData[2],
+			success: function (data) {
+				$("#caducitatDiesNaturals").val(data);
+			},
+			error: function (error) {
+				console.log("error obtenint els dies de caducitat a partir de la data: " + error);
+			}
+		});
+	} else {
+		$("#caducitatDiesNaturals").val('');
+	}
+}
+
+function updateCaducitatAmbDies(dies) {
+	if (dies) {
+		$.ajax({
+			type: 'GET',
+			url: "<c:url value="/document/notificacio/caducitatData/"/>" + dies,
+			success: function (data) {
+				$("#dataCaducitat").val(data);
+			},
+			error: function (error) {
+				console.log("error obtenint la data de caducitat a partir dels dies:" + error);
+			}
+		});
+	} else {
+		$("#dataCaducitat").val('');
+	}
+
+}
+
 </script>
 </head>
 <body>
@@ -575,7 +625,30 @@ function destinitarisNoResults() {
 		<!----  DATA PROGRAMADA   ----->
 		<rip:inputDate labelSize="2" name="dataProgramada" textKey="notificacio.form.camp.data.programada" comment="notificacio.form.camp.data.programada.comment"/>
 		<!----  DATA CADUCITAT  ------->
-		<rip:inputDate labelSize="2" name="dataCaducitat" textKey="notificacio.form.camp.data.caducitat" comment="notificacio.form.camp.data.caducitat.comment"/>
+
+		<c:set var="campErrors"><form:errors path="dataCaducitat"/></c:set>
+		<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
+			<label class="control-label col-xs-2" for="dataCaducitat"><spring:message code="notificacio.form.camp.data.caducitat"/> *</label>
+			<div class="col-xs-2">
+				<form:input path="caducitatDiesNaturals" cssClass="form-control" id="caducitatDiesNaturals" />
+			</div>
+			<div class="col-xs-8">
+				<div class="input-group" style="width:100%">
+					<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
+					<form:input path="dataCaducitat" cssClass="form-control datepicker" id="dataCaducitat" data-toggle="datepicker" data-idioma="${idioma}" />
+					<span class="input-group-addon" style="width:1%"><span class="fa fa-calendar"></span></span>
+				</div>
+			</div>
+			<c:if test="${not empty campErrors}">
+				<div class="col-xs-2"></div>
+				<p class="help-block col-xs-10" style="padding-left: 30px"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="dataCaducitat"/></p>
+			</c:if>			
+			<div class="col-xs-2"></div>
+			<p class="comentari col-xs-10" style="padding-left: 30px"><spring:message code="notificacio.form.camp.data.caducitat.dies.naturals.comment"/></p>
+			<div class="col-xs-2"></div>
+			<p class="comentari col-xs-10" style="padding-left: 30px"><spring:message code="notificacio.form.camp.data.caducitat.comment"/></p>
+		</div>
+		
 		<!---  RETARD  ------->
 		<rip:inputNumber labelSize="2" name="retard" textKey="notificacio.form.camp.retard" nombreDecimals="0" comment="notificacio.form.camp.retard.comment"/>
 		<c:if test="${entregaPostal}">
