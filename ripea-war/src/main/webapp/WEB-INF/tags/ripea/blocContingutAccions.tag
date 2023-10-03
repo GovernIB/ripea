@@ -23,7 +23,7 @@
 					<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 				</c:when>
 				<c:otherwise>
-					<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${fn:escapeXml(contingut.nom)}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+					<li class="hidden"><a href="#" data-nom="${fn:escapeXml(contingut.nom)}" onclick="showViewer(event, ${contingut.id}, this.getAttribute('data-nom'), ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				</c:otherwise>
 			</c:choose>							
 		</c:if>
@@ -195,7 +195,7 @@
 				<%---- Descarregar ----%>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 				<%---- Visualitzar ----%>
-				<li class="${(contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" onclick="showViewer(event, ${contingut.id}, '${fn:escapeXml(contingut.nom)}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+				<li class="${(contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" data-nom="${fn:escapeXml(contingut.nom)}" onclick="showViewer(event, ${contingut.id}, this.getAttribute('data-nom'), ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>
