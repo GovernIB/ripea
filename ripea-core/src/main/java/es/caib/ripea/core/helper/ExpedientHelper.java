@@ -1171,9 +1171,17 @@ public class ExpedientHelper {
 	public void alliberar(ExpedientEntity expedient) {
 		UsuariEntity usuariActual = expedient.getAgafatPer();
 		UsuariEntity usuariCreador = expedient.getCreatedBy();
+
+		boolean agafatPerUsuariActual = false;
 		
-		expedient.updateAgafatPer(usuariCreador);
-		if (usuariCreador != null) {
+		if (usuariActual != null && usuariCreador != null && usuariActual.getCodi().equalsIgnoreCase(usuariCreador.getCodi())) {
+			agafatPerUsuariActual = true;
+			expedient.updateAgafatPer(null);
+		} else {
+			expedient.updateAgafatPer(usuariCreador);
+		}
+		
+		if (usuariCreador != null && !agafatPerUsuariActual) {
 			// Avisa a l'usuari que li han retornat
 			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
 		}

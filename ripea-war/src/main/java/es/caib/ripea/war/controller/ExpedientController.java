@@ -1202,6 +1202,26 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			throw ex;			
 		}
 	}
+	
+	@RequestMapping(value = "/{expedientId}/reobrir", method = RequestMethod.GET)
+	public String expedientReobrirGet(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			expedientService.reobrir(
+					entitatActual.getId(),
+					expedientId);
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.controller.reobrir.ok");
+		} catch (Exception ex) {
+			logger.error("Error al reobrir expedient amb id=" + expedientId, ex);
+			throw ex;			
+		}
+	}
 
 	@RequestMapping(value = "/estatValues/{metaExpedientId}", method = RequestMethod.GET)
 	@ResponseBody

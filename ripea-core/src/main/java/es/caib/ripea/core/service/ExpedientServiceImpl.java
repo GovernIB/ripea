@@ -947,10 +947,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
+		
+		if (!isPermesReobrir())
+			throw new ValidationException("La reobertura d'expedients no està activa");
+
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
+		
+		if (expedient.isTancamentProgramat()) // Tancat en diferit
+			expedient.removeTancamentProgramat();
+
 		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
+		
+		if (! isTancamentLogicActiu())
+			pluginHelper.arxiuExpedientReobrir(expedient);
+		
 		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
-		pluginHelper.arxiuExpedientReobrir(expedient);
 	}
 
 	
@@ -2137,7 +2148,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	
-
+	private boolean isPermesReobrir() {
+		return configHelper.getAsBoolean("es.caib.ripea.expedient.permetre.reobrir");
+	}
 
 	private boolean isIncorporacioDuplicadaPermesa() {
 		return configHelper.getAsBoolean("es.caib.ripea.incorporacio.anotacions.duplicada");
@@ -2155,6 +2168,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return configHelper.getAsBoolean("es.caib.ripea.importacio.expedient.relacionat.activa");
 	}
 
+	private boolean isTancamentLogicActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.expedient.tancament.logic");
+	}
+	
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());
 		for (Serializable s: original) { 
