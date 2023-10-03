@@ -1429,7 +1429,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 						</div>
 					</c:if>
 					<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
-						<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" class="btn btn-default con-mult">
+						<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default con-mult">
 							<span class="fa fa-arrows"></span>
 							
 							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
