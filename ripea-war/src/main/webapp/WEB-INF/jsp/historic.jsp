@@ -336,6 +336,7 @@
 					tableHeader += '<th><spring:message code="historic.taula.header.data"/></th>';
 				</c:when>
 				<c:otherwise>
+					tableHeader += '<th><spring:message code="historic.taula.header.any"/></th>';				
 					tableHeader += '<th><spring:message code="historic.taula.header.mes"/></th>';
 				</c:otherwise>
 			</c:choose>
@@ -361,7 +362,10 @@
 			for (var i = 0; i < dates.length; i++ ){
 				var date = dates[i];
 				var row = '<tr>';
-				row += '<td data-sort="' + moment(date, 'DD-MM-YYYY') + '">' +  getDate(date) + '</td>'
+				<c:if test="${historicFiltreCommand.tipusAgrupament=='MENSUAL'}">
+					row += '<td data-sort="' + moment(date, 'DD-MM-YYYY') + '">' +  getAny(date) + '</td>'
+				</c:if>
+				row += '<td data-sort="' + moment(date, 'DD-MM-YYYY') + '">' +  getDate(date, false) + '</td>'
 				columns.forEach(function(c){
 					var attrname = metricsDefinition[metric]['attrname'];
 					var value = data[c][i][attrname] != null ? data[c][i][attrname] : 0;
@@ -374,30 +378,41 @@
 			return tableHeader + tableBody + tableFooter;
 		}
 
-		function getDate(date){
+		function getDate(date, ambAny){
 			<c:choose>
 				<c:when test="${historicFiltreCommand.tipusAgrupament=='DIARI'}">
 					return date;
 				</c:when>
 				<c:otherwise>
 
-					mes = date.substring(3, 5);
+					let mes = date.substring(3, 5);
 					mes = mes.replace(/^0+/, '');
-						
-					if (mes == 1) return '<spring:message code="mes.1"/>';
-					else if (mes == 2) return '<spring:message code="mes.2"/>';
-					else if (mes == 3) return '<spring:message code="mes.3"/>';
-					else if (mes == 4) return '<spring:message code="mes.4"/>';
-					else if (mes == 5) return '<spring:message code="mes.5"/>';
-					else if (mes == 6) return '<spring:message code="mes.6"/>';
-					else if (mes == 7) return '<spring:message code="mes.7"/>';
-					else if (mes == 8) return '<spring:message code="mes.8"/>';
-					else if (mes == 9) return '<spring:message code="mes.9"/>';
-					else if (mes == 10) return '<spring:message code="mes.10"/>';
-					else if (mes == 11) return '<spring:message code="mes.11"/>';
-					else if (mes == 12) return '<spring:message code="mes.12"/>';
+					let mesString;
+					
+					if (mes == 1) mesString = '<spring:message code="mes.1"/>';
+					else if (mes == 2) mesString = '<spring:message code="mes.2"/>';
+					else if (mes == 3) mesString = '<spring:message code="mes.3"/>';
+					else if (mes == 4) mesString = '<spring:message code="mes.4"/>';
+					else if (mes == 5) mesString = '<spring:message code="mes.5"/>';
+					else if (mes == 6) mesString = '<spring:message code="mes.6"/>';
+					else if (mes == 7) mesString = '<spring:message code="mes.7"/>';
+					else if (mes == 8) mesString = '<spring:message code="mes.8"/>';
+					else if (mes == 9) mesString = '<spring:message code="mes.9"/>';
+					else if (mes == 10) mesString = '<spring:message code="mes.10"/>';
+					else if (mes == 11) mesString = '<spring:message code="mes.11"/>';
+					else if (mes == 12) mesString = '<spring:message code="mes.12"/>';
+
+					if (ambAny) {
+						let any = date.substring(6, 10);
+						mesString += ' ' + any;
+					}
+
+					return mesString;
 				</c:otherwise>
 			</c:choose>
+		}
+		function getAny(date){
+			return date.substring(6, 10);
 		}
 		
 		
@@ -408,7 +423,7 @@
 				data[c] = data[c].sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')));
 			});
 			
-			var dates = data[columns[0]].map(item => getDate(item.data));
+			var dates = data[columns[0]].map(item => getDate(item.data, true));
 			
 			var datasets = []
 			columns.forEach(function(c){
@@ -495,7 +510,7 @@
 		        	console.log(response);
 		        	response.sort((a, b) => (moment(a.data,'DD-MM-YYYY') > moment(b.data,'DD-MM-YYYY')))
 		        	if (response.length > 0) {
-			        	var yLabels = response.map(item => getDate(item.data));
+			        	var yLabels = response.map(item => getDate(item.data, true));
 			        	
 			            chart.data.labels = yLabels;
 			            metriques.forEach(function(metrica){
@@ -1060,6 +1075,7 @@
 		</div>
 	</form:form>
 	<c:if test="${showDadesEntitat}">
+
 		<h1><spring:message code="historic.titol.seccio.entitat"/></h1>
 		<div class="row">
 			<div id="div-dades-entitat" class="col-md-12">
@@ -1081,6 +1097,7 @@
 										<th data-col-name="data" data-type="date" data-converter="date" nowrap><spring:message code="historic.taula.header.data"/></th>
 									</c:when>
 									<c:otherwise>
+										<th data-col-name="any"><spring:message code="historic.taula.header.any"/></th>									
 										<th data-col-name="mes" data-type="date" data-converter="date" data-template="#cellMesTemplate" nowrap><spring:message code="historic.taula.header.mes"/>
 											<script id="cellMesTemplate" type="text/x-jsrender">
 												{{if mes == 1}}

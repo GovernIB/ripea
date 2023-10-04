@@ -106,6 +106,7 @@ public class HistoricServiceImpl implements HistoricService {
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("mes", new String[] { "data" });
+		ordenacioMap.put("any", new String[] { "data" });
 		Page<HistoricExpedientAggregation> pagina = historicExpedientRepository.findByEntitatAndDateRangeGroupedByDate(
 				entitat,
 				filtre.getTipusAgrupament(),

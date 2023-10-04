@@ -47,20 +47,23 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 			try {
 				HSSFRow xlsRow = sheet.createRow(rowNum);
 
-				HSSFCell cellData = xlsRow.createCell(0);
+				int colNum = 0;
+				HSSFCell cellData = xlsRow.createCell(colNum++);
 				if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
 					cellData.setCellValue(historic.getData());
 					cellData.setCellStyle(cellDataStyle);
+					
 				} else {
+					cellData.setCellValue(historic.getAny());
+					cellData = xlsRow.createCell(colNum++);
 					cellData.setCellValue(historic.getMesNom());
 				}
 
-				int colNum = 1;
+			
 				for (HistoricMetriquesEnumDto metricEnum : metriques) {
-					HSSFCell cellUnitatNom = xlsRow.createCell(colNum);
+					HSSFCell cellUnitatNom = xlsRow.createCell(colNum++);
 					cellUnitatNom.setCellValue(metricEnum.getValue(historic));
 					cellUnitatNom.setCellStyle(defaultStyle);
-					colNum++;
 				}
 
 				rowNum++;
@@ -101,10 +104,15 @@ public class ExportacioExcelEntitatHistoric extends ExportacioExcelHistoric {
 		
 		if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
 			cell.setCellValue(new HSSFRichTextString("Data"));
+			cell.setCellStyle(headerStyle);
 		} else {
+			cell.setCellValue(new HSSFRichTextString("Any"));
+			cell.setCellStyle(headerStyle);
+			cell = xlsRow.createCell(colNum++);
 			cell.setCellValue(new HSSFRichTextString("Mes"));
+			cell.setCellStyle(headerStyle);
 		}
-		cell.setCellStyle(headerStyle);
+		
 
 		for (HistoricMetriquesEnumDto metricEnum : metriques) {
 			cell = xlsRow.createCell(colNum++);

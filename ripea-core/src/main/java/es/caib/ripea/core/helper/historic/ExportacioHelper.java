@@ -45,5 +45,11 @@ public class ExportacioHelper {
 			return null;
 		}
 	}
+	
+	public static String getAny(Date data) {
+		 Calendar cal = Calendar.getInstance();
+		 cal.setTime(data);
+		 return String.valueOf(cal.get(Calendar.YEAR));
+	}
 
 }

@@ -40,6 +40,7 @@ public class ExportacioDocHistoric {
 		FieldsMetadata metadata = new FieldsMetadata();
 		metadata.setTemplateEngineKind("Velocity");
 		metadata.addFieldAsList("dades.data");
+		metadata.addFieldAsList("dades.any");
 		metadata.addFieldAsList("dades.mesNom");
 		metadata.addFieldAsList("dades.numExpedientsCreats");
 		metadata.addFieldAsList("dades.numExpedientsCreatsTotal");

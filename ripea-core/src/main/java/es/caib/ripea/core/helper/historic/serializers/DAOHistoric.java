@@ -74,7 +74,7 @@ public class DAOHistoric {
 					regOrgans.add(registre);
 				}
 
-				registres.add(new RegistresOrganGestorMensual(ExportacioHelper.getMesNom(data), regOrgans));
+				registres.add(new RegistresOrganGestorMensual(ExportacioHelper.getAny(data), ExportacioHelper.getMesNom(data), regOrgans));
 			}
 			
 			return new RootOrganGestorsMensual(registres);
@@ -120,6 +120,7 @@ public class DAOHistoric {
 				for (HistoricUsuariDto historic : listHistorics) {
 					RegistreUsuariMensual registre = new RegistreUsuariMensual();
 					BeanUtils.copyProperties(historic, registre);	
+					registre.setAny(historic.getAny());
 					registre.setMes(historic.getMesNom());
 					regUser.addRegistre(registre);
 				}
@@ -154,6 +155,7 @@ public class DAOHistoric {
 				for (HistoricInteressatDto historic : listHistorics) {
 					RegistreInteressatMensual registre = new RegistreInteressatMensual();
 					BeanUtils.copyProperties(historic, registre);
+					registre.setAny(historic.getAny());
 					registre.setMes(historic.getMesNom());
 					regUser.addRegistre(registre);
 				}
@@ -179,6 +181,7 @@ public class DAOHistoric {
 			for (HistoricExpedientDto historic : dades) {
 				RegistreEntitatMensual registre = new RegistreEntitatMensual();
 				BeanUtils.copyProperties(historic, registre);	
+				registre.setAny(historic.getAny());
 				registre.setMes(historic.getMesNom());
 				registres.add(registre);
 			}

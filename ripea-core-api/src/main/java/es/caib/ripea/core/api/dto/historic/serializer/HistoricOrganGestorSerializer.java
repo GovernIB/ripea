@@ -86,13 +86,15 @@ public class HistoricOrganGestorSerializer {
 	
 	public static class RegistresOrganGestorMensual extends RegistresOrganGestor{
 
+		public String any;
 		public String mes;
 
 		@XmlElement(name = "organ_gestor")
 		public List<RegistreOrganGestor> organGestors;
 		
-		public RegistresOrganGestorMensual(String mes, List<RegistreOrganGestor> organGestors) {
+		public RegistresOrganGestorMensual(String any, String mes, List<RegistreOrganGestor> organGestors) {
 			super();
+			this.any = any;
 			this.mes = mes;
 			this.organGestors = organGestors;
 		}
