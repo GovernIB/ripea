@@ -180,17 +180,38 @@ $(document).ready(function() {
 			$('#provincia').val("07");
 			$('#provincia').change();
  		}
- 		netejar = true;
+
 		var tipusInt = 1;
  		if (this.value == '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.PERSONA_FISICA%>') {
  			tipusInt = 1;
+
+			if (netejar) {
+				$('#documentTipus').empty();
+				$('#documentTipus').append("<option value=\"NIF\"><spring:message code='interessat.document.tipus.enum.NIF'/></option>");
+				$('#documentTipus').append("<option value=\"PASSAPORT\"><spring:message code='interessat.document.tipus.enum.PASSAPORT'/></option>");
+				$('#documentTipus').append("<option value=\"DOCUMENT_IDENTIFICATIU_ESTRANGERS\"><spring:message code='interessat.document.tipus.enum.DOCUMENT_IDENTIFICATIU_ESTRANGERS'/></option>");
+				$('#documentTipus').append("<option value=\"CODI_ORIGEN\"><spring:message code='interessat.document.tipus.enum.CODI_ORIGEN'/></option>");				
+	 			$('#documentTipus').val("NIF");
+	 			$('#documentTipus').change();
+			} else {
+				$("#documentTipus option[value='CIF']").remove();
+			}
+ 			
  		} else if (this.value == '<%=es.caib.ripea.core.api.dto.InteressatTipusEnumDto.PERSONA_JURIDICA%>') {
  			tipusInt = 2;
-			$('#documentTipus').val("NIF");
+ 			$('#documentTipus').empty();
+ 			$('#documentTipus').append("<option value=\"CIF\"><spring:message code='interessat.document.tipus.enum.CIF'/></option>");
+			$('#documentTipus').val("CIF");
 			$('#documentTipus').change();
 			$('#documentTipus').prop("disabled", true);
  	 	} else {
  	 		tipusInt = 3;
+ 			$('#documentTipus').empty();
+ 			$('#documentTipus').append("<option value=\"CODI_ORIGEN\"><spring:message code='interessat.document.tipus.enum.CODI_ORIGEN'/></option>");
+			$('#documentTipus').val("CODI_ORIGEN");
+			$('#documentTipus').change();
+			$('#documentTipus').prop("disabled", true);
+ 	 		
  	 		if (organsCarregats == false) {
  	 			$.ajax({
  					type: 'GET',
@@ -221,12 +242,10 @@ $(document).ready(function() {
 			$('#municipi').prop("disabled", true);
 			$('#codiPostal').prop("readonly", true);
 			$('#adresa').prop("readonly", true);
-			$('#documentTipus').val("CODI_ORIGEN");
-			$('#documentTipus').change();
-			$('#documentTipus').prop("disabled", true);
 			$('#documentNum').prop("readonly", true);
 
  		}
+ 	 	netejar = true;
  		canviVisibilitat(tipusInt);
  	});
 	$('select#tipus').change();
