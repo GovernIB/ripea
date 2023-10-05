@@ -416,7 +416,7 @@ $(document).ready(function() {
 		
 
 		// Ja has afegit tots els documents a l'expedient
-		$("#document-new-empty-metadocuments").click(function(e){
+		$(".document-new-empty-metadocuments").click(function(e){
 		    alert("<spring:message code="contingut.document.alerta.max"/>");
 		    e.preventDefault();
 		});	
@@ -1101,7 +1101,7 @@ $(document).ready(function() {
 		var content = '<div> \
 							<select id="selectTipusMassiu" class="select-tipus-massiu"> \
 								<option value=""><spring:message code="contingut.document.form.camp.nti.cap"/></option> \
-									<c:forEach items="${metaDocumentsLeft}" var="metaDocument"> \
+									<c:forEach items="${metaDocumentsNoPinbalLeft}" var="metaDocument"> \
 										<option id="${metaDocument.id}"> \
 										${fn:escapeXml(metaDocument.nom)} \
 										</option> \
@@ -1496,11 +1496,11 @@ function getDetallsSignants(idTbody, contingutId, header) {
 						<%---- Document... ----%>
 						<li>
 							<c:choose>
-								<c:when test="${empty metaDocumentsLeft}">
-									<a href="#" id="document-new-empty-metadocuments">
+								<c:when test="${empty metaDocumentsNoPinbalLeft}">
+									<a href="#" class="document-new-empty-metadocuments">
 										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
 									</a>
-										</c:when>
+								</c:when>
 								<c:otherwise>
 									<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true">
 										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
@@ -1509,14 +1509,21 @@ function getDetallsSignants(idTbody, contingutId, header) {
 							</c:choose>
 						</li>
 						<c:if test="${!isTasca}">
-							<%---- Consulta PINBAL... ----%>	
-							<c:if test="${not empty metaDocumentsPinbalLeft}">
-								<li>
-									<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
-										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
-									</a>
-								</li>
-							</c:if>						
+							<%---- Consulta PINBAL... ----%>
+							<li>
+								<c:choose>
+									<c:when test="${empty metaDocumentsPinbalLeft}">
+										<a href="#" class="document-new-empty-metadocuments">
+											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+										</a>
+									</c:when>
+									<c:otherwise>
+										<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
+											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+										</a>
+									</c:otherwise>	
+								</c:choose>				
+							<li>			
 							<%---- Carpeta... ----%>
 							<c:if test="${isCreacioCarpetesActiva}">
 								<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>

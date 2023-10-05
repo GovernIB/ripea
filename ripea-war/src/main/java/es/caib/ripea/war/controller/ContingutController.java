@@ -230,20 +230,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					true);
 			List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
 			List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
-			List<MetaDocumentDto> metaDocumentsAllNoPinball = new ArrayList<MetaDocumentDto>();
-			for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
-				if (metaDocument.isPinbalActiu()) {
-					metaDocumentsPinbal.add(metaDocument);
-				} else {
-					if (metaDocument.isLeftPerCreacio()) {
+			for (MetaDocumentDto metaDocument : metaDocumentsPerCreacio) {
+				if (metaDocument.isLeftPerCreacio()) {
+					if (metaDocument.isPinbalActiu()) {
+						metaDocumentsPinbal.add(metaDocument);
+					} else {
 						metaDocumentsNoPinbal.add(metaDocument);
-					} 
-					metaDocumentsAllNoPinball.add(metaDocument);
+					}
 				}
 			}
-			model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
+			model.addAttribute("metaDocumentsNoPinbalLeft", metaDocumentsNoPinbal);
 			model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
-			model.addAttribute("metaDocumentsAllNoPinball", metaDocumentsAllNoPinball);
 	
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(EnviamentEstat.class,
