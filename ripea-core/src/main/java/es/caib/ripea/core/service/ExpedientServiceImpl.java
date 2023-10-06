@@ -542,22 +542,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 	
 
 	@Transactional(readOnly = true)
-	public ExpedientDto findByMetaExpedientAndPareAndNomAndEsborrat(
-			Long entitatId,
+	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
-			Long pareId,
-			String nom,
-			int esborrat, 
-			String rolActual, 
-			Long organId) {
-		return expedientHelper.findByMetaExpedientAndPareAndNomAndEsborrat(
-				entitatId,
+			String nom) {
+		return expedientHelper.checkIfExistsByMetaExpedientAndNom(
 				metaExpedientId,
-				pareId,
-				nom,
-				esborrat,
-				rolActual,
-				organId);
+				nom);
 	}
 
 	@Transactional

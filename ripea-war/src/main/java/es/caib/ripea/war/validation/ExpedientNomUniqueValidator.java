@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.war.helper.RolHelper;
 
 
 /**
@@ -59,24 +57,19 @@ public class ExpedientNomUniqueValidator implements ConstraintValidator<Expedien
 			final Long entitatId = getLongProperty(value, campEntitatId); 
 			final Long pareId = getLongProperty(value, campPareId); 
 			final Long organGestorId = getLongProperty(value, campOrganGestorId); 
-			ExpedientDto expedient = null;
+			Long expedientId = null;
 			
 			if (metaExpedientId != null) {
-				expedient = expedientService.findByMetaExpedientAndPareAndNomAndEsborrat(
-					entitatId,
+				expedientId = expedientService.checkIfExistsByMetaExpedientAndNom(
 					metaExpedientId,
-					pareId,
-					nom,
-					0, 
-					RolHelper.getRolActual(request), 
-					organGestorId);
+					nom);
 			}
-			if (expedient != null) {
+			if (expedientId != null) {
 				if (id == null) // creant
 				{
 					return false;
 				}else { // editant
-					return id.equals(expedient.getId());
+					return id.equals(expedientId);
 				}
 				
 			}

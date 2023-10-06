@@ -29,3 +29,10 @@ databaseChangeLog:
           - column:
              name: numero_registre
              type: varchar(80 ${varcharunit})
+    - sql:
+        sql: "update ipa_expedient e
+               set e.registres_importats = (
+                 select listagg(ep.identificador, ',') within group (order by ep.identificador)
+                 from ipa_expedient_peticio ep
+                 where ep.expedient_id is not null and ep.expedient_id = e.id 
+              );"
