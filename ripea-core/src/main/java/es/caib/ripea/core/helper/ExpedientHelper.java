@@ -248,7 +248,7 @@ public class ExpedientHelper {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
-					"Ja existeix un altre expedient amb el mateix tipus i nom");
+					"Ja existeix un altre expedient amb el mateix títol per aquest procediment");
 		}
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
@@ -2046,24 +2046,7 @@ public class ExpedientHelper {
 
 		return documentNtiTipoFirmaEnumDto;
 	}
-//	public void comprovarSiExpedientAmbMateixNom(
-//			MetaExpedientEntity metaExpedient,
-//			ContingutEntity contingutPare,
-//			String nom,
-//			Long id,
-//			Class<?> objectClass) {
-//		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
-//				metaExpedient,
-//				contingutPare,
-//				nom,
-//				0);
-//		if (expedient != null) {
-//			throw new ValidationException(
-//					id,
-//					objectClass,
-//					"Ja existeix un altre expedient amb el mateix tipus i nom");
-//		}
-//	}
+
 	
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());
