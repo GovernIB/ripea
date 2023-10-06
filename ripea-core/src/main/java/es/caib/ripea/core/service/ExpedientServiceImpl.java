@@ -943,6 +943,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
 		
+		if (isTancamentLogicActiu() && expedient.getTancatData() != null)
+			throw new ValidationException("La reobertura d'aquest expedient no és possible. Està tancat a l'arxiu.");
+		
 		if (expedient.isTancamentProgramat()) // Tancat en diferit
 			expedient.removeTancamentProgramat();
 

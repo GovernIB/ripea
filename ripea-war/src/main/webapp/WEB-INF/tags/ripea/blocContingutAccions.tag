@@ -165,7 +165,7 @@
 			</c:if>
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
-		<c:if test="${isReobrirPermes && contingut.expedient && expedientTancat}">
+		<c:if test="${isReobrirPermes && contingut.expedient && expedientTancat && (!isTancamentLogicActiu || (isTancamentLogicActiu && empty contingut.tancatData))}">
 			<li><a href="#" onclick="confirmarReobrir();"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
 		</c:if>
 		<c:if test="${contingut.document}">
