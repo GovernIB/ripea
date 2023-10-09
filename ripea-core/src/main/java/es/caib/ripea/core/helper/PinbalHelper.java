@@ -14,6 +14,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import es.caib.pinbal.client.recobriment.ecot103.ClientEcot103;
+import es.caib.pinbal.client.recobriment.ecot103.ClientEcot103.SolicitudEcot103;
 import es.caib.pinbal.client.recobriment.model.ScspFuncionario;
 import es.caib.pinbal.client.recobriment.model.ScspJustificante;
 import es.caib.pinbal.client.recobriment.model.ScspRespuesta;
@@ -397,6 +399,31 @@ public class PinbalHelper {
 			return processarScspRespuesta(solicitud, respuesta, "SCDHPAJU", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SCDHPAJU", t0);
+		}
+	}
+	
+	/** ECOT103 - Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas con indicación de incumplimientos */
+	public String novaPeticioEcot103(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudEcot103 solicitud = new SolicitudEcot103();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+
+
+		try {
+			ScspRespuesta respuesta = getClientEcot103().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "ECOT103", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "ECOT103", t0);
 		}
 	}
 	
@@ -811,7 +838,19 @@ public class PinbalHelper {
 		return client;
 	}
 	
-
+	private ClientEcot103 getClientEcot103() {
+		ClientEcot103 client = new ClientEcot103(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
 	private String getPinbalBaseUrl() {
 		return configHelper.getConfig("es.caib.ripea.pinbal.base.url");
 	}

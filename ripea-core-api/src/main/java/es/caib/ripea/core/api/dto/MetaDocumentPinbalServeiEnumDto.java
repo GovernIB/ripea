@@ -19,5 +19,6 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	Q2827003ATGSS001, // Estar al corriente de pago con la Seguridad Social
 	SVDDELSEXWS01, // Consulta de inexistencia de delitos sexuales por datos de filiación
 	SCDHPAJU, // Servei de consulta de padró històric
-	NIVRENTI // Consulta del nivel de renta
+	NIVRENTI, // Consulta del nivel de renta
+	ECOT103 // Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas con indicación de incumplimientos
 }
