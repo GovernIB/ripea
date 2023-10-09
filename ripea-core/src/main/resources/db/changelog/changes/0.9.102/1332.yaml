@@ -16,7 +16,7 @@ databaseChangeLog:
         columns:
           - column:
              name: registres_importats
-             type: varchar(1024 ${varcharunit})
+             type: varchar(4000 ${varcharunit})
     - createIndex:
             columns:
             - column:

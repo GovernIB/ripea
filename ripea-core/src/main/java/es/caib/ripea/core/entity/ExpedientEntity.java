@@ -85,7 +85,7 @@ public class ExpedientEntity extends NodeEntity {
 	protected String sistraUnitatAdministrativa;
 	@Column(name = "sistra_clau", length = 100)
 	protected String sistraClau;
-	@Column(name = "registres_importats", length = 1024)
+	@Column(name = "registres_importats", length = 4000)
 	protected String registresImportats;
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "agafat_per_codi")

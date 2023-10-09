@@ -14,7 +14,7 @@ update ipa_massiva_contingut set element_nom = (select nom from ipa_contingut wh
 update ipa_expedient e set e.registres_importats = ( select listagg(ep.identificador, ',') within group (order by ep.identificador) from ipa_expedient_peticio ep where ep.expedient_id is not null and ep.expedient_id = e.id );
 
 -- Changeset db/changelog/changes/0.9.102/1332.yaml::1693899071612-1::limit
-ALTER TABLE ipa_expedient ADD registres_importats VARCHAR2(1024 CHAR);
+ALTER TABLE ipa_expedient ADD registres_importats VARCHAR2(4000);
 
 CREATE INDEX ipa_expedient_reg_importats_i ON ipa_expedient(registres_importats);
 
