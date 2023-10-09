@@ -589,6 +589,11 @@ public interface MetaExpedientService {
 	public CrearReglaResponseDto canviarEstatReglaDistribucio(
 			Long metaExpedientId, 
 			boolean activa);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public MetaExpedientDto findByIdAmbElements(
+			Long entitatId,
+			Long id);
 
 //	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 }

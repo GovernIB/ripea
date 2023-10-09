@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.command;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -58,6 +59,10 @@ public class PinbalConsultaCommand {
 	private String telefon;
 	private String email;
 	
+	@Max(value=99)
+	private Integer nombreAnysHistoric;
+	
+	private Integer exercici;
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(

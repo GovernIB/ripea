@@ -43,6 +43,7 @@ public class DocumentNotificacionsCommand {
 	private Date dataProgramada;
 	private Integer retard;
 	private Date dataCaducitat;
+	private String caducitatDiesNaturals;
 	@NotEmpty(groups = {Create.class, Update.class})
 	private List<Long> interessatsIds;
 	@NotNull
@@ -166,6 +167,14 @@ public class DocumentNotificacionsCommand {
 	public void setEnviaments(List<NotificacioEnviamentCommand> enviaments) {
 		this.enviaments = enviaments;
 	}
+	public String getCaducitatDiesNaturals() {
+		return caducitatDiesNaturals;
+	}
+	public void setCaducitatDiesNaturals(
+			String caducitatDiesNaturals) {
+		this.caducitatDiesNaturals = caducitatDiesNaturals;
+	}
+
 
 
 	public interface Electronica {}

@@ -6,6 +6,7 @@ package es.caib.ripea.core.api.dto;
 
 public enum InteressatDocumentTipusEnumDto {
 	NIF ("N"),
+	CIF ("C"),
 	PASSAPORT ("P"),
 	DOCUMENT_IDENTIFICATIU_ESTRANGERS ("E"),
 	ALTRES_DE_PERSONA_FISICA ("X"),

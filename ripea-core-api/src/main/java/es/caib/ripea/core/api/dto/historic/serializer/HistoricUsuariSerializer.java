@@ -132,9 +132,11 @@ public class HistoricUsuariSerializer {
 	@Setter
 	public static class RegistreUsuariMensual extends RegistreUsuari {
 
-		public String mes;
-		
 		public Long numTasquesTramitades;
+		
+		public String any;
+		public String mes;
+
 		public RegistreUsuariMensual() {}
 	}
 }

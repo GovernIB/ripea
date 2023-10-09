@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <html>
 <head>
-	<title><spring:message code="metaexpedient.grup.titol"/></title>
+	<title><spring:message code="metaexpedient.grup.titol"/>:  ${metaExpedient.nom}</title>
 	<meta name="subtitle" content="${metaExpedient.nom}"/>
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
@@ -17,6 +17,9 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 </head>
 <body>
+
+	<c:set var="element" scope="request" value="grup"/>
+	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
 
 	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/grup/datatable"/>" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
 		<thead>

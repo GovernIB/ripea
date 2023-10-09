@@ -485,6 +485,14 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 				activa);
 	}
 
+	@Override
+	@RolesAllowed({"tothom"})
+	public MetaExpedientDto findByIdAmbElements(
+			Long entitatId,
+			Long id) {
+		return delegate.findByIdAmbElements(entitatId, id);
+	}
+
 //    @Override
 //    public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
 //        return delegate.getMetaExpedientsAmbOrganNoSincronitzat(entitatId);

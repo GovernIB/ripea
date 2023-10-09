@@ -40,4 +40,8 @@ public class PinbalConsultaDto {
 	private String telefon;
 	private String email;
 	
+	private Integer nombreAnysHistoric;
+	
+	private Integer exercici;
+	
 }

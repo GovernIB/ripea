@@ -86,6 +86,18 @@ public class HistoricDto implements Comparable<HistoricDto> {
 		 return cal.get(Calendar.MONTH) + 1;
 	}
 	
+	public String getAny() {
+		 Calendar cal = Calendar.getInstance();
+		 cal.setTime(data);
+		 return String.valueOf(cal.get(Calendar.YEAR));
+	}
+	
+	public String getMesNomIAny() {
+		 Calendar cal = Calendar.getInstance();
+		 cal.setTime(data);
+		 return getMesNom() + " " + getAny();
+	}
+	
 	public String getMesNom() {
 
 		switch (getMes()) {

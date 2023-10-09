@@ -367,6 +367,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						}
 						
 						document.updateDocumentFirmaTipus(DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA);
+						documentHelper.actualitzarFitxerFormatAPdf(document);
 						
 						contingutHelper.arxiuPropagarModificacio(
 								document,

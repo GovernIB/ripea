@@ -68,6 +68,7 @@ public class HistoricEntitatSerializer {
 	@Setter
 	public static class RegistreEntitatMensual extends RegistreExpedient {
 
+		public String any;
 		public String mes;
 	}
 	

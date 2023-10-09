@@ -436,7 +436,11 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			
 			for (ExpedientEntity expedient : expedientsPendentsTancar) {
 				synchronized (SynchronizationHelper.get0To99Lock(expedient.getId(), SynchronizationHelper.locksExpedients)) {
-					expedientHelper2.closeExpedientArxiu(expedient);
+					try {
+						expedientHelper2.closeExpedientArxiu(expedient);
+					} catch (Exception e) {
+						logger.error("Hi ha hagut un error tancant un expedient [id=" + expedient.getId() + "]", e);
+					}
 				}
 			}
 		}

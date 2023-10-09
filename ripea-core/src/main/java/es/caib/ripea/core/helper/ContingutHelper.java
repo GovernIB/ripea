@@ -1524,7 +1524,6 @@ public class ContingutHelper {
 			String ntiOrgano,
 			Date ntiFechaApertura,
 			Integer any,
-			Long sequencia,
 			boolean agafar,
 			Long grupId) {
 		UsuariEntity agafatPer = null;
@@ -1549,30 +1548,17 @@ public class ContingutHelper {
 				agafatPer(agafatPer).
 				grup(grupEntity).
 				build();
+		
 		// Calcula en número del nou expedient
 		long sequenciaMetaExpedient = metaExpedientHelper.obtenirProximaSequenciaExpedient(
 				metaExpedient,
 				any,
 				true);
-		if (sequencia == null) {
-			expedientCrear.updateAnySequenciaCodi(
-					any,
-					sequenciaMetaExpedient,
-					metaExpedient.getCodi());
-		} else {
-			if (sequencia.longValue() == sequenciaMetaExpedient) {
-				metaExpedientHelper.obtenirProximaSequenciaExpedient(
-						metaExpedient,
-						any,
-						true);
-				expedientCrear.updateAnySequenciaCodi(
-						any,
-						sequenciaMetaExpedient,
-						metaExpedient.getCodi());
-			} else {
-				throw new ValidationException("Ja existeix un altre expedient amb el número de seqüència " + sequenciaMetaExpedient);
-			}
-		}
+		expedientCrear.updateAnySequenciaCodi(
+				any,
+				sequenciaMetaExpedient,
+				metaExpedient.getCodi());
+
 		ExpedientEntity expedientCreat = expedientRepository.save(expedientCrear);
 		
 		// Calcula número del nou expedient

@@ -39,6 +39,7 @@ import es.caib.ripea.core.api.dto.AvisNivellEnumDto;
 import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
 import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
@@ -67,6 +68,7 @@ import es.caib.ripea.core.helper.PermisosHelper.ObjectIdentifierExtractor;
 import es.caib.ripea.core.repository.AvisRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -124,6 +126,10 @@ public class MetaExpedientHelper {
 	private MetaExpedientComentariRepository metaExpedientComentariRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private MetaNodeHelper metaNodeHelper;
+	@Autowired
+	private MetaDocumentRepository metaDocumentRepository;
 
 	public static final String PROCEDIMENT_ORGAN_NO_SYNC = "Hi ha procediments que pertanyen a òrgans no existents en l'organigrama actual";
 
@@ -861,8 +867,39 @@ public class MetaExpedientHelper {
 		}
 	}
 	
+	
+	public MetaExpedientDto toMetaExpedientDto(
+			MetaExpedientEntity metaExpedient) {
+		MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
+		
+		metaNodeHelper.omplirMetaDadesPerMetaNode(metaExpedientDto);
+		omplirMetaDocumentsPerMetaExpedient(metaExpedient, metaExpedientDto);
+		metaNodeHelper.omplirPermisosPerMetaNodes(Arrays.asList(metaExpedientDto), true);
+			
+		metaExpedientDto.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedient));
+		metaExpedientDto.setExpedientTasquesCount(
+				metaExpedientTascaRepository.countByMetaExpedient(metaExpedient));
+		metaExpedientDto.setGrupsCount(metaExpedient.getGrups().size());
+		metaExpedientDto.setNumComentaris(metaExpedient.getComentaris().size());
+		if (metaExpedient.getOrganGestor() != null) {
+			metaExpedientDto.setOrganEstat(metaExpedient.getOrganGestor().getEstat());
+			metaExpedientDto.setOrganTipusTransicio(metaExpedient.getOrganGestor().getTipusTransicio());
+		}
+			
+		return metaExpedientDto;
+	}
 
 
+	public void omplirMetaDocumentsPerMetaExpedient(MetaExpedientEntity metaExpedient, MetaExpedientDto dto) {
+		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(
+				metaExpedient);
+		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
+		for (MetaDocumentEntity metaDocument : metaDocumentsDelMetaExpedient) {
+			metaDocuments.add(conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class));
+		}
+		dto.setMetaDocuments(metaDocuments);
+	}
+	
 	public boolean publicarComentariPerMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,

@@ -459,6 +459,12 @@ $(document).ready(function() {
 	
 });//################################################## document ready END ##############################################################
 
+function confirmarReobrir() {
+    var respuesta = confirm("<spring:message code="contingut.expedient.reobrir.confirmacio"/>");
+    if (respuesta) {
+        window.location.href = "<c:url value="/expedient/${contingut.id}/reobrir"/>";
+    }
+}
 
 function urlInstruccio(contingutId, urlInstruccioId) {
 	$.ajax({

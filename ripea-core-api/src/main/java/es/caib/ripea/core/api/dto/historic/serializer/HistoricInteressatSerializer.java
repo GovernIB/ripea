@@ -113,6 +113,7 @@ public class HistoricInteressatSerializer {
 	
 	@Setter
 	public static class RegistreInteressatMensual extends Registre {
+		public String any;
 		public String mes;
 	}
 }

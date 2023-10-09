@@ -38,8 +38,6 @@ public interface ExpedientService {
 	 * @param any
 	 *            Any de l'expedient que es vol crear. Si és null l'expedient es crearà
 	 *            a dins l'any actual.
-	 * @param sequencia
-	 *            Número de seqüència de l'expedient que es vol crear.
 	 * @param nom
 	 *            Nom de l'expedient que es vol crear.
 	 * @param rolActual TODO
@@ -60,12 +58,12 @@ public interface ExpedientService {
 			Long organGestorId,
 			Long pareId,
 			Integer any,
-			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Long grupId,
+			String rolActual, 
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc) throws NotFoundException, ValidationException;
 
 

@@ -36,7 +36,9 @@
 		</div>
 	</c:if>
 	
-	
+	<c:set var="element" scope="request" value="document"/>
+	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
+
 	
 	<table
 		id="metadocuments"

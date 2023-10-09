@@ -201,11 +201,10 @@ public class ExpedientHelper {
 			Long organGestorId,
 			Long pareId,
 			Integer any,
-			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, 
+			Long grupId,
 			String rolActual) {
 
 		logger.info(
@@ -216,7 +215,6 @@ public class ExpedientHelper {
 						"organGestorId=" + organGestorId + ", " +
 						"pareId=" + pareId + ", " +
 						"any=" + any + ", " +
-						"sequencia=" + sequencia + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
 
@@ -250,7 +248,7 @@ public class ExpedientHelper {
 			throw new ValidationException(
 					"<creacio>",
 					ExpedientEntity.class,
-					"Ja existeix un altre expedient amb el mateix tipus i nom");
+					"Ja existeix un altre expedient amb el mateix títol per aquest procediment");
 		}
 
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
@@ -302,7 +300,6 @@ public class ExpedientHelper {
 				metaExpedient.getEntitat().getUnitatArrel(),
 				new Date(),
 				any,
-				sequencia,
 				true,
 				grupId);
 		contingutLogHelper.logCreacio(expedient, false, false);
@@ -1142,9 +1139,17 @@ public class ExpedientHelper {
 	public void alliberar(ExpedientEntity expedient) {
 		UsuariEntity usuariActual = expedient.getAgafatPer();
 		UsuariEntity usuariCreador = expedient.getCreatedBy();
+
+		boolean agafatPerUsuariActual = false;
 		
-		expedient.updateAgafatPer(usuariCreador);
-		if (usuariCreador != null) {
+		if (usuariActual != null && usuariCreador != null && usuariActual.getCodi().equalsIgnoreCase(usuariCreador.getCodi())) {
+			agafatPerUsuariActual = true;
+			expedient.updateAgafatPer(null);
+		} else {
+			expedient.updateAgafatPer(usuariCreador);
+		}
+		
+		if (usuariCreador != null && !agafatPerUsuariActual) {
 			// Avisa a l'usuari que li han retornat
 			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
 		}
@@ -2041,24 +2046,7 @@ public class ExpedientHelper {
 
 		return documentNtiTipoFirmaEnumDto;
 	}
-//	public void comprovarSiExpedientAmbMateixNom(
-//			MetaExpedientEntity metaExpedient,
-//			ContingutEntity contingutPare,
-//			String nom,
-//			Long id,
-//			Class<?> objectClass) {
-//		ExpedientEntity expedient = expedientRepository.findByMetaExpedientAndPareAndNomAndEsborrat(
-//				metaExpedient,
-//				contingutPare,
-//				nom,
-//				0);
-//		if (expedient != null) {
-//			throw new ValidationException(
-//					id,
-//					objectClass,
-//					"Ja existeix un altre expedient amb el mateix tipus i nom");
-//		}
-//	}
+
 	
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());

@@ -3,24 +3,12 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.exception.NotDefinedConfigException;
-import es.caib.ripea.core.api.service.ConfigService;
-import es.caib.ripea.core.api.service.DadesExternesService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.core.api.service.UnitatOrganitzativaService;
-import es.caib.ripea.war.command.InteressatCommand;
-import es.caib.ripea.war.command.InteressatCommand.Administracio;
-import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
-import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RolHelper;
-import es.caib.ripea.war.helper.ValidationHelper;
+import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +22,25 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.List;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.MunicipiDto;
+import es.caib.ripea.core.api.dto.ProvinciaDto;
+import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.core.api.service.DadesExternesService;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.core.api.service.UnitatOrganitzativaService;
+import es.caib.ripea.war.command.InteressatCommand;
+import es.caib.ripea.war.command.InteressatCommand.Administracio;
+import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
+import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
+import es.caib.ripea.war.helper.ValidationHelper;
 
 /**
  * Controlador per als interessats dels expedients.
@@ -73,6 +76,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		model.addAttribute("interessatCommand", interessatCommand);
 		model.addAttribute("expedientId", expedientId);
 		ompleModel(request, model, entitatActual.getCodi());
+
 		return "expedientInteressatForm";
 	}
 
@@ -106,6 +110,13 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		}
 		
 		model.addAttribute("potModificar", potModificar);
+		
+		
+		if (interessatDto instanceof InteressatPersonaJuridicaDto) {
+			interessatCommand.setDocumentTipus(InteressatDocumentTipusEnumDto.CIF);
+		} else {
+			interessatCommand.setDocumentTipus(interessatDto.getDocumentTipus());
+		}
 		
 		return "expedientInteressatForm";
 	}
@@ -159,6 +170,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			break;
 		case PERSONA_JURIDICA:
 			interessatDto = InteressatCommand.asPersonaJuridicaDto(interessatCommand);
+			interessatDto.setDocumentTipus(InteressatDocumentTipusEnumDto.NIF);
 			break;
 		case ADMINISTRACIO:
 			interessatDto = InteressatCommand.asAdministracioDto(interessatCommand);

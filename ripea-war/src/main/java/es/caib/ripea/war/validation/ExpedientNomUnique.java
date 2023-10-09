@@ -23,7 +23,7 @@ import javax.validation.Payload;
 @Constraint(validatedBy=ExpedientNomUniqueValidator.class)
 public @interface ExpedientNomUnique {
 
-	String message() default "Ja existeix un altre expedient amb el mateix tipus i nom";
+	String message() default "Ja existeix un altre expedient amb el mateix títol per aquest procediment";
 
 	Class<?>[] groups() default { };
 

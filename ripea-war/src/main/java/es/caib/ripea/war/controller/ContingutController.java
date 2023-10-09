@@ -213,6 +213,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("isFolderCollapsedDefault", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.contingut.contreure.carpetes")));
 			model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
 			model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
+			model.addAttribute("isTancamentLogicActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic")));
 			
 			boolean isEntitatUserAdminOrOrgan;
 			if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
@@ -230,20 +231,17 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					true);
 			List<MetaDocumentDto> metaDocumentsPinbal = new ArrayList<MetaDocumentDto>();
 			List<MetaDocumentDto> metaDocumentsNoPinbal = new ArrayList<MetaDocumentDto>();
-			List<MetaDocumentDto> metaDocumentsAllNoPinball = new ArrayList<MetaDocumentDto>();
-			for (MetaDocumentDto metaDocument: metaDocumentsPerCreacio) {
-				if (metaDocument.isPinbalActiu()) {
-					metaDocumentsPinbal.add(metaDocument);
-				} else {
-					if (metaDocument.isLeftPerCreacio()) {
+			for (MetaDocumentDto metaDocument : metaDocumentsPerCreacio) {
+				if (metaDocument.isLeftPerCreacio()) {
+					if (metaDocument.isPinbalActiu()) {
+						metaDocumentsPinbal.add(metaDocument);
+					} else {
 						metaDocumentsNoPinbal.add(metaDocument);
-					} 
-					metaDocumentsAllNoPinball.add(metaDocument);
+					}
 				}
 			}
-			model.addAttribute("metaDocumentsLeft", metaDocumentsNoPinbal);
+			model.addAttribute("metaDocumentsNoPinbalLeft", metaDocumentsNoPinbal);
 			model.addAttribute("metaDocumentsPinbalLeft", metaDocumentsPinbal);
-			model.addAttribute("metaDocumentsAllNoPinball", metaDocumentsAllNoPinball);
 	
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(EnviamentEstat.class,

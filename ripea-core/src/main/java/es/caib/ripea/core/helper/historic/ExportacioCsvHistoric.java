@@ -34,29 +34,42 @@ public class ExportacioCsvHistoric {
 		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");  
 		
 		StringBuilder sb = new StringBuilder();
-		String[] columnes = new String[5];
+		int i;
+		String[] columnes;
+
 		if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+			columnes = new String[5];
+			i = 1;
 			columnes[0] = "Date";
+			
 		} else {
-			columnes[0] = "Mes";
+			columnes = new String[6];
+			i = 2;
+			columnes[0] = "Any";
+			columnes[1] = "Mes";
 		}
 		
-		int i=1;
 		for (HistoricMetriquesEnumDto metricEnum : metriques) {
 			columnes[i] = metricEnum.toString();
 			i++;
 		}
 		csvHelper.afegirLinia(sb, columnes, ';');
 		for (HistoricExpedientDto dada : dades) {
-			String[] fila = new String[5];
-			
-			if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
-				fila[0] = dateFormat.format(dada.getData());
-			} else {
-				fila[0] = dada.getMesNom();
-			}
 			
 			int colNum = 1;
+			String[] fila;
+			
+			if (tipusAgrupament == HistoricTipusEnumDto.DIARI) {
+				fila = new String[5];
+				colNum = 1;
+				fila[0] = dateFormat.format(dada.getData());
+			} else {
+				fila = new String[6];
+				colNum = 2;
+				fila[0] = dada.getAny();
+				fila[1] = dada.getMesNom();
+			}
+			
 			for (HistoricMetriquesEnumDto metricEnum : metriques) {
 				fila[colNum] = metricEnum.getValue(dada).toString();
 				colNum++;

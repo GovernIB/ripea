@@ -417,6 +417,14 @@ public class ExpedientEntity extends NodeEntity {
 		this.registresImportats = null;
 	}
 	
+	public void removeTancamentProgramat() {
+		this.tancatProgramat = null;
+	}
+	
+	public boolean isTancamentProgramat() {
+		return this.estat == ExpedientEstatEnumDto.TANCAT && this.tancatProgramat != null && this.tancatData == null;
+	}
+	
 	public static Builder getBuilder(
 			String nom,
 			MetaExpedientEntity metaExpedient,

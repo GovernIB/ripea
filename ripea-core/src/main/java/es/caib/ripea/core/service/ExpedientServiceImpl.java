@@ -211,13 +211,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long organGestorId,
 			Long pareId,
 			Integer any,
-			Long sequencia,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
-			Long grupId, 
+			Long grupId,
 			String rolActual, 
-			Map<Long, Long> anexosIdsMetaDocsIdsMap,
+			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc) {
 		
 		
@@ -230,7 +229,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"organGestorId=" + organGestorId + ", " +
 						"pareId=" + pareId + ", " +
 						"any=" + any + ", " +
-						"sequencia=" + sequencia + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
 
@@ -244,7 +242,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 					organGestorId,
 					pareId,
 					any,
-					sequencia,
 					nom,
 					expedientPeticioId,
 					associarInteressats,
@@ -940,10 +937,24 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
+		
+		if (!isPermesReobrir())
+			throw new ValidationException("La reobertura d'expedients no està activa");
+
 		entityComprovarHelper.comprovarEstatExpedient(entitatId, id, ExpedientEstatEnumDto.TANCAT);
+		
+		if (isTancamentLogicActiu() && expedient.getTancatData() != null)
+			throw new ValidationException("La reobertura d'aquest expedient no és possible. Està tancat a l'arxiu.");
+		
+		if (expedient.isTancamentProgramat()) // Tancat en diferit
+			expedient.removeTancamentProgramat();
+
 		expedient.updateEstat(ExpedientEstatEnumDto.OBERT, null);
+		
+		if (! isTancamentLogicActiu())
+			pluginHelper.arxiuExpedientReobrir(expedient);
+		
 		contingutLogHelper.log(expedient, LogTipusEnumDto.REOBERTURA, null, null, false, false);
-		pluginHelper.arxiuExpedientReobrir(expedient);
 	}
 
 	
@@ -2130,7 +2141,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	
-
+	private boolean isPermesReobrir() {
+		return configHelper.getAsBoolean("es.caib.ripea.expedient.permetre.reobrir");
+	}
 
 	private boolean isIncorporacioDuplicadaPermesa() {
 		return configHelper.getAsBoolean("es.caib.ripea.incorporacio.anotacions.duplicada");
@@ -2148,6 +2161,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return configHelper.getAsBoolean("es.caib.ripea.importacio.expedient.relacionat.activa");
 	}
 
+	private boolean isTancamentLogicActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.expedient.tancament.logic");
+	}
+	
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());
 		for (Serializable s: original) { 

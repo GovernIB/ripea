@@ -615,23 +615,20 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	@Query(	"select " +
 			"    d.id " +
 			"from " +
-			"    DocumentEntity d inner join d.contingut c left join d.annexos a " +
+			"    DocumentEntity d inner join d.contingut c1 " + // d.contingut c1 is used in ordenacioMap
 			"    inner join d.expedient e " +
+			"	 left join d.annexos a " + 
 			"where " +
-			"    d.entitat = :entitat " +
-			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +			
-			"and (d.expedient.metaNode in (:metaExpedientsPermesos)) " +
+			"	 c1.esborrat = 0 " +
+			"and (c1.arxiuUuid = null " + //documents uploaded manually in ripea that were not saved in arxiu
+			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
+			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
+			"and d.entitat = :entitat " +
+			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
+			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
-			"and (d.arxiuUuid = null " +
-			"	  or a.error is not null " +
-			"	  or (d.id in " +
-			"			(select docPortafirmes.document.id from DocumentPortafirmesEntity docPortafirmes " +
-			"				where (docPortafirmes.id, docPortafirmes.createdDate) in (select docPortaf.id, max(docPortaf.createdDate) from DocumentPortafirmesEntity docPortaf group by docPortaf.id) " +
-			"				and docPortafirmes.estat = 'ENVIAT' " +
-			"				and docPortafirmes.error = true)))" +
-			"and d.esborrat = 0 " +
 			"and (:esNullNom = true or lower(d.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullExpedient = true or d.expedient = :expedient) " +
+			"and (:esNullExpedient = true or c1.expedient = :expedient) " +
 			"and (:esNullMetaExpedient = true or d.expedient.metaExpedient = :metaExpedient) " +
 			"and (:esNullCreacioInici = true or d.createdDate >= :creacioInici) " +
 			"and (:esNullCreacioFi = true or d.createdDate <= :creacioFi) ")

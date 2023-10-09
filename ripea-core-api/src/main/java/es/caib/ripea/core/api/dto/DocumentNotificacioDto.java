@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,13 +29,15 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 	private Date dataCaducitat;
 	private String notificacioIdentificador;
 	private String enviamentReferencia;
-	private List<Long> interessatsIds = new ArrayList<Long>();
-	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();
-	private List<NotificacioEnviamentDto> enviaments = new ArrayList<NotificacioEnviamentDto>();
 	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	private ServeiTipusEnumDto serveiTipusEnum;
 	private boolean entregaPostal;
+
+	private List<Long> interessatsIds = new ArrayList<Long>();
 	private List<InteressatDto> interessats = new ArrayList<InteressatDto>();
+	
+	private Set<DocumentEnviamentInteressatDto> documentEnviamentInteressats = new HashSet<DocumentEnviamentInteressatDto>();
+	
 	private Date registreData;
 	private String registreNumero;
 	private String registreNumeroFormatat;
@@ -64,6 +67,22 @@ public class DocumentNotificacioDto extends DocumentEnviamentDto {
 			}
 		}
 		return ambRegistres;
+	}
+	
+	public boolean isEnviamentCertificacio() {
+		if (Utils.isNotEmpty(documentEnviamentInteressats) && documentEnviamentInteressats.iterator().next().getEnviamentCertificacioData() != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public Long getEnviamentId() {
+		if (Utils.isNotEmpty(documentEnviamentInteressats)) {
+			return documentEnviamentInteressats.iterator().next().getId();
+		} else {
+			return null;
+		}
 	}
 
 }

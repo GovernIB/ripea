@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+\<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -28,8 +28,10 @@
 </style>
 <script>
 var metaExpedientOrgan = {};
+var metaExpedientGrup = {};
 <c:forEach var="metaExpedient" items="${metaExpedients}">
 <c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${fn:escapeXml(metaExpedient.organGestor.nom)}'};</c:if>
+metaExpedientGrup['${metaExpedient.id}'] = {gestioAmbGrupsActiva: ${metaExpedient.gestioAmbGrupsActiva}};
 </c:forEach>
 
 
@@ -105,6 +107,8 @@ $(document).ready(function(){
 		}
 
 		refrescarOrgan();
+		refrescarSequencia();
+		refrescarGrups();
 
 		var createPermis;
 		var writePermis;
@@ -189,6 +193,53 @@ $(document).ready(function(){
 	});		
 			
 });
+
+
+
+function refrescarSequencia() {
+	let metaExpedientId = $('#metaExpedientId').val();
+	let any = $('input#any').val();
+	if (metaExpedientId != undefined && metaExpedientId != "" && any != undefined && any != "") {
+		$.ajax({
+			type: 'GET',
+			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
+			success: function(sequencia) {
+				$('input#sequencia').val(sequencia);
+			}
+		});
+	} else {
+		$('input#sequencia').val(undefined);
+	}
+}
+
+function refrescarGrups() {
+
+	let metaExpedientId = $('#metaExpedientId').val();
+	if (metaExpedientId != undefined && metaExpedientId != "") {
+		const gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
+		$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
+		if (gestioAmbGrupsActiva) {
+			$("#grupsActiu").removeClass("hidden");
+			$.ajax({
+				type: 'GET',
+				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+				success: function(data) {
+					$('#grupId').closest('.form-group').show();
+					$('#grupId option[value!=""]').remove();
+					for (var i = 0; i < data.length; i++) {
+						$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+					}
+				}
+			});
+		} else {
+			$('#grupId option[value!=""]').remove();
+			$("#grupsActiu").addClass("hidden");
+		}
+	}
+
+}
+
+
 </script>
 
 </head>
@@ -220,7 +271,12 @@ $(document).ready(function(){
 			<div id="organSelect" style="display: none;">
 				<rip:inputSelect name="organGestorId" textKey="contingut.expedient.form.camp.organ" required="true"/>
 			</div>			
-			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 			
+			<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" disabled="true"/>
+			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 	
+			<form:hidden path="gestioAmbGrupsActiva"/>
+			<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
+				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup"/>
+			</div>					
 		</div>
 		
 		<rip:inputCheckbox name="associarInteressats"

@@ -23,7 +23,7 @@
 					<li class="hidden"><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 				</c:when>
 				<c:otherwise>
-					<li class="hidden"><a href="#" onclick="showViewer(event, ${contingut.id}, '${fn:escapeXml(contingut.nom)}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+					<li class="hidden"><a href="#" data-nom="${fn:escapeXml(contingut.nom)}" onclick="showViewer(event, ${contingut.id}, this.getAttribute('data-nom'), ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				</c:otherwise>
 			</c:choose>							
 		</c:if>
@@ -108,8 +108,7 @@
 				<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
 				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
-				<c:choose>
-					<c:when test="${contingut.estat == 'OBERT'}">
+				<c:if test="${contingut.estat == 'OBERT'}">
 						<c:choose>
 							<c:when test="${contingut.valid && contingut.conteDocuments && !contingut.conteDocumentsEnProcessDeFirma && !contingut.conteDocumentsDePortafirmesNoCustodiats && !contingut.conteDocumentsPendentsReintentsArxiu && !contingut.conteDocumentsDeAnotacionesNoMogutsASerieFinal}">
 								<li><a href="<c:url value="/expedient/${contingut.id}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
@@ -140,11 +139,7 @@
 								</c:choose>
 							</c:otherwise>
 						</c:choose>
-					</c:when>
-					<c:when test="${expedientTancat && isReobrirPermes}">
-						<li><a href="<c:url value="/expedient/${contingut.id}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
-					</c:when>
-				</c:choose>
+				</c:if>
 				<c:set var="mostrarSeparador" value="${true}"/>
 			</c:if>
 			
@@ -169,6 +164,9 @@
 				<li><a href="<c:url value="/contingut/${contingut.id}/delete?contingutNavigationId=${contingutNavigationId}&tascaId=${tascaId}"/>" data-confirm="${esborrarConfirmacioMsg}"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 			</c:if>
 			<c:set var="mostrarSeparador" value="${true}"/>
+		</c:if>
+		<c:if test="${isReobrirPermes && contingut.expedient && expedientTancat && (!isTancamentLogicActiu || (isTancamentLogicActiu && empty contingut.tancatData))}">
+			<li><a href="#" onclick="confirmarReobrir();"><span class="fa fa-undo"></span>&nbsp;<spring:message code="comu.boto.reobrir"/>...</a></li>
 		</c:if>
 		<c:if test="${contingut.document}">
 			<c:if test="${mostrarSeparador}">
@@ -197,7 +195,7 @@
 				<%---- Descarregar ----%>
 				<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/${contingut.id}/descarregar?tascaId=${tascaId}"/>"><span class="fa fa-download"></span>&nbsp;<spring:message code="comu.boto.descarregar"/></a></li>
 				<%---- Visualitzar ----%>
-				<li class="${(contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" onclick="showViewer(event, ${contingut.id}, '${fn:escapeXml(contingut.nom)}', ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
+				<li class="${(contingut.fitxerExtension!='pdf' && contingut.fitxerExtension!='odt' && contingut.fitxerExtension!='docx') ? 'disabled' : ''}"><a href="#" data-nom="${fn:escapeXml(contingut.nom)}" onclick="showViewer(event, ${contingut.id}, this.getAttribute('data-nom'), ${contingut.custodiat})"><span class="fa fa-search"></span>&nbsp;<spring:message code="comu.boto.visualitzar"/></a></li>
 				<c:if test="${(contingut.custodiat or contingut.estat == 'DEFINITIU') and isUrlValidacioDefinida}">
 					<li><a href="#copy_${contingut.id}"><span class="fa fa-copy"></span>&nbsp;<spring:message code="comu.boto.urlValidacio"/></a></li>
 					<script>

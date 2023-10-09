@@ -387,68 +387,146 @@ public class ExpedientInteressatHelper {
 		InteressatEntity interessatEntity = null;
 		if (interessat.isPersonaFisica()) {
 			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
-			interessatEntity = interessatRepository.findPersonaFisicaById(interessat.getId());
-			((InteressatPersonaFisicaEntity)interessatEntity).update(
-					interessatPersonaFisicaDto.getNom(),
-					interessatPersonaFisicaDto.getLlinatge1(),
-					interessatPersonaFisicaDto.getLlinatge2(),
-					interessatPersonaFisicaDto.getDocumentTipus(),
-					interessatPersonaFisicaDto.getDocumentNum(),
-					interessatPersonaFisicaDto.getPais(),
-					interessatPersonaFisicaDto.getProvincia(),
-					interessatPersonaFisicaDto.getMunicipi(),
-					interessatPersonaFisicaDto.getAdresa(),
-					interessatPersonaFisicaDto.getCodiPostal(),
-					interessatPersonaFisicaDto.getEmail(),
-					interessatPersonaFisicaDto.getTelefon(),
-					interessatPersonaFisicaDto.getObservacions(),
-					interessatPersonaFisicaDto.getPreferenciaIdioma(),
-					interessatPersonaFisicaDto.getEntregaDeh(),
-					interessatPersonaFisicaDto.getEntregaDehObligat(),
-					interessatPersonaFisicaDto.getIncapacitat());
+			interessatEntity = interessatRepository.findOne(interessat.getId());
+			
+			if (interessatEntity instanceof InteressatPersonaFisicaEntity) {
+				((InteressatPersonaFisicaEntity)interessatEntity).update(
+						interessatPersonaFisicaDto.getNom(),
+						interessatPersonaFisicaDto.getLlinatge1(),
+						interessatPersonaFisicaDto.getLlinatge2(),
+						interessatPersonaFisicaDto.getDocumentTipus(),
+						interessatPersonaFisicaDto.getDocumentNum(),
+						interessatPersonaFisicaDto.getPais(),
+						interessatPersonaFisicaDto.getProvincia(),
+						interessatPersonaFisicaDto.getMunicipi(),
+						interessatPersonaFisicaDto.getAdresa(),
+						interessatPersonaFisicaDto.getCodiPostal(),
+						interessatPersonaFisicaDto.getEmail(),
+						interessatPersonaFisicaDto.getTelefon(),
+						interessatPersonaFisicaDto.getObservacions(),
+						interessatPersonaFisicaDto.getPreferenciaIdioma(),
+						interessatPersonaFisicaDto.getEntregaDeh(),
+						interessatPersonaFisicaDto.getEntregaDehObligat(),
+						interessatPersonaFisicaDto.getIncapacitat());
+			} else {
+				interessatRepository.delete(interessatEntity);
+				interessatEntity = InteressatPersonaFisicaEntity.getBuilder(
+						interessatPersonaFisicaDto.getNom(),
+						interessatPersonaFisicaDto.getLlinatge1(),
+						interessatPersonaFisicaDto.getLlinatge2(),
+						interessatPersonaFisicaDto.getDocumentTipus(),
+						interessatPersonaFisicaDto.getDocumentNum(),
+						interessatPersonaFisicaDto.getPais(),
+						interessatPersonaFisicaDto.getProvincia(),
+						interessatPersonaFisicaDto.getMunicipi(),
+						interessatPersonaFisicaDto.getAdresa(),
+						interessatPersonaFisicaDto.getCodiPostal(),
+						interessatPersonaFisicaDto.getEmail(),
+						interessatPersonaFisicaDto.getTelefon(),
+						interessatPersonaFisicaDto.getObservacions(),
+						interessatPersonaFisicaDto.getPreferenciaIdioma(),
+						expedient,
+						null,
+						interessatPersonaFisicaDto.getEntregaDeh(),
+						interessatPersonaFisicaDto.getEntregaDehObligat(),
+						interessatPersonaFisicaDto.getIncapacitat()).build();
+			}
+			
+
 		} else if (interessat.isPersonaJuridica()) {
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
-			interessatEntity = interessatRepository.findPersonaJuridicaById(interessat.getId());
-			((InteressatPersonaJuridicaEntity)interessatEntity).update(
-					interessatPersonaJuridicaDto.getRaoSocial(),
-					interessatPersonaJuridicaDto.getDocumentTipus(),
-					interessatPersonaJuridicaDto.getDocumentNum(),
-					interessatPersonaJuridicaDto.getPais(),
-					interessatPersonaJuridicaDto.getProvincia(),
-					interessatPersonaJuridicaDto.getMunicipi(),
-					interessatPersonaJuridicaDto.getAdresa(),
-					interessatPersonaJuridicaDto.getCodiPostal(),
-					interessatPersonaJuridicaDto.getEmail(),
-					interessatPersonaJuridicaDto.getTelefon(),
-					interessatPersonaJuridicaDto.getObservacions(),
-					interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-					interessatPersonaJuridicaDto.getEntregaDeh(),
-					interessatPersonaJuridicaDto.getEntregaDehObligat(),
-					interessatPersonaJuridicaDto.getIncapacitat());
+			interessatEntity = interessatRepository.findOne(interessat.getId());
+			
+			if (interessatEntity instanceof InteressatPersonaJuridicaEntity) {
+			
+				((InteressatPersonaJuridicaEntity)interessatEntity).update(
+						interessatPersonaJuridicaDto.getRaoSocial(),
+						interessatPersonaJuridicaDto.getDocumentTipus(),
+						interessatPersonaJuridicaDto.getDocumentNum(),
+						interessatPersonaJuridicaDto.getPais(),
+						interessatPersonaJuridicaDto.getProvincia(),
+						interessatPersonaJuridicaDto.getMunicipi(),
+						interessatPersonaJuridicaDto.getAdresa(),
+						interessatPersonaJuridicaDto.getCodiPostal(),
+						interessatPersonaJuridicaDto.getEmail(),
+						interessatPersonaJuridicaDto.getTelefon(),
+						interessatPersonaJuridicaDto.getObservacions(),
+						interessatPersonaJuridicaDto.getPreferenciaIdioma(),
+						interessatPersonaJuridicaDto.getEntregaDeh(),
+						interessatPersonaJuridicaDto.getEntregaDehObligat(),
+						interessatPersonaJuridicaDto.getIncapacitat());
+			} else {
+				interessatRepository.delete(interessatEntity);
+				interessatEntity = InteressatPersonaJuridicaEntity.getBuilder(
+						interessatPersonaJuridicaDto.getRaoSocial(),
+						interessatPersonaJuridicaDto.getDocumentTipus(),
+						interessatPersonaJuridicaDto.getDocumentNum(),
+						interessatPersonaJuridicaDto.getPais(),
+						interessatPersonaJuridicaDto.getProvincia(),
+						interessatPersonaJuridicaDto.getMunicipi(),
+						interessatPersonaJuridicaDto.getAdresa(),
+						interessatPersonaJuridicaDto.getCodiPostal(),
+						interessatPersonaJuridicaDto.getEmail(),
+						interessatPersonaJuridicaDto.getTelefon(),
+						interessatPersonaJuridicaDto.getObservacions(),
+						interessatPersonaJuridicaDto.getPreferenciaIdioma(),
+						expedient,
+						null,
+						interessatPersonaJuridicaDto.getEntregaDeh(),
+						interessatPersonaJuridicaDto.getEntregaDehObligat(),
+						interessatPersonaJuridicaDto.getIncapacitat()).build();
+			}
 		} else {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
-			interessatEntity = interessatRepository.findAdministracioById(interessat.getId());
+			interessatEntity = interessatRepository.findOne(interessat.getId());
 			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
 					interessatAdministracioDto.getOrganCodi());
-			((InteressatAdministracioEntity)interessatEntity).update(
-					unitat.getCodi(),
-					unitat.getDenominacio(),
-					interessatAdministracioDto.getDocumentTipus(),
-					interessatAdministracioDto.getDocumentNum(),
-					interessatAdministracioDto.getPais(),
-					interessatAdministracioDto.getProvincia(),
-					interessatAdministracioDto.getMunicipi(),
-					interessatAdministracioDto.getAdresa(),
-					interessatAdministracioDto.getCodiPostal(),
-					interessatAdministracioDto.getEmail(),
-					interessatAdministracioDto.getTelefon(),
-					interessatAdministracioDto.getObservacions(),
-					interessatAdministracioDto.getPreferenciaIdioma(),
-					interessatAdministracioDto.getEntregaDeh(),
-					interessatAdministracioDto.getEntregaDehObligat(),
-					interessatAdministracioDto.getIncapacitat(),
-					interessatAdministracioDto.getAmbOficinaSir());
+			
+			if (interessatEntity instanceof InteressatAdministracioEntity) {
+			
+				((InteressatAdministracioEntity)interessatEntity).update(
+						unitat.getCodi(),
+						unitat.getDenominacio(),
+						interessatAdministracioDto.getDocumentTipus(),
+						interessatAdministracioDto.getDocumentNum(),
+						interessatAdministracioDto.getPais(),
+						interessatAdministracioDto.getProvincia(),
+						interessatAdministracioDto.getMunicipi(),
+						interessatAdministracioDto.getAdresa(),
+						interessatAdministracioDto.getCodiPostal(),
+						interessatAdministracioDto.getEmail(),
+						interessatAdministracioDto.getTelefon(),
+						interessatAdministracioDto.getObservacions(),
+						interessatAdministracioDto.getPreferenciaIdioma(),
+						interessatAdministracioDto.getEntregaDeh(),
+						interessatAdministracioDto.getEntregaDehObligat(),
+						interessatAdministracioDto.getIncapacitat(),
+						interessatAdministracioDto.getAmbOficinaSir());
+			} else {
+				interessatRepository.delete(interessatEntity);
+				interessatEntity = InteressatAdministracioEntity.getBuilder(
+						unitat != null ? unitat.getCodi() : null,
+						unitat != null ? unitat.getDenominacio() : null,
+						interessatAdministracioDto.getDocumentTipus(),
+						interessatAdministracioDto.getDocumentNum(),
+						interessatAdministracioDto.getPais(),
+						interessatAdministracioDto.getProvincia(),
+						interessatAdministracioDto.getMunicipi(),
+						interessatAdministracioDto.getAdresa(),
+						interessatAdministracioDto.getCodiPostal(),
+						interessatAdministracioDto.getEmail(),
+						interessatAdministracioDto.getTelefon(),
+						interessatAdministracioDto.getObservacions(),
+						interessatAdministracioDto.getPreferenciaIdioma(),
+						expedient,
+						null,
+						interessatAdministracioDto.getEntregaDeh(),
+						interessatAdministracioDto.getEntregaDehObligat(),
+						interessatAdministracioDto.getIncapacitat(),
+						interessatAdministracioDto.getAmbOficinaSir()).build();
+			}
 		}
+		
 		interessatEntity = interessatRepository.save(interessatEntity);
 		// Registra al log la modificació de l'interessat
 		contingutLogHelper.log(

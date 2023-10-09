@@ -94,7 +94,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		if (!rolActual.equals("IPA_REVISIO")) {
 			comprovarAccesMetaExpedient(request, metaExpedientId);
 		}
-		MetaExpedientDto metaExpedient = metaExpedientService.findById(
+		MetaExpedientDto metaExpedient = metaExpedientService.findByIdAmbElements(
 				entitatActual.getId(),
 				metaExpedientId);
 		model.addAttribute(
@@ -207,7 +207,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		}
 		if (bindingResult.hasErrors()) {
 			
-			if (bindingResult.getAllErrors().size() == 1 && bindingResult.getAllErrors().get(0).getDefaultMessage().contains("Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile'")) {
+			if (bindingResult.getAllErrors().size() == 1 && bindingResult.getAllErrors().get(0).getDefaultMessage() != null && bindingResult.getAllErrors().get(0).getDefaultMessage().contains("Failed to convert property value of type 'java.lang.String' to required type 'org.springframework.web.multipart.MultipartFile'")) {
 
 //				When file is cleared in the form [Netejar] (in this case it is made using Jasny bootstrap implementation with attribute data-dismiss="fileinput") then on form submit this cleared file is passed as an empty string.
 //				Spring MVC doesn't allow file to be passed as an empty string for which it gives error in bindingResult: 

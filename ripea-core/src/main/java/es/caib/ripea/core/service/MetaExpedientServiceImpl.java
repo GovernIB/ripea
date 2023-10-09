@@ -63,6 +63,7 @@ import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.DominiEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -94,6 +95,7 @@ import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.MetaNodeHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
@@ -554,7 +556,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
+			metaExpedientHelper.omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			resposta.setNumComentaris(metaExpedient.getComentaris().size());
 			
 			if (metaExpedient.getOrganGestor() != null) {
@@ -563,6 +565,19 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				resposta.setOrgansNous(conversioTipusHelper.convertirList(metaExpedient.getOrganGestor().getNous(), OrganGestorDto.class));  
 			}
 		}
+		return resposta;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public MetaExpedientDto findByIdAmbElements(Long entitatId, Long id) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, id);
+
+		MetaExpedientDto resposta = metaExpedientHelper.toMetaExpedientDto(metaExpedient);
+		
 		return resposta;
 	}
 	
@@ -598,7 +613,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		MetaExpedientDto resposta = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		if (resposta != null) {
 			metaNodeHelper.omplirMetaDadesPerMetaNode(resposta);
-			omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
+			metaExpedientHelper.omplirMetaDocumentsPerMetaExpedient(metaExpedient, resposta);
 			
 			if (metaExpedient.getOrganGestor() != null) {
 				resposta.setOrganEstat(metaExpedient.getOrganGestor().getEstat());
@@ -755,22 +770,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		} else {
 			resposta = findByEntitat(entitatId, filtre, paginacioParams, rolActual);
 		}
-		metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());
-		omplirMetaDocumentsPerMetaExpedients(resposta.getContingut());
-		metaNodeHelper.omplirPermisosPerMetaNodes(resposta.getContingut(), true);
-		for (MetaExpedientDto metaExpedient : resposta.getContingut()) {
-			MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedient.getId());
-			metaExpedient.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedientEntity));
-			metaExpedient.setExpedientTasquesCount(
-					metaExpedientTascaRepository.countByMetaExpedient(metaExpedientEntity));
-			metaExpedient.setGrupsCount(metaExpedientEntity.getGrups().size());
-			metaExpedient.setNumComentaris(metaExpedientEntity.getComentaris().size());
-			if (metaExpedientEntity.getOrganGestor() != null) {
-				metaExpedient.setOrganEstat(metaExpedientEntity.getOrganGestor().getEstat());
-				metaExpedient.setOrganTipusTransicio(metaExpedientEntity.getOrganGestor().getTipusTransicio());
-			}
-			
-		}
+
 		return resposta;
 	}
 	
@@ -795,55 +795,40 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		} else {
 			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		}
-		if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
-			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
-			ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
-			ordenacioMap.put("lastModifiedBy.codiAndNom", new String[] {"lastModifiedBy.nom"});
-			
-			// Sempre afegirem el nom com a subordre
-			addNomSort(paginacioParams);
-			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByEntitat(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-							filtre.getCodi() != null ? filtre.getCodi().trim() : "",
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom() != null ? filtre.getNom().trim() : "",
-							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
-							filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
-							filtre.getActiu() == null,
-							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-							filtre.getOrganGestorId() == null,
-							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
-							filtre.getOrganGestorId()) : null,
-							filtre.getAmbit() == null ,
-							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-							filtre.getRevisioEstats()[0] == null,
-							filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
-							paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
-					MetaExpedientDto.class);
-		} else {
-			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByEntitat(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-							filtre.getCodi() != null ? filtre.getCodi().trim() : "",
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom() != null ? filtre.getNom().trim() : "",
-							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
-							filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
-							filtre.getActiu() == null,
-							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-							filtre.getOrganGestorId() == null,
-							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
-							filtre.getOrganGestorId()) : null,
-							filtre.getAmbit() == null ,
-							filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
-							filtre.getRevisioEstats()[0] == null,
-							filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),					
-							paginacioHelper.toSpringDataSort(paginacioParams)),
-					MetaExpedientDto.class);
-		}
+		
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("organGestor.codiINom", new String[] {"org.codi"});
+		ordenacioMap.put("lastModifiedBy.codiAndNom", new String[] {"lastModifiedBy.nom"});
+		
+		// Sempre afegirem el nom com a subordre
+		addNomSort(paginacioParams);
+		
+		return paginacioHelper.toPaginaDto(
+				metaExpedientRepository.findByEntitat(
+						entitat,
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+						filtre.getCodi() != null ? filtre.getCodi().trim() : "",
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() != null ? filtre.getNom().trim() : "",
+						filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+						filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
+						filtre.getActiu() == null,
+						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+						filtre.getOrganGestorId() == null,
+						filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
+						filtre.getOrganGestorId()) : null,
+						filtre.getAmbit() == null ,
+						filtre.getAmbit() == MetaExpedientAmbitEnumDto.COMUNS ? true : false,
+						filtre.getRevisioEstats()[0] == null,
+						filtre.getRevisioEstats()[0] == null ? null : filtre.getRevisioEstats(),
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
+				MetaExpedientDto.class,
+				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
+					@Override
+					public MetaExpedientDto convert(MetaExpedientEntity source) {
+						return metaExpedientHelper.toMetaExpedientDto(source);
+					}
+				});
 
 	}
 
@@ -873,49 +858,33 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitatId,
 				organGestorId,
 				hasPermisAdmComu);
-		if (candidateMetaExpIds.size() == 0) {
-			return new PaginaDto<MetaExpedientDto>();
-		} else if (paginacioHelper.esPaginacioActivada(paginacioParams)) {
-			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByOrganGestor(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-							filtre.getCodi() != null ? filtre.getCodi().trim() : "",
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom() != null ? filtre.getNom().trim() : "",
-							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
-							filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
-							filtre.getActiu() == null,
-							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-							filtre.getOrganGestorId() == null,
-							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
-									filtre.getOrganGestorId()) : null,
-							candidateMetaExpIds,
-							filtre.getRevisioEstat() == null,
-							filtre.getRevisioEstat(),
-							paginacioHelper.toSpringDataPageable(paginacioParams)),
-					MetaExpedientDto.class);
-		} else {
-			return paginacioHelper.toPaginaDto(
-					metaExpedientRepository.findByOrganGestor(
-							entitat,
-							filtre.getCodi() == null || filtre.getCodi().isEmpty(),
-							filtre.getCodi() != null ? filtre.getCodi().trim() : "",
-							filtre.getNom() == null || filtre.getNom().isEmpty(),
-							filtre.getNom() != null ? filtre.getNom().trim() : "",
-							filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
-							filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
-							filtre.getActiu() == null,
-							filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
-							filtre.getOrganGestorId() == null,
-							filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
-									filtre.getOrganGestorId()) : null,
-							candidateMetaExpIds,
-							filtre.getRevisioEstat() == null,
-							filtre.getRevisioEstat(),
-							paginacioHelper.toSpringDataSort(paginacioParams)),
-					MetaExpedientDto.class);
-		}
+
+		return paginacioHelper.toPaginaDto(
+				metaExpedientRepository.findByOrganGestor(
+						entitat,
+						filtre.getCodi() == null || filtre.getCodi().isEmpty(),
+						filtre.getCodi() != null ? filtre.getCodi().trim() : "",
+						filtre.getNom() == null || filtre.getNom().isEmpty(),
+						filtre.getNom() != null ? filtre.getNom().trim() : "",
+						filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
+						filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
+						filtre.getActiu() == null,
+						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
+						filtre.getOrganGestorId() == null,
+						filtre.getOrganGestorId() != null ? organGestorRepository.findOne(
+								filtre.getOrganGestorId()) : null,
+						Utils.getNullIfEmpty(candidateMetaExpIds),
+						filtre.getRevisioEstat() == null,
+						filtre.getRevisioEstat(),
+						paginacioHelper.toSpringDataPageable(paginacioParams)),
+				MetaExpedientDto.class,
+				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
+					@Override
+					public MetaExpedientDto convert(MetaExpedientEntity source) {
+						return metaExpedientHelper.toMetaExpedientDto(source);
+					}
+				});
+		
 	}
 
 	@Transactional(readOnly = true)
@@ -1455,15 +1424,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		}
 	}
 
-	private void omplirMetaDocumentsPerMetaExpedient(MetaExpedientEntity metaExpedient, MetaExpedientDto dto) {
-		List<MetaDocumentEntity> metaDocumentsDelMetaExpedient = metaDocumentRepository.findByMetaExpedient(
-				metaExpedient);
-		List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
-		for (MetaDocumentEntity metaDocument : metaDocumentsDelMetaExpedient) {
-			metaDocuments.add(conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class));
-		}
-		dto.setMetaDocuments(metaDocuments);
-	}
+
 
 
 

@@ -576,13 +576,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getOrganGestorId(),
 					null,
 					command.getAny(),
-					null,
 					command.getNom(),
 					null,
 					false,
-					command.getGrupId(), 
+					command.getGrupId(),
 					RolHelper.getRolActual(request), 
-					null,
+					null, 
 					null);
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
@@ -1200,6 +1199,26 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						ex);
 				return "expedientTancarForm";
 			}
+			throw ex;			
+		}
+	}
+	
+	@RequestMapping(value = "/{expedientId}/reobrir", method = RequestMethod.GET)
+	public String expedientReobrirGet(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			expedientService.reobrir(
+					entitatActual.getId(),
+					expedientId);
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../contingut/" + expedientId,
+					"expedient.controller.reobrir.ok");
+		} catch (Exception ex) {
+			logger.error("Error al reobrir expedient amb id=" + expedientId, ex);
 			throw ex;			
 		}
 	}

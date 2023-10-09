@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.fundaciobit.genapp.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +78,8 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 				return null;
 			}
 			
+		} else if (response != null && response.getStatus().equals("400") && Utils.isEmpty(response.getResultado()) && es.caib.ripea.core.api.utils.Utils.equals(response.getMensaje(), "La petición recibida es incorrecta(parametro: filtro // Tipo esperado: filtro)")) {
+			return null;
 		} else {
 			throw new SistemaExternException(
 					"No s'han pogut consultar el procediment de ROLSAC (" +
@@ -181,7 +184,7 @@ public class ProcedimentPluginRolsac extends RipeaAbstractPluginProperties imple
 				post(ClientResponse.class, body);
 		String json = response.getEntity(String.class);
 		
-		logger.debug("Response find procediment rolsac: " + json);
+		System.out.println("Response find procediment rolsac: " + json);
 		return mapper.readValue(
 				json,
 				TypeFactory.defaultInstance().constructType(ProcedimientosResponse.class));
