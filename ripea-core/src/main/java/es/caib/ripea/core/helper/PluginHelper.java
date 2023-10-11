@@ -4099,7 +4099,7 @@ public class PluginHelper {
 		try {
 			Class<?> clazz = Class.forName(pluginClass);
 			plugin = (DigitalitzacioPlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
-					.newInstance(ConfigDto.prefix + ".", configHelper.getAllPropertiesEntitatOrGeneral(entitatCodi));
+					.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("DIGITALITZACIO", entitatCodi));
 			digitalitzacioPlugins.put(entitatCodi, plugin);
 			return plugin;
 		} catch (Exception ex) {

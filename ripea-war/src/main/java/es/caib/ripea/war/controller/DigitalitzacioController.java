@@ -11,6 +11,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +116,11 @@ public class DigitalitzacioController extends BaseUserController {
 				idTransaccio,
 				returnScannedFile,
 				returnSignedFile);
+		
+		boolean debug = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.digitalitzacio.log", false);
+		if (debug) {
+			logger.info("Recuperar resultat scan: " + ToStringBuilder.reflectionToString(resposta));
+		}
 		
 		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
