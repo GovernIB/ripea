@@ -83,6 +83,8 @@ public class DocumentDto extends NodeDto {
 	private boolean arxiuEstatDefinitiu;
 	private boolean documentDeAnotacio;
 	
+	private Integer resolucion;
+	private String idioma;
 	
 	public String getFitxerExtension() {
 		if (fitxerNom != null) {

@@ -268,6 +268,14 @@ public class DigitalitzacioPluginDigitalIB extends RipeaAbstractPluginProperties
 					resposta.setEniTipoFirma(result.getSignedFileInfo().getEniTipoFirma());
 					logger.debug(errorMsg);
 				}
+				
+				if (result.getScannedFileInfo() != null) {
+					resposta.setIdioma(result.getScannedFileInfo().getDocumentLanguage());
+					resposta.setResolucion(result.getScannedFileInfo().getPppResolution());
+					
+				}
+				
+				
 			}
 				break;
 			default: {

@@ -196,6 +196,10 @@ public class DocumentEntity extends NodeEntity {
 	protected boolean errorDarreraNotificacio;
 	@Transient
 	protected boolean errorEnviamentPortafirmes;
+	@Transient
+	private Integer resolucion;
+	@Transient
+	private String idioma;
 	
 	public Long getPareId() {
 		return pare.getId();

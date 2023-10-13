@@ -587,12 +587,14 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			//Amb firma?
 			if (returnSignedFile) {
 				command.setAmbFirma(true);
-				if (!resultat.getEniTipoFirma().equals("TF02") && !resultat.getEniTipoFirma().equals("TF04")) {
+				if (!resultat.getEniTipoFirma().equals("TF04")) {
 					command.setTipusFirma(DocumentTipusFirmaEnumDto.ADJUNT);
 				} else {
 					command.setTipusFirma(DocumentTipusFirmaEnumDto.SEPARAT);
 				}
 			}
+			command.setIdioma(resultat.getIdioma());
+			command.setResolucion(resultat.getResolucion());
 
             FitxerTemporalHelper.guardarFitxersAdjuntsSessio(
                     request,

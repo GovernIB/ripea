@@ -151,6 +151,9 @@ public class DocumentHelper {
 				documentFirmaTipus, 
 				expedient.getEstatAdditional());
 		
+		entity.setIdioma(document.getIdioma());
+		entity.setResolucion(document.getResolucion());
+		
 		FitxerDto fitxer = new FitxerDto(
 				document.getFitxerNom(),
 				document.getFitxerContentType(),

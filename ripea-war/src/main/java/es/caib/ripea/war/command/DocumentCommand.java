@@ -68,6 +68,8 @@ public class DocumentCommand extends ContenidorCommand {
 	@NotNull(groups = {CreateFirmaSeparada.class, UpdateFirmaSeparada.class})
 	private DocumentTipusFirmaEnumDto tipusFirma = DocumentTipusFirmaEnumDto.ADJUNT;
 	private String escanejatTempId;
+	private Integer resolucion;
+	private String idioma;
 	/*@NotNull(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
 	private Date dataCaptura;
 	@NotEmpty(groups = {CreateDigital.class, CreateFisic.class, UpdateDigital.class, UpdateFisic.class})
@@ -291,6 +293,8 @@ public class DocumentCommand extends ContenidorCommand {
 			metaDocument.setId(command.getMetaNodeId());
 			dto.setMetaNode(metaDocument);
 		}
+		dto.setIdioma(command.getIdioma());
+		dto.setResolucion(command.getResolucion());
 		return dto;
 	}
 
@@ -360,6 +364,22 @@ public class DocumentCommand extends ContenidorCommand {
 	}
 	public void setArxiuEstat(ArxiuEstatEnumDto arxiuEstat) {
 		this.arxiuEstat = arxiuEstat;
+	}
+
+	public Integer getResolucion() {
+		return resolucion;
+	}
+
+	public void setResolucion(Integer resolucion) {
+		this.resolucion = resolucion;
+	}
+
+	public String getIdioma() {
+		return idioma;
+	}
+
+	public void setIdioma(String idioma) {
+		this.idioma = idioma;
 	}
 
 	

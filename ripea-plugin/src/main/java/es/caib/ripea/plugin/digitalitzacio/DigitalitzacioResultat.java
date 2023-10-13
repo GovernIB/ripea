@@ -1,5 +1,10 @@
 package es.caib.ripea.plugin.digitalitzacio;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class DigitalitzacioResultat {
 
 	private boolean error;
@@ -9,49 +14,8 @@ public class DigitalitzacioResultat {
 	private String nomDocument;
 	private String mimeType;
 	private String eniTipoFirma;
-	
-	public boolean isError() {
-		return error;
-	}
-	public void setError(boolean error) {
-		this.error = error;
-	}
-	public String getErrorDescripcio() {
-		return errorDescripcio;
-	}
-	public void setErrorDescripcio(String errorDescripcio) {
-		this.errorDescripcio = errorDescripcio;
-	}
-	public byte[] getContingut() {
-		return contingut;
-	}
-	public void setContingut(byte[] contingut) {
-		this.contingut = contingut;
-	}
-	public DigitalitzacioEstat getEstat() {
-		return estat;
-	}
-	public void setEstat(DigitalitzacioEstat estat) {
-		this.estat = estat;
-	}
-	public String getNomDocument() {
-		return nomDocument;
-	}
-	public void setNomDocument(String nomDocument) {
-		this.nomDocument = nomDocument;
-	}
-	public String getMimeType() {
-		return mimeType;
-	}
-	public void setMimeType(String mimeType) {
-		this.mimeType = mimeType;
-	}
-	public String getEniTipoFirma() {
-		return eniTipoFirma;
-	}
-	public void setEniTipoFirma(String eniTipoFirma) {
-		this.eniTipoFirma = eniTipoFirma;
-	}
+	private Integer resolucion;
+	private String idioma;
 	
 	
 }

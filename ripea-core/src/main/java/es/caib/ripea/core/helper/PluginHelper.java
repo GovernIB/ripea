@@ -2140,6 +2140,8 @@ public class PluginHelper {
 				resultatDto.setNomDocument(resultat.getNomDocument());
 				resultatDto.setMimeType(resultat.getMimeType());
 				resultatDto.setEniTipoFirma(resultat.getEniTipoFirma());
+				resultatDto.setIdioma(resultat.getIdioma());
+				resultatDto.setResolucion(resultat.getResolucion());
 			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
@@ -3511,7 +3513,8 @@ public class PluginHelper {
 						documentEntity,
 						fitxer,
 						documentFirmaTipus, 
-						firmes, arxiuEstat));
+						firmes, 
+						arxiuEstat));
 		
 		return documentArxiu;
 
@@ -3554,6 +3557,26 @@ public class PluginHelper {
 			}
 		}
 		metadadesAddicionals.put("eni:descripcion", documentEntity.getDescripcio());
+		if (documentEntity.getIdioma() != null) {
+			metadadesAddicionals.put("eni:idioma", documentEntity.getIdioma());
+		}
+		if (documentEntity.getResolucion() != null) {
+			metadadesAddicionals.put("eni:resolucion", documentEntity.getResolucion());
+		}
+		
+		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
+			if (firmes != null) {
+				ArxiuFirmaDto primeraFirma = firmes.get(0);
+				if (primeraFirma.getContingut() != null) {
+					metadadesAddicionals.put("eni:tamano_logico", primeraFirma.getContingut().length);
+				}
+			}
+		} else {
+			if (fitxer != null && fitxer.getContingut() != null) {
+				metadadesAddicionals.put("eni:tamano_logico", fitxer.getContingut().length);
+			}
+		}
+		
 		metadades.setMetadadesAddicionals(metadadesAddicionals);
 		
 		return metadades;
