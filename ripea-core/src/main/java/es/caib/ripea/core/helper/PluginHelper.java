@@ -31,6 +31,8 @@ import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -1867,11 +1869,16 @@ public class PluginHelper {
 			}
 		}
 		try {
+			String remitent = "Aplicació RIPEA";
+			UsuariDto usuari = aplicacioService.getUsuariActual();
+			if (usuari != null) {
+				remitent += " - Gestor: " + usuari.getNom();
+			}
 			String portafirmesEnviamentId = getPortafirmesPlugin().upload(
 					portafirmesDocument,
 					documentTipus,
 					motiu,
-					"Aplicació RIPEA",
+					remitent,
 					prioritat,
 					null,
 					flux,
