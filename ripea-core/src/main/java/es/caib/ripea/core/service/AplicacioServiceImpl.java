@@ -377,6 +377,23 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 		return dto;
 	}
+	
+	@Override
+	public boolean doesCurrentUserHasRol(
+			String rolToCheck) {
+
+		boolean hasRol = false;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<String> rols = cacheHelper.findRolsAmbCodi(auth.getName());
+		if (rols != null) {
+			for (String rol : rols) {
+				if (rol.equals(rolToCheck)) {
+					hasRol = true;
+				}
+			}
+		}
+		return hasRol;
+	}
 
 	private String getIdiomaPerDefecte() {
 		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");

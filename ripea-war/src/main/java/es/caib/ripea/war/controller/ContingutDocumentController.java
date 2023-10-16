@@ -212,6 +212,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);
 		}
+		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
 		
 		return "contingutDocumentForm";
 	}

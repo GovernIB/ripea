@@ -253,46 +253,51 @@ $(document).ready(function() {
 	
 	//Recuperar perfils disponibles en cas de no definir un per defecte
 	$('.start-scan-btn').on('click', function(){
-		
-		$('#escaneig').find('.alert').remove();
-		$('.start-scan-btn').hide();
-		$("body").addClass("loading");
-		
-		$.ajax({
-			type: 'GET',
-			url: "<c:url value='/digitalitzacio/perfils'/>",
-			success: function(perfils) {
 
-				if (perfils[0].codi=='SERVER_ERROR') {
-					$('#escaneig').empty();
-					$('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>'+perfils[0].descripcio+'</div></div>');
-				} else {
-					for ( var i in perfils) {
-						$('.scan-profile').append('<span class="btn btn-lg btn-block btn-default" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
-						$('.scan-profile').append('</br>');
-					}
-					
-					if (perfils.length==1) {
-						$('#'+perfils[0].codi).click();
+		let isFuncionariHabilitatDigitalib = ${isFuncionariHabilitatDigitalib};
+		
+		if (isFuncionariHabilitatDigitalib) {
+			$('#escaneig').find('.alert').remove();
+			$('.start-scan-btn').hide();
+			$("body").addClass("loading");
+			
+			$.ajax({
+				type: 'GET',
+				url: "<c:url value='/digitalitzacio/perfils'/>",
+				success: function(perfils) {
+
+					if (perfils[0].codi=='SERVER_ERROR') {
+						$('#escaneig').empty();
+						$('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>'+perfils[0].descripcio+'</div></div>');
 					} else {
-						removeLoading();
-						$('.scan-profile').show();
-						$('.scan-back-btn').removeClass('hidden');
-						webutilModalAdjustHeight();
+						for ( var i in perfils) {
+							$('.scan-profile').append('<span class="btn btn-lg btn-block btn-default" id="' + perfils[i].codi + '"><small>' + perfils[i].nom + '</small></span>');
+							$('.scan-profile').append('</br>');
+						}
+						
+						if (perfils.length==1) {
+							$('#'+perfils[0].codi).click();
+						} else {
+							removeLoading();
+							$('.scan-profile').show();
+							$('.scan-back-btn').removeClass('hidden');
+							webutilModalAdjustHeight();
+						}
 					}
-					
-
+				},
+				error: function(err) {
+					console.log("Error tancant la transacció");
+				},
+				complete: function() {
+					localStorage.removeItem('transaccioId');
 				}
-
-			},
-			error: function(err) {
-				console.log("Error tancant la transacció");
-			},
-			complete: function() {
-				localStorage.removeItem('transaccioId');
-			}
-		});
+			});	
+		} else {
+			$('#escaneig').empty();
+			$('#escaneig').append('<div id="contingut-missatges"><div class="alert alert-warning"><spring:message code="contingut.document.scanner.no.access"/></div></div>');
+		}
 	});
+	
 	
 	//Iniciar procés digitalització després de triar perfil
 	$(document).on('click', '.scan-profile', function(){

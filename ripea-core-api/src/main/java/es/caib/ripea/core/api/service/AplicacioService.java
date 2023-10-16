@@ -227,4 +227,8 @@ public interface AplicacioService {
 			String entitatCodi,
 			String organCodi);
 
+	@PreAuthorize("hasRole('tothom')")
+	public boolean doesCurrentUserHasRol(
+			String rol);
+
 }

@@ -266,5 +266,11 @@ public class AplicacioServiceBean implements AplicacioService {
 				organCodi);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean doesCurrentUserHasRol(String rol) {
+		return delegate.doesCurrentUserHasRol(rol);
+	}
+
 
 }
