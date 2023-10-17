@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,11 +24,14 @@ import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.SeguimentService;
-import es.caib.ripea.war.command.SeguimentFiltreCommand;
+import es.caib.ripea.plugin.notificacio.EnviamentEstat;
+import es.caib.ripea.war.command.SeguimentNotificacionsFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -53,6 +55,7 @@ public class SeguimentNotificacionsController extends BaseAdminController {
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
     	
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(getFiltreCommand(request));
 		
 		model.addAttribute(
@@ -61,13 +64,27 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 						request,
 						getSessionAttributeSelecio(request)));
     	
+		model.addAttribute(
+				"metaExpedients",
+				metaExpedientService.findActius(
+						entitatActual.getId(),
+						null,
+						RolHelper.getRolActual(request),
+						false,
+						null));
+		
+		model.addAttribute("notificacioEnviamentEstats",
+				EnumHelper.getOptionsForEnum(EnviamentEstat.class,
+						"notificacio.enviamentEstat.enum."));
+		
+		
         return "seguimentNotificacionsList";
     }
     
 	@RequestMapping(value = "/filtrar", method = RequestMethod.POST)
 	public String post(
 			HttpServletRequest request,
-			@Valid SeguimentFiltreCommand filtreCommand,
+			SeguimentNotificacionsFiltreCommand filtreCommand,
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
@@ -91,21 +108,21 @@ public class SeguimentNotificacionsController extends BaseAdminController {
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
     public DatatablesResponse datatable(HttpServletRequest request) {
-        PaginaDto<SeguimentDto> docsPortafirmes = new PaginaDto<SeguimentDto>();
+        PaginaDto<SeguimentDto> notificacions = new PaginaDto<SeguimentDto>();
 
             EntitatDto entitat = getEntitatActualComprovantPermisos(request);
             
-            SeguimentFiltreCommand filtreCommand = getFiltreCommand(request);
+            SeguimentNotificacionsFiltreCommand filtreCommand = getFiltreCommand(request);
 
-            docsPortafirmes = seguimentService.findNotificacionsEnviaments(
+            notificacions = seguimentService.findNotificacionsEnviaments(
 					entitat.getId(),
-					SeguimentFiltreCommand.asDto(filtreCommand),
+					SeguimentNotificacionsFiltreCommand.asDto(filtreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request), 
 					ResultEnumDto.PAGE).getPagina();
             
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				docsPortafirmes,
+				notificacions,
 				"id",
 				getSessionAttributeSelecio(request));
     }
@@ -140,7 +157,7 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 			seleccio.addAll(
 		            seguimentService.findNotificacionsEnviaments(
 		            		getEntitatActualComprovantPermisos(request).getId(),
-							SeguimentFiltreCommand.asDto(getFiltreCommand(request)),
+							SeguimentNotificacionsFiltreCommand.asDto(getFiltreCommand(request)),
 							null, 
 							ResultEnumDto.IDS).getIds());
 		}
@@ -241,13 +258,13 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 
 
 	
-	private SeguimentFiltreCommand getFiltreCommand(
+	private SeguimentNotificacionsFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
-		SeguimentFiltreCommand filtreCommand = (SeguimentFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+		SeguimentNotificacionsFiltreCommand filtreCommand = (SeguimentNotificacionsFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
-			filtreCommand = new SeguimentFiltreCommand();
+			filtreCommand = new SeguimentNotificacionsFiltreCommand();
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

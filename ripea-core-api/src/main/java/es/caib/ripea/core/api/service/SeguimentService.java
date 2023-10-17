@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentNotificacionsFiltreDto;
 
 
 public interface SeguimentService {
@@ -27,7 +28,7 @@ public interface SeguimentService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
-			SeguimentFiltreDto filtre,
+			SeguimentNotificacionsFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			ResultEnumDto resultEnum);
 

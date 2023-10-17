@@ -30,7 +30,6 @@ public class SeguimentFiltreCommand {
 	private Date dataInici;
 	private Date dataFinal;
 	private DocumentEnviamentEstatEnumDto portafirmesEstat;
-	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	private TascaEstatEnumDto tascaEstat;
 	private String responsableCodi;
 	private Long metaExpedientTascaId;
@@ -63,9 +62,6 @@ public class SeguimentFiltreCommand {
 	}
 	public void setPortafirmesEstat(DocumentEnviamentEstatEnumDto portafirmesEstat) {
 		this.portafirmesEstat = portafirmesEstat;
-	}
-	public void setNotificacioEstat(DocumentNotificacioEstatEnumDto notificacioEstat) {
-		this.notificacioEstat = notificacioEstat;
 	}
 	public void setTascaEstat(TascaEstatEnumDto tascaEstat) {
 		this.tascaEstat = tascaEstat;

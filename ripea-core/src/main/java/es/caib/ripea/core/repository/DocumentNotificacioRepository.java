@@ -79,27 +79,55 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"			n.document = :document) ")
 	Boolean findErrorLastNotificacioByDocument(@Param("document") DocumentEntity document);
 	
-	@Query(	"from " +
+	
+	@Query("select " +
+			"	dn " +
+			"from " +
 			"    DocumentNotificacioEntity dn " +
+			"    left join dn.documentEnviamentInteressats envInt " +
 			"where " +
 			"    (dn.document.entitat = :entitat) " +
-			"and (:esNullExpedientNom = true or lower(dn.expedient.nom) like lower('%'||:expedientNom||'%')) " +
+			"and (:esNullExpedientId = true or dn.expedient.id = :expedientId) " +
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
-			"and (:esNullEstatEnviament = true or dn.notificacioEstat = :estatEnviament) ")
+			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " + 
+			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " + 			
+			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " + 
+			"and (:esNullConcepte = true or lower(dn.assumpte) like lower('%'||:concepte||'%'))" +
+			"and (:esNullInteressat = true " +
+			"		or  envInt.interessat.esRepresentant = false " +
+			"				and (lower(envInt.interessat.documentNum||' '||envInt.interessat.nom||' '||envInt.interessat.llinatge1||' '||envInt.interessat.llinatge2) like lower('%'||:interessat||'%')" +
+			"					or lower(envInt.interessat.raoSocial) like lower('%'||:interessat||'%')" +
+			"					or lower(envInt.interessat.organNom) like lower('%'||:interessat||'%'))) " +
+			"and (:esNullOrganId = true or dn.expedient.organGestor.id = :organId) " +
+			"and (:esNullProcedimentId = true or dn.expedient.metaExpedient.id = :procedimentId) " + 
+			"and (:nomesAmbError = false or dn.error = true) ")
 	public Page<DocumentNotificacioEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullExpedientNom") boolean esNullExpedientNom,
-			@Param("expedientNom") String expedientNom,
+			@Param("esNullExpedientId") boolean esNullExpedientId,
+			@Param("expedientId") Long expedientId,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,
 			@Param("documentNom") String documentNom,
 			@Param("esNullDataEnviamentInici") boolean esNullDataEnviamentInici,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
 			@Param("esNullDataEnviamentFinal") boolean esNullDataEnviamentFinal,
 			@Param("dataEnviamentFinal") Date dataEnviamentFinal,
+			@Param("esNullEstatNotificacio") boolean esNullEstatNotificacio,
+			@Param("estatNotificacio") DocumentNotificacioEstatEnumDto estatNotificacio,
 			@Param("esNullEstatEnviament") boolean esNullEstatEnviament,
-			@Param("estatEnviament") DocumentNotificacioEstatEnumDto estatEnviament,
+			@Param("estatEnviament") String estatEnviament,
+			@Param("esNullEnviamentTipus") boolean esNullEnviamentTipus,
+			@Param("enviamentTipus") DocumentNotificacioTipusEnumDto enviamentTipus,
+			@Param("esNullConcepte") boolean esNullConcepte,
+			@Param("concepte") String concepte,
+			@Param("esNullInteressat") boolean esNullInteressat,
+			@Param("interessat") String interessat,
+			@Param("esNullOrganId") boolean esNullOrganId,
+			@Param("organId") Long organId,
+			@Param("esNullProcedimentId") boolean esNullProcedimentId,
+			@Param("procedimentId") Long procedimentId,		
+			@Param("nomesAmbError") boolean nomesAmbError,
 			Pageable paginacio);
 	
 	
@@ -107,23 +135,47 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"	dn.id " +
 			"from " +
 			"    DocumentNotificacioEntity dn " +
+			"    left join dn.documentEnviamentInteressats envInt " +
 			"where " +
 			"    (dn.document.entitat = :entitat) " +
-			"and (:esNullExpedientNom = true or lower(dn.expedient.nom) like lower('%'||:expedientNom||'%')) " +
+			"and (:esNullExpedientId = true or dn.expedient.id = :expedientId) " +
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
 			"and (:esNullDataEnviamentFinal = true or dn.createdDate <= :dataEnviamentFinal) " +
-			"and (:esNullEstatEnviament = true or dn.notificacioEstat = :estatEnviament) ")
+			"and (:esNullEstatNotificacio = true or dn.notificacioEstat = :estatNotificacio) " + 
+			"and (:esNullEstatEnviament = true or envInt.enviamentDatatEstat = :estatEnviament) " + 			
+			"and (:esNullEnviamentTipus = true or dn.tipus = :enviamentTipus) " + 
+			"and (:esNullConcepte = true or lower(dn.assumpte) like lower('%'||:concepte||'%'))" +
+			"and (:esNullInteressat = true " +
+			"		or  envInt.interessat.esRepresentant = false " +
+			"				and (lower(envInt.interessat.documentNum||' '||envInt.interessat.nom||' '||envInt.interessat.llinatge1||' '||envInt.interessat.llinatge2) like lower('%'||:interessat||'%')" +
+			"					or lower(envInt.interessat.raoSocial) like lower('%'||:interessat||'%')" +
+			"					or lower(envInt.interessat.organNom) like lower('%'||:interessat||'%'))) " +
+			"and (:esNullOrganId = true or dn.expedient.organGestor.id = :organId) " +
+			"and (:esNullProcedimentId = true or dn.expedient.metaExpedient.id = :procedimentId) ")
 	public List<Long> findIdsAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("esNullExpedientNom") boolean esNullExpedientNom,
-			@Param("expedientNom") String expedientNom,
+			@Param("esNullExpedientId") boolean esNullExpedientId,
+			@Param("expedientId") Long expedientId,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,
 			@Param("documentNom") String documentNom,
 			@Param("esNullDataEnviamentInici") boolean esNullDataEnviamentInici,
 			@Param("dataEnviamentInici") Date dataEnviamentInici,
 			@Param("esNullDataEnviamentFinal") boolean esNullDataEnviamentFinal,
 			@Param("dataEnviamentFinal") Date dataEnviamentFinal,
+			@Param("esNullEstatNotificacio") boolean esNullEstatNotificacio,
+			@Param("estatNotificacio") DocumentNotificacioEstatEnumDto estatNotificacio,
 			@Param("esNullEstatEnviament") boolean esNullEstatEnviament,
-			@Param("estatEnviament") DocumentNotificacioEstatEnumDto estatEnviament);
+			@Param("estatEnviament") String estatEnviament,
+			@Param("esNullEnviamentTipus") boolean esNullEnviamentTipus,
+			@Param("enviamentTipus") DocumentNotificacioTipusEnumDto enviamentTipus,
+			@Param("esNullConcepte") boolean esNullConcepte,
+			@Param("concepte") String concepte,
+			@Param("esNullInteressat") boolean esNullInteressat,
+			@Param("interessat") String interessat,
+			@Param("esNullOrganId") boolean esNullOrganId,
+			@Param("organId") Long organId,
+			@Param("esNullProcedimentId") boolean esNullProcedimentId,
+			@Param("procedimentId") Long procedimentId);
+
 }

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -27,7 +29,9 @@ import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentNotificacionsFiltreDto;
 import es.caib.ripea.core.api.service.SeguimentService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
@@ -129,13 +133,56 @@ public class SeguimentServiceImpl implements SeguimentService {
 	@Transactional(readOnly = true)
 	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
-			SeguimentFiltreDto filtre, 
+			SeguimentNotificacionsFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams, 
 			ResultEnumDto resultEnum) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		
 		ResultDto<SeguimentDto> result = new ResultDto<SeguimentDto>();
+		
+		DocumentNotificacioTipusEnumDto tipus = null;
+		if (filtre.getEnviamentTipus() != null) {
+			switch (filtre.getEnviamentTipus()) {
+			case NOTIFICACIO:
+				tipus = DocumentNotificacioTipusEnumDto.NOTIFICACIO;
+				break;
+			case COMUNICACIO:
+				tipus = DocumentNotificacioTipusEnumDto.COMUNICACIO;
+				break;
+			}
+		}
+		
+		DocumentNotificacioEstatEnumDto estatNotificacio = null;
+		String estatEnviament = null;
+		if (filtre.getNotificacioEstat() != null) {
+			switch (filtre.getNotificacioEstat()) {
+			case PENDENT:
+				estatNotificacio = DocumentNotificacioEstatEnumDto.PENDENT;
+				break;
+			case ENVIADA:
+				estatNotificacio = DocumentNotificacioEstatEnumDto.ENVIADA;
+				break;
+			case REGISTRADA:
+				estatNotificacio = DocumentNotificacioEstatEnumDto.REGISTRADA;
+				break;				
+			case FINALITZADA:
+				estatNotificacio = DocumentNotificacioEstatEnumDto.FINALITZADA;
+				break;
+			case PROCESSADA:
+				estatNotificacio = DocumentNotificacioEstatEnumDto.PROCESSADA;
+				break;
+			case NOTIFICADA:
+				estatEnviament = "NOTIFICADA";
+				break;
+			case REBUTJADA:
+				estatEnviament = "REBUTJADA";
+				break;
+			case ENVIADA_SIR:
+				estatEnviament = "ENVIAT_SIR";
+				break;
+			}
+		}
 
 		if (resultEnum == ResultEnumDto.PAGE) {
 			
@@ -148,19 +195,31 @@ public class SeguimentServiceImpl implements SeguimentService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
 					entitat,
-					filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
-					filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
-					filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
-					filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
-					filtre.getDataEnviamentInici() == null, 
-					filtre.getDataEnviamentInici(), 
-					filtre.getDataEnviamentFinal() == null, 
-					DateHelper.toDateFinalDia(filtre.getDataEnviamentFinal()), 
-					filtre.getNotificacioEstat() == null, 
-					filtre.getNotificacioEstat(), 
+					filtre.getExpedientId() == null,
+					filtre.getExpedientId(),
+					Utils.isEmpty(filtre.getDocumentNom()),
+					filtre.getDocumentNom(),
+					filtre.getDataInici() == null, 
+					filtre.getDataInici(), 
+					filtre.getDataFinal() == null, 
+					DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+					estatNotificacio == null, 
+					estatNotificacio, 
+					estatEnviament == null, 
+					estatEnviament, 					
+					tipus == null,
+					tipus,
+					filtre.getConcepte() == null,
+					filtre.getConcepte(),
+					filtre.getInteressat() == null,
+					filtre.getInteressat(),
+					filtre.getOrganId() == null,
+					filtre.getOrganId(),
+					filtre.getProcedimentId() == null,
+					filtre.getProcedimentId(),	
+					filtre.isNomesAmbError(),
 					paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 			
-	
 	
 			PaginaDto<SeguimentDto> paginaDto = paginacioHelper.toPaginaDto(
 					docsEnvs,
@@ -171,16 +230,28 @@ public class SeguimentServiceImpl implements SeguimentService {
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> idsDocsEnvs = documentNotificacioRepository.findIdsAmbFiltrePaginat(
 					entitat,
-					filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
-					filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
-					filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
-					filtre.getDocumentNom() != null ? filtre.getDocumentNom().trim() : "",
-					filtre.getDataEnviamentInici() == null, 
-					filtre.getDataEnviamentInici(), 
-					filtre.getDataEnviamentFinal() == null, 
-					DateHelper.toDateFinalDia(filtre.getDataEnviamentFinal()), 
-					filtre.getNotificacioEstat() == null, 
-					filtre.getNotificacioEstat());			
+					filtre.getExpedientId() == null,
+					filtre.getExpedientId(),
+					Utils.isEmpty(filtre.getDocumentNom()),
+					filtre.getDocumentNom(),
+					filtre.getDataInici() == null, 
+					filtre.getDataInici(), 
+					filtre.getDataFinal() == null, 
+					DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+					estatNotificacio == null, 
+					estatNotificacio, 
+					estatEnviament == null, 
+					estatEnviament, 					
+					tipus == null,
+					tipus,
+					filtre.getConcepte() == null,
+					filtre.getConcepte(),
+					filtre.getInteressat() == null,
+					filtre.getInteressat(),
+					filtre.getOrganId() == null,
+					filtre.getOrganId(),
+					filtre.getProcedimentId() == null,
+					filtre.getProcedimentId());			
 			
 			result.setIds(idsDocsEnvs);
 		}

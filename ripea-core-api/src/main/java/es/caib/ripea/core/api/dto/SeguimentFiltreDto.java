@@ -28,7 +28,6 @@ public class SeguimentFiltreDto implements Serializable {
 	private Date dataInici;
 	private Date dataFinal;
 	private DocumentEnviamentEstatEnumDto portafirmesEstat;
-	private DocumentNotificacioEstatEnumDto notificacioEstat;
 	private TascaEstatEnumDto tascaEstat;
 	private String responsableCodi;
 	private Long metaExpedientTascaId;
