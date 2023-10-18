@@ -540,10 +540,19 @@ function removeLoading() {
 			</c:if>
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
-				<rip:inputSelect name="pinbalServei" textKey="metadocument.form.camp.pinbal.servei" required="true" optionItems="${pinbalServeiEnumOptions}" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="${bloquejarCamps}"/>
+				<rip:inputSelect 
+					name="pinbalServei" 
+					textKey="metadocument.form.camp.pinbal.servei" 
+					required="true" 
+					optionItems="${pinbalServeiEnumOptions}" 
+					optionValueAttribute="value" 
+					optionTextKeyAttribute="text" 
+					disabled="${bloquejarCamps}" 
+					optionMinimumResultsForSearch="0"/>
 				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" maxlength="256" disabled="${bloquejarCamps}" required="true"/>
 				<rip:inputSelect name="pinbalServeiDocsPermesos" textKey="metadocument.form.camp.pinbal.servei.docs.permesos" multiple="true" optionEnum="PinbalServeiDocPermesEnumDto"/>
 				<rip:inputCheckbox name="pinbalUtilitzarCifOrgan" textKey="metadocument.form.camp.pinbal.utilitzar.cif.organ" disabled="${bloquejarCamps}"/>
+				
 			</div>
 		</div>
 		<div id="modal-botons">
