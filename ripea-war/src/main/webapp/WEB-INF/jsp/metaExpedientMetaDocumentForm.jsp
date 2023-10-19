@@ -170,6 +170,8 @@ div.dropdown-menu.loading .rmodal_carrecs {
 }
 </style>	
 <script type="text/javascript">
+
+//################################################## document ready START ##############################################################
 	$(document).ready(function() {
 		if (window.frameElement != null) {
 			let currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
@@ -355,7 +357,9 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				$('#pinbalFinalitat').parent().parent().css('display', 'block');
 				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'block');
 				$('#pinbalUtilitzarCifOrgan').parent().parent().parent().parent().css('display', 'block');
-				
+				<c:if test="${mostrarAvisPermis}">
+					$('#avisPermis').show();
+				</c:if>				
 			} else {
 				$('#pinbalServei').attr('disabled', 'disabled');
 				$('#pinbalServei').parent().parent().css('display', 'none');
@@ -363,10 +367,14 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				$('#pinbalFinalitat').parent().parent().css('display', 'none');
 				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'none');
 				$('#pinbalUtilitzarCifOrgan').parent().parent().parent().parent().css('display', 'none');
+				<c:if test="${mostrarAvisPermis}">
+					$('#avisPermis').hide();
+				</c:if>						
 			}
 		});
 		$("#pinbalActiu").trigger('change');
-	});
+
+	});//################################################## document ready END ##############################################################		
 	
 function toggleCarrecs() {
 	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu');
@@ -540,6 +548,10 @@ function removeLoading() {
 			</c:if>
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
+				<c:if test="${mostrarAvisPermis}">
+					<div id="avisPermis"><div id="contingut-missatges"><div class="alert alert-warning"><spring:message code='metadocument.form.camp.pinbal.avis.permis'/></div></div></div>
+				</c:if>
+				
 				<rip:inputSelect 
 					name="pinbalServei" 
 					textKey="metadocument.form.camp.pinbal.servei" 
