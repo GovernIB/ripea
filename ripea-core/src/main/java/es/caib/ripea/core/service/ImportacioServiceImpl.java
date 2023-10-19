@@ -6,6 +6,7 @@ package es.caib.ripea.core.service;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -26,11 +26,9 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.ImportacioDto;
-import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -39,13 +37,14 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.helper.ArxiuConversions;
+import es.caib.ripea.core.helper.CarpetaHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 
@@ -66,10 +65,6 @@ public class ImportacioServiceImpl implements ImportacioService {
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 	@Autowired
-	private CarpetaService carpetaService;
-	@Autowired
-	private CarpetaRepository carpetaRepository;
-	@Autowired
 	private EntitatRepository entitatRepository;
 	@Autowired
 	private ConfigHelper configHelper;
@@ -77,6 +72,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 	private MetaDocumentRepository metaDocumentRepository;
 	@Autowired
 	private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private CarpetaHelper carpetaHelper;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
 	
@@ -93,9 +92,10 @@ public class ImportacioServiceImpl implements ImportacioService {
 		FitxerDto fitxer = new FitxerDto();
 		int documentsRepetits = 0;
 		boolean usingNumeroRegistre = params.getTipusImportacio().equals(TipusImportEnumDto.NUMERO_REGISTRE);
-		boolean crearNovaCarpeta = params.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA);
 		String numeroRegistre = params.getNumeroRegistre();
+		ExpedientEntity expedientEntity = null;
 		CarpetaEntity carpetaEntity = null;
+		boolean isCarpeta = false;
 		ContingutEntity pareActual = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -117,17 +117,34 @@ public class ImportacioServiceImpl implements ImportacioService {
 		List<Document> documents = new ArrayList<Document>();
 		expedientsWithImportacio = new ArrayList<DocumentDto>();
 		
-		// CREAR NOVA CARPETA SI ÉS EL CAS ON IMPORTAR DOCUMENT
-		if (crearNovaCarpeta) {
-			CarpetaDto carpeta = carpetaService.create(
-					entitatId,
-					expedientSuperior.getId(),
-					params.getCarpetaNom());
-			carpetaEntity = carpetaRepository.findOne(carpeta.getId());
-			carpetaEntity.updateNumeroRegistre(numeroRegistre);
-		} else {
-			pareActual.updateNumeroRegistre(numeroRegistre);
+		// ### CREA O RECUPERA CARPETA/EXPEDIENT DESTÍ
+		Map<String, Long> desti = carpetaHelper.crearEstructuraCarpetes(
+				entitatId, 
+				params.getEstructuraCarpetes(), 
+				expedientSuperior.getId(), 
+				params.getDestiId());
+		
+		Long destiId = null;
+		try {
+			destiId = Long.valueOf(params.getDestiId());
+		} catch (NumberFormatException nfe) {
+			if (!desti.isEmpty())
+				destiId = Long.valueOf(desti.get(params.getDestiId()));
 		}
+		
+		ContingutEntity destiEntity = entityComprovarHelper.comprovarContingut(destiId);
+		
+		if (destiEntity instanceof CarpetaEntity) {
+			carpetaEntity = (CarpetaEntity)destiEntity;
+			carpetaEntity.updateNumeroRegistre(numeroRegistre);
+			isCarpeta = true;
+		} else {
+			expedientEntity = (ExpedientEntity)destiEntity;
+			expedientEntity.updateNumeroRegistre(numeroRegistre);
+			isCarpeta= false;
+		}
+
+		// ###
 		
 		for (ContingutArxiu contingutArxiu : documentsTrobats) {
 			Document documentArxiu = pluginHelper.arxiuDocumentConsultar(
@@ -165,18 +182,18 @@ public class ImportacioServiceImpl implements ImportacioService {
 				nomDocument = documentArxiu.getNom();
 			}
 			contingutHelper.comprovarNomValid(
-					crearNovaCarpeta ? carpetaEntity : expedientSuperior,
+					isCarpeta ? carpetaEntity : expedientEntity,
 					nomDocument,
 					null,
 					DocumentEntity.class);
 			// CREAR DOCUMENT A LA BBDD
-			if (!checkDocumentUniqueContraint(nomDocument, crearNovaCarpeta ? carpetaEntity : pareActual, entitatId)) {
+			if (!checkDocumentUniqueContraint(nomDocument, isCarpeta ? carpetaEntity : expedientEntity, entitatId)) {
 				throw new DocumentAlreadyImportedException();
 			}
 			crearDocumentActualitzarMetadades(
 					nomDocument, 
 					documentArxiu, 
-					crearNovaCarpeta ? carpetaEntity : pareActual,
+					isCarpeta ? carpetaEntity : expedientEntity,
 					pareActual,
 					expedientSuperior,
 					fitxer,

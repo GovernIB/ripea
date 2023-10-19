@@ -13,8 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -177,6 +179,20 @@ public class CarpetaServiceImpl implements CarpetaService {
 		return carpetes;
 	}
 
+	@Transactional(readOnly = true)
+	@Override
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId, 
+				true, 
+				true, 
+				false, 
+				false, 
+				false, 
+				null);
+		return carpetaHelper.obtenirArbreCarpetesPerExpedient(entitatId, expedient);
+	}
+	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {
 		EntitatEntity entitat = entitatId != null ? entitatRepository.getOne(entitatId) : null;
 		return  contingutHelper.checkUniqueContraint(nom, pare, entitat, ContingutTipusEnumDto.CARPETA);

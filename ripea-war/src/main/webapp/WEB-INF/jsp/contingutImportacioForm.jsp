@@ -20,6 +20,8 @@
 	<script src="<c:url value="/webjars/autoNumeric/1.9.30/autoNumeric.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/jquery.maskedinput.min.js"/>"></script>
+	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
+	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
 	<rip:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -29,19 +31,10 @@ $(document).ready(function() {
 	$("#dataPresentacio").mask("99/99/9999 99:99:99",{ 
 		placeholder:"_"
 	});
+	
 	// Amagar codi ENI per defecte
 	$('.tipus-eni').hide();
-	// Amagar nom carpeta nova per defecte
-	$('#carpetaNom').closest('.form-group').hide();
-	// Mostrar/amagar nom carpeta
-	$('input[type=radio][name=destiTipus]').on('change', function() {
-		if ($(this).val() == 'CARPETA_NOVA') {
-			$('#carpetaNom').closest('.form-group').show();
-		} else {
-			$('#carpetaNom').closest('.form-group').hide();
-		}
-		webutilModalAdjustHeight();
-	});
+	
 	// Mostrar/amagar codi ENI
 	$('input[type=radio][name=tipusImportacio]').on('change', function() {
 		if ($(this).val() == 'CODI_ENI') {
@@ -53,9 +46,118 @@ $(document).ready(function() {
 		}
 		webutilModalAdjustHeight();
 	});
-	$('input[type=radio][name=destiTipus][value=${importacioCommand.destiTipus}]').trigger('change');
 	$('input[type=radio][name=tipusImportacio][value=${importacioCommand.tipusImportacio}]').trigger('change');
-})
+		
+	var arbre = $('#arbreCarpetes');
+	
+	arbre.on('show_contextmenu.jstree', function(e, reference, element) {
+	    if ((!reference.node.original) 
+	    		|| (reference.node.original.id != undefined && !isNaN(reference.node.original.id)) ) {
+	        $('.vakata-context li:eq(2), .vakata-context li:eq(3)').remove();
+	    }
+	});
+	
+	console.log('${selectedCarpeta}');
+		
+	<c:if test="${not empty jstreeJson}">
+		arbre.jstree(true).settings.core.data = ${jstreeJson};
+		arbre.jstree(true).refresh();
+		
+		arbre.on("refresh.jstree", function(e) {
+			  arbre.jstree('select_node', ${selectedCarpeta});
+		});
+	</c:if>
+	
+	
+	
+	$('form').on('submit', function(){
+	    // Obtener la carpeta seleccionada en jsTree
+	    var selectedNode = arbre.jstree('get_selected', true)[0]; // Puedes ajustar este selector según tu configuración
+		var json = arbre.data().jstree.get_json()
+		var jsonString = JSON.stringify(json);
+
+		$('#estructuraCarpetesJson').val(jsonString);
+
+		if (selectedNode) {
+	    	$('#destiId').val(selectedNode.id);
+	    }
+	});
+	
+
+	
+});
+
+
+	var novesCarpetes = [];
+
+	function changedCallback(e, data) {
+		var arbre = $('#arbreCarpetes');
+		var json = arbre.data().jstree.get_json()
+		var jsonString = JSON.stringify(json);
+
+		webutilModalAdjustHeight();
+		$('#estructuraCarpetesJson').val(jsonString);
+	}
+
+	function deletedCallback(e, data) {
+		var arbre = $('#arbreCarpetes');
+		var expedientCarpetaId = data.node.id;
+		if (!isNaN(expedientCarpetaId)) {
+			arbre.closest('ul').addClass('positionRelative');
+			arbre.closest('ul').append(
+					"<div class='rmodal'></div></div>");
+			var deleteUrl = '<c:url value="/metaExpedient/'+ expedientCarpetaId + '/deleteCarpeta"/>';
+			$.ajax({
+				type : "GET",
+				url : deleteUrl,
+				success : function(data) {
+					arbre.closest('ul').removeClass(
+							'positionRelative');
+					arbre.next().remove();
+				}
+			});
+		}
+		var json = arbre.data().jstree.get_json()
+		var jsonString = JSON.stringify(json);
+		$('#estructuraCarpetesJson').val(jsonString);
+		webutilModalAdjustHeight();
+
+		if (jsonString === '[]') {
+			if ($(".arbre-emtpy")[0]) {
+				$('.arbre-emtpy').show();
+			} else {
+				$('#carpetes')
+						.find('ul')
+						.append(
+								"<div class='arbre-emtpy'><spring:message code='metaexpedient.form.camp.estructura.arbre.empty'/></div>");
+			}
+		}
+		
+		var selectedNode = $('#destiId').val();
+		if (selectedNode == expedientCarpetaId) {
+	    	$('#destiId').val('');
+	    }
+	}
+	
+	function renamedCallback(e, data) {
+		var arbre = $('#arbreCarpetes');
+		// comprovar si existeix la carpeta
+		var parent = data.node.parent;
+		var childrens = arbre.jstree(true).get_node(parent).children;
+			
+		childrens.forEach(function(child) {
+			var children = arbre.jstree(true).get_node(child);
+			if (childrens.length > 1 && children.text.trim() === data.node.text.trim() && children.id != data.node.id) {
+				alert("<spring:message code='metaexpedient.form.camp.estructura.exists'/>");
+				var childAdded = arbre.jstree(true).get_node(data.node.id);
+				arbre.jstree(true).delete_node(childAdded);
+			}
+		});
+				
+		var json = arbre.data().jstree.get_json()
+		var jsonString = JSON.stringify(json);
+		$('#estructuraCarpetesJson').val(jsonString);
+	}
 </script>
 </head>
 <body>
@@ -70,12 +172,17 @@ $(document).ready(function() {
 		<div class="tipus-eni">
 			<rip:inputText name="codiEni" textKey="contingut.importacio.form.camp.eni" required="true" placeholder="ES _________ ____ ______________________________"/>
 		</div>
+		<%-- 
 		<rip:inputRadio name="destiTipus" textKey="contingut.importacio.form.camp.desti" botons="true" optionItems="${tipusDestiOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
-		<rip:inputText name="carpetaNom" textKey="contingut.importacio.form.camp.carpeta" required="true"/>
+		<rip:inputText name="carpetaNom" textKey="contingut.importacio.form.camp.carpeta" required="true"/> 
+		--%>
+		<rip:arbreMultiple name="estructuraCarpetesJson" id="arbreCarpetes" withlabel="true" textKey="contingut.importacio.form.camp.desti" required="true" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
+		<form:hidden path="destiId"/>
+				
 		<%-- <rip:inputDateTime name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true"/>--%>
 		<br/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.importar"/></button>
+			<button type="submit" class="btn btn-success" id="btnSubmit"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.importar"/></button>
 			<a href="<c:url value="/contingut/${carpetaCommand.pareId}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

@@ -12,7 +12,9 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
 
@@ -69,4 +71,10 @@ public class CarpetaServiceBean implements CarpetaService {
 		return delegate.findByEntitatAndExpedient(entitatId, expedientId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId) {
+		return delegate.findArbreCarpetesExpedient(entitatId, expedientId);
+	}
+	
 }

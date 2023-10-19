@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -91,5 +93,17 @@ public interface CarpetaService {
 	public List<CarpetaDto> findByEntitatAndExpedient(
 			Long entitatId,
 			Long expedientId) throws NotFoundException;
+	
+	/**
+	 * Recupera estructura carpetes d'un expedient
+	 * 
+	 * @param entitatId
+	 * 			Atribut id de l'entitat a la qual pertany el contenidor.
+	 * @param expedientId
+	 * 			Atribut id de l'expedient actual.
+	 * @return
+	 */
+	@PreAuthorize("hasRole('tothom')")
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId);
 
 }

@@ -1,6 +1,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ attribute name="name" required="false"%>
 <%@ attribute name="id" required="true"%>
 <%@ attribute name="arbre" required="true" type="java.lang.Object"%>
 <%@ attribute name="atributId" required="true"%>
@@ -22,28 +24,54 @@
 <%@ attribute name="isOcultarCounts" type="java.lang.Boolean"%>
 <%@ attribute name="isError" type="java.lang.Boolean"%>
 <%@ attribute name="height" required="false" rtexprvalue="true"%>
+<%@ attribute name="withlabel" type="java.lang.Boolean"%>
+<%@ attribute name="required" required="false" rtexprvalue="true"%>
+<%@ attribute name="text" required="false" rtexprvalue="true"%>
+<%@ attribute name="textKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
+
+<c:set var="campPath" value="${name}"/>
+<c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
+<c:set var="campLabelText"><c:choose><c:when test="${not empty textKey}"><spring:message code="${textKey}"/></c:when><c:when test="${not empty text}">${text}</c:when><c:otherwise>${campPath}</c:otherwise></c:choose><c:if test="${required}"> *</c:if></c:set>
+<c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
+<c:set var="campInputSize"><c:choose><c:when test="${not empty inputSize}">${inputSize}</c:when><c:otherwise>${12 - campLabelSize}</c:otherwise></c:choose></c:set>
 
 <c:if test="${empty isArbreSeleccionable and empty isFullesSeleccionable}"><c:set var="isArbreSeleccionable" value="${true}"/><c:set var="isFullesSeleccionable" value="${true}"/></c:if>
 <c:if test="${empty isOcultarCounts}"><c:set var="isOcultarCounts" value="${false}"/></c:if>
 
-<ul class="well" style="width: 100%; overflow: auto;">
-	<c:if test="${empty arbre}">
-		<div class="arbre-emtpy"><spring:message code='metaexpedient.form.camp.estructura.arbre.empty'/></div>
-	</c:if>
-	<div id="${id}">
-		<c:forEach items="${arbre}" var="pare">
-			<c:if test="${not empty pare and not empty pare.arrel}">
-					<c:set var="arrel" value="${pare.arrel}"/>
-					<ul>
-						<li id="${pare.arrel.dades[atributId]}" class="jstree-close" data-jstree='{"icon":"fa fa-folder fa-lg"<c:if test="${not empty seleccionatId and pare.arrel.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
-							${pare.arrel.dades[atributNom]}
-							<rip:arbreFills pare="${pare.arrel}" fills="${pare.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"/>
-						</li>
-					</ul>
-			</c:if>
-		</c:forEach>
+<form:hidden path="${name}"/>
+
+<c:if test="${withlabel}">
+<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>"<c:if test="${multiple}"> data-toggle="multifield"</c:if>>
+<label class="control-label col-xs-${campLabelSize}" for="${campPath}">${campLabelText}</label>
+	<div class="col-xs-${campInputSize}">
+
+</c:if>
+	<ul class="well" style="width: 100%; overflow: auto;">
+		<c:if test="${empty arbre}">
+			<div class="arbre-emtpy"><spring:message code='metaexpedient.form.camp.estructura.arbre.empty'/></div>
+		</c:if>
+		<div id="${id}">
+			<c:forEach items="${arbre}" var="pare">
+				<c:if test="${not empty pare and not empty pare.arrel}">
+						<c:set var="arrel" value="${pare.arrel}"/>
+						<ul>
+							<li id="${pare.arrel.dades[atributId]}" class="jstree-close" data-jstree='{"icon":"fa fa-folder fa-lg"<c:if test="${not empty seleccionatId and pare.arrel.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
+								${pare.arrel.dades[atributNom]}
+								<rip:arbreFills pare="${pare.arrel}" fills="${pare.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"/>
+							</li>
+						</ul>
+				</c:if>
+			</c:forEach>
+		</div>
+	</ul>
+<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
+<c:if test="${withlabel}">
 	</div>
-</ul>
+</div>
+</c:if>
+
 <script>
 	(function ($) {
 		$.jstree.defaults.conditionalselect = function () { return true; };
@@ -111,7 +139,8 @@
 						                        ref.edit(sel);
 						                    }
 										}
-				},
+				}
+			<c:if test="${not empty renamedCallback}">,
 				"rename" : {
 					"separator_before"  : false,
 				    "separator_after"   : false,
@@ -122,7 +151,9 @@
 					                    	obj = inst.get_node(data.reference);
 					                    	inst.edit(obj);
 					                    }
-				},
+				}
+			</c:if>
+			<c:if test="${not empty deletedCallback}">,
                 "Delete": {
                     "label"	: '<spring:message code="metaexpedient.form.camp.estructura.esborrar"/>',
                     "icon" 	: "fa fa-trash",
@@ -134,6 +165,7 @@
 						
                     }
                 }
+			</c:if>
 			}
 		}
 	})
@@ -143,7 +175,7 @@
 		var jsonString = JSON.stringify(json);
 		$('#estructuraCarpetesJson').val(jsonString);
 	})
-	<c:if test="${not empty deletedCallback}">
+	<c:if test="${not empty renamedCallback}">
 	.on('rename_node.jstree', function (e, data) {
 		//console.log('>>> rename.jstree');
 		return ${renamedCallback}(e, data);

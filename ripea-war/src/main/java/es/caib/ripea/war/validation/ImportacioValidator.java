@@ -14,7 +14,6 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.support.RequestContext;
 
-import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.war.command.ImportacioCommand;
 import es.caib.ripea.war.helper.MessageHelper;
@@ -67,14 +66,17 @@ public class ImportacioValidator implements ConstraintValidator<Importacio, Impo
 				valid = false;
 			}
 		}
-		if (command.getDestiTipus().equals(TipusDestiEnumDto.CARPETA_NOVA) && command.getCarpetaNom().isEmpty()) {
+				
+		if (command.getDestiId() == null || command.getDestiId().isEmpty()) {
 			context.buildConstraintViolationWithTemplate(MessageHelper.getInstance().getMessage("NotEmpty", null, new RequestContext(request).getLocale()))
-			.addNode("carpetaNom")
+			.addNode("estructuraCarpetesJson")
 			.addConstraintViolation();
 			valid = false;
 		}
+		
 		if (!valid)
 			context.disableDefaultConstraintViolation();
+		
 		return valid;
 	}
 

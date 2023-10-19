@@ -25,6 +25,13 @@ public class ArbreJsonDto  implements Serializable {
 			this.text = text.trim();
 		}
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		ArbreJsonDto arbre = (ArbreJsonDto)object;
+		return this.getId().equals(arbre.getId());
+	}
+	
 	private static final long serialVersionUID = -1445293078129901997L;
 	
 }

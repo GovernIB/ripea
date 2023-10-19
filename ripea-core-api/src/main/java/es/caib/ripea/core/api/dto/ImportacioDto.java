@@ -1,6 +1,7 @@
 package es.caib.ripea.core.api.dto;
 
 import java.util.Date;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ public class ImportacioDto {
 	private String numeroRegistre;
 	private TipusRegistreEnumDto tipusRegistre;
 	private Date dataPresentacioFormatted;
-	private TipusDestiEnumDto destiTipus;
-	private String carpetaNom;
+	private Set<ArbreJsonDto> estructuraCarpetes;
+	private String destiId;
 	
 }

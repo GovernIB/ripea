@@ -22,13 +22,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.TipusDestiEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.war.command.ImportacioCommand;
@@ -49,6 +51,8 @@ public class ContingutImportacioController extends BaseUserController {
 	private ImportacioService importacioService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private CarpetaService carpetaService;
 	
 	private final Semaphore semafor = new Semaphore(1, true);
 
@@ -66,9 +70,8 @@ public class ContingutImportacioController extends BaseUserController {
 			@PathVariable Long carpetaId,
 			Model model) {
 		ImportacioCommand command = new ImportacioCommand();
-		command.setDestiTipus(TipusDestiEnumDto.CARPETA_ACTUAL);
 		command.setTipusImportacio(TipusImportEnumDto.NUMERO_REGISTRE);
-		emplenarModelImportacio(contingutId, command, model);
+		emplenarModelImportacio(request, contingutId, command, model);
 		return "contingutImportacioForm";
 	}
 
@@ -96,7 +99,7 @@ public class ContingutImportacioController extends BaseUserController {
 		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(contingutId));
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
-			emplenarModelImportacio(contingutId, command, model);
+			emplenarModelImportacio(request, contingutId, command, model);
 			return "contingutImportacioForm";
 		}
 		int documentsRepetits = 0;
@@ -108,7 +111,7 @@ public class ContingutImportacioController extends BaseUserController {
 							ImportacioCommand.asDto(command));
 			}
 		} catch (Exception ex) {
-			emplenarModelImportacio(contingutId, command, model);
+			emplenarModelImportacio(request, contingutId, command, model);
 			// Excepció si d'alguna forma s'intenta importar el document dues vegades al mateix moment
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DocumentAlreadyImportedException.class)) {
 				return getModalControllerReturnValueSuccess(
@@ -146,21 +149,26 @@ public class ContingutImportacioController extends BaseUserController {
 	}
 	
 	private void emplenarModelImportacio(
+			HttpServletRequest request,
 			Long contingutId,
 			ImportacioCommand command, 
 			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		command.setPareId(contingutId);
 		model.addAttribute(command);
+		
+		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
+				entitatActual.getId(),
+				contingutId);
+		model.addAttribute("carpetes", carpetes);
+		model.addAttribute("jstreeJson", command.getEstructuraCarpetesJson());
+		model.addAttribute("selectedCarpeta", command.getDestiId());
+		
 		model.addAttribute(
 				"tipusImportacioOptions",
 				EnumHelper.getOptionsForEnum(
 						TipusImportEnumDto.class,
 						"contingut.importacio.tipus.enum."));
-		model.addAttribute(
-				"tipusDestiOptions",
-				EnumHelper.getOptionsForEnum(
-						TipusDestiEnumDto.class,
-						"contingut.importacio.desti.enum."));
 	}
 
 	private void addWarningDocumentExists(HttpServletRequest request) {

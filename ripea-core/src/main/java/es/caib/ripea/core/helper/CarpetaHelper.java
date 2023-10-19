@@ -3,19 +3,33 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
+import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientCarpetaArbreEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.ExpedientCarpetaArbreRepository;
 
 /**
  * Helper per a convertir les dades de paginació entre el DTO
@@ -44,8 +58,10 @@ public class CarpetaHelper {
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
 	private ContingutLogHelper contingutLogHelper;
-
-
+	@Resource
+	private ExpedientCarpetaArbreRepository expedientCarpetaArbreRepository;
+	@Resource
+	private ExpedientHelper expedientHelper;
 
 	public CarpetaDto create(
 			Long entitatId,
@@ -129,6 +145,143 @@ public class CarpetaHelper {
 			CarpetaEntity carpeta) {
 		return (CarpetaDto) contingutHelper.toContingutDto(
 				carpeta, false, false);
+	}
+	
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> obtenirArbreCarpetesPerExpedient(Long entitatId, ExpedientEntity expedient) {
+		List<ArbreDto<ExpedientCarpetaArbreDto>> expedients = new ArrayList<ArbreDto<ExpedientCarpetaArbreDto>>();
+
+		// Recupera carptes expedient actual
+		List<ExpedientCarpetaArbreDto> carpetesExpedient = findCarpetesExpedient(entitatId, expedient);
+
+		// Afegeix l'expedient com carpeta arrel
+		ExpedientCarpetaArbreDto expedientArbre = new ExpedientCarpetaArbreDto();
+		expedientArbre.setId(expedient.getId());
+		expedientArbre.setNom(expedient.getNom());
+		ArbreDto<ExpedientCarpetaArbreDto> expedientArrel = new ArbreDto<ExpedientCarpetaArbreDto>(true);
+			
+		ArbreNodeDto<ExpedientCarpetaArbreDto> currentArbreNode =  new ArbreNodeDto<ExpedientCarpetaArbreDto>(
+				null,
+				expedientArbre);
+		
+		for (ExpedientCarpetaArbreDto fill: carpetesExpedient) {
+			// recuperar estructura per cada fill recursivament
+			currentArbreNode.addFill(
+					obtenirArbreCarpetesPerMetaExpedient(
+							fill,
+							currentArbreNode));
+		}
+			
+		expedientArrel.setArrel(currentArbreNode);
+		expedients.add(expedientArrel);
+		
+		
+		return expedients;
+	}
+
+	public Map<String, Long> crearEstructuraCarpetes(
+			Long entitatId,
+			Set<ArbreJsonDto> estructuraCarpetes,
+			Long expedientId,
+			String carpetaDestiId) {
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				expedientId,
+				false,
+				false,
+				false,
+				false, false, true, null);
+		Map<String, Long> carpetaNovaId = new HashMap<String, Long>();
+		
+		for (ArbreJsonDto carpeta: estructuraCarpetes) {
+			ContingutEntity pare = null;
+			crearCarpeta(
+					contingut.getEntitat(),
+					carpeta,
+					pare,
+					carpetaDestiId,
+					carpetaNovaId);
+		}
+		
+		return carpetaNovaId;
+	}
+
+	public void crearCarpeta(
+			EntitatEntity entitat,
+			ArbreJsonDto carpeta,
+			ContingutEntity pare,
+			String carpetaDestiId, 
+			Map<String, Long> carpetaNovaId) {
+
+		// crear carpeta actual
+		Long carpetaId = null;
+		String carpetaDestiIdJstree = null;
+		try {
+			carpetaId = Long.valueOf(carpeta.getId());
+		} catch (NumberFormatException nfe) {}
+		
+		if (carpetaId != null) {
+			try {
+				pare = entityComprovarHelper.comprovarCarpeta(
+						entitat,
+						carpetaId);
+			} catch (NotFoundException e) {
+				pare = entityComprovarHelper.comprovarExpedient(
+						entitat.getId(),
+						carpetaId);
+			}
+			
+			
+		} else {
+			carpetaDestiIdJstree = carpeta.getId();
+			CarpetaDto carpetaCreada = create(
+					entitat.getId(), 
+					pare.getId(), 
+					carpeta.getText(), 
+					false,
+					null,
+					false,
+					null, 
+					false, 
+					null, 
+					true);
+			carpetaNovaId.put(carpetaDestiIdJstree, carpetaCreada.getId());
+		}
+		
+		// crear recursivament totes les carpetes
+		if (!carpeta.getChildren().isEmpty()) {
+			for (ArbreJsonDto subcarpeta : carpeta.getChildren()) {
+				crearCarpeta(
+						entitat,
+						subcarpeta, 
+						pare,
+						carpetaDestiId,
+						carpetaNovaId);
+			}
+		}
+	}
+	
+	public ArbreNodeDto<ExpedientCarpetaArbreDto> obtenirArbreCarpetesPerMetaExpedient(
+			ExpedientCarpetaArbreDto metaExpedientCarpetaDto,
+			ArbreNodeDto<ExpedientCarpetaArbreDto> pare) {
+		ArbreNodeDto<ExpedientCarpetaArbreDto> currentArbreNode =  new ArbreNodeDto<ExpedientCarpetaArbreDto>(
+				pare,
+				metaExpedientCarpetaDto);
+		// crear estructura carpetes a partir del pare actual
+		for (ExpedientCarpetaArbreDto fill: metaExpedientCarpetaDto.getFills()) {
+			// recuperar estructura per cada fill recursivament
+			currentArbreNode.addFill(
+					obtenirArbreCarpetesPerMetaExpedient(
+							fill,
+							currentArbreNode));
+		}
+		return currentArbreNode;
+	}
+	
+	private List<ExpedientCarpetaArbreDto> findCarpetesExpedient(Long entitatId, ExpedientEntity expedient) {
+		List<ExpedientCarpetaArbreEntity> expedientCarpetes = expedientCarpetaArbreRepository.findByPare(entitatId, expedient.getId());
+		return conversioTipusHelper.convertirList(
+				expedientCarpetes, 
+				ExpedientCarpetaArbreDto.class);
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(CarpetaHelper.class);
