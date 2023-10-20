@@ -971,7 +971,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			}
 			// if current user has create permissions for this metaexpedient
 			if (hasPermissions) {
-				command.setMetaExpedientId(expedientPeticioDto.getMetaExpedientId());
+				if (command.getMetaExpedientId() == null) {
+					command.setMetaExpedientId(expedientPeticioDto.getMetaExpedientId());
+				}
 				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), expedientPeticioDto.getMetaExpedientId(), rolActual, EntitatHelper.getOrganGestorActualId(request));
 				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
 				if (expedientNumero != null && !expedientNumero.isEmpty()) {
