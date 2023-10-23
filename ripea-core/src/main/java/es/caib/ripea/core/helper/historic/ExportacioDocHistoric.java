@@ -32,7 +32,7 @@ public class ExportacioDocHistoric {
 			HistoricTipusEnumDto tipusAgrupament) throws IOException, XDocReportException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
-		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_entitat_ca.odt");
+		IXDocReport report = getReportInstance("/es/caib/ripea/core/templates/template_historic_entitat_ca.odt");
 		
 		// https://github.com/opensagres/xdocreport/wiki/DocxReportingJavaMainListFieldInTable
 		// 2) Create fields metadata to manage lazy loop (#forech velocity) for table
@@ -71,7 +71,7 @@ public class ExportacioDocHistoric {
 			Map<OrganGestorDto, List<HistoricExpedientDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws XDocReportException, IOException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
-		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_organ_ca.odt");
+		IXDocReport report = getReportInstance("/es/caib/ripea/core/templates/template_historic_organ_ca.odt");
 
 		// 2) Create Java model context
 		IContext context = report.createContext();
@@ -90,7 +90,7 @@ public class ExportacioDocHistoric {
 			Map<String, List<HistoricUsuariDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws XDocReportException, IOException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
-		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_usuaris_ca.odt");
+		IXDocReport report = getReportInstance("/es/caib/ripea/core/templates/template_historic_usuaris_ca.odt");
 
 		// 2) Create Java model context
 		IContext context = report.createContext();
@@ -109,7 +109,7 @@ public class ExportacioDocHistoric {
 			Map<String, List<HistoricInteressatDto>> dades, HistoricTipusEnumDto tipusAgrupament) throws XDocReportException, IOException {
 		// 1) Load ODT file and set Velocity template engine and cache it to the
 		// registry
-		IXDocReport report = getReportInstance("/es/caib/ripea/war/templates/template_historic_interessats_ca.odt");
+		IXDocReport report = getReportInstance("/es/caib/ripea/core/templates/template_historic_interessats_ca.odt");
 
 		// 2) Create Java model context
 		IContext context = report.createContext();
