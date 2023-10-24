@@ -318,7 +318,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				bindingResult.rejectValue("any", "NotNull");
 			}
 		}
-		if (command.getNewExpedientTitol().contains(".")) {
+		if (command.getNewExpedientTitol() != null && command.getNewExpedientTitol().contains(".")) {
 			bindingResult.rejectValue("newExpedientTitol", "ExpedientODocumentNom");
 		}
 		
