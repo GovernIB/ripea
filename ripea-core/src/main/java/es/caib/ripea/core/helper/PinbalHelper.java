@@ -508,6 +508,11 @@ public class PinbalHelper {
 		
 		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacioSia());
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
+		
+		// If there is character: ’ in finalitat field, some of the services (for example: SVDCCAACPASWS01, SVDCCAACPCWS01) return an error:
+		// [0227] S'ha produït un error al intentar generar la resposta a la consulta: Error processant petició síncrona: SoapFault: System Error.|||El servidor ha devuelto un mensaje SOAP Fault. Error al generar la respuesta. BackofficeException: Error processant petició síncrona: SoapFault: System Error
+		// if ’ (UNICODE: U+2019) is replaced by ' (UNICODE: U+0027) the problem doesn't happen
+		finalitat = finalitat.replace("’", "'"); // 
 		solicitud.setFinalidad(finalitat);
 		switch (consentiment) {
 		case LLEI:
