@@ -72,6 +72,10 @@ public class HistoricInteressatSerializer {
 		@XmlElement(name = "registre")
 		public List<RegistreInteressatDiari> registres;
 		
+		public RegistresInteressatDiari() {
+			super();
+		}
+
 		public RegistresInteressatDiari(String interessatDocNum) {
 			this.interessatDocNum = interessatDocNum;
 			this.registres = new ArrayList<>();
@@ -90,6 +94,10 @@ public class HistoricInteressatSerializer {
 		@XmlElement(name = "registre")
 		public List<RegistreInteressatMensual> registres;
 		
+		public RegistresInteressatMensual() {
+			super();
+		}
+
 		public RegistresInteressatMensual(String interessatDocNum) {
 			this.interessatDocNum = interessatDocNum;
 			this.registres = new ArrayList<>();

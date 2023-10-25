@@ -49,10 +49,11 @@ $(document).ready(function() {
 			<a class="btn btn-default" href="metaDada/new" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metadada.list.boto.nova"/></a>
 		</div>
 	</c:if>
-	
-	<c:set var="element" scope="request" value="dada"/>
-	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
-	
+
+	<c:if test="${not empty metaExpedient}">
+		<c:set var="element" scope="request" value="dada"/>
+		<jsp:include page="includes/procedimentElementsMenu.jsp"/>
+	</c:if>
 	<table id="metadades" data-toggle="datatable" data-url="<c:url value="metaDada/datatable"/>" data-default-order="0" data-default-dir="asc" data-info-type="search" ${!esRevisor ? 'data-drag-enabled="true"' : ''} class="table table-striped table-bordered">
 		<thead>
 			<tr>
