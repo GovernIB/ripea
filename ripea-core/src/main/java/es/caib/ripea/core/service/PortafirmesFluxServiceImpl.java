@@ -3,12 +3,16 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
@@ -18,7 +22,13 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.FluxFirmaUsuariEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.repository.FluxFirmaUsuariRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
  * Implementació del servei de gestió de meta-documents.
@@ -29,9 +39,15 @@ import es.caib.ripea.core.helper.PluginHelper;
 public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 
 	@Autowired
-	PluginHelper pluginHelper;
+	private PluginHelper pluginHelper;
 	@Autowired
-	AplicacioService aplicacioService;
+	private AplicacioService aplicacioService;
+	@Autowired
+	private FluxFirmaUsuariRepository fluxFirmaUsuariRepository;
+	@Autowired
+	private EntityComprovarHelper entityComprovarHelper;
+	@Autowired
+	private UsuariRepository usuariRepository;
 	
 	@Override
 	public PortafirmesIniciFluxRespostaDto iniciarFluxFirma(
@@ -111,17 +127,69 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 				true);
 	}
 	
+	@Transactional(readOnly = true)
 	@Override
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(boolean filtrar) {
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
 		logger.debug("Recuperant plantilles disponibles per l'usuari aplicació");
-		return pluginHelper.portafirmesRecuperarPlantillesDisponibles(aplicacioService.getUsuariActual(), filtrar);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				true,
+				false,
+				false,
+				false, 
+				false);
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+		
+		List<PortafirmesFluxRespostaDto> plantillesFiltrades = new ArrayList<PortafirmesFluxRespostaDto>();
+		List<PortafirmesFluxRespostaDto> plantilles = pluginHelper.portafirmesRecuperarPlantillesDisponibles(aplicacioService.getUsuariActual(), filtrar);
+		
+		if (rolActual.equals("tothom")) {
+			List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
+			
+			for (PortafirmesFluxRespostaDto plantilla: plantilles) {
+				boolean isCurrentUserTemplate = false;
+		        boolean isUserTemplate = false;
+		        
+		        for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
+		            if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && fluxFirmaUsuari.getUsuari().equals(usuari)) {
+		            	// Plantilla usuari actual
+		                isCurrentUserTemplate = true;
+		                break;
+		            } else if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && ! isCurrentUserTemplate) {
+		            	// Plantilla d'un altre usuari (no mostrar al llistat)
+		            	isUserTemplate = true;
+		            	break;
+		            }
+		        }
+
+		        // Plantilles usuari actual i plantilles comuns
+		        if (isCurrentUserTemplate || (!isCurrentUserTemplate && !plantillesFiltrades.contains(plantilla)) && ! isUserTemplate) {
+		            plantilla.setUsuariActual(isCurrentUserTemplate);
+		            plantillesFiltrades.add(plantilla);
+		        }
+			}
+		}
+		return rolActual.equals("tothom") ? plantillesFiltrades : plantilles;
 	}
 	
+	@Transactional
 	@Override
 	public boolean esborrarPlantilla(String plantillaFluxId) {
 		logger.debug("Esborrant la plantilla amb id=" + plantillaFluxId);
 		String idioma = aplicacioService.getUsuariActual().getIdioma();
-		return pluginHelper.portafirmesEsborrarPlantillaFirma(idioma, plantillaFluxId);
+		boolean resposta = pluginHelper.portafirmesEsborrarPlantillaFirma(idioma, plantillaFluxId);
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+		FluxFirmaUsuariEntity entity = fluxFirmaUsuariRepository.findByUsuariAndPortafirmesFluxId(usuari, plantillaFluxId);
+		
+		if (entity != null) {
+			fluxFirmaUsuariRepository.delete(entity);
+		}
+		
+		return resposta;
 	}
 
 	@Override

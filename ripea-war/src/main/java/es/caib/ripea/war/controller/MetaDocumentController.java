@@ -40,6 +40,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de meta-documents no asociats a cap
@@ -249,6 +250,7 @@ public class MetaDocumentController extends BaseAdminController {
 					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
 			model.addAttribute("fluxId", resposta.getFluxId());
 			model.addAttribute("FluxNom", resposta.getNom());
+			model.addAttribute("FluxDescripcio", resposta.getDescripcio());
 		}
 		return "portafirmesModalTancar";
 	}
@@ -264,7 +266,8 @@ public class MetaDocumentController extends BaseAdminController {
 	@RequestMapping(value = "/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
-		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 		return resposta;
 	}
 

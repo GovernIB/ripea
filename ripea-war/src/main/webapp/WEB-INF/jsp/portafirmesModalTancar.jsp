@@ -25,6 +25,7 @@ if (fluxIframe) {
 	const fluxErrorDesc = "${FluxError}";
 	const fluxSuccesDesc = "${FluxCreat}";
 	const fluxCreatedNom = "${FluxNom}";
+	const fluxCreatedDescripcio = "${FluxDescripcio}";
 	const $modalFlux = $(fluxIframe.parentElement.parentElement).prev();
 	var alertDiv;
 	
@@ -60,7 +61,6 @@ if (fluxIframe) {
 			$modalFlux.find('#portafirmesEnviarFluxId').closest('.form-group').prev('p').remove();
 			$modalFlux.find('#portafirmesEnviarFluxId').closest('form').find('.success-label').removeClass('hidden');
 			$modalFlux.find('#portafirmesEnviarFluxId').closest('.form-group').before('<p class="success col-xs-8"></p>');
-			
 			var $success =  $modalFlux.find('.success');
 			var text = '<spring:message code='contingut.document.form.camp.portafirmes.flux.seleccionat'/>';
 			$success.html(text + " <span>" + fluxCreatedNom + "</span>");
@@ -68,20 +68,51 @@ if (fluxIframe) {
 			$success.find('span').css('font-weight', 'bold');
 		}
 	}
+	
+	// En cas de voler mostrar nom/descripcio a la modal de creació
+	var campNom = $modalFlux.find('#fluxNom');
+	var campDescripcio = $modalFlux.find('#fluxDescripcio');
+	var campFluxId = $modalFlux.find('#usuariPortafirmesFluxId');
+	
+	if (campNom.length > 0 && fluxCreatedNom) {
+		campNom.val(fluxCreatedNom)
+		campNom.closest('.form-group').show();
+		$modalFlux.find('.flux_portafib').hide();
+
+		localStorage.setItem('idPlantilla', idTransaccioFlux);
+	}
+	
+	if (campDescripcio.length > 0 && fluxCreatedDescripcio) {
+		campDescripcio.val(fluxCreatedDescripcio);
+		campDescripcio.closest('.form-group').show();
+	}
+	
+	if (campFluxId.length > 0) {
+		campFluxId.val(idTransaccioFlux);
+	}
+	
 	$modalFlux.removeClass('hidden');
 	$modalFlux.find('.alert').remove();
 	$modalFlux.prepend(alertDiv);
 	
 	//Adjust modal width/height
 	adjustModalPerFluxRemove(fluxCreatedNom);
+	
+	if ('${isEdicio}') {
+		$(window.parent.frameElement).closest('.modal').find('.close').click();
+	}
+	
 	$(fluxIframe.parentElement).trigger('remove');
+	
+
 }
 
 function adjustModalPerFluxRemove(fluxCreatedNom) {
 	webutilModalAdjustHeight();
-	let $iframe = $(window.parent.frameElement);
-	let height = localStorage.getItem('currentIframeHeight');
-	$iframe.css('height', (height =! null) ? height : '50vh');
+	var $iframe = $(window.parent.frameElement);
+	var height = localStorage.getItem('currentIframeHeight');
+
+	$iframe.css('height', (height != 'null') ? height : '50vh');
 	$iframe.parent().css('height', 'auto');
 	$iframe.closest('div.modal-content').css('height',  '');
 	$iframe.closest('div.modal-dialog').css({

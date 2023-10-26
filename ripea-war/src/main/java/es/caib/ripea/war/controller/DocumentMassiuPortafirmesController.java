@@ -316,7 +316,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request) ,true);
 
 			MetaDocumentDto metaDocument = metaDocumentService.findById(metadocumentId);
 			String fluxPerDefecteId = metaDocument.getPortafirmesFluxId();
@@ -337,7 +337,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 				}
 			}
 		} else {
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 		}
 
 

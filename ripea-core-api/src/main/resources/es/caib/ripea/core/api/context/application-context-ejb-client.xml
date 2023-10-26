@@ -140,4 +140,8 @@
 			id="urlInstruccioService"
 			jndi-name="ripea/URLInstruccioServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.URLInstruccioService"/>
+	<jee:local-slsb
+			id="fluxFirmaUsuariService"
+			jndi-name="ripea/FluxFirmaUsuariServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.FluxFirmaUsuariService"/>
 </beans>

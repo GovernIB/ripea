@@ -10,6 +10,8 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -222,7 +224,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), true);
 
 			MetaDocumentDto metaDocument = metaDocumentService.findById(metadocumentId);
 			String fluxPerDefecteId = metaDocument.getPortafirmesFluxId();
@@ -243,7 +245,7 @@ public class DocumentMassiuCsvController extends BaseUserOAdminOOrganController 
 				}
 			}
 		} else {
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 		}
 
 

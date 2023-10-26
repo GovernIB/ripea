@@ -82,6 +82,9 @@
 	pageContext.setAttribute(
 			"isUrlsInstruccioActiu",
 			es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
+	pageContext.setAttribute(
+			"isCreacioFluxUsuariActiu",
+			es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
 
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
@@ -465,7 +468,14 @@ body {
 						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.tasques"/>
 							<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
-						</a>						
+						</a>	
+						
+						<c:if test="${isCreacioFluxUsuariActiu}">
+							<%-- Fluxos --%>
+							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary">
+									<spring:message code="decorator.menu.fluxosusuari"/>
+							</a>					
+						</c:if>
 					</c:when>
 				</c:choose>
 				<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">

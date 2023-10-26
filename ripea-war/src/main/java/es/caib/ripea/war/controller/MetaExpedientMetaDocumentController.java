@@ -469,6 +469,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
 			model.addAttribute("fluxId", resposta.getFluxId());
 			model.addAttribute("FluxNom", resposta.getNom());
+			model.addAttribute("FluxDescripcio", resposta.getDescripcio());
 		}
 		return "portafirmesModalTancar";
 	}
@@ -478,14 +479,16 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		model.addAttribute(
 				"FluxCreat",
 				getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
+		model.addAttribute("isEdicio", true);
 		return "portafirmesModalTancar";
 	}
 
 	@RequestMapping(value = "/metaDocument/flux/plantilles", method = RequestMethod.GET)
 	@ResponseBody
 	public List<PortafirmesFluxRespostaDto> getPlantillesDisponibles(HttpServletRequest request, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
-		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+		List<PortafirmesFluxRespostaDto> resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 		return resposta;
 	}
 

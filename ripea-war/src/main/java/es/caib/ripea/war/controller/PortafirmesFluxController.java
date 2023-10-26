@@ -25,14 +25,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FluxFirmaUsuariDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.service.FluxFirmaUsuariService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
 /**
@@ -54,25 +57,24 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 	private DocumentService documentService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private FluxFirmaUsuariService fluxFirmaUsuariService;
 	
 	@RequestMapping(value = "/portafirmes/iniciarTransaccio", method = RequestMethod.GET)
 	@ResponseBody
 	public PortafirmesIniciFluxRespostaDto iniciarTransaccio(
 			HttpServletRequest request,
 			@RequestParam(value="nom", required = false) String nom,
+			@RequestParam(value="isPlantilla", required = false) Boolean isPlantilla,
 			Model model) {
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		PortafirmesIniciFluxRespostaDto transaccioResponse = null;
-//		String nomCodificat = new String(nom.getBytes(), StandardCharsets.UTF_8);
-//		String descripcio = getMessage(
-//				request, 
-//				"document.controller.portafirmes.flux.desc");
 
 		String urlReturn = aplicacioService.propertyBaseUrl() + "/document/portafirmes/flux/returnurl/";
 		try {
 			transaccioResponse = portafirmesFluxService.iniciarFluxFirma(
 					urlReturn,
-					false);
+					isPlantilla == null ? false : isPlantilla);
 		} catch (Exception ex) {
 			logger.error("Error al iniciar transacio", ex);
 			transaccioResponse = new PortafirmesIniciFluxRespostaDto();
@@ -120,7 +122,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			Model model) {
 		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
 		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
-
+		
 		if (resposta.isError() && resposta.getEstat() != null) {
 			model.addAttribute(
 						"FluxError",
@@ -128,6 +130,16 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 						request,
 						"metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
 		} else {
+			if (resposta.getFluxId() != null) {
+				EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+				FluxFirmaUsuariDto flux = new FluxFirmaUsuariDto();
+				flux.setNom(resposta.getNom());
+				flux.setDescripcio(resposta.getDescripcio());
+				flux.setPortafirmesFluxId(resposta.getFluxId());
+				fluxFirmaUsuariService.create(
+						entitatActual.getId(), 
+						flux);
+			}
 			model.addAttribute(
 					"FluxCreat",
 					getMessage(
@@ -157,7 +169,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 		Boolean filtrarPerUsuariActual = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.plugin.portafirmes.flux.filtrar.usuari.descripcio");
 		if (filtrarPerUsuariActual == null || filtrarPerUsuariActual.equals(true)) {
 			
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(true);
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), true);
 			String fluxPerDefecteId = documentService.findById(entitatActual.getId(), documentId, null).getMetaDocument().getPortafirmesFluxId();
 			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
 				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId);
@@ -176,7 +188,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 				}
 			}
 		} else {
-			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 		}
 
 		

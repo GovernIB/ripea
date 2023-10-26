@@ -67,8 +67,8 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(boolean filtrar) {
-		return delegate.recuperarPlantillesDisponibles(filtrar);
+	public List<PortafirmesFluxRespostaDto> recuperarPlantillesDisponibles(Long entitatId, String rolActual, boolean filtrar) {
+		return delegate.recuperarPlantillesDisponibles(entitatId, rolActual, filtrar);
 	}
 	@Override
 	@RolesAllowed("tothom")

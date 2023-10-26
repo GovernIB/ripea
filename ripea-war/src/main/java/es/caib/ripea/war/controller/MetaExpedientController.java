@@ -449,7 +449,7 @@ public class MetaExpedientController extends BaseAdminController {
 						
 						if (metaDocumentDto.getPortafirmesFluxId() != null && !metaDocumentDto.getPortafirmesFluxId().isEmpty()) {
 							boolean exists = false;
-							List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(false);
+							List<PortafirmesFluxRespostaDto> plantilles = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), false);
 							if (plantilles != null) {
 								for (PortafirmesFluxRespostaDto portafirmesFlux : plantilles) {
 									if (portafirmesFlux.getFluxId().equals(metaDocumentDto.getPortafirmesFluxId())) {

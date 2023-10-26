@@ -186,7 +186,10 @@ a.btn.input-group-addon.portafirmesResponsables_btn2 {
     outline: none;
 }
 
-
+.select2-container--bootstrap .select2-results__group {
+    font-size: 1.5rem;
+    background: #dadada;
+}
 </style>
 
 <script type="text/javascript">
@@ -204,52 +207,29 @@ $(document).ready(function() {
 	// Tancar transacció i esborrar localstorage
 	window.parent.removeTransactionId(idModal);
 
-
+	var confirmModal = crearModalConfirmacio();
+	
+	$('body').append(confirmModal);
 	
 	//crear nou flux
-	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function() {		
-
-		let documentNom = "${fn:replace(document.nom, charSearch, charReplace)}";
-		$.ajax({
-			type: 'GET',
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			data: {nom: documentNom},
-			url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
-			success: function(transaccioResponse, textStatus, XmlHttpRequest) {
-				if (transaccioResponse != null && !transaccioResponse.error) {
-					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-					$('.content').addClass("hidden");
-					var fluxIframe = '<div class="iframe_container">' +
-										'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe>' +
-									  '</div>';
-					$('.flux_container').html(fluxIframe);	
-					adjustModalPerFlux(true);
-					$body = $("body");
-					$body.addClass("loading");
-				} else if (transaccioResponse != null && transaccioResponse.error) {
-					let currentIframe = window.frameElement;
-					var alertDiv = '<div class="alert alert-danger" role="alert">' +
-										'<a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span>' +
-									'</div>';
-					$('form').prev().find('.alert').remove();
-					$('form').prev().prepend(alertDiv);
-					webutilModalAdjustHeight();
-				}
-			},
-			error: function(error) {
-				if (error != null && error.responseText != null) {
-					let currentIframe = window.frameElement;
-					var alertDiv = '<div class="alert alert-danger" role="alert">' + 
-										'<a class="close" data-dismiss="alert">×</a><span>' + error.responseText + '</span>' + 
-									'</div>';
-					$('form').prev().find('.alert').remove();
-					$('form').prev().prepend(alertDiv);
-					webutilModalAdjustHeight();
-				}
-			}
-		});
+	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function() {
+		if (${isCreacioFluxUsuariActiu}) {
+			$("#confirmModal").modal('show');
+		} else {
+			crearFlux(false);
+		}
 	});	
+
+
+	$("#confirmYesButton").on("click", function() {
+		$("#confirmModal").modal('hide');
+		crearFlux(true);
+	});
+	
+	$("#confirmNoButton").on("click", function() {
+		$("#confirmModal").modal('hide');
+		crearFlux(false);
+	});
 	
 	//mostrar flux actual
 	$(".portafirmesEnviarFluxId_btn_addicional").on('click', function() {
@@ -277,17 +257,38 @@ $(document).ready(function() {
 			selPlantilles.append("<option value=\"\"></option>");
 			if (data) {
 				var items = [];
+				var itemsUsuari = [];
+				
+				selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.comun'/>'>");
 				$.each(data, function(i, val) {
-					items.push({
-						"id": val.fluxId,
-						"text": val.nom
-					});
-					if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.fluxId) {
-						selPlantilles.append("<option selected value=\"" + val.fluxId + "\">" + val.nom + "</option>");
-					} else {
-						selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+					if (val.usuariActual) {
+						itemsUsuari.push({
+							"id": val.fluxId,
+							"text": val.nom
+						});
+					}
+					if (!val.usuariActual) {
+						if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.fluxId) {
+							selPlantilles.append("<option selected value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						} else {
+							selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						}
 					}
 				});
+				selPlantilles.append("</optgroup>");
+				
+				if (itemsUsuari.length > 0) {
+					selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.usuari'/>'>");
+					$.each(itemsUsuari, function(i, val) {
+						if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.id) {
+							selPlantilles.append("<option selected value=\"" + val.id + "\">" + val.text + "</option>");
+						} else {
+							selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+						}
+					});
+					selPlantilles.append("</optgroup>");
+				}
+			
 			}
 			var select2Options = {
 					theme: 'bootstrap',
@@ -336,6 +337,75 @@ $(document).ready(function() {
 		
 	
 });
+
+function crearFlux(isPlantilla) {
+	let documentNom = "${fn:replace(document.nom, charSearch, charReplace)}";
+
+	$.ajax({
+		type: 'GET',
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		data: {
+			nom: documentNom,
+		    isPlantilla: isPlantilla
+		},
+		url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
+		success: function(transaccioResponse, textStatus, XmlHttpRequest) {
+			if (transaccioResponse != null && !transaccioResponse.error) {
+				localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+				$('.content').addClass("hidden");
+				var fluxIframe = '<div class="iframe_container">' +
+									'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe>' +
+								  '</div>';
+				$('.flux_container').html(fluxIframe);	
+				adjustModalPerFlux(true);
+				$body = $("body");
+				$body.addClass("loading");
+			} else if (transaccioResponse != null && transaccioResponse.error) {
+				let currentIframe = window.frameElement;
+				var alertDiv = '<div class="alert alert-danger" role="alert">' +
+									'<a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span>' +
+								'</div>';
+				$('form').prev().find('.alert').remove();
+				$('form').prev().prepend(alertDiv);
+				webutilModalAdjustHeight();
+			}
+		},
+		error: function(error) {
+			if (error != null && error.responseText != null) {
+				let currentIframe = window.frameElement;
+				var alertDiv = '<div class="alert alert-danger" role="alert">' + 
+									'<a class="close" data-dismiss="alert">×</a><span>' + error.responseText + '</span>' + 
+								'</div>';
+				$('form').prev().find('.alert').remove();
+				$('form').prev().prepend(alertDiv);
+				webutilModalAdjustHeight();
+			}
+		}
+	});
+}
+
+function crearModalConfirmacio() {
+	return '<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">\
+				<div class="modal-dialog" role="document">\
+				<div class="modal-content">\
+				<div class="modal-header">\
+					<h5 class="modal-title" id="confirmModalLabel"><spring:message code="metadocument.form.camp.portafirmes.flux.plantilla.confirmacio"/></h5>\
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">\
+							<span aria-hidden="true">&times;</span>\
+						</button>\
+				</div>\
+				<div class="modal-body">\
+					<spring:message code="metadocument.form.camp.portafirmes.flux.plantilla.confirmacio.text"/>\
+				</div>\
+				<div class="modal-footer">\
+					<button type="button" class="btn btn-secondary" id="confirmNoButton">No</button>\
+					<button type="button" class="btn btn-secondary" id="confirmYesButton">Sí</button>\
+				</div>\
+			</div>\
+		</div>\
+	</div>';	
+}
 
 function toggleCarrecs() {
 	var dropdown = $(".portafirmesResponsables_btn").parent().find('.dropdown-menu.btn1');

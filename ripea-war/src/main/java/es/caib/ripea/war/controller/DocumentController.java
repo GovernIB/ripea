@@ -90,8 +90,6 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	private ExpedientInteressatService expedientInteressatService;
 	@Autowired
 	private OrganGestorService organGestorService;
-	@Autowired
-	private PortafirmesFluxService portafirmesFluxService;
 	
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.GET)
 	public String portafirmesUploadGet(
@@ -132,8 +130,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		model.addAttribute("tascaId", tascaId);
 		model.addAttribute(command);
 		model.addAttribute("isHabilitarAvisFirmaParcialActiu", isHabilitarAvisFirmaParcialActiu());
+		model.addAttribute("isCreacioFluxUsuariActiu", isCreacioFluxUsuariActiu());
 		return "portafirmesForm";
 	}
+	
 	@RequestMapping(value = "/{documentId}/portafirmes/upload", method = RequestMethod.POST)
 	public String portafirmesUploadPost(
 			HttpServletRequest request,
@@ -776,5 +776,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.portafirmes.avis.firma.parcial"));
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(DocumentController.class);
+	private boolean isCreacioFluxUsuariActiu() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.plugin.portafirmes.fluxos.usuaris"));
+	}
+	
 }
