@@ -81,7 +81,7 @@
 				<th data-col-name="dataEnviament" data-type="datetime" data-converter="datetime" nowrap><spring:message code="seguiment.list.columna.dataEnviament"/></th>
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="<c:url value="/seguimentPortafirmes/{{:documentId}}/portafirmes/info/{{:id}}"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
+						<a href="<c:url value="/document/{{:documentId}}/portafirmes/info?readOnly=true"/>" class="btn btn-default" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.detalls"/></a>
 					</script>
 				</th>
 			</tr>

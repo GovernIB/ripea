@@ -97,48 +97,6 @@ public class SeguimentPortafirmesController extends BaseAdminController {
     
     
     
-	@RequestMapping(value = "/{documentId}/portafirmes/info/{enviamentId}", method = RequestMethod.GET)
-	public String portafirmesInfo(
-			HttpServletRequest request,
-			@PathVariable Long documentId,
-			@PathVariable Long enviamentId,
-			Model model) {
-		try {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
-					entitatActual.getId(),
-					documentId,
-					enviamentId);
-			List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
-					entitatActual.getId(),
-					documentId, 
-					enviamentId);
-			model.addAttribute(
-					"portafirmes",
-					portafirmes);
-			model.addAttribute(
-					"blocks", 
-					documentPortafirmesBlocks);
-			model.addAttribute(
-					"document", 
-					documentService.findById(entitatActual.getId(), documentId, null));
-			
-			model.addAttribute(
-					"readOnly", 
-					true);
-			
-		} catch (Exception e) {
-			return getModalControllerReturnValueErrorMessageText(
-					request,
-					"",
-					e.getMessage(),
-					e);
-			}
-		return "portafirmesInfo";
-	}
-    
-    
-    
 
 	
 	private SeguimentFiltreCommand getFiltreCommand(

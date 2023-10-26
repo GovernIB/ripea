@@ -159,50 +159,22 @@ $(document).ready(function() {
 			window.parent.addLoading(idModal);
 		});
 	}
-	
-	//colors blocs
-	var blocs = document.getElementsByClassName('block_container');
-	var primerBlocEnProces = false;
-	var signedContainer;
-	
-	$(blocs).each(function(index, data) {
-		var $blocActual = $(this);
-		var hasBlocFirmaPendent = false;
-		if (!primerBlocEnProces) {
-			var signatures = $blocActual.children();
-			$(signatures).each(function(index, data) {
-				var $signaturaActual = $(this);
-				//firmat
-				if ($signaturaActual.hasClass('signed_true')) {
-					$signaturaActual.addClass('signed_color');
-				}
-				//pendent
-				if (index >= 0 && $signaturaActual.hasClass('signed_false')) {
-					var nextSigner = $signaturaActual;
-					$(nextSigner).addClass("proces_color");
-					hasBlocFirmaPendent = true;
-				}
-				if ((index === signatures.length - 1) && hasBlocFirmaPendent && !primerBlocEnProces) {
-					primerBlocEnProces = true;
-				}
-			});
-		}
-	});
+
 });
 </script>
 </head>
 <body>
-	<c:choose>
+<c:choose>
 	<c:when test="${document.estat == 'FIRMAT' && document.gesDocFirmatId != null }">
 		<c:if test="${portafirmes.error}">
 			<div class="alert well-sm alert-danger alert-dismissable">
 				<span class="fa fa-exclamation-triangle"></span>
 
 				<spring:message code="firma.info.errors.processament"/>
-					
-				<a href="../portafirmes/reintentar?tascaId=${tascaId}" class="btn btn-xs btn-default pull-right">
+				
+				<a href="<c:url value="/modal/document/${portafirmes.document.id}/portafirmes/reintentar?readOnly=${readOnly}&tascaId=${tascaId}"/>" class="btn btn-xs btn-default pull-right">
 					<span class="fa fa-refresh"></span>
-					<spring:message code="firma.info.errors.reintentar"/>
+					<spring:message code="comu.boto.reintentar"/>
 				</a>
 			</div>
 			<div class="panel panel-default">
@@ -223,14 +195,14 @@ $(document).ready(function() {
 		</c:if>	
 	</c:when>
 	<c:otherwise>
-	<c:if test="${portafirmes.error}">
-		<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
-	</c:if>
-	<br/>
+		<c:if test="${portafirmes.error}">
+			<a href="#errors" class="text-danger" aria-controls="errors" role="tab" data-toggle="tab"><span class="fa fa-exclamation-triangle"></span> <spring:message code="firma.info.pipella.errors"/></a>
+		</c:if>
+		<br/>
 		<div class="tab-content">
 			<div class="tab-pane active in" id="dades" role="tabpanel">
 				<div class="portafirmes_container">
-					<div class="${(not empty blocks || not empty urlFluxFirmes) ? 'table_container' : 'table_container_full'}">
+					<div class="${(not empty urlFluxFirmes) ? 'table_container' : 'table_container_full'}">
 						<table class="table table-striped table-bordered">
 						<tbody>
 							<tr>
@@ -253,12 +225,6 @@ $(document).ready(function() {
 								<td><strong><spring:message code="firma.info.camp.prioritat"/></strong></td>
 								<td><spring:message code="portafirmes.prioritat.enum.${portafirmes.prioritat}"/></td>
 							</tr>
-							<%-- 
-							<tr>
-								<td><strong><spring:message code="firma.info.camp.data.cad"/></strong></td>
-								<td><fmt:formatDate value="${portafirmes.caducitatData}" pattern="dd/MM/yyyy"/></td>
-							</tr>
-							--%>
 							<tr>
 								<td><strong><spring:message code="firma.info.camp.document.tipus"/></strong></td>
 								<td>${portafirmes.documentTipus}</td> 
@@ -295,70 +261,15 @@ $(document).ready(function() {
 							<iframe width="100%" height="100%" frameborder="0" allowtransparency="true" src="${urlFluxFirmes}"></iframe>
 						</div>
 					</c:if>
-					<%--
-					<c:if test="${not empty blocks}">
-						<div class="blocks_container">
-							<div class="signers_container">
-								<div class="block_start_end"><spring:message code="firma.info.accio.flux.inici"/></div>
-								<i class="block_arrow fa fa-ellipsis-v"></i>
-								<c:forEach items="${blocks}" var="block" varStatus="status">
-									<div class="block_container">
-										<c:forEach items="${block.signers}" var="signer">
-											<div class="signer_container signed_${signer.signed}">
-												<c:choose>
-													<c:when test="${not empty signer.signerNom}">
-															${signer.signerNom} <c:if test="${signer.signerCodi != ' '}">(${signer.signerCodi})</c:if>
-													</c:when>
-													<c:otherwise>
-														${signer.signerCodi}
-													</c:otherwise>
-												</c:choose>
-												<c:if test="${not empty signer.data}"><br>
-													<fmt:formatDate var="signDay" value="${signer.data}" pattern="dd/MM/yyyy"/>
-													<fmt:formatDate var="signHour" value="${signer.data}" pattern="HH:mm:ss"/>
-													<spring:message code="firma.info.data.firma" arguments="${signDay},${signHour}" htmlEscape="false"/>
-												</c:if>
-												<br>
-												${signer.signerId} 
-											</div>
-										</c:forEach>
-									</div>
-									<c:if test="${!status.last}">
-										<i class="block_arrow fa fa-arrow-down"></i>
-									</c:if>
-								</c:forEach>
-								<i class="block_arrow fa fa-ellipsis-v"></i>
-								<div class="block_start_end"><spring:message code="firma.info.accio.flux.final"/></div>
-							</div>
-							<div class="leyenda">
-								<div class="leyenda_title"><span><spring:message code="firma.info.accio.flux.llegenda"/></span></div>
-								<div class="leyenda_container">
-									<div class="leyenda_block">
-										<div></div><span><spring:message code="firma.info.accio.flux.bloc"/></span>
-									</div>
-									<div class="leyenda_firmat">
-										<div></div><span><spring:message code="firma.info.accio.flux.firma.finalitzada"/></span>
-									</div>
-									<div class="leyenda_proces">
-										<div></div><span><spring:message code="firma.info.accio.flux.firma.proces"/></span>
-									</div>
-									<div class="leyenda_pendent">
-										<div></div><span><spring:message code="firma.info.accio.flux.firma.pendent"/></span>
-									</div>
-								</div>
-							</div>
-						</div>
-					</c:if>
-					 --%>
+
 				</div>
 				<div class="buttons_container">
-					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == null}">
+					<c:if test="${portafirmes.estat == 'ENVIAT' && readOnly == false}">
 						<a id="btn_cancelar" href="<rip:modalUrl value="/document/${portafirmes.document.id}/portafirmes/cancel?tascaId=${tascaId}"/>" data-confirm="<spring:message code="firma.info.accio.cancel.confirmacio"/>" class="btn btn-default"><span class="fa fa-times"></span> <spring:message code="firma.info.accio.cancel"/></a>
 					</c:if>
 				</div>
 			</div>
-			<%--div class="tab-pane" id="annexos" role="tabpanel">
-			</div--%>
+
 			<div class="tab-pane" id="errors" role="tabpanel">
 				<c:if test="${portafirmes.error}">
 					<div class="alert well-sm alert-danger alert-dismissable">
@@ -379,7 +290,9 @@ $(document).ready(function() {
 								<spring:message code="firma.info.errors.cancelacio"/>
 							</c:when>
 						</c:choose>
-						<a href="../portafirmes/reintentar" class="btn btn-xs btn-default pull-right">
+						
+						
+						<a href="<c:url value="/modal/document/${portafirmes.document.id}/portafirmes/reintentar?readOnly=${readOnly}&tascaId=${tascaId}"/>" class="btn btn-xs btn-default pull-right">
 							<span class="fa fa-refresh"></span>
 							<spring:message code="firma.info.errors.reintentar"/>
 						</a>
@@ -402,13 +315,13 @@ $(document).ready(function() {
 				</c:if>
 			</div>
 		</div>
-		</c:otherwise>
-	</c:choose>
+	</c:otherwise>
+</c:choose>
 
 	
-	<div id="modal-botons" class="well">
-			<a href="<c:url value="/contenidor/${portafirmes.document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
-	</div>
+<div id="modal-botons" class="well">
+	<a href="<c:url value="/contingut/${portafirmes.document.id}"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.tancar"/></a>
+</div>
 
 
 </body>

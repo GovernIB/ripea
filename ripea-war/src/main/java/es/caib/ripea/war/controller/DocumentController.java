@@ -225,6 +225,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			@RequestParam(value = "readOnly", required = true) boolean readOnly,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Exception exc = documentService.portafirmesReintentar(
@@ -234,7 +235,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 				tascaId);
 		DocumentDto doc = documentService.findById(entitatActual.getId(), documentId, null);
 		if (exc != null || doc.getGesDocFirmatId() != null) {
-			return "redirect:./info";
+			MissatgesHelper.error(
+					request, 
+					getMessage(
+							request, 
+							"firma.info.processat.ko"),
+					exc);
+			return "redirect:./info?readOnly=" + readOnly + "&tascaId=" + (tascaId == null ? "" : tascaId);
 		} else {
 			return this.getModalControllerReturnValueSuccess(
 					request,
@@ -308,32 +315,30 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 	public String portafirmesInfo(
 			HttpServletRequest request,
 			@PathVariable Long documentId,
+			@RequestParam(value = "readOnly", required = true) boolean readOnly,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
 			Model model) {
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			
 			DocumentPortafirmesDto portafirmes = documentService.portafirmesInfo(
 					entitatActual.getId(),
 					documentId, 
 					null);
-			if (portafirmes.getPortafirmesId() != null && !portafirmes.getPortafirmesId().isEmpty()) {
-				String urlFluxFirmes = documentService.recuperarUrlViewEstatFluxDeFirmes(Long.valueOf(portafirmes.getPortafirmesId()));
-				model.addAttribute(
-						"urlFluxFirmes", 
-						urlFluxFirmes);
-			} else {
-				//TODO: Esborrar després d'assegurar que la url de portafib no dona problemes
-				List<PortafirmesBlockDto> documentPortafirmesBlocks = documentService.recuperarBlocksFirmaEnviament(
-						entitatActual.getId(),
-						documentId, 
-						null);
-				model.addAttribute(
-						"blocks", 
-						documentPortafirmesBlocks);
-			}
 			model.addAttribute(
 					"portafirmes",
 					portafirmes);
+			
+			String urlFluxFirmes = null;
+			try {
+				urlFluxFirmes = documentService.recuperarUrlViewEstatFluxDeFirmes(Long.valueOf(portafirmes.getPortafirmesId()));
+			} catch (Exception e) {
+				logger.error("Error al recuperar urlFluxFirmes: " +  portafirmes.getPortafirmesId() + ", " + portafirmes.getId()+ ", " + documentId);
+			}
+			model.addAttribute(
+					"urlFluxFirmes", 
+					urlFluxFirmes);
+
 			model.addAttribute(
 					"document", 
 					documentService.findById(entitatActual.getId(), documentId, tascaId));
@@ -341,6 +346,10 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			model.addAttribute(
 					"tascaId", 
 					tascaId);
+			
+			model.addAttribute(
+					"readOnly", 
+					readOnly);
 			
 		} catch (Exception e) {
 			return getModalControllerReturnValueErrorMessageText(
