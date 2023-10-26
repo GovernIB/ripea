@@ -36,7 +36,12 @@
 		<rip:inputSelect name="multiplicitat" textKey="metadocument.metadada.form.camp.multiplicitat" disabled="${not empty permisCommand.id}" optionEnum="MultiplicitatEnumDto"/>
 		<rip:inputText name="valor" textKey="metadada.form.camp.valor"/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+				<c:choose>
+					<c:when test="${empty metaNodeMetaDadaCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+					<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+				</c:choose>
+			</button>	
 			<a href="<c:url value="/metaDocument/${metaDocument.id}/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

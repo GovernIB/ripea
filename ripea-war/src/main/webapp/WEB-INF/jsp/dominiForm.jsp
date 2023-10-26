@@ -30,7 +30,12 @@
 		<rip:inputTextarea name="cadena" textKey="domini.form.camp.cadena" required="true" exemple="domini.cadena.exemple" exempleLabel="domini.exemple.boto"/>
 		<rip:inputText name="contrasenya" textKey="domini.form.camp.contrasenya" required="true"/>
 		<div id="modal-botons" class="well">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+				<c:choose>
+					<c:when test="${empty dominiCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+					<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+				</c:choose>
+			</button>
 			<a href="<c:url value="/domini"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

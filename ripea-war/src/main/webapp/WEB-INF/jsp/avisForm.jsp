@@ -39,8 +39,15 @@
 		<rip:inputDate name="dataFinal" textKey="avis.form.camp.dataFinal" required="true"/>
 		<rip:inputSelect name="avisNivell" textKey="avis.form.camp.avisNivell" optionEnum="AvisNivellEnumDto" required="true"/>
 		
+		
+
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+				<c:choose>
+					<c:when test="${empty avisCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+					<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+				</c:choose>
+			</button>
 			<a href="<c:url value="/avis"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

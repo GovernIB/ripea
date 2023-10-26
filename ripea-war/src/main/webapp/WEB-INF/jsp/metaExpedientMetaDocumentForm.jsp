@@ -568,7 +568,14 @@ function removeLoading() {
 			</div>
 		</div>
 		<div id="modal-botons">
-			<c:if test="${!consultar}"><button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button></c:if>
+			<c:if test="${!consultar}">
+				<button type="submit" class="btn btn-success" <c:if test="${bloquejarCamps}">disabled</c:if>><span class="fa fa-save"></span>
+					<c:choose>
+						<c:when test="${empty metaDocumentCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+						<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+					</c:choose>
+				</button>	
+			</c:if>	
 			<a href="<c:url value="/metaDocument"/>" class="btn btn-default modal-cancel" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

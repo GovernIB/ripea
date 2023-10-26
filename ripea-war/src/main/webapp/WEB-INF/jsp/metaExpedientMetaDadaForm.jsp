@@ -35,7 +35,12 @@
 		</c:choose>
 		<rip:inputSelect name="multiplicitat" textKey="metaexpedient.metadada.form.camp.multiplicitat" optionEnum="MultiplicitatEnumDto"/>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>&nbsp;<spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+				<c:choose>
+					<c:when test="${empty metaNodeMetaDadaCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+					<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+				</c:choose>
+			</button>	
 			<a href="<c:url value="/metaExpedient/${metaExpedient.id}/metaDada"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

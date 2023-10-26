@@ -41,7 +41,12 @@
 		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
 	</div>
 	<div id="modal-botons" class="well">
-		<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+		<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+			<c:choose>
+				<c:when test="${empty expedientCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+				<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+			</c:choose>
+		</button>
 		<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 	</div>
 </form:form>

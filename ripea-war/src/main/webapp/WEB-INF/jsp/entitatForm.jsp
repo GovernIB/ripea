@@ -54,7 +54,12 @@ $(document).ready(function() {
 		<rip:inputText name="capsaleraColorFons" textKey="entitat.form.camp.capsaleraColorFons"/>
 		<rip:inputText name="capsaleraColorLletra" textKey="entitat.form.camp.capsaleraColorLletra"/>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+				<c:choose>
+					<c:when test="${empty entitatCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+					<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+				</c:choose>
+			</button>
 			<a href="<c:url value="/entitat"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

@@ -795,11 +795,13 @@ function canviVisibilitat(tipus) {
 
 		<div id="modal-botons" class="well">
 			<c:if test="${potModificar}">
-				<button id="btnSave" type="button" class="btn btn-success">
-					<span class="fa fa-save"></span>
-					<spring:message code="comu.boto.guardar" />
-				</button>			
-			</c:if>
+				<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+					<c:choose>
+						<c:when test="${empty interessatCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
+						<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>
+					</c:choose>
+				</button>
+			</c:if>			
 			<a href="<c:url value="/contingut/${expedientId}"/>" class="btn btn-default" data-modal-cancel="true">
 				<spring:message code="comu.boto.${potModificar ? 'cancelar' : 'tancar'}" />
 			</a>

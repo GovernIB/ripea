@@ -289,7 +289,7 @@
 								<button type="button" class="btn btn-default" onclick="deleteBustia()"><span class="fa fa-trash-o"></span> <spring:message code="contingut.admin.boto.esborrar"/></button>
 							</div>
 							<div class="col-md-2">
-								<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+								<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.modificar"/></button>
 							</div>
 						</div>	
 					</form:form>
