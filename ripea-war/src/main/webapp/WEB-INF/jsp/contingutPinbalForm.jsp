@@ -52,6 +52,12 @@ $(document).ready(function() {
 			$('#divAnysHistoric').hide();
 
 			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
 			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCDDWS01") { // SVDSCDDWS01 - Servei de consulta de dades de discapacitat
@@ -79,6 +85,12 @@ $(document).ready(function() {
 			$('#divAnysHistoric').hide();
 
 			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
 				
 				
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de padró de convivència
@@ -106,6 +118,12 @@ $(document).ready(function() {
 			$('#divAnysHistoric').hide();
 
 			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
 			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCTFNWS01") { // SVDSCTFNWS01 - Servei de consulta de família nombrosa
@@ -133,6 +151,12 @@ $(document).ready(function() {
 			$('#divAnysHistoric').hide();
 
 			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
 			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPCWS01") { // SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA
@@ -160,6 +184,12 @@ $(document).ready(function() {
 			$('#divAnysHistoric').hide();
 
 			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
 			
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDDELSEXWS01") { // SVDDELSEXWS01 - Consulta de inexistencia de delitos sexuales por datos de filiación
@@ -187,6 +217,12 @@ $(document).ready(function() {
 			$('#divAnysHistoric').hide();
 
 			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
 			
 		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDHPAJU") { // SCDHPAJU - Servei de consulta de padró històric
 			$('#bloc-datos-especificos').show();
@@ -214,6 +250,12 @@ $(document).ready(function() {
 
 			$('#divExercici').hide();
 
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
+
 		} else if (metaDocumentServeiScsp[$(this).val()] === "NIVRENTI") { // NIVRENTI - Consulta del nivel de renta
 			$('#bloc-datos-especificos').show();
 			$('#divComunitatAutonomaCodi').hide();
@@ -238,7 +280,47 @@ $(document).ready(function() {
 			
 			$('#divAnysHistoric').hide();		
 
-			$('#divExercici').show();			
+			$('#divExercici').show();	
+
+			$('#divNumeroSoporte').hide();
+			$('#divTipusPassaport').hide();
+			$('#divFechaCaducidad').hide();
+			$('#divCodiNacionalitat2').hide();
+			$('#divFechaExpedicion').hide();
+			
+		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDDGPRESIDENCIALEGALDOCWS01") { // SVDDGPRESIDENCIALEGALDOCWS01 - Servei de consulta de dades de residència legal d'estrangers per documentació
+			$('#bloc-datos-especificos').show();
+			$('#divComunitatAutonomaCodi').hide();
+			$('#divProvinciaCodi').hide();
+			$('#divMunicipiCodi').hide();
+			$('#divDataConsulta').hide();
+			$('#divDataNaixement').hide();
+			$('#divConsentimentTipusDiscapacitat').hide();
+			$('#divNumeroTitol').hide();
+
+			$('#divPaisNaixament').hide();
+			$('#divCodiNacionalitat').hide();
+			$('#divProvinciaNaixament').hide();
+			$('#divPoblacioNaixament').hide();
+			$('#divCodiPoblacioNaixament').hide();
+			$('#divSexe').hide();
+			$('#divNomPare').hide();
+			$('#divNomMare').hide();
+			$('#divTelefon').hide();
+			$('#divEmail').hide();
+			$('#divDataNaixementObligatori').hide();
+			
+			$('#divAnysHistoric').hide();		
+
+			$('#divExercici').hide();
+
+			$('#divNumeroSoporte').show();
+			$('#divTipusPassaport').show();
+			$('#divFechaCaducidad').show();
+			$('#divCodiNacionalitat2').show();
+			$('#divFechaExpedicion').show();
+
+								
 														
 		} else {
 			$('#bloc-datos-especificos').hide();
@@ -308,6 +390,12 @@ $(document).ready(function() {
 					<div id="divAnysHistoric"><rip:inputNumber name="nombreAnysHistoric" textKey="contingut.pinbal.form.camp.data.nombre.anys.historic" nombreDecimals="0"/></div>
 					
 					<div id="divExercici"><rip:inputNumber name="exercici" textKey="contingut.pinbal.form.camp.data.exercici" nombreDecimals="0" required="true"/></div>
+					
+					<div id="divNumeroSoporte"><rip:inputText name="numeroSoporte" textKey="contingut.pinbal.form.camp.numero.soporte" comment="contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment"/></div>
+					<div id="divTipusPassaport"><rip:inputSelect name="tipusPassaport" textKey="contingut.pinbal.form.camp.tipus.passaport" comment="contingut.pinbal.form.camp.tipus.passaport.comment" optionEnum="TipusPassaportEnumDto" emptyOption="true"/></div>
+					<div id="divFechaCaducidad"><rip:inputDate name="fechaCaducidad" textKey="contingut.pinbal.form.camp.data.caducidad"/></div>
+					<div id="divCodiNacionalitat2"><rip:inputSelect name="codiNacionalitat2" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" emptyOption="true" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
+					<div id="divFechaExpedicion"><rip:inputDate name="fechaExpedicion" textKey="contingut.pinbal.form.camp.data.expedicion"/></div>
 			
 					
 				</div>

@@ -20,5 +20,6 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDDELSEXWS01, // Consulta de inexistencia de delitos sexuales por datos de filiación
 	SCDHPAJU, // Servei de consulta de padró històric
 	NIVRENTI, // Consulta del nivel de renta
-	ECOT103 // Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas con indicación de incumplimientos
+	ECOT103, // Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas con indicación de incumplimientos
+	SVDDGPRESIDENCIALEGALDOCWS01 //  Servei de consulta de dades de residència legal d'estrangers per documentació
 }

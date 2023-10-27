@@ -36,6 +36,7 @@ import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.PinbalConsultaCommand;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.EnumHelper.HtmlOption;
@@ -113,6 +114,19 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
 			if (command.getExercici() == null) {
 				bindingResult.rejectValue("exercici", "NotEmpty");
+			}
+		}
+		
+		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPRESIDENCIALEGALDOCWS01) {
+			
+			if (command.getTipusPassaport() == null && Utils.isEmpty(command.getNumeroSoporte())) {
+				bindingResult.reject("contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment");
+			}
+			if (command.getTipusPassaport() != null && command.getFechaCaducidad() == null) {
+				bindingResult.rejectValue("fechaCaducidad", "NotEmpty");
+			}
+			if (command.getTipusPassaport() != null && Utils.isEmpty(command.getCodiNacionalitat2())) {
+				bindingResult.rejectValue("codiNacionalitat2", "NotEmpty");
 			}
 		}
 			

@@ -40,6 +40,9 @@ import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.Solic
 import es.caib.pinbal.client.recobriment.svddelsexws01.ClientSvddelsexws01.SolicitudSvddelsexws01.Sexe;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02;
 import es.caib.pinbal.client.recobriment.svddgpciws02.ClientSvddgpciws02.SolicitudSvddgpciws02;
+import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01;
+import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01;
+import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01.TipusPassaport;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
@@ -426,6 +429,37 @@ public class PinbalHelper {
 			throw processarException(solicitud, ex, "ECOT103", t0);
 		}
 	}
+	
+	/** SVDDGPRESIDENCIALEGALDOCWS01 - Servei de consulta de dades de residència legal d'estrangers per documentació */
+	public String novaPeticioSvddgpresidencialegaldocws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvddgpresidencialegaldocws01 solicitud = new SolicitudSvddgpresidencialegaldocws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+
+		solicitud.setNumeroSoporte(pinbalConsulta.getNumeroSoporte());
+		solicitud.setTipo(Utils.convertEnum(pinbalConsulta.getTipusPassaport(), TipusPassaport.class));
+		solicitud.setFechaCaducidad(pinbalConsulta.getFechaCaducidad());
+		solicitud.setNacionalidad(pinbalConsulta.getCodiNacionalitat2());
+		solicitud.setFechaExpedicion(pinbalConsulta.getFechaExpedicion());
+		
+		try {
+			ScspRespuesta respuesta = getClientSvddgpresidencialegaldocws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDDGPRESIDENCIALEGALDOCWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDDGPRESIDENCIALEGALDOCWS01", t0);
+		}
+	}
+	
 	
 	
 	private String toSNString(SiNoEnumDto consentimentTipusDiscapacitat) {
@@ -845,6 +879,19 @@ public class PinbalHelper {
 	
 	private ClientEcot103 getClientEcot103() {
 		ClientEcot103 client = new ClientEcot103(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
+	private ClientSvddgpresidencialegaldocws01 getClientSvddgpresidencialegaldocws01() {
+		ClientSvddgpresidencialegaldocws01 client = new ClientSvddgpresidencialegaldocws01(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),

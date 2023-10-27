@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,5 +45,11 @@ public class PinbalConsultaDto {
 	private Integer nombreAnysHistoric;
 	
 	private Integer exercici;
+	
+	private TipusPassaportEnumDto tipusPassaport;
+	private Date fechaCaducidad;
+	private String codiNacionalitat2;
+	private Date fechaExpedicion;
+	private String numeroSoporte;
 	
 }

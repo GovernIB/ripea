@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.command;
 
+import java.util.Date;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
@@ -12,6 +14,7 @@ import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.SexeEnumDto;
 import es.caib.ripea.core.api.dto.SiNoEnumDto;
+import es.caib.ripea.core.api.dto.TipusPassaportEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,6 +66,14 @@ public class PinbalConsultaCommand {
 	private Integer nombreAnysHistoric;
 	
 	private Integer exercici;
+	
+	private TipusPassaportEnumDto tipusPassaport;
+	private Date fechaCaducidad;
+	private String codiNacionalitat2;
+	private Date fechaExpedicion;
+	private String numeroSoporte;
+
+	
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(
