@@ -1295,10 +1295,6 @@ public class ContingutHelper {
 			String rolActual) throws IOException {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
-		
-		logger.debug("Esborrant el contingut ("
-				+ "entitatId=" + entitatId + ", "
-				+ "contingutId=" + contingut.getId() + ")");
 
 		ContingutDto dto = toContingutDto(
 				contingut, false, false);
@@ -1375,15 +1371,31 @@ public class ContingutHelper {
 			if (contingut instanceof DocumentEntity) {
 				DocumentEntity document = (DocumentEntity)contingut;
 				if (DocumentTipusEnumDto.DIGITAL.equals(document.getDocumentTipus()) && document.getGesDocAdjuntId() == null) {
-					fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
-					fitxerDocumentEsborratGuardarFirmaEnTmp((DocumentEntity)contingut);
+					try {						
+						fitxerDocumentEsborratGuardarEnTmp((DocumentEntity)contingut);
+					} catch (Exception e) {
+						Throwable root = Utils.getRootCauseOrItself(e);
+						if (root.getMessage().contains("No s'ha trobat l'arxiu")) {
+							logger.info("Al borrar el documento no se ha encontrado el contenido del documento " + document.getNom() + "del expediente " + document.getExpedient().getNom() + " amd id " + document.getExpedient().getId());
+						} else {
+							throw e;
+						}
+					}
+					try {
+						fitxerDocumentEsborratGuardarFirmaEnTmp((DocumentEntity)contingut);
+					} catch (Exception e) {
+						Throwable root = Utils.getRootCauseOrItself(e);
+						if (root.getMessage().contains("Petición mal formada. No fue informado el identificador o localizador del documento a recuperar")) {
+							logger.info("Al borrar el documento no se ha encontrado el contenido de firma del documento " + document.getNom() + "del expediente " + document.getExpedient().getNom() + " amd id " + document.getExpedient().getId());
+						} else {
+							throw e;
+						}
+					}					
 				}
-				// Elimina contingut a l'arxiu
-				arxiuPropagarEliminacio(contingut);
-			} else {
-				// Elimina contingut a l'arxiu
-				arxiuPropagarEliminacio(contingut);
-			}
+			} 
+			
+			// Elimina contingut a l'arxiu
+			arxiuPropagarEliminacio(contingut);
 		}
 
 		return dto;

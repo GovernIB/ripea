@@ -138,6 +138,10 @@ public class Utils {
 		return StringUtils.isEmpty(st);
 	}
 	
+	public static boolean isEmpty(byte[] bytes) {
+		return ArrayUtils.isEmpty(bytes);
+	}
+	
 	/**
 	 * Hibernate doesn't support empty collection as parameter for "IN" operator [WHERE column_name IN ()]
 	 * and if it is empty it throws org.hibernate.hql.ast.QuerySyntaxException: unexpected end of subtree

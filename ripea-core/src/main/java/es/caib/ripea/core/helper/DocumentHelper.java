@@ -174,13 +174,19 @@ public class DocumentHelper {
 					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
 					new ByteArrayInputStream(document.getFitxerContingut()));
 			entity.setGesDocAdjuntId(gestioDocumentalAdjuntId);
+		} else {
+			throw new ValidationException("No es pot crear el document sense especificar el contingut");
 		}
 		String gestioDocumentalAdjuntFirmaId = document.getGesDocAdjuntFirmaId();
 		if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_SEPARADA) {
-			gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
-					PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
-					new ByteArrayInputStream(document.getFirmaContingut()));
-			entity.setGesDocAdjuntFirmaId(gestioDocumentalAdjuntFirmaId);
+			if (document.getFirmaContingut() != null) {
+				gestioDocumentalAdjuntFirmaId = pluginHelper.gestioDocumentalCreate(
+						PluginHelper.GESDOC_AGRUPACIO_DOCS_ADJUNTS,
+						new ByteArrayInputStream(document.getFirmaContingut()));
+				entity.setGesDocAdjuntFirmaId(gestioDocumentalAdjuntFirmaId);
+			} else {
+				throw new ValidationException("No es pot crear el document amb firma separada sense especificar el contingut d'aquesta firma");
+			}
 		}
 		
 		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null);

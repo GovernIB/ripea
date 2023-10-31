@@ -39,6 +39,7 @@ import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ContingutFiltreCommand;
 import es.caib.ripea.war.command.ContingutFiltreCommand.ContenidorFiltreOpcionsEsborratEnum;
 import es.caib.ripea.war.command.ExpedientAssignarCommand;
@@ -216,19 +217,13 @@ public class ContingutAdminController extends BaseAdminController {
 					request,
 					"redirect:../../esborrat",
 					"contingut.admin.controller.recuperat.ok");
-		} catch (ValidationException ex) {
-			return getAjaxControllerReturnValueError(
-					request,
-					"redirect:../../esborrat",
-					"contingut.admin.controller.recuperat.duplicat",
-					ex);
 		}  catch (Exception ex) {
 			logger.error("Error al recuperar element", ex);
 			return getAjaxControllerReturnValueError(
 					request,
 					"redirect:../../esborrat",
 					"contingut.admin.controller.recuperat.error",
-					new Object[] { ExceptionHelper.getRootCauseOrItself(ex).getMessage() },
+					new Object[] { Utils.getRootCauseOrItself(ex).getMessage() },
 					ex);
 		}
 	}

@@ -414,6 +414,10 @@ public class ContingutServiceImpl implements ContingutService {
 								document,
 								firmes.get(0).getFitxer());
 					}
+					if (firmes == null && Utils.isEmpty(fitxer.getContingut())) {
+						throw new ValidationException("No es pot recuperar el document perquè no conté el contingut");
+					}
+					
 					contingutHelper.arxiuPropagarModificacio(
 							document,
 							fitxer,

@@ -295,23 +295,21 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "contingutDocumentForm";
 		} catch (Exception ex) {
 			logger.error("Error al crear un document", ex);
-			Throwable throwable = ExceptionHelper.findExceptionInstance(ex, SistemaExternException.class, 3);
-			if (throwable!=null) {
-				SistemaExternException sisExtExc = (SistemaExternException) throwable;
-				MissatgesHelper.error(request, sisExtExc.getMessage(), sisExtExc);
-				if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
-					return modalUrlTancar();
-				} else {
-					omplirModelFormulari(
-							request,
-							command,
-							pareId,
-							model, 
-							tascaId);
-					return "contingutDocumentForm";
-				}
+			Throwable throwable = Utils.getRootCauseOrItself(ex);
+			MissatgesHelper.error(
+					request,
+					throwable.getMessage(),
+					throwable);
+			if (command.getOrigen().equals(DocumentFisicOrigenEnum.ESCANER)) {
+				return modalUrlTancar();
 			} else {
-				throw ex;
+				omplirModelFormulari(
+						request,
+						command,
+						pareId,
+						model, 
+						tascaId);
+				return "contingutDocumentForm";
 			}
 		} 
 	}
