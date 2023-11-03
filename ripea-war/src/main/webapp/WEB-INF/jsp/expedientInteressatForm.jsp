@@ -795,7 +795,7 @@ function canviVisibilitat(tipus) {
 
 		<div id="modal-botons" class="well">
 			<c:if test="${potModificar}">
-				<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
+				<button id="btnSave" type="button" class="btn btn-success"><span class="fa fa-save"></span>
 					<c:choose>
 						<c:when test="${empty interessatCommand.id}"><spring:message code="comu.boto.crear"/></c:when>
 						<c:otherwise><spring:message code="comu.boto.modificar"/></c:otherwise>

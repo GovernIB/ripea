@@ -388,9 +388,9 @@ public class ExpedientInteressatHelper {
 		if (interessat.isPersonaFisica()) {
 			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
 			interessatEntity = interessatRepository.findOne(interessat.getId());
-			
-			if (interessatEntity instanceof InteressatPersonaFisicaEntity) {
-				((InteressatPersonaFisicaEntity)interessatEntity).update(
+			InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
+			if (deproxied instanceof InteressatPersonaFisicaEntity) {
+				((InteressatPersonaFisicaEntity)deproxied).update(
 						interessatPersonaFisicaDto.getNom(),
 						interessatPersonaFisicaDto.getLlinatge1(),
 						interessatPersonaFisicaDto.getLlinatge2(),
@@ -436,10 +436,11 @@ public class ExpedientInteressatHelper {
 		} else if (interessat.isPersonaJuridica()) {
 			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
 			interessatEntity = interessatRepository.findOne(interessat.getId());
+			InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
 			
-			if (interessatEntity instanceof InteressatPersonaJuridicaEntity) {
+			if (deproxied instanceof InteressatPersonaJuridicaEntity) {
 			
-				((InteressatPersonaJuridicaEntity)interessatEntity).update(
+				((InteressatPersonaJuridicaEntity)deproxied).update(
 						interessatPersonaJuridicaDto.getRaoSocial(),
 						interessatPersonaJuridicaDto.getDocumentTipus(),
 						interessatPersonaJuridicaDto.getDocumentNum(),
@@ -479,12 +480,13 @@ public class ExpedientInteressatHelper {
 		} else {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
 			interessatEntity = interessatRepository.findOne(interessat.getId());
+			InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
 			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
 					interessatAdministracioDto.getOrganCodi());
 			
-			if (interessatEntity instanceof InteressatAdministracioEntity) {
+			if (deproxied instanceof InteressatAdministracioEntity) {
 			
-				((InteressatAdministracioEntity)interessatEntity).update(
+				((InteressatAdministracioEntity)deproxied).update(
 						unitat.getCodi(),
 						unitat.getDenominacio(),
 						interessatAdministracioDto.getDocumentTipus(),
