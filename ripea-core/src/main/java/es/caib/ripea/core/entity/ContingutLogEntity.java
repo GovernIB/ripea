@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.Getter;
 
@@ -97,11 +98,11 @@ public class ContingutLogEntity extends RipeaAuditable<Long> {
 			return this;
 		}
 		public Builder param1(String param1) {
-			built.param1 = param1;
+			built.param1 = Utils.abbreviate(param1, 256);
 			return this;
 		}
 		public Builder param2(String param2) {
-			built.param2 = param2;
+			built.param2 = Utils.abbreviate(param2, 256);
 			return this;
 		}
 		public Builder pare(ContingutLogEntity pare) {

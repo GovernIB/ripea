@@ -329,7 +329,14 @@ function closeViewer() {
 			<button id="btnSave" type="submit" class="btn btn-success">
 				<c:choose>
 					<c:when test="${isLast}">
-						<span class="fa fa-save"></span> <spring:message code="comu.boto.guardar" />
+						<c:choose>
+							<c:when test="${isCrearNewExpedient}">
+								<span class="fa fa-save"></span> <spring:message code="comu.boto.crear" />
+							</c:when>
+							<c:otherwise>
+								<span class="fa fa-save"></span> <spring:message code="expedient.peticio.accio.enum.INCORPORAR" />
+							</c:otherwise>
+						</c:choose>					
 					</c:when>
 					<c:otherwise>
 						<span class="fa fa-arrow-right"></span> <spring:message code="comu.boto.next" />

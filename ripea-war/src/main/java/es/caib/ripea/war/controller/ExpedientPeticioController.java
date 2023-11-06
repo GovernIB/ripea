@@ -398,6 +398,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				index,
 				expedientPeticioAcceptarCommand.getAnnexos().size());
 		
+		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
+		
 
 		return "expedientPeticioAcceptMetaDocs";
 
@@ -476,6 +478,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			}
 			
 		}
+		
+		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
+		
 		return expedientPeticioAcceptarCommand;
 		
 	}

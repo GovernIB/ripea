@@ -199,10 +199,13 @@ $(document).ready(function() {
 	var currentHeight = window.frameElement.contentWindow.document.body.scrollHeight;
 	localStorage.setItem("currentIframeHeight", currentHeight);
 
-	window.parent.removeLoading(idModal);
-	$('form').on('submit', function(){
-		window.parent.addLoading(idModal);
-	});
+
+	if (typeof window.parent.removeLoading === "function") { 
+		window.parent.removeLoading(idModal); // todo: check what removeLoading(), addLoading() do and if it is necessary
+		$('form').on('submit', function(){
+			window.parent.addLoading(idModal);
+		});
+	}
 
 	// Tancar transacció i esborrar localstorage
 	window.parent.removeTransactionId(idModal);
