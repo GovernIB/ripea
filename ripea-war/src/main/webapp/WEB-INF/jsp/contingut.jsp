@@ -738,7 +738,13 @@ function removeCookie(cname) {
 						</c:if> 
 						
 						<c:if test="${!isTasca}">
-							<rip:blocContingutAccions id="botons-accions-info" contingut="${expedient}" modeLlistat="true" mostrarObrir="false" contingutNavigationId="${contingut.id}"/>
+							<rip:blocContingutAccions 
+								id="botons-accions-info" 
+								contingut="${expedient}"
+								modeLlistat="true" 
+								mostrarObrir="false" 
+								contingutNavigationId="${contingut.id}" 
+								className="dropup"/>
 						</c:if>
 					</dl>
 				</div>
