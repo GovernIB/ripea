@@ -536,7 +536,7 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 						aplicacioService.propertyFindByNom("es.caib.ripea.documents.firma.biometrica.activa")));
 		model.addAttribute(
 				"pinbalServeiEnumOptions",
-				EnumHelper.getOptionsForEnum(MetaDocumentPinbalServeiEnumDto.class, "pinbal.servei.enum."));
+				EnumHelper.getOptionsForEnum(MetaDocumentPinbalServeiEnumDto.class, "meta.document.pinbal.servei.enum."));
 
 	}
 	

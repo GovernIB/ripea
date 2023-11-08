@@ -47,10 +47,10 @@
 				<rip:inputSuggest name="responsableCodi" urlConsultaInicial="${urlConsultaInicial}" urlConsultaLlistat="${urlConsultaLlistat}" placeholderKey="seguiment.list.filtre.camp.responsable" suggestValue="codi" suggestText="nom" inline="true"/>
 			</div>				
 			<div class="col-md-4">
-				<rip:inputDate name="dataInici" inline="true" placeholderKey="seguiment.list.filtre.camp.dataInici"/>
+				<rip:inputDate name="dataInici" inline="true" placeholderKey="seguiment.list.filtre.camp.dataIniciInici"/>
 			</div>
 			<div class="col-md-4">
-				<rip:inputDate name="dataFinal" inline="true" placeholderKey="seguiment.list.filtre.camp.dataFinal"/>
+				<rip:inputDate name="dataFinal" inline="true" placeholderKey="seguiment.list.filtre.camp.dataIniciFinal"/>
 			</div>
 
 			<div class="col-md-4 pull-right">

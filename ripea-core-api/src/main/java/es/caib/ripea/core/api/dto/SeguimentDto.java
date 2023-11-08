@@ -12,11 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-/**
- * Informació del filtre d'expedients.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+
 @Getter @Setter
 public class SeguimentDto implements Serializable {
 

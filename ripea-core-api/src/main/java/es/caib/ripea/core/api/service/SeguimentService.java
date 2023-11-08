@@ -11,6 +11,8 @@ import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaPinbalDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentNotificacionsFiltreDto;
@@ -53,6 +55,12 @@ public interface SeguimentService {
 			String rolActual,
 			ResultEnumDto resultEnum,
 			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum);
+
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
+	public PaginaDto<SeguimentConsultaPinbalDto> findConsultesPinbal(
+			Long entitatId,
+			SeguimentConsultaFiltreDto filtre,
+			PaginacioParamsDto paginacioParams);
 
 
 }

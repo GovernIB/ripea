@@ -26,6 +26,7 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.portafib.ws.api.v1.WsValidationException;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
+import es.caib.ripea.core.api.dto.ConsultaPinbalEstatEnumDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
@@ -42,7 +43,6 @@ import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
-import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -69,6 +69,8 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.core.entity.ConsultaPinbalEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DispositiuEnviamentEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -108,11 +110,13 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.helper.ViaFirmaHelper;
+import es.caib.ripea.core.repository.ConsultaPinbalRepository;
 import es.caib.ripea.core.repository.DispositiuEnviamentRepository;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
+import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -128,6 +132,8 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Autowired
 	private DocumentRepository documentRepository;
+	@Autowired
+	private ConsultaPinbalRepository consultaPinbalRepository;	
 	@Autowired
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
 	@Autowired
@@ -180,6 +186,8 @@ public class DocumentServiceImpl implements DocumentService {
 	private ExpedientTascaRepository expedientTascaRepository;
 	@Autowired
 	private UsuariHelper usuariHelper;
+	@Autowired
+	private EntitatRepository entitatRepository;
 	
 	@Transactional
 	@Override
@@ -677,7 +685,7 @@ public class DocumentServiceImpl implements DocumentService {
 
 	@Transactional
 	@Override
-	public void pinbalNovaConsulta(
+	public Exception pinbalNovaConsulta(
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,
@@ -724,146 +732,182 @@ public class DocumentServiceImpl implements DocumentService {
 					DocumentEntity.class,
 					"S'ha especificat un interessat que no és una persona física o juridica");
 		}
-		String idPeticion;
-		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPCIWS02) {
-			idPeticion = pinbalHelper.novaPeticioSvddgpciws02(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta.getFinalitat(),
-					consulta.getConsentiment());
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPVIWS02) {
-			idPeticion = pinbalHelper.novaPeticioSvddgpviws02(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta.getFinalitat(),
-					consulta.getConsentiment());
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPASWS01) {
-			idPeticion = pinbalHelper.novaPeticioSvdccaacpasws01(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta.getFinalitat(),
-					consulta.getConsentiment(),
-					consulta.getComunitatAutonomaCodi(),
-					consulta.getProvinciaCodi());
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDSCDDWS01) {
-			idPeticion = pinbalHelper.novaPeticioSvdscddws01(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta.getFinalitat(),
-					consulta.getConsentiment(),
-					consulta.getComunitatAutonomaCodi(),
-					consulta.getProvinciaCodi(),
-					consulta.getDataConsulta(),
-					consulta.getDataNaixement(),
-					consulta.getConsentimentTipusDiscapacitat());
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SCDCPAJU) {
-			idPeticion = pinbalHelper.novaPeticioScdcpaju(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta.getFinalitat(),
-					consulta.getConsentiment(),
-					consulta.getProvinciaCodi(),
-					consulta.getMunicipiCodi());
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDSCTFNWS01) {
-			idPeticion = pinbalHelper.novaPeticioSvdsctfnws01(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPCWS01) {
-			idPeticion = pinbalHelper.novaPeticioSvdccaacpcws01(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);			
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.Q2827003ATGSS001) {
-			idPeticion = pinbalHelper.novaPeticioQ2827003atgss001(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);		
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
-			idPeticion = pinbalHelper.novaPeticioSvddelsexws01(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);	
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SCDHPAJU) {
-			idPeticion = pinbalHelper.novaPeticioScdhpaju(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);		
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
-			idPeticion = pinbalHelper.novaPeticioNivrenti(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);			
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.ECOT103) {
-			idPeticion = pinbalHelper.novaPeticioEcot103(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);		
-		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPRESIDENCIALEGALDOCWS01) {
-			idPeticion = pinbalHelper.novaPeticioSvddgpresidencialegaldocws01(
-					expedient,
-					metaDocument,
-					interessat,
-					consulta);			
-		} else {
-			throw new ValidationException(
-					"<creacio>",
-					DocumentEntity.class,
-					"S'ha especificat un servei PINBAL no suportat: " + metaDocument.getPinbalServei());
-		}
-		FitxerDto justificant = pinbalHelper.getJustificante(idPeticion);
-		DocumentDto document = new DocumentDto();
-		document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
-		
-		if (interessat instanceof InteressatPersonaFisicaEntity) {
-			InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
-			StringBuilder nomSencer = new StringBuilder(interessatPf.getNom());
-			if (interessatPf.getLlinatge1() != null) {
-				nomSencer.append(" ");
-				nomSencer.append(interessatPf.getLlinatge1().trim());
-			}
-			if (interessatPf.getLlinatge2() != null) {
-				nomSencer.append(" ");
-				nomSencer.append(interessatPf.getLlinatge2().trim());
-			}
-			document.setNom(idPeticion + " - " + nomSencer.toString());
-		} else {
-			document.setNom(idPeticion + " - " + interessat.getIdentificador());
-		}
-		
-		
-		document.setData(new Date());
-		document.setNtiOrgano(expedient.getNtiOrgano());
-		document.setNtiOrigen(NtiOrigenEnumDto.O1);
-		document.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
-		document.setNtiTipoDocumental("TD99");
-		document.setFitxerNom(justificant.getNom());
-		document.setFitxerContentType(justificant.getContentType());
-		document.setFitxerContingut(justificant.getContingut());
-		document.setFitxerTamany(justificant.getContingut() != null ? new Long(justificant.getContingut().length) : null);
-		document.setAmbFirma(true);
-		document.setFirmaSeparada(false);
-		document.setPinbalIdpeticion(idPeticion);
 
-		documentHelper.crearDocument(
-				document,
-				pare,
-				expedient,
-				metaDocument,
-				true);
+		ConsultaPinbalEntity.ConsultaPinbalEntityBuilder consultaPinbalBuilder = ConsultaPinbalEntity.builder();
+		try {
+			String idPeticion = null;
+			if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPCIWS02) {
+				idPeticion = pinbalHelper.novaPeticioSvddgpciws02(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta.getFinalitat(),
+						consulta.getConsentiment());
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPVIWS02) {
+				idPeticion = pinbalHelper.novaPeticioSvddgpviws02(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta.getFinalitat(),
+						consulta.getConsentiment());
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPASWS01) {
+				idPeticion = pinbalHelper.novaPeticioSvdccaacpasws01(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta.getFinalitat(),
+						consulta.getConsentiment(),
+						consulta.getComunitatAutonomaCodi(),
+						consulta.getProvinciaCodi());
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDSCDDWS01) {
+				idPeticion = pinbalHelper.novaPeticioSvdscddws01(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta.getFinalitat(),
+						consulta.getConsentiment(),
+						consulta.getComunitatAutonomaCodi(),
+						consulta.getProvinciaCodi(),
+						consulta.getDataConsulta(),
+						consulta.getDataNaixement(),
+						consulta.getConsentimentTipusDiscapacitat());
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SCDCPAJU) {
+				idPeticion = pinbalHelper.novaPeticioScdcpaju(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta.getFinalitat(),
+						consulta.getConsentiment(),
+						consulta.getProvinciaCodi(),
+						consulta.getMunicipiCodi());
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDSCTFNWS01) {
+				idPeticion = pinbalHelper.novaPeticioSvdsctfnws01(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDCCAACPCWS01) {
+				idPeticion = pinbalHelper.novaPeticioSvdccaacpcws01(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);			
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.Q2827003ATGSS001) {
+				idPeticion = pinbalHelper.novaPeticioQ2827003atgss001(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);		
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
+				idPeticion = pinbalHelper.novaPeticioSvddelsexws01(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);	
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SCDHPAJU) {
+				idPeticion = pinbalHelper.novaPeticioScdhpaju(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);		
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
+				idPeticion = pinbalHelper.novaPeticioNivrenti(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);			
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.ECOT103) {
+				idPeticion = pinbalHelper.novaPeticioEcot103(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);		
+			} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPRESIDENCIALEGALDOCWS01) {
+				idPeticion = pinbalHelper.novaPeticioSvddgpresidencialegaldocws01(
+						expedient,
+						metaDocument,
+						interessat,
+						consulta);			
+			} else {
+				throw new ValidationException(
+						"<creacio>",
+						DocumentEntity.class,
+						"S'ha especificat un servei PINBAL no suportat: " + metaDocument.getPinbalServei());
+			}
+			
+			FitxerDto justificant = pinbalHelper.getJustificante(idPeticion);
+			DocumentDto document = new DocumentDto();
+			document.setDocumentTipus(DocumentTipusEnumDto.DIGITAL);
+			
+			if (interessat instanceof InteressatPersonaFisicaEntity) {
+				InteressatPersonaFisicaEntity interessatPf = (InteressatPersonaFisicaEntity)interessat;
+				StringBuilder nomSencer = new StringBuilder(interessatPf.getNom());
+				if (interessatPf.getLlinatge1() != null) {
+					nomSencer.append(" ");
+					nomSencer.append(interessatPf.getLlinatge1().trim());
+				}
+				if (interessatPf.getLlinatge2() != null) {
+					nomSencer.append(" ");
+					nomSencer.append(interessatPf.getLlinatge2().trim());
+				}
+				document.setNom(idPeticion + " - " + nomSencer.toString());
+			} else {
+				document.setNom(idPeticion + " - " + interessat.getIdentificador());
+			}
+			
+			
+			document.setData(new Date());
+			document.setNtiOrgano(expedient.getNtiOrgano());
+			document.setNtiOrigen(NtiOrigenEnumDto.O1);
+			document.setNtiEstadoElaboracion(DocumentNtiEstadoElaboracionEnumDto.EE01);
+			document.setNtiTipoDocumental("TD99");
+			document.setFitxerNom(justificant.getNom());
+			document.setFitxerContentType(justificant.getContentType());
+			document.setFitxerContingut(justificant.getContingut());
+			document.setFitxerTamany(justificant.getContingut() != null ? new Long(justificant.getContingut().length) : null);
+			document.setAmbFirma(true);
+			document.setFirmaSeparada(false);
+			document.setPinbalIdpeticion(idPeticion);
+
+			DocumentDto docum = documentHelper.crearDocument(
+					document,
+					pare,
+					expedient,
+					metaDocument,
+					true);
+			
+			DocumentEntity doc = documentRepository.findOne(docum.getId());
+			
+			consultaPinbalBuilder
+			.entitat(entitatRepository.findOne(entitatId))
+			.servei(metaDocument.getPinbalServei())
+			.estat(ConsultaPinbalEstatEnumDto.TRAMITADA)
+			.pinbalIdpeticion(idPeticion)
+			.expedient(expedient)
+			.metaExpedient(expedient.getMetaExpedient())
+			.document(doc);
+			
+			consultaPinbalRepository.save(consultaPinbalBuilder.build());
+			
+			return null;
+			
+		} catch (Exception e) {
+			
+			consultaPinbalBuilder
+			.entitat(entitatRepository.findOne(entitatId))
+			.servei(metaDocument.getPinbalServei())
+			.estat(ConsultaPinbalEstatEnumDto.ERROR)
+			.error(Utils.abbreviate(Utils.getRootMsg(e), 4000))
+			.expedient(expedient)
+			.metaExpedient(expedient.getMetaExpedient());
+			consultaPinbalRepository.save(consultaPinbalBuilder.build());
+			
+			return e;
+		}
 	}
+	
+	
+	
 
 	@Transactional
 	@Override

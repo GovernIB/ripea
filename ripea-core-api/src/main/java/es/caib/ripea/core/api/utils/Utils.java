@@ -173,7 +173,6 @@ public class Utils {
 		return valueStr;
 		
 	}
-	
 
 	public static Throwable getRootCauseOrItself(Throwable e) {
 		if (e != null) {
@@ -181,6 +180,19 @@ public class Utils {
 		} else {
 			return null;
 		}
+	}
+	
+	public static String getRootMsg(Throwable e) {
+		Throwable throwable = getRootCauseOrItself(e);
+		String msg = null;
+		if (throwable != null) {
+			if (isNotEmpty(throwable.getMessage())) {
+				msg = throwable.getMessage();
+			} else {
+				msg = throwable.getClass().toString();
+			}
+		}
+		return msg;
 	}
 
 	

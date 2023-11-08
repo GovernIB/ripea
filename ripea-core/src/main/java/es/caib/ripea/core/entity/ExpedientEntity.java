@@ -283,6 +283,9 @@ public class ExpedientEntity extends NodeEntity {
 	public String getNumero() {
 		return numero;
 	}
+	public String getNomINumero() {
+		return this.nom + " (" + this.numero + ")";
+	}
 	public String getRegistresImportats() {
 		return registresImportats;
 	}

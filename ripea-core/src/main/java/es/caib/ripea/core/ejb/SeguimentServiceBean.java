@@ -16,6 +16,8 @@ import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaPinbalDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentNotificacionsFiltreDto;
@@ -100,6 +102,18 @@ public  class SeguimentServiceBean implements SeguimentService {
 				rolActual,
 				resultEnum,
 				arxiuPendentTipusEnum);
+	}
+
+	@Override
+	@RolesAllowed({ "IPA_ADMIN", "IPA_ORGAN_ADMIN", "tothom" })
+	public PaginaDto<SeguimentConsultaPinbalDto> findConsultesPinbal(
+			Long entitatId,
+			SeguimentConsultaFiltreDto filtre,
+			PaginacioParamsDto paginacioParams) {
+		return delegate.findConsultesPinbal(
+				entitatId,
+				filtre,
+				paginacioParams);
 	}
 
 

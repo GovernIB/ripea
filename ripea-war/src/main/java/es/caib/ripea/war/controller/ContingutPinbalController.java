@@ -138,20 +138,34 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		if (command.getPaisNaixament().equals("724")) {
 			command.setCodiPoblacioNaixament(command.getProvinciaNaixament() + command.getMunicipiNaixament());
 		}
+		
+		Exception e = null;
 		try {
-			documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command), RolHelper.getRolActual(request));
-			return getModalControllerReturnValueSuccess(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.ok");
+			e = documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command), RolHelper.getRolActual(request));
 		} catch (Exception ex) {
-			logger.error("Error en la consulta PINBAL", ex);
+			e = ex;
+		}
+		if (e == null) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../contingut/" + pareId,
+					"pinbal.controller.creat.ok");
+		} else {
+			logger.error("Error en la de consulta PINBAL", e);
 			String info = "";
-			Exception pinbalExcepcion = ExceptionHelper.findExceptionInstance(ex, PinbalException.class, 3);
+			Exception pinbalExcepcion = ExceptionHelper.findExceptionInstance(e, PinbalException.class, 3);
 			if (pinbalExcepcion != null) {
 				String metode = ((PinbalException) pinbalExcepcion).getMetode();
 				if (StringUtils.isNotEmpty(metode)) {
 					info = " [" + metode + "] ";
 				}
 			}
-			return getModalControllerReturnValueError(request, "redirect:../contingut/" + pareId, "pinbal.controller.creat.error", new String[] {info + ex.getMessage()}, ex);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:../contingut/" + pareId,
+					"pinbal.controller.creat.error",
+					new String[] { info + e.getMessage() },
+					e);
 		}
 	}
 	

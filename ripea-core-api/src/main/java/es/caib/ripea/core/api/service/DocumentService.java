@@ -277,13 +277,14 @@ public interface DocumentService {
 	 * @param metaDocumentId
 	 *            Atribut id del meta-document.
 	 * @param rolActual
+	 * @return TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws PinbalException
 	 *             Si s'han produit errors en la consulta a PINBAL.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void pinbalNovaConsulta(
+	public Exception pinbalNovaConsulta(
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,

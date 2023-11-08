@@ -149,13 +149,13 @@ public class DocumentServiceBean implements DocumentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void pinbalNovaConsulta(
+	public Exception pinbalNovaConsulta(
 			Long entitatId,
 			Long pareId,
 			Long metaDocumentId,
 			PinbalConsultaDto consulta, 
 			String rolActual) throws NotFoundException, PinbalException {
-		delegate.pinbalNovaConsulta(
+		return delegate.pinbalNovaConsulta(
 				entitatId, 
 				pareId,
 				metaDocumentId,

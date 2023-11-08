@@ -416,6 +416,11 @@ body {
 									</a>
 								</li>
 								<li>
+									<a href="<c:url value="/seguimentPinbal"/>" data-maximized="true">
+										<spring:message code="decorator.menu.seguiment.consultesPinbal"/>
+									</a>
+								</li>								
+								<li>
 									<a href="<c:url value="/seguimentTasques"/>" data-maximized="true">
 										<spring:message code="decorator.menu.seguiment.assignacioTasques"/>
 									</a>

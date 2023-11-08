@@ -18,6 +18,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 
 import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
 import es.caib.ripea.core.aggregation.HistoricAggregation;
@@ -52,6 +53,7 @@ import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaPinbalDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SicresTipoDocumentoEnumDto;
 import es.caib.ripea.core.api.dto.SicresValidezDocumentoEnumDto;
@@ -64,6 +66,7 @@ import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.AlertaEntity;
 import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.ConsultaPinbalEntity;
 import es.caib.ripea.core.entity.DadaEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
@@ -822,7 +825,27 @@ public class ConversioTipusHelper {
 	            }
 	        })
 	        .byDefault()
-	        .register();	      
+	        .register();	
+	      
+	      
+	      mapperFactory.classMap(ConsultaPinbalEntity.class, SeguimentConsultaPinbalDto.class)
+	        .customize(new CustomMapper<ConsultaPinbalEntity, SeguimentConsultaPinbalDto>() {
+	            @Override
+	            public void mapAtoB(ConsultaPinbalEntity source, SeguimentConsultaPinbalDto target, MappingContext mappingContext) {
+	            
+	            	target.setDocumentId(source.getDocument() != null ? source.getDocument().getId() : null);
+	            	target.setDocumentTitol(source.getDocument() != null ? source.getDocument().getNom() : null);
+	            	target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
+	            	target.setExpedientNumeroTitol(source.getExpedient() != null ? source.getExpedient().getNomINumero() : null);
+	            	target.setProcedimentCodiNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getCodiSiaINom() : null);
+	            	target.setCreatedBy(source.getCreatedBy().getNom());
+	            	target.setCreatedDate(source.getCreatedDate().toDate());
+	            	target.setError(HtmlUtils.htmlEscape(source.getError()));
+	            	
+	            }
+	        })
+	        .byDefault()
+	        .register();
 		
       
 	      //if not excluded with the new version of orika 1.4.6 it gives: ma.glasnost.orika.MappingException: Encountered mapping of primitive to object (or vise-versa); sourceType=boolean, destinationType=ExpedientEntity

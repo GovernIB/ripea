@@ -27,11 +27,14 @@ import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaFiltreDto;
+import es.caib.ripea.core.api.dto.SeguimentConsultaPinbalDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
 import es.caib.ripea.core.api.dto.SeguimentFiltreDto;
 import es.caib.ripea.core.api.dto.SeguimentNotificacionsFiltreDto;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.core.entity.ConsultaPinbalEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
@@ -51,6 +54,7 @@ import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosPerAnotacions;
 import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.ConsultaPinbalRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -59,6 +63,7 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 @Service
 public class SeguimentServiceImpl implements SeguimentService {
@@ -91,6 +96,10 @@ public class SeguimentServiceImpl implements SeguimentService {
 	private ExpedientHelper expedientHelper;
 	@Resource
 	private ExpedientPeticioHelper expedientPeticioHelper;
+	@Resource
+	private ConsultaPinbalRepository consultaPinbalRepository;
+	@Resource
+	private UsuariRepository usuariRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -126,6 +135,44 @@ public class SeguimentServiceImpl implements SeguimentService {
 		return paginacioHelper.toPaginaDto(docsEnvs, SeguimentDto.class);
 		
 	}
+	
+	
+	@Override
+	@Transactional(readOnly = true)
+	public PaginaDto<SeguimentConsultaPinbalDto> findConsultesPinbal(
+			Long entitatId,
+			SeguimentConsultaFiltreDto filtre, 
+			PaginacioParamsDto paginacioParams) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("expedientNumeroTitol", new String[] { "exp.nom" });
+		ordenacioMap.put("procedimentCodiNom", new String[] { "metaexp.nom" });
+		
+		
+		Page<ConsultaPinbalEntity> cons = consultaPinbalRepository.findAmbFiltrePaginat(
+				entitat,
+				filtre.getExpedientId() == null,
+				filtre.getExpedientId(),
+				filtre.getMetaExpedientId() == null,
+				filtre.getMetaExpedientId(),
+				filtre.getServei() == null, 
+				filtre.getServei(),
+				filtre.getCreatedByCodi() == null,
+				filtre.getCreatedByCodi() != null ? usuariRepository.findOne(filtre.getCreatedByCodi()) : null,
+				filtre.getDataInici() == null, 
+				DateHelper.toDateInicialDia(filtre.getDataInici()), 
+				filtre.getDataFinal() == null, 
+				DateHelper.toDateFinalDia(filtre.getDataFinal()), 
+				filtre.getEstat() == null, 
+				filtre.getEstat(), 
+				paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
+		
+		return paginacioHelper.toPaginaDto(cons, SeguimentConsultaPinbalDto.class);
+		
+	}
+	
 	
 	
 	
