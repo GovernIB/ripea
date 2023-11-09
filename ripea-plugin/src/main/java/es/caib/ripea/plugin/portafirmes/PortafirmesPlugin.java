@@ -159,7 +159,8 @@ public interface PortafirmesPlugin {
 	 */
 	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String idTransaccio,
-			String idioma) throws SistemaExternException;
+			String idioma,
+			boolean signerInfo) throws SistemaExternException;
 	
 	/**
 	 * Recupera una url per mostrar/editar la informació de la plantilal de forma gràfica.

@@ -58,10 +58,12 @@ public interface PortafirmesFluxService {
 	 * 
 	 * @param plantillaFluxId
 	 * 				Id de la plantilla.
+	 * @param signerInfo
+	 * 				Indica si recuperar integrants flux
 	 * @return Informació bàsica del flux de firma.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId);
+	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String plantillaFluxId, boolean signerInfo);
 	
 	/**
 	 * Recupera un llistat de les plantilles disponibles per un usuari aplicació

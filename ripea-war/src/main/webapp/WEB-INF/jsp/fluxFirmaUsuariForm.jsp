@@ -44,7 +44,6 @@ $(document).ready(function() {
 	localStorage.setItem("currentIframeHeight", "180px");
 	
 	if ('${urlEdicio}') {
-		$('#fluxFirmaUsuariCommand').addClass("hidden");
 		var fluxIframe = '<div class="iframe_container">' + 
 							'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="${urlEdicio}"></iframe>' + 
 			  			 '</div>';
@@ -52,49 +51,26 @@ $(document).ready(function() {
 		adjustModalPerFlux();
 		$body = $("body");
 		$body.addClass("loading");
-	} else {
-		$(".portafirmesFluxId_btn_crear").on('click', function() {
-			$.ajax({
-				type: 'GET',
-				dataType: "json",
-				url: "<c:url value="/modal/metaExpedient/metaDocument/iniciarTransaccio"/>",
-				success: function(transaccioResponse) {
-					if (transaccioResponse != null && !transaccioResponse.error) {
-						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-						$('#fluxFirmaUsuariCommand').addClass("hidden");
-						$('.flux_container').html('<div class="iframe_container"><iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>');	
-						adjustModalPerFlux();
-						$body = $("body");
-						$body.addClass("loading");
-					} else if (transaccioResponse != null && transaccioResponse.error) {
-						let currentIframe = window.frameElement;
-						var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + transaccioResponse.errorDescripcio + '</span></div>';
-						$('form').prev().find('.alert').remove();
-						$('form').prev().prepend(alertDiv);
-						webutilModalAdjustHeight();
-					}
-				},
-				error: function(error) {
-					if (error != null && error.responseJSON != null) {
-						let currentIframe = window.frameElement;
-						var alertDiv = '<div class="alert alert-danger" role="alert"><a class="close" data-dismiss="alert">×</a><span>' + error.responseJSON.message + '</span></div>';
-						$('form').prev().find('.alert').remove();
-						$('form').prev().prepend(alertDiv);
-						webutilModalAdjustHeight();
-					}
-				}
-			});
-		});
 		
 		var parentIframe = window.frameElement;
 		var idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
 		
 		// Tancar transacció i esborrar localstorage
-		window.parent.removePlantillaEvent(false, idModal);
+		window.parent.closeModal(idModal);
+	} else {
+		var fluxIframe = '<div class="iframe_container">' + 
+							'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="${urlCreacio}"></iframe>' + 
+					     '</div>';
+		$('.flux_container').html(fluxIframe);	
+		adjustModalPerFlux();
+		$body = $("body");
+		$body.addClass("loading");
 		
-		document.querySelector('form').addEventListener('submit', function (e) {
-			localStorage.setItem('flagSubmit', '1');
-		});
+		var parentIframe = window.frameElement;
+		var idModal = $(parentIframe.closest("[id^='modal_']")).attr('id');
+		
+		// Tancar transacció i esborrar localstorage
+		window.parent.closeModal(idModal);
 	}
 });
 
@@ -122,19 +98,6 @@ function removeLoading() {
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/fluxusuari"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="fluxFirmaUsuariCommand" role="form">
-		<form:hidden path="id"/>
-		<rip:inputText name="nom" id="fluxNom" textKey="flux.firma.usuari.form.camp.nom" readonly="true"/>
-		<rip:inputText name="descripcio" id="fluxDescripcio" textKey="flux.firma.usuari.form.camp.descripcio"  readonly="true"/>
-		<div class="flux_portafib form-group text-center">
-			<a class="btn btn-default portafirmesFluxId_btn_crear"><spring:message code="flux.firma.usuari.form.crear"/>  <i class="fa fa-external-link"></i></a>
-			<form:hidden path="portafirmesFluxId" id="usuariPortafirmesFluxId"/>
-		</div>	
-		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<button onclick="window.parent.removePlantillaCallback(${not empty urlEdicio ? true : false}); return true;" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></button>
-		</div>
-	</form:form>
 	<div class="flux_container"></div>
 	<div class="rmodal"></div>
 </body>

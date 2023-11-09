@@ -16,29 +16,38 @@
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
 	
 <script type="text/javascript">
-function removePlantillaEvent(urlEdicio, idModal) {
-	if (idModal) {
-		$('#' + idModal).on('hidden.bs.modal', function (e) {
-			if (localStorage.getItem('flagSubmit') !== '1') {
-				removePlantillaCallback(urlEdicio);
-			}
-			
-			localStorage.removeItem('flagSubmit');
-		});
-	}
-};
 
-function removePlantillaCallback(urlEdicio) {
-	var idPlantilla = localStorage.getItem('idPlantilla');
+function closeModal(idModal) {
 	
-	if (idPlantilla && !urlEdicio) {
-		var esborraUrl = '<c:url value="/metaDocument/flux/esborrar/' + idPlantilla + '"/>';
+	$('#' + idModal).on('hidden.bs.modal', function (e) {
 		
-		$.get(esborraUrl);
+		var fluxSucces = localStorage.getItem('fluxSuccesDesc');
+		var fluxError = localStorage.getItem('fluxErrorDesc');
+		var alertDiv;
 		
-		localStorage.removeItem('idPlantilla');
-		localStorage.removeItem('transaccioId');
-	}
+		if (fluxSucces) {
+			alertDiv = '<div class="alert alert-success" role="alert"> \
+						<a class="close" data-dismiss="alert">×</a> \
+						<span>' + fluxSucces + '</span> \
+					</div>';
+		}
+		
+		if (fluxError) {
+			alertDiv = '<div class="alert alert-danger" role="alert"> \
+						<a class="close" data-dismiss="alert">×</a> \
+						<span>' + fluxError + '</span> \
+					</div>';
+		}
+		
+		$('#contingut-missatges').find('.alert').remove();
+		$('#contingut-missatges').prepend(alertDiv);
+		
+		$('#fluxosFirma').DataTable().ajax.reload();
+		
+		localStorage.removeItem('fluxSuccesDesc');
+		localStorage.removeItem('fluxErrorDesc');
+	});
+		
 }
 
 </script>
@@ -57,8 +66,10 @@ function removePlantillaCallback(urlEdicio) {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<th data-col-name="nom"><spring:message code="flux.firma.usuari.list.columna.nom"/></th>
-				<th data-col-name="descripcio"><spring:message code="flux.firma.usuari.list.columna.descripcio"/></th>
+				<th data-col-name="nom" width="13%"><spring:message code="flux.firma.usuari.list.columna.nom"/></th>
+				<th data-col-name="descripcio" width="13%"><spring:message code="flux.firma.usuari.list.columna.descripcio"/></th>
+				<th data-col-name="destinataris"><spring:message code="flux.firma.usuari.list.columna.destinataris"/></th>
+				<th data-col-name="createdDate" width="10%" data-type="datetime" data-converter="datetime"><spring:message code="flux.firma.usuari.list.columna.createl"/></th>
 				
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">

@@ -32,6 +32,11 @@ databaseChangeLog:
                   type: VARCHAR(256 ${varcharUnit})
               - column:
                   constraints:
+                    nullable: true
+                  name: DESTINATARIS
+                  type: VARCHAR(512 ${varcharUnit})
+              - column:
+                  constraints:
                     nullable: false
                   name: PORTAFIRMES_FLUXID
                   type: VARCHAR(64 ${varcharUnit})

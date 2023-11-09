@@ -17,6 +17,9 @@ import es.caib.ripea.core.api.dto.FluxFirmaUsuariDto;
 import es.caib.ripea.core.api.dto.FluxFirmaUsuariFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxReviserDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxSignerDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.FluxFirmaUsuariService;
@@ -57,7 +60,8 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 	@Override
 	public FluxFirmaUsuariDto create(
 			Long entitatId,
-			FluxFirmaUsuariDto flux) throws NotFoundException {
+			FluxFirmaUsuariDto flux,
+			PortafirmesFluxInfoDto fluxDetall) throws NotFoundException {
 		logger.debug("Creant un nou flux (" +
 				"flux=" + flux + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -78,6 +82,37 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 				entitat,
 				usuari).build();
 		
+		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
+			String destinataris = "";
+			
+			for (PortafirmesFluxSignerDto destinatari : fluxDetall.getDestinataris()) {
+				destinataris += destinatari.getNom();
+				destinataris += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
+				destinataris += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
+				
+				destinataris += ! destinatari.getRevisers().isEmpty() ? " [": "";
+				
+				int index = 0;
+				for (PortafirmesFluxReviserDto revisor : destinatari.getRevisers()) {
+					destinataris += revisor.getNom();
+					destinataris += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
+					destinataris += revisor.getNif() != null ? " - " + revisor.getNif() : "";
+					
+					if (index < destinatari.getRevisers().size() - 1) {
+						destinataris += ", ";
+		            }
+
+		            index++;
+				}
+				
+				destinataris += ! destinatari.getRevisers().isEmpty() ? "]": "";
+				
+				destinataris += "<br>";
+			}
+			
+			entity.update(destinataris);
+		}
+		
 		return conversioTipusHelper.convertir(
 				fluxFirmaUsuariRepository.save(entity), 
 				FluxFirmaUsuariDto.class);
@@ -86,16 +121,46 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 	@Transactional
 	@Override
 	public FluxFirmaUsuariDto update(
+			Long id,
 			Long entitatId, 
-			FluxFirmaUsuariDto flux) throws NotFoundException {
+			PortafirmesFluxInfoDto fluxDetall) throws NotFoundException {
 		logger.debug("Actualitzant flux existent (" +
-				"flux=" + flux + ")");
+				"flux=" + id + ")");
 
-		FluxFirmaUsuariEntity entity = fluxFirmaUsuariRepository.findOne(flux.getId());
-		entity.update(
-				flux.getNom(),
-				flux.getDescripcio(),
-				flux.getPortafirmesFluxId());
+		FluxFirmaUsuariEntity entity = fluxFirmaUsuariRepository.findOne(id);
+		
+		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
+			String destinataris = "";
+			
+			for (PortafirmesFluxSignerDto destinatari : fluxDetall.getDestinataris()) {
+				if (destinatari.getNom() != null) {
+					destinataris += "- " + destinatari.getNom();
+					destinataris += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
+					destinataris += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
+					
+					destinataris += ! destinatari.getRevisers().isEmpty() ? " [": "";
+					
+					int index = 0;
+					for (PortafirmesFluxReviserDto revisor : destinatari.getRevisers()) {
+						destinataris += revisor.getNom();
+						destinataris += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
+						destinataris += revisor.getNif() != null ? " - " + revisor.getNif() : "";
+						
+						if (index < destinatari.getRevisers().size() - 1) {
+							destinataris += ", ";
+			            }
+	
+			            index++;
+					}
+					
+					destinataris += ! destinatari.getRevisers().isEmpty() ? "]": "";
+					
+					destinataris += "<br>";
+				}
+			}
+			
+			entity.update(destinataris);
+		}
 		
 		return conversioTipusHelper.convertir(
 				entity,

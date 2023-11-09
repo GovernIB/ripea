@@ -37,6 +37,9 @@ public class FluxFirmaUsuariEntity extends RipeaAuditable<Long> {
 	@Column(name = "portafirmes_fluxid")
 	private String portafirmesFluxId;
 	
+	@Column(name = "destinataris")
+	private String destinataris;
+	
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "entitat_id")
 	@ForeignKey(name = "ipa_flux_firma_usuari_ent_fk")
@@ -48,12 +51,8 @@ public class FluxFirmaUsuariEntity extends RipeaAuditable<Long> {
 	protected UsuariEntity usuari;
 
 	public void update(
-			String nom,
-			String descripcio,
-			String portafirmesFluxId) {
-		this.nom = nom;
-		this.descripcio = descripcio;
-		this.portafirmesFluxId = portafirmesFluxId;
+			String destinataris) {
+		this.destinataris = destinataris;
 	}
 
 	public static Builder getBuilder(

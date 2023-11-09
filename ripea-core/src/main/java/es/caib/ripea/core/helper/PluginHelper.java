@@ -98,6 +98,8 @@ import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxReviserDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxSignerDto;
 import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
@@ -168,6 +170,8 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxReviser;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxSigner;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
@@ -2158,17 +2162,39 @@ public class PluginHelper {
 			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO, errorDescripcio, ex);
 		}
 	}
-	public PortafirmesFluxInfoDto portafirmesRecuperarInfoFluxDeFirma(String plantillaFluxId, String idioma) {
+	public PortafirmesFluxInfoDto portafirmesRecuperarInfoFluxDeFirma(String plantillaFluxId, String idioma, boolean signerInfo) {
 
 		String accioDescripcio = "Recuperant detall flux de firma";
 		long t0 = System.currentTimeMillis();
 		PortafirmesFluxInfoDto respostaDto;
 		try {
 			respostaDto = new PortafirmesFluxInfoDto();
-			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarFluxDeFirmaByIdPlantilla(plantillaFluxId, idioma);
+			PortafirmesFluxInfo resposta = getPortafirmesPlugin().recuperarFluxDeFirmaByIdPlantilla(plantillaFluxId, idioma, signerInfo);
 			if (resposta != null) {
 				respostaDto.setNom(resposta.getNom());
 				respostaDto.setDescripcio(resposta.getDescripcio());
+			}
+			
+			if (signerInfo) {
+				List<PortafirmesFluxSignerDto> destinataris = new ArrayList<PortafirmesFluxSignerDto>();
+				for (PortafirmesFluxSigner signer: resposta.getSigners()) {
+					PortafirmesFluxSignerDto signerDto = new PortafirmesFluxSignerDto();
+					signerDto.setNom(signer.getNom());
+					signerDto.setLlinatges(signer.getLlinatges());
+					signerDto.setNif(signer.getNif());
+					
+					for (PortafirmesFluxReviser revisor: signer.getRevisers()) {
+						PortafirmesFluxReviserDto revisorDto = new PortafirmesFluxReviserDto();
+						revisorDto.setNom(revisor.getNom());
+						revisorDto.setLlinatges(revisor.getLlinatges());
+						revisorDto.setNif(revisor.getNif());
+						
+						signerDto.getRevisers().add(revisorDto);
+					}
+					destinataris.add(signerDto);
+				}
+
+				respostaDto.setDestinataris(destinataris);
 			}
 		} catch (Exception ex) {
 			String errorDescripcio = "Error al accedir al plugin de portafirmes";
@@ -2848,7 +2874,7 @@ public class PluginHelper {
 			sri.setReturnCertificateInfo(true);
 			sri.setReturnValidationChecks(false);
 			sri.setValidateCertificateRevocation(false);
-			sri.setReturnCertificates(false);
+			sri.setReturnCertificates(true);
 			sri.setReturnTimeStampInfo(true);
 			validationRequest.setSignatureRequestedInformation(sri);
 			ValidateSignatureResponse validateSignatureResponse = getValidaSignaturaPlugin().validateSignature(validationRequest);

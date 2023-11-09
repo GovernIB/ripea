@@ -11,6 +11,7 @@ import es.caib.ripea.core.api.dto.FluxFirmaUsuariDto;
 import es.caib.ripea.core.api.dto.FluxFirmaUsuariFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
@@ -26,7 +27,9 @@ public interface FluxFirmaUsuariService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param flux
-	 *            Informació del flux a crear;
+	 *            Informació del flux a crear.
+	 * @param fluxDetall 
+	 * 			  Informació dels destinataris.
 	 * @return El flux creat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -34,7 +37,8 @@ public interface FluxFirmaUsuariService {
 	@PreAuthorize("hasRole('tothom')")
 	public FluxFirmaUsuariDto create(
 			Long entitatId,
-			FluxFirmaUsuariDto flux) throws NotFoundException;
+			FluxFirmaUsuariDto flux,
+			PortafirmesFluxInfoDto fluxDetall) throws NotFoundException;
 
 	/**
 	 * Actualitza la informació d'un flux de firma que tengui el mateix
@@ -42,16 +46,17 @@ public interface FluxFirmaUsuariService {
 	 * 
 	 * @param entitatId
 	 *            Id de l'entitat.
-	 * @param flux
-	 *            Informació del flux a crear;
+	 * @param fluxDetall
+	 *            Informació dels destinataris.
 	 * @return El flux modificat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public FluxFirmaUsuariDto update(
+			Long id,
 			Long entitatId,
-			FluxFirmaUsuariDto flux) throws NotFoundException;
+			PortafirmesFluxInfoDto fluxDetall) throws NotFoundException;
 
 	/**
 	 * Esborra el flux amb el mateix id que l'especificat.

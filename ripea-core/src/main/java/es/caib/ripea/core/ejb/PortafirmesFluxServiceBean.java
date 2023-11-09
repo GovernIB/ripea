@@ -55,8 +55,8 @@ public class PortafirmesFluxServiceBean implements PortafirmesFluxService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String idTransaccio) {
-		return delegate.recuperarDetallFluxFirma(idTransaccio);
+	public PortafirmesFluxInfoDto recuperarDetallFluxFirma(String idTransaccio, boolean signerInfo) {
+		return delegate.recuperarDetallFluxFirma(idTransaccio, signerInfo);
 	}
 
 	@Override

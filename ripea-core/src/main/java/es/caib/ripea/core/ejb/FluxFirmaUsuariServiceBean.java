@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.dto.FluxFirmaUsuariDto;
 import es.caib.ripea.core.api.dto.FluxFirmaUsuariFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.FluxFirmaUsuariService;
 
@@ -31,14 +32,14 @@ public class FluxFirmaUsuariServiceBean implements FluxFirmaUsuariService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public FluxFirmaUsuariDto create(Long entitatId, FluxFirmaUsuariDto flux) throws NotFoundException {
-		return delegate.create(entitatId, flux);
+	public FluxFirmaUsuariDto create(Long entitatId, FluxFirmaUsuariDto flux, PortafirmesFluxInfoDto fluxDetall) throws NotFoundException {
+		return delegate.create(entitatId, flux, fluxDetall);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public FluxFirmaUsuariDto update(Long entitatId, FluxFirmaUsuariDto flux) throws NotFoundException {
-		return delegate.update(entitatId, flux);
+	public FluxFirmaUsuariDto update(Long id, Long entitatId, PortafirmesFluxInfoDto fluxDetall) throws NotFoundException {
+		return delegate.update(id, entitatId, fluxDetall);
 	}
 
 	@Override

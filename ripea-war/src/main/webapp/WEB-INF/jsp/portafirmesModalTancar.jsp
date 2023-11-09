@@ -69,28 +69,6 @@ if (fluxIframe) {
 		}
 	}
 	
-	// En cas de voler mostrar nom/descripcio a la modal de creació
-	var campNom = $modalFlux.find('#fluxNom');
-	var campDescripcio = $modalFlux.find('#fluxDescripcio');
-	var campFluxId = $modalFlux.find('#usuariPortafirmesFluxId');
-	
-	if (campNom.length > 0 && fluxCreatedNom) {
-		campNom.val(fluxCreatedNom)
-		campNom.closest('.form-group').show();
-		$modalFlux.find('.flux_portafib').hide();
-
-		localStorage.setItem('idPlantilla', idTransaccioFlux);
-	}
-	
-	if (campDescripcio.length > 0 && fluxCreatedDescripcio) {
-		campDescripcio.val(fluxCreatedDescripcio);
-		campDescripcio.closest('.form-group').show();
-	}
-	
-	if (campFluxId.length > 0) {
-		campFluxId.val(idTransaccioFlux);
-	}
-	
 	$modalFlux.removeClass('hidden');
 	$modalFlux.find('.alert').remove();
 	$modalFlux.prepend(alertDiv);
@@ -98,12 +76,16 @@ if (fluxIframe) {
 	//Adjust modal width/height
 	adjustModalPerFluxRemove(fluxCreatedNom);
 	
-	if ('${isEdicio}') {
+	if ('${isEdicio}' || '${isCreacio}') {
+
+		localStorage.setItem('fluxSuccesDesc', fluxSuccesDesc);
+		localStorage.setItem('fluxErrorDesc', fluxErrorDesc);
+		
 		$(window.parent.frameElement).closest('.modal').find('.close').click();
+		
 	}
 	
 	$(fluxIframe.parentElement).trigger('remove');
-	
 
 }
 

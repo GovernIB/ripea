@@ -209,30 +209,11 @@ $(document).ready(function() {
 
 	// Tancar transacció i esborrar localstorage
 	window.parent.removeTransactionId(idModal);
-
-	var confirmModal = crearModalConfirmacio();
-	
-	$('body').append(confirmModal);
 	
 	//crear nou flux
 	$(".portafirmesEnviarFluxId_btn_edicio").on('click', function() {
-		if (${isCreacioFluxUsuariActiu}) {
-			$("#confirmModal").modal('show');
-		} else {
-			crearFlux(false);
-		}
-	});	
-
-
-	$("#confirmYesButton").on("click", function() {
-		$("#confirmModal").modal('hide');
-		crearFlux(true);
-	});
-	
-	$("#confirmNoButton").on("click", function() {
-		$("#confirmModal").modal('hide');
 		crearFlux(false);
-	});
+	});	
 	
 	//mostrar flux actual
 	$(".portafirmesEnviarFluxId_btn_addicional").on('click', function() {
