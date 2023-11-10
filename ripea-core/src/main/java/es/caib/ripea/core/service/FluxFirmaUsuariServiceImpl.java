@@ -28,6 +28,7 @@ import es.caib.ripea.core.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.FluxFirmaUsuariRepository;
@@ -55,6 +56,8 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
+	@Autowired
+	private MessageHelper messageHelper;
 	
 	@Transactional
 	@Override
@@ -83,33 +86,7 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 				usuari).build();
 		
 		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
-			String destinataris = "";
-			
-			for (PortafirmesFluxSignerDto destinatari : fluxDetall.getDestinataris()) {
-				destinataris += destinatari.getNom();
-				destinataris += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
-				destinataris += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
-				
-				destinataris += ! destinatari.getRevisers().isEmpty() ? " [": "";
-				
-				int index = 0;
-				for (PortafirmesFluxReviserDto revisor : destinatari.getRevisers()) {
-					destinataris += revisor.getNom();
-					destinataris += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
-					destinataris += revisor.getNif() != null ? " - " + revisor.getNif() : "";
-					
-					if (index < destinatari.getRevisers().size() - 1) {
-						destinataris += ", ";
-		            }
-
-		            index++;
-				}
-				
-				destinataris += ! destinatari.getRevisers().isEmpty() ? "]": "";
-				
-				destinataris += "<br>";
-			}
-			
+			String destinataris = obtenirDestinataris(fluxDetall.getDestinataris());
 			entity.update(destinataris);
 		}
 		
@@ -128,37 +105,9 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 				"flux=" + id + ")");
 
 		FluxFirmaUsuariEntity entity = fluxFirmaUsuariRepository.findOne(id);
-		
-		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
-			String destinataris = "";
-			
-			for (PortafirmesFluxSignerDto destinatari : fluxDetall.getDestinataris()) {
-				if (destinatari.getNom() != null) {
-					destinataris += "- " + destinatari.getNom();
-					destinataris += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
-					destinataris += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
-					
-					destinataris += ! destinatari.getRevisers().isEmpty() ? " [": "";
-					
-					int index = 0;
-					for (PortafirmesFluxReviserDto revisor : destinatari.getRevisers()) {
-						destinataris += revisor.getNom();
-						destinataris += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
-						destinataris += revisor.getNif() != null ? " - " + revisor.getNif() : "";
-						
-						if (index < destinatari.getRevisers().size() - 1) {
-							destinataris += ", ";
-			            }
 	
-			            index++;
-					}
-					
-					destinataris += ! destinatari.getRevisers().isEmpty() ? "]": "";
-					
-					destinataris += "<br>";
-				}
-			}
-			
+		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
+			String destinataris = obtenirDestinataris(fluxDetall.getDestinataris());
 			entity.update(destinataris);
 		}
 		
@@ -247,6 +196,41 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 		return conversioTipusHelper.convertirList(
 				fluxFirmaUsuariRepository.findByEntitatAndUsuari(entitat, usuari), 
 				FluxFirmaUsuariDto	.class);
+	}
+	
+	private String obtenirDestinataris(List<PortafirmesFluxSignerDto> destinataris) {
+		String destinatarisStr = "";
+
+		for (PortafirmesFluxSignerDto destinatari : destinataris) {
+			if (destinatari.getNom() != null) {
+				destinatarisStr += "- " + destinatari.getNom();
+				destinatarisStr += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
+				destinatarisStr += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
+				destinatarisStr += destinatari.isObligat() ? " - <span class='firma-obligat'>" + messageHelper.getMessage("flux.firma.usuari.firma.obligat") + "</span>" : "";
+				
+				destinatarisStr += !destinatari.getRevisors().isEmpty() ? " [" : "";
+
+				int index = 0;
+				for (PortafirmesFluxReviserDto revisor : destinatari.getRevisors()) {
+					destinatarisStr += revisor.getNom();
+					destinatarisStr += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
+					destinatarisStr += revisor.getNif() != null ? " - " + revisor.getNif() : "";
+
+					destinatarisStr += revisor.isObligat() ? " - <span class='firma-obligat'>" + messageHelper.getMessage("flux.firma.usuari.firma.obligat") + "</span>" : "";
+					
+					if (index < destinatari.getRevisors().size() - 1) {
+						destinatarisStr += ", ";
+					}
+
+					index++;
+				}
+
+				destinatarisStr += !destinatari.getRevisors().isEmpty() ? "]" : "";
+
+				destinatarisStr += "<br>";
+			}
+		}
+		return destinatarisStr;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FluxFirmaUsuariServiceImpl.class);

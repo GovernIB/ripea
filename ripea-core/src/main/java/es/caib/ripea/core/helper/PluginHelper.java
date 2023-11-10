@@ -2182,14 +2182,16 @@ public class PluginHelper {
 					signerDto.setNom(signer.getNom());
 					signerDto.setLlinatges(signer.getLlinatges());
 					signerDto.setNif(signer.getNif());
+					signerDto.setObligat(signer.isObligat());
 					
-					for (PortafirmesFluxReviser revisor: signer.getRevisers()) {
+					for (PortafirmesFluxReviser revisor: signer.getRevisors()) {
 						PortafirmesFluxReviserDto revisorDto = new PortafirmesFluxReviserDto();
 						revisorDto.setNom(revisor.getNom());
 						revisorDto.setLlinatges(revisor.getLlinatges());
 						revisorDto.setNif(revisor.getNif());
+						revisorDto.setObligat(revisor.isObligat());
 						
-						signerDto.getRevisers().add(revisorDto);
+						signerDto.getRevisors().add(revisorDto);
 					}
 					destinataris.add(signerDto);
 				}

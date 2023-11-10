@@ -14,7 +14,15 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
+
+<style type="text/css">
+
+.firma-obligat {
+	color: red;
+	font-weight: bold;
+}
+
+</style>
 <script type="text/javascript">
 
 function closeModal(idModal) {
@@ -67,7 +75,6 @@ function closeModal(idModal) {
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
 				<th data-col-name="nom" width="13%"><spring:message code="flux.firma.usuari.list.columna.nom"/></th>
-				<th data-col-name="descripcio" width="13%"><spring:message code="flux.firma.usuari.list.columna.descripcio"/></th>
 				<th data-col-name="destinataris"><spring:message code="flux.firma.usuari.list.columna.destinataris"/></th>
 				<th data-col-name="createdDate" width="10%" data-type="datetime" data-converter="datetime"><spring:message code="flux.firma.usuari.list.columna.createl"/></th>
 				

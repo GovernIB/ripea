@@ -438,6 +438,8 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 						UsuariPersonaBean detallSigner = null;
 						
 						FlowTemplateSimpleSigner signer = signature.getSigner();
+
+						signerFlux.setObligat(signature.isRequired());
 						
 						if (signer.getIntermediateServerUsername() != null) {
 							UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(signer.getIntermediateServerUsername());
@@ -446,6 +448,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 							signerFlux.setNom(detallSigner.getNom());
 							signerFlux.setLlinatges(detallSigner.getLlinatges());
 							signerFlux.setNif(detallSigner.getNif());
+							
 						} else if (signer.getPositionInTheCompany() != null) {
 							CarrecWs carrecWs = getUsuariEntitatWs().getCarrec(signer.getPositionInTheCompany());	
 							detallSigner = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
@@ -460,6 +463,8 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 						if (revisers != null) {
 							for (FlowTemplateSimpleReviser reviser: revisers) {
 								PortafirmesFluxReviser reviserFlux = new PortafirmesFluxReviser();
+								
+								reviserFlux.setObligat(reviser.isRequired());
 								
 								if (reviser.getIntermediateServerUsername() != null) {
 									UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(reviser.getIntermediateServerUsername());
@@ -476,7 +481,7 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 									reviserFlux.setNom(carrecNom);
 									reviserFlux.setNif(detallSigner.getNif());
 								}
-								signerFlux.getRevisers().add(reviserFlux);
+								signerFlux.getRevisors().add(reviserFlux);
 							}
 						}
 						info.getSigners().add(signerFlux);

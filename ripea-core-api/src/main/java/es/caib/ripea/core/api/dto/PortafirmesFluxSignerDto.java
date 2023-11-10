@@ -19,7 +19,9 @@ public class PortafirmesFluxSignerDto implements Serializable {
 	private String nif;
 	private String nom;
 	
-	private List<PortafirmesFluxReviserDto> revisers = new ArrayList<PortafirmesFluxReviserDto>();
+	private boolean obligat;
+	
+	private List<PortafirmesFluxReviserDto> revisors = new ArrayList<PortafirmesFluxReviserDto>();
 
 
 	private static final long serialVersionUID = 5066900852184560484L;

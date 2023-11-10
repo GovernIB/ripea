@@ -133,8 +133,11 @@ public class FluxFirmaUsuariController extends BaseAdminController {
 			PortafirmesFluxInfoDto fluxDetall = portafirmesFluxService.recuperarDetallFluxFirma(plantillaId, true);
 			
 			fluxFirmaUsuariService.update(fluxFirmaUsuariId, entitatActual.getId(), fluxDetall);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			logger.error("Error actualitzant el flux de firmes", ex);
+	        model.addAttribute(
+					"FluxError",
+					getMessage(request, getMessage(request, ex.getMessage())));
 		}
 		
 		return "portafirmesModalTancar";
@@ -164,8 +167,8 @@ public class FluxFirmaUsuariController extends BaseAdminController {
 			
 			try {
 				fluxDetall = portafirmesFluxService.recuperarDetallFluxFirma(resposta.getFluxId(), true);
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (Exception ex) {
+				logger.error("Error recuperant firmants flux", ex);
 			}
 			
 			fluxFirmaUsuariService.create(

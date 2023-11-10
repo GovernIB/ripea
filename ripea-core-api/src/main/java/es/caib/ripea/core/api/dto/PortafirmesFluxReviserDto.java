@@ -17,6 +17,8 @@ public class PortafirmesFluxReviserDto implements Serializable {
 	private String nif;
 	private String nom;
 	
+	private boolean isObligat;
+	
 	private static final long serialVersionUID = 7596085767014933225L;
 
 }
