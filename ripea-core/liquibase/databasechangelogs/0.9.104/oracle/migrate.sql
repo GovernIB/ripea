@@ -10,6 +10,9 @@
 -- Changeset db/changelog/changes/0.9.104/1041.yaml::1697009246691-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.plugin.digitalitzacio.log', 'false', 'Activar logs', 'DIGITALITZACIO', '6', '0', 'BOOL', '0');
 
+-- Changeset db/changelog/changes/0.9.104/1172.yaml::1699878361884-1::limit
+update ipa_interessat set document_tipus = 'NIF' where document_tipus = 'CIF';
+
 -- Changeset db/changelog/changes/0.9.104/1369.yaml::1697785157435-1::limit
 CREATE TABLE IPA_FLUX_FIRMA_USUARI (ID NUMBER(19) NOT NULL, NOM VARCHAR2(80 CHAR) NOT NULL, DESCRIPCIO VARCHAR2(256 CHAR), DESTINATARIS VARCHAR2(512 CHAR), PORTAFIRMES_FLUXID VARCHAR2(64 CHAR) NOT NULL, USUARI_CODI VARCHAR2(64 CHAR) NOT NULL, ENTITAT_ID NUMBER(19) NOT NULL, CREATEDBY_CODI VARCHAR2(64 CHAR), CREATEDDATE TIMESTAMP, LASTMODIFIEDBY_CODI VARCHAR2(64 CHAR), LASTMODIFIEDDATE TIMESTAMP, CONSTRAINT IPA_FLUX_FIRMA_USUARI_PK PRIMARY KEY (ID));
 
