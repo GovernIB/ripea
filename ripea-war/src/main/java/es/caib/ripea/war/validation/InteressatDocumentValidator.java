@@ -40,9 +40,13 @@ public class InteressatDocumentValidator implements ConstraintValidator<Interess
 			if (docNum != null && !docNum.isEmpty()) {
 
 				if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.NIF) {
-					valid = validacioDni(docNum);
-				} else if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.CIF){
-					valid = validacioCif(docNum);
+					
+					if (interessat.getTipus() == InteressatTipusEnumDto.PERSONA_FISICA) {
+						valid = validacioDni(docNum);
+					} else {
+						valid = validacioCif(docNum);
+					}
+
 				} else if (interessat.getDocumentTipus() == InteressatDocumentTipusEnumDto.DOCUMENT_IDENTIFICATIU_ESTRANGERS) {
 					valid = validacioNie(docNum);
 				}
