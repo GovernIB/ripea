@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1699887361133-1
+      author: limit
+      changes:
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.obtenir.data.firma.atributs.document
+              - column:
+                  name: value
+                  value: false
+              - column:
+                  name: description
+                  value: Obtenir informació firma utilitzant les metadades del document
+              - column:
+                  name: group_code
+                  value: CONTINGUT
+              - column:
+                  name: position
+                  value: 40
+              - column:
+                  name: jboss_property
+                  value: 0
+              - column:
+                  name: type_code
+                  value: BOOL
+              - column:
+                  name: configurable
+                  value: 0
+             

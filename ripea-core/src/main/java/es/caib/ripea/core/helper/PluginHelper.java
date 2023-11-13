@@ -2,6 +2,7 @@ package es.caib.ripea.core.helper;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -19,6 +20,8 @@ import java.util.Properties;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 //import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
 import org.fundaciobit.plugins.certificate.InformacioCertificat;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
@@ -2883,6 +2886,21 @@ public class PluginHelper {
 							detall.setResponsableNom(certificateInfo.getEntitatSubscriptoraNom());
 						detall.setEmissorCertificat(certificateInfo.getEmissorOrganitzacio());
 					}
+					
+					if (isObtenirDataFirmaFromAtributDocument() && detall.getResponsableNif() != null) {
+						try {
+							PDDocument document = PDDocument.load(new ByteArrayInputStream(documentContingut));
+				            for (PDSignature signature : document.getSignatureDictionaries()) {
+				            	if (signature.getName() != null && signature.getName().contains(detall.getResponsableNif())) {
+				            			detall.setData(signature.getSignDate().getTime());
+				            	}
+				            }
+				            document.close();
+				        } catch (IOException ex) {
+				            logger.error("Hi ha hagut un problema recuperant l'hora de firma: " + ex.getMessage());
+				        }
+					}
+					
 					detalls.add(detall);
 				}
 				firma.setAutofirma(false);
@@ -4666,6 +4684,9 @@ public class PluginHelper {
 	}
 	public boolean isModificacioCustodiatsActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
+	}
+	private boolean isObtenirDataFirmaFromAtributDocument() {
+		return configHelper.getAsBoolean("es.caib.ripea.obtenir.data.firma.atributs.document");
 	}
 	public void setArxiuPlugin(String entitatCodi, IArxiuPlugin arxiuPlugin) {
 		arxiuPlugins.put(entitatCodi, arxiuPlugin);
