@@ -149,6 +149,10 @@
 		a.btn.input-group-addon.portafirmesResponsables_btn {
 			background-color: #fff;
 		}
+		.select2-container--bootstrap .select2-results__group {
+		    font-size: 1.5rem;
+		    background: #dadada;
+		}
 	</style>
 
 	<script type="text/javascript">
@@ -434,17 +438,37 @@
 					selPlantilles.append("<option value=\"\"></option>");
 					if (data) {
 						var items = [];
+						var itemsUsuari = [];
+						
+						selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.comun'/>'>");
 						$.each(data, function(i, val) {
-							items.push({
-								"id": val.fluxId,
-								"text": val.nom
-							});
-							if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.fluxId) {
-								selPlantilles.append("<option selected value=\"" + val.fluxId + "\">" + val.nom + "</option>");
-							} else {
-								selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+							if (val.usuariActual) {
+								itemsUsuari.push({
+									"id": val.fluxId,
+									"text": val.nom
+								});
+							}
+							if (!val.usuariActual) {
+								if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.fluxId) {
+									selPlantilles.append("<option selected value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+								} else {
+									selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+								}
 							}
 						});
+						selPlantilles.append("</optgroup>");
+						
+						if (itemsUsuari.length > 0) {
+							selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.usuari'/>'>");
+							$.each(itemsUsuari, function(i, val) {
+								if (defaultPortafirmesFluxId != '' && defaultPortafirmesFluxId === val.id) {
+									selPlantilles.append("<option selected value=\"" + val.id + "\">" + val.text + "</option>");
+								} else {
+									selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+								}
+							});
+							selPlantilles.append("</optgroup>");
+						}
 					}
 					var select2Options = {
 						theme: 'bootstrap',

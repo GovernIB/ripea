@@ -56,8 +56,6 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 	private PluginHelper pluginHelper;
 	@Autowired
 	private AplicacioService aplicacioService;
-	@Autowired
-	private MessageHelper messageHelper;
 	
 	@Transactional
 	@Override
@@ -206,7 +204,7 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 				destinatarisStr += "- " + destinatari.getNom();
 				destinatarisStr += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
 				destinatarisStr += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
-				destinatarisStr += destinatari.isObligat() ? " - <span class='firma-obligat'>" + messageHelper.getMessage("flux.firma.usuari.firma.obligat") + "</span>" : "";
+				destinatarisStr += destinatari.isObligat() ? " - <span id='firma-obligat'>OBLIGATORI_TEXT</span>" : "";
 				
 				destinatarisStr += !destinatari.getRevisors().isEmpty() ? " [" : "";
 
@@ -216,7 +214,7 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 					destinatarisStr += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
 					destinatarisStr += revisor.getNif() != null ? " - " + revisor.getNif() : "";
 
-					destinatarisStr += revisor.isObligat() ? " - <span class='firma-obligat'>" + messageHelper.getMessage("flux.firma.usuari.firma.obligat") + "</span>" : "";
+					destinatarisStr += revisor.isObligat() ? " - <span id='firma-obligat'>OBLIGATORI_TEXT</span>" : "";
 					
 					if (index < destinatari.getRevisors().size() - 1) {
 						destinatarisStr += ", ";

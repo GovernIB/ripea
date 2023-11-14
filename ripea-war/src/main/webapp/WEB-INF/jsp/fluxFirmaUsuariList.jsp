@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <html>
 <head>
@@ -17,13 +18,23 @@
 
 <style type="text/css">
 
-.firma-obligat {
+#firma-obligat {
 	color: red;
 	font-weight: bold;
 }
 
 </style>
 <script type="text/javascript">
+
+$(document).ready(function() {
+
+	$.views.helpers({
+        replaceText: function(destinataris) {
+            return destinataris.replaceAll('OBLIGATORI_TEXT', '<spring:message code="flux.firma.usuari.list.columna.destinatari.obligatori"/>');
+        }
+    });
+	
+});
 
 function closeModal(idModal) {
 	
@@ -74,8 +85,13 @@ function closeModal(idModal) {
 		<thead>
 			<tr>
 				<th data-col-name="id" data-visible="false"></th>
-				<th data-col-name="nom" width="13%"><spring:message code="flux.firma.usuari.list.columna.nom"/></th>
-				<th data-col-name="destinataris"><spring:message code="flux.firma.usuari.list.columna.destinataris"/></th>
+				<th data-col-name="nom" width="25%"><spring:message code="flux.firma.usuari.list.columna.nom"/></th>
+				<th data-col-name="destinataris" data-template="#cellDestinatarisTemplate">
+					<spring:message code="flux.firma.usuari.list.columna.destinataris"/>
+					<script id="cellDestinatarisTemplate" type="text/x-jsrender">
+						{{:~replaceText(destinataris)}}
+					</script>
+				</th>
 				<th data-col-name="createdDate" width="10%" data-type="datetime" data-converter="datetime"><spring:message code="flux.firma.usuari.list.columna.createl"/></th>
 				
 				<th data-col-name="id" data-orderable="false" data-template="#cellAccionsTemplate" width="10%">

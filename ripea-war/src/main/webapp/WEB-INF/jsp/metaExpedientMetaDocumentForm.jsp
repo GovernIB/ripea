@@ -168,6 +168,10 @@ div.dropdown-menu.loading {
 div.dropdown-menu.loading .rmodal_carrecs {
     display: block;
 }
+.select2-container--bootstrap .select2-results__group {
+    font-size: 1.5rem;
+    background: #dadada;
+}
 </style>	
 <script type="text/javascript">
 
@@ -267,13 +271,29 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				selPlantilles.append("<option value=\"\"></option>");
 				if (data) {
 					var items = [];
+					var itemsUsuari = [];
+					
+					selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.comun'/>'>");
 					$.each(data, function(i, val) {
-						items.push({
-							"id": val.fluxId,
-							"text": val.nom
-						});
-						selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						if (val.usuariActual) {
+							itemsUsuari.push({
+								"id": val.fluxId,
+								"text": val.nom
+							});
+						}
+						if (!val.usuariActual) {
+							selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						}
 					});
+					selPlantilles.append("</optgroup>");
+					
+					if (itemsUsuari.length > 0) {
+						selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.usuari'/>'>");
+						$.each(itemsUsuari, function(i, val) {
+							selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+						});
+						selPlantilles.append("</optgroup>");
+					}
 				}
 				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
 				selPlantilles.select2(select2Options);

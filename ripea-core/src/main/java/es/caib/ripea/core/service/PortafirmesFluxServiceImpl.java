@@ -146,33 +146,35 @@ public class PortafirmesFluxServiceImpl implements PortafirmesFluxService {
 		List<PortafirmesFluxRespostaDto> plantillesFiltrades = new ArrayList<PortafirmesFluxRespostaDto>();
 		List<PortafirmesFluxRespostaDto> plantilles = pluginHelper.portafirmesRecuperarPlantillesDisponibles(aplicacioService.getUsuariActual(), filtrar);
 		
-		if (rolActual.equals("tothom")) {
-			List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
-			
-			for (PortafirmesFluxRespostaDto plantilla: plantilles) {
-				boolean isCurrentUserTemplate = false;
-		        boolean isUserTemplate = false;
-		        
-		        for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
-		            if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && fluxFirmaUsuari.getUsuari().equals(usuari)) {
-		            	// Plantilla usuari actual
-		                isCurrentUserTemplate = true;
-		                break;
-		            } else if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId()) && ! isCurrentUserTemplate) {
-		            	// Plantilla d'un altre usuari (no mostrar al llistat)
-		            	isUserTemplate = true;
-		            	break;
-		            }
-		        }
+		List<FluxFirmaUsuariEntity> plantillesUsuari = fluxFirmaUsuariRepository.findByEntitat(entitat);
 
-		        // Plantilles usuari actual i plantilles comuns
-		        if (isCurrentUserTemplate || (!isCurrentUserTemplate && !plantillesFiltrades.contains(plantilla)) && ! isUserTemplate) {
-		            plantilla.setUsuariActual(isCurrentUserTemplate);
-		            plantillesFiltrades.add(plantilla);
-		        }
+		for (PortafirmesFluxRespostaDto plantilla : plantilles) {
+			boolean isCurrentUserTemplate = false;
+			boolean isUserTemplate = false;
+
+			for (FluxFirmaUsuariEntity fluxFirmaUsuari : plantillesUsuari) {
+				if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId())
+						&& fluxFirmaUsuari.getUsuari().equals(usuari)) {
+					// Plantilla usuari actual
+					isCurrentUserTemplate = true;
+					break;
+				} else if (plantilla.getFluxId().equals(fluxFirmaUsuari.getPortafirmesFluxId())
+						&& !isCurrentUserTemplate) {
+					// Plantilla d'un altre usuari (no mostrar al llistat)
+					isUserTemplate = true;
+					break;
+				}
+			}
+
+			// Plantilles usuari actual i plantilles comuns
+			if (isCurrentUserTemplate
+					|| (!isCurrentUserTemplate && !plantillesFiltrades.contains(plantilla)) && !isUserTemplate) {
+				plantilla.setUsuariActual(isCurrentUserTemplate);
+				plantillesFiltrades.add(plantilla);
 			}
 		}
-		return rolActual.equals("tothom") ? plantillesFiltrades : plantilles;
+		
+		return plantillesFiltrades;
 	}
 	
 	@Transactional
