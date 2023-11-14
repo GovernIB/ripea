@@ -7,6 +7,7 @@ delete from ipa_contingut where expedient_id = ID_EXPEDIENT;
 
 
 delete from ipa_expedient_tasca_resp where tasca_id in (select id from ipa_expedient_tasca where expedient_id  = ID_EXPEDIENT);
+delete from ipa_expedient_tasca where expedient_id = ID_EXPEDIENT;
 delete from ipa_expedient_rel where expedient_id = ID_EXPEDIENT or expedient_rel_id = ID_EXPEDIENT;
 delete from ipa_exp_comment where expedient_id = ID_EXPEDIENT;
 delete from ipa_alerta where contingut_id = ID_EXPEDIENT;

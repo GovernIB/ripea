@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,8 +67,8 @@ import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSe
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.registre.RegistreInteressat;
 import es.caib.ripea.core.api.utils.Utils;
@@ -2124,6 +2123,9 @@ public class ContingutHelper {
 			PermissionEnumDto permission) {
 		
 		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		if (contingut == null) {
+			throw new NotFoundException(contingutId, ContingutEntity.class);
+		}
 		
 		entityComprovarHelper.comprovarExpedient(
 				contingut.getExpedientPare().getId(),
