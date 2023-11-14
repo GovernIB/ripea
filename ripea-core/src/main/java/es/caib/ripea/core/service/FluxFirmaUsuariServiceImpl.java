@@ -17,6 +17,9 @@ import es.caib.ripea.core.api.dto.FluxFirmaUsuariDto;
 import es.caib.ripea.core.api.dto.FluxFirmaUsuariFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxReviserDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxSignerDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.FluxFirmaUsuariService;
@@ -25,6 +28,7 @@ import es.caib.ripea.core.entity.FluxFirmaUsuariEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.MessageHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.FluxFirmaUsuariRepository;
@@ -57,7 +61,8 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 	@Override
 	public FluxFirmaUsuariDto create(
 			Long entitatId,
-			FluxFirmaUsuariDto flux) throws NotFoundException {
+			FluxFirmaUsuariDto flux,
+			PortafirmesFluxInfoDto fluxDetall) throws NotFoundException {
 		logger.debug("Creant un nou flux (" +
 				"flux=" + flux + ")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -78,6 +83,11 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 				entitat,
 				usuari).build();
 		
+		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
+			String destinataris = obtenirDestinataris(fluxDetall.getDestinataris());
+			entity.update(destinataris);
+		}
+		
 		return conversioTipusHelper.convertir(
 				fluxFirmaUsuariRepository.save(entity), 
 				FluxFirmaUsuariDto.class);
@@ -86,16 +96,18 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 	@Transactional
 	@Override
 	public FluxFirmaUsuariDto update(
+			Long id,
 			Long entitatId, 
-			FluxFirmaUsuariDto flux) throws NotFoundException {
+			PortafirmesFluxInfoDto fluxDetall) throws NotFoundException {
 		logger.debug("Actualitzant flux existent (" +
-				"flux=" + flux + ")");
+				"flux=" + id + ")");
 
-		FluxFirmaUsuariEntity entity = fluxFirmaUsuariRepository.findOne(flux.getId());
-		entity.update(
-				flux.getNom(),
-				flux.getDescripcio(),
-				flux.getPortafirmesFluxId());
+		FluxFirmaUsuariEntity entity = fluxFirmaUsuariRepository.findOne(id);
+	
+		if (fluxDetall != null && fluxDetall.getDestinataris() != null) {
+			String destinataris = obtenirDestinataris(fluxDetall.getDestinataris());
+			entity.update(destinataris);
+		}
 		
 		return conversioTipusHelper.convertir(
 				entity,
@@ -182,6 +194,41 @@ public class FluxFirmaUsuariServiceImpl implements FluxFirmaUsuariService {
 		return conversioTipusHelper.convertirList(
 				fluxFirmaUsuariRepository.findByEntitatAndUsuari(entitat, usuari), 
 				FluxFirmaUsuariDto	.class);
+	}
+	
+	private String obtenirDestinataris(List<PortafirmesFluxSignerDto> destinataris) {
+		String destinatarisStr = "";
+
+		for (PortafirmesFluxSignerDto destinatari : destinataris) {
+			if (destinatari.getNom() != null) {
+				destinatarisStr += "- " + destinatari.getNom();
+				destinatarisStr += destinatari.getLlinatges() != null ? " " + destinatari.getLlinatges() : "";
+				destinatarisStr += destinatari.getNif() != null ? " - " + destinatari.getNif() : "";
+				destinatarisStr += destinatari.isObligat() ? " - <span id='firma-obligat'>OBLIGATORI_TEXT</span>" : "";
+				
+				destinatarisStr += !destinatari.getRevisors().isEmpty() ? " [" : "";
+
+				int index = 0;
+				for (PortafirmesFluxReviserDto revisor : destinatari.getRevisors()) {
+					destinatarisStr += revisor.getNom();
+					destinatarisStr += revisor.getLlinatges() != null ? " " + revisor.getLlinatges() : "";
+					destinatarisStr += revisor.getNif() != null ? " - " + revisor.getNif() : "";
+
+					destinatarisStr += revisor.isObligat() ? " - <span id='firma-obligat'>OBLIGATORI_TEXT</span>" : "";
+					
+					if (index < destinatari.getRevisors().size() - 1) {
+						destinatarisStr += ", ";
+					}
+
+					index++;
+				}
+
+				destinatarisStr += !destinatari.getRevisors().isEmpty() ? "]" : "";
+
+				destinatarisStr += "<br>";
+			}
+		}
+		return destinatarisStr;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(FluxFirmaUsuariServiceImpl.class);

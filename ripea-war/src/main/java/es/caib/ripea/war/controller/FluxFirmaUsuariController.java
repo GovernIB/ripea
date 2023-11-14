@@ -6,14 +6,12 @@ package es.caib.ripea.war.controller;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,8 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FluxFirmaUsuariDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
+import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
+import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.FluxFirmaUsuariService;
+import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
 import es.caib.ripea.war.command.FluxFirmaUsuariCommand;
 import es.caib.ripea.war.command.FluxFirmaUsuariFiltreCommand;
@@ -31,6 +33,7 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.SessioHelper;
 
 /**
  * Controlador per al manteniment de fluxos de firma d'usuari.
@@ -49,6 +52,8 @@ public class FluxFirmaUsuariController extends BaseAdminController {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private PortafirmesFluxService portafirmesFluxService;
+	@Autowired
+	private OrganGestorService organGestorService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get() {
@@ -91,49 +96,94 @@ public class FluxFirmaUsuariController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
 		FluxFirmaUsuariDto fluxFirmaUsuari = null;
+		String urlReturn = aplicacioService.propertyBaseUrl() + "/fluxusuari/returnurl/";
+		
 		if (fluxFirmaUsuariId != null)
 			fluxFirmaUsuari = fluxFirmaUsuariService.findById(entitatActual.getId(), fluxFirmaUsuariId);
 		if (fluxFirmaUsuari != null) {
 			model.addAttribute(FluxFirmaUsuariCommand.asCommand(fluxFirmaUsuari));
-
-			String urlReturn = aplicacioService.propertyBaseUrl() + "/metaExpedient/metaDocument/flux/returnurl/";
+			urlReturn += fluxFirmaUsuariId + "/" + fluxFirmaUsuari.getPortafirmesFluxId();
+			
 			String urlEdicio = portafirmesFluxService.recuperarUrlEdicioPlantilla(fluxFirmaUsuari.getPortafirmesFluxId(), urlReturn);
 			
 			model.addAttribute("urlEdicio", urlEdicio);
 			
 		} else {
 			model.addAttribute(new FluxFirmaUsuariCommand());
+			PortafirmesIniciFluxRespostaDto transaccioResponse = portafirmesFluxService.iniciarFluxFirma(urlReturn, true);
+			
+			model.addAttribute("urlCreacio", transaccioResponse.getUrlRedireccio());
 		}
 		return "fluxFirmaUsuariForm";
 	}
 	
-	@RequestMapping(method = RequestMethod.POST)
-	public String save(
+	@RequestMapping(value = "/returnurl/{fluxFirmaUsuariId}/{plantillaId}", method = RequestMethod.GET)
+	public String returnRipeaModificacio(
 			HttpServletRequest request,
-			@Valid FluxFirmaUsuariCommand command,
-			BindingResult bindingResult) {
+			@PathVariable Long fluxFirmaUsuariId,
+			@PathVariable String plantillaId,
+			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		model.addAttribute(
+				"FluxCreat",
+				getMessage(request, "metadocument.form.camp.portafirmes.flux.edicio.enum.FINAL_OK"));
+		model.addAttribute("isEdicio", true);
 		
-		if (bindingResult.hasErrors()) {
-			return "fluxFirmaUsuariForm";
+		try {
+			PortafirmesFluxInfoDto fluxDetall = portafirmesFluxService.recuperarDetallFluxFirma(plantillaId, true);
+			
+			fluxFirmaUsuariService.update(fluxFirmaUsuariId, entitatActual.getId(), fluxDetall);
+		} catch (Exception ex) {
+			logger.error("Error actualitzant el flux de firmes", ex);
+	        model.addAttribute(
+					"FluxError",
+					getMessage(request, getMessage(request, ex.getMessage())));
 		}
-		if (command.getId() != null) {
-			fluxFirmaUsuariService.update(
-					entitatActual.getId(), 
-					FluxFirmaUsuariCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:fluxusuari",
-					"flux.firma.usuari.controller.modificat.ok");
+		
+		return "portafirmesModalTancar";
+	}
+	
+	@RequestMapping(value = "/returnurl/{transactionId}", method = RequestMethod.GET)
+	public String returnRipeaCreacio(HttpServletRequest request, @PathVariable String transactionId, Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		PortafirmesFluxRespostaDto resposta = portafirmesFluxService.recuperarFluxFirma(transactionId);
+		organGestorService.actualitzarOrganCodi(SessioHelper.getOrganActual(request));
+
+		model.addAttribute("isCreacio", true);
+		
+		if (resposta.isError()) {
+			model.addAttribute(
+					"FluxError",
+					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum." + resposta.getEstat()));
+
+			return "portafirmesModalTancar";
 		} else {
+			PortafirmesFluxInfoDto fluxDetall = null;
+			FluxFirmaUsuariCommand command = new FluxFirmaUsuariCommand();
+			
+			command.setNom(resposta.getNom());
+			command.setDescripcio(resposta.getDescripcio());
+			command.setPortafirmesFluxId(resposta.getFluxId());
+			
+			try {
+				fluxDetall = portafirmesFluxService.recuperarDetallFluxFirma(resposta.getFluxId(), true);
+			} catch (Exception ex) {
+				logger.error("Error recuperant firmants flux", ex);
+			}
+			
 			fluxFirmaUsuariService.create(
 					entitatActual.getId(),
-					FluxFirmaUsuariCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:fluxusuari",
-					"flux.firma.usuari.controller.creat.ok");
+					FluxFirmaUsuariCommand.asDto(command),
+					fluxDetall);
+			
+			
+			model.addAttribute(
+					"FluxCreat",
+					getMessage(request, "metadocument.form.camp.portafirmes.flux.enum.FINAL_OK"));
+			
+			return "portafirmesModalTancar";
 		}
+		
 	}
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)

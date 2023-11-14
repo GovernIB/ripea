@@ -240,7 +240,7 @@ public class PortafirmesPluginCwsJaxws extends RipeaAbstractPluginProperties imp
 	public void tancarTransaccioFlux(String idTransaccio) throws SistemaExternException {}
 	
 	@Override
-	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String fluxId, String idioma)
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String fluxId, String idioma, boolean signerInfo)
 			throws SistemaExternException {
 		return new PortafirmesFluxInfo();
 	}

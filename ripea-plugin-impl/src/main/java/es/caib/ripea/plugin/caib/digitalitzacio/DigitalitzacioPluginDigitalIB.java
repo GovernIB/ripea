@@ -327,7 +327,7 @@ public class DigitalitzacioPluginDigitalIB extends RipeaAbstractPluginProperties
 	}
 
 	private ApiMassiveScanWebSimple getDigitalitzacioClient() throws MalformedURLException {
-		String apiRestUrl = getBaseUrl() + "/common/rest/apimassivescanwebsimple/v1/";
+		String apiRestUrl = getBaseUrl();
 
 		ApiMassiveScanWebSimple api = new ApiMassiveScanWebSimpleJersey(
 				apiRestUrl,

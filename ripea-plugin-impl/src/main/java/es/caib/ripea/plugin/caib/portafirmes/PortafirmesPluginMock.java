@@ -142,7 +142,7 @@ public class PortafirmesPluginMock extends RipeaAbstractPluginProperties impleme
 		
 	}
 	@Override
-	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String idTransaccio, String idioma)
+	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(String idTransaccio, String idioma, boolean signerInfo)
 			throws SistemaExternException {
 		// TODO Auto-generated method stub
 		return null;

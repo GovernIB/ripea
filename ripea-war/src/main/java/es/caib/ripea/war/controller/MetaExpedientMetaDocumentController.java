@@ -180,7 +180,6 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 				model.addAttribute("isRolActualRevisor", true);
 			}
 		}
-		model.addAttribute("mostrarAvisPermis", Utils.isEmpty(aplicacioService.propertyFindByNom("es.caib.ripea.pinbal.codi.sia.peticions")));
 		
 		return "metaExpedientMetaDocumentForm";
 	}

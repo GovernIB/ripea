@@ -168,6 +168,10 @@ div.dropdown-menu.loading {
 div.dropdown-menu.loading .rmodal_carrecs {
     display: block;
 }
+.select2-container--bootstrap .select2-results__group {
+    font-size: 1.5rem;
+    background: #dadada;
+}
 </style>	
 <script type="text/javascript">
 
@@ -267,13 +271,29 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				selPlantilles.append("<option value=\"\"></option>");
 				if (data) {
 					var items = [];
+					var itemsUsuari = [];
+					
+					selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.comun'/>'>");
 					$.each(data, function(i, val) {
-						items.push({
-							"id": val.fluxId,
-							"text": val.nom
-						});
-						selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						if (val.usuariActual) {
+							itemsUsuari.push({
+								"id": val.fluxId,
+								"text": val.nom
+							});
+						}
+						if (!val.usuariActual) {
+							selPlantilles.append("<option value=\"" + val.fluxId + "\">" + val.nom + "</option>");
+						}
 					});
+					selPlantilles.append("</optgroup>");
+					
+					if (itemsUsuari.length > 0) {
+						selPlantilles.append("<optgroup label='<spring:message code='metadocument.form.camp.portafirmes.flux.group.usuari'/>'>");
+						$.each(itemsUsuari, function(i, val) {
+							selPlantilles.append("<option value=\"" + val.id + "\">" + val.text + "</option>");
+						});
+						selPlantilles.append("</optgroup>");
+					}
 				}
 				var select2Options = {theme: 'bootstrap', minimumResultsForSearch: "6"};
 				selPlantilles.select2(select2Options);
@@ -357,9 +377,8 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				$('#pinbalFinalitat').parent().parent().css('display', 'block');
 				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'block');
 				$('#pinbalUtilitzarCifOrgan').parent().parent().parent().parent().css('display', 'block');
-				<c:if test="${mostrarAvisPermis}">
-					$('#avisPermis').show();
-				</c:if>				
+				$('#avisPermis').show();
+					
 			} else {
 				$('#pinbalServei').attr('disabled', 'disabled');
 				$('#pinbalServei').parent().parent().css('display', 'none');
@@ -367,9 +386,7 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				$('#pinbalFinalitat').parent().parent().css('display', 'none');
 				$('#pinbalServeiDocsPermesos').parent().parent().css('display', 'none');
 				$('#pinbalUtilitzarCifOrgan').parent().parent().parent().parent().css('display', 'none');
-				<c:if test="${mostrarAvisPermis}">
-					$('#avisPermis').hide();
-				</c:if>						
+				$('#avisPermis').hide();
 			}
 		});
 		$("#pinbalActiu").trigger('change');
@@ -548,9 +565,7 @@ function removeLoading() {
 			</c:if>
 			<div role="tabpanel" class="tab-pane" id="pinbal">
 				<rip:inputCheckbox name="pinbalActiu" textKey="metadocument.form.camp.pinbal.actiu" disabled="${bloquejarCamps}"/>
-				<c:if test="${mostrarAvisPermis}">
-					<div id="avisPermis"><div id="contingut-missatges"><div class="alert alert-warning"><spring:message code='metadocument.form.camp.pinbal.avis.permis'/></div></div></div>
-				</c:if>
+				<div id="avisPermis"><div id="contingut-missatges"><div class="alert alert-warning"><spring:message code='metadocument.form.camp.pinbal.avis.permis'/></div></div></div>
 				
 				<rip:inputSelect 
 					name="pinbalServei" 

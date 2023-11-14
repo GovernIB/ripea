@@ -138,7 +138,8 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 				flux.setPortafirmesFluxId(resposta.getFluxId());
 				fluxFirmaUsuariService.create(
 						entitatActual.getId(), 
-						flux);
+						flux,
+						null);
 			}
 			model.addAttribute(
 					"FluxCreat",
@@ -172,7 +173,7 @@ public class PortafirmesFluxController extends BaseUserOAdminOOrganController {
 			resposta = portafirmesFluxService.recuperarPlantillesDisponibles(entitatActual.getId(), RolHelper.getRolActual(request), true);
 			String fluxPerDefecteId = documentService.findById(entitatActual.getId(), documentId, null).getMetaDocument().getPortafirmesFluxId();
 			if (fluxPerDefecteId != null && !fluxPerDefecteId.isEmpty()) {
-				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId);
+				PortafirmesFluxInfoDto portafirmesFluxInfoDto = portafirmesFluxService.recuperarDetallFluxFirma(fluxPerDefecteId, false);
 				
 				boolean isAlreadyOnList = false;
 				for (PortafirmesFluxRespostaDto respostaDto : resposta) {

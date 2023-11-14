@@ -8,7 +8,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,6 @@ import org.fundaciobit.apisib.apifirmaasyncsimple.v2.jersey.ApiFirmaAsyncSimpleJ
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.ApiFlowTemplateSimple;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleBlock;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleEditFlowTemplateRequest;
-import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleExternalSigner;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFilterGetAllByFilter;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplate;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleFlowTemplateList;
@@ -53,6 +51,7 @@ import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleG
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleKeyValue;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleReviser;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleSignature;
+import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleSigner;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStartTransactionRequest;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleStatus;
 import org.fundaciobit.apisib.apiflowtemplatesimple.v1.beans.FlowTemplateSimpleViewFlowTemplateRequest;
@@ -62,21 +61,13 @@ import org.fundaciobit.apisib.core.exceptions.ApisIBServerException;
 import org.fundaciobit.apisib.core.exceptions.ApisIBTimeOutException;
 import org.slf4j.LoggerFactory;
 
-import es.caib.portafib.ws.api.v1.BlocDeFirmesWs;
 import es.caib.portafib.ws.api.v1.CarrecWs;
-import es.caib.portafib.ws.api.v1.FirmaBean;
-import es.caib.portafib.ws.api.v1.FluxDeFirmesWs;
-import es.caib.portafib.ws.api.v1.PeticioDeFirmaWs;
-import es.caib.portafib.ws.api.v1.PortaFIBPeticioDeFirmaWs;
-import es.caib.portafib.ws.api.v1.PortaFIBPeticioDeFirmaWsService;
 import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWs;
 import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
 import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
 import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
 import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockSignerInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
@@ -85,6 +76,8 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxEstat;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
 import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxReviser;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxSigner;
 import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
@@ -420,7 +413,8 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 	@Override
 	public PortafirmesFluxInfo recuperarFluxDeFirmaByIdPlantilla(
 			String plantillaFluxId,
-			String idioma) throws SistemaExternException {
+			String idioma,
+			boolean signerInfo) throws SistemaExternException {
 		PortafirmesFluxInfo info = null;
 		try {
 			FlowTemplateSimpleFlowTemplateRequest request = new FlowTemplateSimpleFlowTemplateRequest(idioma, plantillaFluxId);
@@ -432,6 +426,69 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 				info.setNom(result.getName());
 				info.setDescripcio(result.getDescription());
 			}
+			
+			if (signerInfo) {
+				List<FlowTemplateSimpleBlock> blocks = result.getBlocks();
+				
+				for (FlowTemplateSimpleBlock block : blocks) {
+					List<FlowTemplateSimpleSignature> signatures = block.getSignatures();
+					
+					for (FlowTemplateSimpleSignature signature: signatures) {
+						PortafirmesFluxSigner signerFlux = new PortafirmesFluxSigner();
+						UsuariPersonaBean detallSigner = null;
+						
+						FlowTemplateSimpleSigner signer = signature.getSigner();
+
+						signerFlux.setObligat(signature.isRequired());
+						
+						if (signer.getIntermediateServerUsername() != null) {
+							UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(signer.getIntermediateServerUsername());
+							detallSigner = getUsuariEntitatWs().getUsuariPersona(usuariEntitat.getUsuariPersonaID());
+							
+							signerFlux.setNom(detallSigner.getNom());
+							signerFlux.setLlinatges(detallSigner.getLlinatges());
+							signerFlux.setNif(detallSigner.getNif());
+							
+						} else if (signer.getPositionInTheCompany() != null) {
+							CarrecWs carrecWs = getUsuariEntitatWs().getCarrec(signer.getPositionInTheCompany());	
+							detallSigner = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+							
+							String carrecNom = carrecWs.getCarrecName() + " (" + detallSigner.getNom() + " " + detallSigner.getLlinatges() + ")";
+							signerFlux.setNom(carrecNom);
+							signerFlux.setNif(detallSigner.getNif());
+						}
+						
+						List<FlowTemplateSimpleReviser> revisers = signature.getRevisers();
+						
+						if (revisers != null) {
+							for (FlowTemplateSimpleReviser reviser: revisers) {
+								PortafirmesFluxReviser reviserFlux = new PortafirmesFluxReviser();
+								
+								reviserFlux.setObligat(reviser.isRequired());
+								
+								if (reviser.getIntermediateServerUsername() != null) {
+									UsuariEntitatBean usuariEntitat = getUsuariEntitatWs().getUsuariEntitat(reviser.getIntermediateServerUsername());
+									detallSigner = getUsuariEntitatWs().getUsuariPersona(usuariEntitat.getUsuariPersonaID());
+									
+									reviserFlux.setNom(detallSigner.getNom());
+									reviserFlux.setLlinatges(detallSigner.getLlinatges());
+									reviserFlux.setNif(detallSigner.getNif());
+								} else if (reviser.getPositionInTheCompany() != null) {
+									CarrecWs carrecWs = getUsuariEntitatWs().getCarrec(reviser.getPositionInTheCompany());							
+									detallSigner = getUsuariEntitatWs().getUsuariPersona(carrecWs.getUsuariPersonaID());
+									
+									String carrecNom = carrecWs.getCarrecName() + " (" + detallSigner.getNom() + detallSigner.getLlinatges() + ")";
+									reviserFlux.setNom(carrecNom);
+									reviserFlux.setNif(detallSigner.getNif());
+								}
+								signerFlux.getRevisors().add(reviserFlux);
+							}
+						}
+						info.getSigners().add(signerFlux);
+					}
+				}
+			}
+			
 		} catch (Exception ex) {
 			throw new SistemaExternException(
 					"S'ha produït un error recuperant el detall del flux de firmes",
