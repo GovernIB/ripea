@@ -3,6 +3,8 @@ package es.caib.ripea.core.config;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.TaskScheduler;
@@ -15,6 +17,7 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
 
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.api.service.MonitorTasquesService;
 import es.caib.ripea.core.api.service.SegonPlaService;
 import es.caib.ripea.core.helper.ConfigHelper;
 import lombok.SneakyThrows;
@@ -33,6 +36,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private TaskScheduler taskScheduler;
     @Autowired
 	private ConfigHelper configHelper;
+    @Autowired
+    private MonitorTasquesService monitorTasquesService;
 
     private Boolean[] primeraVez = {Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE};
 
@@ -54,12 +59,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // Enviament d'execucions massives
         ////////////////////////////////////////////////////////////////
+		final String codiEnviarDocumentsAlPortafirmes = "enviarDocumentsAlPortafirmes";
+		monitorTasquesService.addTasca(codiEnviarDocumentsAlPortafirmes);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        execucioMassivaService.comprovarExecucionsMassives();
+						monitorTasquesService.inici(codiEnviarDocumentsAlPortafirmes);
+						try {
+							execucioMassivaService.comprovarExecucionsMassives();
+							monitorTasquesService.fi(codiEnviarDocumentsAlPortafirmes);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiEnviarDocumentsAlPortafirmes);
+						}                  
                     }
                 },
                 new Trigger() {
@@ -80,6 +93,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         }
                         trigger.setInitialDelay(registrarEnviamentsPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiEnviarDocumentsAlPortafirmes, longNextExecution);     
                         return nextExecution;
                     }
                 }
@@ -87,12 +102,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // Consultar i guardar anotacions peticions pendents
         ///////////////////////////////////////////////////////
+		final String codiConsultarIGuardarAnotacionsPendents = "consultarIGuardarAnotacionsPendents";
+		monitorTasquesService.addTasca(codiConsultarIGuardarAnotacionsPendents);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
+						monitorTasquesService.inici(codiConsultarIGuardarAnotacionsPendents);
+						try {
+							segonPlaService.consultarIGuardarAnotacionsPeticionsPendents();
+							monitorTasquesService.fi(codiConsultarIGuardarAnotacionsPendents);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiConsultarIGuardarAnotacionsPendents);
+						}                     	
                     }
                 },
                 new Trigger() {
@@ -113,6 +136,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         }
                         trigger.setInitialDelay(delay);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiConsultarIGuardarAnotacionsPendents, longNextExecution);     
                         return nextExecution;
                     }
                 }
@@ -120,15 +145,23 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // Reintentar canvi estat BACK_REBUDA a DISTRIBUCIO
         //////////////////////////////////////////////////////////////////
-
-        taskRegistrar.addTriggerTask( new Runnable() {
-                                          @SneakyThrows
-                                          @Override
-                                          public void run() {
-                                              segonPlaService.reintentarCanviEstatDistribucio();
-                                          }
-                                      },
-                new Trigger() {
+		final String codiCanviarEstatEnDistribucio = "canviarEstatEnDistribucio";
+		monitorTasquesService.addTasca(codiCanviarEstatEnDistribucio);
+		taskRegistrar.addTriggerTask(
+				new Runnable() {
+					@SneakyThrows
+					@Override
+					public void run() {
+						monitorTasquesService.inici(codiCanviarEstatEnDistribucio);
+						try {
+							segonPlaService.reintentarCanviEstatDistribucio();
+							monitorTasquesService.fi(codiCanviarEstatEnDistribucio);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiCanviarEstatEnDistribucio);
+						}  						
+					}
+		},
+				new Trigger() {
                     @Override
                     public Date nextExecutionTime(TriggerContext triggerContext) {
                         PeriodicTrigger trigger = null;
@@ -146,6 +179,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         }
                         trigger.setInitialDelay(delay);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiCanviarEstatEnDistribucio, longNextExecution);     
                         return nextExecution;
                     }
                 });
@@ -153,12 +188,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // Buidar caches dominis
         //////////////////////////////////////////////////////////////////
+//		final String codiBuidarCachesDominis = "buidarCachesDominis";
+//		monitorTasquesService.addTasca(codiBuidarCachesDominis);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.buidarCacheDominis();
+//						monitorTasquesService.inici(codiBuidarCachesDominis);
+//						try {
+	                        segonPlaService.buidarCacheDominis();
+//							monitorTasquesService.fi(codiBuidarCachesDominis);
+//						} catch (Throwable th) {
+//							tractarErrorTascaSegonPla(th, codiBuidarCachesDominis);
+//						}                         
                     }
                 },
                 new Trigger() {
@@ -179,6 +222,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+//                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+//        				monitorTasquesService.updateProperaExecucio(codiBuidarCachesDominis, longNextExecution);     
                         return nextExecution;
                     }
                 }
@@ -189,12 +234,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
         
         // Enviament de correus electrònics per comentaris als responsables dels procediments (is in background because it takes long time to calculate destinataris)
         /////////////////////////////////////////////////////////////////////////
+		final String codiEnviarEmailsInformantDeNouComentariPerProcediment = "enviarEmailsInformantDeNouComentariPerProcediment";
+		monitorTasquesService.addTasca(codiEnviarEmailsInformantDeNouComentariPerProcediment);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.enviarEmailPerComentariMetaExpedient();
+						monitorTasquesService.inici(codiEnviarEmailsInformantDeNouComentariPerProcediment);
+						try {
+	                        segonPlaService.enviarEmailPerComentariMetaExpedient();
+							monitorTasquesService.fi(codiEnviarEmailsInformantDeNouComentariPerProcediment);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiEnviarEmailsInformantDeNouComentariPerProcediment);
+						}                         
                     }
                 },
                 new Trigger() {
@@ -207,6 +260,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                             log.error("Error getting next execution date for enviarEmailPerComentariMetaExpedient()", e);
 						}
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiEnviarEmailsInformantDeNouComentariPerProcediment, longNextExecution);     
                         return nextExecution;
                     }
                 }
@@ -215,12 +270,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // Enviament de correus electrònics pendents agrupats
         /////////////////////////////////////////////////////////////////////////
+        final String codiEnviarEmailsAgrupats = "enviarEmailsAgrupats";
+		monitorTasquesService.addTasca(codiEnviarEmailsAgrupats);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.enviarEmailsPendentsAgrupats();
+                    	monitorTasquesService.inici(codiEnviarEmailsAgrupats);
+                        try{ 
+                        	segonPlaService.enviarEmailsPendentsAgrupats();
+                        	monitorTasquesService.fi(codiEnviarEmailsAgrupats);
+                        } catch(Throwable th) {                        	
+                        	tractarErrorTascaSegonPla(th, codiEnviarEmailsAgrupats);
+                        }
                     }
                 },
                 new Trigger() {
@@ -233,6 +296,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                             log.error("Error getting next execution date for enviarEmailsPendentsAgrupats()", e);
 						}
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiEnviarEmailsAgrupats, longNextExecution);                        
                         return nextExecution;
                     }
                 }
@@ -241,12 +306,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
         
         // Guardar en arxiu continguts pendents
         /////////////////////////////////////////////////////////////////////////
+        final String codiGuardarEnArxiuContingutsPendents = "guardarEnArxiuContingutsPendents";
+		monitorTasquesService.addTasca(codiGuardarEnArxiuContingutsPendents);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.guardarExpedientsDocumentsArxiu();
+						monitorTasquesService.inici(codiGuardarEnArxiuContingutsPendents);
+						try {
+	                        segonPlaService.guardarExpedientsDocumentsArxiu();
+							monitorTasquesService.fi(codiGuardarEnArxiuContingutsPendents);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuContingutsPendents);
+						}                         
                     }
                 },
                 new Trigger() {
@@ -266,6 +339,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiGuardarEnArxiuContingutsPendents, longNextExecution);     
                         return nextExecution;
                     }
                 }
@@ -273,12 +348,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
         
         // Guardar en arxiu interessats
         /////////////////////////////////////////////////////////////////////////
+        final String codiGuardarEnArxiuInteressats = "guardarEnArxiuInteressats";
+		monitorTasquesService.addTasca(codiGuardarEnArxiuInteressats);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.guardarInteressatsArxiu();
+						monitorTasquesService.inici(codiGuardarEnArxiuInteressats);
+						try {
+	                        segonPlaService.guardarInteressatsArxiu();
+							monitorTasquesService.fi(codiGuardarEnArxiuInteressats);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiGuardarEnArxiuInteressats);
+						}                         
                     }
                 },
                 new Trigger() {
@@ -298,6 +381,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                         }
                         trigger.setInitialDelay(enviamentRefrescarEstatPendentsInitialDelayLong);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiGuardarEnArxiuInteressats, longNextExecution);     
                         return nextExecution;
                     }
                 }                
@@ -305,12 +390,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // 7. Actualització automàtica de procediments (MetaExpedients)
         /////////////////////////////////////////////////////////////////////////
+        final String codiActualitzacioDeProcediments = "actualitzacioDeProcediments";
+        monitorTasquesService.addTasca(codiActualitzacioDeProcediments);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.actualitzarProcediments();
+						monitorTasquesService.inici(codiActualitzacioDeProcediments);
+						try {
+	                        segonPlaService.actualitzarProcediments();
+							monitorTasquesService.fi(codiActualitzacioDeProcediments);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiActualitzacioDeProcediments);
+						}                           
                     }
                 },
                 new Trigger() {
@@ -321,6 +414,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
                             cron = "0 15 * * * *";
                         CronTrigger trigger = new CronTrigger(cron);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiActualitzacioDeProcediments, longNextExecution);     
                         return nextExecution;
                     }
                 }
@@ -328,12 +423,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
         // 8. Consulta de canvis en l'organigrama
         /////////////////////////////////////////////////////////////////////////
+        final String codiConsultaDeCanvisAlOrganigrama = "consultaDeCanvisAlOrganigrama";
+        monitorTasquesService.addTasca(codiConsultaDeCanvisAlOrganigrama);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.consultaCanvisOrganigrama();
+						monitorTasquesService.inici(codiConsultaDeCanvisAlOrganigrama);
+						try {
+	                        segonPlaService.consultaCanvisOrganigrama();
+							monitorTasquesService.fi(codiConsultaDeCanvisAlOrganigrama);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiConsultaDeCanvisAlOrganigrama);
+						}                         
                     }
                 },
                 new Trigger() {
@@ -344,18 +447,29 @@ public class SchedulingConfig implements SchedulingConfigurer {
                             cron = "0 45 2 * * *";
                         CronTrigger trigger = new CronTrigger(cron);
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiConsultaDeCanvisAlOrganigrama, longNextExecution);     
                         return nextExecution;
                     }
                 }
         );
         
         // Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada
+        /////////////////////////////////////////////////////////////////////////
+        final String codiTancarExpedientsEnArxiu = "tancarExpedientsEnArxiu";
+        monitorTasquesService.addTasca(codiTancarExpedientsEnArxiu);
         taskRegistrar.addTriggerTask(
                 new Runnable() {
                     @SneakyThrows
                     @Override
                     public void run() {
-                        segonPlaService.tancarExpedientsArxiu();
+						monitorTasquesService.inici(codiTancarExpedientsEnArxiu);
+						try {
+	                        segonPlaService.tancarExpedientsArxiu();
+							monitorTasquesService.fi(codiTancarExpedientsEnArxiu);
+						} catch (Throwable th) {
+							tractarErrorTascaSegonPla(th, codiTancarExpedientsEnArxiu);
+						}                            
                     }
                 },
                 new Trigger() {
@@ -371,10 +485,21 @@ public class SchedulingConfig implements SchedulingConfigurer {
                             log.error("Error getting next execution date for tancarExpedientsArxiu()", e);
 						}
                         Date nextExecution = trigger.nextExecutionTime(triggerContext);
+                        Long longNextExecution = nextExecution.getTime() - System.currentTimeMillis();
+        				monitorTasquesService.updateProperaExecucio(codiTancarExpedientsEnArxiu, longNextExecution);     
                         return nextExecution;
                     }
                 }
         );
 
     }
+    
+    /** Enregistre l'error als logs i marca la tasca amb error. */
+	private void tractarErrorTascaSegonPla(Throwable th, String codiTasca) {
+		String errMsg = th.getClass() + ": " + th.getMessage() + " (" + new Date().getTime() + ")";
+		logger.error("Error no controlat a l'execució de la tasca en segon pla amb codi \"" + codiTasca + "\": " + errMsg, th);
+		monitorTasquesService.error(codiTasca, errMsg);
+	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(SchedulingConfig.class);
 }

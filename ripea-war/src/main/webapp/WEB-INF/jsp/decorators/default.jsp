@@ -337,7 +337,8 @@ body {
 								<%---- Annotacions comunicadas ----%>
 								<li><a href="<c:url value="/expedientPeticioComunicades"></c:url>">
 									<spring:message code="decorator.menu.anotacionsComunicades"/>
-								</a></li>								
+								</a></li>					
+								<li><a href="<c:url value="/monitor"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.monitor"/></a></li>											
 							</ul>
 						</div>
 						<div class="btn-group">
