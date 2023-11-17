@@ -275,7 +275,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 	@RequestMapping(value = "/rebutjar", method = RequestMethod.POST)
 	public String rebutjarPost(HttpServletRequest request, @Valid ExpedientPeticioRebutjarCommand command, BindingResult bindingResult, Model model) {
-
+		
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(command.getId());
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("expedientPeticioRebutjarCommand", command);
 			model.addAttribute("expedientPeticioId", command.getId());
@@ -283,7 +284,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		try {
 			expedientPeticioService.rebutjar(command.getId(), command.getObservacions());
-			return getModalControllerReturnValueSuccess(request, "redirect:expedientPeticio", "expedient.peticio.controller.rebutjat.ok");
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.rebutjat.ok",
+					new Object[] { expedientPeticioDto.getRegistre().getIdentificador() });
 		} catch (Exception ex) {
 			logger.error("Error al rebujtar anotacio", ex);
 			return getModalControllerReturnValueErrorMessageText(request, "redirect:expedientPeticio", ex.getMessage(), ex);
@@ -616,8 +621,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		boolean expCreatArxiuOk = true;
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
 		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
+		Long expedientId = null;
 		try {
-
 			if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
 				ExpedientDto expedientDto = expedientService.create(
 						entitat.getId(),
@@ -635,6 +640,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						justificantIdMetaDoc);
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
+				expedientId = expedientDto.getId();
 				
 				logger.info("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
 				
@@ -649,6 +655,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 							justificantIdMetaDoc,
 							expedientPeticioAcceptarCommand.isAgafarExpedient());
 					
+					expedientId = expedientPeticioAcceptarCommand.getExpedientId();
 				logger.info("Expedient incorporat per anotacio: " + processatOk);
 			}
 		} catch (Exception ex) {
@@ -666,13 +673,33 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					getMessage(request, "expedient.peticio.controller.acceptat.ko") + ": " + ExceptionHelper.getRootCauseOrItself(ex).getMessage(), ex);
 
 		}
+		
+		String expNom = expedientService.getNom(expedientId);
+		
 		if (!expCreatArxiuOk) {
-			return getModalControllerReturnValueWarning(request, "redirect:expedientPeticio", "expedient.peticio.controller.acceptat.warning.arxiu");
+			return getModalControllerReturnValueWarning(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.warning.arxiu",
+					new Object[] { 
+							expedientId.toString(), 
+							expNom,
+							expedientPeticioDto.getRegistre().getIdentificador() });
 		}
 		if (!processatOk) {
-			MissatgesHelper.warning(request, getMessage(request, "expedient.peticio.controller.acceptat.warning"));
+			MissatgesHelper.warning(
+					request,
+					getMessage(request, "expedient.peticio.controller.acceptat.warning"));
 		}
-		return getModalControllerReturnValueSuccess(request, "redirect:expedientPeticio", "expedient.peticio.controller.acceptat.ok");
+
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:expedientPeticio",
+				"expedient.peticio.controller.acceptat.ok",
+				new Object[] { 
+						expedientId.toString(), 
+						expNom, 
+						expedientPeticioDto.getRegistre().getIdentificador() });
 	}
 	
 	

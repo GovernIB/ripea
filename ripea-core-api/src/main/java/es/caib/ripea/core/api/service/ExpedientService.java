@@ -550,4 +550,9 @@ public interface ExpedientService {
 	public void setVistaUsuariActual(
 			es.caib.ripea.core.api.dto.ContingutVistaEnumDto vistaActual);
 
+
+	@PreAuthorize("hasRole('tothom')")
+	public String getNom(
+			Long id);
+
 }

@@ -452,4 +452,10 @@ public class ExpedientServiceBean implements ExpedientService {
 	public FitxerDto exportarEniExpedient(Long entitatId, Set<Long> expedientIds, boolean ambDocuments) throws IOException {
 		return delegate.exportarEniExpedient(entitatId, expedientIds, ambDocuments);
 	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public String getNom(Long id) {
+		return delegate.getNom(id);
+	}
 }

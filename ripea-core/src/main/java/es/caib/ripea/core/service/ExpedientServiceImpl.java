@@ -538,6 +538,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 		return expedientHelper.toExpedientDto(expedient, true, true, null, false);
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public String getNom(Long id) {
+		ExpedientEntity expedient = expedientRepository.findOne(id);
+		return expedient.getNom();
+	}
+	
 
 	
 
