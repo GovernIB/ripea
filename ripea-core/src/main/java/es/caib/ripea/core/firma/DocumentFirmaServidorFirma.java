@@ -5,6 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 //import org.ghost4j.document.Document;
 //import org.ghost4j.document.PDFDocument;
 //import org.ghost4j.modifier.SafeAppenderModifier;
@@ -22,11 +24,13 @@ import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.ArxiuConversions;
+import es.caib.ripea.core.helper.ExpedientHelper2;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
@@ -65,11 +69,28 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 					fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
 				}
 				
-				SignaturaResposta firma = pluginHelper.firmaServidorFirmar(
-						document,
-						fitxer,
-						motiu,
-						"ca");
+				SignaturaResposta firma = null;
+				try {
+					firma = pluginHelper.firmaServidorFirmar(
+							document,
+							fitxer,
+							motiu,
+							"ca");
+				} catch (Exception e) {
+					logger.info("Error al firmar en servidor el documento, documentId=" + document.getId() + ", documentNom=" + document.getNom(), e.getMessage());
+					// if document has signature but it was not detected by ripea/distribucio (this can happen if signature is corrupted as in issue #1375) then remove signature and try signing again
+					if (Utils.getRootMsg(e).contains("Error no controlat cridant al validador de firmes Plugin Validacio Firmes afirma CXF")) {
+
+						fitxer.setContingut(removeSignaturesPdfUsingPdfWriterCopyPdf(fitxer.getContingut(), fitxer.getContentType()));
+						firma = pluginHelper.firmaServidorFirmar(
+								document,
+								fitxer,
+								motiu,
+								"ca");
+					} else {
+						throw e;
+					}
+				}
 				
 				ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
 				arxiuFirma.setFitxerNom(firma.getNom());
@@ -264,7 +285,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	
 	
 	
-
+	private static final Logger logger = LoggerFactory.getLogger(DocumentFirmaServidorFirma.class);
 
 	
 	
