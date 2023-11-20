@@ -184,7 +184,7 @@ public class Utils {
 	
 	public static String getRootMsg(Throwable e) {
 		Throwable throwable = getRootCauseOrItself(e);
-		String msg = null;
+		String msg = "";
 		if (throwable != null) {
 			if (isNotEmpty(throwable.getMessage())) {
 				msg = throwable.getMessage();
