@@ -31,11 +31,6 @@
 		</a>
 	</div>
 
-	<script id="botonsTemplate" type="text/x-jsrender">
-		<div class="text-right">
-			<a href="<c:url value="/organgestor/new"/>" data-toggle="modal" data-maximized="true" class="btn btn-default"><span class="fa fa-plus"></span> <spring:message code="organgestor.list.boto.nou"/></a>
-		</div>
-	</script>
 	<c:url value="organgestor/filtrar" var="formAction"/>
 	<form:form id="organGestorFiltreForm" action="${ formAction }" method="post" cssClass="well" commandName="organGestorFiltreCommand">
 		<div class="row">
@@ -71,7 +66,6 @@
 		data-search-enabled="false"
 		data-default-order="3" 
 		data-default-dir="asc" 
-		data-botons-template="#botonsTemplate"
 		class="table table-striped table-bordered" 
 		data-rowhref-template="#rowhrefTemplate" 
 		data-rowhref-toggle="modal"
@@ -132,35 +126,10 @@
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
 								<li><a href="organgestor/{{:id}}" data-toggle="modal" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
-								<li><a href="organgestor/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="organgestor.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
 					</script>
 				</th>
-<!-- 				<th data-col-name="administration" data-template="#cellAdministrationTemplate"> -->
-<%-- 					<spring:message code="entitat.permis.columna.administracio"/> --%>
-<!-- 					<script id="cellAdministrationTemplate" type="text/x-jsrender"> -->
-<!-- 						{{if administration}}<span class="fa fa-check"></span>{{/if}} -->
-<!-- 					</script> -->
-<!-- 				</th> -->
-<!-- 				<th data-col-name="read" data-template="#cellReadTemplate"> -->
-<%-- 					<spring:message code="entitat.permis.columna.usuari"/> --%>
-<!-- 					<script id="cellReadTemplate" type="text/x-jsrender"> -->
-<!-- 						{{if read}}<span class="fa fa-check"></span>{{/if}} -->
-<!-- 					</script> -->
-<!-- 				</th> -->
-<!-- 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%"> -->
-<!-- 					<script id="cellAccionsTemplate" type="text/x-jsrender"> -->
-<!-- 						<div class="dropdown"> -->
-<!-- 							<button class="btn btn-primary" data-toggle="dropdown"> -->
-<%-- 								<span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span> --%>
-<!-- 							</button> -->
-<!-- 							<ul class="dropdown-menu"> -->
-<%-- 								<li><a href="#" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li> --%>
-<!-- 							</ul> -->
-<!-- 						</div> -->
-<!-- 					</script> -->
-<!-- 				</th> -->
 			</tr>
 		</thead>
 	</table>

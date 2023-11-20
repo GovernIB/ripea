@@ -624,7 +624,6 @@ public class OrganGestorHelper {
 						.nom(Utils.isNotEmpty(unitatWS.getDenominacioCooficial()) ? unitatWS.getDenominacioCooficial() : unitatWS.getDenominacio())
 						.pare(organPare)
 						.estat(unitatWS.getEstat())
-						.gestioDirect(false)
 						.cif(unitatWS.getNifCif())
 						.build();
 				organGestorRepository.save(unitat);

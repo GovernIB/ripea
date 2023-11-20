@@ -22,12 +22,9 @@ import lombok.Getter;
 public class OrganGestorCommand {
 
     private Long id;
-    @NotEmpty
     private String codi;
-    @NotEmpty
     private String nom;
     private Long pareId;
-    @Size(max=9)
     private String cif;
     private boolean utilitzarCifPinbal;
 

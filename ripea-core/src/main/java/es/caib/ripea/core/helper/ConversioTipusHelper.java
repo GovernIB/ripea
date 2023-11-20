@@ -707,7 +707,6 @@ public class ConversioTipusHelper {
 						target.setPareId(source.getPare() != null ? source.getPare().getId() : null);
 						target.setPareCodi(source.getPare() != null ? source.getPare().getCodi() : null);
 						target.setPareNom(source.getPare() != null ? source.getPare().getNom() : null);
-						target.setGestioDirect(source.isGestioDirect());
 						target.setEstat(source.getEstat());
 						target.setTipusTransicio(source.getTipusTransicio());
 						target.setCif(source.getCif());

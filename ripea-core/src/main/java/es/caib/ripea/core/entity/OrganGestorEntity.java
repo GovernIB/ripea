@@ -49,9 +49,6 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
     @Column(name = "actiu")
     private boolean actiu;
     
-    @Column(name = "gestio_direct")
-    private boolean gestioDirect;
-    
     @Column(name = "cif", length = 10)
     private String cif;
     
@@ -156,10 +153,6 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
             built.actiu = actiu;
             return this;
         }
-        public Builder gestioDirect(boolean gestioDirect) {
-            built.gestioDirect = gestioDirect;
-            return this;
-        }
         public Builder estat(String estat) {
             built.estat = OrganGestorEntity.getEstat(estat);
             return this;
@@ -174,18 +167,10 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
         }
     }
 
+
+	
 	public void update(
-			String codi,
-			String nom,
-			OrganGestorEntity pare,
-			boolean gestioDirect, 
-			String cif,
 			boolean utilitzarCifPinbal) {
-		this.codi = codi;
-		this.nom = nom;
-		this.pare = pare;
-		this.gestioDirect = gestioDirect;
-		this.cif = cif;
 		this.utilitzarCifPinbal = utilitzarCifPinbal;
 	}
 	
@@ -204,7 +189,6 @@ public class OrganGestorEntity extends RipeaAuditable<Long> {
 		this.nomEspanyol = nomEspanyol;
         this.estat = getEstat(estat);
         this.pare = pare;
-        this.gestioDirect = false;
         this.cif = cif;
     }
     

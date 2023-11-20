@@ -89,14 +89,6 @@
 	};
 
 
-	function deleteBustia() {
-		if (confirm('<spring:message code="organgestor.list.confirmacio.esborrar"/>')) {
-	  		location.href="organgestor/" + $('#id').val() + "/delete?redirectAOrganigrama=true";		
-		}
-	}
-
-
-
 	$(document).ready(function() {
 		$("input:visible:enabled:not([readonly]),textarea:visible:enabled:not([readonly]),select:visible:enabled:not([readonly])").first().focus();
 
@@ -155,7 +147,6 @@
 			<div style="padding-bottom: 10px;">
  				<button class="btn btn-default" onclick="$('#arbreOrgans').jstree('open_all');"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
  				<button class="btn btn-default" onclick="$('#arbreOrgans').jstree('close_all');"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
- 				<a style="float: right;" class="btn btn-default" href="<c:url value="/organgestor/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-plus"></span>&nbsp;<spring:message code="organgestor.list.boto.nou"/></a> 
 			</div>
  			<c:set var="fillsAtributInfoText"><span style="padding-top: 4.5px; padding-left: 2px;" class="fa fa-warning text-danger pull-right" title="<spring:message code="organgestor.list.obsolet"/>"></span></c:set>
 			<rip:arbre 
@@ -185,8 +176,8 @@
 					<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organGestorCommand" role="form">
 					
 						<form:hidden path="id"/>
-						<rip:inputText name="codi" id="codi1" textKey="organgestor.form.camp.codi" required="true" labelSize="2"/>
-						<rip:inputText name="nom" id="nom1" textKey="organgestor.form.camp.nom" required="true" labelSize="2"/>
+						<rip:inputText name="codi" id="codi1" textKey="organgestor.form.camp.codi" labelSize="2" readonly="true"/>
+						<rip:inputText name="nom" id="nom1" textKey="organgestor.form.camp.nom" labelSize="2" readonly="true"/>
 						<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 						<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
 						<rip:inputSuggest 
@@ -197,9 +188,10 @@
 								textKey="organgestor.form.camp.pare"
 								suggestValue="id"
 								suggestText="codiINom"
-								labelSize="2"/>
+								labelSize="2"
+								disabled="true"/>
 								
-						<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2"/>
+						<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2" readonly="true"/>
 						<rip:inputCheckbox name="utilitzarCifPinbal" textKey="organgestor.form.camp.utilitzar.cif.pinbal" labelSize="2" />
 						
 						
@@ -284,9 +276,7 @@
 						
 						<div class="row">
 							<div class="col-md-6"></div>
-							
 							<div class="col-md-3" style="margin-left: 15px;">
-								<button type="button" class="btn btn-default" onclick="deleteBustia()"><span class="fa fa-trash-o"></span> <spring:message code="contingut.admin.boto.esborrar"/></button>
 							</div>
 							<div class="col-md-2">
 								<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.modificar"/></button>

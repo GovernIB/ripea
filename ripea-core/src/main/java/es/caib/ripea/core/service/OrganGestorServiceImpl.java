@@ -154,7 +154,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				nom(organGestorDto.getNom()).
 				entitat(entitat).
 				pare(organPareEntity).
-				gestioDirect(true).
 				estat(OrganEstatEnumDto.V).
 				cif(organGestorDto.getCif()).
 				build();
@@ -174,18 +173,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		OrganGestorEntity organGestorEntity = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, organGestorDto.getId());
 		
-		OrganGestorEntity organPareEntity = null;
-		if (organGestorDto.getPareId() != null) {
-			organPareEntity = organGestorRepository.findOne(organGestorDto.getPareId());
-		}
-		
-		organGestorEntity.update(
-				organGestorDto.getCodi(),
-				organGestorDto.getNom(),
-				organPareEntity,
-				true, 
-				organGestorDto.getCif(),
-				organGestorDto.isUtilitzarCifPinbal());
+		organGestorEntity.update(organGestorDto.isUtilitzarCifPinbal());
 
 		return conversioTipusHelper.convertir(organGestorEntity, OrganGestorDto.class);
 	}

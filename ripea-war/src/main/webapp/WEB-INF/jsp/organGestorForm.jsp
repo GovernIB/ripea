@@ -27,8 +27,8 @@
 	<c:set var="formAction"><rip:modalUrl value="/organgestor"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="organGestorCommand" role="form">
 		<form:hidden path="id"/>
-		<rip:inputText name="codi" textKey="organgestor.form.camp.codi" required="true" labelSize="2"/>
-		<rip:inputText name="nom" textKey="organgestor.form.camp.nom" required="true" labelSize="2"/>
+		<rip:inputText name="codi" textKey="organgestor.form.camp.codi" labelSize="2" readonly="true"/>
+		<rip:inputText name="nom" textKey="organgestor.form.camp.nom" labelSize="2" readonly="true"/>
 		<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
 		<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
@@ -38,9 +38,10 @@
 				textKey="organgestor.form.camp.pare"
 				suggestValue="id"
 				suggestText="codiINom"
-				labelSize="2"/>
+				labelSize="2"
+				disabled="true"/>
 				
-		<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2"/>
+		<rip:inputText name="cif" textKey="entitat.list.columna.cif" labelSize="2" readonly="true"/>
 		<rip:inputCheckbox name="utilitzarCifPinbal" textKey="organgestor.form.camp.utilitzar.cif.pinbal" labelSize="2" />
 				
 		<div id="modal-botons">
