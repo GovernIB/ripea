@@ -15,10 +15,24 @@
 	<rip:modalHead/>
 <script type="text/javascript">
 $(document).ready(function() {
+
+	let oldNumElementsPagina = $('#numElementsPagina').val();
+	$('#btnSubmit').click(function() {
+	    let newNumElementsPagina = $('#numElementsPagina').val();
+	    if (oldNumElementsPagina != newNumElementsPagina) {
+	        for (var key in sessionStorage) {
+	            if (key.startsWith("DataTables_")) {
+	                sessionStorage.removeItem(key);
+	            }
+	        }
+	    }
+	});
+
 });
 </script>
 </head>
 <body>
+
 	<c:set var="formAction"><rip:modalUrl value="/usuari/configuracio"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="usuariCommand" role="form">
 		<form:hidden path="codi"/>
@@ -31,8 +45,14 @@ $(document).ready(function() {
 		<rip:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
 		<rip:inputCheckbox name="rebreEmailsAgrupats" textKey="usuari.form.camp.rebre.emails.agrupats"/>
 		<rip:inputCheckbox name="rebreAvisosNovesAnotacions" textKey="usuari.form.camp.rebre.avisos.noves.anotacions"/>
+		<rip:inputSelect 
+			name="numElementsPagina" 
+			optionItems="${numElementsPagina}"
+			optionValueAttribute="id"
+			optionTextAttribute="nom"
+			textKey="usuari.form.camp.numElementsPagina"/>
 		<div id="modal-botons">
-			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/usuari/configuracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>

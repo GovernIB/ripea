@@ -66,6 +66,9 @@ public class UsuariEntity implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private ContingutVistaEnumDto vistaActual;
 	
+	@Column(name="num_elements_pagina")
+	private Long numElementsPagina;
+	
 	@Version
 	private long version = 0;
 	
@@ -93,12 +96,13 @@ public class UsuariEntity implements Serializable {
 			String emailAlternatiu,
 			String idioma,
 			boolean rebreEmailsAgrupats,
-			boolean rebreAvisosNovesAnotacions) {
+			boolean rebreAvisosNovesAnotacions, 
+			Long numElementsPagina) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
-
+		this.numElementsPagina = numElementsPagina;
 	}
 	
 

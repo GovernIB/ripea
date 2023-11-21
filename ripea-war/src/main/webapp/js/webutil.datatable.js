@@ -3,7 +3,7 @@
 
 	$.webutilDatatable = function(element, options) {
 		var defaults = {
-			pageLength: 10,
+			pageLength: ($(element).data("page-length") != undefined) ? $(this).data("page-length") : 10,
 			lengthMenu: [10, 20, 50, 100, 250],
 			infoEnabled: true,
 			infoType: 'botons', // 'botons', 'search'

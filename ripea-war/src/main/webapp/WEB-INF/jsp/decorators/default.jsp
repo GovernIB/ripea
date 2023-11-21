@@ -128,6 +128,7 @@
 			$('button[value="netejar"]').click(function() {
 				$('table').dataTable().api().state.clear();
 			});
+			$('table').data("page-length", ${dadesUsuariActual.numElementsPagina});
 		});
 		
 	</script>

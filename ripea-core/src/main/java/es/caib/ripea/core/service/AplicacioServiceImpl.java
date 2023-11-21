@@ -159,7 +159,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.getEmailAlternatiu(),
 				dto.getIdioma(),
 				dto.isRebreEmailsAgrupats(),
-				dto.isRebreAvisosNovesAnotacions());
+				dto.isRebreAvisosNovesAnotacions(),
+				dto.getNumElementsPagina());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}

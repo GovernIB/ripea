@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.IdNomDto;
 import es.caib.ripea.core.api.dto.IdiomaEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -57,6 +60,20 @@ public class UsuariController  extends BaseAdminController {
 				EnumHelper.getOptionsForEnum(
 						IdiomaEnumDto.class,
 						"usuari.form.camp.idioma.enum."));
+		
+		List<IdNomDto> numElementsPagina = new ArrayList<>();
+		numElementsPagina.add(new IdNomDto(10l, "10"));
+		numElementsPagina.add(new IdNomDto(20l, "20"));
+		numElementsPagina.add(new IdNomDto(50l, "50"));
+		numElementsPagina.add(new IdNomDto(100l, "100"));
+		numElementsPagina.add(new IdNomDto(250l, "250"));
+
+		model.addAttribute(
+				"numElementsPagina",
+				numElementsPagina);
+
+		
+		
 		return "usuariForm";
 	}
 	@RequestMapping(value = "/configuracio", method = RequestMethod.POST)

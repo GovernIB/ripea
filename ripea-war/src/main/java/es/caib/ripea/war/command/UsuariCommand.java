@@ -30,6 +30,7 @@ public class UsuariCommand implements Serializable {
 	private String[] rols;
 	private boolean rebreEmailsAgrupats;
 	private boolean rebreAvisosNovesAnotacions;
+	private Long numElementsPagina;
 	
 	
 	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
@@ -59,6 +60,7 @@ public class UsuariCommand implements Serializable {
 	public void setEmailAlternatiu(String emailAlternatiu) {
 		this.emailAlternatiu = Utils.trim(emailAlternatiu);
 	}
+	
 	public static UsuariCommand asCommand(UsuariDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
@@ -73,6 +75,10 @@ public class UsuariCommand implements Serializable {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public void setNumElementsPagina(Long numElementsPagina) {
+		this.numElementsPagina = numElementsPagina;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

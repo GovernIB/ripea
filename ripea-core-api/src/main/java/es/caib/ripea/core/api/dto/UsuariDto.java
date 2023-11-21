@@ -27,6 +27,7 @@ public class UsuariDto implements Serializable {
 	private boolean rebreEmailsAgrupats;
 	private String rolActual;
 	private boolean rebreAvisosNovesAnotacions;
+	private Long numElementsPagina;
 	
 	public String getCodiAndNom() {
 		return nom + " (" + codi + ")";

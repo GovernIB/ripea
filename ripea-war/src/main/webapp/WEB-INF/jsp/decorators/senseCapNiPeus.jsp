@@ -2,7 +2,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip" %>
 <%@ taglib uri="http://www.opensymphony.com/sitemesh/decorator" prefix="decorator"%>
-
+<%
+	pageContext.setAttribute(
+			"dadesUsuariActual",
+			es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,6 +31,17 @@
     <script>
 		var requestLocale = '${requestLocale}';
 		var contextAddress = '${pageContext.request.contextPath}';
+
+		$(document).ready(function() {
+			$('button[value="filtrar"]').click(function() {
+				$('table').dataTable().api().state.clear();
+			});
+			$('button[value="netejar"]').click(function() {
+				$('table').dataTable().api().state.clear();
+			});
+			$('table').data("page-length", ${dadesUsuariActual.numElementsPagina});
+		});
+		
 	</script>
 	<decorator:head />
 </head>
