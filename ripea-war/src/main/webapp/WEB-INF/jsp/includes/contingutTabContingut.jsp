@@ -333,46 +333,50 @@ $(document).ready(function() {
 			}
 		});
 
-		
+		var popoverFlag = 0;
 		// canvi tipus document multiple
 		var $botoTipusDocumental = $('#tipusdocumental-mult');
 		$botoTipusDocumental.popover({
 			html: true,
 			placement: 'bottom',
 			title: '<spring:message code="massiu.canvi.tipus.document.select"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
-		    content: function () {
-		    	return showTipusDocumentals($(this));   
+		    content: function () {	
+		    	popoverFlag = 0;
+		    	return showTipusDocumentals($(this));
 		  	}
 		}).on('shown.bs.popover', function () {
-			var $selTipusDocument = $('.select-tipus-massiu');
-			var select2Options = {
-					theme: 'bootstrap', 
-					width: 'auto', 
-					minimumResultsForSearch: "0"};
-			$selTipusDocument.select2(select2Options);
-			$selTipusDocument.on('change', function(event) {
-				var tipusDocumentId = $(':selected', $(this)).attr('id');
-				if (tipusDocumentId) {
-					showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.massiu.processant"/>');				
-					var updateUrl = '<c:url value="/contingut/updateTipusDocumentMassiu/"/>' + tipusDocumentId;
-					$.ajax({
-						type: 'GET',
-				        url: updateUrl,
-				        success: function(json) {
-				        	if (json.error) {
-				        		$('div.modal').modal('hide');
-								$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
-				        	} else {
-								location.reload();
-							}
-				        },
-				        error: function(e) {
-				        	alert("Hi ha hagut un error actualitzant algún dels documents seleccionats amb el nou tipus de document");
-				        	location.reload();
-				        }
-				    });	
-				}
-			});
+			if (popoverFlag == 0) {
+				var $selTipusDocument = $('.select-tipus-massiu');
+				var select2Options = {
+						theme: 'bootstrap', 
+						width: 'auto', 
+						minimumResultsForSearch: "0"};
+				$selTipusDocument.select2(select2Options);
+				$selTipusDocument.on('change', function(event) {
+					var tipusDocumentId = $(':selected', $(this)).attr('id');
+					if (tipusDocumentId) {
+						showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.massiu.processant"/>');				
+						var updateUrl = '<c:url value="/contingut/updateTipusDocumentMassiu/"/>' + tipusDocumentId;
+						$.ajax({
+							type: 'GET',
+					        url: updateUrl,
+					        success: function(json) {
+					        	if (json.error) {
+					        		$('div.modal').modal('hide');
+									$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
+					        	} else {
+									location.reload();
+								}
+					        },
+					        error: function(e) {
+					        	alert("Hi ha hagut un error actualitzant algún dels documents seleccionats amb el nou tipus de document");
+					        	location.reload();
+					        }
+					    });	
+					}
+				});
+			}
+			popoverFlag = 1;
 			
 			var $popoverClose = $('.popover .close');
 			$popoverClose.on('click', function() {
