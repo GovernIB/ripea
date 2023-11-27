@@ -1953,7 +1953,7 @@ public class ContingutHelper {
 		} else {
 			String expedientNom = expedients.get(0).getNom();
 			if (expedientNom.contains("\"")) {
-				expedientNom = "\"" + expedientNom.replace("\"", "\\\"") + "\"";
+				expedientNom = expedientNom.replace("\"", "\\\"");
 			}
 			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + expedientNom + ".pdf");
 		}
