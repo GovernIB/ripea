@@ -187,27 +187,121 @@
 	</c:if>
 	
 	
-	<script>
-		$(document).ready(function(){
-			${isRolActualAdminOrgan}
-			<c:if test="${isRolActualAdminOrgan}">	
-				$('#revisioEstat').on('change', function() {
-					var revEst = $(this).val();
-					if (revEst == 'PENDENT' || revEst == 'DISSENY') {
-						$("#revisioEstat option[value='REVISAT']").remove();
-						$("#revisioEstat option[value='REBUTJAT']").remove();
-					} else if (revEst == 'REBUTJAT') {
-						$("#revisioEstat option[value='REVISAT']").remove();
-						$("#revisioEstat option[value='PENDENT']").remove();
-					}
-					
-				});
-				$("#revisioEstat").trigger('change');
-			</c:if>
-					
+<script>
+//################################################## document ready START ##############################################################	
+$(document).ready(function(){
+	<c:if test="${isRolActualAdminOrgan}">	
+		$('#revisioEstat').on('change', function() {
+			var revEst = $(this).val();
+			if (revEst == 'PENDENT' || revEst == 'DISSENY') {
+				$("#revisioEstat option[value='REVISAT']").remove();
+				$("#revisioEstat option[value='REBUTJAT']").remove();
+			} else if (revEst == 'REBUTJAT') {
+				$("#revisioEstat option[value='REVISAT']").remove();
+				$("#revisioEstat option[value='PENDENT']").remove();
+			}
+			
 		});
+		$("#revisioEstat").trigger('change');
+	</c:if>
+
+
+	$('input[type=radio][name=tipusClassificacio]').on('change', function() {
+		showHideClassificacioInput();
+	})
+	showHideClassificacioInput();
+	$('#organGestorId').on('change', function() {
+		$('input[name="tipusClassificacio"][value="ID"]').removeClass('focus');
+		disableEnableClassificacioIdButton();
+	})
+	if (!$('#id').val()) {
+		disableEnableClassificacioIdButton();
+	}
+
 	
-	</script>	
+	$('form').submit(function(e) {
+
+	    let selected = $('input[name="tipusClassificacio"]:checked').val();
+	    if (selected == 'SIA') {
+	        let codiSia = $('#classificacioSia').val();
+
+	        $.ajax({
+	            type: 'GET',
+	            async: false,
+	            url: '<c:url value="/metaExpedient/checkIfExistsInRolsac"/>/' + codiSia,
+	            success: function(exists) {
+	                if (!exists) {
+	                    let procedimentNoExiste = '<spring:message code="metaexpedient.form.submit.sia.no.existe"/>';
+	                    if (confirm(procedimentNoExiste)) {
+	                        return true
+	                    } else {
+	                        e.preventDefault(); 
+	                        let iframe = window.frameElement;
+	                        $(iframe).show();
+	                        $('.modal-body .datatable-dades-carregant', parent.document).hide();
+	                        $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', false);
+	                        
+	                        return false;
+	                    }
+	                }
+	            }
+	        });
+	    }
+	});
+	
+	
+			
+});//################################################## document ready END ##############################################################
+
+
+function showHideClassificacioInput() {
+
+	let selected = $('input[name="tipusClassificacio"]:checked').val();
+
+	if (selected == 'SIA') {
+		$('#classificacioSia').parent().show();
+		$('#classificacioId').parent().hide();
+	} else {
+		$('#classificacioSia').val('');
+		$('#classificacioSia').parent().hide();
+		$('#classificacioId').parent().show();
+		if ($('#organGestorId').val()) {
+			calculateClassificacioId();
+		}
+	}
+}
+
+function disableEnableClassificacioIdButton(){
+	if ($('#organGestorId').val()) {
+		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", false);
+		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", "");
+		calculateClassificacioId();
+	} else {
+		$('#classificacioId').val('');
+		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
+		let disabledTitle = '<spring:message code="metaexpedient.form.camp.classificacio.id.disabled.title"/>';
+		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", disabledTitle);
+		$('input[name="tipusClassificacio"][value="SIA"]').click();
+		
+	}
+}
+
+
+function calculateClassificacioId() {
+	let organGestorId = $('#organGestorId').val();
+	$.ajax({
+		type: 'GET',
+		url: '<c:url value="/metaExpedient/calculateClassificacioId"/>/' + organGestorId,
+		success: function(id) {
+			$('#classificacioId').val(id);
+		}
+	});
+	
+}
+
+
+
+</script>	
 	
 	
 	
@@ -263,7 +357,40 @@
 			<div role="tabpanel" class="tab-pane active" id="dades">
 			
 				<rip:inputText name="codi" textKey="metaexpedient.form.camp.codi" required="true" readonly="${bloquejarCamps}"/>
-				<rip:inputText name="classificacioSia" textKey="metaexpedient.form.camp.classificacio.sia" required="true" readonly="${bloquejarCamps}"/>
+				
+				<c:set var="campErrors"><form:errors path="classificacioSia"/></c:set>
+				<div class="form-group<c:if test="${not empty campErrors}"> has-error</c:if>">
+					<label class="control-label col-xs-4" for="tipusClassificacio">
+						<spring:message code="metaexpedient.form.camp.classificacio"/> *
+					</label>
+					<div class="col-xs-8">
+						<div class="controls btn-group col-xs-2" style="padding-right: 0px; padding-left: 0px" data-toggle="buttons">
+							<c:forEach var="opt" items="${tipus}">
+								<c:set var="labelClassActive" value=""/>
+								<spring:bind path="tipusClassificacio"><c:set var="campValue" value="${status.value}"/></spring:bind>
+								<c:if test="${campValue == opt.value}"><c:set var="labelClassActive" value=" active"/></c:if>
+								<c:set var="labelClass" value="btn btn-default${labelClassActive}"/>
+								<button class="${labelClass}" onclick="this.blur();">
+									<form:radiobutton path="tipusClassificacio" value="${opt.value}"/> <spring:message code="${opt.text}"/>
+								</button>
+							</c:forEach>
+						</div>
+						<div class="col-xs-10" style="padding-right: 0px; padding-left: 10px">
+							<div style="display:none;">
+								<form:input path="classificacioSia" cssClass="form-control"/>
+								<c:if test="${not empty campErrors}">
+									<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="classificacioSia"/></p>
+								</c:if>	
+	 						   <p class="comentari col-xs-12"><spring:message code="metaexpedient.form.camp.classificacio.sia.comment"/></p>	
+							</div>	
+							<div style="display:none;">
+								<form:input path="classificacioId" cssClass="form-control" readonly="true"/>
+	 						   <p class="comentari col-xs-12"><spring:message code="metaexpedient.form.camp.classificacio.id.comment"/></p>	
+							</div>							
+						</div>					
+					</div>
+				</div>
+				
 				<c:if test="${empty metaExpedientCommand.id && isRolActualAdministrador}">
 					<rip:inputCheckbox name="crearReglaDistribucio" textKey="metaexpedient.form.camp.crear.regla.distribucio" disabled="${bloquejarCamps}" />
 				</c:if>

@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
 import es.caib.ripea.war.validation.MetaExpedientCodiSiaNoRepetit;
@@ -46,9 +47,10 @@ public class MetaExpedientCommand {
 	private String nom;
 	@Size(max = 1024)
 	private String descripcio;
-	@NotEmpty
+    private TipusClassificacioEnumDto tipusClassificacio;
 	@Size(max = 30)
 	private String classificacioSia;
+	private String classificacioId;
 	@NotEmpty
 	@Size(max = 30)
 	private String serieDocumental;
@@ -94,8 +96,8 @@ public class MetaExpedientCommand {
 		this.descripcio = descripcio != null ? descripcio.trim() : null;
 	}
 
-	public void setClassificacioSia(String classificacioSia) {
-		this.classificacioSia = classificacioSia != null ? classificacioSia.trim() : null;
+	public void setClassificacioSia(String classificacio) {
+		this.classificacioSia = classificacio != null ? classificacio.trim() : null;
 	}
 
 	public void setSerieDocumental(String serieDocumental) {
@@ -178,6 +180,12 @@ public class MetaExpedientCommand {
 			organ.setId(this.getOrganGestorId());
 			dto.setOrganGestor(organ);
 		}
+		
+		if (dto.getTipusClassificacio() == TipusClassificacioEnumDto.SIA) {
+			dto.setClassificacio(this.getClassificacioSia());
+		} else {
+			dto.setClassificacio(this.getClassificacioId());
+		}
 		return dto;
 	}
 
@@ -194,6 +202,13 @@ public class MetaExpedientCommand {
 	}
 	public void setCrearReglaDistribucio(boolean crearReglaDistribucio) {
 		this.crearReglaDistribucio = crearReglaDistribucio;
+	}
+	public void setTipusClassificacio(
+			TipusClassificacioEnumDto tipusClassificacio) {
+		this.tipusClassificacio = tipusClassificacio;
+	}
+	public void setClassificacioId(String classificacioId) {
+		this.classificacioId = classificacioId;
 	}
 
 	

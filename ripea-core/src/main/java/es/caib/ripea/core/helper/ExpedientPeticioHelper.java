@@ -219,7 +219,7 @@ public class ExpedientPeticioHelper {
 //		System.out.println("crearRegistrePerPeticio before findByEntitatAndClassificacioSia, identificador: " + registreEntrada.getIdentificador());
 		
 		// set metaexpedient to which expedient will belong if peticion is accepted
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(
 				entitat,
 				expedientPeticioEntity.getRegistre().getProcedimentCodi());
 		MetaExpedientEntity metaExpedientEntity = null;

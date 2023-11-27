@@ -540,19 +540,14 @@ public class PluginHelper {
 		accioParams.put("títol", expedient.getNom());
 		MetaExpedientEntity metaExpedient = expedient.getMetaExpedient();
 		accioParams.put("tipus", metaExpedient.getNom());
-		accioParams.put("classificacio", metaExpedient.getClassificacioSia());
+		accioParams.put("classificacio", metaExpedient.getClassificacio());
 		accioParams.put("serieDocumental", metaExpedient.getSerieDocumental());
 		String organCodiDir3 = expedient.getOrganGestor().getCodi();
 		accioParams.put("organ", organCodiDir3);
 		accioParams.put("estat", expedient.getEstat().name());
 		long t0 = System.currentTimeMillis();
 		try {
-			String classificacio;
-			if (metaExpedient.getClassificacioSia() != null) {
-				classificacio = metaExpedient.getClassificacioSia();
-			} else {
-				classificacio = organCodiDir3 + "_PRO_RIP" + String.format("%027d", metaExpedient.getId());
-			}
+			String classificacio = metaExpedient.getClassificacio();
 			List<String> interessats = new ArrayList<String>();
 			for (InteressatEntity interessat: expedient.getInteressatsORepresentants()) {
 				if (interessat.getDocumentNum() != null) {
@@ -3003,7 +2998,7 @@ public class PluginHelper {
 				notificacio.setDocumentArxiuNom(documentEntity.getFitxerNom());
 				notificacio.setDocumentArxiuUuid(documentEntity.getArxiuUuid());
 			}
-			notificacio.setProcedimentCodi(metaExpedient.getClassificacioSia());
+			notificacio.setProcedimentCodi(metaExpedient.getClassificacio());
 			notificacio.setNumExpedient(expedientEntity.getNumero());
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
@@ -3054,7 +3049,7 @@ public class PluginHelper {
 			if (interessat.getEntregaDeh() != null && interessat.getEntregaDeh() && Boolean.parseBoolean(configHelper.getConfig("es.caib.ripea.notificacio.enviament.deh.activa"))) {
 				enviament.setEntregaDehActiva(true);
 				enviament.setEntregaDehObligat(interessat.getEntregaDehObligat());
-				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacioSia());
+				enviament.setEntregaDehProcedimentCodi(metaExpedient.getClassificacio());
 				enviament.setEntregaNif(interessat.getDocumentNum());
 			}
 			enviaments.add(enviament);

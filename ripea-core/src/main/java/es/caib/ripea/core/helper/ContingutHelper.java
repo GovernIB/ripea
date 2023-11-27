@@ -1554,7 +1554,7 @@ public class ContingutHelper {
 				"1.0",
 				ntiOrgano,
 				ntiFechaApertura,
-				metaExpedient.getClassificacioSia(),
+				metaExpedient.getClassificacio(),
 				organGestor).
 				agafatPer(agafatPer).
 				grup(grupEntity).

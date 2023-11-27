@@ -56,6 +56,7 @@ import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
 import es.caib.ripea.core.api.dto.StatusEnumDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
@@ -64,6 +65,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.service.PortafirmesFluxService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ExpedientEstatCommand;
 import es.caib.ripea.war.command.FileCommand;
 import es.caib.ripea.war.command.MetaDocumentCommand;
@@ -76,6 +78,7 @@ import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
+import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -214,6 +217,7 @@ public class MetaExpedientController extends BaseAdminController {
 			if (RolHelper.isRolActualAdministrador(request)) {
 				command.setCrearReglaDistribucio(true);
 			}
+			command.setTipusClassificacio(TipusClassificacioEnumDto.SIA);
 		}
 		command.setRolAdminOrgan(isRolActualAdminOrgan);
 		command.setEntitatId(entitatActual.getId());
@@ -245,6 +249,9 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		model.addAttribute("metaExpedientDto", metaExpedient);
 		
+
+		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
+		
 		fillFormModel(
 				request,
 				metaExpedient,
@@ -263,6 +270,9 @@ public class MetaExpedientController extends BaseAdminController {
 		MetaExpedientDto dto = command.asDto();
 		if (!command.isComu() && command.getOrganGestorId() == null) {
 			bindingResult.rejectValue("organGestorId", "NotNull");
+		}
+		if (command.getTipusClassificacio() == TipusClassificacioEnumDto.SIA && Utils.isEmpty(command.getClassificacioSia())) {
+			bindingResult.rejectValue("classificacioSia", "NotNull");
 		}
 		if (command.isComu() && !hasPermisAdmComu(request)) {
 			bindingResult.reject("metaexpedient.controller.comu.permis.error");
@@ -344,6 +354,52 @@ public class MetaExpedientController extends BaseAdminController {
 						throwable);
 			}
 		}
+	}
+	
+	@RequestMapping(value = "/calculateClassificacioId/{organGestorId}", method = RequestMethod.GET)
+	@ResponseBody
+	public String calculateClassificacioId(
+			HttpServletRequest request,
+			@PathVariable Long organGestorId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		OrganGestorDto organGestor = organGestorService.findById(entitatActual.getId(), organGestorId);
+		
+		return organGestor.getCodi() +  "_PRO_" + String.format("%030d", System.currentTimeMillis()) + "3F";
+	}
+	
+	
+	@RequestMapping(value = "/checkIfExistsInRolsac/{codiSia}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean checkIfExistsInRolsac(
+			HttpServletRequest request,
+			@PathVariable String codiSia) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		String codiDir3;
+		if (RolHelper.isRolActualAdministradorOrgan(request)) {
+			codiDir3 = EntitatHelper.getOrganGestorActual(request).getCodi();
+		} else {
+			codiDir3 = entitatActual.getUnitatArrel();
+		}
+		
+		ProcedimentDto procedimentDto = null;
+		try {
+			procedimentDto = metaExpedientService.findProcedimentByCodiSia(
+					entitatActual.getId(),
+					codiDir3,
+					codiSia);
+		} catch (Exception e) {
+			logger.error("Error al comprobar procediment en ROLSAC", e);
+			return true;
+		}
+		
+		if (procedimentDto == null) {
+			return false;
+		} else {
+			return true;
+		}
+		
 	}
 	
 
@@ -497,7 +553,7 @@ public class MetaExpedientController extends BaseAdminController {
 			metaExpedientExport.setCodi(command.getCodi());
 			metaExpedientExport.setNom(command.getNom());
 			metaExpedientExport.setDescripcio(command.getDescripcio());
-			metaExpedientExport.setClassificacioSia(command.getClassificacioSia());
+			metaExpedientExport.setClassificacio(command.getClassificacio());
 			metaExpedientExport.setSerieDocumental(command.getSerieDocumental());
 
 			if (command.getOrganGestorId() != null) {
@@ -588,7 +644,7 @@ public class MetaExpedientController extends BaseAdminController {
 		metaExpedientImportEditCommand.setCodi(metaExpedientExport.getCodi());
 		metaExpedientImportEditCommand.setNom(metaExpedientExport.getNom());
 		metaExpedientImportEditCommand.setDescripcio(metaExpedientExport.getDescripcio());
-		metaExpedientImportEditCommand.setClassificacioSia(metaExpedientExport.getClassificacioSia());
+		metaExpedientImportEditCommand.setClassificacio(metaExpedientExport.getClassificacio());
 		metaExpedientImportEditCommand.setSerieDocumental(metaExpedientExport.getSerieDocumental());
 		
 		metaExpedientImportEditCommand.setComu(metaExpedientExport.isComu());
@@ -637,7 +693,7 @@ public class MetaExpedientController extends BaseAdminController {
 		}
 		
 		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByCodiSia(command.getEntitatId(),
-				command.getClassificacioSia());
+				command.getClassificacio());
 		boolean valid = true;
 		if (metaExpedients != null && !metaExpedients.isEmpty()) {
 			if (command.getId() == null) {
@@ -700,7 +756,7 @@ public class MetaExpedientController extends BaseAdminController {
 			codiDir3 = entitatActual.getUnitatArrel();
 		}
 //		codiDir3 = "A04003003";
-//		command.setClassificacioSia("879427");
+//		command.setClassificacio("879427");
 		
 		try {
 			
@@ -747,6 +803,7 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		return "metaExpedientForm";
 	}
+	
 	
 
 	
@@ -1159,6 +1216,8 @@ public class MetaExpedientController extends BaseAdminController {
 			model.addAttribute("organDisponible", organGestorsList.get(0));
 		}
 		model.addAttribute("organsGestors", organGestorsList);
+		
+		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 	}
 
 	@RequestMapping(value = "/sincronitzar", method = RequestMethod.GET)

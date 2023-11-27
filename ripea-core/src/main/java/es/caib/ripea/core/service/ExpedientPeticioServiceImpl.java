@@ -306,7 +306,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 			if (entitat != null) {
 				// set metaexpedient to which expedient will belong if peticion is accepted
-				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(entitat,
+				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(
+						entitat,
 						procedimentCodi);
 
 				if (!metaExpedients.isEmpty()) {

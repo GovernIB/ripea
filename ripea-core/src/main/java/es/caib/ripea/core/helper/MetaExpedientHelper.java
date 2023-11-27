@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -48,6 +49,7 @@ import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.StatusEnumDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.utils.Utils;
@@ -716,7 +718,7 @@ public class MetaExpedientHelper {
 
 			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.crearRegla(
 					metaExpedient.getEntitat().getUnitatArrel(),
-					metaExpedient.getClassificacioSia());
+					metaExpedient.getClassificacio());
 
 			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {
 				metaExpedient.updateCrearReglaDistribucio(CrearReglaDistribucioEstatEnumDto.PROCESSAT);
@@ -757,6 +759,16 @@ public class MetaExpedientHelper {
 
 			EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatDto.getId(), false, false, false, false, false);
 			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
+			
+			// remove procediments without codi sia
+			Iterator<MetaExpedientEntity> it = metaExpedients.iterator();
+			while (it.hasNext()) {
+				MetaExpedientEntity metaExpedient = it.next();
+				if (metaExpedient.getTipusClassificacio() == TipusClassificacioEnumDto.ID) {
+					it.remove();
+				}
+			}
+
 			progres.setNumOperacions(metaExpedients.size());
 
 			progres.addInfo(ActualitzacioInfo.builder().hasInfo(true).infoTitol(msg("procediment.synchronize.titol.inici")).infoText(msg("procediment.synchronize.info.inici", metaExpedients.size())).build());
@@ -766,7 +778,7 @@ public class MetaExpedientHelper {
 			Integer fallat = 0;
 			for(MetaExpedientEntity metaExpedient: metaExpedients) {
 				ActualitzacioInfo.ActualitzacioInfoBuilder infoBuilder = ActualitzacioInfo.builder()
-						.codiSia(metaExpedient.getClassificacioSia())
+						.codiSia(metaExpedient.getClassificacio())
 						.nomAntic(metaExpedient.getNom())
 						.descripcioAntiga(metaExpedient.getDescripcio())
 						.comuAntic(metaExpedient.isComu());
@@ -778,7 +790,7 @@ public class MetaExpedientHelper {
 					logger.info("Procediment DB: " + metaExpedient);
 					procedimentGga = pluginHelper.procedimentFindByCodiSia(
 							entitat.getUnitatArrel(),
-							metaExpedient.getClassificacioSia());
+							metaExpedient.getClassificacio());
 					infoBuilder.exist(procedimentGga != null);
 					
 					logger.info(" Procediment WS: " + procedimentGga);
@@ -793,7 +805,7 @@ public class MetaExpedientHelper {
 
 				if (procedimentGga == null) {
 					infoBuilder.hasError(true);
-					infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedient.getClassificacioSia()));
+					infoBuilder.errorText(msg("procediment.synchronize.error.exist", metaExpedient.getClassificacio()));
 					progres.addInfo(infoBuilder.build(), true);
 					fallat++;
 					continue;

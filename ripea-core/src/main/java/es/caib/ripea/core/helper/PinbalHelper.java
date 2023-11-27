@@ -540,7 +540,7 @@ public class PinbalHelper {
 		solicitud.setIdentificadorSolicitante(identificadorSolicitante);
 		solicitud.setNombreSolicitante(nombreSolicitante);
 		
-		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacioSia());
+		solicitud.setCodigoProcedimiento((codiSia != null && !codiSia.trim().isEmpty()) ? codiSia : metaExpedient.getClassificacio());
 		solicitud.setUnidadTramitadora(expedient.getOrganGestor().getNom());
 		
 		// If there is character: ’ in finalitat field, some of the services (for example: SVDCCAACPASWS01, SVDCCAACPCWS01) return an error:

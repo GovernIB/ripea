@@ -7,7 +7,7 @@ public class MetaExpedientFiltreDto {
 
 	private String codi;
 	private String nom;
-	private String classificacioSia;
+	private String classificacio;
 	private Long organGestorId;
 	private MetaExpedientActiuEnumDto actiu;
 

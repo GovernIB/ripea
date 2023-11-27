@@ -64,7 +64,7 @@ public class MetaDocumentServiceTest extends BaseServiceTest {
 		metaExpedient.setNom("Metaexpedient de test");
 		metaExpedient.setDescripcio("Descripció de test");
 		metaExpedient.setSerieDocumental("1234");
-		metaExpedient.setClassificacioSia("1234");
+		metaExpedient.setClassificacio("1234");
 		metaExpedient.setNotificacioActiva(false);
 		metaExpedient.setPareId(null);
 		List<PermisDto> permisos = new ArrayList<PermisDto>();

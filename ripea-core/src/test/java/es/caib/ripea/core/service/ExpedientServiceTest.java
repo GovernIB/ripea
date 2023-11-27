@@ -85,7 +85,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						assertEquals(null, argument.getValue().getVersio());
 						assertEquals(ContingutTipus.EXPEDIENT, argument.getValue().getTipus());
 						
-						assertEquals(metaExpedient.getClassificacioSia(), argument.getValue().getMetadades().getClassificacio());
+						assertEquals(metaExpedient.getClassificacio(), argument.getValue().getMetadades().getClassificacio());
 						assertEquals(metaExpedient.getSerieDocumental(), argument.getValue().getMetadades().getSerieDocumental());
 					}
 				},
@@ -130,7 +130,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						assertEquals(null, argument.getValue().getVersio());
 						assertEquals(ContingutTipus.EXPEDIENT, argument.getValue().getTipus());
 						
-						assertEquals(metaExpedient.getClassificacioSia(), argument.getValue().getMetadades().getClassificacio());
+						assertEquals(metaExpedient.getClassificacio(), argument.getValue().getMetadades().getClassificacio());
 						assertEquals(metaExpedient.getSerieDocumental(), argument.getValue().getMetadades().getSerieDocumental());
 						
 					}

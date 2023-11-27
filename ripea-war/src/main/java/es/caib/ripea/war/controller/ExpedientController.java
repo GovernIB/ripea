@@ -1658,8 +1658,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				documentNotificacioDto.getCreatedBy().getNif());
 		
 		model.addAttribute(
-				"classificacioSia",
-				expedientService.findById(entitatActual.getId(), expedientId, null).getMetaExpedient().getClassificacioSia());
+				"classificacio",
+				expedientService.findById(entitatActual.getId(), expedientId, null).getMetaExpedient().getClassificacio());
 		
 		return "enviamentInfo";
 	}

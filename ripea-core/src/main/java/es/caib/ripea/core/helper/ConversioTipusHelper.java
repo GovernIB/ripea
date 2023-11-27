@@ -468,7 +468,7 @@ public class ConversioTipusHelper {
 						target.setRegistre(registre);
 						target.setMetaExpedientId(source.getMetaExpedient() != null ? source.getMetaExpedient().getId() : null);
 						target.setMetaExpedientNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getNom() : null);
-						target.setProcedimentCodi(source.getMetaExpedient() != null ? source.getMetaExpedient().getClassificacioSia() : null);
+						target.setProcedimentCodi(source.getMetaExpedient() != null ? source.getMetaExpedient().getClassificacio() : null);
 						target.setEstat(source.getEstat());
 						target.setIdentificador(source.getIdentificador());
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
@@ -612,7 +612,7 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setElementNom(source.getNom());
 						target.setExpedientNumeroNom(source.getNom() + " (" + source.getNumero() + ")");
-						target.setMetaExpedientCodiNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getClassificacioSia() + " - " + source.getMetaExpedient().getNom() : null);
+						target.setMetaExpedientCodiNom(source.getMetaExpedient() != null ? source.getMetaExpedient().getClassificacio() + " - " + source.getMetaExpedient().getNom() : null);
 						target.setCreatedDate(source.getCreatedDate().toDate());
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						return target;
@@ -628,7 +628,7 @@ public class ConversioTipusHelper {
 						target.setExpedientId(source.getExpedient().getId());
 						target.setElementNom(source.getNom());
 						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
-						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacioSia() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacio() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
 						target.setCreatedDate(source.getCreatedDate().toDate());
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
@@ -653,7 +653,7 @@ public class ConversioTipusHelper {
 							target.setElementNom(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
 						} 
 						target.setExpedientNumeroNom(source.getExpedient().getNom() + " (" + source.getExpedient().getNumero() + ")");
-						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacioSia() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
+						target.setMetaExpedientCodiNom(source.getExpedient().getMetaExpedient() != null ? source.getExpedient().getMetaExpedient().getClassificacio() + " - " + source.getExpedient().getMetaExpedient().getNom() : null);
 						target.setCreatedDate(source.getCreatedDate().toDate());
 						target.setDataDarrerIntent(source.getArxiuIntentData());
 						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);

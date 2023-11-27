@@ -54,7 +54,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    me.entitat = :entitat " +
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
+			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
@@ -65,8 +65,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
-			@Param("esNullClassificacioSia") boolean esNullClassificacioSia,
-			@Param("classificacioSia") String classificacioSia,
+			@Param("esNullClassificacio") boolean esNullClassificacio,
+			@Param("classificacio") String classificacio,
 			@Param("esNullActiu") boolean esNullActiu,
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
@@ -83,7 +83,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    me.entitat = :entitat " +
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
+			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullAmbit = true or ((:comuns = true and me.organGestor = null) or (:comuns = false  and me.organGestor != null)) ) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor)" + 
@@ -94,8 +94,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
-			@Param("esNullClassificacioSia") boolean esNullClassificacioSia,
-			@Param("classificacioSia") String classificacioSia,
+			@Param("esNullClassificacio") boolean esNullClassificacio,
+			@Param("classificacio") String classificacio,
 			@Param("esNullActiu") boolean esNullActiu,
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
@@ -112,7 +112,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    me.entitat = :entitat " +
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
+			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
 			"and me.id in (:ids)" + 
@@ -123,8 +123,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
-			@Param("esNullClassificacioSia") boolean esNullClassificacioSia,
-			@Param("classificacioSia") String classificacioSia,
+			@Param("esNullClassificacio") boolean esNullClassificacio,
+			@Param("classificacio") String classificacio,
 			@Param("esNullActiu") boolean esNullActiu,
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
@@ -140,7 +140,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    me.entitat = :entitat " +
 			"and (:esNullCodi = true or lower(me.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullNom = true or lower(me.nom) like lower('%'||:nom||'%')) " +
-			"and (:esNullClassificacioSia = true or lower(me.classificacioSia) like lower('%'||:classificacioSia||'%')) " +
+			"and (:esNullClassificacio = true or lower(me.classificacio) like lower('%'||:classificacio||'%')) " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:esNullOrganGestor = true or me.organGestor = :organGestor) " +
 			"and me.id in (:ids)" + 
@@ -151,8 +151,8 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			@Param("codi") String codi,
 			@Param("esNullNom") boolean esNullNom,
 			@Param("nom") String nom,
-			@Param("esNullClassificacioSia") boolean esNullClassificacioSia,
-			@Param("classificacioSia") String classificacioSia,
+			@Param("esNullClassificacio") boolean esNullClassificacio,
+			@Param("classificacio") String classificacio,
 			@Param("esNullActiu") boolean esNullActiu,
 			@Param("actiu") Boolean actiu,
 			@Param("esNullOrganGestor") boolean esNullOrganGestor,
@@ -179,7 +179,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    me.entitat = :entitat " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
 			"and (:revisioActiva = false or me.revisioEstat = 'REVISAT') " +
-			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
+			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacio) like lower('%'||:filtre||'%')) " +
 			"and (:organGestorIComu = false or (me.organGestor = :organ or me.organGestor is null)) " +
 			"and (:esAdminEntitat = true " +
 			" 	  or (:esAdminOrgan = true and (me.organGestor is null or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos))) " +
@@ -213,7 +213,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"where " +
 			"    me.organGestor = :organGestor " +
 			"and (:esNullActiu = true or me.actiu = :actiu) " +
-			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacioSia) like lower('%'||:filtre||'%')) " +
+			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacio) like lower('%'||:filtre||'%')) " +
 			"order by me.nom asc")
 	List<MetaExpedientEntity> findByOrganGestorAndActiuAndFiltreTrueOrderByNomAsc(
 			@Param("organGestor") OrganGestorEntity organGestor,
@@ -238,7 +238,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	List<MetaExpedientEntity> findByOrganGestorOrderByNomAsc(OrganGestorEntity organGestorEntity);
 
-	List<MetaExpedientEntity> findByEntitatAndClassificacioSia(EntitatEntity entitat, String classificacioSia);
+	List<MetaExpedientEntity> findByEntitatAndClassificacio(EntitatEntity entitat, String classificacio);
 	
 	@Query( "select " +
 			"   me.id " +

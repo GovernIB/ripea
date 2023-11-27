@@ -3,13 +3,9 @@
  */
 package es.caib.ripea.core.entity;
 
-import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import lombok.Getter;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,9 +21,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -41,8 +43,11 @@ import java.util.Set;
 @Getter
 public class MetaExpedientEntity extends MetaNodeEntity {
 
+	@Column(name = "tipus_classificacio", length = 3, nullable = false)
+	@Enumerated(EnumType.STRING)
+    private TipusClassificacioEnumDto tipusClassificacio;
     @Column(name = "clasif_sia", length = 30, nullable = false)
-    private String classificacioSia;
+    private String classificacio;
     @Column(name = "serie_doc", length = 30, nullable = false)
     private String serieDocumental;
     @Column(name = "expressio_numero", length = 100)
@@ -150,7 +155,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String codi,
 			String nom,
 			String descripcio,
-			String classificacioSia,
+			String classificacio,
 			String serieDocumental,
 			String expressioNumero,
 			boolean notificacioActiva,
@@ -159,7 +164,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			OrganGestorEntity organGestor,
 			boolean gestioAmbGrupsActiva) {
         super.update(codi, nom, descripcio);
-        this.classificacioSia = classificacioSia;
+        this.classificacio = classificacio;
         this.serieDocumental = serieDocumental;
         this.expressioNumero = expressioNumero;
         this.notificacioActiva = notificacioActiva;
@@ -192,7 +197,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			String nom,
 			String descripcio,
 			String serieDocumental,
-			String classificacioSia,
+			String classificacio,
 			boolean notificacioActiva,
 			boolean permetMetadocsGenerals,
 			EntitatEntity entitat,
@@ -204,7 +209,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				nom,
 				descripcio,
 				serieDocumental,
-				classificacioSia,
+				classificacio,
 				entitat,
 				pare,
 				notificacioActiva,
@@ -222,7 +227,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				String nom,
 				String descripcio,
 				String serieDocumental,
-				String classificacioSia,
+				String classificacio,
 				EntitatEntity entitat,
 				MetaExpedientEntity pare,
 				boolean notificacioActiva,
@@ -234,7 +239,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
             built.nom = nom;
             built.descripcio = StringUtils.abbreviate(descripcio, 1000);
             built.serieDocumental = serieDocumental;
-            built.classificacioSia = classificacioSia;
+            built.classificacio = classificacio;
             built.entitat = entitat;
             built.tipus = MetaNodeTipusEnum.EXPEDIENT;
             built.pare = pare;
@@ -248,6 +253,11 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 
         public Builder expressioNumero(String expressioNumero) {
             built.expressioNumero = expressioNumero;
+            return this;
+        }
+        
+        public Builder tipusClassificacio(TipusClassificacioEnumDto tipusClassificacio) {
+            built.tipusClassificacio = tipusClassificacio;
             return this;
         }
 
@@ -265,7 +275,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	}
 	
     public String getCodiSiaINom() {
-    	return classificacioSia + " - " + nom;
+    	return classificacio + " - " + nom;
     }
     
 	@Override
@@ -292,7 +302,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				"codi: " + this.codi + ", " +
 				"nom: " + this.nom + ", " +
 				"descripcio: " + this.descripcio + ", " +
-				"codiSia: " + this.classificacioSia + ", " +
+				"codiSia: " + this.classificacio + ", " +
 				"organGestor: " + (this.organGestor != null ? organGestor.getCodi() : "null") + ", " +
 				"actiu: " + this.actiu + ", " +
 				"entitat: " + (this.entitat != null ? this.entitat.getCodi() : "NULL") + "]";

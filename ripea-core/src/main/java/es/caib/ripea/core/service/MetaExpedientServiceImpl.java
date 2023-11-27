@@ -209,14 +209,15 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getNom(),
 				metaExpedient.getDescripcio(),
 				metaExpedient.getSerieDocumental(),
-				metaExpedient.getClassificacioSia(),
+				metaExpedient.getClassificacio(),
 				metaExpedient.isNotificacioActiva(),
 				metaExpedient.isPermetMetadocsGenerals(),
 				entitat,
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva()).
-				expressioNumero(metaExpedient.getExpressioNumero()).build();
+				expressioNumero(metaExpedient.getExpressioNumero()).
+				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -257,7 +258,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getCodi(),
 				metaExpedient.getNom(),
 				metaExpedient.getDescripcio(),
-				metaExpedient.getClassificacioSia(),
+				metaExpedient.getClassificacio(),
 				metaExpedient.getSerieDocumental(),
 				metaExpedient.getExpressioNumero(),
 				metaExpedient.isNotificacioActiva(),
@@ -329,7 +330,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.getNom(),
 				metaExpedient.getDescripcio(),
 				metaExpedient.getSerieDocumental(),
-				metaExpedient.getClassificacioSia(),
+				metaExpedient.getClassificacio(),
 				metaExpedient.isNotificacioActiva(),
 				metaExpedient.isPermetMetadocsGenerals(),
 				entitat,
@@ -588,7 +589,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(metaExpedientId);
 		
-		return distribucioReglaHelper.consultarRegla(metaExpedient.getClassificacioSia());
+		return distribucioReglaHelper.consultarRegla(metaExpedient.getClassificacio());
 	}
 	
 	@Transactional(readOnly = true)
@@ -645,7 +646,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Consulta del meta-expedient per entitat i codi SIA (" + "entitatId=" + entitatId + ", " + "codi=" + codiSia +
 						")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioSia(entitat, codiSia);
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(entitat, codiSia);
 		
 		List<MetaExpedientDto> resposta = null;
 		if (metaExpedients != null) {
@@ -810,8 +811,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
 						filtre.getNom() != null ? filtre.getNom().trim() : "",
-						filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
-						filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
+						filtre.getClassificacio() == null || filtre.getClassificacio().isEmpty(),
+						filtre.getClassificacio() != null ? filtre.getClassificacio().trim() : "",
 						filtre.getActiu() == null,
 						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 						filtre.getOrganGestorId() == null,
@@ -866,8 +867,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getCodi() != null ? filtre.getCodi().trim() : "",
 						filtre.getNom() == null || filtre.getNom().isEmpty(),
 						filtre.getNom() != null ? filtre.getNom().trim() : "",
-						filtre.getClassificacioSia() == null || filtre.getClassificacioSia().isEmpty(),
-						filtre.getClassificacioSia() != null ? filtre.getClassificacioSia().trim() : "",
+						filtre.getClassificacio() == null || filtre.getClassificacio().isEmpty(),
+						filtre.getClassificacio() != null ? filtre.getClassificacio().trim() : "",
 						filtre.getActiu() == null,
 						filtre.getActiu() != null ? filtre.getActiu().getValue() : null,
 						filtre.getOrganGestorId() == null,
@@ -1344,7 +1345,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		try {
 
 			CrearReglaResponseDto rearReglaResponseDto = distribucioReglaHelper.canviEstat(
-					metaExpedient.getClassificacioSia(), 
+					metaExpedient.getClassificacio(), 
 					activa);
 
 			if (rearReglaResponseDto.getStatus() == StatusEnumDto.OK) {

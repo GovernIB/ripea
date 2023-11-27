@@ -35,7 +35,7 @@ public class MetaExpedientImportEditCommand {
 	private String descripcio;
 	@NotEmpty
 	@Size(max = 30)
-	private String classificacioSia;
+	private String classificacio;
 	@NotEmpty
 	@Size(max = 30)
 	private String serieDocumental;
@@ -52,8 +52,8 @@ public class MetaExpedientImportEditCommand {
 	
 
 
-	public void setClassificacioSia(String classificacioSia) {
-		this.classificacioSia = classificacioSia != null ? classificacioSia.trim() : null;
+	public void setClassificacio(String classificacio) {
+		this.classificacio = classificacio != null ? classificacio.trim() : null;
 	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;

@@ -88,7 +88,7 @@
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.procediment"/></strong></td>
-						<td colspan="4">${classificacioSia}</td>
+						<td colspan="4">${classificacio}</td>
 					</tr>
 					<tr>
 						<td><strong><spring:message code="enviament.info.dada.deh.obligada"/></strong></td>

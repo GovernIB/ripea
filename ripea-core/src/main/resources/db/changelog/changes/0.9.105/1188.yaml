@@ -1,0 +1,25 @@
+databaseChangeLog:
+- property:
+    dbms: oracle
+    name: varcharUnit
+    value: CHAR
+- property:
+    dbms: postgresql
+    name: varcharUnit
+    value: ''
+- changeSet:
+    id: 1700642617760-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: tipus_classificacio
+            defaultValue: 'SIA'
+            type: varchar(3 ${varcharunit})
+        tableName: ipa_metaexpedient        
+    - sql:
+        sql: alter table ipa_metaexpedient modify clasif_sia varchar2(46 char);
+             alter table ipa_metaexpedient add constraint ipa_metaexpedient_clasif_uk unique (clasif_sia);

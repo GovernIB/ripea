@@ -124,7 +124,7 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 		metaExpedient.setNom("Metadocument de test");
 		metaExpedient.setDescripcio("Descripció de test");
 		metaExpedient.setSerieDocumental("S0001");
-		metaExpedient.setClassificacioSia("00000");
+		metaExpedient.setClassificacio("00000");
 		metaExpedient.setNotificacioActiva(false);
 		/*metaExpedient.setNotificacioSeuProcedimentCodi("1234");
 		metaExpedient.setNotificacioSeuRegistreLlibre("1234");

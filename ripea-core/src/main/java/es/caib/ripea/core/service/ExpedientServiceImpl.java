@@ -1387,7 +1387,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			}
 			fila[3] = sdf.format(expedient.getCreatedDate().toDate());
 			fila[4] = expedient.getNtiIdentificador();
-			fila[5] = expedient.getMetaExpedient().getClassificacioSia();
+			fila[5] = expedient.getMetaExpedient().getClassificacio();
 			fila[6] = expedient.getMetaExpedient().getNom();
 			
 			String intressatsString = "";

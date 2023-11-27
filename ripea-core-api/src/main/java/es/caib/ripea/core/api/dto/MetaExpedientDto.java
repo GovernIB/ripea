@@ -19,7 +19,8 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
-    private String classificacioSia;
+    private TipusClassificacioEnumDto tipusClassificacio;
+    private String classificacio;
     private String serieDocumental;
     private String expressioNumero;
     private boolean notificacioActiva;
@@ -51,7 +52,7 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     private List<OrganGestorDto> organsNous;
 	
     public String getCodiSiaINom() {
-    	return classificacioSia + " - " + nom;
+    	return classificacio + " - " + nom;
     }
 	
 	public boolean isComu() {

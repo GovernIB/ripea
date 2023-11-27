@@ -67,7 +67,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		metaExpedientCreate.setNom("Metaexpedient de test");
 		metaExpedientCreate.setDescripcio("Descripció de test");
 		metaExpedientCreate.setSerieDocumental("1234");
-		metaExpedientCreate.setClassificacioSia("1234");
+		metaExpedientCreate.setClassificacio("1234");
 		metaExpedientCreate.setNotificacioActiva(false);
 //		metaExpedientCreate.setNotificacioSeuProcedimentCodi("1234");
 //		metaExpedientCreate.setNotificacioSeuRegistreLlibre("1234");
@@ -85,7 +85,7 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 		metaExpedientUpdate.setNom("Metaexpedient de test2");
 		metaExpedientUpdate.setDescripcio("Descripció de test2");
 		metaExpedientUpdate.setSerieDocumental("12341");
-		metaExpedientUpdate.setClassificacioSia("12342");
+		metaExpedientUpdate.setClassificacio("12342");
 		metaExpedientUpdate.setNotificacioActiva(true);
 //		metaExpedientUpdate.setNotificacioSeuProcedimentCodi("1234");
 //		metaExpedientUpdate.setNotificacioSeuRegistreLlibre("1234");
@@ -266,8 +266,8 @@ public class MetaExpedientServiceTest extends BaseServiceTest {
 				original.getSerieDocumental(),
 				perComprovar.getSerieDocumental());
 		assertEquals(
-				original.getClassificacioSia(),
-				perComprovar.getClassificacioSia());
+				original.getClassificacio(),
+				perComprovar.getClassificacio());
 		assertEquals(
 				original.isNotificacioActiva(),
 				perComprovar.isNotificacioActiva());

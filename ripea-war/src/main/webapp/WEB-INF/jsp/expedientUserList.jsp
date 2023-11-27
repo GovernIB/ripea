@@ -336,10 +336,10 @@ function findActiusPerLectura(organId) {
                     selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.comuns'/>'>");
                     $.each(procedimentsComuns, function(index, val) {
         				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
-        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacio + ")</option>");
         					previousProcedimentStillSelected = true;
         				} else {
-        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacio + ")</option>");
         				}
                     });
                     selProcediments.append("</optgroup>");
@@ -348,10 +348,10 @@ function findActiusPerLectura(organId) {
                 	 selProcediments.append("<optgroup label='<spring:message code='expedient.list.user.procediment.organs'/>'>");
                     $.each(procedimentsOrgan, function(index, val) {
         				if(val.id == previousValue || val.id == '${expedientFiltreCommand.metaExpedientId}') {
-        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        					selProcediments.append("<option value='" + val.id + "' selected>" + val.nom + " (" + val.classificacio + ")</option>");
         					previousProcedimentStillSelected = true;
         				} else {
-        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacioSia + ")</option>");
+        					selProcediments.append("<option value='" + val.id + "'>" + val.nom + " (" + val.classificacio + ")</option>");
         				}
                     });
                     selProcediments.append("</optgroup>");
@@ -470,7 +470,7 @@ function hexToRgb(hex) {
  					placeholderKey="expedient.list.user.placeholder.tipusExpedient"
  					suggestValue="id"
  					suggestText="nom"
- 					suggestTextAddicional="classificacioSia"
+ 					suggestTextAddicional="classificacio"
  					inline="true"
  					urlParamAddicional="${expedientFiltreCommand.organGestorId}"
  					/>				

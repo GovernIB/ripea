@@ -19,7 +19,7 @@ import lombok.Setter;
 @SuppressWarnings("serial")
 public class MetaExpedientExportDto extends MetaNodeAmbMetaDadesDto implements Serializable {
 
-    private String classificacioSia;
+    private String classificacio;
     private String serieDocumental;
     private String expressioNumero;
     private boolean notificacioActiva;

@@ -12,7 +12,7 @@ public class MetaExpedientFiltreCommand {
 
 	private String codi;
 	private String nom;
-	private String classificacioSia;
+	private String classificacio;
 	private Long organGestorId;
 	private MetaExpedientActiuEnumDto actiu;
 	private MetaExpedientAmbitEnumDto ambit;
@@ -31,8 +31,8 @@ public class MetaExpedientFiltreCommand {
 	public void setNom(String nom) {
 		this.nom = nom != null ? nom.trim() : null;
 	}
-	public void setClassificacioSia(String classificacioSia) {
-		this.classificacioSia = classificacioSia != null ? classificacioSia.trim() : null;
+	public void setClassificacio(String classificacio) {
+		this.classificacio = classificacio != null ? classificacio.trim() : null;
 	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;

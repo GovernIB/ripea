@@ -194,7 +194,7 @@ public class IndexHelper {
 			localDest.setLocalDestination("expedient_" + expedient.getId());
 			titolParagraph.add(localDest);
 			titolParagraph.setAlignment(Element.ALIGN_CENTER);
-			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacioSia() + "] (" + expedient.getNumero() + ")";
+			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacio() + "] (" + expedient.getNumero() + ")";
 			Paragraph subTitolParagraph = new Paragraph(subtitol, frutiger9TitolBold);
 			subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
 			subTitolParagraph.add(Chunk.NEWLINE);
@@ -854,7 +854,7 @@ public class IndexHelper {
 	    // Clasificacion
 	    row = sheet.createRow(sheet.getLastRowNum() + 1); //4
 	    cell = row.createCell(0);
-	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.classificacio") + expedient.getMetaExpedient().getClassificacioSia());
+	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.classificacio") + expedient.getMetaExpedient().getClassificacio());
 	    row.setRowStyle(style);
 	    
 	    // Fecha apertura
