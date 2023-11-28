@@ -137,7 +137,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		command.setRevisioComentari(null);
 		model.addAttribute(command);
 		
-		if (RolHelper.isRolActualRevisor(request) && metaExpedientService.isRevisioActiva() && metaExpedient.getRevisioEstat() == MetaExpedientRevisioEstatEnumDto.PENDENT) {
+		if (RolHelper.isRolActualRevisor(request) && metaExpedientService.isRevisioActiva()) {
 			model.addAttribute("modificar", true);
 		}
 		
