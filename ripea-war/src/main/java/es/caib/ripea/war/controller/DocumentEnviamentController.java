@@ -50,6 +50,7 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
 import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -290,6 +291,7 @@ public class DocumentEnviamentController extends BaseUserController {
 						documentId,
 						notificacioId));
 		model.addAttribute(command);
+		
 		return "notificacioForm";
 	}
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}", method = RequestMethod.POST)
@@ -611,7 +613,16 @@ public class DocumentEnviamentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId,
 				false,
-				false, null, null);
+				false,
+				null,
+				null);
+		boolean procedimentSenseCodiSia = false;
+		if (document.getExpedientPare().getMetaExpedient().getTipusClassificacio() == TipusClassificacioEnumDto.ID) {
+			procedimentSenseCodiSia = true;
+		}
+		model.addAttribute(
+				"procedimentSenseCodiSia",
+				procedimentSenseCodiSia);
 		model.addAttribute(
 				"document",
 				document);

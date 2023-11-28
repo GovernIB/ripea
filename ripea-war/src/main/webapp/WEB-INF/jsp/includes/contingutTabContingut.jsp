@@ -1514,20 +1514,22 @@ function getDetallsSignants(idTbody, contingutId, header) {
 						</li>
 						<c:if test="${!isTasca}">
 							<%---- Consulta PINBAL... ----%>
-							<li>
-								<c:choose>
-									<c:when test="${empty metaDocumentsPinbalLeft}">
-										<a href="#" class="document-new-empty-metadocuments">
-											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
-										</a>
-									</c:when>
-									<c:otherwise>
-										<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
-											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
-										</a>
-									</c:otherwise>	
-								</c:choose>				
-							<li>			
+							<c:if test="${expedient.metaExpedient.tipusClassificacio == TipusClassificacioEnumDto.SIA}">
+								<li>
+									<c:choose>
+										<c:when test="${empty metaDocumentsPinbalLeft}">
+											<a href="#" class="document-new-empty-metadocuments">
+												<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+											</a>
+										</c:when>
+										<c:otherwise>
+											<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
+												<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+											</a>
+										</c:otherwise>	
+									</c:choose>				
+								</li>	
+							</c:if>		
 							<%---- Carpeta... ----%>
 							<c:if test="${isCreacioCarpetesActiva}">
 								<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>

@@ -68,6 +68,7 @@ var interessatTipusEnum = [];
 	interessatTipusEnum["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
 
+//################################################## document ready START ##############################################################
 $(document).ready(function() {
 	
 
@@ -198,8 +199,16 @@ $(document).ready(function() {
 		updateCaducitatAmbDies($("#caducitatDiesNaturals").val());
 	});
 
+
+	let procedimentSenseCodiSia = ${procedimentSenseCodiSia};
+	if (procedimentSenseCodiSia) {
+		$("#tipus option[value='']").remove();
+		$("#tipus option[value='NOTIFICACIO']").remove();
+	}
 	
-});
+
+	
+});//################################################## document ready END ##############################################################
 
 function getNotificacionsSenseNif() {
 	var interessatsSelected = $('#interessatsIds').val();
