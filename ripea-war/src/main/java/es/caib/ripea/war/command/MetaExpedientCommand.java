@@ -160,6 +160,11 @@ public class MetaExpedientCommand {
 	public static MetaExpedientCommand asCommand(MetaExpedientDto dto) {
 		MetaExpedientCommand command = ConversioTipusHelper.convertir(dto, MetaExpedientCommand.class);
 		command.setOrganGestorId(dto.getOrganGestor() != null ? dto.getOrganGestor().getId() : null);
+		if (command.getTipusClassificacio() == TipusClassificacioEnumDto.SIA) {
+			command.setClassificacioSia(dto.getClassificacio());
+		} else {
+			command.setClassificacioId(dto.getClassificacio());
+		}
 		return command;
 	}
 

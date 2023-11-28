@@ -206,49 +206,58 @@ $(document).ready(function(){
 	</c:if>
 
 
-	$('input[type=radio][name=tipusClassificacio]').on('change', function() {
+	let bloquejarCamps = ${not empty bloquejarCamps};
+
+	if (bloquejarCamps) {
 		showHideClassificacioInput();
-	})
-	showHideClassificacioInput();
-	$('#organGestorId').on('change', function() {
-		$('input[name="tipusClassificacio"][value="ID"]').removeClass('focus');
-		disableEnableClassificacioIdButton();
-	})
-	if (!$('#id').val()) {
-		disableEnableClassificacioIdButton();
+		disableClassificacioButtons();
+		$('.comentariSia').hide();
+		$('#classificacioSia').attr("readonly", true);
+		
+		
+	} else {
+		$('input[type=radio][name=tipusClassificacio]').on('change', function() {
+			showHideClassificacioInput();
+		})
+		showHideClassificacioInput();
+		$('#organGestorId').on('change', function() {
+			$('input[name="tipusClassificacio"][value="ID"]').removeClass('focus');
+			disableEnableClassificacioIdButton();
+		})
+		if (!$('#id').val()) {
+			disableEnableClassificacioIdButton();
+		}
+
+		// on submit show alert if codi SIA doesn't exist in rolsac
+		$('form').submit(function(e) {
+		    let selected = $('input[name="tipusClassificacio"]:checked').val();
+		    if (selected == 'SIA') {
+		        let codiSia = $('#classificacioSia').val();
+
+		        $.ajax({
+		            type: 'GET',
+		            async: false,
+		            url: '<c:url value="/metaExpedient/checkIfExistsInRolsac"/>/' + codiSia,
+		            success: function(exists) {
+		                if (!exists) {
+		                    let procedimentNoExiste = '<spring:message code="metaexpedient.form.submit.sia.no.existe"/>';
+		                    if (confirm(procedimentNoExiste)) {
+		                        return true
+		                    } else {
+		                        e.preventDefault(); 
+		                        let iframe = window.frameElement;
+		                        $(iframe).show();
+		                        $('.modal-body .datatable-dades-carregant', parent.document).hide();
+		                        $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', false);
+		                        
+		                        return false;
+		                    }
+		                }
+		            }
+		        });
+		    }
+		});
 	}
-
-	
-	$('form').submit(function(e) {
-
-	    let selected = $('input[name="tipusClassificacio"]:checked').val();
-	    if (selected == 'SIA') {
-	        let codiSia = $('#classificacioSia').val();
-
-	        $.ajax({
-	            type: 'GET',
-	            async: false,
-	            url: '<c:url value="/metaExpedient/checkIfExistsInRolsac"/>/' + codiSia,
-	            success: function(exists) {
-	                if (!exists) {
-	                    let procedimentNoExiste = '<spring:message code="metaexpedient.form.submit.sia.no.existe"/>';
-	                    if (confirm(procedimentNoExiste)) {
-	                        return true
-	                    } else {
-	                        e.preventDefault(); 
-	                        let iframe = window.frameElement;
-	                        $(iframe).show();
-	                        $('.modal-body .datatable-dades-carregant', parent.document).hide();
-	                        $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', false);
-	                        
-	                        return false;
-	                    }
-	                }
-	            }
-	        });
-	    }
-	});
-	
 	
 			
 });//################################################## document ready END ##############################################################
@@ -265,7 +274,7 @@ function showHideClassificacioInput() {
 		$('#classificacioSia').val('');
 		$('#classificacioSia').parent().hide();
 		$('#classificacioId').parent().show();
-		if ($('#organGestorId').val()) {
+		if ($('#organGestorId').val() && !$('#classificacioId').val()) {
 			calculateClassificacioId();
 		}
 	}
@@ -284,6 +293,11 @@ function disableEnableClassificacioIdButton(){
 		$('input[name="tipusClassificacio"][value="SIA"]').click();
 		
 	}
+}
+
+function disableClassificacioButtons(){
+	$('input[name="tipusClassificacio"][value="SIA"]').parent().attr("disabled", true);
+	$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);
 }
 
 
@@ -381,7 +395,7 @@ function calculateClassificacioId() {
 								<c:if test="${not empty campErrors}">
 									<p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="classificacioSia"/></p>
 								</c:if>	
-	 						   <p class="comentari col-xs-12"><spring:message code="metaexpedient.form.camp.classificacio.sia.comment"/></p>	
+	 						   <p class="comentari col-xs-12 comentariSia"><spring:message code="metaexpedient.form.camp.classificacio.sia.comment"/></p>	
 							</div>	
 							<div style="display:none;">
 								<form:input path="classificacioId" cssClass="form-control" readonly="true"/>

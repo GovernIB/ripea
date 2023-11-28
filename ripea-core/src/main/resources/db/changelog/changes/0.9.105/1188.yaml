@@ -23,3 +23,4 @@ databaseChangeLog:
     - sql:
         sql: alter table ipa_metaexpedient modify clasif_sia varchar2(46 char);
              alter table ipa_metaexpedient add constraint ipa_metaexpedient_clasif_uk unique (clasif_sia);
+             alter table ipa_expedient modify nti_clasif_sia varchar2(46 char);

@@ -705,7 +705,7 @@ function removeCookie(cname) {
 							</c:if>
 							
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
-							<dd>${contingut.ntiClasificacionSia}</dd>
+							<dd style="overflow-wrap: break-word;">${contingut.ntiClasificacionSia}</dd>
 
 						</c:if>
 
