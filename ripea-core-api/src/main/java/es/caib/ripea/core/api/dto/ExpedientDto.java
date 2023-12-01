@@ -65,6 +65,7 @@ public class ExpedientDto extends NodeDto {
 	private boolean ambEnviamentsPendents;
 	private boolean ambNotificacionsPendents;
 	private Long grupId;
+	private String grupNom;
 	private boolean hasAllDocumentsDefinitiu;
 	private Long organGestorId;
 	private String organGestorText;

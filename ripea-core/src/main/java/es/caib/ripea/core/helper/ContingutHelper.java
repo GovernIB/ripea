@@ -343,6 +343,7 @@ public class ContingutHelper {
 				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
 				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
+				dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
 
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
