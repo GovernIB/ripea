@@ -37,7 +37,7 @@
 	<rip:inputText name="sequencia" textKey="contingut.expedient.form.camp.sequencia" required="false" labelSize="2" disabled="true"/>
 	<rip:inputText name="any" textKey="contingut.expedient.form.camp.any" required="true" labelSize="2"/>
 	<form:hidden path="gestioAmbGrupsActiva"/>
-	<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
+	<div id="grupsActiu" style="display:none;">
 		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
 	</div>
 	<div id="modal-botons" class="well">
@@ -119,13 +119,13 @@ function recuperarDominisMetaExpedient() {
 
 function refrescarGrups() {
 	let expedientId = $('#id').val();
-	if(expedientId == undefined || expedientId == "") {
-		let metaExpedientId = $('#metaNodeId').val();
-		if (metaExpedientId != undefined && metaExpedientId != "") {
-			const gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
-			$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
-			if (gestioAmbGrupsActiva) {
-				$("#grupsActiu").removeClass("hidden");
+	let metaExpedientId = $('#metaNodeId').val();
+	if (metaExpedientId) {
+		let gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
+		$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
+		if (gestioAmbGrupsActiva) {
+			$("#grupsActiu").show();
+			if (!expedientId) {
 				$.ajax({
 					type: 'GET',
 					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
@@ -137,13 +137,12 @@ function refrescarGrups() {
 						}
 					}
 				});
-			} else {
-				$('#grupId option[value!=""]').remove();
-				$("#grupsActiu").addClass("hidden");
 			}
+		} else {
+			$('#grupId option[value!=""]').remove();
+			$("#grupsActiu").hide();
 		}
 	}
-
 }
 
 function refrescarOrgan() {
@@ -193,6 +192,7 @@ function refrescarOrgan() {
 	}
 }
 
+//################################################## document ready START ##############################################################
 $(document).ready(function() {
 	$('select#metaNodeId').change(function(event) {
 		refrescarSequencia();
@@ -203,9 +203,10 @@ $(document).ready(function() {
 		refrescarSequencia();
 	});
 	refrescarSequencia();
+	refrescarGrups();
 	refrescarOrgan();
 	$('input#any').trigger('change');
-});
+});//################################################## document ready END ##############################################################
 </script>
 </head>
 </html>

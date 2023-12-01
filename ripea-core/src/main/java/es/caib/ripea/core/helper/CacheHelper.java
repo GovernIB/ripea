@@ -741,6 +741,21 @@ public class CacheHelper {
 		}
 	}
 	
+	@CacheEvict(value = "mostrarLogsPermisos")
+	public void evictMostrarLogsPermisos() {
+	}
+	
+	@Cacheable(value = "mostrarLogsPermisos")
+	public boolean mostrarLogsPermisos() {
+		
+		String prop = configHelper.getConfig("es.caib.ripea.activar.logs.permisos");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	@Cacheable(value = "mostrarLogsSegonPla")
 	public boolean mostrarLogsSegonPla() {
 		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.segonpla");

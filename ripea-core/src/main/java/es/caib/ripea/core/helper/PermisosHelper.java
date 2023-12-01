@@ -158,12 +158,18 @@ public class PermisosHelper {
 			Class<?> clazz,
 			Permission[] permissions) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		filterGrantedAny(objects, new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
-			@Override
-			public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
-				return entitat.getId();
-			}
-		}, clazz, permissions, auth);
+		filterGrantedAny(
+				objects,
+				new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
+					@Override
+					public Serializable getObjectIdentifier(
+							AbstractPersistable<Serializable> entitat) {
+						return entitat.getId();
+					}
+				},
+				clazz,
+				permissions,
+				auth);
 	}
 
 	/**
@@ -270,17 +276,25 @@ public class PermisosHelper {
 			Class<?> clazz,
 			Permission[] permissions,
 			String usuariCodi) {
-		filterGrantedAny(
-				objects,
-				new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
-					@Override
-					public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
-						return entitat.getId();
-					}
-				},
-				clazz,
-				permissions,
-				usuariCodi);
+		
+		if (usuariCodi == null) {
+			filterGrantedAny(
+					objects,
+					clazz,
+					permissions);
+		} else {
+			filterGrantedAny(
+					objects,
+					new ObjectIdentifierExtractor<AbstractPersistable<Serializable>>() {
+						@Override
+						public Serializable getObjectIdentifier(AbstractPersistable<Serializable> entitat) {
+							return entitat.getId();
+						}
+					},
+					clazz,
+					permissions,
+					usuariCodi);
+		}
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -452,6 +466,9 @@ public class PermisosHelper {
 			if (!isGrantedAll(objectIdentifier, clazz, permissions, usuriCodi))
 				it.remove();
 		}
+	}
+	public boolean isGrantedAll(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions) {
+		return isGrantedAll(objectIdentifier, clazz, permissions, SecurityContextHolder.getContext().getAuthentication());
 	}
 
 	public boolean isGrantedAll(Serializable objectIdentifier, Class<?> clazz, Permission[] permissions, Authentication auth) {

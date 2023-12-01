@@ -62,6 +62,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 
@@ -100,6 +101,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 	private ConsultaPinbalRepository consultaPinbalRepository;
 	@Resource
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private MetaExpedientRepository metaExpedientRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -363,16 +366,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		MetaExpedientEntity metaExpedientFiltre = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false,
-					false, 
-					null, 
-					null);
+			metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(

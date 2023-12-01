@@ -505,12 +505,12 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutOrigen,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -609,12 +609,12 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutOrigen,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,
@@ -702,12 +702,12 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutOrigen,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		ExpedientEntity expedientDesti = contingutHelper.getExpedientSuperior(
 				contingutDesti,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		if (!expedientOrigen.getMetaExpedient().equals(expedientDesti.getMetaExpedient())) {
 			throw new ValidationException(
 					contingutOrigenId,

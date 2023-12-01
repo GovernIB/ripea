@@ -7,6 +7,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.security.core.Authentication;
@@ -28,6 +32,8 @@ import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.ExpedientOrganPareEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -46,6 +52,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientOrganPareRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
@@ -102,6 +109,12 @@ public class EntityComprovarHelper {
     private OrganGestorHelper organGestorHelper;
     @Autowired
     private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Resource
+	private RolHelper rolHelper;
+	@Autowired
+	private GrupRepository grupRepository;
+	@Autowired
+	private CacheHelper cacheHelper;
 	
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,
@@ -391,15 +404,36 @@ public class EntityComprovarHelper {
 				throw new ValidationException(metaExpedientId, MetaExpedientEntity.class, "El procediment no es troba actiu (id=" + metaExpedientId + ")");
 			}
 		}
-		comprovarPermisos(
-				metaExpedient.getId(),
-				null,
-				comprovarPermisRead,
-				comprovarPermisWrite,
-				comprovarPermisCreate,
-				comprovarPermisDelete, 
-				rolActual, 
-				organId);
+		
+		if (comprovarPermisRead) {
+			comprovarPermisMetaExpedient(
+					metaExpedientId,
+					ExtendedPermission.READ,
+					"READ",
+					rolActual);
+		}
+		if (comprovarPermisWrite) {
+			comprovarPermisMetaExpedient(
+					metaExpedientId,
+					ExtendedPermission.WRITE,
+					"WRITE",
+					rolActual);
+		}
+		if (comprovarPermisCreate) {
+			comprovarPermisMetaExpedient(
+				metaExpedientId,
+				ExtendedPermission.CREATE,
+				"CREATE",
+				rolActual);
+		}
+		if (comprovarPermisDelete) {
+			comprovarPermisMetaExpedient(
+					metaExpedientId,
+					ExtendedPermission.DELETE,
+					"DELETE",
+					rolActual);
+		}
+		
 		return metaExpedient;
 	}
 
@@ -575,6 +609,10 @@ public class EntityComprovarHelper {
 				null);
 		
 	}
+	
+
+	
+	
 
 	public ExpedientEntity comprovarExpedient(
 			Long expedientId,
@@ -614,15 +652,47 @@ public class EntityComprovarHelper {
 			if (hasEstatWritePermissons(expedient.getEstatAdditional().getId()))
 				comprovarPermisWrite = false;
 		}
-		comprovarPermisos(
-				null,
+		
+		// comprovar si l'expedient està relacionat i és una consulta de LECTURA sobre algún element de l'expedient, llavors no mirar permisos
+		boolean comprovarNomesLectura = (!comprovarPermisWrite && !comprovarPermisCreate && !comprovarPermisDelete);
+		if (comprovarNomesLectura) {
+			boolean relacionatAmbAlgunExpedient = expedient.getRelacionatsAmb() != null && !expedient.getRelacionatsAmb().isEmpty();
+			boolean relacionatPerAlgunExpedient = expedient.getRelacionatsPer() != null && !expedient.getRelacionatsPer().isEmpty();
+			if (relacionatAmbAlgunExpedient || relacionatPerAlgunExpedient) {
+				comprovarPermisRead = false;
+			}
+		}
+		
+
+		if (comprovarPermisRead) {
+			comprovarPermisExpedient(
+					expedientId,
+					ExtendedPermission.READ,
+					"READ",
+					rolActual);
+		}
+		if (comprovarPermisWrite) {
+			comprovarPermisExpedient(
+					expedientId,
+					ExtendedPermission.WRITE,
+					"WRITE",
+					rolActual);
+		}
+		if (comprovarPermisCreate) {
+		comprovarPermisExpedient(
 				expedientId,
-				comprovarPermisRead,
-		        comprovarPermisWrite,
-		        comprovarPermisCreate,
-		        comprovarPermisDelete,
-		        rolActual, 
-		        null);
+				ExtendedPermission.CREATE,
+				"CREATE",
+				rolActual);
+		}
+		if (comprovarPermisDelete) {
+			comprovarPermisExpedient(
+					expedientId,
+					ExtendedPermission.DELETE,
+					"DELETE",
+					rolActual);
+		}
+		
 		return expedient;
 	}
 	
@@ -813,215 +883,332 @@ public class EntityComprovarHelper {
 	
 
 
-	protected void comprovarPermisos(
-			Long metaExpedientId,
-			Long expedientId,
-			boolean comprovarPermisRead,
-			boolean comprovarPermisWrite,
-			boolean comprovarPermisCreate,
-			boolean comprovarPermisDelete, 
-			String rolActual, 
-			Long organId) {
+	
+	
+	public boolean isAdminEntitat(Long procedimentId) {
 		
-//			comprovar si l'expedient està relacionat i és una consulta de LECTURA sobre algún element de l'expedient, llavors no mirar permisos
-		if (expedientId != null) {
-			ContingutEntity contingut = contingutRepository.findOne(expedientId);
-			boolean comprovarNomesLectura = (!comprovarPermisWrite && !comprovarPermisCreate && !comprovarPermisDelete);
-			if (contingut instanceof ExpedientEntity && comprovarNomesLectura) {
-				ExpedientEntity expedient = (ExpedientEntity)contingut;
-				boolean relacionatAmbAlgunExpedient = expedient.getRelacionatsAmb() != null && !expedient.getRelacionatsAmb().isEmpty();
-				boolean relacionatPerAlgunExpedient = expedient.getRelacionatsPer() != null && !expedient.getRelacionatsPer().isEmpty();
-				if (relacionatAmbAlgunExpedient || relacionatPerAlgunExpedient) {
-					comprovarPermisRead = false;
-					comprovarPermisWrite = false;
-				}
-			}
-		}
-
-		if (comprovarPermisRead) {
-			comprovarPermis(
-					metaExpedientId,
-					expedientId,
-					ExtendedPermission.READ,
-					"READ",
-					null, 
-					rolActual, 
-					organId);
-		}
-		if (comprovarPermisWrite) {
-			comprovarPermis(
-					metaExpedientId,
-					expedientId,
-					ExtendedPermission.WRITE,
-					"WRITE",
-					null, 
-					rolActual, 
-					organId);
-		}
-		if (comprovarPermisCreate) {
-		comprovarPermis(
-				metaExpedientId,
-				expedientId,
-				ExtendedPermission.CREATE,
-				"CREATE",
-				null, 
-				rolActual, 
-				organId);
-		}
-		if (comprovarPermisDelete) {
-			comprovarPermis(
-					metaExpedientId,
-					expedientId,
-					ExtendedPermission.DELETE,
-					"DELETE",
-					null, 
-					rolActual, 
-					organId);
-		}
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isAdminEntitat( procedimentId=" + procedimentId + ")");
 		
-	}
-
-	public void comprovarPermis(
-			Long metaExpedientId,
-			Long expedientId,
-			Permission permission,
-			String permissionName,
-			String usuariCodi, 
-			String rolActual, 
-			Long organChosenOnExpedientCreation) {//in order to check if is permited to create expedient (expedientId is still null then)
-		
-		
-		MetaExpedientEntity metaExpedient = null;
-		if (expedientId != null) {
-			metaExpedient = expedientRepository.findOne(expedientId).getMetaExpedient();
-			metaExpedientId = metaExpedient.getId();
-		} else {
-			metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
-		}
+		MetaExpedientEntity procediment = metaExpedientRepository.findOne(procedimentId);
 		
 		boolean isAdminEntitat = false;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		EntitatEntity entitat = metaExpedient.getEntitat();
+		EntitatEntity entitat = procediment.getEntitat();
 		if (auth.getAuthorities().contains(new SimpleGrantedAuthority("IPA_ADMIN"))) {
 			isAdminEntitat = permisosHelper.isGrantedAll(entitat.getId(), EntitatEntity.class, new Permission[] { ExtendedPermission.ADMINISTRATION }, auth);
 		} 
-		
-		if (!isAdminEntitat) {
-		
-			// Per a tenir permís s'ha de donar, com a mínim, un d'aquests casos:
-			// - Permis assignat directament al meta-node
-			// - Permís assignat a l'òrgan del node (o a un dels òrgans pare)
-			// - Permís assignat a la combinació òrgan + meta-node (o a una combinació òrgan pare + meta-node) en el cas en que sigui un expedient comú.
-			
-			boolean grantedDirect;
-			if (usuariCodi != null) {
-				grantedDirect = permisosHelper.isGrantedAll(
-						metaExpedientId,
-						MetaNodeEntity.class,
-						new Permission[] { permission },
-						usuariCodi);
-			} else {
-				grantedDirect = permisosHelper.isGrantedAll(
-						metaExpedientId,
-						MetaNodeEntity.class,
-						new Permission[] { permission },
-						auth);
-			}
+		return isAdminEntitat;
+	}
 	
-			boolean grantedOrgan = false;
-			boolean grantedOrganMetaNode = false;
-			boolean grantedOrganProcedimentsComuns = false;
-			
-			if (!grantedDirect) {
-				List<OrganGestorEntity> organsGestors = new ArrayList<>();
-				if (expedientId != null) {
-					organsGestors = expedientOrganPareRepository.findOrganGestorByExpedientId(expedientId);
-				} else if (organChosenOnExpedientCreation != null) {
-					OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organChosenOnExpedientCreation);
-					organsGestors = organGestorHelper.findPares(organGestorEntity, true);
-				} else {
-					OrganGestorEntity organGestorEntity = metaExpedient.getOrganGestor();
-					if (organGestorEntity != null) {
-						organsGestors = organGestorHelper.findPares(organGestorEntity, true);
-					}
-				}
-				if (usuariCodi != null) {
-					permisosHelper.filterGrantedAny(
-							organsGestors,
-							OrganGestorEntity.class,
-							new Permission[] { permission , ExtendedPermission.ADMINISTRATION },
-							usuariCodi);
-				} else {
-					permisosHelper.filterGrantedAny(
-							organsGestors,
-							OrganGestorEntity.class,
-							new Permission[] { permission , ExtendedPermission.ADMINISTRATION });
-				}
-				grantedOrgan = !organsGestors.isEmpty();
-			}
-			
-			if (!grantedDirect && !grantedOrgan) {
-				List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors;
-				if (expedientId != null) {
-					metaExpedientOrgansGestors = expedientOrganPareRepository.findMetaExpedientOrganGestorByExpedientId(expedientId);
-				} else {
-					metaExpedientOrgansGestors = organGestorRepository.findMetaExpedientOrganGestorsByMetaExpedientId(metaExpedientId);
-				}
-				if (usuariCodi != null) {
-					permisosHelper.filterGrantedAll(
-							metaExpedientOrgansGestors,
-							MetaExpedientOrganGestorEntity.class,
-							new Permission[] { permission },
-							usuariCodi);
-				} else {
-					permisosHelper.filterGrantedAll(
-							metaExpedientOrgansGestors,
-							MetaExpedientOrganGestorEntity.class,
-							new Permission[] { permission });
-				}
-				grantedOrganMetaNode = !metaExpedientOrgansGestors.isEmpty();
-			}
-			if (!grantedDirect && !grantedOrgan && !grantedOrganMetaNode) {
-				Long orgId = null;
-				if (expedientId != null) {
-					orgId = expedientRepository.findOne(expedientId).getOrganGestor().getId();
-				} else {
-					orgId = organChosenOnExpedientCreation;
-				}
-				if (orgId != null) {
-					List<Long> organPathIds = organGestorHelper.findParesIds(orgId, true);
-					permisosHelper.filterGrantedAll(
-							organPathIds,
-							OrganGestorEntity.class,
-							new Permission[] { ExtendedPermission.COMU, permission },
-							auth);
-					boolean isGrantedProcedimentsComuns = !organPathIds.isEmpty();
-					if (isGrantedProcedimentsComuns && metaExpedient.isComu()) {
-						grantedOrganProcedimentsComuns = true;
-					}
-				} else {
-					// Cercam els òrgans amb permisos per procediemnts comuns
-					List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
-							OrganGestorEntity.class,
-							ExtendedPermission.COMU,
-							permission);
-					boolean accessAllComu = false;
-					if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
-						accessAllComu = true;
-					}
-					if (accessAllComu && metaExpedient.isComu()) {
-						grantedOrganProcedimentsComuns = true;
-					}
-				}
-			}
+	
+	public boolean isAdminOrgan(Long organGestorId) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isAdminOrgan( organGestorId=" + organGestorId + ")");
+		
+		boolean isAdminOrgan = false;
+		
+		if (organGestorId != null) {
+			OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organGestorId);
+			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
+			permisosHelper.filterGrantedAny(
+					organsGestors,
+					OrganGestorEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION });
+			isAdminOrgan = Utils.isNotEmpty(organsGestors);
+		}
+		return isAdminOrgan;
+	}
+	
+	public boolean isGrantedPermisProcediment(
+			Long procedimentId,
+			Permission permission) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isGrantedPermisProcediment( procedimentId=" + procedimentId + ")");
+		
+		boolean grantedMetaExpedient = permisosHelper.isGrantedAll(
+				procedimentId,
+				MetaNodeEntity.class,
+				new Permission[] { permission });
 
-			if (!grantedDirect && !grantedOrgan && !grantedOrganMetaNode && !grantedOrganProcedimentsComuns) {
-				throw new PermissionDeniedException(metaExpedient.getId(), metaExpedient.getClass(), usuariCodi != null ? usuariCodi: auth.getName(), permissionName);
-			}
-					
+		return grantedMetaExpedient;
+	}
 	
+	public boolean isGrantedPermisOrgan(
+			Long organGestorId,
+			Permission permission) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isGrantedPermisOrgan( organGestorId=" + organGestorId + ")");
+		
+		boolean grantedOrgan = false;
+
+		if (organGestorId != null) {
+			OrganGestorEntity organGestorEntity = organGestorRepository.findOne(organGestorId);
+			List<OrganGestorEntity> organsGestors = organGestorHelper.findPares(organGestorEntity, true);
+			permisosHelper.filterGrantedAny(
+					organsGestors,
+					OrganGestorEntity.class,
+					new Permission[] { permission});
+			grantedOrgan = Utils.isNotEmpty(organsGestors);
 		}
 
+		return grantedOrgan;
+	}
+	
+	public boolean isGrantedPermisProcedimentOrgan(
+			Long procedimentId,
+			Permission permission) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isGrantedPermisProcedimentOrgan( procedimentId=" + procedimentId + ")");
+		
+		List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = organGestorRepository.findMetaExpedientOrganGestorsByMetaExpedientId(procedimentId);
+
+		permisosHelper.filterGrantedAll(
+				metaExpedientOrgansGestors,
+				MetaExpedientOrganGestorEntity.class,
+				new Permission[] { permission });
+		
+		boolean grantedOrganProcediment = Utils.isNotEmpty(metaExpedientOrgansGestors);
+		return grantedOrganProcediment;
+	}
+	
+	public boolean isGrantedPermisProcedimentOrgan(
+			Long procedimentId,
+			Long organGestorId,
+			Permission permission) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isGrantedPermisProcedimentOrgan (procedimentId=" + procedimentId + ", organGestorId" + organGestorId + ")");
+		
+		List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = new ArrayList<>();
+		
+		List<Long> organGestorIdAmbPares = organGestorHelper.findParesIds(
+				organGestorId,
+				true);
+		for (Long org: organGestorIdAmbPares) {
+			MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientIdAndOrganGestorId(
+					procedimentId,
+					org); 
+			metaExpedientOrgansGestors.add(metaExpedientOrganGestor);
+		}
+
+		permisosHelper.filterGrantedAll(
+				metaExpedientOrgansGestors,
+				MetaExpedientOrganGestorEntity.class,
+				new Permission[] { permission });
+		
+		boolean grantedOrganProcediment = Utils.isNotEmpty(metaExpedientOrgansGestors);
+		return grantedOrganProcediment;
+	}
+	
+	public boolean isGrantedPermisProcediemntsComuns(
+			Long procedimentId,
+			Permission permission) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isGrantedPermisProcediemntsComuns( procedimentId=" + procedimentId + ")");
+		
+		boolean grantedOrganProcedimentsComuns = false;
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
+		if (metaExpedient.isComu()) {
+			List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
+					OrganGestorEntity.class,
+					ExtendedPermission.COMU,
+					permission);
+			if (Utils.isNotEmpty(organProcedimentsComunsIds) ) {
+				grantedOrganProcedimentsComuns = true;
+			}
+		}
+		return grantedOrganProcedimentsComuns;
+	}
+	
+	public boolean isGrantedPermisProcedimentsComuns(
+			Long procedimentId,
+			Long organId,
+			Permission permission) {
+		
+		
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(procedimentId);
+		OrganGestorEntity organ = organGestorRepository.findOne(organId);
+		
+		boolean grantedOrganProcedimentsComuns = false;
+		
+		if (metaExpedient.isComu()) {
+			List<Long> organParesIds = organGestorHelper.findParesIds(organ.getId(), true);
+			permisosHelper.filterGrantedAll(
+					organParesIds,
+					OrganGestorEntity.class,
+					new Permission[] { ExtendedPermission.COMU, permission },
+					SecurityContextHolder.getContext().getAuthentication()); 
+			boolean isGrantedProcedimentsComuns = Utils.isNotEmpty(organParesIds);
+			if (isGrantedProcedimentsComuns) {
+				grantedOrganProcedimentsComuns = true;
+			}
+		}
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("isGrantedPermisProcedimentsComuns (procedimentId=" + procedimentId + ", organGestorId" + organId + ", grantedOrganProcedimentsComuns" + grantedOrganProcedimentsComuns + ")");
+		return grantedOrganProcedimentsComuns;
+	}
+	
+	
+	public void comprovarPermisMetaExpedient(
+			Long procedimentId,
+			Permission permission,
+			String permissionName,
+			String rolActual) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("comprovarPermisMetaExpedient (procedimentId=" + procedimentId + ", permissionName=" + permissionName + ", rolActual=" + rolActual + ", user=" + SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		OrganGestorEntity organ = metaExpedientRepository.findOne(procedimentId).getOrganGestor();
+		Long organId = organ != null ? organ.getId() : null;
+		
+		if (!isAdminEntitat(procedimentId)) {
+			
+			if (!isAdminOrgan(organId)) {
+				
+				if (!isGrantedPermisProcediment(
+						procedimentId,
+						permission)) {
+
+					if (!isGrantedPermisOrgan(
+							organId,
+							permission)) {
+						
+						if (!isGrantedPermisProcedimentOrgan(
+								procedimentId,
+								permission)) {
+						
+							if (!isGrantedPermisProcediemntsComuns(
+									procedimentId,
+									permission)) {
+								
+								throw new PermissionDeniedException(
+										procedimentId,
+										MetaExpedientEntity.class,
+										permissionName);
+							}	
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+	public void comprovarPermisExpedientCreation(
+			Long procedimentId,
+			Long organId, 
+			Long grupId, 
+			String rolActual) {
+		
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("comprovarPermisExpedientCreation (procedimentId=" + procedimentId + ", organId=" + organId + ", grupId=" + grupId + ", rolActual=" + rolActual + ", user=" + SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		if (!isAdminEntitat(procedimentId)) {
+			
+			if (!isAdminOrgan(organId)) {
+
+				if (!isGrantedPermisProcediment(
+						procedimentId,
+						ExtendedPermission.CREATE)) {
+
+					if (!isGrantedPermisOrgan(
+							organId,
+							ExtendedPermission.CREATE)) {
+
+						if (!isGrantedPermisProcedimentOrgan(
+								procedimentId,
+								organId,
+								ExtendedPermission.CREATE)) {
+
+							if (!isGrantedPermisProcedimentsComuns(
+									procedimentId,
+									organId,
+									ExtendedPermission.CREATE)) {
+								
+								throw new PermissionDeniedException(
+										procedimentId,
+										MetaExpedientEntity.class,
+										"CREATE");
+							}
+						}
+					}
+
+					if (grupId != null) {
+						GrupEntity grup = grupRepository.findOne(grupId);
+						if (grup != null && !rolHelper.doesCurrentUserHasRol(grup.getRol())) {
+							throw new PermissionDeniedException(
+									procedimentId,
+									MetaExpedientEntity.class,
+									"GRUP");
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	
+
+	public void comprovarPermisExpedient(
+			Long expedientId,
+			Permission permission,
+			String permissionName,
+			String rolActual) {
+
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+		Long procedimentId = expedient.getMetaExpedient().getId();
+		Long organId = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
+
+		if (cacheHelper.mostrarLogsPermisos())
+			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", rolActual=" + rolActual + ", user=" + SecurityContextHolder.getContext().getAuthentication().getName());
+		
+		if (!isAdminEntitat(procedimentId)) {
+
+			if (!isAdminOrgan(organId)) {
+
+				if (!isGrantedPermisProcediment(
+						procedimentId,
+						permission)) {
+
+					if (!isGrantedPermisOrgan(
+							expedient.getOrganGestor().getId(),
+							permission)) {
+
+						if (!isGrantedPermisProcedimentOrgan(
+								procedimentId,
+								organId,
+								permission)) {
+
+							if (!isGrantedPermisProcedimentsComuns(
+									procedimentId,
+									organId,
+									permission)) {
+								
+								throw new PermissionDeniedException(
+										expedient.getId(),
+										expedient.getClass(),
+										permissionName);
+							}
+						}
+					}
+				}
+
+				GrupEntity grup = expedientRepository.findOne(expedientId).getGrup();
+				if (grup != null && !rolHelper.doesCurrentUserHasRol(grup.getRol())) {
+					throw new PermissionDeniedException(
+							grup.getId(),
+							grup.getClass(),
+							"GRUP");
+				}
+			}
+		}
 	}
 	
 	private List<Long> toListLong(List<Serializable> original) {
@@ -1031,5 +1218,7 @@ public class EntityComprovarHelper {
 		}
 		return listLong;
 	}
+	
+	private static final Logger logger = LoggerFactory.getLogger(EntityComprovarHelper.class);
 
 }

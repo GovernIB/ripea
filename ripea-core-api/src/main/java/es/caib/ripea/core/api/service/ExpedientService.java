@@ -32,9 +32,6 @@ public interface ExpedientService {
 	 *            Atribut id del meta-expedient a partir del qual es vol crear l'expedient.
 	 * @param organGestorId
 	 *            Atribut id de l'organ gestor responsable de l'expedient.
-	 * @param pareId
-	 *            Contenidor pare a on es vol crear l'expedient. Pot ser null. Si no és
-	 *            null es crearà com a subexpedient d'un expedient superior.
 	 * @param any
 	 *            Any de l'expedient que es vol crear. Si és null l'expedient es crearà
 	 *            a dins l'any actual.
@@ -56,13 +53,12 @@ public interface ExpedientService {
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
 			Long organGestorId,
-			Long pareId,
 			Integer any,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId,
-			String rolActual, 
+			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc) throws NotFoundException, ValidationException;
 

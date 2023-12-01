@@ -343,7 +343,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				document,
 				false,
 				false,
-				true, false, null);
+				true, null);
 		if (expedient == null) {
 			throw new ValidationException(
 					documentId,

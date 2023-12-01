@@ -712,7 +712,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					true,
 					false,
 					false, 
-					false, 
 					null);
 			metaDocuments = findMetaDocumentsDisponiblesPerCreacio(
 					entitat,
@@ -762,7 +761,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				document,
 				true,
 				false,
-				false, false, null);
+				false, null);
 		// Han de ser els mateixos que per a la creació però afegit el meta-document
 		// del document que es vol modificar
 		List<MetaDocumentEntity> metaDocuments = findMetaDocumentsDisponiblesPerCreacio(

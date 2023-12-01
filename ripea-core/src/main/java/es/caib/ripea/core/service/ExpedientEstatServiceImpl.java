@@ -333,33 +333,11 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
 				+ "usuari=" + codi + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				false,
-				true,
-				false,
-				false,
-				null);
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(
-				expedient,
-				false,
-				false,
-				false,
-				false, 
-				null);
-		if (expedientSuperior != null) {
-			logger.error("No es pot agafar un expedient no arrel (id=" + expedientId + ")");
-			throw new ValidationException(
-					expedientId,
-					ExpedientEntity.class,
-					"No es pot agafar un expedient no arrel");
-		}
+		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
+
 		// Agafa l'expedient. Si l'expedient pertany a un altre usuari li pren
 		UsuariEntity usuariOriginal = expedient.getAgafatPer();
 		UsuariEntity usuariNou = usuariHelper.getUsuariByCodi(codi);
-		
-		 
 		
 		expedient.updateAgafatPer(usuariNou);
 		if (usuariOriginal != null) {

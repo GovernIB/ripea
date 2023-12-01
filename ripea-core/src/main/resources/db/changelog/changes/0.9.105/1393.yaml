@@ -1,0 +1,35 @@
+databaseChangeLog:
+- changeSet:
+    id: 1701419006016-1
+    author: limit
+    changes:
+    - insert:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.activar.logs.permisos
+          - column:
+              name: value
+              value: false
+          - column:
+              name: description
+              value: Activar logs per permisos
+          - column:
+              name: group_code
+              value: LOGS
+          - column:
+              name: position
+              value: 3
+          - column:
+              name: jboss_property
+              value: 0
+          - column:
+              name: type_code
+              value: BOOL
+          - column:
+              name: configurable
+              value: 0
+          - column:
+              name: configurable_organ
+              value: 0              

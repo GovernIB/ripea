@@ -31,7 +31,6 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.entity.config.ConfigEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -39,6 +38,7 @@ import es.caib.ripea.core.helper.ExcepcioLogHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
@@ -72,6 +72,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private PaginacioHelper paginacioHelper;
 	@Resource
 	private GrupRepository grupRepository;
+	@Resource
+	private RolHelper rolHelper;
 
 	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
@@ -383,17 +385,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public boolean doesCurrentUserHasRol(
 			String rolToCheck) {
 
-		boolean hasRol = false;
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		List<String> rols = cacheHelper.findRolsAmbCodi(auth.getName());
-		if (rols != null) {
-			for (String rol : rols) {
-				if (rol.equals(rolToCheck)) {
-					hasRol = true;
-				}
-			}
-		}
-		return hasRol;
+		return rolHelper.doesCurrentUserHasRol(rolToCheck);
 	}
 
 	private String getIdiomaPerDefecte() {

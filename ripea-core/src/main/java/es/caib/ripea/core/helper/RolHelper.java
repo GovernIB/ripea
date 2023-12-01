@@ -6,6 +6,8 @@ package es.caib.ripea.core.helper;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RolHelper {
+	@Resource
+	private CacheHelper cacheHelper;
 	
 	public static boolean isAdminEntitat(String rolActual) {
 		if (rolActual != null && rolActual.equals("IPA_ADMIN")) {
@@ -42,6 +46,23 @@ public class RolHelper {
 		}
 		
 		return rolsCurrentUser;
+	}
+	
+	
+	public boolean doesCurrentUserHasRol(
+			String rolToCheck) {
+
+		boolean hasRol = false;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		List<String> rols = cacheHelper.findRolsAmbCodi(auth.getName());
+		if (rols != null) {
+			for (String rol : rols) {
+				if (rol.equals(rolToCheck)) {
+					hasRol = true;
+				}
+			}
+		}
+		return hasRol;
 	}
 
 }

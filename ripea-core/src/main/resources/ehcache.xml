@@ -41,5 +41,6 @@
 	<cache name="dataDarrerEnviament" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="5400" overflowToDisk="false" />
 	<cache name="mostrarLogsRendimentDescarregarAnotacio" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="mostrarLogsCreacioContingut" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
+	<cache name="mostrarLogsPermisos" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	
 </ehcache>

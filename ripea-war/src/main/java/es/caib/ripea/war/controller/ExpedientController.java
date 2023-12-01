@@ -574,13 +574,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getMetaNodeId(),
 					command.getMetaNodeDominiId(),
 					command.getOrganGestorId(),
-					null,
 					command.getAny(),
 					command.getNom(),
 					null,
 					false,
 					command.getGrupId(),
-					RolHelper.getRolActual(request), 
+					RolHelper.getRolActual(request),
 					null, 
 					null);
 			

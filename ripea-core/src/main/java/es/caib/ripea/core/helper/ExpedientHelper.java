@@ -199,7 +199,6 @@ public class ExpedientHelper {
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
 			Long organGestorId,
-			Long pareId,
 			Integer any,
 			String nom,
 			Long expedientPeticioId,
@@ -213,7 +212,6 @@ public class ExpedientHelper {
 						"metaExpedientId=" + metaExpedientId + ", " +
 						"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
 						"organGestorId=" + organGestorId + ", " +
-						"pareId=" + pareId + ", " +
 						"any=" + any + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
@@ -251,49 +249,32 @@ public class ExpedientHelper {
 					"Ja existeix un altre expedient amb el mateix títol per aquest procediment");
 		}
 
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-				entitat,
-				metaExpedientId,
+		entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
 				false,
 				false,
 				true,
-				false, 
-				false, 
-				rolActual, 
-				organGestorId);
+				false);
+		
+		entityComprovarHelper.comprovarPermisExpedientCreation(
+				metaExpedientId,
+				organGestorId, 
+				grupId, 
+				rolActual);
+		
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
 		
 		OrganGestorEntity organGestor = getOrganGestorForExpedient(
 				metaExpedient,
 				organGestorId,
-				ExtendedPermission.CREATE, rolActual);
+				ExtendedPermission.CREATE, 
+				rolActual);
 
-//		if (metaExpedientDominiId != null) {
-//			metaExpedientDomini = metaExpedientDominiRepository.findOne(metaExpedientDominiId);
-//		}
-		ContingutEntity contingutPare = null;
-		if (pareId != null) {
-			contingutPare = contingutHelper.comprovarContingutDinsExpedientModificable(
-					entitatId,
-					pareId,
-					false,
-					false,
-					true,
-					false, 
-					false, 
-					true, rolActual);
-		}
-		contingutHelper.comprovarNomValid(contingutPare, nom, null, ExpedientEntity.class);
-//		comprovarSiExpedientAmbMateixNom(
-//				metaExpedient,
-//				contingutPare,
-//				nom,
-//				null,
-//				ExpedientEntity.class);
 		ExpedientEntity expedient = contingutHelper.crearNouExpedient(
 				nom,
 				metaExpedient,
-				contingutPare,
+				null,
 				metaExpedient.getEntitat(),
 				organGestor,
 				"1.0",
@@ -332,7 +313,7 @@ public class ExpedientHelper {
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
 			if (associarInteressats) {
-				associateInteressats(expedient.getId(), entitat.getId(), expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
+				associateInteressats(expedient.getId(), entitatId, expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
 			}
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
@@ -1120,7 +1101,7 @@ public class ExpedientHelper {
 	}
 	public void agafar(ExpedientEntity expedient, String usuariCodi) {
 
-		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, false, null);
+		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, null);
 		if (expedientSuperior != null) {
 			logger.error("No es pot agafar un expedient no arrel (id=" + expedient.getId() + ")");
 			throw new ValidationException(expedient.getId(), ExpedientEntity.class, "No es pot agafar un expedient no arrel");

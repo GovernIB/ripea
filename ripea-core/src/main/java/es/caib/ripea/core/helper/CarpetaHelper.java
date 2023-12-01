@@ -105,7 +105,6 @@ public class CarpetaHelper {
 					true,
 					false,
 					false, 
-					false, 
 					rolActual);
 			contingutHelper.comprovarNomValid(
 					pare,

@@ -38,13 +38,12 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long contenidorId,
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
-			Long organGestorId,
 			Integer any,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId,
-			String rolActual, 
+			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc) {
 		return delegate.create(
@@ -52,13 +51,12 @@ public class ExpedientServiceBean implements ExpedientService {
 				contenidorId,
 				metaExpedientId,
 				metaExpedientDominiId,
-				organGestorId,
 				any,
 				nom,
 				expedientPeticioId,
 				associarInteressats,
 				grupId,
-				rolActual, 
+				rolActual,
 				anexosIdsMetaDocsIdsMap, 
 				justificantIdMetaDoc);
 	}

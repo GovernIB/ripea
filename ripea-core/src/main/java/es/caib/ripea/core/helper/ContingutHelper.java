@@ -1123,7 +1123,6 @@ public class ContingutHelper {
 				true,
 				false,
 				true,
-				checkPerMassiuAdmin,
 				rolActual);
 		if (expedient == null) {
 			throw new ValidationException(
@@ -1216,7 +1215,7 @@ public class ContingutHelper {
 				true,
 				false,
 				false,
-				false, null);
+				null);
 		if (ContingutTipusEnumDto.EXPEDIENT.equals(contingut.getTipus())) {
 			
 			entityComprovarHelper.comprovarExpedient(
@@ -1457,7 +1456,6 @@ public class ContingutHelper {
 			boolean incloureActual,
 			boolean comprovarPermisRead,
 			boolean comprovarPermisWrite,
-			boolean checkPerMassiuAdmin,
 			String rolActual) {
 		ExpedientEntity expedient = null;
 		if (incloureActual && contingut instanceof ExpedientEntity) {
@@ -1477,34 +1475,17 @@ public class ContingutHelper {
 			}
 		}
 		if (expedient != null) {
-			if (comprovarPermisRead) {
-				entityComprovarHelper.comprovarMetaExpedient(
-						expedient.getEntitat(),
-						expedient.getMetaExpedient().getId(),
-						true,
+			// if user has write permissions to expedient estat don't need to check metaExpedient permissions
+			if (expedient.getEstatAdditional() == null || !hasEstatPermissons(expedient.getEstatAdditional().getId())) {
+				
+				entityComprovarHelper.comprovarExpedient(
+						expedient.getId(),
+						false,
+						comprovarPermisRead,
+						comprovarPermisWrite,
 						false,
 						false,
-						false,
-						false,
-						rolActual,
 						null);
-			}
-			if (comprovarPermisWrite && !checkPerMassiuAdmin) {
-
-				// if user has write permissions to expedient estat don't need to check metaExpedient permissions
-				if (expedient.getEstatAdditional() == null || !hasEstatPermissons(expedient.getEstatAdditional().getId())) {
-
-					
-					entityComprovarHelper.comprovarExpedient(
-							expedient.getId(),
-							false,
-							false,
-							comprovarPermisWrite,
-							false,
-							false,
-							null);
-
-				}
 			}
 		}
 		return expedient;

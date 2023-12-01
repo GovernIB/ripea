@@ -209,13 +209,12 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long metaExpedientId,
 			Long metaExpedientDominiId,
 			Long organGestorId,
-			Long pareId,
 			Integer any,
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
 			Long grupId,
-			String rolActual, 
+			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc) {
 		
@@ -227,7 +226,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 						"metaExpedientId=" + metaExpedientId + ", " +
 						"metaExpedientDominiId=" + metaExpedientDominiId + ", " +
 						"organGestorId=" + organGestorId + ", " +
-						"pareId=" + pareId + ", " +
 						"any=" + any + ", " +
 						"nom=" + nom + ", " +
 						"expedientPeticioId=" + expedientPeticioId + ")");
@@ -240,7 +238,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 					metaExpedientId,
 					metaExpedientDominiId,
 					organGestorId,
-					pareId,
 					any,
 					nom,
 					expedientPeticioId,
@@ -782,16 +779,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (metaExpedientId != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					metaExpedientId,
-					false,
-					true,
-					false,
-					false,
-					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
-					null, 
-					null);
+			metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 //		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
@@ -872,15 +860,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		logger.debug(
 				"Agafant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "arxiuId=" + arxiuId +
 						", " + "id=" + id + ", " + "usuariCodi=" + usuariCodi + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				false,
-				false,
-				false,
-				false,
-				false,
-				null);
-		
+		ExpedientEntity expedient = expedientRepository.findOne(id);
 
 		expedientHelper.agafar(expedient, usuariCodi);
 	}
@@ -908,14 +888,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 	public void alliberarAdmin(Long entitatId, Long id) {
 		logger.debug(
 				"Alliberant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "id=" + id + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				id,
-				false,
-				false,
-				false,
-				false,
-				false,
-				null);
+		ExpedientEntity expedient = expedientRepository.findOne(id);
 		expedientHelper.alliberar(expedient);
 	}
 
@@ -991,23 +964,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, 
 				true, false);
 		
-		boolean checkPerMassiuAdmin = false;
 		boolean nomesAgafats = true;
 		if (rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			nomesAgafats = false;
-			checkPerMassiuAdmin = true;
 		} 
 
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false, 
-					checkPerMassiuAdmin, null, null);
+			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
@@ -1066,13 +1030,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false, false, false);
 		MetaExpedientEntity metaExpedient = null;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
-					entitat,
-					filtre.getMetaExpedientId(),
-					true,
-					false,
-					false,
-					false, false, null, null);
+			metaExpedient = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId, rolActual);
 
@@ -2001,16 +1959,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			MetaExpedientEntity metaExpedientFiltre = null;
 			if (filtre.getMetaExpedientId() != null) {
 				long t2 = System.currentTimeMillis();
-				metaExpedientFiltre = entityComprovarHelper.comprovarMetaExpedient(
-						entitat,
-						filtre.getMetaExpedientId(),
-						true,
-						false,
-						false,
-						false,
-						false, 
-						"tothom",
-						null);
+				metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 				logger.trace("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 			}
 			// estats

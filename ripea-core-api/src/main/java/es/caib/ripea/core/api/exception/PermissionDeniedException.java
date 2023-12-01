@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.core.api.exception;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 /**
  * Excepció que es llança quan l'usuari no te permisos per accedir a un objecte.
  * 
@@ -29,6 +31,21 @@ public class PermissionDeniedException extends RuntimeException {
 		this.objectId = objectId;
 		this.objectClass = objectClass;
 		this.userName = userName;
+		this.permissionName = permissionName;
+	}
+	
+	public PermissionDeniedException(
+			Object objectId,
+			Class<?> objectClass,
+			String permissionName) {
+		super(getExceptionMessage(
+				objectId,
+				objectClass,
+				SecurityContextHolder.getContext().getAuthentication().getName(),
+				permissionName));
+		this.objectId = objectId;
+		this.objectClass = objectClass;
+		this.userName = SecurityContextHolder.getContext().getAuthentication().getName();
 		this.permissionName = permissionName;
 	}
 
