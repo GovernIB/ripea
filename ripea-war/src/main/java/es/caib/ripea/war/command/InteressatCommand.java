@@ -45,14 +45,14 @@ public class InteressatCommand  {
 	protected Long entitatId;
 	@NotEmpty(groups = {PersonaFisica.class})
 	@Size(max = 30, groups = {PersonaFisica.class}, message = "max.size")
-    @Pattern(regexp = "^[A-Za-z ]*$", groups = {PersonaFisica.class}, message = "only.letters")
+    @Pattern(regexp = "^[A-Za-zŽžÀ-ÖØ-Ýà-öø-ÿ ]*$", groups = {PersonaFisica.class}, message = "only.letters")
 	protected String nom;
 	@NotEmpty(groups = {PersonaFisica.class})
 	@Size(max = 30, groups = {PersonaFisica.class}, message = "max.size")
-    @Pattern(regexp = "^[A-Za-z ]*$", groups = {PersonaFisica.class}, message = "only.letters")
+    @Pattern(regexp = "^[A-Za-zŽžÀ-ÖØ-Ýà-öø-ÿ ]*$", groups = {PersonaFisica.class}, message = "only.letters")
 	protected String llinatge1;
 	@Size(max = 30, groups = {PersonaFisica.class}, message = "max.size")
-    @Pattern(regexp = "^[A-Za-z ]*$", groups = {PersonaFisica.class}, message = "only.letters")
+    @Pattern(regexp = "^[A-Za-zŽžÀ-ÖØ-Ýà-öø-ÿ ]*$", groups = {PersonaFisica.class}, message = "only.letters")
 	protected String llinatge2;
 	@NotEmpty(groups = {PersonaJuridica.class})
 	@Size(max = 80, groups = {PersonaJuridica.class}, message = "max.size")
