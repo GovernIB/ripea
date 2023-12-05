@@ -1142,11 +1142,18 @@ public class EntityComprovarHelper {
 
 					if (grupId != null) {
 						GrupEntity grup = grupRepository.findOne(grupId);
-						if (grup != null && !rolHelper.doesCurrentUserHasRol(grup.getRol())) {
-							throw new PermissionDeniedException(
-									procedimentId,
-									MetaExpedientEntity.class,
-									"GRUP");
+						if (grup != null) {
+							
+							boolean grantedGrup = permisosHelper.isGrantedAll(
+									grup.getId(),
+									GrupEntity.class,
+									new Permission[] { ExtendedPermission.READ });
+							if (!grantedGrup) {
+								throw new PermissionDeniedException(
+										grup.getId(),
+										grup.getClass(),
+										"GRUP");
+							}
 						}
 					}
 				}
@@ -1201,15 +1208,25 @@ public class EntityComprovarHelper {
 				}
 
 				GrupEntity grup = expedientRepository.findOne(expedientId).getGrup();
-				if (grup != null && !rolHelper.doesCurrentUserHasRol(grup.getRol())) {
-					throw new PermissionDeniedException(
+				if (grup != null) {
+					boolean grantedGrup = permisosHelper.isGrantedAll(
 							grup.getId(),
-							grup.getClass(),
-							"GRUP");
+							GrupEntity.class,
+							new Permission[] { ExtendedPermission.READ });
+					if (!grantedGrup) {
+						throw new PermissionDeniedException(
+								grup.getId(),
+								grup.getClass(),
+								"GRUP");
+					}
 				}
+				
 			}
 		}
 	}
+	
+	
+
 	
 	private List<Long> toListLong(List<Serializable> original) {
 		List<Long> listLong = new ArrayList<Long>(original.size());

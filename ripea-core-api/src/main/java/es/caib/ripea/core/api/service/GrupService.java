@@ -1,10 +1,13 @@
 package es.caib.ripea.core.api.service;
 
+import java.util.List;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
@@ -65,18 +68,15 @@ public interface GrupService {
 	
 	/**
 	 * Consulta un grup donat el seu id.
-	 * 
-	 * @param entitatId
-	 *            Id de l'entitat.
 	 * @param id
 	 *            Atribut id del grup a trobar.
+	 * 
 	 * @return El grup amb l'id especificat o null si no s'ha trobat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public GrupDto findById(
-			Long entitatId,
 			Long id) throws NotFoundException;
 	
 	/**
@@ -105,7 +105,7 @@ public interface GrupService {
 	 * @param organId TODO
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	void relacionarAmbMetaExpedient(
+	public void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId);
@@ -121,9 +121,23 @@ public interface GrupService {
 	 * @param organId TODO
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	void desvincularAmbMetaExpedient(
+	public void desvincularAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
 			Long id, String rolActual, Long organId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<PermisDto> findPermisos(
+			Long id);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void updatePermis(
+			Long id,
+			PermisDto permis);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void deletePermis(
+			Long id,
+			Long permisId);
 	
 }

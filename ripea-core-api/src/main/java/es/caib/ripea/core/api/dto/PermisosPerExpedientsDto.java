@@ -11,6 +11,7 @@ public class PermisosPerExpedientsDto  {
 	List<Long> idsMetaExpedientOrganPairsPermesos;
 	List<Long> idsOrgansAmbProcedimentsComunsPermesos;
 	List<Long> idsProcedimentsComuns;
+	List<Long> idsGrupsPermesos;
 	
 	public List<Long> getIdsMetaExpedientsPermesos() {
 		return Utils.getNullIfEmpty(idsMetaExpedientsPermesos) ;
@@ -27,7 +28,9 @@ public class PermisosPerExpedientsDto  {
 	public List<Long> getIdsProcedimentsComuns() {
 		return Utils.getNullIfEmpty(idsProcedimentsComuns);
 	}
-	
+	public List<Long> getIdsGrupsPermesos() {
+		return Utils.getNullIfEmpty(idsGrupsPermesos);
+	}
 	
 
 	

@@ -33,6 +33,8 @@ public class GrupEntity extends RipeaAuditable<Long> {
 
 	@Column(name = "rol", length = 50, nullable = false)
 	private String rol;
+	@Column(name = "codi", length = 50, nullable = false)
+	private String codi;
 	@Column(name = "descripcio", length = 512, nullable = false)
 	private String descripcio;
 	
@@ -50,6 +52,9 @@ public class GrupEntity extends RipeaAuditable<Long> {
 	}
 	public void setMetaExpedients(List<MetaExpedientEntity> metaExpedients) {
 		this.metaExpedients = metaExpedients;
+	}
+	public String getCodi() {
+		return codi;
 	}
 	public String getRol() {
 	    return rol;

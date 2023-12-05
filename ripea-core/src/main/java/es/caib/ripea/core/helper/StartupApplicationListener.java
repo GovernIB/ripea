@@ -16,11 +16,15 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.ProcesosInicialsEntity;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.ProcessosInicialsRepository;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +46,17 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     @Autowired
     private HistoricHelper historicHelper;
     @Autowired
-    private PluginHelper pluginHelper;
+    private GrupHelper grupHelper;
     @Autowired
     private EntitatRepository entitatRepository;
     @Autowired
     private ConversioTipusHelper conversioTipusHelper;
     @Autowired
     private OrganGestorHelper organGestorHelper;
+	@Autowired
+	private PermisosHelper permisosHelper;
+	@Autowired
+	private GrupRepository grupRepository;
 
     public static int counter = 0;
 
@@ -83,6 +91,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
                           break;            
                         case ORGANS_DESCARREGAR_NOM_CATALA:
                             organsDescarregarNomCatala();
+                        case GRUPS_PERMISOS:
+                        	crearPermisosDeGrupsJaCreats();
                           break;                              
                         default:
                             log.error("Procés inicial no definit");
@@ -193,6 +203,24 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			organGestorHelper.organsDescarregarNomCatala();
 		} catch (Exception e) {
 			log.error("Error al descarregar noms catalans", e);
+		}
+    }
+    
+    private void crearPermisosDeGrupsJaCreats(){
+    	try {
+    		
+    		List<GrupEntity> grups = grupRepository.findAll();
+    		
+    		for (GrupEntity grup : grups) {
+        		PermisDto dto = new PermisDto();
+        		dto.setRead(true);
+        		dto.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
+        		dto.setPrincipalNom(grup.getRol());
+        		grupHelper.crearPermisosDeGrup(grup.getId(), dto);
+			}
+    		
+		} catch (Exception e) {
+			log.error("Error al afegir permisos als grups", e);
 		}
     }
 	

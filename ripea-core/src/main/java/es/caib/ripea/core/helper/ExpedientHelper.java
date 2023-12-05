@@ -23,7 +23,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -82,6 +81,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
@@ -1384,11 +1384,22 @@ public class ExpedientHelper {
 				ExtendedPermission.READ));
 		permisosPerExpedientsDto.setIdsOrgansAmbProcedimentsComunsPermesos(idsOrgansAmbProcedimentsComunsPermesos);
 		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + " " + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
+			logger.info("idsOrgansAmbProcedimentsComunsPermesos (" + (idsOrgansAmbProcedimentsComunsPermesos != null ? idsOrgansAmbProcedimentsComunsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t91) + " ms");
 		
 		
 		List<Long> procedimentsComunsIds = metaExpedientRepository.findProcedimentsComunsActiveIds(entitat);
 		permisosPerExpedientsDto.setIdsProcedimentsComuns(procedimentsComunsIds);
+		
+		// Grups amb permisos
+		long t92 = System.currentTimeMillis();
+		List<Long> idsGrupsPermesos = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				GrupEntity.class,
+				ExtendedPermission.READ));
+		permisosPerExpedientsDto.setIdsGrupsPermesos(idsGrupsPermesos);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("idsGrupsPermesos (" + (idsGrupsPermesos != null ? idsGrupsPermesos.size() : "0") + ") time:  " + (System.currentTimeMillis() - t92) + " ms");
+		
+		
 		return permisosPerExpedientsDto;
 		
 	}

@@ -3,8 +3,11 @@ package es.caib.ripea.core.ejb;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.GrupService;
+
+import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -54,10 +57,8 @@ public class GrupServiceBean implements GrupService {
 	@Override
 	@RolesAllowed("IPA_ADMIN")
 	public GrupDto findById(
-			Long entitatId, 
 			Long id) throws NotFoundException {
 		return delegate.findById(
-				entitatId, 
 				id);
 	}
 
@@ -95,6 +96,29 @@ public class GrupServiceBean implements GrupService {
 				entitatId,
 				metaExpedientId,
 				id, rolActual, organId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<PermisDto> findPermisos(
+			Long id) {
+		return delegate.findPermisos(id);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void updatePermis(
+			Long id,
+			PermisDto permis) {
+		delegate.updatePermis(id, permis);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void deletePermis(
+			Long id,
+			Long permisId) {
+		delegate.deletePermis(id, permisId);
 	}
     
     

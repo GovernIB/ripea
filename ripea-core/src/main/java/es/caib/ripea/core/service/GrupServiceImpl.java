@@ -1,8 +1,14 @@
 package es.caib.ripea.core.service;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -20,6 +27,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.GrupHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 
@@ -41,6 +49,8 @@ public class GrupServiceImpl implements GrupService {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private GrupHelper grupHelper;
+	@Autowired
+	private PermisosHelper permisosHelper;
 	
 	
 	@Transactional
@@ -106,9 +116,8 @@ public class GrupServiceImpl implements GrupService {
 
 	@Transactional
 	@Override
-	public GrupDto findById(Long entitatId, Long id) throws NotFoundException {
+	public GrupDto findById(Long id) throws NotFoundException {
 		logger.debug("Consultant el tipus documental per l'entitat (" +
-				"entitatId=" + entitatId +
 				"grupId=" + id + ")");
 		GrupEntity entity = grupRepository.findOne(id);
 
@@ -152,12 +161,23 @@ public class GrupServiceImpl implements GrupService {
 				}
 				grup.setRelacionat(relacionat);
 			}
+		} else {
+			omplirPermisosPerGrups(pageDto.getContingut());
 		}
 
 		return pageDto;
 	}
 	
-	
+	public void omplirPermisosPerGrups(List<GrupDto> grups) {
+
+		List<Serializable> ids = new ArrayList<Serializable>();
+		for (GrupDto entitat: grups) {
+			ids.add(entitat.getId());
+		}
+		Map<Serializable, List<PermisDto>> permisos = permisosHelper.findPermisos(ids, GrupEntity.class);
+		for (GrupDto entitat : grups)
+			entitat.setPermisos(permisos.get(entitat.getId()));
+	}
 
 	
 	
@@ -217,6 +237,29 @@ public class GrupServiceImpl implements GrupService {
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
+	}
+	
+	
+	
+	@Transactional
+	@Override
+	public List<PermisDto> findPermisos(Long id) {
+
+		return permisosHelper.findPermisos(id, GrupEntity.class);
+	}
+	@Transactional
+	@Override
+	@CacheEvict(value = "entitatsUsuari", allEntries = true)
+	public void updatePermis(Long id, PermisDto permis) {
+
+		permisosHelper.updatePermis(id, GrupEntity.class, permis);
+	}
+	@Transactional
+	@Override
+	@CacheEvict(value = "entitatsUsuari", allEntries = true)
+	public void deletePermis(Long id, Long permisId) {
+
+		permisosHelper.deletePermis(id, GrupEntity.class, permisId);
 	}
 	
 	

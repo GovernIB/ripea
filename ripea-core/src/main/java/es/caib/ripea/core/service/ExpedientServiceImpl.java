@@ -1648,9 +1648,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				expedientId,
 				entitatId,
 				rolActual);
-			
-		List<String> rolsCurrentUser = RolHelper.getRolsCurrentUser();
-
 		
 		if (resultEnum == ResultEnumDto.PAGE) {
 			
@@ -1702,8 +1699,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiCodi(),
 					filtre.getMetaExpedientDominiValor() == null,
 					filtre.getMetaExpedientDominiValor(),
-					rolsCurrentUser == null,
-					rolsCurrentUser,
+					permisosPerExpedients.getIdsGrupsPermesos() == null,
+					permisosPerExpedients.getIdsGrupsPermesos(),
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
@@ -1779,8 +1776,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.getMetaExpedientDominiCodi(),
 					filtre.getMetaExpedientDominiValor() == null,
 					filtre.getMetaExpedientDominiValor(),
-					rolsCurrentUser == null,
-					rolsCurrentUser,
+					permisosPerExpedients.getIdsGrupsPermesos() == null,
+					permisosPerExpedients.getIdsGrupsPermesos(),
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),

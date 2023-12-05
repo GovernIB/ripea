@@ -120,7 +120,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada where dada.metaDada.codi = :metaExpedientDominiCodi and dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " +
+			"and (:isAdmin = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
 			"			select dp.expedient.id " + 
@@ -175,8 +175,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientDominiCodi") String metaExpedientDominiCodi,
 			@Param("esNullMetaExpedientDominiValor") boolean esNullMetaExpedientDominiValor,
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
-			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
-			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
 			@Param("isAdmin") boolean isAdmin,
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
@@ -226,7 +226,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"					or lower(interessat.organNom) like lower('%'||:interessat||'%')))) " +
 			"and (:esNullMetaExpedientDominiValor = true " +
 			"		or  (select count(*) from DadaEntity dada where dada.metaDada.codi = :metaExpedientDominiCodi and dada.node = e.id and dada.valor = :metaExpedientDominiValor) != 0) " +
-			"and (:isAdmin = true or (e.grup is null or (:esNullRolsCurrentUser = false and e.grup in (select grup from GrupEntity grup where grup.rol in (:rolsCurrentUser))))) " + 
+			"and (:isAdmin = true or (e.grup is null or (:esNullIdsGrupsPermesos = false and e.grup.id in (:idsGrupsPermesos)))) " +
 			"and (:esFiltrarExpedientsAmbFirmaPendent != true " + 
 			"		or e.id in (" + 
 			"			select dp.expedient.id " + 
@@ -281,8 +281,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaExpedientDominiCodi") String metaExpedientDominiCodi,
 			@Param("esNullMetaExpedientDominiValor") boolean esNullMetaExpedientDominiValor,
 			@Param("metaExpedientDominiValor") String metaExpedientDominiValor,
-			@Param("esNullRolsCurrentUser") boolean esNullRolsCurrentUser,
-			@Param("rolsCurrentUser") List<String> rolsCurrentUser,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
 			@Param("isAdmin") boolean isAdmin,
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,

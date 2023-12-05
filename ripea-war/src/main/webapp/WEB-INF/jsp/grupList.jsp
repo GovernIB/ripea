@@ -33,14 +33,18 @@
 		class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				<th data-col-name="rol" data-orderable="false"><spring:message code="grup.columna.rol"/></th>
+				<th data-col-name="codi" data-orderable="false"><spring:message code="grup.columna.codi"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="grup.columna.descripcio"/></th>
+				<th data-col-name="permisosCount" data-orderable="false" data-template="#cellPermisosTemplate" width="10%">
+					<script id="cellPermisosTemplate" type="text/x-jsrender">
+						<a href="grupPermis/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="grup.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+					</script>
+				</th>				
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
-								<li><a href="grup/{{:id}}" data-toggle="modal"><span class="fa fa-pencil"></span>&nbsp;&nbsp;<spring:message code="comu.boto.modificar"/></a></li>
 								<li><a href="grup/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="grup.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>

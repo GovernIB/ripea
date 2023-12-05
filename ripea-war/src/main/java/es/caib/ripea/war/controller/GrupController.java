@@ -68,7 +68,6 @@ public class GrupController extends BaseAdminController {
 		GrupDto grup = null;
 		if (grupId != null)
 			grup = grupService.findById(
-					entitatActual.getId(),
 					grupId);
 		GrupCommand command = null;
 		if (grup != null) {

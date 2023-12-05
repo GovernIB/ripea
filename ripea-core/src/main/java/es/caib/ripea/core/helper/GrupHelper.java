@@ -9,8 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.GrupEntity;
@@ -39,6 +42,8 @@ public class GrupHelper {
 	private MetaExpedientHelper metaExpedientHelper;
 	@Autowired
 	private GrupRepository grupRepository;
+	@Autowired
+	private PermisosHelper permisosHelper;
 	
 
 	public GrupDto create(
@@ -65,6 +70,19 @@ public class GrupHelper {
 		return dto;
 	}
 	
+	
+	@Transactional
+	public void crearPermisosDeGrup(
+			Long grupId, 
+			PermisDto permis)  {
+		GrupEntity grup = grupRepository.findOne(grupId);
+		PermisDto dto = new PermisDto();
+		dto.setRead(true);
+		dto.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
+		dto.setPrincipalNom(grup.getRol());
+		permisosHelper.updatePermis(grup.getId(), GrupEntity.class, dto);
+		
+	}
 	
 	
 	private static final Logger logger = LoggerFactory.getLogger(GrupHelper.class);

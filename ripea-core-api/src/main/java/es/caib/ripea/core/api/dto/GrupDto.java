@@ -1,5 +1,11 @@
 package es.caib.ripea.core.api.dto;
 
+import java.util.List;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class GrupDto {
 
     private Long id;
@@ -9,35 +15,16 @@ public class GrupDto {
     private Long entitatId;
     
     private boolean relacionat;
+    
+	private String codi;
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getRol() {
-        return rol;
-    }
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-    public String getDescripcio() {
-        return descripcio;
-    }
-    public void setDescripcio(String descripcio) {
-        this.descripcio = descripcio;
-    }
-	public Long getEntitatId() {
-		return entitatId;
+	private List<PermisDto> permisos;
+    
+	public int getPermisosCount() {
+		if  (permisos == null)
+			return 0;
+		else
+			return permisos.size();
 	}
-	public void setEntitatId(Long entitatId) {
-		this.entitatId = entitatId;
-	}
-	public boolean isRelacionat() {
-		return relacionat;
-	}
-	public void setRelacionat(boolean relacionat) {
-		this.relacionat = relacionat;
-	}
+
 }
