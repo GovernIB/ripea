@@ -265,7 +265,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedient.isPermetMetadocsGenerals(),
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
-				metaExpedient.isGestioAmbGrupsActiva());
+				metaExpedient.isGestioAmbGrupsActiva(), 
+				metaExpedient.getTipusClassificacio());
 		
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte

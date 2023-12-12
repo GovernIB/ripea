@@ -144,4 +144,8 @@
 			id="fluxFirmaUsuariService"
 			jndi-name="ripea/FluxFirmaUsuariServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.FluxFirmaUsuariService"/>
+	<jee:local-slsb
+			id="monitorTasquesService"
+			jndi-name="ripea/MonitorTasquesServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.MonitorTasquesService"/>			
 </beans>

@@ -1514,7 +1514,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 						</li>
 						<c:if test="${!isTasca}">
 							<%---- Consulta PINBAL... ----%>
-							<c:if test="${expedient.metaExpedient.tipusClassificacio == TipusClassificacioEnumDto.SIA}">
+							<c:if test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">
 								<li>
 									<c:choose>
 										<c:when test="${empty metaDocumentsPinbalLeft}">
