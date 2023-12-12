@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 05.12.23 20:18
+-- Ran at: 12.12.23 17:00
 -- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.4.3
 -- *********************************************************************
@@ -13,6 +13,8 @@ ALTER TABLE ipa_grup ADD codi VARCHAR2(50 CHAR) DEFAULT 'codi' NOT NULL;
 update ipa_grup set codi = rol;
 
 insert into ipa_processos_inicials (codi, init, id) values ('GRUPS_PERMISOS', 1, 6);
+
+alter table ipa_grup modify (rol null);
 
 -- Changeset db/changelog/changes/0.9.105/1188.yaml::1700642617760-1::limit
 ALTER TABLE ipa_metaexpedient ADD tipus_classificacio VARCHAR2(3 CHAR) DEFAULT 'SIA' NOT NULL;

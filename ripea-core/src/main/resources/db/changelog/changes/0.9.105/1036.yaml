@@ -24,3 +24,4 @@ databaseChangeLog:
         sql:  
           update ipa_grup set codi = rol;
           insert into ipa_processos_inicials (codi, init, id) values ('GRUPS_PERMISOS', 1, 6);
+          alter table ipa_grup modify (rol null);

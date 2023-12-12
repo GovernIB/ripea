@@ -1,6 +1,8 @@
 -- Changeset db/changelog/changes/0.9.105/1036.yaml::1701433927769-1::limit
 ALTER TABLE ipa_grup ADD codi VARCHAR2(50 CHAR) DEFAULT 'codi' NOT NULL;
 
+alter table ipa_grup modify (rol null);
+
 -- Changeset db/changelog/changes/0.9.105/1188.yaml::1700642617760-1::limit
 ALTER TABLE ipa_metaexpedient ADD tipus_classificacio VARCHAR2(3 CHAR) DEFAULT 'SIA' NOT NULL;
 
