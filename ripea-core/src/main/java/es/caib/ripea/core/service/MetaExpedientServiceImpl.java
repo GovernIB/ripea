@@ -419,7 +419,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		if (metaExpedient.getGrups() != null) {
 			for (GrupDto grupDto : metaExpedient.getGrups()) {
 				
-				List<GrupEntity> grups = grupRepository.findByRolDescricpio(entitat, grupDto.getRol(), grupDto.getDescripcio());
+				List<GrupEntity> grups = grupRepository.findByRolDescricpio(entitat, grupDto.getCodi(), grupDto.getDescripcio());
 				
 				GrupEntity grup = null;
 				if (grups == null || grups.isEmpty()) {
@@ -934,7 +934,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				GrupEntity grupEntity = it.next();
 				boolean isGranted = false;
 				for (Sid sid : sids) {
-					if (sid.equals(new GrantedAuthoritySid(grupEntity.getRol()))) {
+					if (sid.equals(new GrantedAuthoritySid(grupEntity.getCodi()))) {
 						isGranted = true;
 					}
 				}

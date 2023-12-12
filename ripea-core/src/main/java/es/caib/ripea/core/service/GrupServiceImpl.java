@@ -81,7 +81,7 @@ public class GrupServiceImpl implements GrupService {
 		GrupEntity grupEntity = grupRepository.findOne(grupDto.getId());
 
 		grupEntity.update(
-				grupDto.getRol(),
+				grupDto.getCodi(),
 				grupDto.getDescripcio());
 		
 		GrupDto dto = conversioTipusHelper.convertir(

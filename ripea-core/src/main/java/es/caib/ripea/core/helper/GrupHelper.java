@@ -60,7 +60,7 @@ public class GrupHelper {
 				false);
 		
 		GrupEntity enitity = GrupEntity.getBuilder(
-				grupDto.getRol(),
+				grupDto.getCodi(),
 				grupDto.getDescripcio(),
 				entitat).build();
 
@@ -79,7 +79,7 @@ public class GrupHelper {
 		PermisDto dto = new PermisDto();
 		dto.setRead(true);
 		dto.setPrincipalTipus(PrincipalTipusEnumDto.ROL);
-		dto.setPrincipalNom(grup.getRol());
+		dto.setPrincipalNom(grup.getCodi());
 		permisosHelper.updatePermis(grup.getId(), GrupEntity.class, dto);
 		
 	}

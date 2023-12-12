@@ -290,7 +290,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 		List<String> grupRols = new ArrayList<>();
 		if (grups != null) {
 			for (GrupEntity grup : grups) {
-				grupRols.add(grup.getRol());
+				grupRols.add(grup.getCodi());
 			}
 		}
 		rolsAcls.addAll(grupRols);

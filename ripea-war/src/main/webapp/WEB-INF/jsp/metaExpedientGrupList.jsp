@@ -24,7 +24,7 @@
 	<table id="metadades" data-toggle="datatable" data-url="<c:url value="/metaExpedient/${metaExpedient.id}/grup/datatable"/>" data-info-type="search" data-default-order="0" data-default-dir="asc" class="table table-striped table-bordered">
 		<thead>
 			<tr>
-				<th data-col-name="rol" data-orderable="false"><spring:message code="metaexpedient.grup.columna.rol"/></th>
+				<th data-col-name="codi" data-orderable="false"><spring:message code="metaexpedient.grup.columna.codi"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="metaexpedient.grup.columna.descripcio"/></th>
 
 				<th data-col-name="relacionat" data-template="#cellRelacionatTemplate" data-orderable="false">

@@ -9,7 +9,7 @@ public class GrupCommand {
 
     private Long id;
     @NotEmpty @Size(max = 50)
-    private String rol;
+    private String codi;
     @NotEmpty @Size(max = 512)
     private String descripcio;
  
@@ -21,11 +21,11 @@ public class GrupCommand {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getRol() {
-        return rol;
+    public String getCodi() {
+        return codi;
     }
-    public void setRol(String rol) {
-        this.rol = rol != null ? rol.trim() : null;
+    public void setCodi(String codi) {
+        this.codi = codi != null ? codi.trim() : null;
     }
     public String getDescripcio() {
         return descripcio;
