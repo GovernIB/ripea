@@ -23,6 +23,7 @@ import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.Estat;
 import es.caib.distribucio.rest.client.integracio.domini.Interessat;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioInfoDto;
@@ -69,11 +70,17 @@ public class ExpedientPeticioHelper {
 	private CacheHelper cacheHelper;
 	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
+	@Autowired
+	private ConfigHelper configHelper;
+	@Autowired
+	private ConversioTipusHelper conversioTipusHelper;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
 	@Resource
 	private OrganGestorRepository organGestorRepository;
-
+	@Resource
+	private PluginHelper pluginHelper;
+	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
 			
@@ -255,10 +262,33 @@ public class ExpedientPeticioHelper {
 		}
 //		System.out.println("crearRegistrePerPeticio before annexos, identificador: " + registreEntrada.getIdentificador());
 		for (Annex annex: registreEntrada.getAnnexos()) {
+			
+			// Guardar annexos de les anotacions en FileSystem (instal·lació de Ripea i Distribució en servidors separats)
+			if (getPropertyGuardarContingutAnnexosDistribucio()) {
+				
+				EntitatDto entitatDto = conversioTipusHelper.convertir(entitat, EntitatDto.class);
+				ConfigHelper.setEntitat(entitatDto);
+				
+				// Crear contenidor annexos Distribució en FileSystem
+				String uuidExpedient = pluginHelper.arxiuExpedientDistribucioCrear(
+						registreEntity.getIdentificador(), 
+						registreEntity.getExpedientNumero(),
+						registreEntity.getDestiCodi());
+				
+				// Crear annex Distribució en FileSystem dins contenidor anterior
+				String uuidDocument = pluginHelper.arxiuAnnexDistribucioCrear(
+						annex, 
+						registreEntity.getDestiCodi(), 
+						uuidExpedient);
+				
+				annex.setUuid(uuidDocument);
+			}
+			
 			registreEntity.getAnnexos().add(
 					crearAnnexEntity(
 							annex,
 							registreEntity));
+			
 		}
 		
 //		System.out.println("crearRegistrePerPeticio before canviEstat, identificador: " + registreEntrada.getIdentificador());
@@ -349,6 +379,9 @@ public class ExpedientPeticioHelper {
 		
 	}
 	
+	public boolean getPropertyGuardarContingutAnnexosDistribucio() {
+		return configHelper.getAsBoolean("es.caib.ripea.anotacions.annexos.save");
+	}
 
 	private RegistreInteressatEntity crearInteressatEntity(
 			Interessat interessat,

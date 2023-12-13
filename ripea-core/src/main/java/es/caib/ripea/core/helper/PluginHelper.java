@@ -43,6 +43,10 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
 
+import es.caib.distribucio.rest.client.integracio.domini.Annex;
+import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
@@ -872,8 +876,138 @@ public class PluginHelper {
 		}
 	}
 	
-
+	// Plugin arxiu filesystem
+	public String arxiuExpedientDistribucioCrear(
+			String registreNumero,
+			String expedientNumero,
+			String unitatOrganitzativaCodi) {
+		String accioDescripcio = "Creant contenidor per als documents annexos de Distribució";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("registreNumero", registreNumero);
+		accioParams.put("unitatOrganitzativaCodi", unitatOrganitzativaCodi);
+		long t0 = System.currentTimeMillis();
+		try {
+			String nomExpedient = "EXP_REG_" + expedientNumero + "_" + System.currentTimeMillis();
+			
+			logger.debug("Creant contenidor annexos Distribució:" + nomExpedient);
+			
+			ContingutArxiu expedient = getArxiuPlugin().expedientCrear(
+					toArxiuExpedient(
+							null,
+							nomExpedient,
+							null,
+							Arrays.asList(unitatOrganitzativaCodi),
+							new Date(),
+							null,
+							ExpedientEstatEnumDto.OBERT,
+							null,
+							getPropertyPluginRegistreExpedientSerieDocumental(),
+							null));
+			
+			logger.debug("Contenidor annexos Distribució creat: " + expedient.getIdentificador());
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			return expedient.getIdentificador();
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al crear contenidor per als documents annexos de Distribució";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+	}
 	
+	public String arxiuAnnexDistribucioCrear(
+			Annex annex,
+			String unitatArrelCodi,
+			String uuidExpedient) {
+		String accioDescripcio = "Creant annex de Distribució";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("unitatArrelCodi", unitatArrelCodi);
+		accioParams.put("uuidExpedient", uuidExpedient);
+		long t0 = System.currentTimeMillis();
+		String uuidDocument = null;
+		try {
+			
+			logger.debug("Creant annex Distribució:" + annex.getNom());
+			
+			FitxerDto fitxerContingut = new FitxerDto();
+			fitxerContingut.setNom(annex.getNom());
+			fitxerContingut.setContentType(annex.getTipusMime());
+			fitxerContingut.setContingut(annex.getContingut());
+			fitxerContingut.setTamany(annex.getTamany());
+
+			List<ArxiuFirmaDto> firmes = new ArrayList<ArxiuFirmaDto>();
+			if (annex.getFirmaTipus() != null && !"CSV".equals(annex.getFirmaTipusMime())) {
+				logger.debug("Validant firmes annex Distribució...");
+				firmes = validaSignaturaObtenirFirmes(
+						annex.getContingut(),
+						annex.getFirmaContingut(),
+						annex.getTipusMime(), 
+						false);
+				logger.debug("Total firmes annex Distribució preparades: " + firmes.size());
+			}
+			
+			ContingutArxiu document = getArxiuPlugin().documentCrear(
+							toArxiuDocument(
+									null,
+									annex.getNom(), 
+									annex.getTitol(),
+									fitxerContingut,
+									firmes,
+									null,
+									annex.getNtiOrigen(),
+									Arrays.asList(unitatArrelCodi),
+									annex.getNtiFechaCaptura(),
+									annex.getNtiEstadoElaboracion(),
+									annex.getNtiTipoDocumental(),
+									DocumentEstat.valueOf(annex.getEstat().name()),
+									annex.getFirmaTipus(),
+									null),
+							uuidExpedient);
+			
+			integracioHelper.addAccioOk(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0);
+			
+			uuidDocument = document.getIdentificador();
+			
+			logger.debug("Annex Distribució creat:" + uuidDocument);
+			
+		} catch (Exception ex) {
+			String errorDescripcio = "Error al crear annex de Distribució";
+			integracioHelper.addAccioError(
+					IntegracioHelper.INTCODI_ARXIU,
+					accioDescripcio,
+					accioParams,
+					IntegracioAccioTipusEnumDto.RECEPCIO,
+					System.currentTimeMillis() - t0,
+					errorDescripcio,
+					ex);
+			throw new SistemaExternException(
+					IntegracioHelper.INTCODI_ARXIU,
+					errorDescripcio,
+					ex);
+		}
+		
+		return uuidDocument;
+	}
 	
 	public void arxiuPropagarFirmaSeparada(
 			DocumentEntity document,
@@ -3556,6 +3690,85 @@ public class PluginHelper {
 
 	}
 	
+	/** Llistat de firmes attached */
+	private static List<FirmaTipus> TIPUS_FIRMES_ATTACHED = Arrays.asList(FirmaTipus.CADES_ATT, FirmaTipus.PADES, FirmaTipus.XADES_ENV);
+	
+	private Document toArxiuDocument(
+			String identificador,
+			String nom, 
+			String descripcio,
+			FitxerDto fitxer,
+			List<ArxiuFirmaDto> firmes, 
+			String ntiIdentificador,
+			NtiOrigen ntiOrigen,
+			List<String> ntiOrgans,
+			Date ntiDataCaptura,
+			NtiEstadoElaboracion ntiEstadoElaboracion,
+			NtiTipoDocumento ntiTipoDocumento,
+			DocumentEstat estat,
+			es.caib.distribucio.rest.client.integracio.domini.FirmaTipus firmaTipus,
+			String metaDades) throws SistemaExternException {
+		
+		Document documentArxiu = new Document();
+
+		documentArxiu.setNom(nom);
+		documentArxiu.setDescripcio(descripcio);
+		documentArxiu.setIdentificador(identificador);
+		documentArxiu.setEstat(DocumentEstat.DEFINITIU);
+
+		DocumentFirmaTipusEnumDto documentFirmaTipus = null;
+		ArxiuFirmaDto primeraFirma = new ArxiuFirmaDto();
+		
+		if (firmes != null && ! firmes.isEmpty()) {
+			primeraFirma = firmes.get(0);
+			if (primeraFirma.getTipus() != null && TIPUS_FIRMES_ATTACHED.contains(FirmaTipus.valueOf(primeraFirma.getTipus().name()))) {
+				if (ArxiuFirmaTipusEnumDto.PADES.equals(primeraFirma.getTipus())) {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA;
+					//PluginArxiuFileSystem - linia 513
+					firmes.get(0).setFitxerNom(fitxer.getNom());					
+				} else {
+					documentFirmaTipus = DocumentFirmaTipusEnumDto.FIRMA_SEPARADA;
+				}
+			}
+		} else {
+			documentFirmaTipus = DocumentFirmaTipusEnumDto.SENSE_FIRMA;
+		}
+		
+		setContingutIFirmes(
+				documentArxiu,
+				fitxer,
+				documentFirmaTipus,
+				firmes,
+				null,
+				null);
+		
+		DocumentContingut contingut = new DocumentContingut();
+		if (fitxer != null) {
+			contingut.setArxiuNom(fitxer.getNom());
+			contingut.setContingut(fitxer.getContingut());
+			contingut.setTipusMime(fitxer.getContentType());
+		}
+		DocumentExtensio extensio = getDocumentExtensio(fitxer, documentFirmaTipus, firmes);
+		DocumentFormat format = getDocumentFormat(extensio);
+		String serieDocumental = getPropertyPluginRegistreExpedientSerieDocumental();
+		
+		DocumentMetadades metadades = ArxiuConversions.getMetadadesArxiuDocumentAnotacio(
+				ntiIdentificador, 
+				ntiDataCaptura, 
+				ntiOrigen, 
+				ntiEstadoElaboracion,
+				ntiTipoDocumento,
+				extensio,
+				format,
+				serieDocumental,
+				ntiOrgans);
+		
+		documentArxiu.setMetadades(metadades);
+		documentArxiu.setEstat(estat);
+		documentArxiu.setContingut(contingut);
+		
+		return documentArxiu;
+	}
 	
 	private DocumentMetadades getMetadades(
 			DocumentEntity documentEntity,
@@ -4696,6 +4909,11 @@ public class PluginHelper {
 	}
 	private boolean isComprovacioNomsDesactivada() {
 		return configHelper.getAsBoolean("es.caib.ripea.desactivar.comprovacio.duplicat.nom.arxiu");
+	}
+	
+	private String getPropertyPluginRegistreExpedientSerieDocumental() {
+		return configHelper.getConfig(
+				"es.caib.ripea.anotacions.registre.expedient.serie.documental");
 	}
 	
 	public boolean isCarpetaLogica() {

@@ -1,9 +1,17 @@
 package es.caib.ripea.core.helper;
 
 
+import java.util.Date;
+import java.util.List;
+
+import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
+import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
+import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.ContingutOrigen;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentEstatElaboracio;
+import es.caib.plugins.arxiu.api.DocumentExtensio;
+import es.caib.plugins.arxiu.api.DocumentFormat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.DocumentTipus;
 import es.caib.plugins.arxiu.api.Firma;
@@ -254,6 +262,56 @@ public class ArxiuConversions {
 			tipusDocumental = document.getMetadades().getTipusDocumental().toString();
 	
 		return tipusDocumental;
+	}
+	
+	public static DocumentMetadades getMetadadesArxiuDocumentAnotacio(
+			String ntiIdentificador, 
+			Date ntiDataCaptura, 
+			NtiOrigen ntiOrigen, 
+			NtiEstadoElaboracion ntiEstadoElaboracion, 
+			NtiTipoDocumento ntiTipoDocumento, 
+			DocumentExtensio extensio, 
+			DocumentFormat format,
+			String serieDocumental,
+			List<String> ntiOrgans) {
+		DocumentMetadades metadades = new DocumentMetadades();
+		metadades.setIdentificador(ntiIdentificador);
+		metadades.setDataCaptura(ntiDataCaptura);
+		
+		metadades.setOrigen(ContingutOrigen.valueOf(ntiOrigen.name()));
+		
+		DocumentEstatElaboracio estatElaboracio = null;
+		switch (ntiEstadoElaboracion) {
+		case ORIGINAL:
+			estatElaboracio = DocumentEstatElaboracio.ORIGINAL;
+			break;
+		case COPIA_ELECT_AUTENTICA_CANVI_FORMAT:
+			estatElaboracio = DocumentEstatElaboracio.COPIA_CF;
+			break;
+		case COPIA_ELECT_AUTENTICA_PAPER:
+			estatElaboracio = DocumentEstatElaboracio.COPIA_DP;
+			break;
+		case COPIA_ELECT_AUTENTICA_PARCIAL:
+			estatElaboracio = DocumentEstatElaboracio.COPIA_PR;
+			break;
+		case ALTRES:
+			estatElaboracio = DocumentEstatElaboracio.ALTRES;
+			break;
+		}
+		metadades.setEstatElaboracio(estatElaboracio);
+		metadades.setTipusDocumental(DocumentTipus.valueOf(ntiTipoDocumento.name()));
+		
+		if (extensio != null) {
+			metadades.setExtensio(extensio);
+			metadades.setFormat(format);
+		}
+		metadades.setOrgans(ntiOrgans);
+		
+		if (serieDocumental != null && !serieDocumental.isEmpty()) {
+			metadades.setSerieDocumental(serieDocumental);
+		}
+		
+		return metadades;
 	}
 	
 	public static void setTipusDocumental(DocumentMetadades metadades, String ntiTipoDocumental) {
