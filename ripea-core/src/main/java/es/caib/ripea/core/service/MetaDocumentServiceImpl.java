@@ -543,7 +543,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					metaDocumentRepository.findByMetaExpedient(
 							metaExpedient,
 							paginacioParams.getFiltre() == null,
-							paginacioParams.getFiltre(),
+							paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaDocumentDto.class);
 		} else {
@@ -551,7 +551,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 					metaDocumentRepository.findByMetaExpedient(
 							metaExpedient,
 							paginacioParams.getFiltre() == null,
-							paginacioParams.getFiltre(),
+							paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaDocumentDto.class);
 		}
@@ -575,7 +575,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			resposta = paginacioHelper.toPaginaDto(
 					metaDocumentRepository.findWithoutMetaExpedient(
 							paginacioParams.getFiltre() == null,
-							paginacioParams.getFiltre(),
+							paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaDocumentDto.class);
 		metaNodeHelper.omplirMetaDadesPerMetaNodes(resposta.getContingut());

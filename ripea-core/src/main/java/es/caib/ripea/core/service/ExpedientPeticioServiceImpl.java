@@ -188,9 +188,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				metaExpedient == null,
 				metaExpedient,
 				StringUtils.isEmpty(filtre.getNumero()),
-				StringUtils.trim(filtre.getNumero()),		
+				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
 				StringUtils.isEmpty(filtre.getExtracte()),
-				StringUtils.trim(filtre.getExtracte()),							
+				filtre.getExtracte() != null ? StringUtils.trim(filtre.getExtracte()) : "",							
 				StringUtils.isEmpty(filtre.getDestinacioCodi()),
 				StringUtils.trim(filtre.getDestinacioCodi()),
 				filtre.getDataInicial() == null,
@@ -202,7 +202,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				filtre.getAccioEnum() == null,
 				filtre.getAccioEnum(), 
 				StringUtils.isEmpty(filtre.getInteressat()), 
-				StringUtils.trim(filtre.getInteressat()), 
+				filtre.getInteressat() != null ? StringUtils.trim(filtre.getInteressat()) : "", 
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams,
 						ordenacioMap));
@@ -241,7 +241,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findComunicadesByFiltre(
 				StringUtils.isEmpty(filtre.getNumero()),
-				StringUtils.trim(filtre.getNumero()),		
+				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
 				filtre.getDataInicial() == null,
 				filtre.getDataInicial(),
 				filtre.getDataFinal() == null,
@@ -263,7 +263,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
 			List<Long> idsExpedientPeticios = expedientPeticioRepository.findIdsComunicadesByFiltre(
 					StringUtils.isEmpty(filtre.getNumero()),
-					StringUtils.trim(filtre.getNumero()),		
+					filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
 					filtre.getDataInicial() == null,
 					filtre.getDataInicial(),
 					filtre.getDataFinal() == null,
@@ -876,7 +876,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Page<ExpedientPeticioEntity> pagina = expedientPeticioRepository.findPendentsCanviEstatDistribucio(
 					entitat,
 					Strings.isNullOrEmpty(filtre.getNumero()),
-					filtre.getNumero(),
+					filtre.getNumero() != null ? filtre.getNumero() : "",
 					filtre.getDataInicial() == null,
 					filtre.getDataInicial(),
 					filtre.getDataFinal() == null,
@@ -896,7 +896,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			List<Long> ids = expedientPeticioRepository.findIdsPendentsCanviEstatDistribucio(
 					entitat,
 					Strings.isNullOrEmpty(filtre.getNumero()),
-					filtre.getNumero(),
+					filtre.getNumero() != null ? filtre.getNumero() : "",
 					filtre.getDataInicial() == null,
 					filtre.getDataInicial(),
 					filtre.getDataFinal() == null,

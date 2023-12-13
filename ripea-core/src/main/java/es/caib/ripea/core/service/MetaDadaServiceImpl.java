@@ -356,7 +356,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 					metaDadaRepository.findByMetaNode(
 							metaNode,
 							paginacioParams.getFiltre() == null,
-							paginacioParams.getFiltre(),
+							paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 							paginacioHelper.toSpringDataPageable(paginacioParams)),
 					MetaDadaDto.class);
 		} else {
@@ -364,7 +364,7 @@ public class MetaDadaServiceImpl implements MetaDadaService {
 					metaDadaRepository.findByMetaNode(
 							metaNode,
 							paginacioParams.getFiltre() == null,
-							paginacioParams.getFiltre(),
+							paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 							paginacioHelper.toSpringDataSort(paginacioParams)),
 					MetaDadaDto.class);
 		}

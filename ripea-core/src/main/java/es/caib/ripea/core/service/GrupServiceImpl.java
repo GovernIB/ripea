@@ -142,7 +142,7 @@ public class GrupServiceImpl implements GrupService {
 		Page<GrupEntity> page = grupRepository.findByEntitat(
 				entitat,
 				paginacioParams.getFiltre() == null,
-				paginacioParams.getFiltre(),
+				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		
 		

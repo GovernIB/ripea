@@ -1234,7 +1234,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos() == null,
 				permisosPerExpedients.getIdsOrgansAmbProcedimentsComunsPermesos(),	
 				permisosPerExpedients.getIdsProcedimentsComuns(),
-				text,
+				text != null ? text : "",
 				rolsCurrentUser == null,
 				rolsCurrentUser,
 				rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
@@ -1673,9 +1673,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getOrganGestorFiltre() == null,
 					expedientFiltreCalculat.getOrganGestorFiltre(),
 					filtre.getNumero() == null,
-					filtre.getNumero(),
+					filtre.getNumero() != null ? filtre.getNumero() : "",
 					filtre.getNom() == null,
-					filtre.getNom(),
+					filtre.getNom() != null ? filtre.getNom() : "",
 					filtre.getDataCreacioInici() == null,
 					filtre.getDataCreacioInici(),
 					filtre.getDataCreacioFi() == null,
@@ -1695,7 +1695,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getExpedientsToBeExluded() == null,
 					expedientFiltreCalculat.getExpedientsToBeExluded(),
 					filtre.getInteressat() == null,
-					filtre.getInteressat(),
+					filtre.getInteressat() != null ? filtre.getInteressat() : "",
 					filtre.getMetaExpedientDominiCodi(),
 					filtre.getMetaExpedientDominiValor() == null,
 					filtre.getMetaExpedientDominiValor(),
@@ -1704,7 +1704,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
-					filtre.getNumeroRegistre(),
+					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
 					pageable);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
@@ -1750,9 +1750,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getOrganGestorFiltre() == null,
 					expedientFiltreCalculat.getOrganGestorFiltre(),
 					filtre.getNumero() == null,
-					filtre.getNumero(),
+					filtre.getNumero() != null ? filtre.getNumero() : "",
 					filtre.getNom() == null,
-					filtre.getNom(),
+					filtre.getNom() != null ? filtre.getNom() : "",
 					filtre.getDataCreacioInici() == null,
 					filtre.getDataCreacioInici(),
 					filtre.getDataCreacioFi() == null,
@@ -1772,7 +1772,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					expedientFiltreCalculat.getExpedientsToBeExluded() == null,
 					expedientFiltreCalculat.getExpedientsToBeExluded(),
 					filtre.getInteressat() == null,
-					filtre.getInteressat(),
+					filtre.getInteressat() != null ? filtre.getInteressat() : "",
 					filtre.getMetaExpedientDominiCodi(),
 					filtre.getMetaExpedientDominiValor() == null,
 					filtre.getMetaExpedientDominiValor(),
@@ -1781,7 +1781,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
-					filtre.getNumeroRegistre());				
+					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "");
 
 			result.setIds(expedientsIds);
 			if (cacheHelper.mostrarLogsRendiment())

@@ -1128,7 +1128,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						entitat,
 						metaExpedient,
 						paginacioParams.getFiltre() == null,
-						paginacioParams.getFiltre(),
+						paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 				MetaExpedientTascaDto.class);
 	}

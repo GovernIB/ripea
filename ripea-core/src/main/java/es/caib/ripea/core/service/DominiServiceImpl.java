@@ -151,7 +151,7 @@ public class DominiServiceImpl implements DominiService {
 		Page<DominiEntity> page = dominiRepository.findByEntitat(
 				entitat,
 				paginacioParams.getFiltre() == null,
-				paginacioParams.getFiltre(),
+				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 
 		PaginaDto<DominiDto> dominiDto = paginacioHelper.toPaginaDto(

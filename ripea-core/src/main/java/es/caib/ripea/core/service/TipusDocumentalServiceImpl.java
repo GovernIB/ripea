@@ -155,7 +155,7 @@ public class TipusDocumentalServiceImpl implements TipusDocumentalService {
 		Page<TipusDocumentalEntity> page = tipusDocumentalRepository.findByEntitat(
 				entitat,
 				paginacioParams.getFiltre() == null,
-				paginacioParams.getFiltre(),
+				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 
 		return paginacioHelper.toPaginaDto(

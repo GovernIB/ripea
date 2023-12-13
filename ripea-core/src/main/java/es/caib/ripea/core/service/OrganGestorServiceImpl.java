@@ -247,7 +247,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 		List<OrganGestorEntity> organs = organGestorRepository.findByFiltre(
 				filter == null || filter.isEmpty(),
-				filter);
+				filter != null ? filter : "");
 		return conversioTipusHelper.convertirList(
 				organs,
 				OrganGestorDto.class);
@@ -797,7 +797,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 					organGestorRepository.findByCanditatsAndFiltre(
 							list,
 							filter == null || filter.isEmpty(),
-							filter));
+							filter != null ? filter : ""));
 		}
 
 		return conversioTipusHelper.convertirList(filtrats, OrganGestorDto.class);
@@ -828,7 +828,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			filtrats = organGestorRepository.findByEntitatAndFiltre(
 					entitat,
 					filter == null || filter.isEmpty(),
-					filter);
+					filter != null ? filter : "");
 		} else {
 			
 			List<OrganGestorEntity> organGestorsCanditats = entityComprovarHelper.getOrgansByOrgansAndCombinacioMetaExpedientsOrgansPermissions(entitat);
@@ -844,7 +844,7 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 							organGestorRepository.findByCanditatsAndFiltre(
 									sublist,
 									filter == null || filter.isEmpty(),
-									filter));
+									filter != null ? filter : ""));
 				}
 			}
 			
