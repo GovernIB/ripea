@@ -9,14 +9,13 @@ import lombok.Setter;
 public class GrupDto {
 
     private Long id;
-    private String rol;
+    private String codi;
     private String descripcio;
     
     private Long entitatId;
     
     private boolean relacionat;
     
-	private String codi;
 
 	private List<PermisDto> permisos;
     

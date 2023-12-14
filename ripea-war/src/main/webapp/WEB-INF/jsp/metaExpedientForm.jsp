@@ -223,9 +223,12 @@ $(document).ready(function(){
 		$('#organGestorId').on('change', function() {
 			$('input[name="tipusClassificacio"][value="ID"]').removeClass('focus');
 			disableEnableClassificacioIdButton();
+			calculateClassificacioId();
 		})
+
+		disableEnableClassificacioIdButton();
 		if (!$('#id').val()) {
-			disableEnableClassificacioIdButton();
+			calculateClassificacioId();
 		}
 
 		// on submit show alert if codi SIA doesn't exist in rolsac
@@ -234,27 +237,48 @@ $(document).ready(function(){
 		    if (selected == 'SIA') {
 		        let codiSia = $('#classificacioSia').val();
 
-		        $.ajax({
-		            type: 'GET',
-		            async: false,
-		            url: '<c:url value="/metaExpedient/checkIfExistsInRolsac"/>/' + codiSia,
-		            success: function(exists) {
-		                if (!exists) {
-		                    let procedimentNoExiste = '<spring:message code="metaexpedient.form.submit.sia.no.existe"/>';
-		                    if (confirm(procedimentNoExiste)) {
-		                        return true
-		                    } else {
-		                        e.preventDefault(); 
-		                        let iframe = window.frameElement;
-		                        $(iframe).show();
-		                        $('.modal-body .datatable-dades-carregant', parent.document).hide();
-		                        $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', false);
-		                        
-		                        return false;
-		                    }
-		                }
-		            }
-		        });
+				if (codiSia) {
+					
+			        let iframe = window.frameElement;
+	                $(iframe).hide();
+	                $('.modal-body .datatable-dades-carregant', parent.document).show();
+	                $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', true);
+					
+			        $.ajax({
+			            type: 'GET',
+			            async: false,
+			            url: '<c:url value="/metaExpedient/checkIfExistsInRolsac"/>/' + codiSia,
+			            success: function(json) {
+							let showConfirmDialog;
+							let confirmDialogMsg;
+				        	if (json.error) {
+				        		showConfirmDialog = true;
+				        		${fn:escapeXml(contingut.nom)}
+				        		confirmDialogMsg = "<spring:message code='metaexpedient.form.submit.sia.no.comprovat'/>";
+
+				        	} else {
+				        		let exists = json.data;
+				        		showConfirmDialog = !exists;
+				        		confirmDialogMsg = '<spring:message code="metaexpedient.form.submit.sia.no.existe"/>';
+							}
+
+			                if (showConfirmDialog) {
+			                   
+			                    if (confirm(confirmDialogMsg)) {
+			                        return true
+			                    } else {
+			                        e.preventDefault(); 
+			                        let iframe = window.frameElement;
+			                        $(iframe).show();
+			                        $('.modal-body .datatable-dades-carregant', parent.document).hide();
+			                        $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', false);
+			                        
+			                        return false;
+			                    }
+			                }
+			            }
+			        });
+				}
 		    }
 		});
 	}
@@ -284,7 +308,6 @@ function disableEnableClassificacioIdButton(){
 	if ($('#organGestorId').val()) {
 		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", false);
 		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("title", "");
-		calculateClassificacioId();
 	} else {
 		$('#classificacioId').val('');
 		$('input[name="tipusClassificacio"][value="ID"]').parent().attr("disabled", true);

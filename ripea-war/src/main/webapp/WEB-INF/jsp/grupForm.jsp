@@ -23,7 +23,7 @@
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="grupCommand">
 		<form:hidden path="id"/>
 		<!--  form:hidden path="entitatId"/-->
-		<rip:inputText name="rol" textKey="grup.form.camp.rol" required="true"/>
+		<rip:inputText name="codi" textKey="grup.form.camp.codi" required="true"/>
 		<rip:inputTextarea name="descripcio" textKey="grup.form.camp.descripcio" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>

@@ -162,7 +162,8 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			boolean permetMetadocsGenerals,
 			MetaExpedientEntity pare,
 			OrganGestorEntity organGestor,
-			boolean gestioAmbGrupsActiva) {
+			boolean gestioAmbGrupsActiva, 
+			TipusClassificacioEnumDto tipusClassificacio) {
         super.update(codi, nom, descripcio);
         this.classificacio = classificacio;
         this.serieDocumental = serieDocumental;
@@ -173,6 +174,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.permetMetadocsGenerals = permetMetadocsGenerals;
         this.organGestor = organGestor;
         this.gestioAmbGrupsActiva = gestioAmbGrupsActiva;
+        this.tipusClassificacio = tipusClassificacio;
 
     }
 	

@@ -80,6 +80,7 @@ import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -371,7 +372,7 @@ public class MetaExpedientController extends BaseAdminController {
 	
 	@RequestMapping(value = "/checkIfExistsInRolsac/{codiSia}", method = RequestMethod.GET)
 	@ResponseBody
-	public boolean checkIfExistsInRolsac(
+	public JsonResponse checkIfExistsInRolsac(
 			HttpServletRequest request,
 			@PathVariable String codiSia) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -391,13 +392,13 @@ public class MetaExpedientController extends BaseAdminController {
 					codiSia);
 		} catch (Exception e) {
 			logger.error("Error al comprobar procediment en ROLSAC", e);
-			return true;
+			return new JsonResponse(true, null);
 		}
 		
 		if (procedimentDto == null) {
-			return false;
+			return new JsonResponse(new Boolean(false));
 		} else {
-			return true;
+			return new JsonResponse(new Boolean(true));
 		}
 		
 	}

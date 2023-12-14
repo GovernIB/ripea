@@ -66,11 +66,11 @@ public class GrupEntity extends RipeaAuditable<Long> {
 	    return entitat;
 	}
 	public static Builder getBuilder(
-			String rol,
+			String codi,
 			String descripcio,
 			EntitatEntity entitat) {
 		return new Builder(
-				rol,
+				codi,
 				descripcio,
 				entitat);
 	}
@@ -79,9 +79,9 @@ public class GrupEntity extends RipeaAuditable<Long> {
 
 	    GrupEntity built;
 
-	    Builder(String rol, String descripcio, EntitatEntity entitat) {
+	    Builder(String codi, String descripcio, EntitatEntity entitat) {
 	        built = new GrupEntity();
-	        built.rol = rol;
+	        built.codi = codi;
 	        built.descripcio = descripcio;
 	        built.entitat = entitat;
 	    }
@@ -90,8 +90,8 @@ public class GrupEntity extends RipeaAuditable<Long> {
 	        return built;
 	    }
 	}
-	public void update(String rol, String descripcio) {
-	    this.rol = rol;
+	public void update(String codi, String descripcio) {
+	    this.codi = codi;
 	    this.descripcio = descripcio;
 	}
 
