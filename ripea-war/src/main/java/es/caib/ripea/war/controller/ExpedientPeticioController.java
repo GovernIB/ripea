@@ -691,14 +691,25 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					getMessage(request, "expedient.peticio.controller.acceptat.warning"));
 		}
 
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:expedientPeticio",
-				"expedient.peticio.controller.acceptat.ok",
-				new Object[] { 
-						expedientId.toString(), 
-						expNom, 
-						expedientPeticioDto.getRegistre().getIdentificador() });
+		if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.ok",
+					new Object[] { 
+							expedientId.toString(), 
+							expNom, 
+							expedientPeticioDto.getRegistre().getIdentificador() });
+		} else {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:expedientPeticio",
+					"expedient.peticio.controller.acceptat.incorporat.ok",
+					new Object[] {
+							expedientPeticioDto.getRegistre().getIdentificador(),
+							expedientId.toString(), 
+							expNom});
+		}
 	}
 	
 	

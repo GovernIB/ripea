@@ -65,7 +65,7 @@
 					inline="true" 
 					optionMinimumResultsForSearch="0"/>
 			</div>		
-			<div class="col-md-3">					
+			<div class="col-md-4">					
 				<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 				<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 				<rip:inputSuggest 
