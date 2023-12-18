@@ -20,6 +20,10 @@ databaseChangeLog:
             defaultValue: 'codi'
             type: varchar(50 ${varcharunit})
         tableName: ipa_grup
+    - addUniqueConstraint:
+        tableName: ipa_grup
+        constraintName: ipa_grup_codi_uk
+        columnNames: entitat_id, codi
     - sql:
         sql:  
           update ipa_grup set codi = rol;

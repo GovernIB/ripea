@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.service.GrupService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.GrupCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -87,6 +88,11 @@ public class GrupController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		
+		if (Utils.isNotEmpty(command.getCodi()) && grupService.checkIfAlreadyExistsWithCodi(entitatActual.getId(), command.getCodi())) {
+			bindingResult.rejectValue("codi", "GrupCodiRepetit");
+		}
+		
 		if (bindingResult.hasErrors()) {
 			return "grupForm";
 		}
