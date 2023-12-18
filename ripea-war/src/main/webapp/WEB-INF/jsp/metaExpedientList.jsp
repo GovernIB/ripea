@@ -24,15 +24,25 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	<style>
+	
+<style>
 	#metaExpedientFiltreForm {
 		margin-bottom: 15px;
 	}
+	
 	.badge {
-  	 	background-color: #333;
-  	 }
-	</style>
-	<script type="text/javascript">
+		background-color: #333;
+	}
+	
+	table.dataTable tr > td:nth-child(1), 
+	table.dataTable tr > td:nth-child(2), 
+	table.dataTable tr > td:nth-child(3),
+	table.dataTable tr > td:nth-child(5) {
+		word-wrap: break-word; 
+		max-width: 1px;
+	}
+</style>
+<script type="text/javascript">
 	$(function() {
 	    $("form input").keypress(function (e) {
 	        if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
@@ -58,15 +68,15 @@
 
 	<div class="text-right" data-toggle="botons-titol" data-btn-title-col-size="4">
 		<div>
-				<div class="btn-group">
-					<button class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-  						<span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
-						<li><a href="metaExpedient/importFitxer" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
-					</ul>
-				</div>
+			<div class="btn-group">
+				<button class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+ 						<span class="fa fa-upload"></span> <spring:message code="comu.boto.importar"/> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li><a href="metaExpedient/importRolsac" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.rolsac"/></a></li>
+					<li><a href="metaExpedient/importFitxer" data-toggle="modal" data-datatable-id="metaexpedients"><spring:message code="metaexpedient.boto.importar.fitxer"/></a></li>
+				</ul>
+			</div>
 			
 			<a class="btn btn-default" href="metaExpedient/sincronitzar" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="metaexpedient.list.boto.sincronitzar"/></a>
 			<a class="btn btn-default" href="metaExpedient/new" data-toggle="modal" data-datatable-id="metaexpedients"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.list.boto.nou"/></a>
@@ -129,6 +139,7 @@
 		</div>
 	</form:form>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
+
 	<table 
 		id="metaexpedients" 
 		data-toggle="datatable" 
@@ -143,11 +154,11 @@
 		data-search-enabled="false">
 		<thead>
 			<tr>
-				<th data-col-name="codi" width="1%"><spring:message code="metaexpedient.list.columna.codi"/></th>
-				<th data-col-name="classificacio" width="1%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
-				<th data-col-name="nom" width="20%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
+				<th data-col-name="codi" width="3%"><spring:message code="metaexpedient.list.columna.codi"/></th>
+				<th data-col-name="classificacio" width="2%"><spring:message code="metaexpedient.list.columna.codiSia"/></th>	
+				<th data-col-name="nom" width="8%"><spring:message code="metaexpedient.list.columna.nom"/></th>			
 				<th data-col-name="serieDocumental" width="1%"><spring:message code="metaexpedient.list.columna.serieDocumental"/></th>				
-				<th data-col-name="organGestor.codiINom" data-template="#cellSyncTemplate" width="20%">
+				<th data-col-name="organGestor.codiINom" data-template="#cellSyncTemplate" width="7%">
 					<spring:message code="metaexpedient.list.columna.organGestor"/>
 					<script id="cellSyncTemplate" type="text/x-jsrender">
 						{{:organGestor?.codiINom}}
@@ -185,7 +196,7 @@
 					</script>
 				</th>
 				<c:if test="${isRevisioActiva}">
-					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" width="10%">
+					<th data-col-name="revisioEstat" data-template="#cellRevisioEstatTemplate" width="1%">
 						<spring:message code="metaexpedient.list.columna.revisioEstat"/>
 						<script id="cellRevisioEstatTemplate" type="text/x-jsrender">
 							{{if revisioEstat == 'DISSENY'}}

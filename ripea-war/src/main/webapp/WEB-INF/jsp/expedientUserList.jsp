@@ -73,6 +73,12 @@ body.loading .rmodal {
 table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
     color: #333;
 }
+
+
+table.dataTable tr > td:nth-child(6) {
+	word-wrap: break-word; 
+	max-width: 1px;
+}
 </style>
 <script>
 
