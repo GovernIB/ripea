@@ -2,13 +2,15 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 12.12.23 17:00
+-- Ran at: 18.12.23 13:15
 -- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.4.3
 -- *********************************************************************
 
 -- Changeset db/changelog/changes/0.9.105/1036.yaml::1701433927769-1::limit
 ALTER TABLE ipa_grup ADD codi VARCHAR2(50 CHAR) DEFAULT 'codi' NOT NULL;
+
+ALTER TABLE ipa_grup ADD CONSTRAINT ipa_grup_codi_uk UNIQUE (entitat_id, codi);
 
 update ipa_grup set codi = rol;
 
