@@ -34,6 +34,11 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("rol") String rol,
 			@Param("descripcio") String descripcio);
+	
+
+	GrupEntity findByEntitatIdAndCodi(
+			@Param("entitatId") Long entitatId, 
+			@Param("codi") String codi);
 
 	
 }

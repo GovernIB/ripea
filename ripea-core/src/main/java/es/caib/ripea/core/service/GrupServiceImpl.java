@@ -239,6 +239,12 @@ public class GrupServiceImpl implements GrupService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	public boolean checkIfAlreadyExistsWithCodi(
+			Long entitatId,
+			String codi) {
+		return grupRepository.findByEntitatIdAndCodi(entitatId, codi) != null;
+	}
 	
 	
 	@Transactional

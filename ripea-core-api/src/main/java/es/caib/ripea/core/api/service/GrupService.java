@@ -139,5 +139,10 @@ public interface GrupService {
 	public void deletePermis(
 			Long id,
 			Long permisId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public boolean checkIfAlreadyExistsWithCodi(
+			Long entitatId,
+			String codi);
 	
 }

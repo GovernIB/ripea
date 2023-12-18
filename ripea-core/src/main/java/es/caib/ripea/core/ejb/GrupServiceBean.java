@@ -121,6 +121,14 @@ public class GrupServiceBean implements GrupService {
 		delegate.deletePermis(id, permisId);
 	}
     
-    
+	@Override
+	@RolesAllowed("tothom")
+	public boolean checkIfAlreadyExistsWithCodi(
+			Long entitatId,
+			String codi) {
+		return delegate.checkIfAlreadyExistsWithCodi(
+				entitatId,
+				codi);
+	}
     
 }
