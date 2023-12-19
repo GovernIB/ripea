@@ -70,7 +70,6 @@ public interface ContingutService {
 	 * @param nomesMarcarEsborrat
 	 *            Posar a true si es vol esborrar el contingut definitivament
 	 *            o false si només es vol marcar com a esborrat.
-	 * @return El contingut esborrat.
 	 * @throws IOException
 	 *             Si s'han produit errors guardant l'arxiu al sistema
 	 *             de fitxers.
@@ -78,7 +77,7 @@ public interface ContingutService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public ContingutDto deleteReversible(
+	public void deleteReversible(
 			Long entitatId,
 			Long contingutId, 
 			String rolActual, 
@@ -91,12 +90,11 @@ public interface ContingutService {
 	 *            Atribut id de l'entitat a la qual pertany el contingut.
 	 * @param contingutId
 	 *            Atribut id del contingut que es vol esborrar.
-	 * @return El contingut esborrat.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public ContingutDto deleteDefinitiu(
+	public void deleteDefinitiu(
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
 
@@ -107,7 +105,6 @@ public interface ContingutService {
 	 *            Atribut id de l'entitat a la qual pertany el contingut.
 	 * @param contingutId
 	 *            Atribut id del contingut que es vol esborrar.
-	 * @return El contingut recuperat.
 	 * @throws IOException
 	 *             Si s'han produit errors recuperant l'arxiu del sistema
 	 *             de fitxers.
@@ -118,7 +115,7 @@ public interface ContingutService {
 	 *             a dins el mateix pare.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public ContingutDto undelete(
+	public void undelete(
 			Long entitatId,
 			Long contingutId) throws IOException, NotFoundException, ValidationException;
 
@@ -132,7 +129,6 @@ public interface ContingutService {
 	 * @param contingutDestiId
 	 *            Atribut id del contingut a on es vol moure l'origen.
 	 * @param rolActual TODO
-	 * @return El contingut mogut.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws ValidationException
@@ -140,7 +136,7 @@ public interface ContingutService {
 	 *             a dins el destí.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public ContingutDto move(
+	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId, String rolActual) throws NotFoundException, ValidationException;
@@ -189,7 +185,7 @@ public interface ContingutService {
 	 *             a dins el destí.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public ContingutDto link(
+	public Long link(
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId,
@@ -206,6 +202,7 @@ public interface ContingutService {
 	 *            Indica si la resposta ha d'incloure els fills del contingut.
 	 * @param ambVersions
 	 *            Indica si la resposta ha d'incloure les versions del contingut.
+	 * @param ambPermisos TODO
 	 * @param rolActual TODO
 	 * @param organActualId TODO
 	 * @return El contingut amb l'id especificat.
@@ -217,7 +214,7 @@ public interface ContingutService {
 			Long entitatId,
 			Long contingutId,
 			boolean ambFills,
-			boolean ambVersions, String rolActual, Long organActualId) throws NotFoundException;
+			boolean ambVersions, boolean ambPermisos, String rolActual, Long organActualId) throws NotFoundException;
 	
 	/**
 	 * Obté una informació simplificada del contingut especificat per moure/copiar/vincular documents.
@@ -508,11 +505,7 @@ public interface ContingutService {
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
 
-	ContingutDto findAmbIdUser(Long entitatId,
-			Long contingutId,
-			boolean ambFills,
-			boolean ambVersions,
-			boolean ambPermis, String rolActual, Long organActualId);
+
 	
 	/**
 	 * Assigna el nou ordre als fills d'un contenidor.
@@ -580,5 +573,11 @@ public interface ContingutService {
 			ContingutMassiuFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			String rolActual) throws NotFoundException;
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<ContingutDto> getFillsBasicInfo(Long contingutId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public ContingutDto getBasicInfo(Long contingutId, boolean checkPermissions);
 	
 }

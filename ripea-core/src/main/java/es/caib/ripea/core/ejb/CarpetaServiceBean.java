@@ -47,11 +47,11 @@ public class CarpetaServiceBean implements CarpetaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public CarpetaDto update(
+	public void update(
 			Long entitatId,
 			Long id,
 			String nom) {
-		return delegate.update(
+		delegate.update(
 				entitatId,
 				id,
 				nom);

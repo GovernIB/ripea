@@ -225,7 +225,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
-	public ContingutDto deleteReversible(
+	public void deleteReversible(
 			Long entitatId,
 			Long contingutId, 
 			String rolActual, 
@@ -257,7 +257,7 @@ public class ContingutServiceImpl implements ContingutService {
 			entityComprovarHelper.comprovarEstatExpedient(entitatId, contingutId, ExpedientEstatEnumDto.OBERT);
 		}
 
-		return contingutHelper.deleteReversible(
+		contingutHelper.deleteReversible(
 				entitatId,
 				contingut, 
 				rolActual);
@@ -266,7 +266,7 @@ public class ContingutServiceImpl implements ContingutService {
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
-	public ContingutDto deleteDefinitiu(
+	public void deleteDefinitiu(
 			Long entitatId,
 			Long contingutId) {
 		logger.debug("Esborrant el contingut ("
@@ -280,8 +280,6 @@ public class ContingutServiceImpl implements ContingutService {
 		ContingutEntity contingut = entityComprovarHelper.comprovarContingut(
 				contingutId);
 		// No es comproven permisos perquè això només ho pot fer l'administrador
-		ContingutDto dto = contingutHelper.toContingutDto(
-				contingut, false, false);
 		if (contingut.getPare() != null) {
 			contingut.getPare().getFills().remove(contingut);
 		}
@@ -308,14 +306,11 @@ public class ContingutServiceImpl implements ContingutService {
 		} else {
 			contingutRepository.delete(contingut);
 		}
-
-
-		return dto;
 	}
 	
 	@Transactional
 	@Override
-	public ContingutDto undelete(
+	public void undelete(
 			Long entitatId,
 			Long contingutId) throws IOException {
 		logger.debug("Recuperant el contingut ("
@@ -355,8 +350,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 		// Recupera el contingut esborrat
 		contingut.updateEsborrat(0);
-		ContingutDto dto = contingutHelper.toContingutDto(
-				contingut, false, false);
+
 		// Registra al log la recuperació del contingut
 		contingutLogHelper.log(
 				contingut,
@@ -438,8 +432,6 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutHelper.fitxerDocumentEsborratEsborrar((DocumentEntity)contingut);
 			}
 		}
-
-		return dto;
 	}
 	
 	
@@ -454,7 +446,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional
 	@Override
-	public ContingutDto move(
+	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId, 
@@ -540,9 +532,6 @@ public class ContingutServiceImpl implements ContingutService {
 				contingutMoviment,
 				true,
 				true);
-		ContingutDto dto = contingutHelper.toContingutDto(
-				contingutOrigen, false, false);
-		
 		
 		if (contingutOrigen instanceof DocumentEntity){
 			contingutHelper.arxiuDocumentPropagarMoviment(
@@ -554,9 +543,7 @@ public class ContingutServiceImpl implements ContingutService {
 					(CarpetaEntity)contingutOrigen,
 					contingutDesti.getArxiuUuid());
 		}
-		
 
-		return dto;
 	}
 
 	@Transactional
@@ -656,7 +643,7 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional
 	@Override
-	public ContingutDto link(
+	public Long link(
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId,
@@ -745,29 +732,10 @@ public class ContingutServiceImpl implements ContingutService {
 				null,
 				true,
 				true);
-		ContingutDto dto = contingutHelper.toContingutDto(
-				contingutOrigen, false, false);
-		return dto;
+
+		return contingutOrigen.getId();
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public ContingutDto findAmbIdUser(
-			Long entitatId,
-			Long contingutId,
-			boolean ambFills,
-			boolean ambVersions, 
-			String rolActual, 
-			Long organActualId) {
-		return findAmbIdUser(
-				entitatId,
-				contingutId,
-				ambFills,
-				ambVersions,
-				true, 
-				rolActual, 
-				organActualId);
-	}
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -788,30 +756,42 @@ public class ContingutServiceImpl implements ContingutService {
 	}
 	
 	
+
 	
 	@Transactional(readOnly = true)
 	@Override
-	public ContingutDto findAmbIdUser(
-			Long entitatId,
-			Long contingutId,
-			boolean ambFills,
-			boolean ambVersions,
-			boolean ambPermisos, 
-			String rolActual, 
-			Long organActualId) {
-		
-		return findAmbIdUser(
-				entitatId,
-				contingutId,
-				ambFills,
-				ambVersions,
-				ambPermisos,
-				rolActual,
-				true,
-				false, 
-				false);
+	public List<ContingutDto> getFillsBasicInfo(
+			Long contingutId) {
 
+		List<ContingutDto> contingutsDto = new ArrayList<>();
+
+		List<ContingutEntity> continguts = contingutRepository.findByPareIdAndEsborrat(contingutId, 0);
+
+		if (Utils.isNotEmpty(continguts)) {
+
+			for (ContingutEntity contingut : continguts) {
+				contingutsDto.add(contingutHelper.getBasicInfo(contingut));
+			}
+		}
+		return contingutsDto;
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public ContingutDto getBasicInfo(Long contingutId, boolean checkPermissions)  {
+		
+		ContingutEntity contingut = contingutRepository.findOne(contingutId);
+		if (checkPermissions) {
+			contingutHelper.comprovarContingutDinsExpedientAccessible(
+					contingut.getEntitat().getId(),
+					contingutId,
+					true,
+					false);
+		} 
+
+		return contingutHelper.getBasicInfo(contingut);
+	}
+	
 	
 	@Override
 	public ContingutDto findAmbIdUserPerMoureCopiarVincular(Long entitatId, Long contingutId) throws NotFoundException {
@@ -828,6 +808,31 @@ public class ContingutServiceImpl implements ContingutService {
 		
 		return contingutHelper.toContingutDtoSimplificat(contingut, true, null);
 	}
+	
+
+	@Transactional(readOnly = true)
+	@Override
+	public ContingutDto findAmbIdUser(
+			Long entitatId,
+			Long contingutId,
+			boolean ambFills,
+			boolean ambVersions, 
+			boolean ambPermisos, 
+			String rolActual, 
+			Long organActualId) {
+		return findAmbIdUser(
+				entitatId,
+				contingutId,
+				ambFills,
+				ambVersions,
+				ambPermisos,
+				rolActual,
+				true,
+				false, 
+				false);
+	}
+
+	
 
 	@Transactional(readOnly = true)
 	@Override

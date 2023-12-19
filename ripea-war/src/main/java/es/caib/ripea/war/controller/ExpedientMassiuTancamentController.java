@@ -374,6 +374,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 					expedientId,
 					true,
 					false, 
+					true, 
 					null, 
 					null);
 			List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(

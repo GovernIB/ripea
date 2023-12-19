@@ -196,6 +196,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		String separador = aplicacioService.propertyFindByNom("es.caib.ripea.numero.expedient.separador");
 		model.addAttribute("separadorDefinit", (separador != null && ! separador.equals("/") ? true : false));
 		
+		model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
+		model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
+		
 		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
 			MissatgesHelper.warning(
 					request, 
@@ -705,6 +708,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			redirect = "redirect:../../contingut/" + expedientId;
 		} else if (origin.equals("seguiment")) {
 			redirect = "redirect:../../seguimentArxiuPendents";
+		} else if (origin.equals("expedientList")) {
+			redirect = "redirect:../../expedient";
 		}
 		
 		if (exception == null) {
@@ -966,11 +971,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"contingut",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
+				contingutService.getBasicInfo(
 						expedientId,
-						true,
-						false, null, null));
+						true));
 		boolean hasWritePermisions = expedientService.hasWritePermission(expedientId);
 		model.addAttribute(
 				"hasWritePermisions",
@@ -1866,7 +1869,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						expedientId,
 						true,
-						false, null, null));
+						false, true, null, null));
 		model.addAttribute("expedientId", expedientId);
 		ExpedientFiltreCommand filtre = new ExpedientFiltreCommand();
 		model.addAttribute(filtre);
@@ -1984,7 +1987,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				expedientId,
 				true,
-				false, null, null);
+				false, true, null, null);
 		model.addAttribute("expedient", expedient);
 		List<DocumentDto> esborranys = documentService.findDocumentsNoFirmatsOAmbFirmaInvalidaONoGuardatsEnArxiu(
 				entitatActual.getId(),

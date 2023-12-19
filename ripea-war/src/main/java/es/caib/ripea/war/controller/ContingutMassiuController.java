@@ -163,7 +163,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null, null);
+					false, true, null, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO)) {
 				documentService.documentActualitzarEstat(
 						entitatActual.getId(), 

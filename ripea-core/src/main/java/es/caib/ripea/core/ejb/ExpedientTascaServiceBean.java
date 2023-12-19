@@ -110,28 +110,13 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	}
 
 
-
-
 	@Override
 	@RolesAllowed("tothom")
-	public DocumentDto findDocumentById(
-			Long entitatId,
-			Long tascaId,
-			Long documentId) {
-		return delegate.findDocumentById(
-				entitatId,
-				tascaId,
-				documentId);
-	}
-
-
-	@Override
-	@RolesAllowed("tothom")
-	public ContingutDto deleteTascaReversible(
+	public void deleteTascaReversible(
 			Long entitatId,
 			Long tascaId,
 			Long contingutId) throws IOException {
-		return delegate.deleteTascaReversible(
+		delegate.deleteTascaReversible(
 				entitatId,
 				tascaId,
 				contingutId);
@@ -170,6 +155,12 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	@Override
 	public List<ExpedientTascaComentariDto> findComentarisPerTasca(Long entitatId, Long expedientTascaId) {
 		return delegate.findComentarisPerTasca(entitatId, expedientTascaId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId) {
+		return delegate.findByTascaBasicInfo(contingutId, tascaId);
 	}
 
 }

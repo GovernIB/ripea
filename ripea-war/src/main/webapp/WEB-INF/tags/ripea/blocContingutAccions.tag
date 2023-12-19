@@ -28,6 +28,7 @@
 			</c:choose>							
 		</c:if>
 		
+		<%---- Guardar en arxiu ----%>
 		<c:choose>
 			<c:when test="${contingut.document && contingut.arxiuUuid==null}">
 				<c:set var="primerGuardarExpedientArxiu"><spring:message code="disabled.button.primerGuardarExpedientArxiu"/></c:set>
@@ -56,7 +57,7 @@
 			<c:set var="mostrarSeparador" value="${true}"/>
 		</c:if>
 		
-		
+		<%---- Assignar... ----%>
 		<c:if test="${contingut.expedient && isEntitatUserAdminOrOrgan}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
 		</c:if>
@@ -94,6 +95,7 @@
 				<li role="separator" class="divider"></li>
 			</c:if>
 		</c:if>
+		<%---- Agafar/Alliberar ... ----%>
 		<c:if test="${contingut.expedient && expedientAgafatPerUsuariActual}">
 			<li><a href="<c:url value="/expedient/${contingut.id}/alliberar"/>"><span class="fa fa-unlock"></span>&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
 		</c:if>
@@ -102,12 +104,13 @@
 		</c:if>
 		<c:if test="${(potModificar) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
+				<%---- Canviar estat... ----%>
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
 				</c:if>
+				<%---- Relacionar... ----%>
 				<li><a href="<c:url value="/expedient/${contingut.id}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
-				<%--li><a href="<c:url value="/expedient/${contingut.id}/acumular"/>" data-toggle="modal"><span class="fa fa-sign-in"></span>&nbsp;<spring:message code="comu.boto.acumular"/>...</a></li>
-				<li><a href="<c:url value="/contingut/${contingut.pare.id}/expedient/${contingut.id}/disgregar"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.disgregar"/>...</a></li--%>
+				<%---- Tancar... ----%>
 				<c:if test="${contingut.estat == 'OBERT'}">
 						<c:choose>
 							<c:when test="${contingut.valid && contingut.conteDocuments && !contingut.conteDocumentsEnProcessDeFirma && !contingut.conteDocumentsDePortafirmesNoCustodiats && !contingut.conteDocumentsPendentsReintentsArxiu && !contingut.conteDocumentsDeAnotacionesNoMogutsASerieFinal}">

@@ -401,31 +401,7 @@ public class DocumentServiceImpl implements DocumentService {
 		return toDocumentDto(document);
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public List<DocumentDto> findAmbExpedient(
-			Long entitatId,
-			Long expedientId) {
-		logger.debug("Obtenint els documents amb permis de lectura de l'expedient ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				false,
-				false,
-				false,
-				false,
-				null);
-		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
-		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
-		for (DocumentEntity document: documents) {
-			dtos.add(
-					(DocumentDto)contingutHelper.toContingutDto(document, false, false));
-		}
-		return dtos;
-	}
-	
+
 	
 	
 	@Transactional
@@ -485,34 +461,7 @@ public class DocumentServiceImpl implements DocumentService {
 	
 
 
-	
-	@Transactional(readOnly = true)
-	@Override
-	public List<DocumentDto> findAmbExpedientIEstat(
-			Long entitatId,
-			Long expedientId,
-			DocumentEstatEnumDto estat) {
-		logger.debug("Obtenint els documents amb permis de lectura de l'expedient (" +
-				"entitatId=" + entitatId + ", " +
-				"expedientId=" + expedientId + ", " +
-				"estat=" + estat + ")");
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				false,
-				false,
-				false,
-				false,
-				false,
-				null);
-		List<DocumentEntity> documents = documentRepository.findByExpedientAndEstatAndEsborrat(expedient, estat, 0);
-		List<DocumentDto> dtos = new ArrayList<DocumentDto>();
-		for (DocumentEntity document: documents) {
-			dtos.add(
-					(DocumentDto)contingutHelper.toContingutDto(document, false, false));
-		}
-		return dtos;
-	}
-	
+
 	
 	@Transactional(readOnly = true)
 	@Override

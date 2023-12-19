@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.validation;
 
+import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -43,14 +45,9 @@ public class NomDocumentNoRepetitValidator implements ConstraintValidator<NomDoc
 			String nom = obj instanceof DocumentCommand ? ((DocumentCommand) obj).getNom() : ((DocumentGenericCommand) obj).getNom();
 			
 			boolean valid = true;
-			ContingutDto contingutPare = contingutService.findAmbIdUser(
-					entitatId, 
-					pareId, 
-					true, 
-					false,
-					false, null, null);
+			List<ContingutDto> fills = contingutService.getFillsBasicInfo(pareId);
 			
-			for (ContingutDto contingut: contingutPare.getFills()) {
+			for (ContingutDto contingut: fills) {
 				if (contingut.isDocument()) {
 					if (contingut.getNom().equals(nom)) {
 						if (id == null || id != contingut.getId()) {

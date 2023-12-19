@@ -147,13 +147,10 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						try {
-							ContingutDto esborrat = contingutService.deleteReversible(
+							contingutService.deleteReversible(
 									entitatCreada.getId(),
 									expedientCreat.getId(), null, null);
-							assertTrue(esborrat instanceof ExpedientDto);
-							comprovarExpedientCoincideix(
-									expedientCreate,
-									(ExpedientDto)esborrat);
+;
 							try {
 								autenticarUsuari("user");
 								expedientService.findById(
@@ -188,13 +185,9 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 						EntitatDto entitatCreada = (EntitatDto)elementsCreats.get(0);
 						ExpedientDto expedientCreat = (ExpedientDto)elementsCreats.get(5);
 						autenticarUsuari("admin");
-						ContingutDto esborrat = contingutService.deleteDefinitiu(
+						contingutService.deleteDefinitiu(
 								entitatCreada.getId(),
 								expedientCreat.getId());
-						assertTrue(esborrat instanceof ExpedientDto);
-						comprovarExpedientCoincideix(
-								expedientCreate,
-								(ExpedientDto)esborrat);
 						try {
 							autenticarUsuari("user");
 							expedientService.findById(

@@ -725,21 +725,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 		ContingutDto pare = null;
 		if (tascaId == null) {
-			pare = contingutService.findAmbIdUser(
-					entitatActual.getId(),
+			pare = contingutService.getBasicInfo(
 					pareId,
-					true,
-					false, 
-					null, 
-					null);
-		} else {
-
-			pare = expedientTascaService.findTascaExpedient(
-					entitatActual.getId(),
-					pareId,
-					tascaId,
-					true,
 					true);
+		} else {
+			pare = expedientTascaService.findByTascaBasicInfo(
+					pareId,
+					tascaId);
 		}
 		
 		
@@ -1018,11 +1010,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Model model) throws ClassNotFoundException, IOException, NotFoundException, ValidationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		boolean existsEsborrat  = false;
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				false, null, null);
 		
 		@SuppressWarnings("unchecked")
 		Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(
@@ -1034,7 +1021,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					entitatActual.getId(),
 					docId,
 					true,
-					false, null, null);
+					false, true, null, null);
 			if (document.getEstat().equals(DocumentEstatEnumDto.REDACCIO) && !document.getDocumentTipus().equals(DocumentTipusEnumDto.IMPORTAT)) {
 				existsEsborrat = true;
 				documentService.documentActualitzarEstat(
@@ -1047,13 +1034,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (existsEsborrat) {
 			return this.getModalControllerReturnValueSuccess(
 					request,
-					"redirect:../../contingut/" + contingut.getId(),
+					"redirect:../../contingut/" + contingutId,
 					"document.controller.estat.canviat.ok");
 		} else {
 			//No s'ha seleccionat cap document de tipus esborrany
 			return this.getModalControllerReturnValueError(
 					request,
-					"redirect:../../contingut/" + contingut.getId(),
+					"redirect:../../contingut/" + contingutId,
 					"document.controller.estat.canviat.ko",
 					null);
 		}
@@ -1156,64 +1143,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return seleccio.size();
 	}
 	
-	@RequestMapping(value = "/{pareId}/comprovarContingut", method = RequestMethod.GET)
-	@ResponseBody
-	public HashMap<String, Boolean> comprovarContingut(
-			HttpServletRequest request,
-			@PathVariable Long pareId,
-			@RequestParam(value="docsIdx[]", required = false) Long[] docsIdx) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		HashMap<String, Boolean> resultat = new HashMap<String, Boolean>();
-		Boolean isTotPdfFirmat = true;
-		Boolean isTotPdf = true;
-		if (docsIdx != null) {
-			for (Long docId: docsIdx) {
-				ContingutDto contingut = contingutService.findAmbIdUser(
-						entitatActual.getId(),
-						docId,
-						true,
-						false, null, null);
-				if (contingut instanceof DocumentDto) {
-					DocumentDto document = (DocumentDto) contingut;
-					if ((!document.isFirmat() || document.isCustodiat())
-							&& (document.isFirmat() || !document.isCustodiat())
-							&& !document.isDefinitiu()) {
-						isTotPdfFirmat = false;
-						break;
-					}
-					if (document.getFitxerContentType() != null && !document.getFitxerContentType().equals("application/pdf")) {
-						isTotPdf = false;
-					}
-				}
-			}
-		}
-		resultat.put("isTotPdf", isTotPdf);
-		resultat.put("isTotPdfFirmat", isTotPdfFirmat);
-		return resultat;
-	}
 
-	@RequestMapping(value = "/{pareId}/comprovarContingut/{contingutId}", method = RequestMethod.GET)
-	@ResponseBody
-	public boolean comprovarContingut(
-			HttpServletRequest request,
-			@PathVariable Long pareId,
-			@PathVariable Long contingutId) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		boolean isDocument = true;
-		
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				contingutId,
-				true,
-				false, null, null);
-		if (!contingut.isCarpeta())
-			isDocument = true;
-		else
-			isDocument = false;
-		
-		return isDocument;
-	}
-	
 	@RequestMapping(value = "/{contingutId}/document/{documentId}/descarregarImprimible", method = RequestMethod.GET)
 	public String descarregarImprimible(
 			HttpServletRequest request,
@@ -1223,11 +1153,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		try {
-			contingutService.findAmbIdUser(
-					entitatActual.getId(),
-					documentId,
-					true,
-					false, null, null);
+
 				FitxerDto fitxer = documentService.descarregarImprimible(
 						entitatActual.getId(),
 						documentId,

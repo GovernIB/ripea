@@ -31,8 +31,6 @@ import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.ExpedientOrganPareEntity;
 import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaDadaEntity;
@@ -115,6 +113,8 @@ public class EntityComprovarHelper {
 	private GrupRepository grupRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private ConfigHelper configHelper;
 	
 	public EntitatEntity comprovarEntitat(
 			String entitatCodi,
@@ -610,8 +610,107 @@ public class EntityComprovarHelper {
 		
 	}
 	
+	public boolean comprovarAdminEntitatOAdminOrganDelExpedient(ExpedientEntity expedient) {
+		
+		if (!rolHelper.doesCurrentUserHasRol("IPA_ADMIN") && !rolHelper.doesCurrentUserHasRol("IPA_ORGAN_ADMIN")) {
+			return false;
+		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		boolean esAdministradorEntitat = permisosHelper.isGrantedAll(
+				expedient.getEntitat().getId(),
+				EntitatEntity.class,
+				new Permission[] { ExtendedPermission.ADMINISTRATION },
+				auth);
+		
+		boolean esAdministradorOrgan = organGestorHelper.isOrganGestorPermes(
+				expedient.getOrganGestor(),
+				ExtendedPermission.ADMINISTRATION);
+		
+		if (esAdministradorEntitat || esAdministradorOrgan) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	public boolean comprovarRolActualAdminEntitatOAdminOrganDelExpedient(ExpedientEntity expedient, String rolActual) {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		if (rolActual.equals("IPA_ADMIN")) {
+			
+			return permisosHelper.isGrantedAll(
+					expedient.getEntitat().getId(),
+					EntitatEntity.class,
+					new Permission[] { ExtendedPermission.ADMINISTRATION },
+					auth);
+		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			
+			return organGestorHelper.isOrganGestorPermes(
+					expedient.getOrganGestor(),
+					ExtendedPermission.ADMINISTRATION);
+		} else {
+			
+			return false;
+		}
+	}
+	
+	public boolean comprovarSiRolTePermisPerModificarExpedient(ExpedientEntity expedient, String rolActual) {
+		
+		boolean rolActualAdminEntitatOAdminOrgan = comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual);
+		if (rolActualAdminEntitatOAdminOrgan) {
+			return true;
+		} else {
+			return comprovarPermisExpedient(
+					expedient.getId(),
+					ExtendedPermission.WRITE,
+					"WRITE",
+					false);
+		}
+	}
+	
 
 	
+	public boolean comprovarSiEsPotModificarExpedient(ExpedientEntity expedient) {
+
+		boolean expedientAgafatPerUsuariActual = comprovarSiExpedientAgafatPerUsuariActual(expedient);
+
+		boolean usuariActualWrite = comprovarPermisExpedient(
+				expedient.getId(),
+				ExtendedPermission.WRITE,
+				"WRITE",
+				false);
+		
+		boolean permisosAdminEntitatOAdminOrgan = comprovarAdminEntitatOAdminOrganDelExpedient(expedient);
+		
+		if (((expedientAgafatPerUsuariActual && usuariActualWrite) || permisosAdminEntitatOAdminOrgan) && expedient.getEstat() == ExpedientEstatEnumDto.OBERT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean comprovarSiEsPotReobrirExpedient(ExpedientEntity expedient) {
+
+		boolean isReobrirPermes = configHelper.getAsBoolean("es.caib.ripea.expedient.permetre.reobrir");
+		
+		boolean expedientTancat = expedient.getEstat() == ExpedientEstatEnumDto.TANCAT;
+		
+		boolean isTancamentLogicActiu = configHelper.getAsBoolean("es.caib.ripea.expedient.tancament.logic");
+		
+		return isReobrirPermes && expedientTancat && (!isTancamentLogicActiu || (isTancamentLogicActiu && expedient.getTancatData() == null));		
+
+	}
+	
+	public boolean comprovarSiExpedientAgafatPerUsuariActual(ExpedientEntity expedient) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		return expedient.getAgafatPer() != null ? expedient.getAgafatPer().getCodi().equals(auth.getName()) : false;
+	}
+
 	
 
 	public ExpedientEntity comprovarExpedient(
@@ -646,12 +745,6 @@ public class EntityComprovarHelper {
 				        "L'expedient no està agafat per cap usuari");
 			}
 		}
-		// if expedient estat has write permissions don't need to check metaExpedient
-		// permissions
-		if (comprovarPermisWrite && expedient.getEstatAdditional() != null) {
-			if (hasEstatWritePermissons(expedient.getEstatAdditional().getId()))
-				comprovarPermisWrite = false;
-		}
 		
 		// comprovar si l'expedient està relacionat i és una consulta de LECTURA sobre algún element de l'expedient, llavors no mirar permisos
 		boolean comprovarNomesLectura = (!comprovarPermisWrite && !comprovarPermisCreate && !comprovarPermisDelete);
@@ -668,29 +761,25 @@ public class EntityComprovarHelper {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.READ,
-					"READ",
-					rolActual);
+					"READ", true);
 		}
 		if (comprovarPermisWrite) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.WRITE,
-					"WRITE",
-					rolActual);
+					"WRITE", true);
 		}
 		if (comprovarPermisCreate) {
 		comprovarPermisExpedient(
 				expedientId,
 				ExtendedPermission.CREATE,
-				"CREATE",
-				rolActual);
+				"CREATE", true);
 		}
 		if (comprovarPermisDelete) {
 			comprovarPermisExpedient(
 					expedientId,
 					ExtendedPermission.DELETE,
-					"DELETE",
-					rolActual);
+					"DELETE", true);
 		}
 		
 		return expedient;
@@ -720,18 +809,7 @@ public class EntityComprovarHelper {
 		}
 	}
 
-	/**
-	 * checking if expedient estat has modify permissions
-	 * 
-	 * @param estatId
-	 * @return
-	 */
-	public boolean hasEstatWritePermissons(Long estatId) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-		return permisosHelper.isGrantedAll(estatId, ExpedientEstatEntity.class,
-		        new Permission[] { ExtendedPermission.WRITE }, auth);
-	}
 
 	/**
 	 * checking if expedient estat has modify permissions
@@ -1163,18 +1241,18 @@ public class EntityComprovarHelper {
 	
 	
 
-	public void comprovarPermisExpedient(
+	public boolean comprovarPermisExpedient(
 			Long expedientId,
 			Permission permission,
-			String permissionName,
-			String rolActual) {
+			String permissionName, 
+			boolean throwException) {
 
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
 		Long procedimentId = expedient.getMetaExpedient().getId();
 		Long organId = expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null;
 
 		if (cacheHelper.mostrarLogsPermisos())
-			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", rolActual=" + rolActual + ", user=" + SecurityContextHolder.getContext().getAuthentication().getName());
+			logger.info("comprovarPermisExpedient (expedientId=" + expedientId + ", permission=" + permissionName + ", user=" + SecurityContextHolder.getContext().getAuthentication().getName());
 		
 		if (!isAdminEntitat(procedimentId)) {
 
@@ -1197,11 +1275,14 @@ public class EntityComprovarHelper {
 									procedimentId,
 									organId,
 									permission)) {
-								
-								throw new PermissionDeniedException(
-										expedient.getId(),
-										expedient.getClass(),
-										permissionName);
+								if (throwException) {
+									throw new PermissionDeniedException(
+											expedient.getId(),
+											expedient.getClass(),
+											permissionName);
+								} else {
+									return false;
+								}
 							}
 						}
 					}
@@ -1214,15 +1295,19 @@ public class EntityComprovarHelper {
 							GrupEntity.class,
 							new Permission[] { ExtendedPermission.READ });
 					if (!grantedGrup) {
-						throw new PermissionDeniedException(
-								grup.getId(),
-								grup.getClass(),
-								"GRUP");
+						if (throwException) {
+							throw new PermissionDeniedException(
+									grup.getId(),
+									grup.getClass(),
+									"GRUP");
+						} else {
+							return false;
+						}						
 					}
 				}
-				
 			}
 		}
+		return true;
 	}
 	
 	

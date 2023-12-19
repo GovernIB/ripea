@@ -163,38 +163,8 @@ public interface DocumentService {
 			Long id,
 			int versio) throws NotFoundException;*/
 
-	/**
-	 * Consulta els documents d'un expedient.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contenidor.
-	 * @param expedientId
-	 *            Atribut id de l'expedient.
-	 * @return la llistat de documents.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	public List<DocumentDto> findAmbExpedient(
-			Long entitatId,
-			Long expedientId) throws NotFoundException;
 
-	/**
-	 * Consulta els documents d'un expedient amb un estat determinat.
-	 * 
-	 * @param entitatId
-	 *            Atribut id de l'entitat a la qual pertany el contenidor.
-	 * @param expedientId
-	 *            Atribut id de l'expedient.
-	 * @param estat
-	 *            L'estat dels documents.
-	 * @return la llistat de documents.
-	 * @throws NotFoundException
-	 *             Si no s'ha trobat l'objecte amb l'id especificat.
-	 */
-	public List<DocumentDto> findAmbExpedientIEstat(
-			Long entitatId,
-			Long expedientId,
-			DocumentEstatEnumDto estat) throws NotFoundException;
+
 
 	/**
 	 * Consulta els documents d'un expedient.

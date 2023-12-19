@@ -682,18 +682,15 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long documentId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		ContingutDto contingut = contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				documentId,
-				true,
-				false, null, null);
+		Long pareId = contingutService.getPareId(
+				documentId);
 		documentService.documentActualitzarEstat(
 				entitatActual.getId(), 
 				documentId, 
 				DocumentEstatEnumDto.DEFINITIU);
 		return this.getModalControllerReturnValueSuccess(
 				request,
-				"redirect:../../contingut/" + contingut.getPare().getId(),
+				"redirect:../../contingut/" + pareId,
 				"document.controller.estat.canviat.ok");
 	}
 	

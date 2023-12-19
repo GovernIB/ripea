@@ -658,9 +658,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 				new Permission[] { ExtendedPermission.WRITE },
 				auth);
 
-		if (!granted && expedient.getEstatAdditional() != null && entityComprovarHelper.hasEstatWritePermissons(expedient.getEstatAdditional().getId())) {
-			granted = true;
-		}
 		return granted;
 	}
 
@@ -740,24 +737,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 								UsuariDto.class));
 				expedientsDto.add(expedient);
 			}
-		} else { // if not add only expedients having estat with permisions
-			for (ContingutEntity cont : expedientsEnt) {
-				ExpedientEntity exp = (ExpedientEntity)cont;
-				if (exp.getEstatAdditional() != null &&
-						entityComprovarHelper.hasEstatWritePermissons(exp.getEstatAdditional().getId())) {
-					ExpedientDto expedient = new ExpedientDto();
-					expedient.setId(exp.getId());
-					expedient.setNom(exp.getNom());
-					expedient.setNumero(exp.getNumero());
-					expedient.setAgafatPer(
-							conversioTipusHelper.convertir(
-									exp.getAgafatPer(),
-									UsuariDto.class));
-					expedientsDto.add(expedient);
-
-				}
-			}
-		}
+		} 
 		return expedientsDto;
 	}
 	

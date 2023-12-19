@@ -384,11 +384,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				contingutOrigenId,
 				docsIdx,
 				model);
-		ContingutDto contingutOrigen = contingutService.findAmbIdUser(
-				entitatActual.getId(), 
+		ContingutDto contingutOrigen = contingutService.getBasicInfo(
 				contingutOrigenId, 
-				false, 
-				false, null, null);
+				true);
 		ContingutMoureCopiarEnviarCommand command = new ContingutMoureCopiarEnviarCommand();
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			command.setOrigenIds(
@@ -455,6 +453,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				contingutOrigenId,
 				true,
 				false, 
+				true, 
 				null, 
 				null);
 		
@@ -567,14 +566,14 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					model);
 			return "contingutVincularForm";
 		}
-		ContingutDto contingutCreat = contingutService.link(
+		Long contingutCreatId = contingutService.link(
 				entitatActual.getId(),
 				contingutOrigenId,
 				command.getDestiId(),
 				true);
 		return getModalControllerReturnValueSuccess(
 				request,
-				"redirect:../../" + contingutCreat.getId(),
+				"redirect:../../" + contingutCreatId,
 				"contingut.controller.element.vinculat.ok");
 	}
 	
@@ -615,11 +614,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"contingut",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
+				contingutService.getBasicInfo(
 						contingutId,
-						true,
-						false, null, null));
+						true));
 		model.addAttribute(
 				"errors",
 				contingutService.findErrorsValidacio(
@@ -636,11 +633,9 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"contingut",
-				contingutService.findAmbIdUser(
-						entitatActual.getId(),
+				contingutService.getBasicInfo(
 						contingutId,
-						true,
-						false, null, null));
+						true));
 		model.addAttribute(
 				"alertes",
 				contingutService.findAlertes(
@@ -734,7 +729,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						entitatActual.getId(),
 						contingutId,
 						true,
-						false, null, null));
+						false, true, null, null));
 		model.addAttribute(
 				"logs",
 				contingutService.findLogsPerContingutUser(
@@ -785,6 +780,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId,
 					false,
 					false, 
+					true, 
 					null, 
 					null);
 			model.addAttribute("contingut", contingut);
@@ -806,7 +802,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 					contingutId,
 					false,
 					false,
-					null,
+					true,
+					null, 
 					null);
 			
 			logger.error("Error al consultar informació arxiu" + " (id: " + contingutId + ", uuid: " + contingut.getArxiuUuid() + ") ", e);
@@ -973,11 +970,11 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutOrigenId,
 				true,
-				false, null, null);
+				false, true, null, null);
 		if (docsIdx != null && !docsIdx.isEmpty() && (contingutOrigen instanceof CarpetaDto || contingutOrigen instanceof ExpedientDto)) {
 			List<ContingutDto> documentsOrigen = new ArrayList<ContingutDto>();
 			for (Long docIdx : docsIdx) {
-				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, null, null);
+				ContingutDto contingut = contingutService.findAmbIdUser(entitatActual.getId(), docIdx, false, false, true, null, null);
 				documentsOrigen.add(contingut);
 			}
 			model.addAttribute(

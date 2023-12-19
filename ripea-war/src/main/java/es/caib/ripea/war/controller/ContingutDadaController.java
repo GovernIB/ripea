@@ -126,7 +126,7 @@ public class ContingutDadaController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				contingutId,
 				false,
-				false, null, null);
+				false, true, null, null);
 		if (contingut instanceof NodeDto) {
 			return ((NodeDto)contingut).getDadesCount();
 		} else {

@@ -296,9 +296,20 @@ public class ContingutHelper {
 
 			Boolean conteDocumentsDefinitiusSelect = documentRepository.expedientHasDocumentsDefinitius(expedient);
 			dto.setConteDocumentsDefinitius(conteDocumentsDefinitiusSelect);
+			dto.setConteDocuments(CollectionUtils.isNotEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0)));
+			dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));	
+			dto.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient)));	
+			dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
+			dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));	
+
 
 			if (onlyForList) {
 				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
+				dto.setRolActualAdminEntitatOAdminOrgan(entityComprovarHelper.comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual));
+				dto.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedient));
+				dto.setExpedientAgafatPerUsuariActual(entityComprovarHelper.comprovarSiExpedientAgafatPerUsuariActual(expedient));
+				dto.setRolActualPermisPerModificarExpedient(entityComprovarHelper.comprovarSiRolTePermisPerModificarExpedient(expedient, rolActual));
+				dto.setPotReobrir(entityComprovarHelper.comprovarSiEsPotReobrirExpedient(expedient));
 			}
 			
 			if (!onlyForList) {
@@ -318,11 +329,6 @@ public class ContingutHelper {
 				dto.setSistraClau(expedient.getSistraClau());
 				dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions( ).isEmpty() ? true : false);
 
-				dto.setConteDocuments(CollectionUtils.isNotEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0)));
-				dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));	
-				dto.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient)));	
-				dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
-				dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));	
 
 				dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
 				dto.setConteDocumentsFirmats(
@@ -918,6 +924,26 @@ public class ContingutHelper {
 	}
 	
 	
+	public ContingutDto getBasicInfo(ContingutEntity contingut) {
+		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
+		ContingutDto resposta = null;
+		if (deproxied instanceof ExpedientEntity) {
+			ExpedientDto expedient = new ExpedientDto();
+			resposta = expedient;
+		} else if (deproxied instanceof CarpetaEntity) {
+			CarpetaDto carpeta = new CarpetaDto();
+			resposta = carpeta;
+		} else if (deproxied instanceof DocumentEntity) {
+			DocumentDto carpeta = new DocumentDto();
+			resposta = carpeta;
+		}
+		resposta.setId(contingut.getId());
+		resposta.setNom(contingut.getNom());
+		
+		return resposta;
+	}
+	
+	
 	public ContingutDto toContingutDtoSimplificat(ContingutEntity contingut, boolean nomesFinsExpedientArrel, List<ContingutDto> pathDto) {
 		ContingutDto resposta = null;		
 		if (contingut instanceof ExpedientEntity) {
@@ -1288,15 +1314,13 @@ public class ContingutHelper {
 
 
 
-	public ContingutDto deleteReversible(
+	public void deleteReversible(
 			Long entitatId,
 			ContingutEntity contingut,
 			String rolActual) throws IOException {
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
 
-		ContingutDto dto = toContingutDto(
-				contingut, false, false);
 		// Comprova que el contingut no estigui esborrat
 		if (contingut.getEsborrat() > 0) {
 			logger.error("Aquest contingut ja està esborrat (contingutId=" + contingut.getId() + ")");
@@ -1397,7 +1421,6 @@ public class ContingutHelper {
 			arxiuPropagarEliminacio(contingut);
 		}
 
-		return dto;
 	}
 
 	public boolean conteDocumentsDefinitius(ContingutEntity contingut) {

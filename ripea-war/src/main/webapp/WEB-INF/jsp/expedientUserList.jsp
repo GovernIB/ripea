@@ -712,30 +712,120 @@ function hexToRgb(hex) {
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
 							<ul class="dropdown-menu">
+								<%---- Gestionar ----%>
 								<li><a id="agafar_lnk" href="contingut/{{:id}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.gestionar"/></a></li>
-								{{if usuariActualWrite || '${rolActual}' == 'IPA_ADMIN' || '${rolActual}' == 'IPA_ORGAN_ADMIN'}}
-									{{if !agafat}}
-										<li><a  href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
-									{{else}}
-										{{if agafatPer.codi != '${pageContext.request.userPrincipal.name}'}}
-											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
-										{{else}}
-											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
-										{{/if}}
-									{{/if}}
-								{{/if}}	
+
+								<%---- Seguir -----%>
 								{{if usuariActualWrite && seguidor}}
 									<li><a href="expedient/{{:id}}/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.unfollow"/></a></li>
 								{{else usuariActualWrite && !seguidor}}					
 									<li><a href="expedient/{{:id}}/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="comu.boto.follow"/></a></li>		
 								{{/if}}
+								<%-----------------%>
+								<li role="separator" class="divider"></li>
+
+								<%---- Guardar en arxiu ----%>
+								{{if arxiuUuid == null}}
+									<li><a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=expedientList"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
+								{{/if}}
+
+								
+								<%---- Assignar ----%>
+								{{if rolActualAdminEntitatOAdminOrgan}}
+									<li><a href="<c:url value="/expedient/{{:id}}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
+								{{/if}}
+
+								<%---- Modificar... ----%>
+								{{if potModificar}}
+								 	<li><a href="<c:url value="/expedient/{{:id}}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+								{{/if}}
+
+								<%-----------------%>
+								<li role="separator" class="divider"></li>
+
+								<%---- Agafar/Alliberar... ----%>
+								{{if rolActualPermisPerModificarExpedient}}
+									{{if !agafat}}
+										<li><a  href="expedient/{{:id}}/agafar" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+									{{else}}
+										{{if !expedientAgafatPerUsuariActual}}
+											<li><a href="expedient/{{:id}}/agafar" data-confirm="<spring:message code="expedient.list.user.agafar.confirm.1"/> {{:nomPropietariEscriptoriPare}}. <spring:message code="expedient.list.user.agafar.confirm.2"/>" data-toggle="ajax"><span class="fa fa-lock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.agafar"/></a></li>
+										{{else}}
+											<li><a href="expedient/{{:id}}/alliberar" data-toggle="ajax"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="comu.boto.alliberar"/></a></li>
+										{{/if}}
+									{{/if}}
+								{{/if}}	
+
+
+
+								{{if potModificar}}
+									<%---- Canviar estat... ----%>
+								 	{{if estat == 'OBERT'}}
+										<li><a href="<c:url value="/expedient/{{:id}}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
+									{{/if}}
+									<%---- Relacionar... ----%>
+									<li><a href="<c:url value="/expedient/{{:id}}/relacionarList"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;<spring:message code="comu.boto.relacionar"/>...</a></li>
+								 	<%---- Tancar... ----%>
+									{{if estat == 'OBERT'}}
+										{{if potTancar}}
+											<li><a href="<c:url value="/expedient/{{:id}}/tancar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+										{{else}}
+											<li class="disabled"><a href="#"/><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/>...</a></li>
+										{{/if}}
+									{{/if}}
+								{{/if}}
+								<%---- Esborrar ----%>
 								{{if usuariActualDelete && estat != 'TANCAT' && !conteDocumentsDefinitius}}
 									<li><a href="contingut/{{:id}}/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 								{{/if}}
+
+								<%-----------------%>
+								<li role="separator" class="divider"></li>
+
+								<%---- Hist�ric d'accions ----%>
+								<li><a href="<c:url value="/contingut/{{:id}}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
+
+								{{if conteDocuments}}
+									<%---- Exportar índex PDF... ----%>
+									<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>
+									<c:if test="${isExportacioExcelActiva}">
+										<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarIndex/XLSX"/>"><span class="fa fa-th-list"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.xlsx"/>...</a></li>
+									</c:if>
+									<%---- Índex PDF i exportació ENI... ----%>
+									{{if conteDocumentsDefinitius}}
+										<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarExportarIndex"/>"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+										<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/exportarEni"/>"><span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni"/>...</a></li>
+										<c:if test="${isExportacioInsideActiva}">
+											<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/exportarEni?ambDocuments=true"/>"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+										</c:if>
+
+									{{else}}
+										<li class="disabled"><a href="#"><span class="fa fa-list-ol"></span>&nbsp;<span class="fa fa-file-code-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportar.index"/>...</a></li>
+										<c:if test="${isExportacioInsideActiva}">
+											<li class="disabled"><a href="#"><span class="fa fa-file-archive-o"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.exportacio.eni.inside"/>...</a></li>
+										</c:if>
+									{{/if}}
+								{{else}}
+									<li class="disabled"><a href="#"/><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="comu.boto.index"/>...</a></li>
+								{{/if}}
+
+								{{if arxiuUuid != null}}
+									<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+								{{else}}
+									<li class="disabled"><a href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+								{{/if}}
+
 							</ul>
 						</div>
 					</script>
 				</th>
+				<th data-col-name="rolActualAdminEntitatOAdminOrgan" data-visible="false"></th>
+				<th data-col-name="potModificar" data-visible="false"></th>
+				<th data-col-name="rolActualPermisPerModificarExpedient" data-visible="false"></th>
+				<th data-col-name="expedientAgafatPerUsuariActual" data-visible="false"></th>
+				<th data-col-name="potTancar" data-visible="false"></th>
+				<th data-col-name="conteDocuments" data-visible="false"></th>	
+				
 			</tr>
 		</thead>
 	</table>

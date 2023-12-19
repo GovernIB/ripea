@@ -184,6 +184,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 		return dto;
 	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public ContingutDto findByTascaBasicInfo(
+			Long contingutId,
+			Long tascaId) {
+
+		ContingutEntity contingut = contingutHelper.comprovarContingutPertanyTascaAccesible(
+					tascaId,
+					contingutId);
+
+		return contingutHelper.getBasicInfo(contingut);
+	}
 
 	@Transactional(readOnly = true)
 	@Override
@@ -415,26 +428,10 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	}	
 
 
-	@Transactional(readOnly = true)
-	@Override
-	public DocumentDto findDocumentById(
-			Long entitatId,
-			Long tascaId,
-			Long documentId) {
-		logger.debug("Obtenint el document ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + documentId + ")");
-		DocumentEntity document = (DocumentEntity) contingutHelper.comprovarContingutPertanyTascaAccesible(
-				tascaId,
-				documentId);
-		return toDocumentDto(document);
-	}
-
-
 	@Transactional
 	@Override
 	@CacheEvict(value = "errorsValidacioNode", key = "#contingutId")
-	public ContingutDto deleteTascaReversible(
+	public void deleteTascaReversible(
 			Long entitatId,
 			Long tascaId,
 			Long contingutId) throws IOException {
@@ -446,7 +443,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				tascaId,
 				contingutId);
 		
-		return contingutHelper.deleteReversible(
+		contingutHelper.deleteReversible(
 				entitatId,
 				contingut, null);
 	}
@@ -545,28 +542,6 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false);
 	}
 	
-	private DocumentDto toDocumentDto(
-			DocumentEntity document) {
-		return (DocumentDto) contingutHelper.toContingutDto(
-				document,
-				false,
-				false,
-				false,
-				true,
-				true,
-				false,
-				null,
-				false,
-				null,
-				false,
-				0,
-				null,
-				null,
-				true,
-				true,
-				false,
-				false);
-	}
 
 	/*private String getIdiomaPerDefecte() {
 		return PropertiesHelper.getProperties().getProperty(

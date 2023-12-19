@@ -50,14 +50,13 @@ public interface CarpetaService {
 	 *            Atribut id de la carpeta que es vol modificar.
 	 * @param nom
 	 *            Nom de la carpeta.
-	 * @return La carpeta modificada.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 * @throws ValidationException
 	 *             Si el nom del contenidor conté caràcters invàlids.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public CarpetaDto update(
+	public void update(
 			Long entitatId,
 			Long id,
 			String nom) throws NotFoundException, ValidationException;

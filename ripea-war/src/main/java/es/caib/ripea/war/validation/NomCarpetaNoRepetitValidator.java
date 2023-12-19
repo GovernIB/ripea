@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.validation;
 
+import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -42,15 +44,10 @@ public class NomCarpetaNoRepetitValidator implements ConstraintValidator<NomCarp
 			String nom = ((CarpetaCommand) obj).getNom();
 			
 			boolean valid = true;
-			ContingutDto contingutPare = contingutService.findAmbIdUser(
-					entitatId, 
-					pareId, 
-					true, 
-					false,
-					false, null, null);
+			List<ContingutDto> fills = contingutService.getFillsBasicInfo(pareId);
 			
-			for (ContingutDto contingut: contingutPare.getFills()) {
-				if (contingut.isCarpeta() && !contingut.isEsborrat()) {
+			for (ContingutDto contingut: fills) {
+				if (contingut.isCarpeta()) {
 					if (contingut.getNom().equals(nom)) {
 						if (id == null || id != contingut.getId()) {
 							context.disableDefaultConstraintViolation();

@@ -93,7 +93,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 
 	@Transactional
 	@Override
-	public CarpetaDto update(
+	public void update(
 			Long entitatId,
 			Long id,
 			String nom) {
@@ -131,11 +131,9 @@ public class CarpetaServiceImpl implements CarpetaService {
 				null,
 				true,
 				true);
-		CarpetaDto dto = carpetaHelper.toCarpetaDto(carpeta);
 		contingutHelper.arxiuPropagarModificacio(
 				carpeta,
 				false);
-		return dto;
 	}
 
 	@Transactional(readOnly = true)

@@ -3,8 +3,9 @@ package es.caib.ripea.core.api.service;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -49,15 +50,7 @@ public interface ExpedientTascaService {
 			boolean ambFills,
 			boolean ambVersions);
 
-
-
-	public DocumentDto findDocumentById(
-			Long entitatId,
-			Long tascaId,
-			Long documentId);
-
-
-	public ContingutDto deleteTascaReversible(
+	public void deleteTascaReversible(
 			Long entitatId,
 			Long tascaId,
 			Long contingutId) throws IOException;
@@ -84,4 +77,9 @@ public interface ExpedientTascaService {
 	public List<ExpedientTascaComentariDto> findComentarisPerTasca(
 			Long entitatId, 
 			Long expedientTascaId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId);
+
 }
+	

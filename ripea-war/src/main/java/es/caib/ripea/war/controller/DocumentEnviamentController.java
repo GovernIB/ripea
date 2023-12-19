@@ -351,7 +351,7 @@ public class DocumentEnviamentController extends BaseUserController {
 				entitatActual.getId(),
 				documentId,
 				true,
-				false, null, null);
+				false, true, null, null);
 		if (contingut instanceof DocumentDto) {
 			FitxerDto fitxer = documentService.descarregar(
 					entitatActual.getId(),
@@ -614,7 +614,8 @@ public class DocumentEnviamentController extends BaseUserController {
 				documentId,
 				false,
 				false,
-				null,
+				true,
+				null, 
 				null);
 		boolean procedimentSenseCodiSia = false;
 		if (document.getExpedientPare().getMetaExpedient().getTipusClassificacio() == TipusClassificacioEnumDto.ID) {
@@ -739,7 +740,7 @@ public class DocumentEnviamentController extends BaseUserController {
 						entitatActual.getId(),
 						documentId,
 						false,
-						false, null, null));
+						false, true, null, null));
 		model.addAttribute(
 				"publicacioTipusEnumOptions",
 				EnumHelper.getOptionsForEnum(

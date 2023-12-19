@@ -66,12 +66,12 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ContingutDto deleteReversible(
+	public void deleteReversible(
 			Long entitatId,
 			Long contingutId,
 			String rolActual,
 			Long tascaId) throws IOException {
-		return delegate.deleteReversible(
+		delegate.deleteReversible(
 				entitatId,
 				contingutId,
 				rolActual,
@@ -80,27 +80,27 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public ContingutDto deleteDefinitiu(
+	public void deleteDefinitiu(
 			Long entitatId,
 			Long contingutId) {
-		return delegate.deleteDefinitiu(entitatId, contingutId);
+		delegate.deleteDefinitiu(entitatId, contingutId);
 	}
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public ContingutDto undelete(
+	public void undelete(
 			Long entitatId,
 			Long contingutId) throws IOException {
-		return delegate.undelete(entitatId, contingutId);
+		delegate.undelete(entitatId, contingutId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public ContingutDto move(
+	public void move(
 			Long entitatId,
 			Long contingutOrigenId,
 			Long contingutDestiId, String rolActual) {
-		return delegate.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
+		delegate.move(entitatId, contingutOrigenId, contingutDestiId, rolActual);
 	}
 
 	@Override
@@ -120,12 +120,15 @@ public class ContingutServiceBean implements ContingutService {
 			Long contingutId,
 			boolean ambFills,
 			boolean ambVersions, 
-			String rolActual, Long organActualId) {
+			boolean ambPermisos, 
+			String rolActual, 
+			Long organActualId) {
 		return delegate.findAmbIdUser(
 				entitatId,
 				contingutId,
 				ambFills,
 				ambVersions, 
+				ambPermisos, 
 				rolActual, 
 				organActualId);
 	}
@@ -285,7 +288,7 @@ public class ContingutServiceBean implements ContingutService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public ContingutDto link(
+	public Long link(
 			Long entitatId, 
 			Long contingutOrigenId, 
 			Long contingutDestiId, 
@@ -298,25 +301,6 @@ public class ContingutServiceBean implements ContingutService {
 				recursiu);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public ContingutDto findAmbIdUser(
-			Long entitatId,
-			Long contingutId,
-			boolean ambFills,
-			boolean ambVersions,
-			boolean ambPermis, 
-			String rolActual, 
-			Long organActualId) {
-		return delegate.findAmbIdUser(
-				entitatId,
-				contingutId,
-				ambFills,
-				ambVersions,
-				ambPermis, 
-				rolActual, 
-				organActualId);
-	}
 
 	@Override
 	@RolesAllowed("tothom")
@@ -427,6 +411,19 @@ public class ContingutServiceBean implements ContingutService {
 				filtre,
 				paginacioParams,
 				rolActual);
+	}
+
+	
+	@Override
+	@RolesAllowed("tothom")
+	public List<ContingutDto> getFillsBasicInfo(Long contingutId) {
+		return delegate.getFillsBasicInfo(contingutId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ContingutDto getBasicInfo(Long contingutId, boolean checkPermissions) {
+		return delegate.getBasicInfo(contingutId, checkPermissions);
 	}
 
 }
