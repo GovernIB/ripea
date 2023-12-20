@@ -146,6 +146,17 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			int esborrat);
 	
 	
+	@Query(	"select " +
+			"    d.id " +
+			"from " +
+			"    DocumentEntity d " +
+			"where " +
+			"d.expedient.id = :expedientId " +
+			"and d.esborrat = :esborrat ")
+	List<Long> findIdByExpedientIdAndEsborrat(
+			@Param("expedientId") Long expedientId,
+			@Param("esborrat") int esborrat);
+	
 	List<DocumentEntity> findByExpedient(
 			ExpedientEntity expedient);
 	

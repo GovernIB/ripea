@@ -481,7 +481,16 @@ public class DocumentServiceImpl implements DocumentService {
 		
 		return dtos;
 	}
-
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<Long> findIdsAllDocumentsOfExpedient(
+			Long expedientId) {
+		
+		return documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public List<DocumentDto> findAnnexosAmbExpedient(

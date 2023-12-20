@@ -1395,7 +1395,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 					</div>
 				</div>
 			</c:if>
-			<%---- Button descarregar mult ----%>
+			<%---- Descarregar documents seleccionats ----%>
 			<div class="btn-group">
 				<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
 					<a href="<c:url value="/contingut/${contingut.id}/descarregarMultiples?tascaId=${tascaId}"/>" class="btn btn-default con-mult">

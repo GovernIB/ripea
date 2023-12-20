@@ -337,6 +337,11 @@
 			</c:if>		
 			<li class="${contingut.document && contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 		</c:if>
+		
+		<%---- Descarregar fitxer comprimit ----%>
+		<c:if test="${contingut.expedient && contingut.conteDocuments}">
+			<li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li>
+		</c:if>
 		<c:if test="${(contingut.expedient or contingut.document) and !isTasca}">
 			<c:if test="${contingut.expedient}">
 				<c:choose>

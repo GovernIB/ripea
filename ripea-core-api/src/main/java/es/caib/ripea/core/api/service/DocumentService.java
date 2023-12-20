@@ -720,7 +720,7 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public void notificacioActualitzarEstat(Long id);
 
-
-	
+	@PreAuthorize("hasRole('tothom')")
+	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId);
 
 }

@@ -785,6 +785,11 @@ function hexToRgb(hex) {
 								<%---- Hist�ric d'accions ----%>
 								<li><a href="<c:url value="/contingut/{{:id}}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 
+								<%---- Descarregar fitxer comprimit ----%>
+								{{if conteDocuments}}
+									<li><a href="<c:url value="/contingut/{{:id}}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li>
+								{{/if}}
+
 								{{if conteDocuments}}
 									<%---- Exportar índex PDF... ----%>
 									<li><a class="fileDownload" href="<c:url value="/expedient/{{:id}}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="expedient.list.user.recuperar.index.pdf"/>...</a></li>

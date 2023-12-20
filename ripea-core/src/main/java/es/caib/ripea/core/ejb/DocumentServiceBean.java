@@ -549,4 +549,10 @@ public class DocumentServiceBean implements DocumentService {
 		delegate.notificacioActualitzarEstat(id);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId) {
+		return delegate.findIdsAllDocumentsOfExpedient(expedientId);
+	}
+
 }
