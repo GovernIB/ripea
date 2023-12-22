@@ -2,7 +2,7 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 18.12.23 13:44
+-- Ran at: 21.12.23 16:02
 -- Against: null@offline:postgresql?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.4.3
 -- *********************************************************************
@@ -52,4 +52,7 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 
 -- Changeset db/changelog/changes/0.9.105/1393.yaml::1701419006016-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.activar.logs.permisos', 'false', 'Activar logs per permisos', 'LOGS', '3', '0', 'BOOL', '0', '0');
+
+-- Changeset db/changelog/changes/0.9.105/1397.yaml::1703170006766-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.mostrar.logs.rendiment', 'false', 'Generar logs de rendiment', 'LOGS', '7', '0', 'BOOL', '0');
 
