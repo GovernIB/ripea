@@ -31,6 +31,12 @@
 	.badge {
   	 	background-color: #333;
   	 }
+  	 
+	table.dataTable tr > td:nth-child(1), 
+	table.dataTable tr > td:nth-child(2) {
+		word-wrap: break-word; 
+		max-width: 1px;
+	}  	 
 	</style>
 	<script type="text/javascript">
 	$(function() {
@@ -97,6 +103,7 @@
 		</div>
 	</form:form>
 	<script id="rowhrefTemplate" type="text/x-jsrender">nodeco/metaExpedient/{{:id}}</script>
+
 	<table 
 		id="metaexpedients" 
 		data-toggle="datatable" 
