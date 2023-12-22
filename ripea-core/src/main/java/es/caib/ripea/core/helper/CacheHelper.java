@@ -768,7 +768,7 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsRendiment")
 	public boolean mostrarLogsRendiment() {
-		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.rendiment");
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.rendiment");
 		if (prop != null && prop.equals("true")) {
 			return true;
 		} else {
@@ -776,6 +776,9 @@ public class CacheHelper {
 		}
 	}
 	
+	@CacheEvict(value = "mostrarLogsRendiment")
+	public void evictMostrarLogsRendiment() {
+	}
 	
 	@Cacheable(value = "mostrarLogsRendimentDescarregarAnotacio")
 	public boolean mostrarLogsRendimentDescarregarAnotacio() {

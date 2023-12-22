@@ -51,6 +51,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
@@ -128,14 +129,18 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			Model model) {
 		
 		long t0 = System.currentTimeMillis();
-		
-		long t1 = System.currentTimeMillis();
 
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
 		
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("ExpedientController.get start ( entitatId=" + entitatActual.getId() + " rolActual=" + rolActual + " filtreOrganId=" + filtreCommand.getOrganGestorId() + ")");
+		
+		
+		long t1 = System.currentTimeMillis();
 		@SuppressWarnings("unused")
 		List<MetaExpedientDto> metaExpedientsPermisLectura;
 
@@ -152,7 +157,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					false, 
 					null);
 		}
-		logger.trace("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
+    	if (aplicacioService.mostrarLogsRendiment())
+    		logger.info("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
+		
 		long t2 = System.currentTimeMillis();
 		model.addAttribute(
 				"rolActual",
@@ -170,8 +177,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				RequestSessionHelper.obtenirObjecteSessio(
 						request,
 						SESSION_ATTRIBUTE_SELECCIO));
-		
-		logger.trace("findActiusAmbEntitatPerCreacio time:  " + (System.currentTimeMillis() - t2) + " ms");
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("findActiusAmbEntitatPerCreacio time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		long t3 = System.currentTimeMillis();
 		//putting enums from ExpedientEstatEnumDto and ExpedientEstatDto into one class, need to have all estats from enums and database in one class 
@@ -203,9 +210,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 							request, 
 							"expedient.controller.sense.permis.lectura"));
 		}
-		logger.trace("findEstats time:  " + (System.currentTimeMillis() - t3) + " ms");
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("findEstats time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
-		logger.trace("Getting page of expedients time " + (System.currentTimeMillis() - t0) + " ms");
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("ExpedientController.get end " + (System.currentTimeMillis() - t0) + " ms");
 		
 		return "expedientUserList";
 	}
@@ -257,16 +266,26 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientFiltreCommand filtreCommand = getFiltreCommand(request);
-
+		
+		long t0 = System.currentTimeMillis();
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("ExpedientController.datatable start");
+		
+		PaginaDto<ExpedientDto> pagina = expedientService.findAmbFiltreUser(
+				entitatActual.getId(),
+				ExpedientFiltreCommand.asDto(filtreCommand),
+				DatatablesHelper.getPaginacioDtoFromRequest(request), 
+				RolHelper.getRolActual(request));
+		
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("ExpedientController.datatable end " + (System.currentTimeMillis() - t0) + " ms");
+		
 		return DatatablesHelper.getDatatableResponse(
 				request,
-				expedientService.findAmbFiltreUser(
-						entitatActual.getId(),
-						ExpedientFiltreCommand.asDto(filtreCommand),
-						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						RolHelper.getRolActual(request)),
+				pagina,
 				"id",
 				SESSION_ATTRIBUTE_SELECCIO);
+
 	}
 
 	

@@ -79,6 +79,7 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DistribucioReglaHelper;
@@ -182,6 +183,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private EmailHelper emailHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 //	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
@@ -712,19 +715,30 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			String rolActual, 
 			boolean comu, 
 			Long organId) {
-		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
+		
+		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+				entitatId,
+				ExtendedPermission.READ,
+				true,
+				filtreNomOrCodiSia, 
+				"IPA_ADMIN".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				organId, 
+				comu); // TODO especificar organId quan és admin organ
 
-		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbPermis(
-						entitatId,
-						ExtendedPermission.READ,
-						true,
-						filtreNomOrCodiSia, 
-						"IPA_ADMIN".equals(rolActual),
-						"IPA_ORGAN_ADMIN".equals(rolActual),
-						organId, 
-						comu), // TODO especificar organId quan és admin organ
+		long t0 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientServiceImpl.findActius convertirList start ( entitatId=" + entitatId + ", filtreNomOrCodiSia=" + 
+					filtreNomOrCodiSia + ", rolActual=" + rolActual + ", organId=" + organId + ", comu=" + comu + ", metaExpedientsEnt=" + (Utils.isNotEmpty(metaExpedientsEnt) ? metaExpedientsEnt.size() : 0) +") ");
+		
+		List<MetaExpedientDto> metaExpedientsDto =  conversioTipusHelper.convertirList(
+				metaExpedientsEnt,
 				MetaExpedientDto.class);
+		
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientServiceImpl.findActius convertirList end:  " + (System.currentTimeMillis() - t0) + " ms");
+		 
+		 return metaExpedientsDto;
 
 	}
 	
