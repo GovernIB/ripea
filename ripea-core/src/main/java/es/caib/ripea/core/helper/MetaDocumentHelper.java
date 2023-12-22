@@ -85,7 +85,6 @@ public class MetaDocumentHelper {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos(),
 				metaDocumentRepository.countByMetaExpedient(metaExpedient)).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).

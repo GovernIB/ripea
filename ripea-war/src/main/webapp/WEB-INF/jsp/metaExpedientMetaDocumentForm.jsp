@@ -577,7 +577,6 @@ function removeLoading() {
 					disabled="${bloquejarCamps}" 
 					optionMinimumResultsForSearch="0"/>
 				<rip:inputTextarea name="pinbalFinalitat" textKey="metadocument.form.camp.pinbal.finalitat" maxlength="256" disabled="${bloquejarCamps}" required="true"/>
-				<rip:inputSelect name="pinbalServeiDocsPermesos" textKey="metadocument.form.camp.pinbal.servei.docs.permesos" multiple="true" optionEnum="PinbalServeiDocPermesEnumDto"/>
 				<rip:inputCheckbox name="pinbalUtilitzarCifOrgan" textKey="metadocument.form.camp.pinbal.utilitzar.cif.organ" disabled="${bloquejarCamps}"/>
 				
 			</div>

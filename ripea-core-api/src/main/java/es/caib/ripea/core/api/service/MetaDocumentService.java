@@ -12,6 +12,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalServeiDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
@@ -425,4 +426,6 @@ public interface MetaDocumentService {
 			int posicio) throws NotFoundException;
 
 
+	@PreAuthorize("hasRole('tothom')")
+	public PinbalServeiDto findPinbalServei(Long metaDocumentId);
 }

@@ -51,6 +51,7 @@ import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01.SolicitudSvdsctfnws01;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
 import es.caib.ripea.core.api.dto.PinbalConsultaDto;
 import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
@@ -65,7 +66,9 @@ import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.repository.PinbalServeiRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -83,6 +86,8 @@ public class PinbalHelper {
 	private IntegracioHelper integracioHelper;
 	@Autowired
 	private ConfigHelper configHelper;
+	@Autowired
+	private PinbalServeiRepository pinbalServeiRepository;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
 
@@ -558,7 +563,7 @@ public class PinbalHelper {
 		}
 		solicitud.setIdExpediente(expedient.getNumero());
 		solicitud.setFuncionario(getFuncionariActual());
-		solicitud.setTitular(getTitularFromInteressat(interessat, false, metaDocument.getPinbalServeiDocsPermesos()));
+		solicitud.setTitular(getTitularFromInteressat(interessat, false, metaDocument.getPinbalServei()));
 	}
 
 	private ScspFuncionario getFuncionariActual() {
@@ -572,7 +577,11 @@ public class PinbalHelper {
 	private ScspTitular getTitularFromInteressat(
 			InteressatEntity interessat,
 			boolean ambNomSencer,
-			List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
+			MetaDocumentPinbalServeiEnumDto pinbalServeiEnum) {
+		
+		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(pinbalServeiEnum.toString());
+		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = pinbalServei.getPinbalServeiDocsPermesos();
+		
 		ScspTitular titular = new ScspTitular();
 
 		titular.setDocumentacion(interessat.getDocumentNum());

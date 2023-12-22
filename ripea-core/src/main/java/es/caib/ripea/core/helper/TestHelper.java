@@ -69,7 +69,6 @@ public class TestHelper {
 				"ntiTipoDocumental",
 				false,
 				"Finalitat test",
-				null, 
 				0).build();
 		
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(
@@ -142,7 +141,6 @@ public class TestHelper {
 				"ntiTipoDocumental",
 				false,
 				"Finalitat test",
-				null, 
 				0).build();
 		
 		DocumentEntity documentCrear = DocumentEntity.getBuilder(

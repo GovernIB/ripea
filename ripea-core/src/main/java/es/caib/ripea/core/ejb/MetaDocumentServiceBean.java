@@ -17,6 +17,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalServeiDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.MetaDocumentService;
@@ -278,6 +279,12 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 				metaDocumentId,
 				posicio);
 		
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public PinbalServeiDto findPinbalServei(Long metaDocumentId) {
+		return delegate.findPinbalServei(metaDocumentId);
 	}
 
 }

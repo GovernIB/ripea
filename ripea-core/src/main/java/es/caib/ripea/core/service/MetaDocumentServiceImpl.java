@@ -24,6 +24,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PinbalServeiDto;
 import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
 import es.caib.ripea.core.api.exception.ExisteixenDocumentsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -35,6 +36,7 @@ import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.PinbalServeiEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
@@ -50,6 +52,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.PinbalServeiRepository;
 
 /**
  * Implementació del servei de gestió de meta-documents.
@@ -90,6 +93,8 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 	private MetaExpedientRepository metaExpedientRepository;
 	@Autowired
 	private CacheHelper cacheHelper;
+	@Autowired
+	private PinbalServeiRepository pinbalServeiRepository;
 
 	@Transactional
 	@Override
@@ -144,7 +149,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.getNtiTipoDocumental(),
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos(), 
 				0).
 				biometricaLectura(metaDocument.isBiometricaLectura()).
 				firmaBiometricaActiva(metaDocument.isFirmaBiometricaActiva()).
@@ -219,7 +223,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalServei(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos(), 
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		if (plantillaContingut != null) {
 			if (Utils.isNotEmpty(plantillaContingut)) { // file was changed
@@ -289,7 +292,6 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				metaDocument.isPinbalActiu(),
 				metaDocument.getPinbalServei(),
 				metaDocument.getPinbalFinalitat(),
-				metaDocument.getPinbalServeiDocsPermesos(), 
 				metaDocument.isPinbalUtilitzarCifOrgan());
 		
 		if (plantillaContingut != null) {
@@ -481,6 +483,20 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 			resposta.setMetaExpedientId(metaDocument.getMetaExpedient() != null ? metaDocument.getMetaExpedient().getId() : null);
 		}
 		return resposta;
+	}	
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public PinbalServeiDto findPinbalServei(
+			Long metaDocumentId) {
+
+		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
+				metaDocumentId);
+
+		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(metaDocument.getPinbalServei().toString());
+		return conversioTipusHelper.convertir(pinbalServei, PinbalServeiDto.class);
+
 	}	
 
 	@Transactional(readOnly = true)

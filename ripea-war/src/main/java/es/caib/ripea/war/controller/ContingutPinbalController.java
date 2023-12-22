@@ -180,7 +180,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = metaDocumentService.findById(
+		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = metaDocumentService.findPinbalServei(
 				metaDocumentId).
 				getPinbalServeiDocsPermesos();
 

@@ -19,7 +19,6 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PinbalServeiDocPermesEnumDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaDocumentNoRepetit;
 import es.caib.ripea.war.validation.ResponsableNotEmpty;
@@ -76,7 +75,6 @@ public class MetaDocumentCommand {
 	private boolean pinbalActiu;
 	private MetaDocumentPinbalServeiEnumDto pinbalServei;
 	private String pinbalFinalitat;
-	private List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos;
 	private boolean pinbalUtilitzarCifOrgan;
 	
 	private boolean comu;
@@ -222,10 +220,6 @@ public class MetaDocumentCommand {
 
 	public void setPinbalFinalitat(String pinbalFinalitat) {
 		this.pinbalFinalitat = pinbalFinalitat;
-	}
-
-	public void setPinbalServeiDocsPermesos(List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos) {
-		this.pinbalServeiDocsPermesos = pinbalServeiDocsPermesos;
 	}
 
 	public void setPinbalUtilitzarCifOrgan(boolean pinbalUtilitzarCifOrgan) {
