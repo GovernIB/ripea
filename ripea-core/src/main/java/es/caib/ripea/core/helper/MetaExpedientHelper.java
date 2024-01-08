@@ -350,6 +350,14 @@ public class MetaExpedientHelper {
 			boolean isAdminOrgan,
 			Long organId, 
 			boolean comu) {
+		
+		
+		long t0 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis start ( entitatId=" + entitatId + 
+					", nomesActius=" + nomesActius + ", filtreNomOrCodiSia=" + filtreNomOrCodiSia + ", isAdminEntitat=" + isAdminEntitat + 
+					", isAdminOrgan=" + isAdminOrgan + ", organId=" + organId + ", comu=" + comu +") ");
+		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -358,10 +366,16 @@ public class MetaExpedientHelper {
 				true, 
 				false);
 		
+		long t1 = System.currentTimeMillis();
 		// Cercam els metaExpedients amb permisos assignats directament
 		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaNodeEntity.class,
 				permis));
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis metaExpedientIds (" + (Utils.isNotEmpty(metaExpedientIds) ? metaExpedientIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
+		
+		
+		long t2 = System.currentTimeMillis();
 		// Cercam els òrgans amb permisos assignats directament
 		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
@@ -369,13 +383,20 @@ public class MetaExpedientHelper {
 		organIds = organGestorRepository.findIdsByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organIds));
 		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
 		organIds = Utils.getUniqueValues(organIds);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis organIds (" + (Utils.isNotEmpty(organIds) ? organIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
+		
+		long t3 = System.currentTimeMillis();
 		// Cercam las parelles metaExpedient-organ amb permisos assignats directament
 		List<Long> metaExpedientOrganIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				MetaExpedientOrganGestorEntity.class,
 				permis));
 		// there is no need to find descendants because for the query to find procediments it doesn't matter  
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis metaExpedientOrganIds (" + (Utils.isNotEmpty(metaExpedientOrganIds) ? metaExpedientOrganIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
+		long t4 = System.currentTimeMillis();
 		// Cercam els òrgans amb permisos per procediemnts comuns
 		List<Serializable> organProcedimentsComunsIds = permisosHelper.getObjectsIdsWithTwoPermissions(
 				OrganGestorEntity.class,
@@ -385,7 +406,8 @@ public class MetaExpedientHelper {
 		if (Utils.isNotEmpty(organProcedimentsComunsIds)) {
 			accessAllComu = true;
 		}
-		
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis organProcedimentsComunsIds (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t4) + " ms");
 		
 		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
 		// in issue #1330 unnecessary ids were removed from the lists
@@ -403,7 +425,7 @@ public class MetaExpedientHelper {
 			metaExpedientOrganIds = metaExpedientOrganIds.subList(0, 1000);
 		}
 			
-
+		long t5 = System.currentTimeMillis();
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(
 				entitat,
 				!nomesActius,
@@ -422,9 +444,11 @@ public class MetaExpedientHelper {
 				comu && organId != null,
 				organId != null ? organGestorRepository.findOne(organId) : null,
 				accessAllComu);
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis findByEntitatAndActiuAndFiltreAndPermes (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");
 		
-		
-
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientHelper.findAmbPermis end:  " + (System.currentTimeMillis() - t0) + " ms");
 		
 		return metaExpedients;
 	}

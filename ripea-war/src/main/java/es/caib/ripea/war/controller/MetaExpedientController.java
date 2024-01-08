@@ -1099,6 +1099,10 @@ public class MetaExpedientController extends BaseAdminController {
 			@RequestParam(value = "organId", required = false) Long organId,
 			Model model) {
 		long t0 = System.currentTimeMillis();
+		
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("MetaExpedientController.findPerLectura start ( organId=" + organId +  ")");
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
@@ -1111,7 +1115,6 @@ public class MetaExpedientController extends BaseAdminController {
 					true, 
 					organId);
 			
-			logger.trace("findPerLecturaOrgan time: " + (System.currentTimeMillis() - t0) + " ms");
 		} else {
 			metaExpedientsPermisLectura = metaExpedientService.findActius(
 					entitatActual.getId(), 
@@ -1119,8 +1122,10 @@ public class MetaExpedientController extends BaseAdminController {
 					rolActual, 
 					false, 
 					null);
-			logger.trace("findPerLectura time: " + (System.currentTimeMillis() - t0) + " ms");
 		}
+		
+    	if (aplicacioService.mostrarLogsRendiment())
+    		logger.info("MetaExpedientController.findPerLectura end:  " + (System.currentTimeMillis() - t0) + " ms");
 
 		return metaExpedientsPermisLectura;
 	}

@@ -3,61 +3,8 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.domain.GrantedAuthoritySid;
-import org.springframework.security.acls.domain.PrincipalSid;
-import org.springframework.security.acls.model.Sid;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-//import com.codahale.metrics.Timer;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
-import es.caib.ripea.core.api.dto.DominiDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
-import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
-import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
-import es.caib.ripea.core.api.dto.StatusEnumDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -79,26 +26,8 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.DistribucioReglaHelper;
-import es.caib.ripea.core.helper.DominiHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExceptionHelper;
-import es.caib.ripea.core.helper.ExpedientEstatHelper;
-import es.caib.ripea.core.helper.GrupHelper;
-import es.caib.ripea.core.helper.MessageHelper;
-import es.caib.ripea.core.helper.MetaDadaHelper;
-import es.caib.ripea.core.helper.MetaDocumentHelper;
-import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.MetaNodeHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.*;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
-import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.DominiRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -113,6 +42,21 @@ import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -182,6 +126,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private EmailHelper emailHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired
+	private CacheHelper cacheHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 //	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
@@ -712,19 +658,30 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			String rolActual, 
 			boolean comu, 
 			Long organId) {
-		logger.debug("Consulta de meta-expedients de l'entitat amb el permis READ (" + "entitatId=" + entitatId + ")");
+		
+		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+				entitatId,
+				ExtendedPermission.READ,
+				true,
+				filtreNomOrCodiSia, 
+				"IPA_ADMIN".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				organId, 
+				comu); // TODO especificar organId quan és admin organ
 
-		return conversioTipusHelper.convertirList(
-				metaExpedientHelper.findAmbPermis(
-						entitatId,
-						ExtendedPermission.READ,
-						true,
-						filtreNomOrCodiSia, 
-						"IPA_ADMIN".equals(rolActual),
-						"IPA_ORGAN_ADMIN".equals(rolActual),
-						organId, 
-						comu), // TODO especificar organId quan és admin organ
+		long t0 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientServiceImpl.findActius convertirList start ( entitatId=" + entitatId + ", filtreNomOrCodiSia=" + 
+					filtreNomOrCodiSia + ", rolActual=" + rolActual + ", organId=" + organId + ", comu=" + comu + ", metaExpedientsEnt=" + (Utils.isNotEmpty(metaExpedientsEnt) ? metaExpedientsEnt.size() : 0) +") ");
+		
+		List<MetaExpedientDto> metaExpedientsDto =  conversioTipusHelper.convertirList(
+				metaExpedientsEnt,
 				MetaExpedientDto.class);
+		
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("MetaExpedientServiceImpl.findActius convertirList end:  " + (System.currentTimeMillis() - t0) + " ms");
+		 
+		 return metaExpedientsDto;
 
 	}
 	
@@ -923,25 +880,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		List<GrupEntity> grups = metaExpedientRepository.findOne(metaExpedientId).getGrups();
 		if (!rolActual.equals("IPA_ADMIN") && !rolActual.equals("IPA_ORGAN_ADMIN")) {
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			List<Sid> sids = new ArrayList<Sid>();
-			sids.add(new PrincipalSid(auth.getName()));
-			for (GrantedAuthority ga : auth.getAuthorities()) {
-				sids.add(new GrantedAuthoritySid(ga.getAuthority()));
-			}
-			Iterator<GrupEntity> it = grups.iterator();
-			while (it.hasNext()) {
-				GrupEntity grupEntity = it.next();
-				boolean isGranted = false;
-				for (Sid sid : sids) {
-					if (sid.equals(new GrantedAuthoritySid(grupEntity.getCodi()))) {
-						isGranted = true;
-					}
-				}
-				if (!isGranted) {
-					it.remove();
-				}
-			}
+			permisosHelper.filterGrantedAny(grups, GrupEntity.class, new Permission[] {ExtendedPermission.READ});
 		}
 		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}
