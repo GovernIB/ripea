@@ -50,6 +50,8 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     private OrganEstatEnumDto organEstat;
     private TipusTransicioEnumDto organTipusTransicio;
     private List<OrganGestorDto> organsNous;
+    
+    private boolean procedimentComu;
 	
     public String getCodiSiaINom() {
     	return classificacio + " - " + nom;

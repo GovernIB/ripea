@@ -596,4 +596,9 @@ public interface MetaExpedientService {
 			Long id);
 
 //	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
+
+
+	@PreAuthorize("hasRole('tothom')")
+	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis);
+
 }

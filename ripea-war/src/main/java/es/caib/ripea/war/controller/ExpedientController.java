@@ -52,6 +52,7 @@ import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
@@ -139,37 +140,17 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (aplicacioService.mostrarLogsRendiment())
 			logger.info("ExpedientController.get start ( entitatId=" + entitatActual.getId() + " rolActual=" + rolActual + " filtreOrganId=" + filtreCommand.getOrganGestorId() + ")");
 		
-		
-		long t1 = System.currentTimeMillis();
-		@SuppressWarnings("unused")
-		List<MetaExpedientDto> metaExpedientsPermisLectura;
-
-		if (filtreCommand.getOrganGestorId() != null) {
-			metaExpedientsPermisLectura = metaExpedientService.findActiusAmbOrganGestorPermisLectura(
-					entitatActual.getId(),
-					filtreCommand.getOrganGestorId(), 
-					null);
-		} else {
-			metaExpedientsPermisLectura = metaExpedientService.findActius(
-					entitatActual.getId(), 
-					null, 
-					rolActual, 
-					false, 
-					null);
-		}
-    	if (aplicacioService.mostrarLogsRendiment())
-    		logger.info("findActiusAmbEntitatPerLectura time:  " + (System.currentTimeMillis() - t1) + " ms");
-		
 		long t2 = System.currentTimeMillis();
 		model.addAttribute(
 				"rolActual",
 				rolActual);
-		List<MetaExpedientDto> metaExpedientsPermisCreacio = metaExpedientService.findActiusAmbEntitatPerCreacio(
-				entitatActual.getId(), 
-				rolActual);
+
 		model.addAttribute(
-				"metaExpedientsPermisCreacio",
-				metaExpedientsPermisCreacio);
+				"hasCreatePermissionForAnyProcediment",
+				metaExpedientService.hasPermissionForAnyProcediment(
+						entitatActual.getId(),
+						rolActual,
+						PermissionEnumDto.CREATE));
 		model.addAttribute(
 				filtreCommand);
 		model.addAttribute(
@@ -1894,14 +1875,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(filtre);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActius(
-						entitatActual.getId(), 
-						null, 
-						rolActual, 
-						false, 
-						null));
+
 		model.addAttribute(
 				"expedientEstatEnumOptions",
 				EnumHelper.getOptionsForEnum(

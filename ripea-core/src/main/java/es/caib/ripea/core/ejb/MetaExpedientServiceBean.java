@@ -498,4 +498,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 //        return delegate.getMetaExpedientsAmbOrganNoSincronitzat(entitatId);
 //    }
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean hasPermissionForAnyProcediment(Long entitatId, String rolActual, PermissionEnumDto permis) {
+		return delegate.hasPermissionForAnyProcediment(entitatId, rolActual, permis);
+	}
+
 }

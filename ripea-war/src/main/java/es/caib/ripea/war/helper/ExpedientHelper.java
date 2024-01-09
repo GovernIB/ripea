@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
@@ -72,8 +73,7 @@ public class ExpedientHelper {
 			teAcces = new Boolean(false);
 			EntitatDto entitatActual = EntitatHelper.getEntitatActual(request);
 			if (entitatActual != null) {
-				List<MetaExpedientDto> expedientsAccessibles =  metaExpedientService.findActius(entitatActual.getId(), null, rolActual, false, null);
-				teAcces = new Boolean(expedientsAccessibles != null && !expedientsAccessibles.isEmpty());
+				teAcces = metaExpedientService.hasPermissionForAnyProcediment(entitatActual.getId(), rolActual, PermissionEnumDto.READ);
 			}
 			request.getSession().setAttribute(
 					REQUEST_PARAMETER_ACCES_EXPEDIENTS,

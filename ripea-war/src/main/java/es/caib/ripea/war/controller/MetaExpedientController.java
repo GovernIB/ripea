@@ -1106,23 +1106,13 @@ public class MetaExpedientController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		List<MetaExpedientDto> metaExpedientsPermisLectura = new ArrayList<MetaExpedientDto>();
-		if (organId != null) {
-			metaExpedientsPermisLectura = metaExpedientService.findActius(
-					entitatActual.getId(), 
-					null, 
-					rolActual, 
-					true, 
-					organId);
-			
-		} else {
-			metaExpedientsPermisLectura = metaExpedientService.findActius(
-					entitatActual.getId(), 
-					null, 
-					rolActual, 
-					false, 
-					null);
-		}
+		
+		List<MetaExpedientDto> metaExpedientsPermisLectura = metaExpedientService.findActius(
+				entitatActual.getId(),
+				null,
+				rolActual,
+				organId != null,
+				organId);
 		
     	if (aplicacioService.mostrarLogsRendiment())
     		logger.info("MetaExpedientController.findPerLectura end:  " + (System.currentTimeMillis() - t0) + " ms");

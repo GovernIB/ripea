@@ -667,16 +667,26 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"IPA_ADMIN".equals(rolActual),
 				"IPA_ORGAN_ADMIN".equals(rolActual),
 				organId, 
-				comu); // TODO especificar organId quan és admin organ
+				comu); 
 
 		long t0 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientServiceImpl.findActius convertirList start ( entitatId=" + entitatId + ", filtreNomOrCodiSia=" + 
 					filtreNomOrCodiSia + ", rolActual=" + rolActual + ", organId=" + organId + ", comu=" + comu + ", metaExpedientsEnt=" + (Utils.isNotEmpty(metaExpedientsEnt) ? metaExpedientsEnt.size() : 0) +") ");
 		
-		List<MetaExpedientDto> metaExpedientsDto =  conversioTipusHelper.convertirList(
-				metaExpedientsEnt,
-				MetaExpedientDto.class);
+		List<MetaExpedientDto> metaExpedientsDto = new ArrayList<>();
+		
+		if (Utils.isNotEmpty(metaExpedientsEnt)) {
+			for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
+				MetaExpedientDto metaExpedientDto = new MetaExpedientDto();
+				metaExpedientDto.setId(metaExpedientEntity.getId());
+				metaExpedientDto.setNom(metaExpedientEntity.getNom());
+				metaExpedientDto.setClassificacio(metaExpedientEntity.getClassificacio());
+				metaExpedientDto.setProcedimentComu(metaExpedientEntity.getOrganGestor() == null);
+				metaExpedientsDto.add(metaExpedientDto);
+				
+			}
+		}
 		
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientServiceImpl.findActius convertirList end:  " + (System.currentTimeMillis() - t0) + " ms");
@@ -684,6 +694,43 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		 return metaExpedientsDto;
 
 	}
+	
+
+	@Transactional(readOnly = true)
+	@Override
+	public boolean hasPermissionForAnyProcediment(
+			Long entitatId,
+			String rolActual, 
+			PermissionEnumDto permisDto) {
+		
+		Permission permis = null;
+		
+		if (permisDto != null) {
+			if (permisDto == PermissionEnumDto.READ) {
+				permis = ExtendedPermission.READ;
+			} else if (permisDto == PermissionEnumDto.WRITE) {
+				permis = ExtendedPermission.WRITE;
+			} else if (permisDto == PermissionEnumDto.CREATE) {
+				permis = ExtendedPermission.CREATE;
+			} else if (permisDto == PermissionEnumDto.DELETE) {
+				permis = ExtendedPermission.DELETE;
+			}
+		}
+
+		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+				entitatId,
+				permis,
+				true,
+				null, 
+				"IPA_ADMIN".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				null, 
+				false);
+
+		 return Utils.isNotEmpty(metaExpedientsEnt);
+
+	}
+	
 	
 	@Transactional(readOnly = true)
 	@Override
