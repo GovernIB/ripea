@@ -148,4 +148,8 @@
 			id="monitorTasquesService"
 			jndi-name="ripea/MonitorTasquesServiceBean/local"
 			business-interface="es.caib.ripea.core.api.service.MonitorTasquesService"/>			
+	<jee:local-slsb
+			id="pinbalServeiService"
+			jndi-name="ripea/PinbalServeiServiceBean/local"
+			business-interface="es.caib.ripea.core.api.service.PinbalServeiService"/>			
 </beans>
