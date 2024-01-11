@@ -1355,6 +1355,23 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		Long pareId = command.getPareId();
 		if (command.getId() == null) {
 			
+			// for testing, create multiple documents with the same fitxer
+			boolean createMultiple = false; //createMultiple = true; 
+			if (createMultiple) {
+				int numberOfDocumentsToCreate = 5; //numberOfDocumentsToCreate = 10; 
+				for (int i = 0; i < numberOfDocumentsToCreate - 1; i++) {
+					DocumentDto dto = DocumentCommand.asDto(command);
+					dto.setNom(dto.getNom() + " " + System.currentTimeMillis());
+					documentService.create(
+							entitatActual.getId(),
+							pareId,
+							dto,
+							comprovarMetaExpedient, 
+							rolActual, 
+							tascaId);
+				}
+			}
+			
 			DocumentDto document = documentService.create(
 					entitatActual.getId(),
 					pareId,

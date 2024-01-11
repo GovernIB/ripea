@@ -426,4 +426,21 @@ public class ContingutServiceBean implements ContingutService {
 		return delegate.getBasicInfo(contingutId, checkPermissions);
 	}
 
+
+	@Override
+	@RolesAllowed("tothom")
+	public ResultDto<ContingutMassiuDto> findDocumentsPerFirmaSimpleWebMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			ResultEnumDto resultEnum) {
+		return delegate.findDocumentsPerFirmaSimpleWebMassiu(
+				entitatId,
+				filtre,
+				paginacioParams,
+				rolActual,
+				resultEnum);
+	}
+
 }

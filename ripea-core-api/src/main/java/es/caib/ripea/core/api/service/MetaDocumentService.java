@@ -428,4 +428,10 @@ public interface MetaDocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public PinbalServeiDto findPinbalServei(Long metaDocumentId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaSimpleWebActiva(
+			Long entitatId,
+			Long metaExpedientId);
+
 }

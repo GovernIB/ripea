@@ -1762,6 +1762,8 @@ public class ContingutServiceImpl implements ContingutService {
 	
 	
 	
+	
+	
 
 	@Transactional(readOnly = true)
 	@Override
@@ -1820,6 +1822,122 @@ public class ContingutServiceImpl implements ContingutService {
 			return new ArrayList<>();
 		}
 	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public ResultDto<ContingutMassiuDto> findDocumentsPerFirmaSimpleWebMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			ResultEnumDto resultEnum) throws NotFoundException {
+
+		ResultDto<ContingutMassiuDto> result = new ResultDto<ContingutMassiuDto>();
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true,
+				false);
+
+		MetaExpedientEntity metaExpedient = null;
+		if (filtre.getMetaExpedientId() != null) {
+			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					filtre.getMetaExpedientId());
+		}
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+		}
+		MetaDocumentEntity metaDocument = null;
+		if (filtre.getMetaDocumentId() != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(filtre.getMetaDocumentId());
+		}
+		List<MetaExpedientEntity> metaExpedientsPermesos = metaExpedientHelper.findPermesosAccioMassiva(entitatId,
+				rolActual);
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+
+		if (resultEnum == ResultEnumDto.PAGE) {
+
+			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			ordenacioMap.put("createdByCodiAndNom", new String[] { "createdBy.nom" });
+			ordenacioMap.put("tipusDocumentNom", new String[] { "metaNode.nom" });
+			Page<DocumentEntity> paginaDocuments = documentRepository.findDocumentsPerFirmaSimpleWebMassiu(
+					entitat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos),
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					Utils.getEmptyStringIfNull(filtre.getNom()),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams,
+							ordenacioMap));
+
+			PaginaDto<ContingutMassiuDto> paginaDto = paginacioHelper.toPaginaDto(
+					paginaDocuments,
+					ContingutMassiuDto.class,
+					new Converter<DocumentEntity, ContingutMassiuDto>() {
+						@Override
+						public ContingutMassiuDto convert(DocumentEntity source) {
+
+							ContingutMassiuDto dto = new ContingutMassiuDto();
+							dto.setId(source.getId());
+							dto.setNom(source.getNom());
+							dto.setTipusDocumentNom(source.getMetaDocument() != null ? source.getMetaDocument().getNom() : null);
+							dto.setExpedientId(source.getExpedient().getId());
+							dto.setExpedientNumeroNom(source.getExpedient().getNumeroINom());
+							dto.setCreatedDate(source.getCreatedDate().toDate());
+							dto.setCreatedByCodiAndNom(source.getCreatedBy().getCodiAndNom());
+							return dto;
+						}
+					});
+			result.setPagina(paginaDto);
+
+		} else {
+
+			List<Long> ids = documentRepository.findIdsDocumentsPerFirmaSimpleWebMassiu(
+					entitat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos),
+					metaExpedient == null,
+					metaExpedient,
+					expedient == null,
+					expedient,
+					metaDocument == null,
+					metaDocument,
+					filtre.getNom() == null,
+					Utils.getEmptyStringIfNull(filtre.getNom()),
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi);
+
+			result.setIds(ids);
+		}
+
+		return result;
+	}
+	
+	
 	
 	@Transactional(readOnly = true)
 	@Override

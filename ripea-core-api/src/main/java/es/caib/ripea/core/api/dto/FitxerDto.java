@@ -24,6 +24,7 @@ public class FitxerDto implements Serializable {
 	private String firmaContentType;
 	private byte[] contingutFirma;
 	private long firmaTamany;*/
+	private Long id;
 	
 	public FitxerDto() { }
 	

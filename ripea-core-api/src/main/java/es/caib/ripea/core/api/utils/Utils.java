@@ -154,6 +154,18 @@ public class Utils {
 		}
 	}
 	
+	
+	/**
+	 * PostgreSQL doesn't allow null value for string parameter
+	 */
+	public static String getEmptyStringIfNull(String str) {
+		if (str == null) {
+			return "";
+		} else {
+			return str.trim();
+		}
+	}
+	
 
 	public static String getTamanyString(Long value) {
 		String[] tamanyUnitats = {"B", "KB", "MB", "GB", "TB", "PB"};

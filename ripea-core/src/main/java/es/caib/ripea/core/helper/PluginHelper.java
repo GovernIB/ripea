@@ -34,8 +34,6 @@ import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
@@ -3543,14 +3541,18 @@ public class PluginHelper {
 	
 
 	public String firmaSimpleWebStart(
-			FitxerDto fitxerPerFirmar,
+			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
 			UsuariDto usuariActual, 
 			String urlReturnToRipea) {
 
 		FirmaWebPlugin firmaWebPlugin = getFirmaSimpleWebPlugin();
 
-		return firmaWebPlugin.firmaSimpleWebStart(fitxerPerFirmar, motiu, usuariActual, urlReturnToRipea);
+		return firmaWebPlugin.firmaSimpleWebStart(
+				fitxersPerFirmar,
+				motiu,
+				usuariActual,
+				urlReturnToRipea);
 
 	}
 	

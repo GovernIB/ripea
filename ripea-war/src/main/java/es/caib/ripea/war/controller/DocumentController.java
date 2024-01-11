@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
@@ -439,7 +438,14 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long documentId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			@RequestParam(value = "massiu", required = false, defaultValue = "false") boolean massiu,
 			Model model) {
+		
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				"massiu",
+				massiu);
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		DocumentDto document = documentService.findById(
 				entitatActual.getId(),
@@ -482,6 +488,7 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		FitxerDto fitxerPerFirmar = documentService.convertirPdfPerFirmaClient(
 				entitatActualId,
 				documentId);
+		fitxerPerFirmar.setId(documentId);
 		
 		String urlReturnToRipea = aplicacioService.propertyBaseUrl() + "/document/" + documentId + "/firmaSimpleWebEnd?tascaId=" + (tascaId == null ? "" : tascaId);
 		
@@ -508,13 +515,13 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 		
 		FirmaResultatDto firmaResultat =  documentService.firmaSimpleWebEnd(transactionID);
 		
-		if (firmaResultat.getStatus() == StatusEnumDto.OK) {
+		if (firmaResultat.getStatus() == StatusEnumDto.OK && firmaResultat.getSignatures().get(0).getStatus() == StatusEnumDto.OK) {
 			
 			documentService.processarFirmaClient(
 					entitatActualId,
 					documentId,
-					firmaResultat.getFitxerFirmatNom(), 
-					firmaResultat.getFitxerFirmatContingut(), 
+					firmaResultat.getSignatures().get(0).getFitxerFirmatNom(), 
+					firmaResultat.getSignatures().get(0).getFitxerFirmatContingut(), 
 					RolHelper.getRolActual(request), 
 					tascaId);
 			
@@ -535,8 +542,16 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 					firmaResultat.getMsg());
 		}
 		
+		
+		boolean massiu = (boolean) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				"massiu");
 
-		return "redirect:/contingut/" + contingutService.getExpedientId(documentId) + "?tascaId=" + (tascaId == null ? "" : tascaId);
+		if (massiu) {
+			return "redirect:/massiu/firmasimpleweb";
+		} else {
+			return "redirect:/contingut/" + contingutService.getExpedientId(documentId) + "?tascaId=" + (tascaId == null ? "" : tascaId);
+		}
 
 	}
 	

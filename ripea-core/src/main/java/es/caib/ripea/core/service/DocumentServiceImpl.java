@@ -4,6 +4,7 @@
 package es.caib.ripea.core.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -436,15 +437,44 @@ public class DocumentServiceImpl implements DocumentService {
 	
 	
 	@Override
+	public String firmaSimpleWebStartMassiu(
+			Set<Long> ids,
+			String motiu, 
+			String urlReturnToRipea, 
+			Long entitatId) {
+		
+		List <FitxerDto> fitxersPerFirmar = new ArrayList<>();
+		for (Long id : ids) {
+			FitxerDto fitxerPerFirmar = documentHelper.convertirPdfPerFirmaClient(
+					entitatId,
+					id);
+			fitxerPerFirmar.setId(id);
+			fitxersPerFirmar.add(fitxerPerFirmar);
+		}
+
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		
+		return pluginHelper.firmaSimpleWebStart(
+				fitxersPerFirmar,
+				motiu,
+				usuariActual, 
+				urlReturnToRipea);
+
+	}
+	
+	
+	
+	
+	@Override
 	public String firmaSimpleWebStart(
 			FitxerDto fitxerPerFirmar,
 			String motiu, 
 			String urlReturnToRipea) {
 
 		UsuariDto usuariActual = aplicacioService.getUsuariActual();
-
+		
 		return pluginHelper.firmaSimpleWebStart(
-				fitxerPerFirmar,
+				Arrays.asList(fitxerPerFirmar),
 				motiu,
 				usuariActual, 
 				urlReturnToRipea);
@@ -1549,22 +1579,9 @@ public class DocumentServiceImpl implements DocumentService {
 	public FitxerDto convertirPdfPerFirmaClient(
 			Long entitatId,
 			Long id) {
-		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
-		logger.debug("Converteix un document en PDF per a la firma client ("
-				+ "entitatId=" + entitatId + ", "
-				+ "id=" + id + ")");
-		DocumentEntity document = documentHelper.comprovarDocumentDinsExpedientAccessible(
+		return documentHelper.convertirPdfPerFirmaClient(
 				entitatId,
-				id,
-				true,
-				false);
-        if (!document.isFirmat()) {
-            return pluginHelper.conversioConvertirPdf(
-                    documentHelper.getFitxerAssociat(document, null),
-                    null);
-        } else {
-            return documentHelper.getFitxerAssociat(document, null);
-        }
+				id);
 	}
 
 	@Transactional

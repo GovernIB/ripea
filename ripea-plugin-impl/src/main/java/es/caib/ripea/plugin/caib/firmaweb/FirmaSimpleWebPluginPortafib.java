@@ -20,6 +20,7 @@ import org.fundaciobit.apisib.apifirmasimple.v1.beans.FirmaSimpleStatus;
 import org.fundaciobit.apisib.apifirmasimple.v1.jersey.ApiFirmaWebSimpleJersey;
 
 import es.caib.ripea.core.api.dto.FirmaResultatDto;
+import es.caib.ripea.core.api.dto.FirmaResultatDto.FirmaSignatureStatus;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
@@ -46,11 +47,13 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 
 	@Override
 	public String firmaSimpleWebStart(
-			FitxerDto fitxerPerFirmar,
+			List<FitxerDto> fitxersPerFirmar,
 			String motiu,
 			UsuariDto usuariActual, 
 			String urlReturnToRipea) {
-
+		
+		if (getPropertyDebug())
+			log.info("firmaSimpleWebStart " + getPropertyEndpoint());
 		
 		ApiFirmaWebSimple api = getApi();
 
@@ -70,49 +73,58 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 					username,
 					administrationID,
 					signerEmail);
-
+			
+			if (getPropertyDebug())
+				log.info("api.getTransactionID username=" + username);
+			
 			transactionID = api.getTransactionID(commonInfoSignature);
-
-			FirmaSimpleFile fileToSign = new FirmaSimpleFile(
-					fitxerPerFirmar.getNom(),
-					fitxerPerFirmar.getContentType(),
-					fitxerPerFirmar.getContingut());
-
-			String signID = "1";
-			String name = fileToSign.getNom();
-
+			
 			final String reason = motiu;
 			final String location = getPropertyLocation();
 			long tipusDocumentalID = 99; // =TD99
 			
+			
+			for (FitxerDto fitxerDto : fitxersPerFirmar) {
 
-			FirmaSimpleFileInfoSignature fileInfoSignature = new FirmaSimpleFileInfoSignature(
-					fileToSign,
-					signID,
-					name,
-					reason,
-					location,
-					1,
-					language,
-					tipusDocumentalID);
+				FirmaSimpleFile fileToSign = new FirmaSimpleFile(
+						fitxerDto.getNom(),
+						fitxerDto.getContentType(),
+						fitxerDto.getContingut());
 
-				FirmaSimpleAddFileToSignRequest newDocument = new FirmaSimpleAddFileToSignRequest(
-						transactionID,
-						fileInfoSignature);
-				api.addFileToSign(newDocument);
+				FirmaSimpleFileInfoSignature fileInfoSignature = new FirmaSimpleFileInfoSignature(
+						fileToSign,
+						String.valueOf(fitxerDto.getId()),
+						fitxerDto.getNom(),
+						reason,
+						location,
+						1,
+						language,
+						tipusDocumentalID);
 
+					FirmaSimpleAddFileToSignRequest newDocument = new FirmaSimpleAddFileToSignRequest(
+							transactionID,
+							fileInfoSignature);
+					api.addFileToSign(newDocument);
+					
+			}
 			
 
 			// Aquí especificam la URL de retorn un cop finalitzada la transacció
-			urlReturnToRipea = urlReturnToRipea + "&transactionID=" + transactionID;
+			urlReturnToRipea = urlReturnToRipea + (urlReturnToRipea.contains("?") ? "&" : "?") + "transactionID=" + transactionID;
 
-			FirmaSimpleStartTransactionRequest startTransactionInfo;
-			startTransactionInfo = new FirmaSimpleStartTransactionRequest(
+			if (getPropertyDebug())
+				log.info("urlReturnToRipea=" + urlReturnToRipea);
+			
+			FirmaSimpleStartTransactionRequest startTransactionInfo = new FirmaSimpleStartTransactionRequest(
 					transactionID,
 					urlReturnToRipea,
 					FirmaSimpleStartTransactionRequest.VIEW_IFRAME);
 
 			String urlRedirectToPortafib = api.startTransaction(startTransactionInfo);
+			
+			if (getPropertyDebug())
+				log.info("urlRedirectToPortafib=" + urlRedirectToPortafib);
+			
 			return urlRedirectToPortafib;
 
 		} catch (Exception e) {
@@ -137,6 +149,9 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			String transactionID) {
 
 		FirmaResultatDto firmaResultat = null;
+		
+		if (getPropertyDebug())
+			log.info("firmaSimpleWebEnd transactionID=" + transactionID);
 
 		ApiFirmaWebSimple api = null;
 
@@ -148,29 +163,36 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 
 			FirmaSimpleStatus transactionStatus = fullTransactionStatus.getTransactionStatus();
 			int status = transactionStatus.getStatus();
+			
+			if (getPropertyDebug())
+				log.info("fullTransactionStatus=" + status);
+			
 			switch (status) {
 
 			case FirmaSimpleStatus.STATUS_INITIALIZING: // = 0;
 				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.ERROR,
+								StatusEnumDto.ERROR,
 						"S'ha rebut un estat inconsistent del proces de firma (inicialitzant). Pot ser el Plugin de Firma no està ben desenvolupat. Consulti amb el seu administrador.");
 				break;
 
 			case FirmaSimpleStatus.STATUS_IN_PROGRESS: // = 1;
 				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.ERROR,
+								StatusEnumDto.ERROR,
 						"S'ha rebut un estat inconsistent del proces de firma (En Progrés). Pot ser el Plugin de Firma no està ben desenvolupat. Consulti amb el seu administrador.");
 				break;
 
 			case FirmaSimpleStatus.STATUS_FINAL_ERROR: // = -1;
+				String errorMsg = "Error durant la realització de les firmes: " + transactionStatus.getErrorMessage() + " \n " + transactionStatus.getErrorStackTrace();
 				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.ERROR,
-						"Error durant la realització de les firmes: " + transactionStatus.getErrorMessage() + " \n " + transactionStatus.getErrorStackTrace());
+								StatusEnumDto.ERROR,
+								errorMsg);
+				if (getPropertyDebug())
+					log.info(errorMsg);
 				break;
 
 			case FirmaSimpleStatus.STATUS_CANCELLED: // = -2;
 				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.WARNING,
+								StatusEnumDto.WARNING,
 						"Durant el proces de firmes, l'usuari ha cancelat la transacció.");
 				break;
 
@@ -206,14 +228,15 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 	}
 	
 	
-	
 
 	private FirmaResultatDto processStatusFileOfSign(
 			ApiFirmaWebSimple api,
 			String transactionID,
 			FirmaSimpleGetTransactionStatusResponse fullTransactionStatus) throws Exception {
 
-		FirmaResultatDto firmaResultat = null;
+		FirmaResultatDto firmaResultat = new FirmaResultatDto(
+				StatusEnumDto.OK,
+				null);
 
 		List<FirmaSimpleSignatureStatus> ssl = fullTransactionStatus.getSignaturesStatusList();
 
@@ -222,32 +245,47 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 			final String signID = signatureStatus.getSignID();
 			FirmaSimpleStatus fss = signatureStatus.getStatus();
 			int statusSign = fss.getStatus();
+			
+			if (getPropertyDebug())
+				log.info("signID= " + signID + ", statusSign=" + statusSign);
+			
 			switch (statusSign) {
 
 			case FirmaSimpleStatus.STATUS_INITIALIZING: // = 0;
 
-				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.ERROR,
-						"Incoherent Status (STATUS_INITIALIZING)");
+				firmaResultat.addSignature(
+						new FirmaSignatureStatus(
+								signID,
+								StatusEnumDto.ERROR,
+								"Incoherent Status (STATUS_INITIALIZING)"));
 				break;
 			case FirmaSimpleStatus.STATUS_IN_PROGRESS: // = 1;
 
-				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.ERROR,
-						"Incoherent Status (STATUS_IN_PROGRESS)");
+				firmaResultat.addSignature( 
+						new FirmaSignatureStatus(
+								signID,
+								StatusEnumDto.ERROR,
+								"Incoherent Status (STATUS_IN_PROGRESS)"));
 				break;
 
 			case FirmaSimpleStatus.STATUS_FINAL_ERROR: // = -1;
 
-				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.ERROR,
-						"Error en la firma: " + fss.getErrorMessage() + " (STATUS_ERROR)");
+				String errorMsg = "Error en la firma: " + fss.getErrorMessage() + " (STATUS_ERROR)";
+				firmaResultat.addSignature( 
+						new FirmaSignatureStatus(
+								signID,
+								StatusEnumDto.ERROR,
+								errorMsg));
+				if (getPropertyDebug())
+					log.info(errorMsg);
 				break;
 
 			case FirmaSimpleStatus.STATUS_CANCELLED: // = -2;
-				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.WARNING,
-						"L'usuari ha cancel.lat la firma. (STATUS_CANCELLED)");
+				firmaResultat.addSignature( 
+						new FirmaSignatureStatus(
+								signID,
+								StatusEnumDto.WARNING,
+								"L'usuari ha cancel.lat la firma. (STATUS_CANCELLED)"));
 				break;
 
 			case FirmaSimpleStatus.STATUS_FINAL_OK: // = 2;
@@ -260,10 +298,12 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 				FirmaSimpleFile fsf = fssr.getSignedFile();
 				final String outFile = signID + "_" + fsf.getNom();
 
-				firmaResultat = new FirmaResultatDto(
-						StatusEnumDto.OK,
-						outFile,
-						fsf.getData());
+				firmaResultat.addSignature( 
+						new FirmaSignatureStatus(
+								signID,
+								StatusEnumDto.OK,
+								outFile,
+								fsf.getData()));
 				break;
 			}
 		}
@@ -298,5 +338,10 @@ public class FirmaSimpleWebPluginPortafib extends RipeaAbstractPluginProperties 
 	private String getPropertyLocation() {
 		return getProperty("plugin.firmasimpleweb.location");
 	}
+	
+	private boolean getPropertyDebug() {
+		return getAsBoolean("plugin.firmasimpleweb.debug");
+	}
+
 
 }

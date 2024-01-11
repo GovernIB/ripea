@@ -1475,6 +1475,29 @@ public class DocumentHelper {
 		return documentsDto;
 	}
 
+	
+	public FitxerDto convertirPdfPerFirmaClient(
+			Long entitatId,
+			Long id) {
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(id));
+		logger.debug("Converteix un document en PDF per a la firma client ("
+				+ "entitatId=" + entitatId + ", "
+				+ "id=" + id + ")");
+		DocumentEntity document = comprovarDocumentDinsExpedientAccessible(
+				entitatId,
+				id,
+				true,
+				false);
+        if (!document.isFirmat()) {
+            return pluginHelper.conversioConvertirPdf(
+                    getFitxerAssociat(document, null),
+                    null);
+        } else {
+            return getFitxerAssociat(document, null);
+        }
+	}
+	
+	
 	public boolean isModificacioCustodiatsActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");
 	}

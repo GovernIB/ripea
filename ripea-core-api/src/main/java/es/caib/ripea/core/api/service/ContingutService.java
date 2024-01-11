@@ -579,5 +579,13 @@ public interface ContingutService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public ContingutDto getBasicInfo(Long contingutId, boolean checkPermissions);
-	
+
+	@PreAuthorize("hasRole('tothom')")
+	public ResultDto<ContingutMassiuDto> findDocumentsPerFirmaSimpleWebMassiu(
+			Long entitatId,
+			ContingutMassiuFiltreDto filtre,
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			ResultEnumDto resultEnum);
+
 }

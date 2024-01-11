@@ -176,6 +176,9 @@
  	<c:when test="${exm.errors > 0}">
  		<c:set var="modebg" value="danger"/>
  	</c:when>
+ 	<c:when test="${exm.cancelats > 0}">
+ 		<c:set var="modebg" value="warning"/>
+ 	</c:when> 	
  	<c:otherwise>
  		<c:set var="modebg" value="default"/>
  	</c:otherwise>

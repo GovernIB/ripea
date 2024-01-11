@@ -287,4 +287,14 @@ public class MetaDocumentServiceBean implements MetaDocumentService {
 		return delegate.findPinbalServei(metaDocumentId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaSimpleWebActiva(
+			Long entitatId,
+			Long metaExpedientId) {
+		return delegate.findByMetaExpedientAndFirmaSimpleWebActiva(
+				entitatId,
+				metaExpedientId);
+	}
+
 }

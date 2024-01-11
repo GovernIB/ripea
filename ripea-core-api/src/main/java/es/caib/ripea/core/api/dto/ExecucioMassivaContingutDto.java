@@ -42,6 +42,19 @@ public class ExecucioMassivaContingutDto extends AuditoriaDto {
 		this.elementId = elementId;
 		this.throwable = throwable;
 	}
+	
+	public ExecucioMassivaContingutDto(
+			Date dataInici,
+			Date dataFi,
+			Long elementId,
+			ExecucioMassivaEstatDto estat) {
+		this.dataInici = dataInici;
+		this.dataFi = dataFi;
+		this.elementId = elementId;
+		this.estat = estat;
+	}
+	
+	
 
 	
 	public String getDataFiAmbFormat() {

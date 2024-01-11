@@ -494,6 +494,7 @@ body {
 						</button>
 						<ul class="dropdown-menu">
 							<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
+							<li><a href="<c:url value="/massiu/firmasimpleweb"/>"><spring:message code="massiu.firmasimpleweb"/></a></li>
 							<c:if test="${isConvertirDefinitiuActiu}">
 							<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
 							</c:if>

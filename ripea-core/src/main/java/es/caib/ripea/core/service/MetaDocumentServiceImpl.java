@@ -924,6 +924,29 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 				MetaDocumentDto.class);
 	}
 	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<MetaDocumentDto> findByMetaExpedientAndFirmaSimpleWebActiva(
+			Long entitatId,
+			Long metaExpedientId) {
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false, 
+				true, false);
+		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(
+				entitat,
+				metaExpedientId);
+
+		return conversioTipusHelper.convertirList(
+				metaDocumentRepository.findByMetaExpedientAndFirmaPortafirmesActiva(
+						metaExpedient),
+				MetaDocumentDto.class);
+	}
+	
 	@Transactional
 	@Override
 	public void marcarPerDefecte(

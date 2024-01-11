@@ -333,14 +333,18 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			ExecucioMassivaDto dto = conversioTipusHelper.convertir(exm, ExecucioMassivaDto.class);
 			int errors = 0;
 			Long pendents = 0L;
+			int cancelats = 0;
 			for (ExecucioMassivaContingutEntity emc: exm.getContinguts()) {
 				if (emc.getEstat() == ExecucioMassivaEstatDto.ESTAT_ERROR)
 					errors ++;
+				if (emc.getEstat() == ExecucioMassivaEstatDto.ESTAT_CANCELAT)
+					cancelats ++;
 				if (emc.getDataFi() == null)
 					pendents++;
 				dto.getContingutIds().add(emc.getId());
 			}
 			dto.setErrors(errors);
+			dto.setCancelats(cancelats);
 			Long total = new Long(dto.getContingutIds().size());
 			dto.setExecutades(getPercent((total - pendents), total));
 			dtos.add(dto);

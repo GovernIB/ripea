@@ -43,6 +43,7 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private Boolean portafirmesAvisFirmaParcial;
 	
 	private int errors;
+	private int cancelats;
 	private double executades;
 
 

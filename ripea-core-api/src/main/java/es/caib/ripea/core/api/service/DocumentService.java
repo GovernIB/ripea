@@ -5,6 +5,7 @@ package es.caib.ripea.core.api.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -722,5 +723,8 @@ public interface DocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String firmaSimpleWebStartMassiu(Set<Long> ids, String motiu, String urlReturnToRipea, Long entitatId);
 
 }

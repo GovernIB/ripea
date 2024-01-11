@@ -5,6 +5,7 @@ package es.caib.ripea.core.ejb;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -23,7 +24,6 @@ import es.caib.ripea.core.api.dto.FirmaResultatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
 import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
@@ -553,6 +553,19 @@ public class DocumentServiceBean implements DocumentService {
 	@RolesAllowed("tothom")
 	public List<Long> findIdsAllDocumentsOfExpedient(Long expedientId) {
 		return delegate.findIdsAllDocumentsOfExpedient(expedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public String firmaSimpleWebStartMassiu(
+			Set<Long> ids,
+			String motiu,
+			String urlReturnToRipea,
+			Long entitatId) {
+		return delegate.firmaSimpleWebStartMassiu(ids,
+				motiu,
+				urlReturnToRipea,
+				entitatId);
 	}
 
 }

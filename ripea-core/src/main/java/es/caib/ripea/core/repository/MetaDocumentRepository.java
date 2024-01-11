@@ -118,5 +118,12 @@ public interface MetaDocumentRepository extends JpaRepository<MetaDocumentEntity
 	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActivaAmbFluxOResponsable(
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
+	@Query(	"from " +
+			"    MetaDocumentEntity md " +
+			"where (md.metaExpedient = :metaExpedient) " +
+			"and (md.firmaPassarelaActiva = true) ")
+	List<MetaDocumentEntity> findByMetaExpedientAndFirmaPortafirmesActiva(
+			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
+	
 	MetaDocumentEntity findByMetaExpedientAndPerDefecteTrue(MetaExpedientEntity metaExpedient);
 }
