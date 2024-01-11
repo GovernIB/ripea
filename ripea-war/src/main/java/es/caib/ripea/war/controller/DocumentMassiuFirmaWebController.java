@@ -103,7 +103,7 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 		if (filtreCommand.getMetaExpedientId() != null) {
 			model.addAttribute(
 					"metaDocuments",
-					 metaDocumentService.findByMetaExpedientAndFirmaPortafirmesActiva(entitatActual.getId(), filtreCommand.getMetaExpedientId()));
+					 metaDocumentService.findByMetaExpedientAndFirmaSimpleWebActiva(entitatActual.getId(), filtreCommand.getMetaExpedientId()));
 		}
 		
 
