@@ -11,6 +11,8 @@ import java.util.concurrent.Semaphore;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -30,6 +32,7 @@ import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ImportacioService;
 import es.caib.ripea.core.api.service.OrganGestorService;
@@ -53,6 +56,8 @@ public class ContingutImportacioController extends BaseUserController {
 	private OrganGestorService organGestorService;
 	@Autowired
 	private CarpetaService carpetaService;
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 	private final Semaphore semafor = new Semaphore(1, true);
 
@@ -157,12 +162,20 @@ public class ContingutImportacioController extends BaseUserController {
 		command.setPareId(contingutId);
 		model.addAttribute(command);
 		
+		long t0 = System.currentTimeMillis();
+		
+		if (aplicacioService.mostrarLogsRendiment())
+			logger.info("ContingutImportacioController.emplenarModelImportacio start ( contingutId=" + contingutId +  ")");
+		
 		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
 				entitatActual.getId(),
 				contingutId);
 		model.addAttribute("carpetes", carpetes);
 		model.addAttribute("jstreeJson", command.getEstructuraCarpetesJson());
 		model.addAttribute("selectedCarpeta", command.getDestiId());
+		
+		if (aplicacioService.mostrarLogsRendiment())
+    		logger.info("ContingutImportacioController.emplenarModelImportacio end:  " + (System.currentTimeMillis() - t0) + " ms");
 		
 		model.addAttribute(
 				"tipusImportacioOptions",
@@ -208,5 +221,7 @@ public class ContingutImportacioController extends BaseUserController {
 	    				new SimpleDateFormat("dd/MM/yyyy"),
 	    				true));
 	}
+
+	private static final Logger logger = LoggerFactory.getLogger(ContingutImportacioController.class);
 
 }

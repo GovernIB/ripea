@@ -20,7 +20,6 @@ import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -62,7 +61,9 @@ public class CarpetaHelper {
 	private ExpedientCarpetaArbreRepository expedientCarpetaArbreRepository;
 	@Resource
 	private ExpedientHelper expedientHelper;
-
+	@Resource
+	private CacheHelper cacheHelper;
+	
 	public CarpetaDto create(
 			Long entitatId,
 			Long pareId,
@@ -149,9 +150,19 @@ public class CarpetaHelper {
 	public List<ArbreDto<ExpedientCarpetaArbreDto>> obtenirArbreCarpetesPerExpedient(Long entitatId, ExpedientEntity expedient) {
 		List<ArbreDto<ExpedientCarpetaArbreDto>> expedients = new ArrayList<ArbreDto<ExpedientCarpetaArbreDto>>();
 
+		long t0 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient start ( entitatId=" + entitatId + 
+					", expedient=" + expedient.getNom() + ")");
+		
+		long t1 = System.currentTimeMillis();
+		
 		// Recupera carptes expedient actual
 		List<ExpedientCarpetaArbreDto> carpetesExpedient = findCarpetesExpedient(entitatId, expedient);
 
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient findCarpetesExpedient time: " + (System.currentTimeMillis() - t1) + " ms");
+		
 		// Afegeix l'expedient com carpeta arrel
 		ExpedientCarpetaArbreDto expedientArbre = new ExpedientCarpetaArbreDto();
 		expedientArbre.setId(expedient.getId());
@@ -162,6 +173,7 @@ public class CarpetaHelper {
 				null,
 				expedientArbre);
 		
+		long t2 = System.currentTimeMillis();
 		for (ExpedientCarpetaArbreDto fill: carpetesExpedient) {
 			// recuperar estructura per cada fill recursivament
 			currentArbreNode.addFill(
@@ -169,10 +181,15 @@ public class CarpetaHelper {
 							fill,
 							currentArbreNode));
 		}
-			
+		
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient obtenirArbreCarpetesPerMetaExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
+		
 		expedientArrel.setArrel(currentArbreNode);
 		expedients.add(expedientArrel);
 		
+		if (cacheHelper.mostrarLogsRendiment())
+			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient end:  " + (System.currentTimeMillis() - t0) + " ms");
 		
 		return expedients;
 	}
@@ -219,17 +236,7 @@ public class CarpetaHelper {
 		} catch (NumberFormatException nfe) {}
 		
 		if (carpetaId != null) {
-			try {
-				pare = entityComprovarHelper.comprovarCarpeta(
-						entitat,
-						carpetaId);
-			} catch (NotFoundException e) {
-				pare = entityComprovarHelper.comprovarExpedient(
-						entitat.getId(),
-						carpetaId);
-			}
-			
-			
+			pare = entityComprovarHelper.comprovarContingut(carpetaId);
 		} else {
 			carpetaDestiIdJstree = carpeta.getId();
 			CarpetaDto carpetaCreada = create(

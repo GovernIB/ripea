@@ -48,11 +48,14 @@ public class ExpedientCarpetaArbreEntity {
 	@Column(name = "entitat")
 	protected Long entitat;
 
-	@ManyToOne(optional = true, fetch = FetchType.EAGER)
-	@JoinColumn(name = "pare_id")
-	@ForeignKey(name = "ipa_pare_contingut_fk")
-	protected ExpedientCarpetaArbreEntity pare;
+//	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+//	@JoinColumn(name = "pare_id")
+//	@ForeignKey(name = "ipa_pare_contingut_fk")
+//	protected ExpedientCarpetaArbreEntity pare;
 
+	@Column(name = "pare_id")
+	protected Long pare;
+	
 	@ManyToOne(optional = true, fetch = FetchType.LAZY)
 	@JoinColumn(name = "expedient_id")
 	@ForeignKey(name = "ipa_expedient_contingut_fk")
@@ -81,13 +84,13 @@ public class ExpedientCarpetaArbreEntity {
 		this.nom = nom;
 	}
 
-	public ExpedientCarpetaArbreEntity getPare() {
-		return pare;
-	}
-
-	public void setPare(ExpedientCarpetaArbreEntity pare) {
-		this.pare = pare;
-	}
+//	public ExpedientCarpetaArbreEntity getPare() {
+//		return pare;
+//	}
+//
+//	public void setPare(ExpedientCarpetaArbreEntity pare) {
+//		this.pare = pare;
+//	}
 
 	public ExpedientEntity getExpedient() {
 		return expedient;
@@ -103,6 +106,29 @@ public class ExpedientCarpetaArbreEntity {
 
 	public void setFills(Set<ExpedientCarpetaArbreEntity> fills) {
 		this.fills = fills;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = (int) (prime * result + id);
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ExpedientCarpetaArbreEntity other = (ExpedientCarpetaArbreEntity) obj;
+		if (id != other.id)
+			return false;
+
+		return true;
 	}
 
 }

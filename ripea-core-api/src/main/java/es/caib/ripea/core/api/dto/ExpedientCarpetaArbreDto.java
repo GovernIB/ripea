@@ -1,7 +1,7 @@
 package es.caib.ripea.core.api.dto;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -15,7 +15,7 @@ public class ExpedientCarpetaArbreDto extends AuditoriaDto {
 	private Long id;
 	private String nom;
 	private ExpedientCarpetaArbreDto pare;
-	private Set<ExpedientCarpetaArbreDto> fills = new HashSet<ExpedientCarpetaArbreDto>();
+	private List<ExpedientCarpetaArbreDto> fills = new ArrayList<ExpedientCarpetaArbreDto>();
 	private ExpedientDto expedient;
 
 	@Override
@@ -23,6 +23,15 @@ public class ExpedientCarpetaArbreDto extends AuditoriaDto {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = (int) (prime * result + id);
+		result = prime * result + ((pare == null) ? 0 : pare.hashCode());
+		result = prime * result + ((nom == null) ? 0 : nom.hashCode());
+		return result;
+	}
 	@Override
 	public boolean equals(Object object) {
 		ExpedientCarpetaArbreDto carpeta = (ExpedientCarpetaArbreDto)object;

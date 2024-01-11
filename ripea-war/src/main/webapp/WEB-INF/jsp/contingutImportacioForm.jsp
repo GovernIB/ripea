@@ -56,9 +56,7 @@ $(document).ready(function() {
 	        $('.vakata-context li:eq(2), .vakata-context li:eq(3)').remove();
 	    }
 	});
-	
-	console.log('${selectedCarpeta}');
-		
+			
 	<c:if test="${not empty jstreeJson}">
 		arbre.jstree(true).settings.core.data = ${jstreeJson};
 		arbre.jstree(true).refresh();
@@ -68,8 +66,7 @@ $(document).ready(function() {
 		});
 	</c:if>
 	
-	
-	
+
 	$('form').on('submit', function(){
 	    // Obtener la carpeta seleccionada en jsTree
 	    var selectedNode = arbre.jstree('get_selected', true)[0]; // Puedes ajustar este selector según tu configuración

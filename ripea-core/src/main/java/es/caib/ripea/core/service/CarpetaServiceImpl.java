@@ -179,15 +179,17 @@ public class CarpetaServiceImpl implements CarpetaService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId) {
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId, 
-				true, 
-				true, 
-				false, 
-				false, 
-				false, 
-				null);
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long contingutId) {
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
+				entitatId,
+				contingutId,
+				false,
+				false,
+				false,
+				false, false, true, null);
+		
+		ExpedientEntity expedient = contingut instanceof ExpedientEntity ? (ExpedientEntity)contingut : ((CarpetaEntity)contingut).getExpedient();
+		
 		return carpetaHelper.obtenirArbreCarpetesPerExpedient(entitatId, expedient);
 	}
 	
