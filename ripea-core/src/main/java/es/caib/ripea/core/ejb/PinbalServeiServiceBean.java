@@ -37,10 +37,5 @@ public class PinbalServeiServiceBean implements PinbalServeiService {
 		return delegate.findById(id);
 	}
 
-	@Override
-	@RolesAllowed("IPA_SUPER")
-	public PinbalServeiDto findByCodi(String codi) {
-		return delegate.findByCodi(codi);
-	}
 
 }

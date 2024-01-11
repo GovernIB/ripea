@@ -579,7 +579,7 @@ public class PinbalHelper {
 			boolean ambNomSencer,
 			MetaDocumentPinbalServeiEnumDto pinbalServeiEnum) {
 		
-		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(pinbalServeiEnum.toString());
+		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(pinbalServeiEnum);
 		List<PinbalServeiDocPermesEnumDto> pinbalServeiDocsPermesos = pinbalServei.getPinbalServeiDocsPermesos();
 		
 		ScspTitular titular = new ScspTitular();

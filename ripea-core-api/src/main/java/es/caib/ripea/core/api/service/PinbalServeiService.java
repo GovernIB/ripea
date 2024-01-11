@@ -17,7 +17,6 @@ public interface PinbalServeiService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	public PinbalServeiDto findById(Long id);
 
-	@PreAuthorize("hasRole('IPA_SUPER')")
-	public PinbalServeiDto findByCodi(String codi);
+
 
 }

@@ -44,14 +44,6 @@ public class PinbalServeiServiceImpl implements PinbalServeiService {
 		return conversioTipusHelper.convertir(pinbalServei, PinbalServeiDto.class);
 	}
 	
-	@Transactional(readOnly = true)
-	@Override
-	public PinbalServeiDto findByCodi(String codi) {
-
-		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(codi);
-		return conversioTipusHelper.convertir(pinbalServei, PinbalServeiDto.class);
-	}
-	
 	
 	@Transactional
 	@Override
