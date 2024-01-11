@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import es.caib.ripea.core.api.dto.MetaDocumentPinbalServeiEnumDto;
 import es.caib.ripea.core.entity.PinbalServeiEntity;
 
 public interface PinbalServeiRepository extends JpaRepository<PinbalServeiEntity, Long> {
@@ -16,6 +17,6 @@ public interface PinbalServeiRepository extends JpaRepository<PinbalServeiEntity
 			Pageable pageable);
 	
 	
-	PinbalServeiEntity findByCodi(String codi);
+	PinbalServeiEntity findByCodi(MetaDocumentPinbalServeiEnumDto codi);
 	
 }

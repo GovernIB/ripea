@@ -494,7 +494,7 @@ public class MetaDocumentServiceImpl implements MetaDocumentService {
 		MetaDocumentEntity metaDocument = entityComprovarHelper.comprovarMetaDocument(
 				metaDocumentId);
 
-		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(metaDocument.getPinbalServei().toString());
+		PinbalServeiEntity pinbalServei = pinbalServeiRepository.findByCodi(metaDocument.getPinbalServei());
 		return conversioTipusHelper.convertir(pinbalServei, PinbalServeiDto.class);
 
 	}	
