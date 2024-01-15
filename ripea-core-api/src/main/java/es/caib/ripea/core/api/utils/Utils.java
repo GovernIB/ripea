@@ -1,8 +1,11 @@
 package es.caib.ripea.core.api.utils;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -208,5 +211,17 @@ public class Utils {
 	}
 
 	
+	public static Date convertStringToDate(String str, String format) {
+        Date date = null;
+        if (isNotEmpty(str)) {
+            SimpleDateFormat sdf = new SimpleDateFormat(format);
+    		try {
+    			date = sdf.parse(str);
+    		} catch (ParseException e) {
+    			throw new RuntimeException(e);
+    		}
+		} 
+		return date;
+	}
 	
 }

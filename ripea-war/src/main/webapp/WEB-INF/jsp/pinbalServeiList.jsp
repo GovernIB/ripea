@@ -62,6 +62,8 @@
 							<spring:message code="pinbal.servei.ECOT103"/>
 						{{else codi == 'SVDDGPRESIDENCIALEGALDOCWS01'}}
 							<spring:message code="pinbal.servei.SVDDGPRESIDENCIALEGALDOCWS01"/>
+						{{else codi == 'SVDRRCCNACIMIENTOWS01'}}
+							<spring:message code="pinbal.servei.SVDRRCCNACIMIENTOWS01"/>
 						{{/if}}
 					</script>
 				</th>

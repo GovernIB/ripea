@@ -21,5 +21,6 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SCDHPAJU, // Servei de consulta de padró històric
 	NIVRENTI, // Consulta del nivel de renta
 	ECOT103, // Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas con indicación de incumplimientos
-	SVDDGPRESIDENCIALEGALDOCWS01 //  Servei de consulta de dades de residència legal d'estrangers per documentació
+	SVDDGPRESIDENCIALEGALDOCWS01, //  Servei de consulta de dades de residència legal d'estrangers per documentació
+	SVDRRCCNACIMIENTOWS01, // Servei de consulta de naixement
 }

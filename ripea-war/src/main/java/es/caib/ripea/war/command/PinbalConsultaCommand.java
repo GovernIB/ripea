@@ -40,6 +40,8 @@ public class PinbalConsultaCommand {
 	private String finalitat;
 	@NotNull
 	private PinbalConsentimentEnumDto consentiment;
+	
+	
 	private String comunitatAutonomaCodi;
 	private String provinciaCodi;
 	private String municipiCodi;
@@ -47,8 +49,6 @@ public class PinbalConsultaCommand {
 	private String dataNaixement;
 	private SiNoEnumDto consentimentTipusDiscapacitat;
 	private String numeroTitol;
-	
-	
 	private String codiNacionalitat = "724";
 	private String paisNaixament = "724";
 	private String provinciaNaixament;
@@ -58,7 +58,6 @@ public class PinbalConsultaCommand {
 	private SexeEnumDto sexe;
 	private String nomPare;
 	private String nomMare;
-	private String dataNaixementObligatori;
 	private String telefon;
 	private String email;
 	
@@ -68,11 +67,17 @@ public class PinbalConsultaCommand {
 	private Integer exercici;
 	
 	private TipusPassaportEnumDto tipusPassaport;
-	private Date fechaCaducidad;
-	private String codiNacionalitat2;
-	private Date fechaExpedicion;
+	private Date dataCaducidad;
+	private Date dataExpedicion;
 	private String numeroSoporte;
 
+	
+	private String registreCivil;
+	private String tom;
+	private String pagina;
+	private Date dataRegistre;
+	private String municipiRegistre;
+	private boolean ausenciaSegundoApellido;
 	
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {

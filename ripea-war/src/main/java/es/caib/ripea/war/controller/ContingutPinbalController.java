@@ -97,8 +97,8 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		MetaDocumentDto metaDocument = metaDocumentService.findById(command.getMetaDocumentId());
 	
 		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDELSEXWS01) {
-			if (StringUtils.isEmpty(command.getDataNaixementObligatori())) {
-				bindingResult.rejectValue("dataNaixementObligatori", "NotEmpty");
+			if (StringUtils.isEmpty(command.getDataNaixement())) {
+				bindingResult.rejectValue("dataNaixement", "NotEmpty");
 			}
 			if (command.getPaisNaixament().equals("724") && StringUtils.isEmpty(command.getMunicipiNaixament())) {
 				bindingResult.rejectValue("municipiNaixament", "NotEmpty");
@@ -109,25 +109,36 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			if (command.getCodiNacionalitat().equals("724") && StringUtils.isEmpty(command.getNomPare()) && StringUtils.isEmpty(command.getNomMare())) {
 				bindingResult.rejectValue("nomPare", "NotEmpty");
 			}
-		}
-		
-		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.NIVRENTI) {
 			if (command.getExercici() == null) {
 				bindingResult.rejectValue("exercici", "NotEmpty");
 			}
-		}
-		
-		if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPRESIDENCIALEGALDOCWS01) {
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDDGPRESIDENCIALEGALDOCWS01) {
 			
 			if (command.getTipusPassaport() == null && Utils.isEmpty(command.getNumeroSoporte())) {
 				bindingResult.reject("contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment");
 			}
-			if (command.getTipusPassaport() != null && command.getFechaCaducidad() == null) {
-				bindingResult.rejectValue("fechaCaducidad", "NotEmpty");
+			if (command.getTipusPassaport() != null && command.getDataCaducidad() == null) {
+				bindingResult.rejectValue("dataCaducidad", "NotEmpty");
 			}
-			if (command.getTipusPassaport() != null && Utils.isEmpty(command.getCodiNacionalitat2())) {
-				bindingResult.rejectValue("codiNacionalitat2", "NotEmpty");
+			if (command.getTipusPassaport() != null && Utils.isEmpty(command.getCodiNacionalitat())) {
+				bindingResult.rejectValue("codiNacionalitat", "NotEmpty");
 			}
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDRRCCNACIMIENTOWS01) {
+			
+			if (Utils.isEmpty(command.getRegistreCivil())) {
+				bindingResult.rejectValue("registreCivil", "NotEmpty");
+			}
+			if (Utils.isEmpty(command.getPagina())) {
+				bindingResult.rejectValue("pagina", "NotEmpty");
+			}
+			if (Utils.isEmpty(command.getTom())) {
+				bindingResult.rejectValue("tom", "NotEmpty");
+			}
+			if (command.getDataRegistre() == null) {
+				bindingResult.rejectValue("dataRegistre", "NotEmpty");
+			}
+
 		}
 			
 		if (bindingResult.hasErrors()) {
@@ -135,13 +146,17 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			return "contingutPinbalForm";
 		}
 		
-		if (command.getPaisNaixament().equals("724")) {
-			command.setCodiPoblacioNaixament(command.getProvinciaNaixament() + command.getMunicipiNaixament());
-		}
+
 		
 		Exception e = null;
 		try {
-			e = documentService.pinbalNovaConsulta(entitatActual.getId(), pareId, command.getMetaDocumentId(), PinbalConsultaCommand.asDto(command), RolHelper.getRolActual(request));
+			e = documentService.pinbalNovaConsulta(
+					entitatActual.getId(),
+					pareId,
+					command.getMetaDocumentId(),
+					PinbalConsultaCommand.asDto(command),
+					RolHelper.getRolActual(request));
+			
 		} catch (Exception ex) {
 			e = ex;
 		}

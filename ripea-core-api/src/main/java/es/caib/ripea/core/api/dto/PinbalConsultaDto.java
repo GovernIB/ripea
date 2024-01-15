@@ -33,12 +33,12 @@ public class PinbalConsultaDto {
 	private String codiNacionalitat;
 	private String paisNaixament;
 	private String provinciaNaixament;
+	private String municipiNaixament;
 	private String poblacioNaixament;
 	private String codiPoblacioNaixament;
 	private SexeEnumDto sexe;
 	private String nomPare;
 	private String nomMare;
-	private String dataNaixementObligatori;
 	private String telefon;
 	private String email;
 	
@@ -47,9 +47,15 @@ public class PinbalConsultaDto {
 	private Integer exercici;
 	
 	private TipusPassaportEnumDto tipusPassaport;
-	private Date fechaCaducidad;
-	private String codiNacionalitat2;
-	private Date fechaExpedicion;
+	private Date dataCaducidad;
+	private Date dataExpedicion;
 	private String numeroSoporte;
+	
+	private String registreCivil;
+	private String tom;
+	private String pagina;
+	private Date dataRegistre;
+	private String municipiRegistre;
+	private boolean ausenciaSegundoApellido;
 	
 }

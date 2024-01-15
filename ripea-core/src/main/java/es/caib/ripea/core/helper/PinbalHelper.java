@@ -23,6 +23,10 @@ import es.caib.pinbal.client.recobriment.model.ScspSolicitante.ScspConsentimient
 import es.caib.pinbal.client.recobriment.model.ScspTitular;
 import es.caib.pinbal.client.recobriment.model.ScspTitular.ScspTipoDocumentacion;
 import es.caib.pinbal.client.recobriment.model.SolicitudBase;
+import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc;
+import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.FetRegistral;
+import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.Lloc;
+import es.caib.pinbal.client.recobriment.model.SolicitudBaseSvdrrcc.TitularDadesAdicionals;
 import es.caib.pinbal.client.recobriment.nivrenti.ClientNivrenti;
 import es.caib.pinbal.client.recobriment.nivrenti.ClientNivrenti.SolicitudNivrenti;
 import es.caib.pinbal.client.recobriment.q2827003atgss001.ClientQ2827003atgss001;
@@ -45,6 +49,8 @@ import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvdd
 import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01.TipusPassaport;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
+import es.caib.pinbal.client.recobriment.svdrrccnacimientows01.ClientSvdrrccnacimientows01;
+import es.caib.pinbal.client.recobriment.svdrrccnacimientows01.ClientSvdrrccnacimientows01.SolicitudSvdrrccnacimientows01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01.SolicitudSvdscddws01;
 import es.caib.pinbal.client.recobriment.svdsctfnws01.ClientSvdsctfnws01;
@@ -334,11 +340,17 @@ public class PinbalHelper {
 		solicitud.setPaisNacimiento(pinbalConsulta.getPaisNaixament());
 		solicitud.setProvinciaNacimiento(pinbalConsulta.getProvinciaNaixament());
 		solicitud.setPoblacionNacimiento(pinbalConsulta.getPoblacioNaixament());
-		solicitud.setCodPoblacionNacimiento(pinbalConsulta.getCodiPoblacioNaixament());
+		
+		if (pinbalConsulta.getPaisNaixament().equals("724")) {
+			solicitud.setCodPoblacionNacimiento(pinbalConsulta.getProvinciaNaixament() + pinbalConsulta.getMunicipiNaixament());
+		} else {
+			solicitud.setCodPoblacionNacimiento(pinbalConsulta.getCodiPoblacioNaixament());
+		}
+
 		solicitud.setSexo(pinbalConsulta.getSexe() != null ? Sexe.valueOf(pinbalConsulta.getSexe().toString()) : null);
 		solicitud.setNombrePadre(pinbalConsulta.getNomPare());
 		solicitud.setNombreMadre(pinbalConsulta.getNomMare());
-		solicitud.setFechaNacimiento(pinbalConsulta.getDataNaixementObligatori());
+		solicitud.setFechaNacimiento(pinbalConsulta.getDataNaixement());
 		solicitud.setTelefono(pinbalConsulta.getTelefon());
 		solicitud.setMail(pinbalConsulta.getEmail());
 		try {
@@ -453,15 +465,69 @@ public class PinbalHelper {
 
 		solicitud.setNumeroSoporte(pinbalConsulta.getNumeroSoporte());
 		solicitud.setTipo(Utils.convertEnum(pinbalConsulta.getTipusPassaport(), TipusPassaport.class));
-		solicitud.setFechaCaducidad(pinbalConsulta.getFechaCaducidad());
-		solicitud.setNacionalidad(pinbalConsulta.getCodiNacionalitat2());
-		solicitud.setFechaExpedicion(pinbalConsulta.getFechaExpedicion());
+		solicitud.setFechaCaducidad(pinbalConsulta.getDataCaducidad());
+		solicitud.setNacionalidad(pinbalConsulta.getCodiNacionalitat());
+		solicitud.setFechaExpedicion(pinbalConsulta.getDataExpedicion());
 		
 		try {
 			ScspRespuesta respuesta = getClientSvddgpresidencialegaldocws01().peticionSincrona(Arrays.asList(solicitud));
 			return processarScspRespuesta(solicitud, respuesta, "SVDDGPRESIDENCIALEGALDOCWS01", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SVDDGPRESIDENCIALEGALDOCWS01", t0);
+		}
+	}
+	
+	/** SVDRRCCNACIMIENTOWS01 - Servei de consulta de naixement */
+	public String novaPeticioSvdrrccnacimientows01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdrrccnacimientows01 solicitud = new SolicitudSvdrrccnacimientows01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		
+        solicitud.setDadesRegistrals(SolicitudBaseSvdrrcc.DadesRegistrals.builder()
+                .registreCivil(pinbalConsulta.getRegistreCivil())
+                .tom(pinbalConsulta.getTom())
+                .pagina(pinbalConsulta.getPagina())
+                .build());
+        
+
+        solicitud.setTitularDadesAdicionals(TitularDadesAdicionals.builder()
+                .fetregistral(FetRegistral.builder()
+                        .data(pinbalConsulta.getDataRegistre())
+                        .municipi(Lloc.builder()
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistre()) ? "07" + pinbalConsulta.getMunicipiRegistre() : null)
+                                .build())
+                        .build())
+                .naixement(SolicitudBaseSvdrrcc.Naixement.builder()
+                        .data(Utils.convertStringToDate(pinbalConsulta.getDataNaixement(), "dd/MM/yyyy"))
+                        .municipi(Lloc.builder()
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixament()) ? "07" + pinbalConsulta.getMunicipiNaixament() : null)
+                                .build())
+                        .build())
+                .ausenciaSegonLlinatge(pinbalConsulta.isAusenciaSegundoApellido())
+                .nomMare(pinbalConsulta.getNomMare())
+                .nomPare(pinbalConsulta.getNomPare())
+                .sexe(Utils.convertEnum(pinbalConsulta.getSexe(), es.caib.pinbal.client.recobriment.model.Sexe.class))
+                .build());
+        
+
+
+		
+		try {
+			ScspRespuesta respuesta = getClientSvdrrccnacimientows01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SSVDRRCCNACIMIENTOWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SSVDRRCCNACIMIENTOWS01", t0);
 		}
 	}
 	
@@ -901,6 +967,19 @@ public class PinbalHelper {
 	
 	private ClientSvddgpresidencialegaldocws01 getClientSvddgpresidencialegaldocws01() {
 		ClientSvddgpresidencialegaldocws01 client = new ClientSvddgpresidencialegaldocws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
+	private ClientSvdrrccnacimientows01 getClientSvdrrccnacimientows01() {
+		ClientSvdrrccnacimientows01 client = new ClientSvdrrccnacimientows01(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),

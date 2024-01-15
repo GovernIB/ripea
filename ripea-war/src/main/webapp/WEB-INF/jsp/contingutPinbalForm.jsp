@@ -27,306 +27,12 @@ metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
 </c:forEach>
 $(document).ready(function() {
 	$('#metaDocumentId').on('change', function() {
-		if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPASWS01") { // SVDCCAACPASWS01 - Estar al corriente de obligaciones tributarias para solicitud de subvenciones y ayudas de la CCAA
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').show();
-			$('#divProvinciaCodi').show();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
+		
+		let serveiNom = metaDocumentServeiScsp[$(this).val()];
+		showHideDatosEspecificos('#div' + serveiNom);
+						
 
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-			
-			
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCDDWS01") { // SVDSCDDWS01 - Servei de consulta de dades de discapacitat
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').show();
-			$('#divProvinciaCodi').show();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').show();
-			$('#divDataNaixement').show();
-			$('#divConsentimentTipusDiscapacitat').show();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-				
-				
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDCPAJU") { // SCDCPAJU - Servei de consulta de padró de convivència
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').hide();
-			$('#divProvinciaCodi').show();
-			$('#divMunicipiCodi').show();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-			
-			
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDSCTFNWS01") { // SVDSCTFNWS01 - Servei de consulta de família nombrosa
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').show();
-			$('#divProvinciaCodi').hide();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').show();
-			$('#divDataNaixement').show();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').show();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-			
-			
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDCCAACPCWS01") { // SVDCCAACPCWS01 - Estar al corriente de obligaciones tributarias para contratación con la CCAA
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').show();
-			$('#divProvinciaCodi').show();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-			
-			
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDDELSEXWS01") { // SVDDELSEXWS01 - Consulta de inexistencia de delitos sexuales por datos de filiación
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').hide();
-			$('#divProvinciaCodi').hide();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').show();
-			$('#divCodiNacionalitat').show();
-			$('#divProvinciaNaixament').show();
-			$('#divPoblacioNaixament').show();
-			$('#divCodiPoblacioNaixament').show();
-			$('#divSexe').show();
-			$('#divNomPare').show();
-			$('#divNomMare').show();
-			$('#divTelefon').show();
-			$('#divEmail').show();
-			$('#divDataNaixementObligatori').show();
-			
-			$('#divAnysHistoric').hide();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-			
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SCDHPAJU") { // SCDHPAJU - Servei de consulta de padró històric
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').hide();
-			$('#divProvinciaCodi').show();
-			$('#divMunicipiCodi').show();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').show();
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-
-		} else if (metaDocumentServeiScsp[$(this).val()] === "NIVRENTI") { // NIVRENTI - Consulta del nivel de renta
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').hide();
-			$('#divProvinciaCodi').hide();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();		
-
-			$('#divExercici').show();	
-
-			$('#divNumeroSoporte').hide();
-			$('#divTipusPassaport').hide();
-			$('#divFechaCaducidad').hide();
-			$('#divCodiNacionalitat2').hide();
-			$('#divFechaExpedicion').hide();
-			
-		} else if (metaDocumentServeiScsp[$(this).val()] === "SVDDGPRESIDENCIALEGALDOCWS01") { // SVDDGPRESIDENCIALEGALDOCWS01 - Servei de consulta de dades de residència legal d'estrangers per documentació
-			$('#bloc-datos-especificos').show();
-			$('#divComunitatAutonomaCodi').hide();
-			$('#divProvinciaCodi').hide();
-			$('#divMunicipiCodi').hide();
-			$('#divDataConsulta').hide();
-			$('#divDataNaixement').hide();
-			$('#divConsentimentTipusDiscapacitat').hide();
-			$('#divNumeroTitol').hide();
-
-			$('#divPaisNaixament').hide();
-			$('#divCodiNacionalitat').hide();
-			$('#divProvinciaNaixament').hide();
-			$('#divPoblacioNaixament').hide();
-			$('#divCodiPoblacioNaixament').hide();
-			$('#divSexe').hide();
-			$('#divNomPare').hide();
-			$('#divNomMare').hide();
-			$('#divTelefon').hide();
-			$('#divEmail').hide();
-			$('#divDataNaixementObligatori').hide();
-			
-			$('#divAnysHistoric').hide();		
-
-			$('#divExercici').hide();
-
-			$('#divNumeroSoporte').show();
-			$('#divTipusPassaport').show();
-			$('#divFechaCaducidad').show();
-			$('#divCodiNacionalitat2').show();
-			$('#divFechaExpedicion').show();
-
-								
-														
-		} else {
-			$('#bloc-datos-especificos').hide();
-		}
 		$('#finalitat').val(metaDocumentFinalitat[$(this).val()]);
-
 		
 		const metaDocumentId = $(this).val();
 		$.get("<c:url value="/contingut"/>" + "/${pinbalConsultaCommand.pareId}/pinbal/titulars/" + metaDocumentId)
@@ -344,6 +50,41 @@ $(document).ready(function() {
 		
 	});
 	$('#metaDocumentId').trigger('change');
+
+	function showHideDatosEspecificos(divToShow) {
+
+		if ($(divToShow).length) {
+			$('#bloc-datos-especificos').show();
+
+			var divsToShow = [];
+			var divsToHide = [];
+
+			$('#datos-especificos').children().each(function () {
+				let divId = "#" + this.id;
+				if (divToShow == divId) {
+					divsToShow.push(divId);
+				} else {
+					divsToHide.push(divId);
+				}
+
+			});
+
+			divsToShow.forEach(function(divToShow) {
+				$(divToShow).find(":input").prop("disabled", false);
+				$(divToShow).show();
+			});
+
+			divsToHide.forEach(function(divToHide) {
+				$(divToHide).find(":input").prop("disabled", true);
+				$(divToHide).hide();
+			});
+			
+		} else {
+			$('#bloc-datos-especificos').hide();
+			$('#bloc-datos-especificos').find(":input").prop("disabled", true);
+		}
+		
+	}
 
 	
 });
@@ -367,36 +108,95 @@ $(document).ready(function() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="datos-especificos">
-					<div id="divComunitatAutonomaCodi"><rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/></div>
-					<div id="divProvinciaCodi"><rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/></div>
-					<div id="divMunicipiCodi"><rip:inputSelect name="municipiCodi" textKey="interessat.form.camp.organ.filtre.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
-					<div id="divDataConsulta"><rip:inputDate name="dataConsulta" textKey="contingut.pinbal.form.camp.data.consulta" /></div>
-					<div id="divDataNaixement"><rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" /></div>
-					<div id="divConsentimentTipusDiscapacitat"><rip:inputSelect name="consentimentTipusDiscapacitat" textKey="contingut.pinbal.form.camp.consentiment.tipus.discapacitat" optionEnum="SiNoEnumDto"/></div>
-					<div id="divNumeroTitol"><rip:inputText name="numeroTitol" textKey="contingut.pinbal.form.camp.numero.titol" /></div>
+				
+
+				
+					<div id="divSVDCCAACPASWS01">
+						<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+					</div>
 					
-				  	<div id="divCodiNacionalitat"><rip:inputSelect name="codiNacionalitat" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
-				  	<div id="divSexe"><rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/></div>
-				  	<div id="divPaisNaixament">	<rip:inputSelect name="paisNaixament" textKey="contingut.pinbal.form.camp.pais.naixament" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
-				  	<div id="divProvinciaNaixament"><rip:inputSelect name="provinciaNaixament" textKey="contingut.pinbal.form.camp.provincia.naixament" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text" comment="contingut.pinbal.form.camp.provincia.naixament.comment"/></div>
-				  	<div id="divPoblacioNaixament"><rip:inputText name="poblacioNaixament" textKey="contingut.pinbal.form.camp.poblacio.naixament" comment="contingut.pinbal.form.camp.poblacio.naixament.comment"/></div>
-				  	<div id="divCodiPoblacioNaixament"><rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi.naixament" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment" optionMinimumResultsForSearch="0"/></div>
-					<div id="divNomPare"><rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare" comment="contingut.pinbal.form.camp.nom.pare.comment"/></div>
-					<div id="divNomMare"><rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare" comment="contingut.pinbal.form.camp.nom.mare.comment"/></div>
-					<div id="divDataNaixementObligatori"><rip:inputDate name="dataNaixementObligatori" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/></div>
-					<div id="divTelefon"><rip:inputText name="telefon" textKey="contingut.pinbal.form.camp.telefon"/></div>
-					<div id="divEmail"><rip:inputText name="email" textKey="contingut.pinbal.form.camp.email"/></div>
+					<div id="divSVDSCDDWS01">
+						<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputDate name="dataConsulta" textKey="contingut.pinbal.form.camp.data.consulta" />
+						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" />
+						<rip:inputSelect name="consentimentTipusDiscapacitat" textKey="contingut.pinbal.form.camp.consentiment.tipus.discapacitat" optionEnum="SiNoEnumDto"/>					
+					</div>
 					
-					<div id="divAnysHistoric"><rip:inputNumber name="nombreAnysHistoric" textKey="contingut.pinbal.form.camp.data.nombre.anys.historic" nombreDecimals="0"/></div>
+					<div id="divSCDCPAJU">
+						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputSelect name="municipiCodi" textKey="interessat.form.camp.organ.filtre.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom"/>
+					</div>
+
+					<div id="divSVDSCTFNWS01">
+						<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputDate name="dataConsulta" textKey="contingut.pinbal.form.camp.data.consulta" />
+						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement"/>
+						<rip:inputText name="numeroTitol" textKey="contingut.pinbal.form.camp.numero.titol"/>
+					</div>
+				
+					<div id="divSVDCCAACPCWS01">
+						<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+					</div>
 					
-					<div id="divExercici"><rip:inputNumber name="exercici" textKey="contingut.pinbal.form.camp.data.exercici" nombreDecimals="0" required="true"/></div>
 					
-					<div id="divNumeroSoporte"><rip:inputText name="numeroSoporte" textKey="contingut.pinbal.form.camp.numero.soporte" comment="contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment"/></div>
-					<div id="divTipusPassaport"><rip:inputSelect name="tipusPassaport" textKey="contingut.pinbal.form.camp.tipus.passaport" comment="contingut.pinbal.form.camp.tipus.passaport.comment" optionEnum="TipusPassaportEnumDto" emptyOption="true"/></div>
-					<div id="divFechaCaducidad"><rip:inputDate name="fechaCaducidad" textKey="contingut.pinbal.form.camp.data.caducidad"/></div>
-					<div id="divCodiNacionalitat2"><rip:inputSelect name="codiNacionalitat2" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" emptyOption="true" optionValueAttribute="codi" optionTextAttribute="nom"/></div>
-					<div id="divFechaExpedicion"><rip:inputDate name="fechaExpedicion" textKey="contingut.pinbal.form.camp.data.expedicion"/></div>
-			
+					<div id="divSVDDELSEXWS01">
+						<rip:inputSelect name="codiNacionalitat" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/>
+					  	<rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/>
+					  	<rip:inputSelect name="paisNaixament" textKey="contingut.pinbal.form.camp.pais.naixament" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/>
+					  	<rip:inputSelect name="provinciaNaixament" textKey="contingut.pinbal.form.camp.provincia.naixament" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text" comment="contingut.pinbal.form.camp.provincia.naixament.comment"/>
+					  	<rip:inputText name="poblacioNaixament" textKey="contingut.pinbal.form.camp.poblacio.naixament" comment="contingut.pinbal.form.camp.poblacio.naixament.comment"/>
+					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi.naixament" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment" optionMinimumResultsForSearch="0"/>
+						<rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare" comment="contingut.pinbal.form.camp.nom.pare.comment"/>
+						<rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare" comment="contingut.pinbal.form.camp.nom.mare.comment"/>
+						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/>
+						<rip:inputText name="telefon" textKey="contingut.pinbal.form.camp.telefon"/>
+						<rip:inputText name="email" textKey="contingut.pinbal.form.camp.email"/>
+					</div>
+					
+					<div id="divSCDHPAJU">
+						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
+						<rip:inputSelect name="municipiCodi" textKey="interessat.form.camp.organ.filtre.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom"/>
+						<rip:inputNumber name="nombreAnysHistoric" textKey="contingut.pinbal.form.camp.data.nombre.anys.historic" nombreDecimals="0"/>
+					</div>
+
+					<div id="divNIVRENTI">
+						<rip:inputNumber name="exercici" textKey="contingut.pinbal.form.camp.data.exercici" nombreDecimals="0" required="true"/>
+					</div>
+
+					
+					<div id="divSVDDGPRESIDENCIALEGALDOCWS01">
+						<rip:inputText name="numeroSoporte" textKey="contingut.pinbal.form.camp.numero.soporte" comment="contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment"/>
+						<rip:inputSelect name="tipusPassaport" textKey="contingut.pinbal.form.camp.tipus.passaport" comment="contingut.pinbal.form.camp.tipus.passaport.comment" optionEnum="TipusPassaportEnumDto" emptyOption="true"/>
+						<rip:inputDate name="dataCaducidad" textKey="contingut.pinbal.form.camp.data.caducidad"/>
+						<rip:inputSelect name="codiNacionalitat" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" emptyOption="true" optionValueAttribute="codi" optionTextAttribute="nom"/>
+						<rip:inputDate name="dataExpedicion" textKey="contingut.pinbal.form.camp.data.expedicion"/>
+					</div>
+					
+					<div id="divSVDRRCCNACIMIENTOWS01">
+					
+						<legend><spring:message code="contingut.pinbal.form.legend.dadesRegistrals"/></legend>
+						
+						<rip:inputText name="registreCivil" textKey="contingut.pinbal.form.camp.registreCivil" required="true"/>
+						<rip:inputText name="tom" textKey="contingut.pinbal.form.camp.tom" required="true"/>
+						<rip:inputText name="pagina" textKey="contingut.pinbal.form.camp.pagina" required="true"/>
+						
+						<legend><spring:message code="contingut.pinbal.form.legend.fetRegistral"/></legend>
+						<rip:inputDate name="dataRegistre" textKey="contingut.pinbal.form.camp.data" required="true"/>
+						<rip:inputSelect name="municipiRegistre" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
+						
+						<legend><spring:message code="contingut.pinbal.form.legend.naixement"/></legend>		
+						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data"/>		
+					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
+					  	
+					  	<legend><spring:message code="contingut.pinbal.form.legend.dadesAdicionals"/></legend>	
+					  	<rip:inputCheckbox name="ausenciaSegundoApellido" textKey="contingut.pinbal.form.camp.ausenciaSegundoApellido"/>
+					  	<rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/>
+					  	<rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare"/>
+						<rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare"/>	
+					</div>																				
 					
 				</div>
 			</div>
