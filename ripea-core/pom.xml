@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>es.caib.ripea</groupId>
 		<artifactId>ripea</artifactId>
-		<version>0.9.105</version>
+		<version>0.9.105.1</version>
 	</parent>
 	<artifactId>ripea-core</artifactId>
 	<packaging>ejb</packaging>
