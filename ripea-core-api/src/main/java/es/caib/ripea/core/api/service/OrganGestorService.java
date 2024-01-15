@@ -241,7 +241,7 @@ public interface OrganGestorService {
 			Long entitatId,
 			String codi);
 
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public OrganGestorDto findById(
 			Long entitatId,
 			Long id);
