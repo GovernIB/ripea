@@ -164,7 +164,7 @@ public class OrganGestorServiceBean implements OrganGestorService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public OrganGestorDto findById(
 			Long entitatId,
 			Long id) {
