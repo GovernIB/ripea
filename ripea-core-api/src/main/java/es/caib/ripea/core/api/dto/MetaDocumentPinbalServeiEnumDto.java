@@ -24,4 +24,5 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDDGPRESIDENCIALEGALDOCWS01, //  Servei de consulta de dades de residència legal d'estrangers per documentació
 	SVDRRCCNACIMIENTOWS01, // Servei de consulta de naixement
 	SVDRRCCMATRIMONIOWS01, // Servei de consulta de matrimoni 
+	SVDRRCCDEFUNCIONWS01, // Servei de consulta de defunció
 }
