@@ -49,6 +49,8 @@ import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvdd
 import es.caib.pinbal.client.recobriment.svddgpresidencialegaldocws01.ClientSvddgpresidencialegaldocws01.SolicitudSvddgpresidencialegaldocws01.TipusPassaport;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02;
 import es.caib.pinbal.client.recobriment.svddgpviws02.ClientSvddgpviws02.SolicitudSvddgpviws02;
+import es.caib.pinbal.client.recobriment.svdrrccmatrimoniows01.ClientSvdrrccmatrimoniows01;
+import es.caib.pinbal.client.recobriment.svdrrccmatrimoniows01.ClientSvdrrccmatrimoniows01.SolicitudSvdrrccmatrimoniows01;
 import es.caib.pinbal.client.recobriment.svdrrccnacimientows01.ClientSvdrrccnacimientows01;
 import es.caib.pinbal.client.recobriment.svdrrccnacimientows01.ClientSvdrrccnacimientows01.SolicitudSvdrrccnacimientows01;
 import es.caib.pinbal.client.recobriment.svdscddws01.ClientSvdscddws01;
@@ -520,8 +522,6 @@ public class PinbalHelper {
                 .sexe(Utils.convertEnum(pinbalConsulta.getSexe(), es.caib.pinbal.client.recobriment.model.Sexe.class))
                 .build());
         
-
-
 		
 		try {
 			ScspRespuesta respuesta = getClientSvdrrccnacimientows01().peticionSincrona(Arrays.asList(solicitud));
@@ -531,6 +531,57 @@ public class PinbalHelper {
 		}
 	}
 	
+	
+	/** SVDRRCCMATRIMONIOWS01 - Servei de consulta de matrimoni  */
+	public String novaPeticioSvdrrccmatrimoniows01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdrrccmatrimoniows01 solicitud = new SolicitudSvdrrccmatrimoniows01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+        solicitud.setDadesRegistrals(SolicitudBaseSvdrrcc.DadesRegistrals.builder()
+                .registreCivil(pinbalConsulta.getRegistreCivil())
+                .tom(pinbalConsulta.getTom())
+                .pagina(pinbalConsulta.getPagina())
+                .build());
+        
+
+        solicitud.setTitularDadesAdicionals(TitularDadesAdicionals.builder()
+                .fetregistral(FetRegistral.builder()
+                        .data(pinbalConsulta.getDataRegistre())
+                        .municipi(Lloc.builder()
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistre()) ? "07" + pinbalConsulta.getMunicipiRegistre() : null)
+                                .build())
+                        .build())
+                .naixement(SolicitudBaseSvdrrcc.Naixement.builder()
+                        .data(Utils.convertStringToDate(pinbalConsulta.getDataNaixement(), "dd/MM/yyyy"))
+                        .municipi(Lloc.builder()
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixament()) ? "07" + pinbalConsulta.getMunicipiNaixament() : null)
+                                .build())
+                        .build())
+                .ausenciaSegonLlinatge(pinbalConsulta.isAusenciaSegundoApellido())
+                .nomMare(pinbalConsulta.getNomMare())
+                .nomPare(pinbalConsulta.getNomPare())
+                .sexe(Utils.convertEnum(pinbalConsulta.getSexe(), es.caib.pinbal.client.recobriment.model.Sexe.class))
+                .build());
+
+        
+		try {
+			ScspRespuesta respuesta = getClientSvdrrccmatrimoniows01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDRRCCMATRIMONIOWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDRRCCMATRIMONIOWS01", t0);
+		}
+	}
 	
 	
 	private String toSNString(SiNoEnumDto consentimentTipusDiscapacitat) {
@@ -980,6 +1031,19 @@ public class PinbalHelper {
 	
 	private ClientSvdrrccnacimientows01 getClientSvdrrccnacimientows01() {
 		ClientSvdrrccnacimientows01 client = new ClientSvdrrccnacimientows01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
+	private ClientSvdrrccmatrimoniows01 getClientSvdrrccmatrimoniows01() {
+		ClientSvdrrccmatrimoniows01 client = new ClientSvdrrccmatrimoniows01(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),

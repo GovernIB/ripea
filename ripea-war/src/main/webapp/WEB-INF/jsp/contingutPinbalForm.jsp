@@ -196,7 +196,30 @@ $(document).ready(function() {
 					  	<rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/>
 					  	<rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare"/>
 						<rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare"/>	
-					</div>																				
+					</div>				
+					
+					<div id="divSVDRRCCMATRIMONIOWS01">
+					
+						<legend><spring:message code="contingut.pinbal.form.legend.dadesRegistrals"/></legend>
+						
+						<rip:inputText name="registreCivil" textKey="contingut.pinbal.form.camp.registreCivil" required="true"/>
+						<rip:inputText name="tom" textKey="contingut.pinbal.form.camp.tom" required="true"/>
+						<rip:inputText name="pagina" textKey="contingut.pinbal.form.camp.pagina" required="true"/>
+						
+						<legend><spring:message code="contingut.pinbal.form.legend.fetRegistral"/></legend>
+						<rip:inputDate name="dataRegistre" textKey="contingut.pinbal.form.camp.data" required="true"/>
+						<rip:inputSelect name="municipiRegistre" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
+						
+						<legend><spring:message code="contingut.pinbal.form.legend.naixement"/></legend>		
+						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data"/>		
+					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
+					  	
+					  	<legend><spring:message code="contingut.pinbal.form.legend.dadesAdicionals"/></legend>	
+					  	<rip:inputCheckbox name="ausenciaSegundoApellido" textKey="contingut.pinbal.form.camp.ausenciaSegundoApellido"/>
+					  	<rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/>
+					  	<rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare"/>
+						<rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare"/>	
+					</div>																	
 					
 				</div>
 			</div>
