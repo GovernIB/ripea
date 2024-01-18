@@ -680,11 +680,69 @@ $(document).ready(function() {
 			
 		}
 
-
+		<c:if test="${isMantenirEstatCarpetaActiu}">
+			var $tableDocuments = $("#table-documents");
+			
+			$tableDocuments.on("click", "tr", function() {
+				var nodeId = $(this).data("node");
+				
+				toggleCurrentNode(nodeId);
+		    });
+			
+			function toggleCurrentNode(nodeId) {
+				var currentState = sessionStorage.getItem("nodeState-" + nodeId);
+			    var $selectedNode = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+			    
+			    if (currentState === "collapsed") {
+			      	sessionStorage.removeItem("nodeState-" + nodeId);
+				  	sessionStorage.setItem("nodeState-" + nodeId, "expanded");
+				  	
+				  	// Mostrar carpeta
+				  	$selectedNode.show();
+			    } else {
+			    	sessionStorage.removeItem("nodeState-" + nodeId);
+			      	sessionStorage.setItem("nodeState-" + nodeId, "collapsed");
+			      
+			      	$selectedNode.hide();
+			      	
+			      	// Ocultar de forma recursiva la carpeta
+			      	toggleCurrentNode($selectedNode.data('node'));
+			    }
+			}
+			
+			// Revisa el estado de las carpetas
+			$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
+				var nodeId = $(this).data("node");
+			    var nodeState = sessionStorage.getItem("nodeState-" + nodeId);
+				var $node = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+				
+			    if (nodeState === "expanded") {
+			    	$node.show();
+			      
+			      	var $expanderIcon = $node.prev('tr[data-node=' + $node.data("pnode") + ']').find('.treetable-expander');
+			      	$expanderIcon.removeClass('fa-angle-right').addClass('fa-angle-down');
+			    } else if (nodeState === "collapsed") {
+			    	closeCurrentNode($node);
+			    }
+			});
+		
+			// Cerrar carpetas e forma recursiva
+			function closeCurrentNode($node) {
+				$node.hide();
+			      
+			    var $expanderIcon = $node.prev('tr[data-node=' + $node.data("pnode") + ']').find('.treetable-expander');
+			    $expanderIcon.removeClass('fa-angle-down').addClass('fa-angle-right');
+			    
+			    var nodeIdActual = $node.data("node");
+			    var $nextNodes = $node.nextAll('tr[data-pnode="' + nodeIdActual + '"]');
 	
-
-		
-		
+			    if ($nextNodes && $nextNodes.size() > 0) {
+			    	$nextNodes.each(function(i, nextNode) {
+			    		closeCurrentNode($(nextNode));
+			    	});
+			    }
+			}
+	 	</c:if>
 	</c:if>//------------------------- if contingut is not document END ----------------------------------
 
 
