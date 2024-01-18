@@ -5,6 +5,7 @@ package es.caib.ripea.core.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariTascaFiltreDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
@@ -42,6 +44,7 @@ import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -128,10 +131,37 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		UsuariEntity usuariEntity = usuariRepository.findByCodi(auth.getName());
 		
+		ExpedientEntity expedient = null;
+		if (filtre.getExpedientId() != null) {
+			expedient = entityComprovarHelper.comprovarExpedient(
+					filtre.getExpedientId(),
+					false,
+					false,
+					false,
+					false,
+					false,
+					null);
+		}
+		
+		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
+		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
+		Date dataLimitInici = DateHelper.toDateInicialDia(filtre.getDataLimitInici());
+		Date dataLimitFi = DateHelper.toDateFinalDia(filtre.getDataLimitFi());
+		
 		Page<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
 				usuariEntity,
 				filtre.getEstat() == null,
 				filtre.getEstat(), 
+				expedient == null,
+				expedient,
+				dataInici == null,
+				dataInici,
+				dataFi == null,
+				dataFi,		
+				dataLimitInici == null,
+				dataLimitInici,
+				dataLimitFi == null,
+				dataLimitFi,
 				paginacioHelper.toSpringDataPageable(
 						paginacioParams));
 		

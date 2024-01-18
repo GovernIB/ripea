@@ -206,6 +206,7 @@ public class UsuariTascaController extends BaseUserController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new UsuariTascaFiltreCommand();
+			filtreCommand.setEstat(TascaEstatEnumDto.PENDENT);
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

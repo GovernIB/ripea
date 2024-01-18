@@ -15,6 +15,9 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>	
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
@@ -34,7 +37,33 @@
 	<c:url value="usuariTasca/filtrar" var="formAction"/>
 	<form:form id="filtreForm" action="${ formAction }" method="post" cssClass="well" commandName="usuariTascaFiltreCommand">
 		<div class="row">
-		
+			<div class="col-md-4">					
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpInicial"/>
+				<c:url value="/expedientajax/expedient" var="urlConsultaExpLlistat"/>
+				<rip:inputSuggest 
+ 					name="expedientId"  
+ 					urlConsultaInicial="${urlConsultaExpInicial}"
+ 					urlConsultaLlistat="${urlConsultaExpLlistat}"
+ 					usePathVariable="false"
+					placeholderKey="contingut.admin.filtre.expedient"
+ 					suggestValue="id"
+ 					suggestText="nomINumero"
+					inline="true"/>
+			</div>
+			<div class="col-md-2">
+				<rip:inputDate name="dataInici" inline="true" placeholderKey="accio.massiva.list.filtre.datainici"/>
+			</div>
+			<div class="col-md-2">
+				<rip:inputDate name="dataFi" inline="true" placeholderKey="accio.massiva.list.filtre.datafi"/>
+			</div>			
+		</div>
+		<div class="row">
+			<div class="col-md-2">
+				<rip:inputDate name="dataLimitInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitInici"/>
+			</div>
+			<div class="col-md-2">
+				<rip:inputDate name="dataLimitFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitFi"/>
+			</div>					
 			<div class="col-md-4">
 				<rip:inputSelect name="estat" optionEnum="TascaEstatEnumDto" emptyOption="true" placeholderKey="expedient.tasca.list.columna.estat" inline="true"/>
 			</div>

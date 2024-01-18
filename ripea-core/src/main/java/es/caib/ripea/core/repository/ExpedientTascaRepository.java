@@ -33,11 +33,26 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"inner join tasca.responsables responsable " +
 			"where " +
 			"	 responsable = :responsable " +
-			"and (:esNullEstat = true or tasca.estat = :estat)")
+			"and (:esNullEstat = true or tasca.estat = :estat)" + 
+			"and (:esNullExpedient = true or tasca.expedient = :expedient) " +
+			"and (:esNullDataInici = true or tasca.dataInici >= :dataInici) " +
+			"and (:esNullDataFi = true or tasca.dataInici <= :dataFi) " +
+			"and (:esNullDataLimitInici = true or tasca.dataLimit >= :dataLimitInici) " +
+			"and (:esNullDataLimitFi = true or tasca.dataLimit <= :dataLimitFi) ")			
 	Page<ExpedientTascaEntity> findByResponsableAndEstat(
 			@Param("responsable") UsuariEntity responsable,
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") TascaEstatEnumDto estat,
+			@Param("esNullExpedient") boolean esNullExpedient,
+			@Param("expedient") ExpedientEntity expedient,
+			@Param("esNullDataInici") boolean esNullDataInici,
+			@Param("dataInici") Date dataInici,
+			@Param("esNullDataFi") boolean esNullDataFi,
+			@Param("dataFi") Date dataFi,
+			@Param("esNullDataLimitInici") boolean esNullDataLimitInici,
+			@Param("dataLimitInici") Date dataLimitInici,
+			@Param("esNullDataLimitFi") boolean esNullDataLimitFi,
+			@Param("dataLimitFi") Date dataLimitFi,
 			Pageable pageable);
 	
 	
