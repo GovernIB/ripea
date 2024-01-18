@@ -70,6 +70,9 @@ public class PinbalConsultaCommand {
 	private Date dataCaducidad;
 	private Date dataExpedicion;
 	private String numeroSoporte;
+	
+	
+	private Integer curs;
 
 	
 	private String registreCivil;

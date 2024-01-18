@@ -68,6 +68,8 @@
 							<spring:message code="pinbal.servei.SVDRRCCMATRIMONIOWS01"/>
 						{{else codi == 'SVDRRCCDEFUNCIONWS01'}}
 							<spring:message code="pinbal.servei.SVDRRCCDEFUNCIONWS01"/>
+						{{else codi == 'SVDBECAWS01'}}
+							<spring:message code="pinbal.servei.SVDBECAWS01"/>
 						{{/if}}
 					</script>
 				</th>

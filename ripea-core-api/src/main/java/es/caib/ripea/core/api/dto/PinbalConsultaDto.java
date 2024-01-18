@@ -58,4 +58,6 @@ public class PinbalConsultaDto {
 	private String municipiRegistre;
 	private boolean ausenciaSegundoApellido;
 	
+	private Integer curs;
+	
 }

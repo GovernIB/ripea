@@ -242,7 +242,11 @@ $(document).ready(function() {
 					  	<rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/>
 					  	<rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare"/>
 						<rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare"/>	
-					</div>													
+					</div>		
+					
+					<div id="divSVDBECAWS01">
+						<rip:inputNumber name="curs" textKey="contingut.pinbal.form.camp.curs" required="true" nombreDecimals="0" comment="contingut.pinbal.form.camp.curs.comment"/>
+					</div>												
 					
 				</div>
 			</div>

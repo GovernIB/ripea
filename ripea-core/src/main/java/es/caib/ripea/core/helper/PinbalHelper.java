@@ -35,6 +35,8 @@ import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju;
 import es.caib.pinbal.client.recobriment.scdcpaju.ClientScdcpaju.SolicitudScdcpaju;
 import es.caib.pinbal.client.recobriment.scdhpaju.ClientScdhpaju;
 import es.caib.pinbal.client.recobriment.scdhpaju.ClientScdhpaju.SolicitudScdhpaju;
+import es.caib.pinbal.client.recobriment.svdbecaws01.ClientSvdbecaws01;
+import es.caib.pinbal.client.recobriment.svdbecaws01.ClientSvdbecaws01.SolicitudSvdbecaws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpasws01.ClientSvdccaacpasws01.SolicitudSvdccaacpasws01;
 import es.caib.pinbal.client.recobriment.svdccaacpcws01.ClientSvdccaacpcws01;
@@ -586,7 +588,7 @@ public class PinbalHelper {
 	}
 	
 	
-	/** SVDRRCCMATRIMONIOWS01 - Servei de consulta de matrimoni  */
+	/** SVDRRCCDEFUNCIONWS01 - Servei de consulta de defunció */
 	public String novaPeticioSvdrrccdefuncionws01(
 			ExpedientEntity expedient,
 			MetaDocumentEntity metaDocument,
@@ -634,6 +636,32 @@ public class PinbalHelper {
 			return processarScspRespuesta(solicitud, respuesta, "SVDRRCCDEFUNCIONWS01", t0);
 		} catch (Exception ex) {
 			throw processarException(solicitud, ex, "SVDRRCCDEFUNCIONWS01", t0);
+		}
+	}
+	
+	/** SVDBECAWS01 - Servei de consulta de condició de becat */
+	public String novaPeticioSvdbecaws01(
+			ExpedientEntity expedient,
+			MetaDocumentEntity metaDocument,
+			InteressatEntity interessat,
+			PinbalConsultaDto pinbalConsulta) throws PinbalException {
+		long t0 = System.currentTimeMillis();
+		SolicitudSvdbecaws01 solicitud = new SolicitudSvdbecaws01();
+		emplenarSolicitudBase(
+				solicitud,
+				expedient,
+				metaDocument,
+				interessat,
+				pinbalConsulta.getFinalitat(),
+				pinbalConsulta.getConsentiment());
+		
+		solicitud.setCurso(pinbalConsulta.getCurs().toString());
+        
+		try {
+			ScspRespuesta respuesta = getClientSvdbecaws01().peticionSincrona(Arrays.asList(solicitud));
+			return processarScspRespuesta(solicitud, respuesta, "SVDRRCSVDBECAWS01CDEFUNCIONWS01", t0);
+		} catch (Exception ex) {
+			throw processarException(solicitud, ex, "SVDBECAWS01", t0);
 		}
 	}
 	
@@ -1110,6 +1138,19 @@ public class PinbalHelper {
 	
 	private ClientSvdrrccdefuncionws01 getClientSvdrrccdefuncionws01() {
 		ClientSvdrrccdefuncionws01 client = new ClientSvdrrccdefuncionws01(
+				getPinbalBaseUrl(),
+				getPinbalUser(),
+				getPinbalPassword(),
+				getPinbalBasicAuth(),
+				null,
+				null);
+		if (log.isDebugEnabled())
+			client.enableLogginFilter();
+		return client;
+	}
+	
+	private ClientSvdbecaws01 getClientSvdbecaws01() {
+		ClientSvdbecaws01 client = new ClientSvdbecaws01(
 				getPinbalBaseUrl(),
 				getPinbalUser(),
 				getPinbalPassword(),

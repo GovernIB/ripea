@@ -139,6 +139,11 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 				bindingResult.rejectValue("dataRegistre", "NotEmpty");
 			}
 
+		} else if (metaDocument.getPinbalServei() == MetaDocumentPinbalServeiEnumDto.SVDBECAWS01) {
+		
+			if (command.getCurs() == null) {
+				bindingResult.rejectValue("curs", "NotEmpty");
+			}
 		}
 			
 		if (bindingResult.hasErrors()) {

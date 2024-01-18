@@ -25,4 +25,5 @@ public enum MetaDocumentPinbalServeiEnumDto {
 	SVDRRCCNACIMIENTOWS01, // Servei de consulta de naixement
 	SVDRRCCMATRIMONIOWS01, // Servei de consulta de matrimoni 
 	SVDRRCCDEFUNCIONWS01, // Servei de consulta de defunció
+	SVDBECAWS01, // Servei de consulta de condició de becat
 }
