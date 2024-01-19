@@ -286,13 +286,21 @@
 				
 					<%---- Notificar ----%>
 					<c:choose>
+						<c:when test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">
+							<c:set var="notificarMsg"><spring:message code="comu.boto.notificarOComunicar"/></c:set>	
+						</c:when>
+						<c:otherwise>
+							<c:set var="notificarMsg"><spring:message code="comu.boto.notificar"/></c:set>
+						</c:otherwise>
+					</c:choose>						
+					<c:choose>
 						<c:when test="${!empty expedient.interessatsNotificable}">
 							<li>
-							<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a>
+							<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a>
 							</li>
 						</c:when>
 						<c:otherwise>
-							<li class="disabled"><a class="btnNotificar" href="#" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;<spring:message code="comu.boto.notificar"/>...</a></li>
+							<li class="disabled"><a class="btnNotificar" href="#" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a></li>
 							<p style="font-size: 9px;padding: 1px 15px;">&nbsp;<spring:message code="comu.boto.notificar.comentari"/></p>
 						</c:otherwise>
 					</c:choose>
