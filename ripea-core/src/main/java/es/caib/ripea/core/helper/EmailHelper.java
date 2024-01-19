@@ -790,8 +790,7 @@ public class EmailHelper {
 						estatAnterior == null,
 						expedientTascaEntity.getExpedient(),
 						expedientTascaEntity.getCreatedBy().getCodi(),
-						expedientTascaEntity.getResponsables()),
-				false);
+						expedientTascaEntity.getResponsables()));
 
 	}	
 	
@@ -914,8 +913,7 @@ public class EmailHelper {
 	private void enviarEmailCanviarEstatTasca(
 			ExpedientTascaEntity expedientTascaEntity,
 			TascaEstatEnumDto estatAnterior,
-			Set<DadesUsuari> responsables,
-			boolean destinitariHasPermisTasca) {
+			Set<DadesUsuari> responsables) {
 		logger.debug("Enviant correu electrònic per a canvis de tasca (" +
 			"tascaId=" + expedientTascaEntity.getId() + ")");
 		
@@ -927,10 +925,7 @@ public class EmailHelper {
 		if (estat == TascaEstatEnumDto.REBUTJADA) {
 			rebutjMotiu = "\tMotiu: " + expedientTascaEntity.getMotiuRebuig() + "\n";
 		}
-		String enllacTramitar = "";
-		if (destinitariHasPermisTasca && (estatAnterior == null || expedientTascaEntity.getEstat() == TascaEstatEnumDto.INICIADA || expedientTascaEntity.getEstat() == TascaEstatEnumDto.PENDENT)) {
-			enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/usuariTasca/" + expedientTascaEntity.getId() + "/tramitar" + "\n";
-		}
+		String enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/contingut/" + expedientTascaEntity.getExpedient().getId() + "?tascaId=" + expedientTascaEntity.getId() + "\n"; 
 		if (estatAnterior == null) {
 			subject = getPrefixRipea() + " Nova tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 			text = 					
@@ -939,6 +934,7 @@ public class EmailHelper {
 					"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
 					"\tEstat: " + estat + "\n" +
 					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
+					"\tExpedient: " + expedientTascaEntity.getExpedient().getNomINumero() + "\n" +
 					enllacTramitar;
 		} else {
 			subject = getPrefixRipea() + " Canvi d'estat de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
@@ -950,6 +946,7 @@ public class EmailHelper {
 							"\tEstat actual:" + estat + "\n" + 
 							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 							rebutjMotiu +
+							"\tExpedient: " + expedientTascaEntity.getExpedient().getNomINumero() + "\n" +
 							enllacTramitar;
 		}
 		
