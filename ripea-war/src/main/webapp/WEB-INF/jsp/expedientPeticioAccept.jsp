@@ -75,6 +75,7 @@ function refrescarOrgan() {
 }
 
 
+//################################################## document ready START ##############################################################
 $(document).ready(function(){
 
 	if ('${expedientPeticioAcceptarCommand.accio}' == 'CREAR') {
@@ -192,7 +193,7 @@ $(document).ready(function(){
 		}
 	});		
 			
-});
+});//################################################## document ready END ##############################################################
 
 
 

@@ -124,9 +124,6 @@ $(document).ready(function() {
 	});
 
 
-
-
-	
 	$(".notificarSubmit").click(function(event) {
 
 		event.stopImmediatePropagation();
@@ -168,16 +165,6 @@ $(document).ready(function() {
 		}
 	});
 
-	function submitNotificacio(){
-		$("#notificacioForm").submit();
-		$('.notificarSubmit', parent.document).parent().parent().find(".modal-body iframe").hide();
-		$('.modal-body .datatable-dades-carregant', parent.document).css('padding-bottom', '0px');
-		$('.modal-body .datatable-dades-carregant', parent.document).css('padding-top', '60px');
-		$('.modal-body .datatable-dades-carregant', parent.document).show();
-		$('.notificarSubmit', parent.document).attr('disabled', true);
-		
-	}
-
 	
 	$('#entregaPostal').on('change', function() {
 		if ($(this).is(':checked')) {
@@ -205,10 +192,30 @@ $(document).ready(function() {
 		$("#tipus option[value='']").remove();
 		$("#tipus option[value='NOTIFICACIO']").remove();
 	}
+
+
+	<c:if test="${fn:length(interessats) == 1}">
+		let interessatId = ${interessats[0].id};
+		$('#interessatsIds').val(interessatId);
+		$('#interessatsIds').trigger('change');
+	</c:if>
 	
+
 
 	
 });//################################################## document ready END ##############################################################
+
+
+function submitNotificacio(){
+	$("#notificacioForm").submit();
+	$('.notificarSubmit', parent.document).parent().parent().find(".modal-body iframe").hide();
+	$('.modal-body .datatable-dades-carregant', parent.document).css('padding-bottom', '0px');
+	$('.modal-body .datatable-dades-carregant', parent.document).css('padding-top', '60px');
+	$('.modal-body .datatable-dades-carregant', parent.document).show();
+	$('.notificarSubmit', parent.document).attr('disabled', true);
+	
+}
+
 
 function getNotificacionsSenseNif() {
 	var interessatsSelected = $('#interessatsIds').val();
