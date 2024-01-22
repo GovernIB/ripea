@@ -2206,9 +2206,15 @@ public class PluginHelper {
 	}
 	
 	public List<DigitalitzacioPerfilDto> digitalitzacioPerfilsDisponibles(String idioma) {
-
-		String accioDescripcio = "Recuperant perfils disponibles";
-		long t0 = System.currentTimeMillis();
+		
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idioma", idioma);
+		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+				"Recuperant perfils disponibles",
+				accioParams,
+				IntegracioHelper.INTCODI_DIGITALITZACIO,
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
 		List<DigitalitzacioPerfilDto> perfilsDto = new ArrayList<DigitalitzacioPerfilDto>();;
 		try {
 			List<DigitalitzacioPerfil> perfils = getDigitalitzacioPlugin().recuperarPerfilsDisponibles(idioma);
@@ -2222,21 +2228,34 @@ public class PluginHelper {
 					perfilsDto.add(perfilDto);
 				}
 			}
+			
+			accioOk(integracioAccio);
+			
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_DIGITALITZACIO, accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			if (ex.getClass() == SistemaExternException.class) {
-				throw (SistemaExternException) ex;
-			}
-			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO, errorDescripcio, ex);
+
+			throw accioError(
+					"Error al accedir al plugin de digitalitzacio",
+					integracioAccio,
+					ex);
 		}
 		return perfilsDto;
 	}
 	
 	public DigitalitzacioTransaccioRespostaDto digitalitzacioIniciarProces(String idioma, String codiPerfil, UsuariDto funcionari, String urlReturn) {
 
-		String accioDescripcio = "Iniciant procés digitalització";
-		long t0 = System.currentTimeMillis();
+		
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idioma", idioma);
+		accioParams.put("codiPerfil", codiPerfil);
+		accioParams.put("funcionari", funcionari.getCodi());
+		accioParams.put("urlReturn", urlReturn);
+		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+				"Iniciant procés digitalització",
+				accioParams,
+				IntegracioHelper.INTCODI_DIGITALITZACIO,
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
+		
 		DigitalitzacioTransaccioRespostaDto respostaDto = new DigitalitzacioTransaccioRespostaDto();
 		try {
 			DigitalitzacioTransaccioResposta resposta = getDigitalitzacioPlugin().iniciarProces(codiPerfil, idioma, funcionari, urlReturn);
@@ -2246,18 +2265,30 @@ public class PluginHelper {
 				respostaDto.setReturnScannedFile(resposta.isReturnScannedFile());
 				respostaDto.setReturnSignedFile(resposta.isReturnSignedFile());
 			}
+			
+			accioOk(integracioAccio);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_DIGITALITZACIO, accioDescripcio, null, IntegracioAccioTipusEnumDto.RECEPCIO, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO, errorDescripcio, ex);
+
+			throw accioError(
+					"Error al accedir al plugin de digitalitzacio",
+					integracioAccio,
+					ex);
 		}
 		return respostaDto;
 	}
 	
 	public DigitalitzacioResultatDto digitalitzacioRecuperarResultat(String idTransaccio, boolean returnScannedFile, boolean returnSignedFile) {
 
-		String accioDescripcio = "Recuperant resultat digitalització";
-		long t0 = System.currentTimeMillis();
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idTransaccio", idTransaccio);
+		accioParams.put("returnScannedFile", String.valueOf(returnScannedFile));
+		accioParams.put("returnSignedFile", String.valueOf(returnSignedFile));
+		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+				"Recuperant resultat digitalització",
+				accioParams,
+				IntegracioHelper.INTCODI_DIGITALITZACIO,
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
+		
 		DigitalitzacioResultatDto resultatDto = new DigitalitzacioResultatDto();
 		try {
 			DigitalitzacioResultat resultat = getDigitalitzacioPlugin().recuperarResultat(idTransaccio, returnScannedFile, returnSignedFile);
@@ -2271,25 +2302,40 @@ public class PluginHelper {
 				resultatDto.setEniTipoFirma(resultat.getEniTipoFirma());
 				resultatDto.setIdioma(resultat.getIdioma());
 				resultatDto.setResolucion(resultat.getResolucion());
+				
+				accioOk(integracioAccio);
 			}
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_DIGITALITZACIO, accioDescripcio, null, IntegracioAccioTipusEnumDto.RECEPCIO, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO, errorDescripcio, ex);
+			
+			throw accioError(
+					"Error al accedir al plugin de digitalitzacio",
+					integracioAccio,
+					ex);
+			
 		}
 		return resultatDto;
 	}
 	
 	public void digitalitzacioTancarTransaccio(String idTransaccio) {
+		
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("idTransaccio", idTransaccio);
+		IntegracioAccioDto integracioAccio = getIntegracioAccio(
+				"Tancant transacció digitalització",
+				accioParams,
+				IntegracioHelper.INTCODI_DIGITALITZACIO,
+				IntegracioAccioTipusEnumDto.ENVIAMENT);
 
-		String accioDescripcio = "Tancant transacció digitalització";
-		long t0 = System.currentTimeMillis();
 		try {
 			getDigitalitzacioPlugin().tancarTransaccio(idTransaccio);
+			
+			accioOk(integracioAccio);
 		} catch (Exception ex) {
-			String errorDescripcio = "Error al accedir al plugin de digitalitzacio";
-			integracioHelper.addAccioError(IntegracioHelper.INTCODI_DIGITALITZACIO, accioDescripcio, null, IntegracioAccioTipusEnumDto.ENVIAMENT, System.currentTimeMillis() - t0, errorDescripcio, ex);
-			throw new SistemaExternException(IntegracioHelper.INTCODI_DIGITALITZACIO, errorDescripcio, ex);
+			
+			throw accioError(
+					"Error al accedir al plugin de digitalitzacio",
+					integracioAccio,
+					ex);
 		}
 	}
 	public PortafirmesFluxInfoDto portafirmesRecuperarInfoFluxDeFirma(String plantillaFluxId, String idioma, boolean signerInfo) {
