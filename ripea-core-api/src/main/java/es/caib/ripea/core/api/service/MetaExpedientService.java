@@ -459,7 +459,7 @@ public interface MetaExpedientService {
 			String codiDir3, String codiSia);
 	
 	@PreAuthorize("hasRole('tothom')")
-	public List<MetaExpedientDto> findByCodiSia(
+	public List<MetaExpedientDto> findByClassificacio(
 			Long entitatId,
 			String codiSia);
 

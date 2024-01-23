@@ -11,6 +11,8 @@ import javax.validation.constraints.Size;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.validation.CodiMetaExpedientNoRepetit;
 import lombok.Getter;
 
@@ -33,9 +35,11 @@ public class MetaExpedientImportEditCommand {
 	private String nom;
 	@Size(max = 1024)
 	private String descripcio;
-	@NotEmpty
+
+    private TipusClassificacioEnumDto tipusClassificacio;
 	@Size(max = 30)
-	private String classificacio;
+	private String classificacioSia;
+	private String classificacioId;
 	@NotEmpty
 	@Size(max = 30)
 	private String serieDocumental;
@@ -52,9 +56,6 @@ public class MetaExpedientImportEditCommand {
 	
 
 
-	public void setClassificacio(String classificacio) {
-		this.classificacio = classificacio != null ? classificacio.trim() : null;
-	}
 	public void setOrganGestorId(Long organGestorId) {
 		this.organGestorId = organGestorId;
 	}
@@ -84,6 +85,15 @@ public class MetaExpedientImportEditCommand {
 	}
 	public void setSerieDocumental(String serieDocumental) {
 		this.serieDocumental = StringUtils.trim(serieDocumental);
+	}
+	public void setClassificacioSia(String classificacioSia) {
+		this.classificacioSia = Utils.trim(classificacioSia);
+	}
+	public void setClassificacioId(String classificacioId) {
+		this.classificacioId = classificacioId;
+	}
+	public void setTipusClassificacio(TipusClassificacioEnumDto tipusClassificacio) {
+		this.tipusClassificacio = tipusClassificacio;
 	}
 
 

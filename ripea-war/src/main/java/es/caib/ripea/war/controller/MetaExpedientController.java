@@ -472,6 +472,8 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		request.getSession().setAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL, metaExpedientExport);
 		
+		model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
+		
 		return "importMetaExpedientEditForm";
 		
 	}
@@ -492,6 +494,7 @@ public class MetaExpedientController extends BaseAdminController {
 		
 		if (bindingResult.hasErrors()) {
 			model.addAttribute("hasPermisAdmComu", hasPermisAdmComu(request));
+			model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 			return "importMetaExpedientEditForm";
 		}
 		
@@ -554,7 +557,13 @@ public class MetaExpedientController extends BaseAdminController {
 			metaExpedientExport.setCodi(command.getCodi());
 			metaExpedientExport.setNom(command.getNom());
 			metaExpedientExport.setDescripcio(command.getDescripcio());
-			metaExpedientExport.setClassificacio(command.getClassificacio());
+			
+			metaExpedientExport.setTipusClassificacio(command.getTipusClassificacio());
+			if (command.getTipusClassificacio() == TipusClassificacioEnumDto.SIA) {
+				metaExpedientExport.setClassificacio(command.getClassificacioSia());
+			} else {
+				metaExpedientExport.setClassificacio(command.getClassificacioId());
+			}
 			metaExpedientExport.setSerieDocumental(command.getSerieDocumental());
 
 			if (command.getOrganGestorId() != null) {
@@ -645,7 +654,15 @@ public class MetaExpedientController extends BaseAdminController {
 		metaExpedientImportEditCommand.setCodi(metaExpedientExport.getCodi());
 		metaExpedientImportEditCommand.setNom(metaExpedientExport.getNom());
 		metaExpedientImportEditCommand.setDescripcio(metaExpedientExport.getDescripcio());
-		metaExpedientImportEditCommand.setClassificacio(metaExpedientExport.getClassificacio());
+		
+		TipusClassificacioEnumDto tipus = metaExpedientExport.getTipusClassificacio() != null ? metaExpedientExport.getTipusClassificacio() : TipusClassificacioEnumDto.SIA; 
+		metaExpedientImportEditCommand.setTipusClassificacio(tipus);
+		if (tipus == TipusClassificacioEnumDto.SIA) {
+			metaExpedientImportEditCommand.setClassificacioSia(metaExpedientExport.getClassificacio());
+		} else {
+			metaExpedientImportEditCommand.setClassificacioId(metaExpedientExport.getClassificacio());
+		}
+
 		metaExpedientImportEditCommand.setSerieDocumental(metaExpedientExport.getSerieDocumental());
 		
 		metaExpedientImportEditCommand.setComu(metaExpedientExport.isComu());
@@ -693,8 +710,9 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 		}
 		
-		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByCodiSia(command.getEntitatId(),
-				command.getClassificacio());
+		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByClassificacio(
+				command.getEntitatId(),
+				command.getClassificacioSia());
 		boolean valid = true;
 		if (metaExpedients != null && !metaExpedients.isEmpty()) {
 			if (command.getId() == null) {

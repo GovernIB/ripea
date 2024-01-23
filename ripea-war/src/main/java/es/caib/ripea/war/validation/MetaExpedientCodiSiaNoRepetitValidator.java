@@ -41,7 +41,7 @@ public class MetaExpedientCodiSiaNoRepetitValidator implements ConstraintValidat
 
 			MetaExpedientCommand metaExpedientCommand = (MetaExpedientCommand) value;
 
-			 List<MetaExpedientDto> metaExpedients = metaExpedientService.findByCodiSia(
+			 List<MetaExpedientDto> metaExpedients = metaExpedientService.findByClassificacio(
 					metaExpedientCommand.getEntitatId(),
 					metaExpedientCommand.getClassificacioSia());
 			if (metaExpedients == null || metaExpedients.isEmpty()) {

@@ -284,7 +284,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientPare,
 				organGestorId == null ? null : organGestorRepository.findOne(organGestorId),
 				metaExpedient.isGestioAmbGrupsActiva()).
-				expressioNumero(metaExpedient.getExpressioNumero()).build();
+				expressioNumero(metaExpedient.getExpressioNumero()).
+				tipusClassificacio(metaExpedient.getTipusClassificacio()).build();
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.save(entity);
 		if (metaExpedient.getEstructuraCarpetes() != null) {
 			//crear estructura carpetes per defecte
@@ -588,12 +589,12 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public List<MetaExpedientDto> findByCodiSia(Long entitatId, String codiSia) {
+	public List<MetaExpedientDto> findByClassificacio(Long entitatId, String classificacio) {
 		logger.debug(
-				"Consulta del meta-expedient per entitat i codi SIA (" + "entitatId=" + entitatId + ", " + "codi=" + codiSia +
+				"Consulta del meta-expedient per entitat i codi SIA (" + "entitatId=" + entitatId + ", " + "codi=" + classificacio +
 						")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(entitat, codiSia);
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(entitat, classificacio);
 		
 		List<MetaExpedientDto> resposta = null;
 		if (metaExpedients != null) {

@@ -306,10 +306,10 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 
 	@Override
 	@RolesAllowed({"tothom"})
-	public List<MetaExpedientDto> findByCodiSia(
+	public List<MetaExpedientDto> findByClassificacio(
 			Long entitatId,
 			String codiSia) {
-		return delegate.findByCodiSia(
+		return delegate.findByClassificacio(
 				entitatId, 
 				codiSia);
 	}
