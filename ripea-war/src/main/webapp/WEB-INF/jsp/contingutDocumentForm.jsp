@@ -310,7 +310,15 @@ $(document).ready(function() {
 			success: function(transaccioResponse) {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="140%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+
+					var mock = false; 
+					if (mock) {
+						var url = "<c:url value='/modal/digitalitzacio/mock'/>";
+					} else {
+						var url = transaccioResponse.urlRedireccio;
+					}
+					
+					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="140%" frameborder="0" allowtransparency="true" src="' + url + '"></iframe></div>'
 					$('.scan-result').append(iframeScan);
 					$('.scan-back-btn').addClass('hidden');
 					webutilModalAdjustHeight();
@@ -555,6 +563,7 @@ function removeLoading() {
 				<br/>
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="fitxer">
+					
 						<c:choose>
 							<c:when test="${isDeteccioFirmaAutomaticaActiva}">
 								<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>

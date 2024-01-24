@@ -33,6 +33,15 @@ if (rootIframe) {
 		$(window.parent.document).find('.start-scan-btn').show();
 	}
 
+
+	$(window.parent.document).find('#ntiEstadoElaboracion option').each(function() {
+	    if ( $(this).val() != 'EE03' ) {
+	        $(this).remove();
+	    }
+	});
+
+	
+
 	 $('.crearDocumentBtnSubmit', parent.parent.document).prop('disabled', false);
 	
 	//Adjust modal width/height

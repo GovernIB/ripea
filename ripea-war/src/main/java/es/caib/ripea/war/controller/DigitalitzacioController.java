@@ -99,6 +99,42 @@ public class DigitalitzacioController extends BaseUserController {
 				transaccioResponse.getIdTransaccio());
 		return transaccioResponse;
 	}
+	
+	@RequestMapping(value = "/mock", method = RequestMethod.GET)
+	public String mock(
+			HttpServletRequest request) {
+
+		return "mockDigitalitzacio";
+	}
+	
+	@RequestMapping(value = "/recuperarResultatMock/{idTransaccio}", method = RequestMethod.GET)
+	public String recuperarResultatMock(
+			HttpServletRequest request,
+			@PathVariable String idTransaccio,
+			Model model) {
+
+		
+		DigitalitzacioResultatDto resposta = new DigitalitzacioResultatDto();
+		
+		resposta.setNomDocument("Nom document");
+
+		
+		if (resposta.isError() && resposta.getEstat() != null) {
+			model.addAttribute(
+						"digitalizacioError",
+						getMessage(
+						request,
+						"document.digitalitzacio.estat.enum."+ resposta.getEstat()));
+		} else {
+			model.addAttribute(
+					"digitalizacioFinalOk",
+					getMessage(
+					request,
+					"document.digitalitzacio.estat.enum.FINAL_OK"));
+			model.addAttribute("nomDocument", resposta.getNomDocument());
+		}
+		return "digitalitzacioIframeTancar";
+	}
 
 	@RequestMapping(value = "/recuperarResultat/{idTransaccio}", method = RequestMethod.GET)
 	public String recuperarResultat(
