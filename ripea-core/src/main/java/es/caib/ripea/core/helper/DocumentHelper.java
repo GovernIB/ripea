@@ -162,7 +162,17 @@ public class DocumentHelper {
 		actualitzarFitxerDB(
 				entity,
 				fitxer);
-
+		
+		if (document.isScanned()) {
+			contingutLogHelper.log(
+					entity,
+					LogTipusEnumDto.ESCANEIG,
+					entity.getNom(),
+					null,
+					true,
+					true);
+		}
+		
 		contingutLogHelper.logCreacio(
 				entity,
 				true,
