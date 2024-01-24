@@ -212,7 +212,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);
 		}
-		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
+
 		
 		return "contingutDocumentForm";
 	}
@@ -1528,6 +1528,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
 		model.addAttribute("isDeteccioFirmaAutomaticaActiva", isDeteccioFirmaAutomaticaActiva());
+		
+		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
 		
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);

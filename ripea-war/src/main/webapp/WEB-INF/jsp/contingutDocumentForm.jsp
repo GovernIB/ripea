@@ -361,7 +361,17 @@ $(document).ready(function() {
 		$('.scan-back-btn').addClass('hidden');
 	});
 
+	//if validation errors on scanning
+	if ('${documentCommand.origen}' === 'ESCANER') {
+
+		leaveOnlyCopiaDelDocumentEnPapel();
+		
+	}
+	
 	$('#escaneigTab').on('click', function(){
+
+		leaveOnlyCopiaDelDocumentEnPapel();
+		
 		if (!$("#escaneig").find(".scan-cancel-btn").length) {
 			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
 		}
@@ -369,8 +379,33 @@ $(document).ready(function() {
 		    $('.start-scan-btn').click();
 		}
 	});
+
+	function leaveOnlyCopiaDelDocumentEnPapel() {
+		$('#ntiEstadoElaboracion option').each(function() {
+		    if ( $(this).val() != 'EE03' ) {
+		        $(this).remove();
+		    }
+		});
+		$('#ntiEstadoElaboracion').val('EE03'); 
+		$('#ntiEstadoElaboracion').trigger('change');
+	}
 	
 	$('#fitxerTab').on('click', function(){
+
+		$('#ntiEstadoElaboracion').empty(); 
+		let newOption = new Option('Cap', '', false, false);
+		$('#ntiEstadoElaboracion').append(newOption);
+		let estatsArray = [];
+		<c:forEach var="option" items="${ntiEstatElaboracioOptions}">
+			estatsArray.push(new Option("<spring:message code="${option.text}"/>", "${option.value}", false, false));
+		</c:forEach>
+		for ( var el in estatsArray) {
+			$('#ntiEstadoElaboracion').append(estatsArray[el]);
+		}
+		$('#ntiEstadoElaboracion').val(''); 
+		$('#ntiEstadoElaboracion').trigger('change');
+
+		
 		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
 
 	});
