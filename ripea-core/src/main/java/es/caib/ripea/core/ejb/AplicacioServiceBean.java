@@ -190,7 +190,7 @@ public class AplicacioServiceBean implements AplicacioService {
 	public boolean getBooleanJbossProperty(
 			String key,
 			boolean defaultValueIfNull) {
-		return getBooleanJbossProperty(
+		return delegate.getBooleanJbossProperty(
 				key,
 				defaultValueIfNull);
 	}
