@@ -741,7 +741,9 @@ function hexToRgb(hex) {
 								{{/if}}
 
 								<%-----------------%>
-								<li role="separator" class="divider"></li>
+								{{if arxiuUuid == null || rolActualAdminEntitatOAdminOrgan || potModificar}}
+									<li role="separator" class="divider"></li>
+								{{/if}}
 
 								<%---- Agafar/Alliberar... ----%>
 								{{if rolActualPermisPerModificarExpedient}}
@@ -815,7 +817,7 @@ function hexToRgb(hex) {
 								{{/if}}
 
 								{{if arxiuUuid != null}}
-									<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+									<li><a href="<c:url value="/contingut/{{:id}}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 								{{else}}
 									<li class="disabled"><a href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
 								{{/if}}
