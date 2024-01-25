@@ -142,7 +142,10 @@ $(document).ready(function() {
 				$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+					var hasOption = $('#ntiEstadoElaboracion option[value="' + data.ntiEstadoElaboracion + '"]');
+					if (hasOption.length != 0) {
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+					}
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 				})
 			} else { // if modifying existing document 
@@ -150,6 +153,11 @@ $(document).ready(function() {
 					$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+
+						var hasOption = $('#ntiEstadoElaboracion option[value="' + data.ntiEstadoElaboracion + '"]');
+						if (hasOption.length != 0) {
+							$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						}
 						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
 						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					})
@@ -311,7 +319,7 @@ $(document).ready(function() {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 
-					var mock = false; 
+					var mock = ${isScannerMock}; 
 					if (mock) {
 						var url = "<c:url value='/modal/digitalitzacio/mock'/>";
 					} else {

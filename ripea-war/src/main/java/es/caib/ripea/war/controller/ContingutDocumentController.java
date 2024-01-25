@@ -1531,6 +1531,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
 		
+		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty("es.caib.ripea.document.scanner.mock", false));
+		
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);
 		}
