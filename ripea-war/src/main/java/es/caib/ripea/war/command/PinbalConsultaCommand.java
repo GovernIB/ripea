@@ -54,7 +54,6 @@ public class PinbalConsultaCommand {
 	private String provinciaNaixament;
 	private String poblacioNaixament;
 	private String codiPoblacioNaixament;
-	private String municipiNaixament;
 	private SexeEnumDto sexe;
 	private String nomPare;
 	private String nomMare;
@@ -79,9 +78,15 @@ public class PinbalConsultaCommand {
 	private String tom;
 	private String pagina;
 	private Date dataRegistre;
-	private String municipiRegistre;
 	private boolean ausenciaSegundoApellido;
-	
+	private String municipiRegistreSVDRRCCDEFUNCIONWS01;
+	private String municipiNaixamentSVDRRCCDEFUNCIONWS01;
+	private String municipiNaixamentSVDRRCCMATRIMONIOWS01;
+	private String municipiRegistreSVDRRCCMATRIMONIOWS01;
+	private String municipiRegistreSVDRRCCNACIMIENTOWS01;
+	private String municipiNaixamentSVDRRCCNACIMIENTOWS01;
+	private String municipiNaixamentSVDDELSEXWS01;
+
 	
 	public static PinbalConsultaDto asDto(PinbalConsultaCommand command) {
 		PinbalConsultaDto dto = ConversioTipusHelper.convertir(

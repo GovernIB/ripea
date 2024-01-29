@@ -33,7 +33,6 @@ public class PinbalConsultaDto {
 	private String codiNacionalitat;
 	private String paisNaixament;
 	private String provinciaNaixament;
-	private String municipiNaixament;
 	private String poblacioNaixament;
 	private String codiPoblacioNaixament;
 	private SexeEnumDto sexe;
@@ -55,9 +54,16 @@ public class PinbalConsultaDto {
 	private String tom;
 	private String pagina;
 	private Date dataRegistre;
-	private String municipiRegistre;
 	private boolean ausenciaSegundoApellido;
 	
 	private Integer curs;
+	
+	private String municipiRegistreSVDRRCCDEFUNCIONWS01;
+	private String municipiNaixamentSVDRRCCDEFUNCIONWS01;
+	private String municipiNaixamentSVDRRCCMATRIMONIOWS01;
+	private String municipiRegistreSVDRRCCMATRIMONIOWS01;
+	private String municipiRegistreSVDRRCCNACIMIENTOWS01;
+	private String municipiNaixamentSVDRRCCNACIMIENTOWS01;
+	private String municipiNaixamentSVDDELSEXWS01;
 	
 }

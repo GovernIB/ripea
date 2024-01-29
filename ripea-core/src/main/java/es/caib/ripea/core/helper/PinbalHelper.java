@@ -348,7 +348,7 @@ public class PinbalHelper {
 		solicitud.setPoblacionNacimiento(pinbalConsulta.getPoblacioNaixament());
 		
 		if (pinbalConsulta.getPaisNaixament().equals("724")) {
-			solicitud.setCodPoblacionNacimiento(pinbalConsulta.getProvinciaNaixament() + pinbalConsulta.getMunicipiNaixament());
+			solicitud.setCodPoblacionNacimiento(pinbalConsulta.getProvinciaNaixament() + pinbalConsulta.getMunicipiNaixamentSVDDELSEXWS01());
 		} else {
 			solicitud.setCodPoblacionNacimiento(pinbalConsulta.getCodiPoblacioNaixament());
 		}
@@ -511,13 +511,13 @@ public class PinbalHelper {
                 .fetregistral(FetRegistral.builder()
                         .data(pinbalConsulta.getDataRegistre())
                         .municipi(Lloc.builder()
-                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistre()) ? "07" + pinbalConsulta.getMunicipiRegistre() : null)
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistreSVDRRCCNACIMIENTOWS01()) ? "07" + pinbalConsulta.getMunicipiRegistreSVDRRCCNACIMIENTOWS01() : null)
                                 .build())
                         .build())
                 .naixement(SolicitudBaseSvdrrcc.Naixement.builder()
                         .data(Utils.convertStringToDate(pinbalConsulta.getDataNaixement(), "dd/MM/yyyy"))
                         .municipi(Lloc.builder()
-                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixament()) ? "07" + pinbalConsulta.getMunicipiNaixament() : null)
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixamentSVDRRCCNACIMIENTOWS01()) ? "07" + pinbalConsulta.getMunicipiNaixamentSVDRRCCNACIMIENTOWS01() : null)
                                 .build())
                         .build())
                 .ausenciaSegonLlinatge(pinbalConsulta.isAusenciaSegundoApellido())
@@ -563,13 +563,13 @@ public class PinbalHelper {
                 .fetregistral(FetRegistral.builder()
                         .data(pinbalConsulta.getDataRegistre())
                         .municipi(Lloc.builder()
-                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistre()) ? "07" + pinbalConsulta.getMunicipiRegistre() : null)
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistreSVDRRCCMATRIMONIOWS01()) ? "07" + pinbalConsulta.getMunicipiRegistreSVDRRCCMATRIMONIOWS01() : null)
                                 .build())
                         .build())
                 .naixement(SolicitudBaseSvdrrcc.Naixement.builder()
                         .data(Utils.convertStringToDate(pinbalConsulta.getDataNaixement(), "dd/MM/yyyy"))
                         .municipi(Lloc.builder()
-                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixament()) ? "07" + pinbalConsulta.getMunicipiNaixament() : null)
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixamentSVDRRCCMATRIMONIOWS01()) ? "07" + pinbalConsulta.getMunicipiNaixamentSVDRRCCMATRIMONIOWS01() : null)
                                 .build())
                         .build())
                 .ausenciaSegonLlinatge(pinbalConsulta.isAusenciaSegundoApellido())
@@ -616,13 +616,13 @@ public class PinbalHelper {
                 .fetregistral(FetRegistral.builder()
                         .data(pinbalConsulta.getDataRegistre())
                         .municipi(Lloc.builder()
-                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistre()) ? "07" + pinbalConsulta.getMunicipiRegistre() : null)
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiRegistreSVDRRCCDEFUNCIONWS01()) ? "07" + pinbalConsulta.getMunicipiRegistreSVDRRCCDEFUNCIONWS01() : null)
                                 .build())
                         .build())
                 .naixement(SolicitudBaseSvdrrcc.Naixement.builder()
                         .data(Utils.convertStringToDate(pinbalConsulta.getDataNaixement(), "dd/MM/yyyy"))
                         .municipi(Lloc.builder()
-                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixament()) ? "07" + pinbalConsulta.getMunicipiNaixament() : null)
+                                .codi(Utils.isNotEmpty(pinbalConsulta.getMunicipiNaixamentSVDRRCCDEFUNCIONWS01()) ? "07" + pinbalConsulta.getMunicipiNaixamentSVDRRCCDEFUNCIONWS01() : null)
                                 .build())
                         .build())
                 .ausenciaSegonLlinatge(pinbalConsulta.isAusenciaSegundoApellido())
