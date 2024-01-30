@@ -1071,7 +1071,11 @@ public class EntityComprovarHelper {
 			MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientIdAndOrganGestorId(
 					procedimentId,
 					org); 
-			metaExpedientOrgansGestors.add(metaExpedientOrganGestor);
+			
+			if (metaExpedientOrganGestor != null) {
+				metaExpedientOrgansGestors.add(metaExpedientOrganGestor);
+			}
+			
 		}
 
 		permisosHelper.filterGrantedAll(

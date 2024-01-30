@@ -170,7 +170,8 @@ public class ContingutServiceTest extends BaseExpedientServiceTest {
 						contingutService.dadaSave(
 								entitatCreada.getId(),
 								expedientCreat.getId(),
-								valors);
+								valors, 
+								null);
 						
 						ExpedientDto contingut = (ExpedientDto) contingutService.findAmbIdUser(
 								entitatCreada.getId(),

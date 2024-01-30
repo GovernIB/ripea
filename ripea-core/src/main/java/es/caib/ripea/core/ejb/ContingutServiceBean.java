@@ -57,11 +57,13 @@ public class ContingutServiceBean implements ContingutService {
 	public void dadaSave(
 			Long entitatId,
 			Long contingutId,
-			Map<String, Object> valors) {
+			Map<String, Object> valors, 
+			Long tascaId) {
 		delegate.dadaSave(
 				entitatId,
 				contingutId,
-				valors);
+				valors, 
+				tascaId);
 	}
 
 	@Override

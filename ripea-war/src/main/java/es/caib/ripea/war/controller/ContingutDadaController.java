@@ -110,7 +110,8 @@ public class ContingutDadaController extends BaseUserOAdminOOrganController {
 			contingutService.dadaSave(
 					entitatActual.getId(),
 					contingutId,
-					valors);
+					valors, 
+					null);
 			MissatgesHelper.success(request, getMessage(request, "contingut.controller.dades.modificades.ok"));
 			return AjaxHelper.generarAjaxFormOk();
 		}
