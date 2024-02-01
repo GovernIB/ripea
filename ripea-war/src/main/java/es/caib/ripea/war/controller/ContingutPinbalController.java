@@ -100,7 +100,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			if (StringUtils.isEmpty(command.getDataNaixement())) {
 				bindingResult.rejectValue("dataNaixement", "NotEmpty");
 			}
-			if (command.getPaisNaixament().equals("724") && StringUtils.isEmpty(command.getMunicipiNaixament())) {
+			if (command.getPaisNaixament().equals("724") && StringUtils.isEmpty(command.getMunicipiNaixamentSVDDELSEXWS01())) {
 				bindingResult.rejectValue("municipiNaixament", "NotEmpty");
 			}
 			if (!command.getPaisNaixament().equals("724") && StringUtils.isEmpty(command.getPoblacioNaixament())) {

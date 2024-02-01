@@ -142,7 +142,10 @@ $(document).ready(function() {
 				$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 				.done(function(data) {			
 					$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
-					$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+					var hasOption = $('#ntiEstadoElaboracion option[value="' + data.ntiEstadoElaboracion + '"]');
+					if (hasOption.length != 0) {
+						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+					}
 					$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 				})
 			} else { // if modifying existing document 
@@ -150,6 +153,11 @@ $(document).ready(function() {
 					$.get('<c:url value="/modal/contingut/${contingutId}/metaDocument/"/>' +  $(this).val() + '/dadesnti')
 					.done(function(data) {			
 						$('#ntiOrigen').val(data.ntiOrigen).trigger('change');
+
+						var hasOption = $('#ntiEstadoElaboracion option[value="' + data.ntiEstadoElaboracion + '"]');
+						if (hasOption.length != 0) {
+							$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
+						}
 						$('#ntiEstadoElaboracion').val(data.ntiEstadoElaboracion).trigger('change');
 						$('#ntiTipoDocumental').val(data.ntiTipoDocumental).trigger('change');
 					})
@@ -310,7 +318,15 @@ $(document).ready(function() {
 			success: function(transaccioResponse) {
 				if (transaccioResponse != null) {
 					localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
-					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="140%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe></div>'
+
+					var mock = ${isScannerMock}; 
+					if (mock) {
+						var url = "<c:url value='/modal/digitalitzacio/mock'/>";
+					} else {
+						var url = transaccioResponse.urlRedireccio;
+					}
+					
+					var iframeScan = '<div class="iframe_container"><iframe onload="removeLoading()" class="iframe_content" width="100%" height="140%" frameborder="0" allowtransparency="true" src="' + url + '"></iframe></div>'
 					$('.scan-result').append(iframeScan);
 					$('.scan-back-btn').addClass('hidden');
 					webutilModalAdjustHeight();
@@ -353,7 +369,17 @@ $(document).ready(function() {
 		$('.scan-back-btn').addClass('hidden');
 	});
 
+	//if validation errors on scanning
+	if ('${documentCommand.origen}' === 'ESCANER') {
+
+		leaveOnlyCopiaDelDocumentEnPapel();
+		
+	}
+	
 	$('#escaneigTab').on('click', function(){
+
+		leaveOnlyCopiaDelDocumentEnPapel();
+		
 		if (!$("#escaneig").find(".scan-cancel-btn").length) {
 			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
 		}
@@ -361,8 +387,33 @@ $(document).ready(function() {
 		    $('.start-scan-btn').click();
 		}
 	});
+
+	function leaveOnlyCopiaDelDocumentEnPapel() {
+		$('#ntiEstadoElaboracion option').each(function() {
+		    if ( $(this).val() != 'EE03' ) {
+		        $(this).remove();
+		    }
+		});
+		$('#ntiEstadoElaboracion').val('EE03'); 
+		$('#ntiEstadoElaboracion').trigger('change');
+	}
 	
 	$('#fitxerTab').on('click', function(){
+
+		$('#ntiEstadoElaboracion').empty(); 
+		let newOption = new Option('Cap', '', false, false);
+		$('#ntiEstadoElaboracion').append(newOption);
+		let estatsArray = [];
+		<c:forEach var="option" items="${ntiEstatElaboracioOptions}">
+			estatsArray.push(new Option("<spring:message code="${option.text}"/>", "${option.value}", false, false));
+		</c:forEach>
+		for ( var el in estatsArray) {
+			$('#ntiEstadoElaboracion').append(estatsArray[el]);
+		}
+		$('#ntiEstadoElaboracion').val(''); 
+		$('#ntiEstadoElaboracion').trigger('change');
+
+		
 		$('.crearDocumentBtnSubmit', parent.document).prop('disabled', false);
 
 	});
@@ -555,6 +606,7 @@ function removeLoading() {
 				<br/>
 				<div class="tab-content">
 					<div role="tabpanel" class="tab-pane active" id="fitxer">
+					
 						<c:choose>
 							<c:when test="${isDeteccioFirmaAutomaticaActiva}">
 								<div id="loading" style="display: none;"><div style="text-align: center; margin-bottom: 30px; color: #666666; margin-top: 30px;"><span class="fa fa-circle-o-notch fa-spin fa-3x"></span></div></div>

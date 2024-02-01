@@ -295,6 +295,8 @@ public class DocumentCommand extends ContenidorCommand {
 		}
 		dto.setIdioma(command.getIdioma());
 		dto.setResolucion(command.getResolucion());
+		
+		dto.setScanned(command.getOrigen() == DocumentFisicOrigenEnum.ESCANER);
 		return dto;
 	}
 

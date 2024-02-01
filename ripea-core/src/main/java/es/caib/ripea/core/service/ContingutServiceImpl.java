@@ -181,18 +181,28 @@ public class ContingutServiceImpl implements ContingutService {
 	public void dadaSave(
 			Long entitatId,
 			Long contingutId,
-			Map<String, Object> valors) throws NotFoundException {
+			Map<String, Object> valors, 
+			Long tascaId) throws NotFoundException {
 		logger.debug("Guardant dades del node (" +
 				"entitatId=" + entitatId + ", " +
 				"contingutId=" + contingutId + ", " +
 				"valors=" + valors + ")");
-		NodeEntity node = contingutHelper.comprovarNodeDinsExpedientModificable(
-				entitatId,
-				contingutId,
-				false,
-				true,
-				false,
-				false, true, null);
+		
+		NodeEntity node = null;
+		if (tascaId == null) {
+			node = contingutHelper.comprovarNodeDinsExpedientModificable(
+					entitatId,
+					contingutId,
+					false,
+					true,
+					false,
+					false, true, null);
+		} else {
+			node = contingutHelper.comprovarNodePertanyTascaAccesible(
+					tascaId,
+					contingutId);
+		}
+
 		// Esborra les dades no especificades
 		for (DadaEntity dada: dadaRepository.findByNode(node)) {
 			if (!valors.keySet().contains(dada.getMetaDada().getCodi())) {

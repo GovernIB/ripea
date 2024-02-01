@@ -1123,6 +1123,10 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 			organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
 		} else if (RolHelper.isAdminOrgan(rolActual)){
 			organsGestors = organGestorRepository.findDescendents(entitat, Arrays.asList(organActualId));
+			OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
+					entitat,
+					entitat.getUnitatArrel());
+			organsGestors.add(0, organGestorEntitat);
 			
 		} else {
 		

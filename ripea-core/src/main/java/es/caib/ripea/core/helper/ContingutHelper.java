@@ -1311,6 +1311,22 @@ public class ContingutHelper {
 
 		return contingut;
 	}
+	
+	
+	public NodeEntity comprovarNodePertanyTascaAccesible(
+			Long tascaId,
+			Long contingutId) {
+		ContingutEntity contingut = comprovarContingutPertanyTascaAccesible(
+				tascaId,
+				contingutId);
+		if (!(contingut instanceof NodeEntity)) {
+			throw new ValidationException(
+					contingut.getId(),
+					ContingutEntity.class,
+					"El contingut no és un node");
+		}
+		return (NodeEntity)contingut;
+	}
 
 
 

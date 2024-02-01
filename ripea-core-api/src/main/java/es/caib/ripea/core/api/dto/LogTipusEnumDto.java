@@ -75,5 +75,7 @@ public enum LogTipusEnumDto {
 	CANVI_RESPONSABLES,
 	
 	// Tancament logic expedient
-	TANCAMENT_LOGIC
+	TANCAMENT_LOGIC,
+	
+	ESCANEIG
 }

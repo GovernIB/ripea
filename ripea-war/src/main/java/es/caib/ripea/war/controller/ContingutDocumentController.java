@@ -212,7 +212,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);
 		}
-		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
+
 		
 		return "contingutDocumentForm";
 	}
@@ -1383,7 +1383,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			crearDadesPerDefecteSiExisteixen(
 					entitatActual.getId(),
 					document.getId(),
-					command.getMetaNodeId());
+					command.getMetaNodeId(), 
+					tascaId);
 			
 
 			if (document.getArxiuUuid() != null) {
@@ -1419,7 +1420,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private void crearDadesPerDefecteSiExisteixen(
 			Long entitatId,
 			Long documentId,
-			Long metaDocumentId) {
+			Long metaDocumentId, 
+			Long tascaId) {
 		
 		try {
 			List<DadaDto> dades = new ArrayList<DadaDto>();
@@ -1450,7 +1452,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			contingutService.dadaSave(
 					entitatId,
 					documentId,
-					valors);
+					valors, 
+					tascaId);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -1528,6 +1531,10 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
 		model.addAttribute("isDeteccioFirmaAutomaticaActiva", isDeteccioFirmaAutomaticaActiva());
+		
+		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
+		
+		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty("es.caib.ripea.document.scanner.mock", false));
 		
 		if (tascaId != null) {
 			model.addAttribute("tascaId", tascaId);

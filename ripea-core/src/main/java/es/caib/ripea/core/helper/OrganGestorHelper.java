@@ -158,8 +158,22 @@ public class OrganGestorHelper {
 		
 		if (RolHelper.isAdminEntitat(rolActual)) {
 			return true;
-		} else if (RolHelper.isAdminOrgan(rolActual) && organGestorAmbPares.contains(organGestor)) {
-			return true;
+		} else if (RolHelper.isAdminOrgan(rolActual)) {
+			boolean permes = false;
+			for (OrganGestorEntity organGestorActual: organGestorAmbPares) {
+				if (permisosHelper.isGrantedAny(
+						organGestorActual.getId(),
+						OrganGestorEntity.class,
+						new Permission[] { ExtendedPermission.ADMINISTRATION },
+						SecurityContextHolder.getContext().getAuthentication())) {
+					permes = true;
+					break;
+				}
+			}
+			if (permes) {
+				return true;
+			}
+
 		} else {
 			boolean permes = false;
 			
@@ -196,6 +210,7 @@ public class OrganGestorHelper {
 			}
 			return permes;
 		}
+		return false;
 	}
 
 	public void crearExpedientOrganPares(

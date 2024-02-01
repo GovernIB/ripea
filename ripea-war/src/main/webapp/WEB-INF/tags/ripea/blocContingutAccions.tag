@@ -290,7 +290,7 @@
 							<c:set var="notificarMsg"><spring:message code="comu.boto.notificarOComunicar"/></c:set>	
 						</c:when>
 						<c:otherwise>
-							<c:set var="notificarMsg"><spring:message code="comu.boto.notificar"/></c:set>
+							<c:set var="notificarMsg"><spring:message code="comu.boto.comunicar"/></c:set>
 						</c:otherwise>
 					</c:choose>						
 					<c:choose>

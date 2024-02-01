@@ -148,7 +148,7 @@ $(document).ready(function() {
 					  	<rip:inputSelect name="paisNaixament" textKey="contingut.pinbal.form.camp.pais.naixament" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/>
 					  	<rip:inputSelect name="provinciaNaixament" textKey="contingut.pinbal.form.camp.provincia.naixament" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text" comment="contingut.pinbal.form.camp.provincia.naixament.comment"/>
 					  	<rip:inputText name="poblacioNaixament" textKey="contingut.pinbal.form.camp.poblacio.naixament" comment="contingut.pinbal.form.camp.poblacio.naixament.comment"/>
-					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi.naixament" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment" optionMinimumResultsForSearch="0"/>
+					  	<rip:inputSelect name="municipiNaixamentSVDDELSEXWS01" textKey="contingut.pinbal.form.camp.municipi.naixament" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" comment="contingut.pinbal.form.camp.codi.poblacio.naixament.comment" optionMinimumResultsForSearch="0"/>
 						<rip:inputText name="nomPare" textKey="contingut.pinbal.form.camp.nom.pare" comment="contingut.pinbal.form.camp.nom.pare.comment"/>
 						<rip:inputText name="nomMare" textKey="contingut.pinbal.form.camp.nom.mare" comment="contingut.pinbal.form.camp.nom.mare.comment"/>
 						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data.naixement" required="true"/>
@@ -185,11 +185,11 @@ $(document).ready(function() {
 						
 						<legend><spring:message code="contingut.pinbal.form.legend.fetRegistral"/></legend>
 						<rip:inputDate name="dataRegistre" textKey="contingut.pinbal.form.camp.data" required="true"/>
-						<rip:inputSelect name="municipiRegistre" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
+						<rip:inputSelect name="municipiRegistreSVDRRCCNACIMIENTOWS01" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
 						
 						<legend><spring:message code="contingut.pinbal.form.legend.naixement"/></legend>		
 						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data"/>		
-					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
+					  	<rip:inputSelect name="municipiNaixamentSVDRRCCNACIMIENTOWS01" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
 					  	
 					  	<legend><spring:message code="contingut.pinbal.form.legend.dadesAdicionals"/></legend>	
 					  	<rip:inputCheckbox name="ausenciaSegundoApellido" textKey="contingut.pinbal.form.camp.ausenciaSegundoApellido"/>
@@ -208,11 +208,11 @@ $(document).ready(function() {
 						
 						<legend><spring:message code="contingut.pinbal.form.legend.fetRegistral"/></legend>
 						<rip:inputDate name="dataRegistre" textKey="contingut.pinbal.form.camp.data" required="true"/>
-						<rip:inputSelect name="municipiRegistre" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
+						<rip:inputSelect name="municipiRegistreSVDRRCCMATRIMONIOWS01" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
 						
 						<legend><spring:message code="contingut.pinbal.form.legend.naixement"/></legend>		
 						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data"/>		
-					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
+					  	<rip:inputSelect name="municipiNaixamentSVDRRCCMATRIMONIOWS01" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
 					  	
 					  	<legend><spring:message code="contingut.pinbal.form.legend.dadesAdicionals"/></legend>	
 					  	<rip:inputCheckbox name="ausenciaSegundoApellido" textKey="contingut.pinbal.form.camp.ausenciaSegundoApellido"/>
@@ -231,11 +231,11 @@ $(document).ready(function() {
 						
 						<legend><spring:message code="contingut.pinbal.form.legend.fetRegistral"/></legend>
 						<rip:inputDate name="dataRegistre" textKey="contingut.pinbal.form.camp.data"/>
-						<rip:inputSelect name="municipiRegistre" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
+						<rip:inputSelect name="municipiRegistreSVDRRCCDEFUNCIONWS01" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>			
 						
 						<legend><spring:message code="contingut.pinbal.form.legend.naixement"/></legend>		
 						<rip:inputDate name="dataNaixement" textKey="contingut.pinbal.form.camp.data"/>		
-					  	<rip:inputSelect name="municipiNaixament" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
+					  	<rip:inputSelect name="municipiNaixamentSVDRRCCDEFUNCIONWS01" textKey="contingut.pinbal.form.camp.municipi" optionItems="${municipis}" optionValueAttribute="codi" optionTextAttribute="nom" emptyOption="true" optionMinimumResultsForSearch="0"/>		
 					  	
 					  	<legend><spring:message code="contingut.pinbal.form.legend.dadesAdicionals"/></legend>	
 					  	<rip:inputCheckbox name="ausenciaSegundoApellido" textKey="contingut.pinbal.form.camp.ausenciaSegundoApellido"/>

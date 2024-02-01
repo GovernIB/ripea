@@ -48,6 +48,7 @@ public interface ContingutService {
 	 *            Atribut id del contingut del qual es vol consultar el contingut.
 	 * @param valors
 	 *            Valors de les dades.
+	 * @param tascaId TODO
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
@@ -55,7 +56,8 @@ public interface ContingutService {
 	public void dadaSave(
 			Long entitatId,
 			Long contingutId,
-			Map<String, Object> valors) throws NotFoundException;
+			Map<String, Object> valors, 
+			Long tascaId) throws NotFoundException;
 
 	/**
 	 * Marca un contingut com a esborrat. Posteriorment un administrador
