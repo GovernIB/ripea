@@ -35,6 +35,14 @@ public class Utils {
 		return StringUtils.equals(str1, str2);
 	}
 	
+	public static boolean equalsIgnoreCase(String str1, String str2) {
+		return StringUtils.equalsIgnoreCase(str1, str2);
+	}
+	
+	public static boolean containsIgnoreCase(String str1, String str2) {
+		return StringUtils.containsIgnoreCase(str1, str2);
+	}
+	
 	public static boolean notEquals(String str1, String str2) {
 		return !StringUtils.equals(str1, str2);
 	}

@@ -11,6 +11,13 @@
 	<script src="<c:url value="/webjars/datatables.net/1.10.19/js/jquery.dataTables.min.js"/>"></script>
 	<script src="<c:url value="/webjars/datatables.net-bs/1.10.19/js/dataTables.bootstrap.min.js"/>"></script>
 	<link href="<c:url value="/webjars/datatables.net-bs/1.10.19/css/dataTables.bootstrap.min.css"/>" rel="stylesheet"></link>
+	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
+	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
+	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>	
 	<script src="<c:url value="/webjars/jsrender/1.0.0-rc.70/jsrender.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
@@ -21,9 +28,26 @@
 <c:url value="organgestor/filtrar" var="formAction"/>
 	<form:form id="filtre" action="" method="post" cssClass="well" commandName="integracioFiltreCommand">
 		<div class="row">
+		
 			<div class="col-md-2">
 				<rip:inputText name="entitatCodi" inline="true" placeholderKey="integracio.list.codi.entitat"/>
 			</div>
+			<div class="col-md-3">
+				<rip:inputDate name="dataInici" inline="true" placeholderKey="integracio.list.data.inici"/>
+			</div>
+			<div class="col-md-3">
+				<rip:inputDate name="dataFi" inline="true" placeholderKey="integracio.list.data.fi"/>
+			</div>		
+			<div class="col-md-4">
+				<rip:inputSelect  name="tipus"  optionEnum="IntegracioAccioTipusEnumDto" emptyOption="true" placeholderKey="integracio.list.tipus" inline="true"/>
+			</div>					
+			<div class="col-md-4">
+				<rip:inputText name="descripcio" inline="true" placeholderKey="integracio.list.descripcio"/>
+			</div>
+			<div class="col-md-4">
+				<rip:inputSelect  name="estat"  optionEnum="IntegracioAccioEstatEnumDto" emptyOption="true" placeholderKey="integracio.list.estat" inline="true"/>
+			</div>
+			
 			<div class="col-md-2 pull-right">
 				<div class="pull-right">
 					<button id="btnNetejar" type="submit" name="accio" value="netejar" class="btn btn-default"><spring:message code="comu.boto.netejar"/></button>

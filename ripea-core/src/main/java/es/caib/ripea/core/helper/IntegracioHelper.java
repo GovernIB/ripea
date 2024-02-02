@@ -24,6 +24,7 @@ import es.caib.ripea.core.api.dto.IntegracioAccioEstatEnumDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
 import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.UsuariEntity;
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,11 +95,20 @@ public class IntegracioHelper {
 			int index = 0;
 			LinkedList<IntegracioAccioDto> accionsFiltered = new LinkedList<>();
 			for(IntegracioAccioDto accio : listaAccions) {
-				String entitatCodiFiltre = filtre != null ? filtre.getEntitatCodi() : null;
 				
-				boolean filterEmpty = (entitatCodiFiltre == null || entitatCodiFiltre == "");
-				boolean filterOk = filterEmpty || accio.getEntitatCodi() != null && accio.getEntitatCodi().toLowerCase().contains(entitatCodiFiltre.toLowerCase());
-				if (filterOk) {
+				boolean shouldAddTList = true;
+				if (filtre != null) {
+					shouldAddTList = 
+							(Utils.isEmpty(filtre.getEntitatCodi()) || Utils.containsIgnoreCase(accio.getEntitatCodi(), filtre.getEntitatCodi())) &&
+							(filtre.getDataInici() == null || !filtre.getDataInici().after(accio.getData())) &&
+							(filtre.getDataFi() == null || !DateHelper.toDateFinalDia(filtre.getDataFi()).before(accio.getData())) &&
+							(filtre.getTipus() == null || filtre.getTipus() ==  accio.getTipus()) &&
+							(Utils.isEmpty(filtre.getDescripcio()) || Utils.containsIgnoreCase(accio.getDescripcio(), filtre.getDescripcio())) &&
+							(filtre.getEstat() == null || filtre.getEstat() ==  accio.getEstat());
+					
+				}
+			
+				if (shouldAddTList) {
 					accio.setIndex(new Long(index++));
 					accionsFiltered.add(accio);
 				}

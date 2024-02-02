@@ -1,10 +1,14 @@
 package es.caib.ripea.war.command;
 
+import es.caib.ripea.core.api.dto.IntegracioAccioEstatEnumDto;
+import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
 import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,6 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 public class IntegracioFiltreCommand {
 
     private String entitatCodi;
+	private Date dataInici;
+	private Date dataFi;
+	private IntegracioAccioTipusEnumDto tipus;
+	private String descripcio;
+	private IntegracioAccioEstatEnumDto estat;
 
     public static IntegracioFiltreCommand asCommand(IntegracioFiltreDto dto) {
         return dto != null ? ConversioTipusHelper.convertir(dto, IntegracioFiltreCommand.class ) : null;
