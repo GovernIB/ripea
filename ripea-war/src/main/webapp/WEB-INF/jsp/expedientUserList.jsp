@@ -187,7 +187,10 @@ $(document).ready(function() {
 		metaExpedientId = $(this).val();
 		if (counter != 0) {
 			if (metaExpedientId) {
-				$.get("<c:url value="/expedient/estatValues/"/>"+metaExpedientId)
+				var baseUrl = "<c:url value="/expedient/estatValues/"/>";
+				if (/;jsessionid/.test(baseUrl))
+					baseUrl = baseUrl.substring(0, baseUrl.indexOf(";jsessionid"));
+				$.get(baseUrl + metaExpedientId)
 				.done(function(data) {
 					
 					$('#expedientEstatId').select2('val', '', true);

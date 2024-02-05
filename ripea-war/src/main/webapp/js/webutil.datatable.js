@@ -724,7 +724,8 @@
 		}
 		var getBaseUrl = function() {
 			var baseUrl = plugin.settings.url;
-			if (/datatable$/.test(baseUrl) || /datatable\/$/.test(baseUrl)) {
+			// Bug jsessionid: /ripea/expedient/datatable;jsessionid=BB8A0CC1E686DDBBDBDDA5BA594AD27D
+			if (/datatable$/.test(baseUrl) || /datatable\/$/.test(baseUrl) || /datatable;jsessionid/.test(baseUrl)) {
 				return baseUrl.substring(0, baseUrl.indexOf("/datatable"));
 			}
 			return baseUrl;
