@@ -1,0 +1,28 @@
+databaseChangeLog:
+- changeSet:
+    id: 1706870816380-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: data_actualitzacio
+            type: timestamp
+        - column:
+            name: usuari_actualitzacio
+            type: varchar(64)            
+        tableName: ipa_expedient_peticio
+    - addForeignKeyConstraint:
+        baseColumnNames: usuari_actualitzacio
+        baseTableName: ipa_expedient_peticio
+        constraintName: ipa_usuari_actual_exp_pet_fk
+        referencedColumnNames: codi
+        referencedTableName: ipa_usuari     
+    - addColumn:
+        columns:
+        - column:
+            name: observacions
+            type: varchar(4000 ${varcharunit})
+        tableName: ipa_expedient_peticio 
+        
+        

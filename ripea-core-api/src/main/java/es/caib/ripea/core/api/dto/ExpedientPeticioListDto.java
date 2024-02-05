@@ -41,6 +41,7 @@ public class ExpedientPeticioListDto {
 	private Date consultaWsErrorDate;
 	private boolean pendentCanviEstatDistribucio;
 	private int reintentsCanviEstatDistribucio;
+	private Date dataActualitzacio;
 	
     public String getConsultaWsErrorDescShort() {
 		return Utils.abbreviate(consultaWsErrorDesc, 400);
@@ -55,6 +56,11 @@ public class ExpedientPeticioListDto {
 		}
     	
     }
+    
+	public String getDataActualitzacioStr() {
+		return Utils.surroundWithParenthesis(Utils.convertDateToString(dataActualitzacio, "dd-MM-yyyy HH:mm:ss"));
+	}
+
 	
 	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {

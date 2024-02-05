@@ -971,6 +971,35 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		writeFileToResponse(fitxer.getNom(), fitxer.getContingut(), response);
 		return null;
 	}
+	
+	
+	@RequestMapping(value = "/rebutjadaInfo/{expedientPeticioId}")
+	public String rebutjadaInfo(
+			HttpServletRequest request,
+			@PathVariable Long expedientPeticioId,
+			Model model) {
+		
+		try {
+			
+			ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+			model.addAttribute("expedientPeticio", expedientPeticioDto);
+
+			return "anotacioRebutjadaInfo";
+		} catch (Exception e) {
+			
+			logger.error("Error al consultar rebutjadaInfo" + " (expedientPeticioId: " + expedientPeticioId , e);
+			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
+
+				return getModalControllerReturnValueErrorMessageText(
+						request,
+						"redirect:../../expedientPeticio/" + expedientPeticioId,
+						root.getMessage(),
+						root);
+			
+		}
+	}
+		
+	
 
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {

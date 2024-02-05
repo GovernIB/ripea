@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,7 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -74,6 +76,8 @@ public class ExpedientPeticioHelper {
 	private ConfigHelper configHelper;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
+	@Autowired
+	private UsuariRepository usuariRepository;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
 	@Resource
@@ -121,6 +125,10 @@ public class ExpedientPeticioHelper {
 	public void canviEstatExpedientPeticio(ExpedientPeticioEntity expedientPeticioEntity, ExpedientPeticioEstatEnumDto expedientPeticioEstatEnumDto) {
 
 		expedientPeticioEntity.updateEstat(expedientPeticioEstatEnumDto);
+		if (expedientPeticioEstatEnumDto == ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT) {
+			expedientPeticioEntity.setDataActualitzacio(new Date());
+			expedientPeticioEntity.setUsuariActualitzacio(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
+		}
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null) {
 			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
@@ -485,4 +493,3 @@ public class ExpedientPeticioHelper {
 	
 	
 	
-

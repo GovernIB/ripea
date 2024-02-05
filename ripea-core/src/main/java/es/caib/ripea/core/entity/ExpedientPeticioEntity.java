@@ -49,6 +49,17 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "estat", nullable = false, length = 40)
 	private ExpedientPeticioEstatEnumDto estat;
+	@Column(name = "data_actualitzacio")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataActualitzacio;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "usuari_actualitzacio")
+	@ForeignKey(name = "ipa_usuari_actual_exp_pet_fk")
+	private UsuariEntity usuariActualitzacio;
+	
+	@Column(name = "observacions", length = 4000)
+	private String observacions;
 	
 	
 	// these fields are filled if error occurs while getting anotacio from DISTRIBUCIO and saving it in DB

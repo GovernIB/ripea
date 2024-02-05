@@ -82,6 +82,7 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -135,6 +136,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Autowired
 	private ExpedientPeticioHelper0 expedientPeticioHelper0;
+	@Autowired
+	private UsuariRepository usuariRepository;
 
 	
 	@Transactional(readOnly = true)
@@ -509,6 +512,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.REBUTJAT);
+		expedientPeticioEntity.setDataActualitzacio(new Date());
+		expedientPeticioEntity.setUsuariActualitzacio(usuariRepository.findByCodi(SecurityContextHolder.getContext().getAuthentication().getName()));
+		expedientPeticioEntity.setObservacions(observacions);
 
 		AnotacioRegistreId anotacioRegistreId = new AnotacioRegistreId();
 		anotacioRegistreId.setClauAcces(expedientPeticioEntity.getClauAcces());

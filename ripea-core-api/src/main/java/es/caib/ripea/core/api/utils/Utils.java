@@ -22,6 +22,14 @@ public class Utils {
 		return StringUtils.trimToNull(value);
 	}
 	
+	public static String surroundWithParenthesis(String value) {
+		String newValue = "";
+		if (isNotEmpty(value)) {
+			newValue = "(" + value + ")";
+		}
+		return newValue;
+	}
+	
 	public static String abbreviate(String value, int maxWidth) { 
 		return StringUtils.abbreviate(value, maxWidth);
 	}
@@ -230,6 +238,18 @@ public class Utils {
     		}
 		} 
 		return date;
+	}
+	
+	
+	public static String convertDateToString(
+			Date date,
+			String format) {
+		String str = "";
+		if (date != null) {
+			SimpleDateFormat sdtTime = new SimpleDateFormat(format);
+			str = sdtTime.format(date);
+		}
+		return str;
 	}
 	
 }

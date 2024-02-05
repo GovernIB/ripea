@@ -5,11 +5,17 @@ package es.caib.ripea.core.api.dto;
 
 import java.util.Date;
 
+import es.caib.ripea.core.api.utils.Utils;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Informació d'un expedient peticio.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@Getter
+@Setter
 public class ExpedientPeticioDto {
 
 	private Long id;
@@ -23,6 +29,14 @@ public class ExpedientPeticioDto {
 	private ExpedientPeticioAccioEnumDto accio;
 	private String notificaDistError;
 	private Long expedientId;
+	private Date dataActualitzacio;
+	private String usuariActualitzacio;
+	private String observacions;
+
+	
+	public String getDataActualitzacioStr() {
+		return Utils.convertDateToString(dataActualitzacio, "dd-MM-yyyy HH:mm:ss");
+	}
 
 	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {
@@ -43,78 +57,4 @@ public class ExpedientPeticioDto {
 		}
 		return estatView;
 	}
-	public String getNotificaDistError() {
-		return notificaDistError;
-	}
-	public void setNotificaDistError(String notificaDistError) {
-		this.notificaDistError = notificaDistError;
-	}
-	public String getMetaExpedientNom() {
-		return metaExpedientNom;
-	}
-	public void setMetaExpedientNom(
-			String metaExpedientNom) {
-		this.metaExpedientNom = metaExpedientNom;
-	}
-	public Long getId() {
-		return id;
-	}
-	public void setId(
-			Long id) {
-		this.id = id;
-	}
-	public String getIdentificador() {
-		return identificador;
-	}
-	public void setIdentificador(
-			String identificador) {
-		this.identificador = identificador;
-	}
-	public String getClauAcces() {
-		return clauAcces;
-	}
-	public void setClauAcces(
-			String clauAcces) {
-		this.clauAcces = clauAcces;
-	}
-	public Date getDataAlta() {
-		return dataAlta;
-	}
-	public void setDataAlta(
-			Date dataAlta) {
-		this.dataAlta = dataAlta;
-	}
-	public ExpedientPeticioEstatEnumDto getEstat() {
-		return estat;
-	}
-	public void setEstat(
-			ExpedientPeticioEstatEnumDto estat) {
-		this.estat = estat;
-	}
-	public RegistreDto getRegistre() {
-		return registre;
-	}
-	public void setRegistre(
-			RegistreDto registre) {
-		this.registre = registre;
-	}
-	public ExpedientPeticioAccioEnumDto getAccio() {
-		return accio;
-	}
-	public void setAccio(ExpedientPeticioAccioEnumDto accio) {
-		this.accio = accio;
-	}
-	public Long getMetaExpedientId() {
-		return metaExpedientId;
-	}
-	public void setMetaExpedientId(Long metaExpedientId) {
-		this.metaExpedientId = metaExpedientId;
-	}
-	public Long getExpedientId() {
-		return expedientId;
-	}
-	public void setExpedientId(Long expedientId) {
-		this.expedientId = expedientId;
-	}
-
 }

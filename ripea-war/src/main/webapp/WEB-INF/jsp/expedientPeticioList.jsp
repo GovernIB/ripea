@@ -39,7 +39,19 @@ table.dataTable td {
 }
 
 </style>
+	<script type="application/javascript">
 
+		function showEstat(element) {
+			
+			if (element.id == 'PENDENT') {
+				return $('<span class="fa fa-spinner"></span><span> ' + element.text + '</span>');
+			} else if(element.id == 'ACCEPTAT'){
+				return $('<span class="fa fa-check"></span><span> ' + element.text + '</span>');
+			} else if(element.id == 'REBUTJAT'){
+				return $('<span class="fa fa-close"></span><span> ' + element.text + '</span>');
+			}
+		}
+	</script>
 </head>
 <body>
 	<form:form id="expedientPeticioFiltreForm" action="" method="post" cssClass="well" commandName="expedientPeticioFiltreCommand">
@@ -90,7 +102,7 @@ table.dataTable td {
 				<rip:inputDate name="dataFinal" inline="true" placeholderKey="expedient.peticio.list.placeholder.dataFinal"/>
 			</div>	
 			<div class="col-md-4">							
-				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat"/>
+				<rip:inputSelect name="estat" inline="true" optionEnum="ExpedientPeticioEstatViewEnumDto" emptyOption="true" placeholderKey="expedient.peticio.list.placeholder.estat" templateResultFunction="showEstat"/>
 			</div>		
 			<div class="col-md-4">
 				<rip:inputText name="interessat" inline="true" placeholderKey="expedient.list.user.placeholder.creacio.interessat"/>
@@ -128,10 +140,19 @@ table.dataTable td {
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="interessatsResum" data-orderable="false"><spring:message code="expedient.peticio.list.columna.interessats"/></th>
-				<th data-col-name="estatView" data-orderable="false" data-template="#cellEstatTemplate">
+				<th data-col-name="estatView" width="10%" data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-						{{:estatView}}
+
+						{{if estatView == 'PENDENT'}}
+							<span class='fa fa-spinner'></span> <spring:message code="expedient.peticio.estat.view.enum.PENDENT"/>
+						{{else estatView == 'ACCEPTAT'}}
+							<span class='fa fa-check'></span> <spring:message code="expedient.peticio.estat.view.enum.ACCEPTAT"/>
+						{{else estatView == 'REBUTJAT'}}
+							<span class='fa fa-close'></span> <spring:message code="expedient.peticio.estat.view.enum.REBUTJAT"/>
+						{{/if}}
+
+						{{:dataActualitzacioStr}}
 						{{if pendentEnviarDistribucio}}
 							<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
 							class="fa fa-exclamation-triangle text-danger"></span>
@@ -154,6 +175,9 @@ table.dataTable td {
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
 								{{/if}}
+								{{if estatView == 'REBUTJAT'}}
+									<li><a href="<c:url value="/expedientPeticio/rebutjadaInfo/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.rebutjadaInfo"/></a></li>
+								{{/if}}
 								<c:if test="${isRolActualAdmin}">
 									{{if pendentEnviarDistribucio}}
 										<li><a href="<c:url value="/expedientPeticio/canviarEstatDistribucio/{{:id}}"/>"><span class="fa fa-mail-forward"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>
@@ -163,6 +187,7 @@ table.dataTable td {
 						</div>
 					</script>
 				</th>
+				<th data-col-name="dataActualitzacioStr" data-visible="false"></th>
 			</tr>
 		</thead>
 	</table>
