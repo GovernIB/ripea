@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
@@ -55,6 +56,8 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.NodeDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
 import es.caib.ripea.core.api.service.AplicacioService;
@@ -280,6 +283,90 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		}
 		
 		
+	}
+	
+	@RequestMapping(value = "/contingut/tag/{contingutId}", method = RequestMethod.GET)
+	public String contingutTagGet(
+			HttpServletRequest request,
+			@PathVariable Long contingutId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		ContingutDto contingut;
+		boolean isTascaObert = false;
+		
+		if (tascaId == null) {
+			contingut = contingutService.findAmbIdUser(
+					entitatActual.getId(),
+					contingutId,
+					true,
+					true, 
+					true,
+					RolHelper.getRolActual(request), 
+					false,
+					expedientHelper.isVistaTreetablePerTipusDocuments(request), 
+					expedientHelper.isVistaTreetablePerEstats(request));
+		} else {
+			ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(tascaId);
+			contingut = expedientTascaService.findTascaExpedient(
+					entitatActual.getId(),
+					expedientTascaDto.getExpedient().getId(),
+					expedientTascaDto.getId(),
+					true,
+					true);
+			model.addAttribute("tascaId", tascaId);
+			model.addAttribute("tascaNom", expedientTascaDto.getMetaExpedientTasca().getNom());
+			model.addAttribute("tascaDescripcio", expedientTascaDto.getMetaExpedientTasca().getDescripcio());
+			model.addAttribute("tascaEstat", expedientTascaDto.getEstat());
+			model.addAttribute("tasca", expedientTascaDto);
+			isTascaObert = expedientTascaDto.getEstat().equals(TascaEstatEnumDto.PENDENT) || expedientTascaDto.getEstat().equals(TascaEstatEnumDto.INICIADA);
+		}
+		
+		model.addAttribute("contingut", contingut);
+		model.addAttribute("isMostrarCopiar", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.copiarMoure.activa")));
+		model.addAttribute("isMostrarVincular", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.vincular.activa")));
+		model.addAttribute("isCreacioCarpetesActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.carpetes.activa")));
+		model.addAttribute("isPermesModificarCustodiats", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.modificar.custodiats", false));
+		model.addAttribute("isUrlValidacioDefinida", aplicacioService.propertyFindByNom("es.caib.ripea.documents.validacio.url") != null ? true : false);
+		model.addAttribute("isPermesEsborrarFinals", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.esborrar.finals", true));
+		model.addAttribute("isOrdenacioPermesa", aplicacioService.propertyBooleanFindByKey("es.caib.ripea.ordenacio.contingut.habilitada", false));
+		model.addAttribute("isMostrarCarpetesPerAnotacions", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.mostrar.carpetes.anotacions")));
+		model.addAttribute("isCreacioCarpetesLogica", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.logiques")));
+		model.addAttribute("isFolderCollapsedDefault", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.contingut.contreure.carpetes")));
+		model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
+		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
+		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
+		
+		
+		//model.addAttribute("paddingCurrentFill", 60 * contingut.getPath().size());
+		
+		boolean isEntitatUserAdminOrOrgan;
+		if (entitatActual.isUsuariActualAdministration() || entitatActual.isUsuariActualTeOrgans()) {
+			isEntitatUserAdminOrOrgan = true;
+		} else {
+			isEntitatUserAdminOrOrgan = false;
+		}
+		model.addAttribute("isEntitatUserAdminOrOrgan", isEntitatUserAdminOrOrgan);
+		
+		UsuariDto usuariActual = aplicacioService.getUsuariActual();
+		ExpedientDto expedient = contingut.getExpedientPare();
+		
+		boolean agafatUsuariActual = false;
+		
+		if (usuariActual.getCodi().equals(expedient.getAgafatPer().getCodi()))
+			agafatUsuariActual = true;
+		
+		model.addAttribute("expedientAgafatPerUsuariActual", agafatUsuariActual);
+
+		boolean potModificar = ((agafatUsuariActual && expedient.isUsuariActualWrite() || isTascaObert || contingut.isAdmin()) && expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
+		model.addAttribute("potModificar", potModificar);
+		model.addAttribute("expedientObert", expedient.getEstat().equals(ExpedientEstatEnumDto.OBERT));
+		model.addAttribute("expedientTancat", expedient.getEstat().equals(ExpedientEstatEnumDto.TANCAT));
+		model.addAttribute("expedientId", contingut.getExpedientId());
+		model.addAttribute("expedient", contingut.getExpedientObject());
+		
+		return "blocContingutTreeTableFillAsync";
 	}
 	
 	@RequestMapping(value = "/contingut/{contingutId}/delete", method = RequestMethod.GET)
@@ -870,15 +957,15 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		
 		model.addAttribute("contingut", contingut);
 		model.addAttribute(
-				"metaExpedients",
-				metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId(), null));
-		model.addAttribute(
-				"metaDocuments",
-				metaDocumentService.findActiusPerCreacio(
-						entitatActual.getId(),
-						contingut.getId(), 
-						null, 
-						false));
+				"hasPermissionAnyProcediment",
+				metaExpedientService.hasPermissionForAnyProcediment(entitatActual.getId(), RolHelper.getRolActual(request), PermissionEnumDto.CREATE));
+//		model.addAttribute(
+//				"metaDocuments",
+//				metaDocumentService.findActiusPerCreacio(
+//						entitatActual.getId(),
+//						contingut.getId(), 
+//						null, 
+//						false));
 		
 		expedientHelper.omplirVistaActiva(request, model);
 		model.addAttribute("pipellaAnotacionsRegistre", pipellaAnotacionsRegistre);

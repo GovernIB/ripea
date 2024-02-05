@@ -14,7 +14,7 @@ databaseChangeLog:
                   value: false
               - column:
                   name: description
-                  value: Mantenir estat carpetes (oberta o tancada) fins que es tanqui el navegador
+                  value: Mantenir estat carpetes (oberta o tancada) fins que es tanqui el navegador i recarregar contingut carpetes de forma asíncrona
               - column:
                   name: group_code
                   value: CONTINGUT

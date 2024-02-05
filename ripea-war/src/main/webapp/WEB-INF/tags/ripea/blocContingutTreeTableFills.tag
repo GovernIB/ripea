@@ -22,7 +22,7 @@
 		</c:if>
 
 		<tr id="${fill.id}"
-			class="element-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
+			class="element-draggable <c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document}"> isDocument</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if><c:if test="${fill.carpeta && fill.hasFills}">hasFills</c:if>"
 			data-expedient-id="${expedient.id}" 
 			data-node="treetable-${fill.id}"
 			data-pnode="treetable-${contingut.id}">
@@ -65,8 +65,14 @@
 				<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
 					class="fa fa-sort"></span></td>
 			</c:if>
-		</tr>
 
+			
+			<c:if test="${isMantenirEstatCarpetaActiu && fill.carpeta}">
+				<script>
+					loadCurrentFolderFromServer(${fill.id});
+				</script>
+			</c:if>
+		</tr>
 	</c:if>
 	
 	<rip:blocContingutTreeTableFills contingut="${fill}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}" contingutNavigationId="${contingutNavigationId}"/>	

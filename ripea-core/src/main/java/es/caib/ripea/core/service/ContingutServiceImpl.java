@@ -891,7 +891,7 @@ public class ContingutServiceImpl implements ContingutService {
 //				}
 //			}
 //		}
-		Long t0 = System.currentTimeMillis();
+//		Long t0 = System.currentTimeMillis();
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
 				ambPermisos,
@@ -903,7 +903,7 @@ public class ContingutServiceImpl implements ContingutService {
 				rolActual,
 				false,
 				null,
-				false,
+				isMantenirEstatCarpetaActiu(),
 				0,
 				null,
 				null,
@@ -2379,6 +2379,10 @@ public class ContingutServiceImpl implements ContingutService {
 		return result;
     }
 
+    public boolean isMantenirEstatCarpetaActiu() {
+		return configHelper.getAsBoolean("es.caib.ripea.carpetes.mantenir.estat");
+	}
+    
 	public boolean isPropagarMetadadesActiu() {
 		return configHelper.getAsBoolean("es.caib.ripea.expedient.propagar.metadades");
 	}

@@ -554,9 +554,17 @@ public class DocumentServiceImpl implements DocumentService {
 				entitat, 
 				expedient,
 				document.getId());
-		return conversioTipusHelper.convertirList(
-				documents, 
-				DocumentDto.class);
+		List<DocumentDto> documentsDto = new ArrayList<DocumentDto>();
+		if (Utils.isNotEmpty(documents)) {
+			for (DocumentEntity documentEntity : documents) {
+				DocumentDto documentDto = new DocumentDto();
+				documentDto.setId(documentEntity.getId());
+				documentDto.setNom(documentEntity.getNom());
+				documentsDto.add(documentDto);
+			}
+		}
+		
+		return documentsDto;
 	}
 
 	@Transactional(readOnly = true)

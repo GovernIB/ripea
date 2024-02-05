@@ -233,105 +233,7 @@ $(document).ready(function() {
 			</c:otherwise>
 		</c:choose>
 		
-		//remove treetable click events on unnecessary columns for all rows
-		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8)').css('cursor','default').unbind('click');
-		//remove treetable click events on all columns for document rows
-		$('#table-documents > tbody > tr.isDocument > td').css('cursor','default').unbind('click');
-		//add show viewer click events on all necessary columns for document rows
-		$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6)').css('cursor','pointer').click(function(event) {
-			event.stopPropagation();
-			$('a:first', $(this).parent())[0].click();
-		});
-		
-
-		// order by dragging
-		$('.ordre-col').on('mouseover', function() {
-			$('.element-draggable').draggable({ disabled: true });
-			$('.element-draggable').droppable({ disabled: true });
-			$('#table-documents tbody').sortable({
-				handle: ".ordre-col",
-				refreshPositions: true,
-		        helper : 'clone',
-				cursor: "move",
-				cursorAt: { left: 5 },
-				opacity: 0.65,
-				placeholder: "sortable-dest",
-				start: function (event, ui) {
-					$(this).attr('data-previndex', ui.item[0].rowIndex);
-		        },
-		        update: function (event, ui) {
-					//showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-					var tableDocuments = document.getElementById('table-documents');
-					$(tableDocuments).addClass("disabled");
-		            $('#loading').removeClass('hidden');
-					var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'id'});
-		            var filtered = idsInOrder.filter(function (el) {
-		           		return el != '';
-		            });
-		            var orderedElements = new Map();
-					var idx = 1;
-		            filtered.forEach(function(row) {
-		            	orderedElements[idx] = row;
-			            idx++;
-		            });
-		
-		            $.ajax({
-				        url: '<c:url value="/contingut/${expedientId}/ordenar"/>',
-				        type: "POST",
-				        contentType: "application/json",
-				        data: JSON.stringify(orderedElements),
-				        success: function (data) {
-				        	location.reload();
-				        }
-					});
-		        }
-		    }).disableSelection();
-		});
-		$('.ordre-col').on('mouseleave', function() {
-			$('.element-draggable').draggable("enable");
-			$('.element-draggable').droppable("enable");
-		});
-
-		
-		// add new document by dragging it to #drag_container 
-		$('#drag_container').filedrop({
-			maxfiles: 1,
-			fallback_dropzoneClick : false,
-			error: function(err, file) {
-				switch(err) {
-				case 'BrowserNotSupported':
-					alert('browser does not support HTML5 drag and drop')
-					break;
-				case 'TooManyFiles':
-					alert('Només es pemet adjuntar un document a la vegada!')
-					break;
-				case 'FileTooLarge':
-					break;
-				case 'FileTypeNotAllowed':
-					break;
-				case 'FileExtensionNotAllowed':
-					break;
-				default:
-					break;
-				}
-			},
-			dragOver: function() {
-				$('#drag_container').css('background-color', '#e6e3e3');
-			},
-			dragLeave: function() {
-				$('#drag_container').css('background-color', '#f5f5f5');
-			},
-			drop: function(e) {
-				if (e.originalEvent.dataTransfer != null) {
-					let files = e.originalEvent.dataTransfer.files;
-					$('#drag_container').css('background-color', '#f5f5f5');
-					if (!(files.length > 1)) {
-						document.querySelector('#dropped-files').files = files;
-						$('#document-new').trigger('click');
-					}
-				}
-			}
-		});
+		updateTableEvents();
 
 		var popoverFlag = 0;
 		// canvi tipus document multiple
@@ -425,31 +327,8 @@ $(document).ready(function() {
 		    e.preventDefault();
 		});	
 
+		// ##### Added to updateTableEvents()
 		
-		// popover notificacions
-		$("span[class*='popover-']").popover({
-			html: true,
-		    content: function () {
-		    	return getEnviamentsDocument($(this));   
-		  	}
-		}).on('mouseenter', function () {
-		    $(this).popover("show");
-		   
-		    $(".popover").on('mouseleave', function () {
-		        $(this).popover('hide');
-		    });
-		}).on('mouseleave', function () {
-		   	if (!$('.popover:hover').length) {
-		    	$(this).popover('hide');
-		    }
-		});	
-
-
-
-
-
-
-
 		let vistaActiva = $('#vistes').children("a.active").attr('id');
 		//-------------------------------- VISTA GRID  -----------------------------------------﻿
 		if (vistaActiva == 'vistaGrid') {
@@ -596,56 +475,12 @@ $(document).ready(function() {
 
 			// Select one
 			$('.checkbox').change(function() {
-				
-				let docsIdx = [];
-				let selectedId = $(this).closest('tr').attr('id');
-				docsIdx.push(parseInt(selectedId));
-				
-				if ($(this).prop('checked')) {
-					var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
-					$.get(
-							multipleUrl, 
-							{docsIdx: docsIdx},
-							function(data) {
-								$(".seleccioCount").html(data);
-							}
-					);
-				} else {
-					var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
-					$.get(
-							multipleUrl, 
-							{docsIdx: docsIdx},
-							function(data) {
-								$(".seleccioCount").html(data);
-							}
-					);
-				}
-
-				let idsSelected = getIdsSelectedFromTable();
-				enableDisableMultipleButtons(idsSelected);
+				selectCheckbox($(this));
 			});
 
 
 			if (vistaActiva == 'vistaTreetablePerCarpetes'){
-				// move to another folder by drag and drop (jquery-ui widget) 
-				$('.element-draggable').draggable({
-					containment: 'parent',
-					helper: 'clone',
-					revert: true,
-					revertDuration: 200,
-					opacity: 0.50,
-				});	
-				$('.element-droppable').droppable({
-					accept: '.element-draggable',
-					tolerance: 'pointer',
-					drop: function(event, ui) {
-						showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-						let origenId = ui.draggable.attr('id');
-						let destiId = $(this).attr('id');
-						window.location = origenId + "/moure/" + destiId;
-					}
-				});
-
+				dragAndDropVistaCarpetes();
 			} else if (vistaActiva == 'vistaTreetablePerTipusDocuments'){
 				// change tipus de document by drag and drop (jquery-ui widget) 
 				$('.element-draggable').draggable({
@@ -671,81 +506,56 @@ $(document).ready(function() {
 				});
 			}
 			
-				
-			
-
-
-
-
-			
 		}
 
 		<c:if test="${isMantenirEstatCarpetaActiu}">
+		
 			var $tableDocuments = $("#table-documents");
 			
-			$tableDocuments.on("click", "tr", function() {
-				var nodeId = $(this).data("node");
+			$tableDocuments.on("click", "tr", function(e, showAll) {
+				var $selectedFolder = $(this);
+				var isDocument = $selectedFolder.hasClass('isDocument');
+				var hasFills = $selectedFolder.hasClass('hasFills');
 				
-				toggleCurrentNode(nodeId);
+				if (! isDocument && hasFills) {
+					
+					var $ignoredTds = $selectedFolder.find('td:nth-child(1), td:nth-child(7), td:nth-child(8)');
+
+			        if ($ignoredTds.is(e.target) || $ignoredTds.has(e.target).length > 0) {
+			            return;
+			        }
+			        
+					var nodeId = $selectedFolder.data("node");
+					var attrId = $selectedFolder.attr("id");
+					
+					if (nodeId !== undefined) {
+						updateCurrentNode(nodeId, attrId, showAll);
+						setIcon($selectedFolder);
+					}
+					updateTableEvents();
+				}
 		    });
 			
-			function toggleCurrentNode(nodeId) {
+			function updateCurrentNode(nodeId, attrId, showAll) {
 				var currentState = sessionStorage.getItem("nodeState-" + nodeId);
-			    var $selectedNode = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
 			    
-			    if (currentState === "collapsed") {
-			      	sessionStorage.removeItem("nodeState-" + nodeId);
-				  	sessionStorage.setItem("nodeState-" + nodeId, "expanded");
-				  	
-				  	// Mostrar carpeta
-				  	$selectedNode.show();
+			    if (currentState === "collapsed" || currentState == null) {
+			    	showCurrentNode(nodeId, attrId, showAll);
 			    } else {
-			    	sessionStorage.removeItem("nodeState-" + nodeId);
-			      	sessionStorage.setItem("nodeState-" + nodeId, "collapsed");
-			      
-			      	$selectedNode.hide();
-			      	
-			      	// Ocultar de forma recursiva la carpeta
-			      	toggleCurrentNode($selectedNode.data('node'));
+			    	hideCurrentNode(nodeId, attrId);
 			    }
 			}
 			
-			// Revisa el estado de las carpetas
+			// Cambia icono carpetas principales
 			$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
-				var nodeId = $(this).data("node");
-			    var nodeState = sessionStorage.getItem("nodeState-" + nodeId);
-				var $node = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
-				
-			    if (nodeState === "expanded") {
-			    	$node.show();
-			      
-			      	var $expanderIcon = $node.prev('tr[data-node=' + $node.data("pnode") + ']').find('.treetable-expander');
-			      	$expanderIcon.removeClass('fa-angle-right').addClass('fa-angle-down');
-			    } else if (nodeState === "collapsed") {
-			    	closeCurrentNode($node);
-			    }
+				setIcon($(this));
 			});
-		
-			// Cerrar carpetas e forma recursiva
-			function closeCurrentNode($node) {
-				$node.hide();
-			      
-			    var $expanderIcon = $node.prev('tr[data-node=' + $node.data("pnode") + ']').find('.treetable-expander');
-			    $expanderIcon.removeClass('fa-angle-down').addClass('fa-angle-right');
-			    
-			    var nodeIdActual = $node.data("node");
-			    var $nextNodes = $node.nextAll('tr[data-pnode="' + nodeIdActual + '"]');
-	
-			    if ($nextNodes && $nextNodes.size() > 0) {
-			    	$nextNodes.each(function(i, nextNode) {
-			    		closeCurrentNode($(nextNode));
-			    	});
-			    }
+			
+			if ($('#table-documents .treetable-expander').length > 0) {
+				$('#expandCollapseButtons').show();
 			}
 	 	</c:if>
 	</c:if>//------------------------- if contingut is not document END ----------------------------------
-
-
 
 	$("#mostraDetallSignants").click(function(){
 		let contingutId = ${contingut.id}; 
@@ -755,8 +565,290 @@ $(document).ready(function() {
 	
 });//################################################## document ready END ##############################################################
 
+$(document).on('change', '.checkbox', function() {
+	selectCheckbox($(this));
+});
 
+function expandAll() {
+	var $tableDocuments = $("#table-documents");
+	$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
+		var nodeId = $(this).data("node");
+		var attrId = $(this).attr("id");
+		
+		showCurrentNode(nodeId, attrId, true);
+		setIcon($(this));
+	});
+}
 
+function collapseAll() {
+	var $tableDocuments = $("#table-documents");
+	$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
+		var nodeId = $(this).data("node");
+		var attrId = $(this).attr("id");
+		
+		hideCurrentNode(nodeId, attrId);
+		setIcon($(this));
+	});
+}
+
+function showCurrentNode(nodeId, attrId, showAll) {
+	var $tableDocuments = $("#table-documents");
+    var $selectedNode = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+	sessionStorage.removeItem("nodeState-" + nodeId);
+  	sessionStorage.setItem("nodeState-" + nodeId, "expanded");
+  	
+  	// Mostrar carpeta
+  	$selectedNode.show();
+  	
+  	// Cargar contenido del servidor
+  	loadCurrentFolderFromServer(attrId, showAll);
+}
+
+function hideCurrentNode(nodeId, attrId) {
+	var $tableDocuments = $("#table-documents");
+    var $fillsCarpeta = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+    sessionStorage.removeItem("nodeState-" + nodeId);
+  	sessionStorage.setItem("nodeState-" + nodeId, "collapsed");
+  	
+    $fillsCarpeta.each(function(i, fill) {	
+      	$(fill).remove();
+      	
+      	// Ocultar de forma recursiva la carpeta
+      	var selectedNodeId = $(fill).data('node');
+      	var selectedAttrId = $(fill).attr("id");
+      	
+      	if (selectedAttrId)
+      		hideCurrentNode(selectedNodeId, selectedAttrId);
+      	
+	    nodeId = $(fill).data('node');
+	    var $fillsSubCarpeta = $(fill).nextUntil(':not([data-pnode="' + nodeId + '"])');
+	});
+}
+
+function selectCheckbox($this) {
+	let docsIdx = [];
+	let selectedId = $this.closest('tr').attr('id');
+	docsIdx.push(parseInt(selectedId));
+	
+	if ($this.prop('checked')) {
+		var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+		$.get(
+				multipleUrl, 
+				{docsIdx: docsIdx},
+				function(data) {
+					$(".seleccioCount").html(data);
+				}
+		);
+	} else {
+		var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+		$.get(
+				multipleUrl, 
+				{docsIdx: docsIdx},
+				function(data) {
+					$(".seleccioCount").html(data);
+				}
+		);
+	}
+
+	let idsSelected = getIdsSelectedFromTable();
+	enableDisableMultipleButtons(idsSelected);
+}
+
+function dragAndDropVistaCarpetes() {
+	// move to another folder by drag and drop (jquery-ui widget) 
+	$('.element-draggable').draggable({
+		containment: 'parent',
+		helper: 'clone',
+		revert: true,
+		revertDuration: 200,
+		opacity: 0.50,
+	});	
+	$('.element-droppable').droppable({
+		accept: '.element-draggable',
+		tolerance: 'pointer',
+		drop: function(event, ui) {
+			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+			let origenId = ui.draggable.attr('id');
+			let destiId = $(this).attr('id');
+			window.location = origenId + "/moure/" + destiId;
+		}
+	});
+}
+
+function updateTableEvents() {
+	<c:if test="${isMantenirEstatCarpetaActiu}">
+		//add treetable click events on necessary columns for all rows
+		$('#table-documents > tbody > tr > td:not(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor','pointer');
+	</c:if>
+	//remove treetable click events on unnecessary columns for all rows
+	$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor','default').unbind('click');
+	//remove treetable click events on all columns for document rows
+	$('#table-documents > tbody > tr.isDocument > td').css('cursor','default').unbind('click');
+	//add show viewer click events on all necessary columns for document rows
+	$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6))').css('cursor','pointer').click(function(event) {
+		event.stopPropagation();
+		$('a:first', $(this).parent())[0].click();
+	});
+
+	// order by dragging
+	$('.ordre-col').on('mouseover', function() {
+		$('.element-draggable').draggable({ disabled: true });
+		$('.element-draggable').droppable({ disabled: true });
+		$('#table-documents tbody').sortable({
+			handle: ".ordre-col",
+			refreshPositions: true,
+	        helper : 'clone',
+			cursor: "move",
+			cursorAt: { left: 5 },
+			opacity: 0.65,
+			placeholder: "sortable-dest",
+			start: function (event, ui) {
+				$(this).attr('data-previndex', ui.item[0].rowIndex);
+	        },
+	        update: function (event, ui) {
+				//showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+				//var tableDocuments = document.getElementById('table-documents');
+				//$(tableDocuments).addClass("disabled");
+	            //$('#loading').removeClass('hidden');
+				var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'id'});
+	            var filtered = idsInOrder.filter(function (el) {
+	           		return el != '';
+	            });
+	            var orderedElements = new Map();
+				var idx = 1;
+	            filtered.forEach(function(row) {
+	            	orderedElements[idx] = row;
+		            idx++;
+	            });
+
+	            var nodeId = ui.item.data('pnode');
+	            var indice = nodeId.indexOf("treetable-");
+	            var attrId = nodeId.substring(indice + "treetable-".length);
+	            showLoadingCurrentFolder(attrId);
+	            
+	            $.ajax({
+			        url: '<c:url value="/contingut/${expedientId}/ordenar"/>',
+			        type: "POST",
+			        contentType: "application/json",
+			        data: JSON.stringify(orderedElements),
+			        success: function (data) {
+			        	//location.reload();
+			        }
+				});
+	            loadCurrentFolderFromServer(attrId);
+	        }
+	    }).disableSelection();
+	});
+	$('.ordre-col').on('mouseleave', function() {
+		$('.element-draggable').draggable("enable");
+		$('.element-draggable').droppable("enable");
+	});
+
+	// add new document by dragging it to #drag_container 
+	$('#drag_container').filedrop({
+		maxfiles: 1,
+		fallback_dropzoneClick : false,
+		error: function(err, file) {
+			switch(err) {
+			case 'BrowserNotSupported':
+				alert('browser does not support HTML5 drag and drop')
+				break;
+			case 'TooManyFiles':
+				alert('Només es pemet adjuntar un document a la vegada!')
+				break;
+			case 'FileTooLarge':
+				break;
+			case 'FileTypeNotAllowed':
+				break;
+			case 'FileExtensionNotAllowed':
+				break;
+			default:
+				break;
+			}
+		},
+		dragOver: function() {
+			$('#drag_container').css('background-color', '#e6e3e3');
+		},
+		dragLeave: function() {
+			$('#drag_container').css('background-color', '#f5f5f5');
+		},
+		drop: function(e) {
+			if (e.originalEvent.dataTransfer != null) {
+				let files = e.originalEvent.dataTransfer.files;
+				$('#drag_container').css('background-color', '#f5f5f5');
+				if (!(files.length > 1)) {
+					document.querySelector('#dropped-files').files = files;
+					$('#document-new').trigger('click');
+				}
+			}
+		}
+	});
+	
+	// popover notificacions
+	$("span[class*='popover-']").popover({
+		html: true,
+	    content: function () {
+	    	return getEnviamentsDocument($(this));   
+	  	}
+	}).on('mouseenter', function () {
+	    $(this).popover("show");
+	   
+	    $(".popover").on('mouseleave', function () {
+	        $(this).popover('hide');
+	    });
+	}).on('mouseleave', function () {
+	   	if (!$('.popover:hover').length) {
+	    	$(this).popover('hide');
+	    }
+	});	
+	
+	dragAndDropVistaCarpetes();
+
+}
+
+function setIcon($this) {
+	var $tableDocuments = $("#table-documents");
+	var nodeId = $this.data("node");
+	var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
+	var hasFills = $node.hasClass('hasFills');
+	var nodeState = sessionStorage.getItem("nodeState-" + nodeId);
+	var expanderIcon;
+	
+	if (hasFills && nodeState === "expanded") {
+		expanderIcon = '<span class="treetable-expander fa fa-angle-down" style="margin-right: 8px;"></span>';
+	} else if (hasFills) {
+		expanderIcon = '<span class="treetable-expander fa fa-angle-right" style="margin-right: 8px;"></span>';
+	}
+	
+	var $folderIcon = $node.find('.fa-folder-o');
+	var hasIcon = $node.find('.treetable-expander').remove();
+	
+	$folderIcon.before(expanderIcon);
+}
+
+function setPadding($this) {
+	var $tableDocuments = $("#table-documents");
+	var nodeId = $this.data("node");
+	var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
+	
+	var padding = calcPadding(false, 10, $node);
+	
+	$node.find('td').eq(1).css('padding-left', padding);
+}
+
+function calcPadding(s, padding, $node) {
+	if (s) {
+		return padding;
+	} else {
+		var $parent = $node.prevAll('tr[data-node=' + $node.data('pnode') + ']');
+		if ($parent.length > 0) {
+			padding += 60;
+		} else {
+			s = true;
+		}
+		return calcPadding(s, padding, $parent);
+	}
+}
 
 //------------------------- if contingut is not document START ----------------------------------	
 <c:if test="${!contingut.document}"> 
@@ -1269,6 +1361,62 @@ function getDetallsSignants(idTbody, contingutId, header) {
 	});
 }	
 
+function loadCurrentFolderFromServer(carpetaId, showAll) {
+	var $tableDocuments = $("#table-documents");
+    var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
+	var currentState = sessionStorage.getItem("nodeState-treetable-" + carpetaId);
+	
+    if (currentState === "expanded") {
+    	showLoadingCurrentFolder(carpetaId);
+    	
+    	$.ajax({
+    		url: '<c:url value="/contingut/tag/"/>' + carpetaId,
+    	    method: 'get',
+    	    success: function(response) {
+    	    	$('.loading_carpeta').remove();
+    	    	$selectedCarpeta.after(response);
+    	    },
+    	    error: function() {
+    	    	console.log("error");
+    	    },
+    	    complete: function() {
+    			$('[data-toggle="modal"]').webutilModalEval();
+    	    
+    	    	var $tableDocuments = $("#table-documents");
+    	    	// Cambia icono subcarpetas
+    	    	$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
+    	    		setIcon($(this));
+    			});
+    	    	
+    	    	$tableDocuments.find("tbody tr").each(function() {
+					$($(this).find('[data-toggle="modal"]')).webutilModal();
+    	    	});
+    	    	
+    	    	// Calcula padding izquierdo hijos
+    	    	$tableDocuments.find("tbody tr").each(function() {
+    				setPadding($(this));
+    			});
+    	    	    	    	
+    	    	updateTableEvents();
+    	    	
+    	    	if (showAll) {
+	    	    	var $fills = $tableDocuments.find('tr[data-pnode="treetable-' + carpetaId + '"]');
+	    	    	$fills.each(function() {
+	    	    		$(this).trigger('click', [showAll]);
+	    	    	});
+    	    	}
+    	    }
+    	});
+    	
+    }
+}
+
+function showLoadingCurrentFolder(carpetaId) {
+	var $tableDocuments = $("#table-documents");
+	var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
+    $selectedCarpeta.nextUntil(':not([data-pnode="treetable-' + carpetaId + '"])').remove();
+	$selectedCarpeta.after("<tr class='loading_carpeta'><td></td><td colspan='7' style='padding-left: 10px; text-align: center;'><img src='/ripea/img/loading.gif'></td></tr>");
+}
 </script>
 
 
@@ -1429,8 +1577,17 @@ function getDetallsSignants(idTbody, contingutId, header) {
 			<%---- expand/collapse tree ----%>
 			<c:if test="${!vistaIcones}">
 				<div id="expandCollapseButtons" style="float: left;display: inline-block;">
-					<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
-					<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+					<c:choose>
+						<c:when test="${isMantenirEstatCarpetaActiu}">
+							<button class="btn btn-default" onclick="expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
+							<button class="btn btn-default" onclick="collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+						</c:when>
+						<c:otherwise>
+							<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
+							<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+						</c:otherwise>
+					</c:choose>
+					
 				</div>
 			</c:if>
 			<c:if test="${isTasca}">
@@ -1548,7 +1705,7 @@ function getDetallsSignants(idTbody, contingutId, header) {
 					<%---- Crear contingut ----%>
 					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
 					<ul class="dropdown-menu text-left" role="menu">
-						<c:if test="${contingut.crearExpedients and not empty metaExpedients}">
+						<c:if test="${contingut.crearExpedients and hasPermissionAnyProcediment}">
 							<li>
 							<a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true">
 								<span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...
