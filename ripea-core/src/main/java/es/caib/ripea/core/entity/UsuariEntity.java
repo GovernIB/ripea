@@ -75,9 +75,20 @@ public class UsuariEntity implements Serializable {
 	
 	@Column(name = "emails_agrupats")
 	private boolean rebreEmailsAgrupats = true;
-
+	
 	@Column(name = "avisos_noves_anotacions")
 	private boolean rebreAvisosNovesAnotacions;
+	
+	@Column(name = "exp_list_data_darrer_env")
+	private boolean expedientListDataDarrerEnviament = false;
+	@Column(name = "exp_list_agafat_per")
+	private boolean expedientListAgafatPer = true;
+	@Column(name = "exp_list_interessats")
+	private boolean expedientListInteressats = true;
+	@Column(name = "exp_list_comentaris")
+	private boolean expedientListComentaris = true;
+	@Column(name = "exp_list_grup")
+	private boolean expedientListGrup = false;
 
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
@@ -97,12 +108,21 @@ public class UsuariEntity implements Serializable {
 			String idioma,
 			boolean rebreEmailsAgrupats,
 			boolean rebreAvisosNovesAnotacions, 
-			Long numElementsPagina) {
+			Long numElementsPagina,
+			boolean expedientListDataDarrerEnviament,
+			boolean expedientListAgafatPer,
+			boolean expedientListInteressats,
+			boolean expedientListComentaris,
+			boolean expedientListGrup) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
 		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
-		this.numElementsPagina = numElementsPagina;
+		this.expedientListDataDarrerEnviament = expedientListDataDarrerEnviament;
+		this.expedientListAgafatPer = expedientListAgafatPer;
+		this.expedientListInteressats = expedientListInteressats;
+		this.expedientListComentaris = expedientListComentaris;
+		this.expedientListGrup = expedientListGrup;
 	}
 	
 

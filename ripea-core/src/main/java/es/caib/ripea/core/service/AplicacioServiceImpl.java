@@ -162,7 +162,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.getIdioma(),
 				dto.isRebreEmailsAgrupats(),
 				dto.isRebreAvisosNovesAnotacions(),
-				dto.getNumElementsPagina());
+				dto.getNumElementsPagina(),
+				dto.isExpedientListDataDarrerEnviament(),
+				dto.isExpedientListAgafatPer(),
+				dto.isExpedientListInteressats(),
+				dto.isExpedientListComentaris(),
+				dto.isExpedientListGrup());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}

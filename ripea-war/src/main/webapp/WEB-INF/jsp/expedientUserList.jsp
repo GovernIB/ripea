@@ -622,7 +622,7 @@ function hexToRgb(hex) {
 		data-toggle="datatable" 
 		data-url="<c:url value="/expedient/datatable"/>" 
 		class="table table-bordered table-striped table-hover" 
-		data-default-order="19" 
+		data-default-order="18" 
 		data-default-dir="desc"
 		data-botons-template="#botonsTemplate"
 		data-rowhref-template="#rowhrefTemplate"
@@ -666,9 +666,11 @@ function hexToRgb(hex) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="dataDarrerEnviament" data-type="datetime" data-converter="datetime" nowrap data-orderable="false"><spring:message code="expedient.list.user.columna.data.enviament"/></th>
 				<th data-col-name="tipusStr" data-orderable="false" width="20%"><spring:message code="expedient.list.user.columna.procediment"/></th>								
 				<th data-col-name="createdDate" data-type="datetime" data-converter="datetime" nowrap><spring:message code="expedient.list.user.columna.createl"/></th>
+				<c:if test="${usuariActual.expedientListDataDarrerEnviament}">
+					<th data-col-name="dataDarrerEnviament" data-type="datetime" data-converter="datetime" nowrap data-orderable="false"><spring:message code="expedient.list.user.columna.data.enviament"/></th>
+				</c:if>				
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -693,14 +695,23 @@ function hexToRgb(hex) {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="agafatPer.codiAndNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
-<%-- 				<th data-col-name="interessatsResum" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.interessats"/></th>	 --%>
-				<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="1%">
-					<script id="cellPermisosTemplate" type="text/x-jsrender">
+				<c:if test="${usuariActual.expedientListAgafatPer}">
+					<th data-col-name="agafatPer.codiAndNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+				</c:if>
+				<c:if test="${usuariActual.expedientListInteressats}">
+ 					<th data-col-name="interessatsResum" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.interessats"/></th>
+ 				</c:if>
+				<c:if test="${usuariActual.expedientListGrup}">
+ 					<th data-col-name="grupNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.grup"/></th>
+ 				</c:if> 				
+				<c:if test="${usuariActual.expedientListComentaris}">
+					<th data-col-name="numComentaris" data-orderable="false" data-template="#cellPermisosTemplate" width="1%">
+						<script id="cellPermisosTemplate" type="text/x-jsrender">
 							<a href="expedient/{{:id}}/comentaris" data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default {{if !usuariActualWrite}} disabled {{/if}}"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 				
 					</script>
-				</th>	
+					</th>	
+				</c:if>
 				<th data-col-name="numSeguidors" data-orderable="false" data-template="#cellSeguidorsTemplate" width="1%">
 					<script id="cellSeguidorsTemplate" type="text/x-jsrender">
 						{{if numSeguidors > 0}}

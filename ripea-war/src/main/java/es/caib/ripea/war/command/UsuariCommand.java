@@ -31,6 +31,11 @@ public class UsuariCommand implements Serializable {
 	private boolean rebreEmailsAgrupats;
 	private boolean rebreAvisosNovesAnotacions;
 	private Long numElementsPagina;
+	private boolean expedientListDataDarrerEnviament;
+	private boolean expedientListAgafatPer;
+	private boolean expedientListInteressats;
+	private boolean expedientListComentaris;
+	private boolean expedientListGrup;
 	
 	
 	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
@@ -61,6 +66,8 @@ public class UsuariCommand implements Serializable {
 		this.emailAlternatiu = Utils.trim(emailAlternatiu);
 	}
 	
+	
+	
 	public static UsuariCommand asCommand(UsuariDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
@@ -79,6 +86,30 @@ public class UsuariCommand implements Serializable {
 
 	public void setNumElementsPagina(Long numElementsPagina) {
 		this.numElementsPagina = numElementsPagina;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+	public void setExpedientListDataDarrerEnviament(
+			boolean expedientListDataDarrerEnviament) {
+		this.expedientListDataDarrerEnviament = expedientListDataDarrerEnviament;
+	}
+	public void setExpedientListAgafatPer(
+			boolean expedientListAgafatPer) {
+		this.expedientListAgafatPer = expedientListAgafatPer;
+	}
+	public void setExpedientListInteressats(
+			boolean expedientListInteressats) {
+		this.expedientListInteressats = expedientListInteressats;
+	}
+	public void setExpedientListComentaris(
+			boolean expedientListComentaris) {
+		this.expedientListComentaris = expedientListComentaris;
+	}
+	public void setExpedientListGrup(
+			boolean expedientListGrup) {
+		this.expedientListGrup = expedientListGrup;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

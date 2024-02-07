@@ -144,6 +144,10 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"rolActual",
 				rolActual);
+		
+		model.addAttribute(
+				"usuariActual",
+				aplicacioService.getUsuariActual());
 
 		model.addAttribute(
 				"hasCreatePermissionForAnyProcediment",

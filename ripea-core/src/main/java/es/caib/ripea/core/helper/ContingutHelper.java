@@ -302,6 +302,9 @@ public class ContingutHelper {
 			dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
 			dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));	
 
+			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
+			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
+			dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
 
 			if (onlyForList) {
 				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
@@ -346,10 +349,7 @@ public class ContingutHelper {
 					}
 				}
 
-				dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
 				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
-				dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
-				dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
 
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?

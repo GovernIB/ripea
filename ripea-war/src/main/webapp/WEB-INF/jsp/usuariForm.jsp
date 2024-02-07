@@ -51,6 +51,15 @@ $(document).ready(function() {
 			optionValueAttribute="id"
 			optionTextAttribute="nom"
 			textKey="usuari.form.camp.numElementsPagina"/>
+			
+		<rip:inputCheckbox name="expedientListDataDarrerEnviament" textKey="usuari.form.camp.expedientListDataDarrerEnviament"/>
+		<rip:inputCheckbox name="expedientListAgafatPer" textKey="usuari.form.camp.expedientListAgafatPer"/>
+		<rip:inputCheckbox name="expedientListInteressats" textKey="usuari.form.camp.expedientListInteressats"/>
+		<rip:inputCheckbox name="expedientListComentaris" textKey="usuari.form.camp.expedientListComentaris"/>
+		<rip:inputCheckbox name="expedientListGrup" textKey="usuari.form.camp.expedientListGrup"/>				
+		
+
+		
 		<div id="modal-botons">
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			<a href="<c:url value="/usuari/configuracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

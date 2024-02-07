@@ -117,5 +117,31 @@ public class ExpedientDto extends NodeDto {
 		return interessats;
 	}
 	
+	public String getInteressatsResum() {
+		String interessatsResum = "";
+		if (this.interessats != null) {
+
+			for (InteressatDto interessat : this.interessats) {
+				if (interessat.getTipus() == InteressatTipusEnumDto.PERSONA_FISICA) {
+					
+					InteressatPersonaFisicaDto pers = (InteressatPersonaFisicaDto) interessat;
+					interessatsResum += pers.getNom() == null ? "" : pers.getNom() + " ";
+					interessatsResum += pers.getLlinatge1() == null ? "" : pers.getLlinatge1() + " ";
+					interessatsResum += pers.getLlinatge2() == null ? "" : pers.getLlinatge2() + " ";
+					interessatsResum += "(" + pers.getDocumentNum() + ")" + "<br>";
+				} else if (interessat.getTipus() == InteressatTipusEnumDto.PERSONA_JURIDICA) {
+					InteressatPersonaJuridicaDto persJur = (InteressatPersonaJuridicaDto) interessat;
+					interessatsResum += persJur.getRaoSocial() + " ";
+					interessatsResum += "(" + persJur.getDocumentNum() + ")" + "<br>";
+				} else if (interessat.getTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
+					InteressatAdministracioDto adm = (InteressatAdministracioDto) interessat;
+					interessatsResum += adm.getNomComplet() + " ";
+					interessatsResum += "(" + adm.getDocumentNum() + ")" + "<br>";
+				}
+			}
+		}
+		
+		return interessatsResum;
+	}
 	
 }
