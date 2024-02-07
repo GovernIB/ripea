@@ -675,6 +675,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
 			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
 			"and d.entitat = :entitat " +
+			"and e.esborrat = 0 " +
 			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
@@ -713,6 +714,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			"	  or a.error is not null " + //documents from distribucio that were not moved in arxiu to ripea expedient
 			"	  or d.gesDocFirmatId is not null) " + // documents signed in portafirmes that arrived in callback and were not saved in arxiu 		
 			"and d.entitat = :entitat " +
+			"and e.esborrat = 0 " +
 			"and e.estat = es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.OBERT " +
 			"and (c1.expedient.metaNode in (:metaExpedientsPermesos)) " +
 			"and (:nomesAgafats = false or d.expedient.agafatPer.codi = :usuariActual) " +
