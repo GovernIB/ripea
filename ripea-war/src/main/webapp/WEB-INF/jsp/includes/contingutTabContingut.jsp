@@ -732,10 +732,14 @@ function updateTableEvents() {
 			        contentType: "application/json",
 			        data: JSON.stringify(orderedElements),
 			        success: function (data) {
-			        	//location.reload();
+			        	<c:if test="${! isMantenirEstatCarpetaActiu}">
+			        		location.reload();
+			        	</c:if>
 			        }
 				});
-	            loadCurrentFolderFromServer(attrId);
+	            <c:if test="${isMantenirEstatCarpetaActiu}">
+	            	loadCurrentFolderFromServer(attrId);
+	            </c:if>
 	        }
 	    }).disableSelection();
 	});
