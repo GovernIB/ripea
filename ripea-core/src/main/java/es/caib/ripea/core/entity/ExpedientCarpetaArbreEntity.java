@@ -30,7 +30,8 @@ import javax.persistence.OneToMany;
 			" c.id as id, " + 
 			" c.nom as nom, " + 
 			" c.pare_id as pare_id, " +
-			" c.expedient_id as expedient_id, " + 
+//			" c.expedient_id as expedient_id, " + 
+			" case when c.expedient_id = c.pare_id then c.expedient_id else null end as expedient_id, " +
 			" c.entitat_id as entitat " +
 			" from ipa_contingut c " + 
 			" where c.tipus != 2 " + 

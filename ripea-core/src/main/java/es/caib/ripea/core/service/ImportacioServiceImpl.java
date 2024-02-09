@@ -181,6 +181,7 @@ public class ImportacioServiceImpl implements ImportacioService {
 			} else {
 				nomDocument = documentArxiu.getNom();
 			}
+			nomDocument = nomDocument.trim();
 			contingutHelper.comprovarNomValid(
 					isCarpeta ? carpetaEntity : expedientEntity,
 					nomDocument,
