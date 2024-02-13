@@ -109,6 +109,7 @@ import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
 import es.caib.ripea.core.api.dto.ProcedimentDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.core.api.dto.TipusDocumentalDto;
 import es.caib.ripea.core.api.dto.TipusImportEnumDto;
 import es.caib.ripea.core.api.dto.TipusViaDto;
@@ -3176,7 +3177,11 @@ public class PluginHelper {
 				notificacio.setDocumentArxiuNom(documentEntity.getFitxerNom());
 				notificacio.setDocumentArxiuUuid(documentEntity.getArxiuUuid());
 			}
-			notificacio.setProcedimentCodi(metaExpedient.getClassificacio());
+			
+			if (metaExpedient.getTipusClassificacio() == TipusClassificacioEnumDto.SIA) {
+				notificacio.setProcedimentCodi(metaExpedient.getClassificacio());
+			}
+
 			notificacio.setNumExpedient(expedientEntity.getNumero());
 			UsuariDto usuari = aplicacioService.getUsuariActual();
 			List<Enviament> enviaments = new ArrayList<>();
