@@ -26,14 +26,86 @@
 	top: 10px;
 }
 </style>
+
+
 <script>
+
+//################################################## document ready START ##############################################################
+$(document).ready(function() {
+
+
+	$('#expedientPeticioModificarForm').on('submit', function () {
+		  $(this).find('select#grupId').prop('disabled', false);
+		});
+	
+	$('select#metaExpedientId').change(function(event) {
+
+		refrescarGrup(false);
+	});
+	
+	refrescarGrup(true);
+
+});//################################################## document ready END ##############################################################
+
+
+
+function refrescarGrup(firstTime) {
+	$("#grupId").empty();
+	
+	const metaExpedientId = $('#metaExpedientId').val();
+	if (metaExpedientId != undefined ) {
+
+		var findUrl = '<c:url value="/expedientPeticio/findGrups?procedimentId="/>' + metaExpedientId;
+		$.ajax({
+	        type: "GET",
+	        url: findUrl,
+	        success: function (data) {
+		        
+
+	        	if (data != undefined && data != 0) {
+
+	        		var emptyOption = new Option('', '', false, false);
+	        		$('#grupId').append(emptyOption);
+		        	
+	    		    $.each(data, function(i, val) {
+
+		        		var newOption = new Option(val.descripcio, val.id, false, false);
+		        		$('#grupId').append(newOption);
+	    		    });
+
+	    		    <c:if test="${expedientPeticioModificarCommand.grupId != null}">
+					if (firstTime) {
+		        		$('#grupId').val(${expedientPeticioModificarCommand.grupId});
+					}
+					</c:if>
+
+	    			$('#grupId').trigger('change');
+	    		    $("#grupId").parent().parent().show();
+	    		    
+
+
+	        	} else {
+	        		$("#grupId").parent().parent().hide();
+	        	}
+	        }
+		});
+
+	} else {
+		$("#grupId").parent().parent().hide();
+	}
+
+
+}
+
+
+
 
 </script>
 
 </head>
 <body>
 	<c:set var="formAction"><rip:modalUrl value="/expedientPeticio/canviarProcediment"/></c:set>
-	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioModificarCommand">
+	<form:form id="expedientPeticioModificarForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientPeticioModificarCommand">
 		<form:hidden path="id" />
 
 		<rip:inputText name="numero" textKey="expedient.peticio.list.columna.numero" readonly = "true"/>
@@ -48,6 +120,17 @@
 			emptyOption="true"
 			optionTextAttribute="codiSiaINom" 
 			optionMinimumResultsForSearch="6" />
+	
+		<rip:inputSelect 
+			name="grupId" 
+			optionItems="${grups}" 
+			optionValueAttribute="id" 
+			optionTextAttribute="descripcio"
+			textKey="metaexpedient.relacionar.grup.form.camp.grup" 
+			emptyOption="true"
+			disabled="${rolActual == 'tothom'}"/>
+	
+
 
 		<div id="modal-botons">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

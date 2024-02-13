@@ -99,7 +99,8 @@ public interface ExpedientPeticioService {
 	@PreAuthorize("hasRole('tothom')")
 	public void canviarProcediment(
 			Long expedientPeticioId,
-			Long procedimentId);
+			Long procedimentId, 
+			Long grupId);
 
 	@PreAuthorize("hasRole('tothom')")
 	public void retornarPendent(Long expedientPeticioId);

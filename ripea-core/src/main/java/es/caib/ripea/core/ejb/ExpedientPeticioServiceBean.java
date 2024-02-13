@@ -210,10 +210,12 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	@RolesAllowed("tothom")
 	public void canviarProcediment(
 			Long expedientPeticioId,
-			Long procedimentId) {
+			Long procedimentId, 
+			Long grupId) {
 		delegate.canviarProcediment(
 				expedientPeticioId,
-				procedimentId);
+				procedimentId, 
+				grupId);
 		
 	}
 

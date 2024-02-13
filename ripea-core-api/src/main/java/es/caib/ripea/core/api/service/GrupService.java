@@ -28,7 +28,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto create(
 			Long entitatId,
 			GrupDto grup) throws NotFoundException;
@@ -45,7 +45,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto update(
 			Long entitatId,
 			GrupDto grup) throws NotFoundException;
@@ -61,7 +61,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto delete(
 			Long entitatId,
 			Long id) throws NotFoundException;
@@ -75,7 +75,7 @@ public interface GrupService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
 	public GrupDto findById(
 			Long id) throws NotFoundException;
 	
@@ -85,6 +85,7 @@ public interface GrupService {
 	 * @param entitatId
 	 *            Id de l'entitat.
 	 * @param metaExpedientId TODO
+	 * @param organId TODO
 	 * @return La llista de grups.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
@@ -93,7 +94,10 @@ public interface GrupService {
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
 			Long metaExpedientId, 
-			PaginacioParamsDto paginacioParams) throws NotFoundException;
+			PaginacioParamsDto paginacioParams, 
+			Long organId) throws NotFoundException;
+	
+	
 
 	/**
 	 * Relacionar grup amb metaexpedient
@@ -103,12 +107,15 @@ public interface GrupService {
 	 * @param id
 	 * @param rolActual TODO
 	 * @param organId TODO
+	 * @param marcarPerDefecte TODO
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public void relacionarAmbMetaExpedient(
 			Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual, Long organId);
+			Long id, String rolActual, 
+			Long organId, 
+			boolean marcarPerDefecte);
 	
 	
 	/**
@@ -143,6 +150,39 @@ public interface GrupService {
 	@PreAuthorize("hasRole('tothom')")
 	public boolean checkIfAlreadyExistsWithCodi(
 			Long entitatId,
-			String codi);
+			String codi, 
+			Long grupId);
 	
+	@PreAuthorize("hasRole('tothom')")
+	public void marcarPerDefecte(
+			Long entitatId,
+			Long procedimentId,
+			Long grupId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			Long organGestorId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void esborrarPerDefecte(
+			Long entitatId,
+			Long procedimentId,
+			Long grupId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<GrupDto> findGrups(
+			Long entitatId,
+			Long organGestorId,
+			Long metaExpedientId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public GrupDto findGrupById(Long grupId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public GrupDto findGrupByExpedientPeticioAndProcedimentId(
+			Long expedientPeticioId,
+			Long procedimentId);
+
 }

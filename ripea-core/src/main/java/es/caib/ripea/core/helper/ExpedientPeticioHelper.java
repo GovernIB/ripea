@@ -29,10 +29,13 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioInfoDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.RegistreEntity;
 import es.caib.ripea.core.entity.RegistreInteressatEntity;
@@ -45,6 +48,7 @@ import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -78,6 +82,8 @@ public class ExpedientPeticioHelper {
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private PermisosHelper permisosHelper;
 	@Resource
 	private OrganGestorHelper organGestorHelper;
 	@Resource
@@ -243,6 +249,9 @@ public class ExpedientPeticioHelper {
 		}
 		expedientPeticioEntity.updateMetaExpedient(
 				metaExpedientEntity);
+		
+		calcularGrup(expedientPeticioEntity);
+		
 		ExpedientEntity expedientEntity = null;
 		if (metaExpedientEntity != null) {
 			expedientEntity = expedientRepository.findByEntitatAndMetaNodeAndNumero(
@@ -307,6 +316,59 @@ public class ExpedientPeticioHelper {
 		
 //		System.out.println("crearRegistrePerPeticio metod finished, identificador: " + registreEntrada.getIdentificador());
 		
+	}
+	
+	private void calcularGrup(ExpedientPeticioEntity expedientPeticioEntity) {
+		
+		if (cacheHelper.mostrarLogsGrups())
+			logger.info("calcularGrupAlRecibirAnotacio start (expedientPeticio=" + expedientPeticioEntity.getId() + ", " + expedientPeticioEntity.getIdentificador());
+		
+		GrupEntity grup = null;
+		MetaExpedientEntity metaExpedient = expedientPeticioEntity.getMetaExpedient();
+		
+		if (cacheHelper.mostrarLogsGrups())
+			logger.info("metaExpedient= " + metaExpedient.getId() + ", " + metaExpedient.getCodi());
+		
+		if (metaExpedient != null && metaExpedient.isGestioAmbGrupsActiva()) {
+			
+			if (cacheHelper.mostrarLogsGrups())
+				logger.info("gestioAmbGrupsActiva");
+			
+			List<GrupEntity> grups = metaExpedient.getGrups();
+			if (Utils.isNotEmpty(grups)) {
+				
+				if (cacheHelper.mostrarLogsGrups())
+					logger.info("grupsNotEmpty");
+				
+				OrganGestorEntity org = organGestorRepository.findByCodi(expedientPeticioEntity.getRegistre().getDestiCodi());
+				
+				while (grup == null && org != null) {
+					
+					if (cacheHelper.mostrarLogsGrups())
+						logger.info("organ=" + org.getId() + ", " + org.getCodi());
+					
+					for (GrupEntity grupEntity : grups) {
+						if (cacheHelper.mostrarLogsGrups())
+							logger.info("grup=" + grupEntity.getId() + ", " + grupEntity.getCodi() + ", " + grupEntity.getOrganGestor());
+						
+						if (grupEntity.getOrganGestor() != null && grupEntity.getOrganGestor().getId().equals(org.getId())) {
+							grup = grupEntity;
+							if (cacheHelper.mostrarLogsGrups())
+								logger.info("grup trobat per organ=" + grup.getId());
+							break;
+						}
+					}
+					org = org.getPare();
+				}
+				
+				if (grup == null ) {
+					grup = metaExpedient.getGrupPerDefecte();
+				}
+			}
+		}
+		
+		if (cacheHelper.mostrarLogsGrups())
+			logger.info("calcularGrupAlRecibirAnotacio end (expedientPeticio=" + expedientPeticioEntity.getId() + ", " + expedientPeticioEntity.getIdentificador());
 	}
 	
 	
@@ -380,6 +442,11 @@ public class ExpedientPeticioHelper {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId));
 		} else if (rolActual.equals("tothom")) {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.getCreateWritePermesos(entitatId));
+			
+			List<Long> idsGrupsPermesos = Utils.toListLong(permisosHelper.getObjectsIdsWithPermission(
+					GrupEntity.class,
+					ExtendedPermission.READ));
+			permisosPerAnotacionsDto.setIdsGrupsPermesos(idsGrupsPermesos);
 		}
 
 

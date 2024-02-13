@@ -15,6 +15,8 @@ public class GrupCommand {
  
     private Long entitatId;
     
+    private Long organGestorId;
+    
     public Long getId() {
         return id;
     }
@@ -45,4 +47,12 @@ public class GrupCommand {
 	public void setEntitatId(Long entitatId) {
 		this.entitatId = entitatId;
 	}
+	public Long getOrganGestorId() {
+		return organGestorId;
+	}
+	public void setOrganGestorId(Long organGestorId) {
+		this.organGestorId = organGestorId;
+	}
+	
+	
 }

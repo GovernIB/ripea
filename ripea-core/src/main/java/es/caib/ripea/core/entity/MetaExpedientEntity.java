@@ -107,6 +107,11 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			inverseName = "ipa_grup_metaexpgrup_fk")
 	private List<GrupEntity> grups = new ArrayList<GrupEntity>();
 	
+	
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "grup_per_defecte")
+    @ForeignKey(name = "ipa_grup_metaexp_fk")
+    private GrupEntity grupPerDefecte;
 
 	
 	@Column(name = "revisio_estat", length = 8)
@@ -177,6 +182,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
         this.tipusClassificacio = tipusClassificacio;
 
     }
+	
 	
 	public void updateRevisioEstat(
 			MetaExpedientRevisioEstatEnumDto revisioEstat) {
@@ -311,6 +317,12 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 	}
 	
 
-    private static final long serialVersionUID = -2299453443943600172L;
+    public void setGrupPerDefecte(
+			GrupEntity grupPerDefecte) {
+		this.grupPerDefecte = grupPerDefecte;
+	}
+
+
+	private static final long serialVersionUID = -2299453443943600172L;
 
 }

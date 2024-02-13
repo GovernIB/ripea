@@ -32,6 +32,7 @@ public class ExpedientPeticioDto {
 	private Date dataActualitzacio;
 	private String usuariActualitzacio;
 	private String observacions;
+	private Long grupId;
 
 	
 	public String getDataActualitzacioStr() {

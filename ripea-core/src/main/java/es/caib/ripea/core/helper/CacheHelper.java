@@ -756,6 +756,20 @@ public class CacheHelper {
 		}
 	}
 	
+	@CacheEvict(value = "mostrarLogsGrups")
+	public void evictMostrarLogsGrups() {
+	}
+	@Cacheable(value = "mostrarLogsGrups")
+	public boolean mostrarLogsGrups() {
+		
+		String prop = configHelper.getConfig("es.caib.ripea.activar.logs.grups");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	@Cacheable(value = "mostrarLogsSegonPla")
 	public boolean mostrarLogsSegonPla() {
 		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.segonpla");

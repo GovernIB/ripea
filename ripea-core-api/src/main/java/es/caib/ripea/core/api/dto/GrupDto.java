@@ -14,8 +14,11 @@ public class GrupDto {
     
     private Long entitatId;
     
-    private boolean relacionat;
+    private OrganGestorDto organGestor;
     
+    private Long organGestorId;
+    
+    private boolean perDefecte;
 
 	private List<PermisDto> permisos;
     

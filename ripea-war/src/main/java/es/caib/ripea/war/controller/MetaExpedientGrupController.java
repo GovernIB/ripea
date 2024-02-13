@@ -5,13 +5,16 @@ package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,11 +23,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.RelacionarGrupCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EntitatHelper;
@@ -92,8 +97,9 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				request,
 				grupService.findByEntitatPaginat(
 						entitatActual.getId(),
-						metaExpedientId, 
-						DatatablesHelper.getPaginacioDtoFromRequest(request)),
+						metaExpedientId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request), 
+						null),
 				"id");
 		return dtr;
 	}
@@ -108,31 +114,107 @@ public class MetaExpedientGrupController extends BaseAdminController {
 	    				true));
 	}
 	
+
 	
-	@RequestMapping(value = "/{metaExpedientId}/grup/{id}/relacionar", method = RequestMethod.GET)
-	public String relacionar(
+	@RequestMapping(value = "/{metaExpedientId}/grup/{grupId}/marcarPerDefecte", method = RequestMethod.GET)
+	public String marcarPerDefecte(
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientId,
-			@PathVariable Long id) {
+			@PathVariable Long grupId) {
 		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
-		comprovarAccesMetaExpedient(request, metaExpedientId);
-		grupService.relacionarAmbMetaExpedient(
+
+		grupService.marcarPerDefecte(
 				entitatActual.getId(),
 				metaExpedientId,
-				id, rolActual, organActual != null ? organActual.getId() : null);
+				grupId);
 		
-		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
-			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
-		}
+
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../grup",
-				"metaexpedient.controller.grup.relacionat.ok");
+				"metaexpedient.controller.grup.marcarPerDefecte.ok");
 	}
+	
+	@RequestMapping(value = "/{metaExpedientId}/grup/{grupId}/esborrarPerDefecte", method = RequestMethod.GET)
+	public String esborrarPerDefecte(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@PathVariable Long grupId) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+
+		grupService.esborrarPerDefecte(
+				entitatActual.getId(),
+				metaExpedientId,
+				grupId);
+		
+
+		return getAjaxControllerReturnValueSuccess(
+				request,
+				"redirect:../../grup",
+				"metaexpedient.controller.grup.esborrarPerDefecte.ok");
+	}
+	
+	
+	@RequestMapping(value = "/{metaExpedientId}/grup/relacionar", method = RequestMethod.GET)
+	public String relacionar(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			Model model) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		
+		List<GrupDto> grups = grupService.findGrupsNoRelacionatAmbMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId, 
+				RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null);
+		model.addAttribute("grups", grups);
+		model.addAttribute("metaExpedientId", metaExpedientId);
+
+		RelacionarGrupCommand command = new RelacionarGrupCommand();
+		model.addAttribute(command);
+
+		return "metaExpedientRelacionarGrupForm";
+	}
+	
+	
+	
+	@RequestMapping(value = "/{metaExpedientId}/grup/relacionar/save", method = RequestMethod.POST)
+	public String save(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId,
+			@Valid RelacionarGrupCommand command,
+			BindingResult bindingResult,
+			Model model) {
+
+		comprovarAccesMetaExpedient(request, metaExpedientId);
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+
+		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		
+		grupService.relacionarAmbMetaExpedient(
+				entitatActual.getId(),
+				metaExpedientId,
+				command.getGrupId(), 
+				rolActual, 
+				organActual != null ? organActual.getId() : null, 
+				command.isPerDefecte());
+		
+		
+		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
+		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
+			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
+		}
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../../grup",
+				"metaexpedient.controller.grup.relacionat.ok");
+	
+	}
+	
 	@RequestMapping(value = "/{metaExpedientId}/grup/{id}/desvincular", method = RequestMethod.GET)
 	public String desvincular(
 			HttpServletRequest request,
@@ -157,6 +239,7 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				"redirect:../../grup",
 				"metaexpedient.controller.grup.desvinculat.ok");
 	}
+
 
 	
 

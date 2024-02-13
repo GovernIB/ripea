@@ -78,6 +78,11 @@ function refrescarOrgan() {
 //################################################## document ready START ##############################################################
 $(document).ready(function(){
 
+
+	$('#expedientPeticioAcceptarForm').on('submit', function () {
+	  $(this).find('select#grupId').prop('disabled', false);
+	});
+	
 	if ('${expedientPeticioAcceptarCommand.accio}' == 'CREAR') {
 		$('#input-accio-crear').removeClass('hidden');
 		$('#input-accio-incorporar').addClass('hidden');
@@ -221,17 +226,67 @@ function refrescarGrups() {
 		$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
 		if (gestioAmbGrupsActiva) {
 			$("#grupsActiu").removeClass("hidden");
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
-				success: function(data) {
-					$('#grupId').closest('.form-group').show();
-					$('#grupId option[value!=""]').remove();
-					for (var i = 0; i < data.length; i++) {
-						$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
-					}
+
+			if (typeof firstTime === 'undefined' && ${expedientPeticioAcceptarCommand.grupId}) {
+				$('#grupId').val(${expedientPeticioAcceptarCommand.grupId});
+				grupIdDefault = ${expedientPeticioAcceptarCommand.grupId};
+				firstTime = 'defined';	
+			} else {
+				grupIdDefault = '';
+			}
+
+			if (${rolActual == 'tothom'}) {
+
+				if (grupIdDefault) {
+
+					$.ajax({
+						type: 'GET',
+						url: '<c:url value="/expedientPeticio/findGrupById"/>/' + grupIdDefault,
+						success: function(data) {
+							
+							var newOption = new Option(data.descripcio, data.id, false, false);
+							$('#grupId').append(newOption);
+							$('#grupId').val(grupIdDefault);
+							$('#grupId').trigger('change');
+						}
+					});
+					
+				} else {
+					
+					$.ajax({
+						type: 'GET',
+						url: '<c:url value="/expedientPeticio/findGrupByProcedimentId"/>/' + ${expedientPeticioAcceptarCommand.id} + '/' + metaExpedientId,
+						success: function(data) {
+
+							var newOption = new Option(data.descripcio, data.id, false, false);
+							$('#grupId').append(newOption);
+							$('#grupId').val(data.id);
+							$('#grupId').trigger('change');
+
+							$('#grupId').closest('.form-group').show();
+						}
+					});
 				}
-			});
+			
+			} else {
+
+				$.ajax({
+					type: 'GET',
+					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+					success: function(data) {
+						$('#grupId').closest('.form-group').show();
+						$('#grupId option[value!=""]').remove();
+						for (var i = 0; i < data.length; i++) {
+							$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+						}
+						if (grupIdDefault) {
+							$('#grupId').val(grupIdDefault);
+						}
+					}
+				});
+				
+			}
+			
 		} else {
 			$('#grupId option[value!=""]').remove();
 			$("#grupsActiu").addClass("hidden");
@@ -276,7 +331,7 @@ function refrescarGrups() {
 			<rip:inputText name="any" textKey="expedient.peticio.form.acceptar.camp.any" required="true"/> 	
 			<form:hidden path="gestioAmbGrupsActiva"/>
 			<div id="grupsActiu" class="<c:if test="${not expedientCommand.gestioAmbGrupsActiva}">hidden</c:if>">
-				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup"/>
+				<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" disabled="${rolActual == 'tothom'}"/>
 			</div>					
 		</div>
 		

@@ -1,5 +1,6 @@
 package es.caib.ripea.core.api.utils;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -69,6 +70,14 @@ public class Utils {
     public static boolean isBiggerThan( String string, int size) {
 		return isNotEmpty(string) && string.length() > size;
     }
+    
+    public static List<Long> toListLong(List<Serializable> original) {
+		List<Long> listLong = new ArrayList<Long>(original.size());
+		for (Serializable s: original) { 
+			listLong.add((Long)s); 
+		}
+		return listLong;
+	}
 
 	public static <T> List<T> getUniqueValues(List<T> objects) {
 		if (objects != null) {

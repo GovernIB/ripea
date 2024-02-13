@@ -22,6 +22,7 @@ import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 
 
 @Component
@@ -44,6 +45,8 @@ public class GrupHelper {
 	private GrupRepository grupRepository;
 	@Autowired
 	private PermisosHelper permisosHelper;
+	@Autowired
+	private OrganGestorRepository organGestorRepository;
 	
 
 	public GrupDto create(
@@ -54,15 +57,17 @@ public class GrupHelper {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
-				true,
+				false,
 				false, 
 				false, 
-				false);
+				true);
+		
 		
 		GrupEntity enitity = GrupEntity.getBuilder(
 				grupDto.getCodi(),
 				grupDto.getDescripcio(),
-				entitat).build();
+				entitat, 
+				organGestorRepository.findOne(grupDto.getOrganGestorId())).build();
 
 		GrupDto dto = conversioTipusHelper.convertir(
 				grupRepository.save(enitity),

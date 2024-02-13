@@ -18,6 +18,12 @@
 </head>
 <body>
 
+	<c:if test="${!esRevisor && !bloquejarCamps}">
+		<div class="text-right" data-toggle="botons-titol">
+			<a class="btn btn-default" href="grup/relacionar" data-toggle="modal" data-datatable-id="metadades"><span class="fa fa-plus"></span>&nbsp;<spring:message code="metaexpedient.grup.btn.relacionar"/></a>
+		</div>
+	</c:if>
+
 	<c:set var="element" scope="request" value="grup"/>
 	<jsp:include page="includes/procedimentElementsMenu.jsp"/>
 
@@ -26,28 +32,31 @@
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="metaexpedient.grup.columna.codi"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="metaexpedient.grup.columna.descripcio"/></th>
-
-				<th data-col-name="relacionat" data-template="#cellRelacionatTemplate" data-orderable="false">
-					<spring:message code="metaexpedient.grup.columna.relacionat"/>
-					<script id="cellRelacionatTemplate" type="text/x-jsrender">
-						{{if relacionat}}<span class="fa fa-check"></span>{{/if}}
+				<th data-col-name="organGestor.codiINom" data-orderable="false"><spring:message code="metaexpedient.grup.columna.organGestor"/></th>
+				<th data-col-name="perDefecte" data-orderable="false" data-template="#cellComuTemplate" width="1%">
+					<spring:message code="metaexpedient.grup.columna.perDefecte"/>
+					<script id="cellComuTemplate" type="text/x-jsrender">
+						{{if perDefecte}}<span class="fa fa-check"></span>{{/if}}
 					</script>
-				</th>
+				</th>				
+
 				<c:if test="${!esRevisor}">
-					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+					<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 						<script id="cellAccionsTemplate" type="text/x-jsrender">
-							<c:if test="${!bloquejarCamps}">
-							{{if !relacionat}}
-								<a href="grup/{{:id}}/relacionar" class="btn btn-success"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="comu.boto.relacionar"/></a>
-								
-							{{else}}
-								<a href="grup/{{:id}}/desvincular" class="btn btn-success"><span class="fa fa-unlink"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desvincular"/></a>
-							{{/if}}
-							</c:if>
-						</script>
-					</th>
-				</c:if>
-				
+							<div class="dropdown">
+								<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>
+								<ul class="dropdown-menu">
+									<li><a href="grup/{{:id}}/desvincular"><span class="fa fa-unlink"></span>&nbsp;&nbsp;<spring:message code="comu.boto.desvincular"/></a></li>
+									{{if perDefecte}}
+										<li><a href="grup/{{:id}}/esborrarPerDefecte"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrarPerDefecte"/></a></li>
+									{{else}}
+										<li><a href="grup/{{:id}}/marcarPerDefecte"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.marcarPerDefecte"/></a></li>
+									{{/if}}
+								</ul>
+							</div>
+					</script>
+					</th>		
+				</c:if>		
 			</tr>
 		</thead>
 	</table>

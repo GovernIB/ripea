@@ -76,7 +76,8 @@ public class ConfigServiceImpl implements ConfigService {
        // cacheHelper.clearAllCaches();
         
         cacheHelper.evictMostrarLogsEmail();
-        cacheHelper.mostrarLogsPermisos();
+        cacheHelper.evictMostrarLogsPermisos();
+        cacheHelper.evictMostrarLogsGrups();
         cacheHelper.evictMostrarLogsRendimentDescarregarAnotacio();
         cacheHelper.evictMostrarLogsRendiment();
         cacheHelper.evictMostrarLogsCreacioContingut();

@@ -19,6 +19,7 @@ import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
 
 /**
  * Classe del model de dades que representa un grup.
@@ -28,8 +29,9 @@ import es.caib.ripea.core.audit.RipeaAuditable;
 @Entity
 @Table(name = "ipa_grup")
 @EntityListeners(AuditingEntityListener.class)
+@Getter
 public class GrupEntity extends RipeaAuditable<Long> {
-
+	
 
 	@Column(name = "rol", length = 50, nullable = false)
 	private String rol;
@@ -44,6 +46,12 @@ public class GrupEntity extends RipeaAuditable<Long> {
 	@ForeignKey(name = "ipa_entitat_ipa_grup_fk")
 	protected EntitatEntity entitat;
 
+    
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "organ_id")
+    @ForeignKey(name = "ipa_organ_grup_fk")
+    private OrganGestorEntity organGestor;
+
 	@ManyToMany(mappedBy = "grups", fetch = FetchType.EAGER)
 	protected List<MetaExpedientEntity> metaExpedients = new ArrayList<MetaExpedientEntity>();
 
@@ -53,46 +61,51 @@ public class GrupEntity extends RipeaAuditable<Long> {
 	public void setMetaExpedients(List<MetaExpedientEntity> metaExpedients) {
 		this.metaExpedients = metaExpedients;
 	}
-	public String getCodi() {
-		return codi;
+
+	public void updateOrganGestor(OrganGestorEntity organGestor) {
+		this.organGestor = organGestor;
 	}
-	public String getRol() {
-	    return rol;
-	}
-	public String getDescripcio() {
-	    return descripcio;
-	}
-	public EntitatEntity getEntitat() {
-	    return entitat;
-	}
+
 	public static Builder getBuilder(
 			String codi,
 			String descripcio,
-			EntitatEntity entitat) {
+			EntitatEntity entitat, 
+			OrganGestorEntity organGestor) {
 		return new Builder(
 				codi,
 				descripcio,
-				entitat);
+				entitat, 
+				organGestor);
 	}
 	
 	public static class Builder {
 
 	    GrupEntity built;
 
-	    Builder(String codi, String descripcio, EntitatEntity entitat) {
+		Builder(
+				String codi,
+				String descripcio,
+				EntitatEntity entitat,
+				OrganGestorEntity organGestor) {
 	        built = new GrupEntity();
 	        built.codi = codi;
 	        built.descripcio = descripcio;
 	        built.entitat = entitat;
+	        built.organGestor = organGestor;
 	    }
 
 	    public GrupEntity build() {
 	        return built;
 	    }
 	}
-	public void update(String codi, String descripcio) {
+
+	public void update(
+			String codi,
+			String descripcio,
+			OrganGestorEntity organGestor) {
 	    this.codi = codi;
 	    this.descripcio = descripcio;
+	    this.organGestor = organGestor;
 	}
 
 	private static final long serialVersionUID = -8765569320503898715L;

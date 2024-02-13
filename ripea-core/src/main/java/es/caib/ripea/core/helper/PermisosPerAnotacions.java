@@ -11,6 +11,7 @@ public class PermisosPerAnotacions {
 	boolean adminOrganHasPermisAdminComu;
 	List<String> adminOrganCodisOrganAmbDescendents;
 	List<MetaExpedientEntity> procedimentsPermesos;
+	List<Long> idsGrupsPermesos;
 	
 	public boolean isAdminOrganHasPermisAdminComu() {
 		return adminOrganHasPermisAdminComu;
@@ -20,6 +21,9 @@ public class PermisosPerAnotacions {
 	}
 	public List<MetaExpedientEntity> getProcedimentsPermesos() {
 		return Utils.getNullIfEmpty(procedimentsPermesos);
+	}
+	public List<Long> getIdsGrupsPermesos() {
+		return Utils.getNullIfEmpty(idsGrupsPermesos);
 	}
 
 }

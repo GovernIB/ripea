@@ -97,6 +97,11 @@ public class ExpedientPeticioEntity extends RipeaAuditable<Long> {
 	@Column(name = "reintents_canvi_estat_dis")
 	private int reintentsCanviEstatDistribucio;
 	
+	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@JoinColumn(name = "grup_id")
+	@ForeignKey(name = "ipa_grup_exp_pet_fk")
+	private GrupEntity grup;
+	
 	
 	public void setEstatCanviatDistribucio(boolean canviat) {
 		setEstatCanviatDistribucio(

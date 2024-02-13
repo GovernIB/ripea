@@ -25,7 +25,7 @@ public class GrupServiceBean implements GrupService {
     
     
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto create(
 			Long entitatId, 
 			GrupDto tipusDocumental) throws NotFoundException {
@@ -35,7 +35,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto update(
 			Long entitatId, 
 			GrupDto tipusDocumental) throws NotFoundException {
@@ -45,7 +45,7 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto delete(
 			Long entitatId, 
 			Long id) throws NotFoundException {
@@ -55,35 +55,41 @@ public class GrupServiceBean implements GrupService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_ADMIN")
+	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
 	public GrupDto findById(
 			Long id) throws NotFoundException {
 		return delegate.findById(
 				id);
 	}
-
+	
 	@Override
 	@RolesAllowed("tothom")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,
 			Long metaExpedientId, 
-			PaginacioParamsDto paginacioParams)
+			PaginacioParamsDto paginacioParams, 
+			Long organId)
 			throws NotFoundException {
 		return delegate.findByEntitatPaginat(
 				entitatId, 
 				metaExpedientId, 
-				paginacioParams);
+				paginacioParams, 
+				organId);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public void relacionarAmbMetaExpedient(Long entitatId,
 			Long metaExpedientId,
-			Long id, String rolActual, Long organId) {
+			Long id, String rolActual, Long organId, 
+			boolean marcarPerDefecte) {
 		delegate.relacionarAmbMetaExpedient(
 				entitatId,
 				metaExpedientId,
-				id, rolActual, organId);
+				id,
+				rolActual,
+				organId,
+				marcarPerDefecte);
 
 	}
 
@@ -125,10 +131,76 @@ public class GrupServiceBean implements GrupService {
 	@RolesAllowed("tothom")
 	public boolean checkIfAlreadyExistsWithCodi(
 			Long entitatId,
-			String codi) {
+			String codi, 
+			Long grupId) {
 		return delegate.checkIfAlreadyExistsWithCodi(
 				entitatId,
-				codi);
+				codi, 
+				grupId);
 	}
     
+	@Override
+	@RolesAllowed("tothom")
+	public void marcarPerDefecte(
+			Long entitatId,
+			Long procedimentId,
+			Long grupId) {
+		delegate.marcarPerDefecte(
+				entitatId,
+				procedimentId,
+				grupId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(
+			Long entitatId,
+			Long metaExpedientId,
+			Long organGestorId) {
+		return delegate.findGrupsNoRelacionatAmbMetaExpedient(
+				entitatId,
+				metaExpedientId,
+				organGestorId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void esborrarPerDefecte(
+			Long entitatId,
+			Long procedimentId,
+			Long grupId) {
+		delegate.esborrarPerDefecte(
+				entitatId,
+				procedimentId,
+				grupId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<GrupDto> findGrups(
+			Long entitatId,
+			Long organGestorId,
+			Long metaExpedientId) {
+		return delegate.findGrups(
+				entitatId,
+				organGestorId,
+				metaExpedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public GrupDto findGrupById(Long grupId) {
+		return delegate.findGrupById(grupId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public GrupDto findGrupByExpedientPeticioAndProcedimentId(
+			Long expedientPeticioId,
+			Long procedimentId) {
+		return delegate.findGrupByExpedientPeticioAndProcedimentId(
+				expedientPeticioId,
+				procedimentId);
+	}
+
 }

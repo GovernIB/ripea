@@ -70,7 +70,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"ep.registre.entitat = :entitat " +
 			"and ((:rolActual = 'IPA_ADMIN') " +
 			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((me.organGestor is not null and ep.metaExpedient in (:metaExpedientsPermesos)) or (me.organGestor is null and :hasPermisAdminComu = true and ep.registre.destiCodi in (:organsPermesos)))) " +
-			"	or (:rolActual = 'tothom' and ep.metaExpedient in (:metaExpedientsPermesos))) " +	
+			"	or (:rolActual = 'tothom' and ep.metaExpedient in (:metaExpedientsPermesos) and me.gestioAmbGrupsActiva = false or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +	
 			"and (:esNullMetaExpedient = true or ep.metaExpedient = :metaExpedient) " +
 			"and (:esNullNumero = true or lower(ep.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullExtracte = true or lower(ep.registre.extracte) like lower('%'||:extracte||'%')) " +
@@ -96,6 +96,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
 			@Param("organsPermesos") List<String> organsPermesos,
 			@Param("hasPermisAdminComu") boolean hasPermisAdminComu,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullNumero") boolean esNullNumero,

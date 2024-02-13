@@ -54,6 +54,7 @@ import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
@@ -78,6 +79,7 @@ import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
@@ -138,6 +140,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	private ExpedientPeticioHelper0 expedientPeticioHelper0;
 	@Autowired
 	private UsuariRepository usuariRepository;
+	@Autowired
+	private GrupRepository grupRepository;
 
 	
 	@Transactional(readOnly = true)
@@ -188,6 +192,8 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				permisosPerAnotacions.getProcedimentsPermesos(),
 				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
 				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
+				permisosPerAnotacions.getIdsGrupsPermesos() == null,
+				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedient == null,
 				metaExpedient,
 				StringUtils.isEmpty(filtre.getNumero()),
@@ -649,7 +655,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	
 	@Transactional
 	@Override
-	public void canviarProcediment(Long expedientPeticioId, Long procedimentId) {
+	public void canviarProcediment(Long expedientPeticioId, Long procedimentId, Long grupId) {
 
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		
@@ -658,6 +664,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			expedientPeticioEntity.updateMetaExpedient(metaExpedient);
 		} else {
 			expedientPeticioEntity.updateMetaExpedient(null);
+		}
+		
+		if (grupId != null) {
+			GrupEntity grup = grupRepository.findOne(grupId);
+			expedientPeticioEntity.setGrup(grup);
+		} else {
+			expedientPeticioEntity.setGrup(null);
 		}
 	
 	}

@@ -43,6 +43,8 @@ public class ExpedientPeticioListDto {
 	private int reintentsCanviEstatDistribucio;
 	private Date dataActualitzacio;
 	
+	private String grupNom;
+	
     public String getConsultaWsErrorDescShort() {
 		return Utils.abbreviate(consultaWsErrorDesc, 400);
     	

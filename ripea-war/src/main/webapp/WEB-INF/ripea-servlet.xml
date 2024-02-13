@@ -240,6 +240,8 @@
 		<mvc:interceptor>
 			<mvc:mapping path="/metaExpedient**"/>
 			<mvc:mapping path="/metaExpedient/**"/>
+			<mvc:mapping path="/grup**"/>
+			<mvc:mapping path="/grup/**"/>
 			<mvc:exclude-mapping path="/metaExpedient/findPerLectura/**"/>
 			<mvc:exclude-mapping path="/metaExpedient/**/meta**"/>
 			<mvc:exclude-mapping path="/metaExpedient/**/meta**/**"/>
@@ -259,8 +261,6 @@
 		<mvc:interceptor>
 			<mvc:mapping path="/domini**"/>
 			<mvc:mapping path="/domini/**"/>
-			<mvc:mapping path="/grup**"/>
-			<mvc:mapping path="/grup/**"/>
 			<mvc:mapping path="/organgestor**"/>
 			<mvc:mapping path="/organgestor/**"/>
 			<mvc:mapping path="/permis**"/>

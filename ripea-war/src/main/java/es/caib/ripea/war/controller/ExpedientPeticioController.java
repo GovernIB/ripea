@@ -43,6 +43,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
@@ -54,6 +55,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
@@ -103,6 +105,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private GrupService grupService;
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
@@ -116,7 +120,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				organActualId,
 				rolActual);
 		model.addAttribute("metaExpedients", metaExpedientsPermesos);
-		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN"));
+		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
 		return "expedientPeticioList";
 	}
 
@@ -738,17 +742,64 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitatActual.getId(), rolActual);
 		model.addAttribute("metaExpedients", metaExpedients);
 		
-		
 		ExpedientPeticioModificarCommand command = new ExpedientPeticioModificarCommand();
 		command.setId(expedientPeticioId);
 		command.setExtracte(expedientPeticioDto.getRegistre().getExtracte());
 		command.setNumero(expedientPeticioDto.getRegistre().getIdentificador());
 		command.setMetaExpedientId(expedientPeticioDto.getMetaExpedientId());
+		command.setGrupId(expedientPeticioDto.getGrupId());
 		model.addAttribute("expedientPeticioModificarCommand", command);
+		model.addAttribute("rolActual", RolHelper.getRolActual(request));
 		
 		return "expedientPeticioModificarForm";
 
 	}
+	
+	
+	@RequestMapping(value = "/findGrups", method = RequestMethod.GET)
+	@ResponseBody
+	public List<GrupDto> findGrups(
+			HttpServletRequest request,
+			@RequestParam(value = "procedimentId", required = false) Long procedimentId,
+			Model model) {
+		
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		
+		List<GrupDto> grups = grupService.findGrups(
+				entitatActual.getId(),
+				RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null, 
+				procedimentId);
+
+		return grups;
+	}
+	
+	@RequestMapping(value = "/findGrupById/{grupId}", method = RequestMethod.GET)
+	@ResponseBody
+	public GrupDto findGrupById(
+			HttpServletRequest request,
+			@PathVariable(value = "grupId") Long grupId,
+			Model model) {
+		
+		GrupDto grup = grupService.findGrupById(grupId);
+
+		return grup;
+	}
+	
+	@RequestMapping(value = "/findGrupByProcedimentId/{expedientPeticioId}/{procedimentId}", method = RequestMethod.GET)
+	@ResponseBody
+	public GrupDto findGrupByProcedimentId(
+			HttpServletRequest request,
+			@PathVariable(value = "expedientPeticioId") Long expedientPeticioId,
+			@PathVariable(value = "procedimentId") Long procedimentId,
+			Model model) {
+		
+		GrupDto grup = grupService.findGrupByExpedientPeticioAndProcedimentId(expedientPeticioId, procedimentId);
+
+		return grup;
+	}
+	
+	
 	
 	
 	@RequestMapping(value = "/canviarProcediment", method = RequestMethod.POST)
@@ -763,7 +814,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		try {
 			expedientPeticioService.canviarProcediment(
 					command.getId(),
-					command.getMetaExpedientId());
+					command.getMetaExpedientId(), 
+					command.getGrupId());
 
 			return getModalControllerReturnValueSuccess(
 					request,
@@ -1066,7 +1118,10 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		command.setAssociarInteressats(true);
 //		command.setNewExpedientTitol(expedientPeticioDto.getIdentificador());
 		command.setAny(Calendar.getInstance().get(Calendar.YEAR));
+		command.setGrupId(expedientPeticioDto.getGrupId());
 		model.addAttribute("expedientPeticioAcceptarCommand", command);
+		
+		model.addAttribute("rolActual", rolActual);
 	}
 
 	private boolean isIncorporacioJustificantActiva() {

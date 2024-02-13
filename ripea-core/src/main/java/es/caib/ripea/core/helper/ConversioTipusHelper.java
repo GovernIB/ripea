@@ -446,6 +446,8 @@ public class ConversioTipusHelper {
 						target.setDataActualitzacio(source.getDataActualitzacio());
 						target.setUsuariActualitzacio(source.getUsuariActualitzacio() != null ? source.getUsuariActualitzacio().getCodiAndNom() : "");
 						target.setObservacions(source.getObservacions());
+						target.setGrupId(source.getGrup() != null ? source.getGrup().getId() : null);
+						
 						return target;
 					}
 				});
@@ -484,6 +486,8 @@ public class ConversioTipusHelper {
 						target.setPendentCanviEstatDistribucio(source.isPendentCanviEstatDistribucio());
 						target.setReintentsCanviEstatDistribucio(source.getReintentsCanviEstatDistribucio());
 						target.setDataActualitzacio(source.getDataActualitzacio());
+						
+						target.setGrupNom(source.getGrup() != null ? source.getGrup().getDescripcio() : null);
 						
 						ExpedientPeticioEstatPendentDistribucioEnumDto estatPendentEnviarDistribucio = null;
 						switch (source.getEstat()) {

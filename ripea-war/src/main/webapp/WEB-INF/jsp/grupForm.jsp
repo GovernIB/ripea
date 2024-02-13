@@ -25,6 +25,18 @@
 		<!--  form:hidden path="entitatId"/-->
 		<rip:inputText name="codi" textKey="grup.form.camp.codi" required="true"/>
 		<rip:inputTextarea name="descripcio" textKey="grup.form.camp.descripcio" required="true"/>
+		
+		<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>
+		<c:url value="/organgestorajax/organgestor" var="urlConsultaLlistat"/>
+		<rip:inputSuggest 
+				name="organGestorId"  
+				urlConsultaInicial="${urlConsultaInicial}"
+				urlConsultaLlistat="${urlConsultaLlistat}"
+				textKey="metaexpedient.relacionar.grup.form.camp.organGestor"
+				suggestValue="id"
+				suggestText="codiINom"
+				required="${esAdminOrgan}" />
+		
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 				<c:choose>

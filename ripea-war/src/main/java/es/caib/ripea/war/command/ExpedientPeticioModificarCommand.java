@@ -14,5 +14,6 @@ public class ExpedientPeticioModificarCommand {
 	private String numero;
 	private String extracte;
 	private Long metaExpedientId;
+	private Long grupId;
 
 }
