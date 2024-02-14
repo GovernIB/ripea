@@ -380,6 +380,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 				permisosPerAnotacions.getProcedimentsPermesos(),
 				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
 				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
+				permisosPerAnotacions.getIdsGrupsPermesos() == null,
+				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedientFiltre == null,
 				metaExpedientFiltre,
 				StringUtils.isEmpty(filtre.getNumero()),
