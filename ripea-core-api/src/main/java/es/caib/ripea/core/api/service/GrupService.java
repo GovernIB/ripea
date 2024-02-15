@@ -199,4 +199,10 @@ public interface GrupService {
 			Long expedientPeticioId,
 			Long procedimentId);
 
+	@PreAuthorize("hasRole('tothom')")
+	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
+			Long entitatId,
+			String rolActual,
+			Long organGestorId);
+
 }

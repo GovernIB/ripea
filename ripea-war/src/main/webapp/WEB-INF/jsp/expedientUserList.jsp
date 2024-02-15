@@ -547,6 +547,21 @@ function hexToRgb(hex) {
 			<div class="col-md-2">
 				<rip:inputText name="numeroRegistre" inline="true" placeholderKey="expedient.list.user.placeholder.numeroregistre"/>
 			</div>
+			
+			<c:if test="${fn:length(grups) > 1 }">
+				<div class="col-md-3">
+					<rip:inputSelect 
+						name="grupId" 
+						optionItems="${grups}"
+						optionMinimumResultsForSearch="1" 
+						optionValueAttribute="id" 
+						emptyOption="true"
+						optionTextAttribute="descripcio"
+						placeholderKey="expedient.list.user.placeholder.grup" 
+						inline="true" />
+				</div>			
+			</c:if>		
+				
 			<c:choose>
 			 	<c:when test="${rolActual!='tothom'}">
 					<div class="col-md-2">

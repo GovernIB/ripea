@@ -43,6 +43,8 @@ public class ExpedientFiltreDto implements Serializable {
 	private boolean ambFirmaPendent;
 	private String numeroRegistre;
 	
+	private Long grupId;
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

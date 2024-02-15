@@ -41,6 +41,8 @@ public class ExpedientFiltreCommand {
 	private boolean ambFirmaPendent;
 	private String numeroRegistre;
 	
+	private Long grupId;
+	
 	public static ExpedientFiltreCommand asCommand(ExpedientFiltreDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
@@ -110,6 +112,9 @@ public class ExpedientFiltreCommand {
 	}
 	public void setNumeroRegistre(String numeroRegistre) {
 		this.numeroRegistre = Utils.trim(numeroRegistre);
+	}
+	public void setGrupId(Long grupId) {
+		this.grupId = grupId;
 	}
 
 }

@@ -66,6 +66,7 @@ import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.utils.Utils;
@@ -120,6 +121,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private ExpedientEstatService expedientEstatService;
 	@Autowired
 	private OrganGestorService organGestorService;
+	@Autowired
+	private GrupService grupService;
 
 	
 	@RequestMapping(method = RequestMethod.GET)
@@ -190,6 +193,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		model.addAttribute("isExportacioExcelActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel")));
 		model.addAttribute("isExportacioInsideActiva", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportar.inside")));
+		
+		model.addAttribute("grups", grupService.findGrupsPermesosProcedimentsGestioActiva(entitatActual.getId(), rolActual, RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null));
 		
 		if (!expedientService.hasReadPermissionsAny(rolActual, entitatActual.getId())) {
 			MissatgesHelper.warning(

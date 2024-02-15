@@ -226,4 +226,16 @@ public class GrupServiceBean implements GrupService {
 				procedimentId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
+			Long entitatId,
+			String rolActual,
+			Long organGestorId) {
+		return delegate.findGrupsPermesosProcedimentsGestioActiva(
+				entitatId,
+				rolActual,
+				organGestorId);
+	}
+
 }

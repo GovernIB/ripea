@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 
 @Service
 public class GrupServiceImpl implements GrupService {
@@ -473,6 +475,57 @@ public class GrupServiceImpl implements GrupService {
 				metaExpedientId,
 				organGestorId == null,
 				organGestorId);
+		
+		return conversioTipusHelper.convertirList(
+				grups, 
+				GrupDto.class);
+	}
+	
+	
+	@Transactional(readOnly = true)
+	@Override
+	public List<GrupDto> findGrupsPermesosProcedimentsGestioActiva(
+			Long entitatId,
+			String rolActual, 
+			Long organGestorId) {
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId);
+		
+		List<GrupEntity> grups = new ArrayList<>();
+		
+		List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+				entitatId,
+				ExtendedPermission.READ,
+				true,
+				null, 
+				"IPA_ADMIN".equals(rolActual),
+				"IPA_ORGAN_ADMIN".equals(rolActual),
+				null, 
+				false);
+		
+		boolean isAnyGestioAmbGrupsActiva = false;
+		for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
+			if (metaExpedientEntity.isGestioAmbGrupsActiva()) {
+				isAnyGestioAmbGrupsActiva = true;
+				break;
+			}
+		}
+		
+		if (isAnyGestioAmbGrupsActiva) {
+			grups = grupRepository.findByEntitatAndOrgan(
+					entitat,
+					true,
+					null,
+					organGestorId == null,
+					organGestorId);
+			if (rolActual == "tothom") {
+				permisosHelper.filterGrantedAny(
+						grups,
+						GrupEntity.class,
+						new Permission[] { ExtendedPermission.READ });
+			}
+		}
 		
 		return conversioTipusHelper.convertirList(
 				grups, 
