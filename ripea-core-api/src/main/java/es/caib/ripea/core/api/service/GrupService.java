@@ -5,9 +5,12 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.GrupFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 
 /**
@@ -86,10 +89,21 @@ public interface GrupService {
 	 *            Id de l'entitat.
 	 * @param metaExpedientId TODO
 	 * @param organId TODO
+	 * @param filtre TODO
+	 * @param resultEnum TODO
 	 * @return La llista de grups.
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
+	@PreAuthorize("hasRole('tothom')")
+	public ResultDto<GrupDto> findByEntitat(
+			Long entitatId,
+			Long metaExpedientId, 
+			PaginacioParamsDto paginacioParams, 
+			Long organId, 
+			GrupFiltreDto filtre, 
+			ResultEnumDto resultEnum) throws NotFoundException;
+	
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<GrupDto> findByEntitatPaginat(
 			Long entitatId,

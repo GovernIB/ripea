@@ -99,7 +99,7 @@ public class MetaExpedientGrupController extends BaseAdminController {
 						entitatActual.getId(),
 						metaExpedientId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						null),
+						RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null),
 				"id");
 		return dtr;
 	}

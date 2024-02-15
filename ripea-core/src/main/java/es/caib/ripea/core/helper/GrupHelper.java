@@ -62,12 +62,11 @@ public class GrupHelper {
 				false, 
 				true);
 		
-		
 		GrupEntity enitity = GrupEntity.getBuilder(
 				grupDto.getCodi(),
 				grupDto.getDescripcio(),
 				entitat, 
-				organGestorRepository.findOne(grupDto.getOrganGestorId())).build();
+				grupDto.getOrganGestorId() != null ?  organGestorRepository.findOne(grupDto.getOrganGestorId()) : null).build();
 
 		GrupDto dto = conversioTipusHelper.convertir(
 				grupRepository.save(enitity),

@@ -25,6 +25,8 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			Pageable pageable);
 	
 	
+	
+	
 	@Query(	"select " +
 			"    grup " +
 			"from " +
@@ -54,6 +56,79 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
 			@Param("organGestorId") Long organGestorId,	
 			Pageable pageable);
+	
+	
+	
+	@Query(	"select " +
+			"    grup " +
+			"from " +
+			"    GrupEntity grup " +
+			"    left join grup.metaExpedients me " +
+			"    left join grup.organGestor og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    grup.entitat = :entitat " +
+			"and (:esNullProcedimentId = true or me.id = :procedimentId) " +
+			"and (:esNullCodi = true or lower(grup.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullDescripcio = true or lower(grup.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:esNullOrganGestorId = true or og.id = :organGestorId) " +
+			"and (:esNullOrganGestorAscendentId = true " +
+			"	  or og.id = :organGestorAscendentId " +
+			"     or pare1.id = :organGestorAscendentId " +
+			"     or pare2.id = :organGestorAscendentId " +
+			"     or pare3.id = :organGestorAscendentId " +
+			"     or pare4.id = :organGestorAscendentId)")
+	Page<GrupEntity> findByEntitatAndProcediment(
+			@Param("entitat") EntitatEntity entitat, 
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullDescripcio") boolean esNullDescripcio,
+			@Param("descripcio") String descripcio,
+			@Param("esNullProcedimentId") boolean esNullProcedimentId,
+			@Param("procedimentId") Long procedimentId,	
+			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
+			@Param("organGestorId") Long organGestorId,	
+			@Param("esNullOrganGestorAscendentId") boolean esNullOrganGestorAscendentId,
+			@Param("organGestorAscendentId") Long organGestorAscendentId,	
+			Pageable pageable);
+	
+	@Query(	"select " +
+			"    grup.id " +
+			"from " +
+			"    GrupEntity grup " +
+			"    left join grup.metaExpedients me " +
+			"    left join grup.organGestor og " +
+			"    left join og.pare pare1 " +
+			"    left join pare1.pare pare2 " + 
+			"	 left join pare2.pare pare3 " +
+			"	 left join pare3.pare pare4 " +
+			"where " +
+			"    grup.entitat = :entitat " +
+			"and (:esNullProcedimentId = true or me.id = :procedimentId) " +
+			"and (:esNullCodi = true or lower(grup.codi) like lower('%'||:codi||'%')) " +
+			"and (:esNullDescripcio = true or lower(grup.descripcio) like lower('%'||:descripcio||'%')) " +
+			"and (:esNullOrganGestorId = true or og.id = :organGestorId) " +
+			"and (:esNullOrganGestorAscendentId = true " +
+			"	  or og.id = :organGestorAscendentId " +
+			"     or pare1.id = :organGestorAscendentId " +
+			"     or pare2.id = :organGestorAscendentId " +
+			"     or pare3.id = :organGestorAscendentId " +
+			"     or pare4.id = :organGestorAscendentId)")
+	List<Long> findIdsByEntitatAndProcediment(
+			@Param("entitat") EntitatEntity entitat, 
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullDescripcio") boolean esNullDescripcio,
+			@Param("descripcio") String descripcio,
+			@Param("esNullProcedimentId") boolean esNullProcedimentId,
+			@Param("procedimentId") Long procedimentId,	
+			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
+			@Param("organGestorId") Long organGestorId,	
+			@Param("esNullOrganGestorAscendentId") boolean esNullOrganGestorAscendentId,
+			@Param("organGestorAscendentId") Long organGestorAscendentId);
 	
 	
 	@Query(	"select " +

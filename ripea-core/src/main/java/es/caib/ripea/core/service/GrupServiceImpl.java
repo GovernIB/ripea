@@ -15,9 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.GrupFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.api.utils.Utils;
@@ -200,6 +203,88 @@ public class GrupServiceImpl implements GrupService {
 		}
 
 		return pageDto;
+	}
+	
+	
+	@Transactional
+	@Override
+	public ResultDto<GrupDto> findByEntitat(
+			Long entitatId,
+			Long metaExpedientId, 
+			PaginacioParamsDto paginacioParams, 
+			Long organId, 
+			GrupFiltreDto filtre, 
+			ResultEnumDto resultEnum) throws NotFoundException {
+		
+		ResultDto<GrupDto> result = new ResultDto<GrupDto>();
+		
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId);
+
+		if (resultEnum == ResultEnumDto.PAGE) {
+			// ================================  RETURNS PAGE (DATATABLE) ==========================================
+		
+			Page<GrupEntity> page = grupRepository.findByEntitatAndProcediment(
+					entitat,
+					Utils.isEmpty(filtre.getCodi()),
+					Utils.getEmptyStringIfNull(filtre.getCodi()),
+					Utils.isEmpty(filtre.getDescripcio()),
+					Utils.getEmptyStringIfNull(filtre.getDescripcio()),
+					metaExpedientId == null,
+					metaExpedientId,
+					filtre.getOrganGestorAscendentId() == null,
+					filtre.getOrganGestorAscendentId(),
+					organId == null,
+					organId,
+					paginacioHelper.toSpringDataPageable(paginacioParams));
+			
+			PaginaDto<GrupDto> pageDto = null;
+			if (metaExpedientId != null) {
+				GrupEntity grupPerDefecte = metaExpedientRepository.findOne(metaExpedientId).getGrupPerDefecte();
+				pageDto = paginacioHelper.toPaginaDto(
+						page,
+						GrupDto.class);
+				
+				if (grupPerDefecte != null) {
+					for (GrupDto grup : pageDto.getContingut()) {
+						if (grup.getId().equals(grupPerDefecte.getId())) {
+							grup.setPerDefecte(true);
+						}
+					}
+				}
+
+			} else {
+				
+				pageDto = paginacioHelper.toPaginaDto(
+						page,
+						GrupDto.class);
+				
+				omplirPermisosPerGrups(pageDto.getContingut());
+			}
+
+			result.setPagina(pageDto);
+			
+			
+		} else {
+			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
+			List<Long> ids = grupRepository.findIdsByEntitatAndProcediment(
+					entitat,
+					Utils.isEmpty(filtre.getCodi()),
+					Utils.getEmptyStringIfNull(filtre.getCodi()),
+					Utils.isEmpty(filtre.getDescripcio()),
+					Utils.getEmptyStringIfNull(filtre.getDescripcio()),
+					metaExpedientId == null,
+					metaExpedientId,
+					filtre.getOrganGestorAscendentId() == null,
+					filtre.getOrganGestorAscendentId(),
+					organId == null,
+					organId);
+			
+			result.setIds(ids);
+			
+		}
+		return result;
+
 	}
 	
 	

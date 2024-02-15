@@ -1,19 +1,23 @@
 package es.caib.ripea.core.ejb;
 
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.service.GrupService;
-
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.GrupFiltreDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.ResultDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.service.GrupService;
 
 @Stateless
 @Interceptors(SpringBeanAutowiringInterceptor.class)
@@ -60,6 +64,25 @@ public class GrupServiceBean implements GrupService {
 			Long id) throws NotFoundException {
 		return delegate.findById(
 				id);
+	}
+	
+	@Override
+	@RolesAllowed("tothom")
+	public ResultDto<GrupDto> findByEntitat(
+			Long entitatId,
+			Long metaExpedientId, 
+			PaginacioParamsDto paginacioParams, 
+			Long organId, 
+			GrupFiltreDto filtre, 
+			ResultEnumDto resultEnum)
+			throws NotFoundException {
+		return delegate.findByEntitat(
+				entitatId, 
+				metaExpedientId, 
+				paginacioParams, 
+				organId, 
+				filtre, 
+				resultEnum);
 	}
 	
 	@Override
