@@ -396,6 +396,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			}
 			dto.setRols(rols);
 		}
+		dto.setProcedimentId(usuari.getProcediment() != null ? usuari.getProcediment().getId() : null);
 		return dto;
 	}
 	
