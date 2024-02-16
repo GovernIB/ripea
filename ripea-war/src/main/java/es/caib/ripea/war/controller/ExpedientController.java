@@ -1932,6 +1932,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			filtreCommand.setExpedientEstatId(Long.valueOf(0));
 			
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
 		filtreCommand.setMeusExpedients(cookie != null && "true".equals(cookie.getValue()));

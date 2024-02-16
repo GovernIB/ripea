@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.war.command.ExpedientPeticioFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -43,6 +44,8 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
 	
     @Autowired
     private SeguimentService seguimentService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 
     @RequestMapping(method = RequestMethod.GET)
@@ -114,6 +117,7 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
 		if (filtreCommand == null) {
 			filtreCommand = new ExpedientPeticioFiltreCommand();
 			filtreCommand.setEstat(ExpedientPeticioEstatViewEnumDto.PENDENT);
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

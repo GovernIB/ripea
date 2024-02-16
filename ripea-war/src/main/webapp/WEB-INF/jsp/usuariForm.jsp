@@ -58,6 +58,16 @@ $(document).ready(function() {
 		<rip:inputCheckbox name="expedientListComentaris" textKey="usuari.form.camp.expedientListComentaris"/>
 		<rip:inputCheckbox name="expedientListGrup" textKey="usuari.form.camp.expedientListGrup"/>				
 		
+		<c:if test="${fn:length(procediments) > 1 }">
+			<rip:inputSelect 
+				name="procedimentId" 
+				optionItems="${procediments}"
+				optionMinimumResultsForSearch="1" 
+				optionValueAttribute="id" 
+				emptyOption="true"
+				optionTextAttribute="codiSiaINom"
+				textKey="usuari.form.camp.procedimentPerDefecte"/>
+		</c:if>			
 
 		
 		<div id="modal-botons">

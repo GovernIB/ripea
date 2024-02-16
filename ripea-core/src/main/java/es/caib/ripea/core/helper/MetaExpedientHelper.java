@@ -402,8 +402,13 @@ public class MetaExpedientHelper {
 				OrganGestorEntity.class,
 				ExtendedPermission.COMU,
 				permis);
+
+		// Cercam els òrgans amb permisos de administracio comuns
+		List<Long> organAdmIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
+				OrganGestorEntity.class,
+				ExtendedPermission.ADM_COMU));
 		boolean accessAllComu = false;
-		if (Utils.isNotEmpty(organProcedimentsComunsIds)) {
+		if (Utils.isNotEmpty(organProcedimentsComunsIds) || Utils.isNotEmpty(organAdmIds)) {
 			accessAllComu = true;
 		}
 		if (cacheHelper.mostrarLogsRendiment())

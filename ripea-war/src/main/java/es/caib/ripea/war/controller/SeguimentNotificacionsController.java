@@ -22,6 +22,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
@@ -51,6 +52,8 @@ public class SeguimentNotificacionsController extends BaseAdminController {
     private SeguimentService seguimentService;
 	@Autowired
 	private DocumentService documentService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -265,6 +268,7 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentNotificacionsFiltreCommand();
+			filtreCommand.setProcedimentId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

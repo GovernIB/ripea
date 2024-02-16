@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.SeguimentConsultaPinbalDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.war.command.SeguimentConsultaFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -35,6 +36,8 @@ public class SeguimentPinbalController extends BaseAdminController {
 	
     @Autowired
     private SeguimentService seguimentService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 
     @RequestMapping(method = RequestMethod.GET)
@@ -109,6 +112,7 @@ public class SeguimentPinbalController extends BaseAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentConsultaFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

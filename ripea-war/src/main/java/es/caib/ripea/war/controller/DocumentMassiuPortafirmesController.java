@@ -478,6 +478,7 @@ public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganCon
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new ContingutMassiuFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

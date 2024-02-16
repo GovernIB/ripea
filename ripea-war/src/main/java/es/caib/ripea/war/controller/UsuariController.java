@@ -72,7 +72,17 @@ public class UsuariController  extends BaseAdminController {
 				"numElementsPagina",
 				numElementsPagina);
 
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		
+
+		model.addAttribute("procediments",
+				metaExpedientService.findActius(
+						entitatActual.getId(), 
+						null, 
+						rolActual, 
+						false, 
+						null));
 		
 		return "usuariForm";
 	}

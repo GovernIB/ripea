@@ -17,10 +17,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.ForeignKey;
 
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import lombok.Getter;
@@ -90,6 +92,11 @@ public class UsuariEntity implements Serializable {
 	@Column(name = "exp_list_grup")
 	private boolean expedientListGrup = false;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "metaexpedient_id")
+	@ForeignKey(name = "ipa_metaexp_usuari_fk")
+	private MetaExpedientEntity procediment;
+
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
 	}
@@ -113,7 +120,8 @@ public class UsuariEntity implements Serializable {
 			boolean expedientListAgafatPer,
 			boolean expedientListInteressats,
 			boolean expedientListComentaris,
-			boolean expedientListGrup) {
+			boolean expedientListGrup,
+			MetaExpedientEntity procediment) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
@@ -123,6 +131,7 @@ public class UsuariEntity implements Serializable {
 		this.expedientListInteressats = expedientListInteressats;
 		this.expedientListComentaris = expedientListComentaris;
 		this.expedientListGrup = expedientListGrup;
+		this.procediment = procediment;
 	}
 	
 

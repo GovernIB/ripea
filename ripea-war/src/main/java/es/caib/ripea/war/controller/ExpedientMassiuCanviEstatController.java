@@ -34,6 +34,7 @@ import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -74,6 +75,8 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 	
 	@Autowired
 	private ExpedientEstatService expedientEstatService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -379,6 +382,7 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new ContingutMassiuFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

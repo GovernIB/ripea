@@ -41,6 +41,7 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
@@ -70,6 +71,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private ConfigHelper configHelper;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
+	@Autowired
+	private MetaExpedientRepository metaExpedientRepository;
 	@Resource
 	private GrupRepository grupRepository;
 	@Resource
@@ -167,7 +170,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.isExpedientListAgafatPer(),
 				dto.isExpedientListInteressats(),
 				dto.isExpedientListComentaris(),
-				dto.isExpedientListGrup());
+				dto.isExpedientListGrup(),
+				dto.getProcedimentId() != null ? metaExpedientRepository.findOne(dto.getProcedimentId()) : null);
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
@@ -369,6 +373,15 @@ public class AplicacioServiceImpl implements AplicacioService {
 		}
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public Long getProcedimentPerDefecte() {
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+		return usuari.getProcediment() != null ? usuari.getProcediment().getId() : null;
+	}
+	
 	private UsuariDto toUsuariDtoAmbRols(
 			UsuariEntity usuari) {
 		UsuariDto dto = conversioTipusHelper.convertir(
@@ -396,6 +409,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private String getIdiomaPerDefecte() {
 		return configHelper.getConfig("es.caib.ripea.usuari.idioma.defecte");
 	}
+	
+	
 	
 	
 	@Override

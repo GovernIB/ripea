@@ -36,6 +36,7 @@ import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -67,6 +68,8 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 	private MetaDocumentService metaDocumentService;
 	@Autowired
 	private ExecucioMassivaService execucioMassivaService;
+	@Autowired
+	private AplicacioService aplicacioService;
 	
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -458,6 +461,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new MassiuAnnexProcesarFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

@@ -32,6 +32,7 @@ import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
@@ -72,6 +73,8 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 	private DocumentService documentService;
 	@Autowired
 	private ExecucioMassivaService execucioMassivaService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -411,6 +414,7 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new ContingutMassiuFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

@@ -1,5 +1,25 @@
 package es.caib.ripea.war.controller;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import antlr.Utils;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
@@ -10,27 +30,12 @@ import es.caib.ripea.core.api.dto.historic.HistoricMetriquesEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricTipusEnumDto;
 import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
 import es.caib.ripea.core.api.exception.PermissionDeniedStatisticsException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/historic")
@@ -43,6 +48,8 @@ public class HistoricController extends BaseAdminController {
 
 	@Autowired
 	private HistoricService historicService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
@@ -362,6 +369,8 @@ public class HistoricController extends BaseAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new HistoricFiltreCommand();
+			Long id = aplicacioService.getProcedimentPerDefecte();
+			filtreCommand.setMetaExpedientsIds(id != null ? Arrays.asList(aplicacioService.getProcedimentPerDefecte()) : null);
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
 		}
 //		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);

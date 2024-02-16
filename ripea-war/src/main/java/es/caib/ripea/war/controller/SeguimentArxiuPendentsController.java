@@ -36,6 +36,7 @@ import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -77,6 +78,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 	private MetaExpedientService metaExpedientService;
 	@Autowired
 	private ExecucioMassivaService execucioMassivaService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 
     @RequestMapping(method = RequestMethod.GET)
@@ -172,6 +175,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentArxiuPendentsFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS,
@@ -239,6 +243,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE_DOCUMENTS);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentArxiuPendentsFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE_DOCUMENTS,
@@ -307,6 +312,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE_INTERESSATS);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentArxiuPendentsFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE_INTERESSATS,

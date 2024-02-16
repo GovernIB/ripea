@@ -182,7 +182,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"and (:esNullFiltre = true or lower(me.nom) like lower('%'||:filtre||'%') or lower(me.classificacio) like lower('%'||:filtre||'%')) " +
 			"and (:organGestorIComu = false or (me.organGestor = :organ or me.organGestor is null)) " +
 			"and (:esAdminEntitat = true " +
-			" 	  or (:esAdminOrgan = true and (me.organGestor is null or (me.organGestor is not null and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos))) " +
+			" 	  or (:esAdminOrgan = true and :esNullOrganIdPermesos = false and me.organGestor.id in (:organIdPermesos) " +
 			"     or (:esNullMetaExpedientIdPermesos = false and me.id in (:metaExpedientIdPermesos)) " +
 			"     or (me.organGestor is not null and :esNullOrganIdPermesos = false and (me.organGestor.id) in (:organIdPermesos)) " +
 			"     or (me.organGestor is null and :esNullMetaExpedientOrganIdPermesos = false and meog.id in (:metaExpedientOrganIdPermesos)) " +

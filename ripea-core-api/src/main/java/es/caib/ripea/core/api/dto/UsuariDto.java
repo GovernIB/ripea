@@ -33,6 +33,7 @@ public class UsuariDto implements Serializable {
 	private boolean expedientListInteressats;
 	private boolean expedientListComentaris;
 	private boolean expedientListGrup;
+	private Long procedimentId;
 	
 	public String getCodiAndNom() {
 		return nom + " (" + codi + ")";

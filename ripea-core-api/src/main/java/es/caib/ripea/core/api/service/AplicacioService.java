@@ -231,4 +231,7 @@ public interface AplicacioService {
 	public boolean doesCurrentUserHasRol(
 			String rol);
 
+	@PreAuthorize("hasRole('tothom')")
+	public Long getProcedimentPerDefecte();
+
 }

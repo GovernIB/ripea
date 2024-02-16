@@ -36,6 +36,7 @@ public class UsuariCommand implements Serializable {
 	private boolean expedientListInteressats;
 	private boolean expedientListComentaris;
 	private boolean expedientListGrup;
+	private Long procedimentId;
 	
 	
 	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
@@ -65,7 +66,6 @@ public class UsuariCommand implements Serializable {
 	public void setEmailAlternatiu(String emailAlternatiu) {
 		this.emailAlternatiu = Utils.trim(emailAlternatiu);
 	}
-	
 	
 	
 	public static UsuariCommand asCommand(UsuariDto dto) {
@@ -110,6 +110,11 @@ public class UsuariCommand implements Serializable {
 	public void setExpedientListGrup(
 			boolean expedientListGrup) {
 		this.expedientListGrup = expedientListGrup;
+	}
+
+	public void setProcedimentId(
+			Long procedimentId) {
+		this.procedimentId = procedimentId;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
