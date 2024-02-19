@@ -171,7 +171,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.isExpedientListInteressats(),
 				dto.isExpedientListComentaris(),
 				dto.isExpedientListGrup(),
-				dto.getProcedimentId() != null ? metaExpedientRepository.findOne(dto.getProcedimentId()) : null);
+				dto.getProcedimentId() != null ? metaExpedientRepository.findOne(dto.getProcedimentId()) : null,
+				dto.getVistaActual());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}

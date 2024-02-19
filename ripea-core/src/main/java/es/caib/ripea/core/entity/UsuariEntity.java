@@ -121,7 +121,8 @@ public class UsuariEntity implements Serializable {
 			boolean expedientListInteressats,
 			boolean expedientListComentaris,
 			boolean expedientListGrup,
-			MetaExpedientEntity procediment) {
+			MetaExpedientEntity procediment,
+			ContingutVistaEnumDto vistaActual) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
@@ -132,6 +133,7 @@ public class UsuariEntity implements Serializable {
 		this.expedientListComentaris = expedientListComentaris;
 		this.expedientListGrup = expedientListGrup;
 		this.procediment = procediment;
+		this.vistaActual = vistaActual;
 	}
 	
 

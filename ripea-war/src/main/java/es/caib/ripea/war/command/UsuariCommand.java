@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -37,6 +38,7 @@ public class UsuariCommand implements Serializable {
 	private boolean expedientListComentaris;
 	private boolean expedientListGrup;
 	private Long procedimentId;
+	private ContingutVistaEnumDto vistaActual;
 	
 	
 	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
@@ -115,6 +117,11 @@ public class UsuariCommand implements Serializable {
 	public void setProcedimentId(
 			Long procedimentId) {
 		this.procedimentId = procedimentId;
+	}
+
+	public void setVistaActual(
+			ContingutVistaEnumDto vistaActual) {
+		this.vistaActual = vistaActual;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;
