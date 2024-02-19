@@ -35,6 +35,7 @@ public class UsuariDto implements Serializable {
 	private boolean expedientListGrup;
 	private Long procedimentId;
 	private ContingutVistaEnumDto vistaActual;
+	private boolean expedientExpandit;
 	
 	
 	public String getCodiAndNom() {

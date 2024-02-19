@@ -66,7 +66,7 @@ public class UsuariEntity implements Serializable {
 	
 	@Column(name="vista_actual", length = 64)
 	@Enumerated(EnumType.STRING)
-	private ContingutVistaEnumDto vistaActual;
+	private ContingutVistaEnumDto vistaActual = ContingutVistaEnumDto.TREETABLE_PER_CARPETA;
 	
 	@Column(name="num_elements_pagina")
 	private Long numElementsPagina;
@@ -96,6 +96,9 @@ public class UsuariEntity implements Serializable {
 	@JoinColumn(name = "metaexpedient_id")
 	@ForeignKey(name = "ipa_metaexp_usuari_fk")
 	private MetaExpedientEntity procediment;
+	
+	@Column(name = "expedient_expandit")
+	private boolean expedientExpandit = true;
 
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
@@ -122,7 +125,8 @@ public class UsuariEntity implements Serializable {
 			boolean expedientListComentaris,
 			boolean expedientListGrup,
 			MetaExpedientEntity procediment,
-			ContingutVistaEnumDto vistaActual) {
+			ContingutVistaEnumDto vistaActual, 
+			boolean expedientExpandit) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
@@ -134,6 +138,7 @@ public class UsuariEntity implements Serializable {
 		this.expedientListGrup = expedientListGrup;
 		this.procediment = procediment;
 		this.vistaActual = vistaActual;
+		this.expedientExpandit = expedientExpandit;
 	}
 	
 

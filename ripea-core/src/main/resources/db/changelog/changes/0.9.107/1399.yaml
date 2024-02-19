@@ -1,0 +1,12 @@
+databaseChangeLog:
+- changeSet:
+    id: 1708339656292-1
+    author: limit
+    changes:
+    - addColumn:
+        columns:
+        - column:
+            name: expedient_expandit
+            type: boolean
+            defaultValueBoolean: true             
+        tableName: ipa_usuari

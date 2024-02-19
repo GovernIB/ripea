@@ -39,6 +39,7 @@ public class UsuariCommand implements Serializable {
 	private boolean expedientListGrup;
 	private Long procedimentId;
 	private ContingutVistaEnumDto vistaActual;
+	private boolean expedientExpandit;
 	
 	
 	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
@@ -122,6 +123,11 @@ public class UsuariCommand implements Serializable {
 	public void setVistaActual(
 			ContingutVistaEnumDto vistaActual) {
 		this.vistaActual = vistaActual;
+	}
+
+	public void setExpedientExpandit(
+			boolean expedientExpandit) {
+		this.expedientExpandit = expedientExpandit;
 	}
 
 	private static final long serialVersionUID = -139254994389509932L;

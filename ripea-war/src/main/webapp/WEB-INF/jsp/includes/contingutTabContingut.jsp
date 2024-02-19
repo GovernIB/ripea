@@ -225,11 +225,11 @@ $(document).ready(function() {
 		<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
 	
 		<c:choose>
-			<c:when test="${isFolderCollapsedDefault}">
-				$('#table-documents').treeTable({ startCollapsed: true });
+			<c:when test="${isExpedientExpanditPerDefecte}">
+				$('#table-documents').treeTable();
 			</c:when>
 			<c:otherwise>
-				$('#table-documents').treeTable();
+				$('#table-documents').treeTable({ startCollapsed: true });
 			</c:otherwise>
 		</c:choose>
 		

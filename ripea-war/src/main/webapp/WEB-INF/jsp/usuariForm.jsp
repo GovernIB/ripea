@@ -73,6 +73,8 @@ $(document).ready(function() {
 			name="vistaActual" 
 			optionEnum="ContingutVistaEnumDto" 
 			textKey="usuari.form.camp.tipusVistaPerDefecte"/>
+			
+		<rip:inputCheckbox name="expedientExpandit" textKey="usuari.form.camp.expedientExpandit"/>		
 
 		<div id="modal-botons">
 			<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
