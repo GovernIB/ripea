@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
 import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.exception.FirmaServidorException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -30,7 +31,6 @@ import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.ExpedientHelper2;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.plugin.firmaservidor.SignaturaResposta;
@@ -77,7 +77,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 							motiu,
 							"ca");
 				} catch (Exception e) {
-					logger.info("Error al firmar en servidor el documento, documentId=" + document.getId() + ", documentNom=" + document.getNom(), e.getMessage());
+					logger.error("Error al firmar en servidor el documento, documentId=" + document.getId() + ", documentNom=" + document.getNom(), e);
 					// if document has signature but it was not detected by ripea/distribucio (this can happen if signature is corrupted as in issue #1375) then remove signature and try signing again
 					if (Utils.getRootMsg(e).contains("Error no controlat cridant al validador de firmes Plugin Validacio Firmes afirma CXF")) {
 
@@ -139,7 +139,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				logAll(document, LogTipusEnumDto.SFIRMA_FIRMA);
 				return arxiuFirma;
 			} catch (Exception e) {
-				throw new RuntimeException("Error al firmar el document en servidor, documentId=" + document.getId() + ", documentNom=" + document.getNom(), e);
+				throw new FirmaServidorException(document.getNom(), Utils.getRootMsg(e));
 			}
 			
 		} else {

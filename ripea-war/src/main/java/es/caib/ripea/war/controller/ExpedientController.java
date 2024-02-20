@@ -57,6 +57,7 @@ import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
+import es.caib.ripea.core.api.exception.FirmaServidorException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -1209,8 +1210,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 								null),
 						ex);
 				return "expedientTancarForm";
+			} else if (ExceptionHelper.isExceptionOrCauseInstanceOf(
+					ex,
+					FirmaServidorException.class)) {
+				
+				FirmaServidorException fe = (FirmaServidorException) ExceptionHelper.findExceptionInstance(ex, FirmaServidorException.class, 3);
+				
+				return getModalControllerReturnValueError(
+						request,
+						"redirect:../../contingut/" + expedientId,
+						"expedient.controller.tancar.error",
+						new Object[] {fe.getDocumentNom()},
+						ex);
+			} else {
+				throw ex;
 			}
-			throw ex;			
+			
+
 		}
 	}
 	
