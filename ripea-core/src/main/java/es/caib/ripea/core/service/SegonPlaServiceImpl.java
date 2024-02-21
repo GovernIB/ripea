@@ -290,9 +290,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_VIAFIRMA) {
 				header = "Canvi d'estat de documents enviat a ViaFirma";
 			} else if(entry.getKey() == EventTipusEnumDto.CANVI_ESTAT_REVISIO) {
-				header = "Canvi d'estat de revisio de procediments";
+				header = "Canvi d'estat de revisió de procediments";
 			} else if(entry.getKey() == EventTipusEnumDto.PROCEDIMENT_COMENTARI) {
-				header = "Nous comentaris per procediments";
+				header = "Nous comentaris en els procediments";
 			} else if (entry.getKey() == EventTipusEnumDto.NOVA_ANOTACIO) {
 				header = "Noves anotacions pendents";
 			} else if (entry.getKey() == EventTipusEnumDto.CANVI_RESPONSABLES_TASCA) {

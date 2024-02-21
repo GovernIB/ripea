@@ -4,6 +4,7 @@
 package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -102,7 +103,6 @@ public class EmailHelper {
 		String subject = getPrefixRipea() + " Element de l'escriptori agafat per un altre usuari: (" + tipus + ") " + contingut.getNom();
 		String text = 
 				"Informació de l'element de l'escriptori:\n" +
-				"\tEntitat: " + contingut.getEntitat().getNom() + "\n" +
 				"\tTipus: " + tipus + "\n" +
 				"\tNom: " + contingut.getNom() + "\n\n" + 
 				"\tPersona que ho ha agafat: " + usuariNou.getNom() + "(" + usuariNou.getCodi() + ").";
@@ -122,7 +122,6 @@ public class EmailHelper {
 		String subject = getPrefixRipea() + " Element de l'escriptori s'ha alliberat per un usuari: (" + tipus + ") " + expedient.getNom();
 		String text = 
 				"Informació de l'element de l'escriptori:\n" +
-				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 				"\tTipus: " + tipus + "\n" +
 				"\tNom: " + expedient.getNom() + "\n\n" + 
 				"\tPersona que ho ha alliberat: " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ").";
@@ -207,16 +206,16 @@ public class EmailHelper {
 			}
 		}
 		
-		String subject = getPrefixRipea() + " Canvi d'estat de revisio de procediment";
+		String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
 			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
 		}
 		String text = 
 				"Informació del procediment:\n" +
-						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
-						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
+						"\tNom: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
 						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+						"Data de revisió: " + Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss") + "\n" +
 						comentari ;
 		
 		sendOrSaveEmail(
@@ -306,13 +305,13 @@ public class EmailHelper {
 		}
 		
 		
-		String subject = getPrefixRipea() + " Nou comentari per procediment";
+		String subject = getPrefixRipea() + " Nou comentari en el procediment";
 		String text = 
 				"Informació del procediment:\n" +
-						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
-						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
+						"\tNom: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
 						"Comentari: \n\t" + comentari.replace("\n", "\n\t") + "\n" +
-						"Usuari: " + metaExpComnt.getCreatedBy().getNom();
+						"Usuari: " + metaExpComnt.getCreatedBy().getNom() + "\n" +
+						"Data: " + Utils.convertDateToString(metaExpComnt.getCreatedDate().toDate(), "dd-MM-yyyy HH:mm:ss");
 		
 		sendOrSaveEmail(
 				emailsNoAgrupats,
@@ -496,7 +495,6 @@ public class EmailHelper {
 		String subject = getPrefixRipea() + " Nova anotació pendent";
 		String text = 
 				"Informació d'anotació:\n" +
-						"\tEntitat: " + entitat.getNom() + "\n" +
 						"\tNúmero: " + registre.getIdentificador() + "\n" +
 						"\tExtracte: " + registre.getExtracte() + "\n";
 		
@@ -534,16 +532,16 @@ public class EmailHelper {
 				null,
 				"Email canviEstatRevisioMetaExpedientEnviarAAdminOrganCreador. Permission: creador del metaexpedient," + metaExpedientEntity.getCodi() + ", user: " + organAdminCreador.getCodi());
 		
-		String subject = getPrefixRipea() + " Canvi d'estat de revisio de procediment";
+		String subject = getPrefixRipea() + " Canvi d'estat de revisió de procediment";
 		String comentari = "";
 		if (metaExpedientEntity.getRevisioComentari() != null && !metaExpedientEntity.getRevisioComentari().isEmpty()) {
 			comentari = "\tComentari: " + metaExpedientEntity.getRevisioComentari() + "\n";
 		}
 		String text = 
 				"Informació del procediment:\n" +
-						"\tEntitat: " + metaExpedientEntity.getEntitat().getNom() + "\n" +
-						"\tProcediment nom: " + metaExpedientEntity.getNom() + "\n" +
-						"Estat de revisio: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+						"\tProcediment: " + metaExpedientEntity.getCodiSiaINom() + "\n" +
+						"Estat de revisió: " + metaExpedientEntity.getRevisioEstat() + "\n" +
+						"Data de revisió: " + Utils.convertDateToString(new Date(), "dd-MM-yyyy HH:mm:ss") + "\n" +
 						comentari ;
 
 		sendOrSaveEmail(
@@ -575,7 +573,6 @@ public class EmailHelper {
 		}
 		String text = 
 				"Informació del document:\n" +
-						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 						"\tExpedient nom: " + expedient.getNom() + "\n" +
 						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 						"\tDocument nom: " + document.getNom() + "\n" +
@@ -615,7 +612,6 @@ public class EmailHelper {
 		String estat = (documentPortafirmes.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "FIRMAT" : documentPortafirmes.getEstat().toString();
 		String text = 
 				"Informació del document:\n" +
-						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 						"\tExpedient nom: " + expedient.getNom() + "\n" +
 						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 						"\tDocument nom: " + document.getNom() + "\n" +
@@ -663,7 +659,6 @@ public class EmailHelper {
 
 		String text = 
 				"Informació del document:\n" +
-						"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 						"\tExpedient nom: " + expedient.getNom() + "\n" +
 						"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 						"\tDocument nom: " + document.getNom() + "\n" +
@@ -703,7 +698,6 @@ public class EmailHelper {
 		String estat = (documentNotificacio.getEstat() == DocumentEnviamentEstatEnumDto.PROCESSAT) ? "ENTREGAT" : documentNotificacio.getEstat().toString();
 		String text = 
 				"Informació del document:\n" +
-				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
 				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
@@ -749,7 +743,6 @@ public class EmailHelper {
 		String estat = documentNotificacio.getNotificacioEstat() != null ? documentNotificacio.getNotificacioEstat().toString() : "";
 		String text = 
 				"Informació del document:\n" +
-				"\tEntitat: " + expedient.getEntitat().getNom() + "\n" +
 				"\tExpedient nom: " + expedient.getNom() + "\n" +
 				"\tExpedient núm.: " + expedient.getNumero() + "\n" +
 				"\tDocument nom: " + document.getNom() + "\n" +
@@ -824,7 +817,6 @@ public class EmailHelper {
 		EntitatEntity entitat = expedient.getEntitat();
 		missatge.setText(
 				"L'usuari " + usuariActual.getNom() + "(" + usuariActual.getCodi() + ") t'ha mencionat al comentari d'un expedient [" + expedient.getNom() + "]: \n" +
-				"\tEntitat: " + (entitat != null ? entitat.getNom() : "") + "\n" +
 				"\tNom expedient: " + (expedient != null ? expedient.getNom() : "") + "\n" +
 				"\tComentari: " + comentari + "\n");
 		
