@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,14 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.DocumentPublicacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
@@ -43,6 +42,8 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
+import es.caib.ripea.core.repository.DocumentRepository;
+import es.caib.ripea.core.repository.InteressatRepository;
 
 /**
  * Implementació dels mètodes per a gestionar els enviaments
@@ -79,6 +80,10 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
+	@Autowired
+	private InteressatRepository interessatRepository;
+	@Autowired
+	private DocumentRepository documentRepository;
 
 	
 
@@ -106,6 +111,36 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 			documentFirmaServidorFirma.doFirmar(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents");
 		}
 		
+	}
+	
+	@Transactional
+	@Override
+	public boolean checkIfAnyInteressatIsAdministracio(
+			List<Long> interessatsIds) {
+		
+		boolean isAnyAdministracio = false;
+
+		if (interessatsIds != null) {
+			for (Long id : interessatsIds) {
+				InteressatEntity inter = interessatRepository.findOne(id);
+				if (inter instanceof InteressatAdministracioEntity) {
+					isAnyAdministracio = true;
+					break;
+				}
+			}
+		}
+
+		return isAnyAdministracio;
+	}
+	
+	@Transactional
+	@Override
+	public boolean checkIfDocumentIsZip(
+			Long documentId) {
+		
+		DocumentEntity doc = documentRepository.findOne(documentId);
+		
+		return doc.getFitxerContentType().equals("application/zip");
 	}
 	
 	@Transactional

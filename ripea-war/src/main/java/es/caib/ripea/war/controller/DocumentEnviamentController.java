@@ -123,6 +123,10 @@ public class DocumentEnviamentController extends BaseUserController {
 			bindingResult.rejectValue("dataCaducitat", "NotEmpty");
 		}
 		
+		if (command.getTipus() == DocumentNotificacioTipusEnumDto.COMUNICACIO && documentEnviamentService.checkIfDocumentIsZip(documentId) && documentEnviamentService.checkIfAnyInteressatIsAdministracio(command.getInteressatsIds())) {
+			bindingResult.reject("notificacio.controller.reject.comunicacio.zip.administracio");
+		}
+		
 		if (bindingResult.hasErrors()) {
 			emplenarModelNotificacio(
 					request,

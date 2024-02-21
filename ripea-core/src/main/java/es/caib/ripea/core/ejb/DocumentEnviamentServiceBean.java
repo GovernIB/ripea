@@ -194,4 +194,16 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 		return delegate.consultaErrorsNotificacio();
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds) {
+		return delegate.checkIfAnyInteressatIsAdministracio(interessatsIds);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean checkIfDocumentIsZip(Long documentId) {
+		return delegate.checkIfDocumentIsZip(documentId);
+	}
+
 }

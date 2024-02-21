@@ -6,6 +6,8 @@ package es.caib.ripea.core.api.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
@@ -236,9 +238,17 @@ public interface DocumentEnviamentService {
 
 	Map<String, String> consultaErrorsNotificacio();
 
+
+
 //	/**
 //	 * Actualitza l'estat de les notificacions pendents de forma periòdica.
 //	 */
 //	public void notificacioActualitzarEstat();
+
+	@PreAuthorize("hasRole('tothom')")
+	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds);
+
+	@PreAuthorize("hasRole('tothom')")
+	public boolean checkIfDocumentIsZip(Long documentId);
 
 }
