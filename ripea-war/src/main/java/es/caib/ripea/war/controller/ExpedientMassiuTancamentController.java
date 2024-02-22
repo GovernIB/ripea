@@ -57,7 +57,7 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/massiu/tancament")
 public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientMassiuTancamentController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientMassiuTancamentController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_USER = "ExpedientMassiuTancamentController.session.seleccio.user";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_ADMIN = "ExpedientMassiuTancamentController.session.seleccio.admin";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_ORGAN = "ExpedientMassiuTancamentController.session.seleccio.organ";
@@ -112,14 +112,22 @@ public class ExpedientMassiuTancamentController extends BaseUserOAdminOOrganCont
 			HttpServletRequest request,
 			@Valid ContingutMassiuFiltreCommand filtreCommand,
 			BindingResult bindingResult,
-			Model model) {
-		if (!bindingResult.hasErrors()) {
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					filtreCommand);
-		}
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
 		
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE);
+
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_FILTRE,
+						filtreCommand);
+			}
+		}
 		return "redirect:/massiu/tancament";
 	}
 	

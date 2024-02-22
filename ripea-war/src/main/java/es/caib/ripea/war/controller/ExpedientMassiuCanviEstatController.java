@@ -59,7 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/massiu/canviEstat")
 public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientCanviEstatMassiuController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientCanviEstatMassiuController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_USER = "ExpedientCanviEstatMassiuController.session.seleccio.user";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_ADMIN = "ExpedientCanviEstatMassiuController.session.seleccio.admin";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_ORGAN = "ExpedientCanviEstatMassiuController.session.seleccio.organ";
@@ -128,12 +128,21 @@ public class ExpedientMassiuCanviEstatController extends BaseUserOAdminOOrganCon
 			HttpServletRequest request,
 			@Valid ContingutMassiuFiltreCommand filtreCommand,
 			BindingResult bindingResult,
-			Model model) {
-		if (!bindingResult.hasErrors()) {
-			RequestSessionHelper.actualitzarObjecteSessio(
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+		
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(
 					request,
-					SESSION_ATTRIBUTE_FILTRE,
-					filtreCommand);
+					SESSION_ATTRIBUTE_FILTRE);
+
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(
+						request,
+						SESSION_ATTRIBUTE_FILTRE,
+						filtreCommand);
+			}
 		}
 		
 		return "redirect:/massiu/canviEstat";

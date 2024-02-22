@@ -57,7 +57,7 @@ import es.caib.ripea.war.helper.RolHelper;
 public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganController {
 	
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "MassiuAnnexProcesarController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "MassiuAnnexProcesarController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "MassiuAnnexProcesarController.session.seleccio";
 
 	@Autowired

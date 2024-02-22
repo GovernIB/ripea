@@ -40,7 +40,7 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/seguimentExpedientsPendents")
 public class SeguimentExpedientsPendentsController extends BaseAdminController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "seguimentExpedientsPendents.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "seguimentExpedientsPendents.session.filtre";
 	
     @Autowired
     private SeguimentService seguimentService;

@@ -59,9 +59,9 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/seguimentArxiuPendents")
 public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS = "SeguimentPortafirmesController.session.filtre.expedients";
-	private static final String SESSION_ATTRIBUTE_FILTRE_DOCUMENTS = "SeguimentPortafirmesController.session.filtre.documents";
-	private static final String SESSION_ATTRIBUTE_FILTRE_INTERESSATS = "SeguimentPortafirmesController.session.filtre.interessats";
+	public static final String SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS = "SeguimentPortafirmesController.session.filtre.expedients";
+	public static final String SESSION_ATTRIBUTE_FILTRE_DOCUMENTS = "SeguimentPortafirmesController.session.filtre.documents";
+	public static final String SESSION_ATTRIBUTE_FILTRE_INTERESSATS = "SeguimentPortafirmesController.session.filtre.interessats";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_EXPEDIENTS = "SeguimentPortafirmesController.session.seleccio.expedients";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS = "SeguimentPortafirmesController.session.seleccio.documents";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_INTERESSATS = "SeguimentPortafirmesController.session.seleccio.interessats";

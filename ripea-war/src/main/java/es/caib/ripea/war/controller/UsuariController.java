@@ -5,6 +5,7 @@ package es.caib.ripea.war.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
@@ -30,6 +31,7 @@ import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.UsuariCommand;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.SessioHelper;
 
 /**
@@ -114,6 +116,66 @@ public class UsuariController  extends BaseAdminController {
 			
 			return "usuariForm";
 		}
+		
+		UsuariDto us = aplicacioService.getUsuariActual();
+		
+		if (!Objects.equals(us.getProcedimentId(), command.getProcedimentId())) {
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					ExpedientController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					ExpedientPeticioController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					HistoricController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SeguimentNotificacionsController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SeguimentPinbalController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SeguimentExpedientsPendentsController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					DocumentMassiuPortafirmesController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					DocumentMassiuFirmaWebController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					ExpedientMassiuCanviEstatController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					ExpedientMassiuTancamentController.SESSION_ATTRIBUTE_FILTRE);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SeguimentArxiuPendentsController.SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS);
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SeguimentArxiuPendentsController.SESSION_ATTRIBUTE_FILTRE_DOCUMENTS);
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					SeguimentArxiuPendentsController.SESSION_ATTRIBUTE_FILTRE_INTERESSATS);
+			
+			RequestSessionHelper.esborrarObjecteSessio(
+					request,
+					MassiuAnnexProcesarController.SESSION_ATTRIBUTE_FILTRE);
+			
+		}
+		
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
 		

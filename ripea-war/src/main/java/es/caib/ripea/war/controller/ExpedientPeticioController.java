@@ -85,7 +85,7 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/expedientPeticio")
 public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
-	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientPeticioController.session.filtre";
 	
 	private static final String SESSION_ATTRIBUTE_COMMAND = "ExpedientPeticioController.session.command";
 	private static final String SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES = "ExpedientPeticioController.session.tipusDocsDisponibles";

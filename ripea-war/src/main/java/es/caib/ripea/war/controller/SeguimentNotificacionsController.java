@@ -45,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/seguimentNotificacions")
 public class SeguimentNotificacionsController extends BaseAdminController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentNotificacionsController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentNotificacionsController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "SeguimentNotificacionsController.session.seleccio";
 	
     @Autowired

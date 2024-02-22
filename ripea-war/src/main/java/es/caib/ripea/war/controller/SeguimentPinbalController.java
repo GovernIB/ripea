@@ -32,7 +32,7 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/seguimentPinbal")
 public class SeguimentPinbalController extends BaseAdminController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentPinbalController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentPinbalController.session.filtre";
 	
     @Autowired
     private SeguimentService seguimentService;

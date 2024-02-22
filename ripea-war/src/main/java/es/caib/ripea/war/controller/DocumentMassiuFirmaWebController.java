@@ -59,7 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/massiu/firmasimpleweb")
 public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuFirmaWebController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuFirmaWebController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuFirmaWebController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_DATA_INICI = "DocumentMassiuFirmaWebController.session.data.inici";
 

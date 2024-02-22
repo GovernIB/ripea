@@ -34,7 +34,7 @@ import java.util.*;
 @RequestMapping("/massiu/portafirmes")
 public class DocumentMassiuPortafirmesController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuPortafirmesController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuPortafirmesController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuPortafirmesController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_TRANSACCIOID = "DocumentController.session.transaccioID";
 

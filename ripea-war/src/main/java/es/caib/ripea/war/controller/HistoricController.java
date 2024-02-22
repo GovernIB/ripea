@@ -41,7 +41,7 @@ import es.caib.ripea.war.helper.RequestSessionHelper;
 @RequestMapping("/historic")
 public class HistoricController extends BaseAdminController {
 
-	private static final String SESSION_ATTRIBUTE_FILTRE = "HistoricController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "HistoricController.session.filtre";
 //	private static final String SESSION_ATTRIBUTE_METRIQUES = "HistoricController.session.metriques";
 	private static final String SESSION_ATTRIBUTE_USUARIS = "HistoricController.session.usuaris";
 	private static final String SESSION_ATTRIBUTE_INTERESSATS = "HistoricController.session.interessats";
