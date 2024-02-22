@@ -443,7 +443,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				request,
 				SESSION_ATTRIBUTE_SELECCIO,
 				seleccio);
-		expedientService.setVistaUsuariActual(vista);
 		
 		SessioHelper.updateContenidorVista(
 				request,

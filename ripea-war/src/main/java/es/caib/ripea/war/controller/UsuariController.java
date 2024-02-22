@@ -176,6 +176,10 @@ public class UsuariController  extends BaseAdminController {
 			
 		}
 		
+		SessioHelper.updateContenidorVista(
+				request,
+				command.getVistaActual());
+		
 		UsuariDto usuari = aplicacioService.updateUsuariActual(UsuariCommand.asDto(command));
 		SessioHelper.setUsuariActual(request, usuari);
 		
