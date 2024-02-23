@@ -227,9 +227,18 @@ function refrescarGrups() {
 		if (gestioAmbGrupsActiva) {
 			$("#grupsActiu").removeClass("hidden");
 
-			if (typeof firstTime === 'undefined' && ${expedientPeticioAcceptarCommand.grupId}) {
-				$('#grupId').val(${expedientPeticioAcceptarCommand.grupId});
-				grupIdDefault = ${expedientPeticioAcceptarCommand.grupId};
+			<c:choose>
+				<c:when test="${not empty expedientPeticioAcceptarCommand.grupId}">
+					let grupId = ${expedientPeticioAcceptarCommand.grupId};
+				</c:when>
+				<c:otherwise>
+					let grupId = '';
+				</c:otherwise>
+			</c:choose>
+			
+			if (typeof firstTime === 'undefined' && grupId) {
+				$('#grupId').val(grupId);
+				grupIdDefault = grupId;
 				firstTime = 'defined';	
 			} else {
 				grupIdDefault = '';

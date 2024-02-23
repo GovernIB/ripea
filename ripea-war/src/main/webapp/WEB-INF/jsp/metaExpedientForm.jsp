@@ -472,15 +472,17 @@ function calculateClassificacioId() {
 				</c:if>
 				<rip:inputCheckbox name="gestioAmbGrupsActiva" textKey="metaexpedient.form.camp.gestioAmbGrupsActiva" disabled="${bloquejarCamps}"/>
 				
-				<div style="min-height: 60px;">
-					<div class="alert well-sm alert-info" >
-						<span class="fa fa-info-circle"></span>
-						<spring:message code="metaexpedient.form.creatEl"/> ${metaExpedientDto.createdDateAmbFormat} <spring:message code="metaexpedient.form.per"/> ${metaExpedientDto.createdBy.codiAndNom}.
-						<c:if test="${not empty metaExpedientDto.lastModifiedBy}">
-							<spring:message code="metaexpedient.form.modificatEl"/> ${metaExpedientDto.lastModifiedDateAmbFormat} <spring:message code="metaexpedient.form.per"/> ${metaExpedientDto.lastModifiedBy.codiAndNom}.
-						</c:if>
-					</div>				
-				</div>
+				<c:if test="${ not empty metaExpedientCommand.id}">
+					<div style="min-height: 60px;">
+						<div class="alert well-sm alert-info" >
+							<span class="fa fa-info-circle"></span>
+							<spring:message code="metaexpedient.form.creatEl"/> ${metaExpedientDto.createdDateAmbFormat} <spring:message code="metaexpedient.form.per"/> ${metaExpedientDto.createdBy.codiAndNom}.
+							<c:if test="${not empty metaExpedientDto.lastModifiedBy}">
+								<spring:message code="metaexpedient.form.modificatEl"/> ${metaExpedientDto.lastModifiedDateAmbFormat} <spring:message code="metaexpedient.form.per"/> ${metaExpedientDto.lastModifiedBy.codiAndNom}.
+							</c:if>
+						</div>				
+					</div>
+				</c:if>
 				
 			</div>
 			<%-- <div role="tabpanel" class="tab-pane" id="notificacions">
