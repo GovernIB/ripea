@@ -275,7 +275,7 @@ public class AplicacioServiceBean implements AplicacioService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public Long getProcedimentPerDefecte() {
-		return delegate.getProcedimentPerDefecte();
+	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
+		return delegate.getProcedimentPerDefecte(entitatId, rolActual);
 	}
 }

@@ -232,6 +232,6 @@ public interface AplicacioService {
 			String rol);
 
 	@PreAuthorize("hasRole('tothom')")
-	public Long getProcedimentPerDefecte();
+	public Long getProcedimentPerDefecte(Long entitatId, String rolActual);
 
 }

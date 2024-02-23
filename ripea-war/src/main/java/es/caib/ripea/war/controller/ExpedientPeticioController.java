@@ -1069,7 +1069,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (filtreCommand == null) {
 			filtreCommand = new ExpedientPeticioFiltreCommand();
 			filtreCommand.setEstat(ExpedientPeticioEstatViewEnumDto.PENDENT);
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
 		}
 		return filtreCommand;

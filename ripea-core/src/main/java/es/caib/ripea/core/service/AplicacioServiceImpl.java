@@ -30,12 +30,14 @@ import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.ExcepcioLogHelper;
 import es.caib.ripea.core.helper.IntegracioHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
@@ -43,6 +45,7 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
 
 /**
@@ -73,6 +76,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private PaginacioHelper paginacioHelper;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
+	@Autowired
+	private MetaExpedientHelper metaExpedientHelper;
 	@Resource
 	private GrupRepository grupRepository;
 	@Resource
@@ -377,11 +382,31 @@ public class AplicacioServiceImpl implements AplicacioService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public Long getProcedimentPerDefecte() {
+	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
-		return usuari.getProcediment() != null ? usuari.getProcediment().getId() : null;
+		
+		Long procId = null;
+		if (usuari.getProcediment() != null) {
+			List<MetaExpedientEntity> metaExpedientsEnt = metaExpedientHelper.findAmbPermis(
+					entitatId,
+					ExtendedPermission.READ,
+					true,
+					null, 
+					"IPA_ADMIN".equals(rolActual),
+					"IPA_ORGAN_ADMIN".equals(rolActual),
+					null, 
+					false); 
+			
+			for (MetaExpedientEntity metaExpedientEntity : metaExpedientsEnt) {
+				if (metaExpedientEntity.getId().equals(usuari.getProcediment().getId())) {
+					procId = metaExpedientEntity.getId();
+				}
+			}
+		}
+		
+		return procId;
 	}
 	
 	private UsuariDto toUsuariDtoAmbRols(

@@ -28,6 +28,7 @@ import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.plugin.notificacio.EnviamentEstat;
 import es.caib.ripea.war.command.SeguimentNotificacionsFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -268,7 +269,7 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentNotificacionsFiltreCommand();
-			filtreCommand.setProcedimentId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setProcedimentId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

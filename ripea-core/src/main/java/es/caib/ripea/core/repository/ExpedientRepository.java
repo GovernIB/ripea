@@ -22,6 +22,7 @@ import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
@@ -129,7 +130,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT) " + 
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
-			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))"
+			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))" +
+			"and (:esNullGrup = true or e.grup = :grup) "
 			)
 	Page<ExpedientEntity> findByEntitatAndPermesosAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -181,6 +183,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
 			@Param("numeroRegistre") String numeroRegistre,
+			@Param("esNullGrup") boolean esNullGrup,
+			@Param("grup") GrupEntity grup,
 			Pageable pageable);
 
 	
@@ -235,7 +239,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"				   dp.estat = es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto.ENVIAT)" + 
 			"				   and dp.error = false)) " +
 			"and (:esNullNumeroRegistre = true " +
-			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%'))"
+			"		or lower(e.registresImportats) like lower('%'||:numeroRegistre||'%')) " +
+			"and (:esNullGrup = true or e.grup = :grup) "
 			)
 	List<Long> findIdsByEntitatAndFiltre(
 			@Param("entitat") EntitatEntity entitat,
@@ -286,7 +291,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("isAdmin") boolean isAdmin,
 			@Param("esFiltrarExpedientsAmbFirmaPendent") boolean esFiltrarExpedientsAmbFirmaPendent,
 			@Param("esNullNumeroRegistre") boolean esNullNumeroRegistre,
-			@Param("numeroRegistre") String numeroRegistre);
+			@Param("numeroRegistre") String numeroRegistre,
+			@Param("esNullGrup") boolean esNullGrup,
+			@Param("grup") GrupEntity grup);
 	
 	
 	@Query(	"select " +

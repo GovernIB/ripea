@@ -1685,6 +1685,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
 					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
+					expedientFiltreCalculat.getGrup() == null,
+					expedientFiltreCalculat.getGrup(),
 					pageable);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
@@ -1761,7 +1763,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
-					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "");
+					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
+					expedientFiltreCalculat.getGrup() == null,
+					expedientFiltreCalculat.getGrup());
 
 			result.setIds(expedientsIds);
 			if (cacheHelper.mostrarLogsRendiment())
@@ -1790,6 +1794,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		expedientFiltreCalculat.setMetaExpedientFiltre(metaExpedientFiltre);
+		
+		if (filtre.getGrupId() != null) {
+			expedientFiltreCalculat.setGrup(grupRepository.findOne(filtre.getGrupId()));
+		}
+		
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
