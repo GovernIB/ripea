@@ -51,6 +51,27 @@ function refrescarOrgan() {
 }
 
 
+function showGrup(element) {
+
+	let text = element.text;
+
+	if (text) {
+		let isEntitat = false;
+		if (text.startsWith('isEntitat')) {
+			isEntitat = true;
+			text = text.slice(9);
+		}
+
+		if (isEntitat) {
+			return $('<button class="btn btn-info btn-xs" style="pointer-events: none; padding: 0px 5px; font-size: 11px;">E</button><span> ' + text + '</span>');
+		} else {
+			return $('<button class="btn btn-info btn-xs" style="pointer-events: none; padding: 0px 5px; font-size: 11px;">O</button><span> ' + text + '</span>');
+		}
+	}
+ 
+}
+
+
 </script>
 
 </head>
@@ -64,9 +85,10 @@ function refrescarOrgan() {
 			optionItems="${grups}" 
 			required="true"
 			optionValueAttribute="id" 
-			optionTextAttribute="descripcio"
+			optionTextAttribute="codiDescripcioIsEntitat"
 			textKey="metaexpedient.relacionar.grup.form.camp.grup" 
-			emptyOption="true"/>
+			emptyOption="true"
+			templateResultFunction="showGrup"/>
 
 		<rip:inputSelect 
 			name="organId" 
@@ -78,6 +100,7 @@ function refrescarOrgan() {
 				
 		<rip:inputCheckbox name="perDefecte" textKey="metaexpedient.relacionar.grup.form.camp.perDefecte" disabled="${bloquejarCamps}"/>
 		
+		<div style="min-height: 100px;"></div>
 		
 		<div id="modal-botons" class="well">
 			<c:if test="${!consultar}">

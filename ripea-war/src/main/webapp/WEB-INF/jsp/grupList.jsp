@@ -89,7 +89,7 @@ $(document).ready(function() {
 				<rip:inputText name="codi" inline="true" placeholderKey="grup.list.filtre.camp.codi"/>
 			</div>					
 			<div class="col-md-4">
-				<rip:inputText name="descripcio" inline="true" placeholderKey="grup.list.filtre.camp.nom"/>
+				<rip:inputText name="descripcio" inline="true" placeholderKey="grup.list.filtre.camp.descripcio"/>
 			</div>
 			<div class="col-md-4">
 				<c:url value="/organgestorajax/organgestor" var="urlConsultaInicial"/>

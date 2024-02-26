@@ -97,7 +97,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     @Column(name = "gestio_amb_grups_activa", nullable = false)
     private boolean gestioAmbGrupsActiva;
     
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name = "ipa_metaexpedient_grup",
 			joinColumns = {@JoinColumn(name = "metaexpedient_id", referencedColumnName="id")},
