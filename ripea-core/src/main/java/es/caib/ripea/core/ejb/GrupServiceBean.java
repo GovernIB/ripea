@@ -238,4 +238,10 @@ public class GrupServiceBean implements GrupService {
 				organGestorId);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public boolean checkIfHasGrupPerDefecte(Long procedimentId) {
+		return delegate.checkIfHasGrupPerDefecte(procedimentId);
+	}
+
 }

@@ -27,6 +27,45 @@ $(document).ready(function() {
 		refrescarOrgan();
 	});
 
+
+	// on submit show alert if there is already grup selected per defecte
+	$('form').submit(function(e) {
+
+	    if ($('#grupId').find(":selected").val() && $("#perDefecte").is(':checked')) {
+
+	        let iframe = window.frameElement;
+               $(iframe).hide();
+               $('.modal-body .datatable-dades-carregant', parent.document).show();
+               $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', true);
+				
+	        $.ajax({
+	            type: 'GET',
+	            async: false,
+	            url: '<c:url value="/metaExpedient/checkIfHasGrupPerDefecte"/>/' + ${metaExpedientId},
+	            success: function(result) {
+
+		        	if (result) {
+			        	
+		        		let confirmDialogMsg = "<spring:message code='metaexpedient.relacionar.grup.form.submit.per.defecte'/>";
+	                    if (confirm(confirmDialogMsg)) {
+	                        return true
+	                    } else {
+	                        e.preventDefault(); 
+	                        let iframe = window.frameElement;
+	                        $(iframe).show();
+	                        $('.modal-body .datatable-dades-carregant', parent.document).hide();
+	                        $('.modal-footer', parent.document).find('button[type="submit"]').attr('disabled', false);
+	                        
+	                        return false;
+	                    }
+		        	}
+	            }
+	        });
+	    }
+		
+	});
+	
+
 });//################################################## document ready END ##############################################################
 
 

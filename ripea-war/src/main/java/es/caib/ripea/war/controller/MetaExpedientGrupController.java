@@ -114,7 +114,14 @@ public class MetaExpedientGrupController extends BaseAdminController {
 	    				true));
 	}
 	
+	@RequestMapping(value = "/checkIfHasGrupPerDefecte/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean checkIfHasGrupPerDefecte(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
 
+		return grupService.checkIfHasGrupPerDefecte(metaExpedientId);
+	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/grup/{grupId}/marcarPerDefecte", method = RequestMethod.GET)
 	public String marcarPerDefecte(

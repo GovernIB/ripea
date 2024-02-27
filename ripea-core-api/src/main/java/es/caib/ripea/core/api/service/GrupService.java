@@ -205,4 +205,7 @@ public interface GrupService {
 			String rolActual,
 			Long organGestorId);
 
+	@PreAuthorize("hasRole('tothom')")
+	public boolean checkIfHasGrupPerDefecte(Long procedimentId);
+
 }

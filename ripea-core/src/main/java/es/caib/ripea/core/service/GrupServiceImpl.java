@@ -424,6 +424,15 @@ public class GrupServiceImpl implements GrupService {
 		
 	}
 	
+	@Transactional
+	@Override
+	public boolean checkIfHasGrupPerDefecte(
+			Long procedimentId) throws NotFoundException {
+		
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(procedimentId);
+		return metaExpedientEntity.getGrupPerDefecte() != null;
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long adminOrganId) {
