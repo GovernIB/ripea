@@ -1695,7 +1695,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					paginaExpedients,
 					ExpedientDto.class,
 					rolActual,
-					new ConverterParam<ExpedientEntity, ExpedientDto>() {
+					new ConverterParam<ExpedientEntity, ExpedientDto, String>() {
 						@Override
 						public ExpedientDto convert(ExpedientEntity source, String param) {
 							return expedientHelper.toExpedientDto(source, false, true, param, true);
@@ -1985,7 +1985,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					paginaExpedientsRelacionats,
 					ExpedientDto.class,
 					"tothom",
-					new ConverterParam<ExpedientEntity, ExpedientDto>() {
+					new ConverterParam<ExpedientEntity, ExpedientDto, String>() {
 						@Override
 						public ExpedientDto convert(ExpedientEntity source, String param) {
 							return expedientHelper.toExpedientDto(source, false, false, param, true);

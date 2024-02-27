@@ -593,7 +593,8 @@ public interface MetaExpedientService {
 	@PreAuthorize("hasRole('tothom')")
 	public MetaExpedientDto findByIdAmbElements(
 			Long entitatId,
-			Long id);
+			Long id, 
+			Long adminOrganId);
 
 //	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId);
 

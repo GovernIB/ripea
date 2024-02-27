@@ -69,7 +69,8 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				"metaExpedient",
 				metaExpedientService.findByIdAmbElements(
 						entitatActual.getId(),
-						metaExpedientId));
+						metaExpedientId, 
+						RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null));
 		
 		if (metaExpedient != null // es tracta d'una modificació
 				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
