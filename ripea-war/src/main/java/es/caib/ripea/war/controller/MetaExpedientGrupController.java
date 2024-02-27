@@ -195,6 +195,17 @@ public class MetaExpedientGrupController extends BaseAdminController {
 			@Valid RelacionarGrupCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		
+		if (bindingResult.hasErrors()) {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+			List<GrupDto> grups = grupService.findGrupsNoRelacionatAmbMetaExpedient(
+					entitatActual.getId(),
+					metaExpedientId, 
+					RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null);
+			model.addAttribute("grups", grups);
+			model.addAttribute("metaExpedientId", metaExpedientId);
+			return "metaExpedientRelacionarGrupForm";
+		}
 
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		
