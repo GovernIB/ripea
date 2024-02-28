@@ -79,8 +79,10 @@ public class ConfigServiceImpl implements ConfigService {
         cacheHelper.evictMostrarLogsPermisos();
         cacheHelper.evictMostrarLogsGrups();
         cacheHelper.evictMostrarLogsRendimentDescarregarAnotacio();
+        cacheHelper.evictMostrarLogsCercadorAnotacio();
         cacheHelper.evictMostrarLogsRendiment();
         cacheHelper.evictMostrarLogsCreacioContingut();
+
         return conversioTipusHelper.convertir(configEntity, ConfigDto.class);
     }
     

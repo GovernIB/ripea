@@ -53,3 +53,6 @@ ALTER TABLE ipa_expedient_peticio ADD CONSTRAINT ipa_grup_exp_pet_fk FOREIGN KEY
 
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.activar.logs.grups', 'false', 'Activar logs per grups', 'LOGS', '8', '0', 'BOOL', '0', '0');
 
+-- Changeset db/changelog/changes/0.9.107/1433.yaml::1709132700705-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.mostrar.logs.cercador.anotacions', 'false', 'Activar logs per cercador d''anotacions', 'LOGS', '9', '0', 'BOOL', '0');
+

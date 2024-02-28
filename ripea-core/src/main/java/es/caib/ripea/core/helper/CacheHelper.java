@@ -808,6 +808,20 @@ public class CacheHelper {
 	public void evictMostrarLogsRendimentDescarregarAnotacio() {
 	}
 	
+	@Cacheable(value = "mostrarLogsCercadorAnotacio")
+	public boolean mostrarLogsCercadorAnotacio() {
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.cercador.anotacions");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@CacheEvict(value = "mostrarLogsCercadorAnotacio")
+	public void evictMostrarLogsCercadorAnotacio() {
+	}
+	
 	
 	@Cacheable(value = "mostrarLogsCreacioContingut")
 	public boolean mostrarLogsCreacioContingut() {

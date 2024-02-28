@@ -369,6 +369,11 @@ public class AplicacioServiceImpl implements AplicacioService {
 	}
 	
 	@Override
+	public boolean mostrarLogsCercadorAnotacio() {
+		return cacheHelper.mostrarLogsCercadorAnotacio();
+	}
+	
+	@Override
 	public boolean getBooleanJbossProperty(
 			String key,
 			boolean defaultValueIfNull) {

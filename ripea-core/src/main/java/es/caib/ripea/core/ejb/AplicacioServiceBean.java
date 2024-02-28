@@ -278,4 +278,11 @@ public class AplicacioServiceBean implements AplicacioService {
 	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
 		return delegate.getProcedimentPerDefecte(entitatId, rolActual);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public boolean mostrarLogsCercadorAnotacio() {
+		return delegate.mostrarLogsCercadorAnotacio();
+	}
+	
 }
