@@ -5,16 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
@@ -22,9 +16,7 @@ import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NotificacioInfoRegistreDto;
 import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -34,16 +26,8 @@ import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
 import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.service.DocumentServiceImpl;
-import es.caib.ripea.plugin.notificacio.EnviamentReferencia;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
-import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
-import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 
 /**
  * Utilitat per gestionar l'enviament de notificacions dels documents d'expedients
@@ -52,8 +36,7 @@ import es.caib.ripea.plugin.notificacio.RespostaEnviar;
  */
 @Component
 public class DocumentNotificacioHelper {
-	@Autowired
-	private CacheHelper cacheHelper;
+	
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -69,24 +52,15 @@ public class DocumentNotificacioHelper {
 	@Autowired
 	private DadesExternesService dadesExternesService;
 	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
-	private DocumentRepository documentRepository;
-	@Autowired
-	private ContingutHelper contingutHelper;
-	@Autowired
-	private ConfigHelper configHelper;
+	private DocumentNotificacioInteressatHelper documentNotificacioInteressatHelper;
 
 	public static Map<String, String> notificacionsWithError = new HashMap<String, String>();
 	
 	public void crear(
 			DocumentNotificacioDto notificacioDto, 
 			DocumentEntity documentEntity) {
-//		List<InteressatEntity> interessats = validateInteressatsPerNotificacio(notificacioDto, expedientEntity);
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
 				  notificacioDto.getTipus());
 		
@@ -96,90 +70,16 @@ public class DocumentNotificacioHelper {
 		
 		notificacionsWithError = new HashMap<String, String>();
 		for (Long interessatId : notificacioDto.getInteressatsIds()) {
-			
-			InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(
-					expedientEntity,
+			documentNotificacioInteressatHelper.crearEnviarNotificacioInteressat(
+					notificacioDto, 
+					expedientEntity, 
+					documentEntity, 
 					interessatId);
-			notificacioDto.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());
-			notificacioDto.setEntregaPostal(notificacioDto.isEntregaPostal());
-			
-			RespostaEnviar respostaEnviar = new RespostaEnviar();
-//			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
-				respostaEnviar = pluginHelper.notificacioEnviar(
-						notificacioDto,
-						expedientEntity,
-						documentEntity,
-						interessat);
-//			}
-			
-			DocumentNotificacioEntity notificacioEntity = DocumentNotificacioEntity.getBuilder(
-					DocumentNotificacioEstatEnumDto.PENDENT,
-					notificacioDto.getAssumpte(),
-					notificacioDto.getTipus(),
-					notificacioDto.getDataProgramada(),
-					notificacioDto.getRetard(),
-					notificacioDto.getDataCaducitat(), 
-					expedientEntity,
-					documentEntity,
-					notificacioDto.getServeiTipusEnum(),
-					notificacioDto.isEntregaPostal()).
-					observacions(notificacioDto.getObservacions()).
-					emisor(documentEntity.getExpedient() != null ? documentEntity.getExpedient().getOrganGestor() : null).
-					build();
-			
-			documentNotificacioRepository.save(notificacioEntity);
-			
-			DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity;
-			documentEnviamentInteressatEntity = DocumentEnviamentInteressatEntity.getBuilder(
-					interessat, 
-					notificacioEntity).build();
-			documentEnviamentInteressatRepository.save(documentEnviamentInteressatEntity);
-			
-//			if (!DocumentNotificacioTipusEnumDto.MANUAL.equals(notificacioDto.getTipus())) {
-
-				if (respostaEnviar.isError()) {
-					cacheHelper.evictNotificacionsAmbErrorPerExpedient(expedientEntity);
-					notificacioEntity.updateEnviatError(
-							respostaEnviar.getErrorDescripcio(),
-							respostaEnviar.getIdentificador());
-					
-					notificacionsWithError.put(interessat.getDocumentNum(), respostaEnviar.getErrorDescripcio());
-				} else {
-					cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
-					cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
-					notificacioEntity.updateEnviat(
-							null,
-							respostaEnviar.getEstat(),
-							respostaEnviar.getIdentificador());
-				}
-
-				for (EnviamentReferencia enviamentReferencia : respostaEnviar.getReferencies()) {
-					for (DocumentEnviamentInteressatEntity documentEnviamentInteressat : notificacioEntity.getDocumentEnviamentInteressats()) {
-						if(documentEnviamentInteressat.getInteressat().getDocumentNum().equals(enviamentReferencia.getTitularNif())) {
-							documentEnviamentInteressat.updateEnviamentReferencia(enviamentReferencia.getReferencia());
-							//pluginHelper.actualitzarRegistreInfo(documentEnviamentInteressat);
-						}
-					}
-				}
-//			}
-				
-			DocumentNotificacioDto dto = conversioTipusHelper.convertir(
-					notificacioEntity,
-					DocumentNotificacioDto.class);
-			
-			String destinitariAmbDocument = "";
-			for (InteressatDto interessatDto : dto.getInteressats()) {
-				destinitariAmbDocument += interessatDto.getNomCompletAmbDocument();
-			}
-			cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
-			cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
-			logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
-			
 		}
 	}
 	
 	public Map<String, String> consultaErrorsNotificacio() {
-		return notificacionsWithError;
+		return documentNotificacioInteressatHelper.consultaErrorsNotificacio();
 	}
 	
 	public DocumentNotificacioDto update (DocumentNotificacioDto notificacio, DocumentEntity document) {
@@ -392,5 +292,4 @@ public class DocumentNotificacioHelper {
 		return interessats;
 	}
 	
-	private static final Logger logger = LoggerFactory.getLogger(DocumentServiceImpl.class);
 }
