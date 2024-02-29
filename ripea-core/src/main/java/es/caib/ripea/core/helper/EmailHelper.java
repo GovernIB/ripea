@@ -327,6 +327,10 @@ public class EmailHelper {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void novaAnotacioPendent(Long expedientPeticioId) {
 		
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("novaAnotacioPendent start (id=" + expedientPeticioId + ")");
+		
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findOne(expedientPeticioId);
 		RegistreEntity registre = expedientPeticio.getRegistre();
 		MetaExpedientEntity metaExpedient = expedientPeticio.getMetaExpedient();
@@ -337,8 +341,14 @@ public class EmailHelper {
 		List<String> emailsNoAgrupats = new ArrayList<>();
 		List<String> emailsAgrupats = new ArrayList<>();
 		
+		
+		long t2 = System.currentTimeMillis();
 		// Administradors d'entitats
 		List<DadesUsuari> dadesUsuarisAdminEntitat = pluginHelper.dadesUsuariFindAmbGrup("IPA_ADMIN");
+		
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) (size=" + Utils.getSize(dadesUsuarisAdminEntitat) + ")");
+		
 		for (DadesUsuari dadesUsuari : dadesUsuarisAdminEntitat) {
 			boolean granted = permisosHelper.isGrantedAll(
 					entitat.getId(),
@@ -354,13 +364,18 @@ public class EmailHelper {
 						"Email nova anotació. Permission: Administració de entitat: " + entitat.getId() + ", user: " + dadesUsuari.getCodi());
 			}
 		}
-		
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("dadesUsuariFindAmbGrup(IPA_ADMIN) time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		if (metaExpedient != null) {
 			boolean isProcedimentNoComu = metaExpedient.getOrganGestor() != null;
 			
+			long t3 = System.currentTimeMillis();
 			// Administradors d'òrgans
 			List<DadesUsuari> dadesUsuarisAdminOrgan = pluginHelper.dadesUsuariFindAmbGrup("IPA_ORGAN_ADMIN");
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("dadesUsuariFindAmbGrup(IPA_ORGAN_ADMIN) (size=" + Utils.getSize(dadesUsuarisAdminOrgan) + ") isProcedimentNoComu=" + isProcedimentNoComu + " " + organ);
 
 			for (DadesUsuari dadesUsuari : dadesUsuarisAdminOrgan) {
 				if (isProcedimentNoComu) {
@@ -404,10 +419,16 @@ public class EmailHelper {
 					}
 				}
 			}
-			
-			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("dadesUsuariFindAmbGrup(IPA_ORGAN_ADMIN) time:  " + (System.currentTimeMillis() - t3) + " ms");
+
+			long t4 = System.currentTimeMillis();
 			// tothoms
 			List<DadesUsuari> dadesUsuarisTothoms = pluginHelper.dadesUsuariFindAmbGrup("tothom");
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("dadesUsuariFindAmbGrup(tothom) (size=" + Utils.getSize(dadesUsuarisTothoms) + ") isProcedimentNoComu=" + isProcedimentNoComu + " " + organ);
+			
 			for (DadesUsuari dadesUsuari : dadesUsuarisTothoms) {
 				// 1. Permission on procediment of anotacion (procediments no comuns)
 				boolean grantedProc = permisosHelper.isGrantedAny(
@@ -422,7 +443,9 @@ public class EmailHelper {
 							emailsAgrupats,
 							EventTipusEnumDto.NOVA_ANOTACIO,
 							"Email nova anotació. 1. Permission on procediment: " + metaExpedient.getId() + ", user: " + dadesUsuari.getCodi());
-				}				
+				}
+				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+					logger.info(dadesUsuari.getCodi() + " 1");
 				
 				if (isProcedimentNoComu) {
 					// 2. Permission on organ of procediment of anotacio (procediments no comuns)
@@ -442,6 +465,8 @@ public class EmailHelper {
 									"Email nova anotació. 2. Permission on organ of procediment: " + orgId + ", user: " + dadesUsuari.getCodi());
 						}
 					}
+					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+						logger.info(dadesUsuari.getCodi() + " 2");
 
 				} else {
 					// 3. Permission on pair organ-procediment of anotacio (procediments comuns)
@@ -464,6 +489,8 @@ public class EmailHelper {
 							}
 						}
 					}
+					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+						logger.info(dadesUsuari.getCodi() + " 3");
 					
 					// 4. Permission on organ per procediments comuns (procediments comuns)
 					for (Long orgId : organPathIds) {
@@ -486,9 +513,13 @@ public class EmailHelper {
 									"Email nova anotació. 4. Permission per procediment comuns: " + metaExpedient.getId() +  "on organ: " + orgId +  ", user: " + dadesUsuari.getCodi());	
 								
 						}
-					}					
+					}
+					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+						logger.info(dadesUsuari.getCodi() + " 4");
 				}
-			}			
+			}	
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+				logger.info("dadesUsuariFindAmbGrup(tothom) time:  " + (System.currentTimeMillis() - t4) + " ms");
 		}
 
 		
@@ -512,6 +543,9 @@ public class EmailHelper {
 				text,
 				EventTipusEnumDto.NOVA_ANOTACIO);
 		
+		
+		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+			logger.info("novaAnotacioPendent end (id=" + expedientPeticioId + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 	
 	

@@ -119,6 +119,14 @@ public class Utils {
     public static String toString(Object obj) {
         return String.valueOf(obj);
     }
+    
+	public static <T> int getSize(List<T> objects) {
+		if (isNotEmpty(objects)) {
+			return objects.size();
+		} else {
+			return 0;
+		}
+	}
 	
 	public static <T> void removeLast(List<T> objects) {
 		if (isNotEmpty(objects)) {

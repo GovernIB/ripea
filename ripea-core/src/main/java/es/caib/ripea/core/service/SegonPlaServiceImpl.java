@@ -123,7 +123,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	public void consultarIGuardarAnotacionsPeticionsPendents() throws Throwable {
 
-		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients");
 		
 		long t1 = System.currentTimeMillis();
@@ -143,7 +143,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			}
 		}
 		
-		if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
+		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Fin de tasca periòdica: consultar i guardar anotacions per peticions pedents de creacio del expedients :  " + (System.currentTimeMillis() - t1) + " ms");
 		
 	}
@@ -151,15 +151,24 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void reintentarCanviEstatDistribucio() {
+		
+		long t1 = System.currentTimeMillis();
+    	if (cacheHelper.mostrarLogsSegonPla())
+    		logger.info("Execució tasca periòdica: Reintentar canvi estat BACK_REBUDA a DISTRIBUCIO");
 
 		List<Long> idsPendents = expedientPeticioRepository.findIdsPendentsCanviEstat(getMaxReintentsCanviEstatRebudaDistribucio());
 		for (Long idPendent : idsPendents) {
 			expedientPeticioHelper.reintentarCanviEstatDistribucio(idPendent);
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Reintentar canvi estat BACK_REBUDA a DISTRIBUCIO :  " + (System.currentTimeMillis() - t1) + " ms");
+		
 	}
 
 	@Override
 	public void buidarCacheDominis() {
+		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Buidar cachés dominis");
 		try {
@@ -168,6 +177,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 		} catch (Exception ex) {
 			logger.error("No s'ha pogut buidar la cache de dominis", ex);
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Buidar cachés dominis :  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
 	@Override
@@ -182,6 +194,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void enviarEmailPerComentariMetaExpedient() {
+		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Enviar email per comentari metaexpedient");
 
@@ -198,6 +211,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				logger.error("Error enviant l'email per comentari comentariId=" + metaExpComnt.getId() + ", metaexpedientId=" + metaExpComnt.getMetaExpedient().getId() + ": " + e.getMessage());
 			}
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Enviar email per comentari metaexpedient :  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 	
 	
@@ -205,6 +221,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Transactional
 	public void enviarEmailsPendentsAgrupats() {
 		
+		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Enviar correus pendents agrupats");
 
@@ -247,6 +264,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			}
 
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Enviar correus pendents agrupats :  " + (System.currentTimeMillis() - t1) + " ms");
 
 	}
 	
@@ -325,7 +345,7 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	@Override
 	@Transactional
 	public void guardarExpedientsDocumentsArxiu() {
-		
+		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.info("Execució tasca periòdica: Guardar expedients i documents en arxiu");
 		
@@ -363,12 +383,16 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				}
 			}
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Guardar expedients i documents en arxiu :  " + (System.currentTimeMillis() - t1) + " ms");
 
 	}
 
 	@Override
 	@Transactional
 	public void guardarInteressatsArxiu() {
+		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
 			logger.debug("Execució tasca periòdica: Guardar interessats en arxiu");
 		
@@ -386,14 +410,17 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				}
 			}
 		}
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Guardar interessats en arxiu :  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
     @Override
 	@Transactional
     public void actualitzarProcediments() {
 
+		long t1 = System.currentTimeMillis();
     	if (cacheHelper.mostrarLogsSegonPla())
-    		logger.info("Execució tasca periòdica: Actualitzar procedimetns");
+    		logger.info("Execució tasca periòdica: Actualitzar procediments");
 
 		if (configHelper.getConfig(PropertiesConstants.ACTUALITZAR_PROCEDIMENTS) == null)	// Tasca en segon pla no configurada
 			return;
@@ -406,14 +433,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				logger.error("Error al actualitzar procediments en segon pla", e);
 			}
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Actualitzar procediments :  " + (System.currentTimeMillis() - t1) + " ms");
     }
 
 	@Override
 	@Transactional
 	public void consultaCanvisOrganigrama() {
 		
+		long t1 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsSegonPla())
-			logger.info("Execució tasca periòdica: Actualitzar procedimetns");
+			logger.info("Execució tasca periòdica: Consulta de canvis en l'organigrama");
 
 		if (configHelper.getConfig(PropertiesConstants.CONSULTA_CANVIS_ORGANIGRAMA) == null)	// Tasca en segon pla no configurada
 			return;
@@ -422,11 +453,18 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 			ConfigHelper.setEntitat(conversioTipusHelper.convertir(entitat, EntitatDto.class));
 			organGestorHelper.consultaCanvisOrganigrama(entitat);
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Consulta de canvis en l'organigrama :  " + (System.currentTimeMillis() - t1) + " ms");
 	} 
 
 	@Override
 	@Transactional
 	public void tancarExpedientsArxiu() {
+		
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Execució tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada");
 		
 		List<EntitatEntity> entitats = entitatRepository.findAll();
 
@@ -444,6 +482,9 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				}
 			}
 		}
+		
+		if (cacheHelper.mostrarLogsSegonPla())
+			logger.info("Fin de tasca periòdica: Consulta expedients pendents de tancar a l'arxiu i que ha arribat l'hora programada :  " + (System.currentTimeMillis() - t1) + " ms");
 		
 	}
 	
