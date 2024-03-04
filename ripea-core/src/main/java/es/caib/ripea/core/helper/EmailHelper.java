@@ -416,11 +416,19 @@ public class EmailHelper {
 			// 1. Permission on procediment of anotacion (procediments no comuns)
 			objectesAclIds.add(metaExpedient.getId());
 			
+			if (cacheHelper.mostrarLogsEmail()) {
+				logger.info("1. Permission on procediment of anotacion (procediments no comuns): " + objectesAclIds);
+			}
+			
 			if (isProcedimentNoComu) {
 				// 2. Permission on organ of procediment of anotacio (procediments no comuns)
 				List<Long> organPathIds = organGestorHelper.findParesIds(metaExpedient.getOrganGestor().getId(), true);
 				
 				objectesAclIds.addAll(organPathIds);
+				
+				if (cacheHelper.mostrarLogsEmail()) {
+					logger.info("2. Permission on organ of procediment of anotacio (procediments no comuns): " + organPathIds);
+				}
 			} else {
 				// 3. Permission on pair organ-procediment of anotacio (procediments comuns)
 				List<Long> organPathIds = organGestorHelper.findParesIds(organ.getId(), true);
@@ -431,11 +439,19 @@ public class EmailHelper {
 						objectesAclIds.add(metaExpedientOrganGestor.getId());
 				}
 				
+				if (cacheHelper.mostrarLogsEmail()) {
+					logger.info("3. Permission on pair organ-procediment of anotacio (procediments comuns): " + organPathIds);
+				}
+				
 				// 4. Permission on organ per procediments comuns (procediments comuns)
 				usuarisDobleCondicio = permisosHelper.findPermisosObjectes(
 						organPathIds,
 						new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
 						new Permission[] { ExtendedPermission.COMU});
+				
+				if (cacheHelper.mostrarLogsEmail() && usuarisDobleCondicio != null && ! usuarisDobleCondicio.isEmpty()) {
+					logger.info("4. Permission on organ per procediments comuns (procediments comuns): " + usuarisDobleCondicio.size());
+				}
 				
 				usuarisAmbPermis.addAll(usuarisDobleCondicio);
 			}
@@ -446,7 +462,16 @@ public class EmailHelper {
 					new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
 					null);
 			
+			if (cacheHelper.mostrarLogsEmail() && usuarisUnaCondicio != null && ! usuarisUnaCondicio.isEmpty()) {
+				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (objectesAclIds): " + objectesAclIds);
+				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (usuarisUnaCondicio): " + usuarisUnaCondicio.size());
+			}
+			
 			usuarisAmbPermis.addAll(usuarisUnaCondicio);
+			
+			if (cacheHelper.mostrarLogsEmail() && usuarisAmbPermis != null && ! usuarisAmbPermis.isEmpty()) {
+				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (usuarisAmbPermis): " + usuarisAmbPermis.size());
+			}
 			
 			for (PermisDto permisDto : usuarisAmbPermis) {
 				addDestinatari(
