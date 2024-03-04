@@ -427,7 +427,8 @@ public class EmailHelper {
 				
 				for (Long orgId : organPathIds) {
 					MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientIdAndOrganGestorId(metaExpedient.getId(), orgId);
-					objectesAclIds.add(metaExpedientOrganGestor.getId());
+					if (metaExpedientOrganGestor != null)
+						objectesAclIds.add(metaExpedientOrganGestor.getId());
 				}
 				
 				// 4. Permission on organ per procediments comuns (procediments comuns)
