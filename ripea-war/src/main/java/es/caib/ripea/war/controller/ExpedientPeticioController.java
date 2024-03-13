@@ -106,17 +106,34 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, Model model) {
+		
+		long t1 = System.currentTimeMillis();
+    	if (aplicacioService.mostrarLogsCercadorAnotacio())
+    		logger.info("expedientPeticio start ");
+    	
+		long t2 = System.currentTimeMillis();
 
 		model.addAttribute(getFiltreCommand(request));
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		Long organActualId = EntitatHelper.getOrganGestorActualId(request);
+		
+		if (aplicacioService.mostrarLogsCercadorAnotacio())
+    		logger.info("getFiltreCommand time:  " + (System.currentTimeMillis() - t2) + " ms");
+		
+		long t3 = System.currentTimeMillis();
 		List<MetaExpedientDto> metaExpedientsPermesos = expedientPeticioService.findMetaExpedientsPermesosPerAnotacions(
 				entitatActual.getId(),
 				organActualId,
 				rolActual);
 		model.addAttribute("metaExpedients", metaExpedientsPermesos);
 		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN"));
+		
+		if (aplicacioService.mostrarLogsCercadorAnotacio())
+    		logger.info("findMetaExpedientsPermesosPerAnotacions time:  " + (System.currentTimeMillis() - t3) + " ms");
+		
+    	if (aplicacioService.mostrarLogsCercadorAnotacio())
+    		logger.info("expedientPeticio end:  " + (System.currentTimeMillis() - t1) + " ms");
 		return "expedientPeticioList";
 	}
 
@@ -142,11 +159,15 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(HttpServletRequest request) {
+		
+    	if (aplicacioService.mostrarLogsCercadorAnotacio())
+    		logger.info("expedientPeticioDatatable start ");
+		long t1 = System.currentTimeMillis();
 
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		ExpedientPeticioFiltreCommand expedientPeticioFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		return DatatablesHelper.getDatatableResponse(
+		DatatablesResponse dr = DatatablesHelper.getDatatableResponse(
 				request,
 				expedientPeticioService.findAmbFiltre(
 						entitatActual.getId(),
@@ -155,6 +176,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						rolActual,
 						EntitatHelper.getOrganGestorActualId(request)),
 				"id");
+		
+    	if (aplicacioService.mostrarLogsCercadorAnotacio())
+    		logger.info("expedientPeticioDatatable end:  " + (System.currentTimeMillis() - t1) + " ms");
+    	
+    	return dr;
 	}
 	
 

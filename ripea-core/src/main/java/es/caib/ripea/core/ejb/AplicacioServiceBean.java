@@ -272,5 +272,10 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.doesCurrentUserHasRol(rol);
 	}
 
-
+	@Override
+	@RolesAllowed("tothom")
+	public boolean mostrarLogsCercadorAnotacio() {
+		return delegate.mostrarLogsCercadorAnotacio();
+	}
+	
 }

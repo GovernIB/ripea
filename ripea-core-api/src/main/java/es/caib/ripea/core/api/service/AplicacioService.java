@@ -230,5 +230,8 @@ public interface AplicacioService {
 	@PreAuthorize("hasRole('tothom')")
 	public boolean doesCurrentUserHasRol(
 			String rol);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public boolean mostrarLogsCercadorAnotacio();
 
 }

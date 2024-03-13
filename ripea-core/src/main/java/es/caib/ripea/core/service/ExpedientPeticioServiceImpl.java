@@ -145,15 +145,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			PaginacioParamsDto paginacioParams, 
 			String rolActual, 
 			Long organActualId) {
-		log.debug("Consultant els expedient peticions segons el filtre (" +
-				"entitatId=" +
-				entitatId +
-				", filtre=" +
-				filtre +
-				", paginacioParams=" +
-				paginacioParams +
-				")");
+		
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+			log.info("findAmbFiltre start(" + "entitatId=" + entitatId + ", filtre=" + filtre + ", paginacioParams=" + paginacioParams + ", rolActual=" + rolActual + ", organActualId=" + organActualId +")");
 
+		
+		long t2 = System.currentTimeMillis();
 		final EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -173,12 +171,19 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (filtre.getMetaExpedientId() != null) {
 			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
 		}
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("comprovarEntitat time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
+		
+		long t3 = System.currentTimeMillis();
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitatId,
 				rolActual, 
 				organActualId);
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("findPermisosPerAnotacions time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
+		long t4 = System.currentTimeMillis();
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
 				rolActual,
@@ -207,12 +212,18 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 						paginacioParams,
 						ordenacioMap));
 		
-
-
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("findByEntitatAndFiltre time:  " + (System.currentTimeMillis() - t4) + " ms");
+		
+		long t5 = System.currentTimeMillis();
 		PaginaDto<ExpedientPeticioListDto> result = paginacioHelper.toPaginaDto(
 				paginaExpedientPeticios,
 				ExpedientPeticioListDto.class);
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("toPaginaDto time:  " + (System.currentTimeMillis() - t5) + " ms");
 
+    	if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("findAmbFiltre end:  " + (System.currentTimeMillis() - t1) + " ms");
 		return result;
 
 	}
@@ -936,6 +947,10 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 			Long organActualId,
 			String rolActual) {
 		
+		long t1 = System.currentTimeMillis();
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+			log.info("findMetaExpedientsPermesosPerAnotacions start(" + "entitatId=" + entitatId + ", rolActual=" + rolActual + ", organActualId=" + organActualId +")");
+
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -944,7 +959,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				true,
 				false);
 		
-		
+		long t2 = System.currentTimeMillis();
 		List<MetaExpedientEntity> metaExpedientsPermesos = null;
 		if (rolActual.equals("IPA_ADMIN")) {
 			metaExpedientsPermesos = metaExpedientRepository.findByEntitat(entitat);
@@ -957,10 +972,23 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		} else if (rolActual.equals("tothom")) {
 			metaExpedientsPermesos = metaExpedientHelper.getCreateWritePermesos(entitat.getId()); 
 		}
+		
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("findMetaExpedients time:  " + (System.currentTimeMillis() - t2) + " ms");
 
-		return conversioTipusHelper.convertirList(
+		long t3 = System.currentTimeMillis();
+
+		List<MetaExpedientDto> dto = conversioTipusHelper.convertirList(
 				metaExpedientsPermesos,
 				MetaExpedientDto.class);
+		
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("convertirList time:  " + (System.currentTimeMillis() - t3) + " ms");
+		
+		if (cacheHelper.mostrarLogsCercadorAnotacio())
+    		log.info("findMetaExpedientsPermesosPerAnotacions end:  " + (System.currentTimeMillis() - t1) + " ms");
+		
+		return dto;
 	}
 
 }
