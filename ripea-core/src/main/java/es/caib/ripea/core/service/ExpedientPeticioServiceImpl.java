@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -978,10 +979,17 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 
 		long t3 = System.currentTimeMillis();
 
-		List<MetaExpedientDto> dto = conversioTipusHelper.convertirList(
-				metaExpedientsPermesos,
-				MetaExpedientDto.class);
-		
+//		List<MetaExpedientDto> dto = conversioTipusHelper.convertirList(
+//				metaExpedientsPermesos,
+//				MetaExpedientDto.class);
+		List<MetaExpedientDto> dto = new ArrayList<MetaExpedientDto>();
+		for (MetaExpedientEntity metaExpedient: metaExpedientsPermesos) {
+			MetaExpedientDto metaExpedientDto = new MetaExpedientDto();
+			metaExpedientDto.setId(metaExpedient.getId());
+			metaExpedientDto.setClassificacio(metaExpedient.getClassificacio());
+			metaExpedientDto.setNom(metaExpedient.getNom());
+			dto.add(metaExpedientDto);
+		}
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("convertirList time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
