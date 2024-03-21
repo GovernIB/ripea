@@ -234,7 +234,7 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_SUPER")
+	@RolesAllowed("IPA_ADMIN")
 	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
@@ -246,7 +246,7 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 	}
 
 	@Override
-	@RolesAllowed("IPA_SUPER")
+	@RolesAllowed("IPA_ADMIN")
 	public void comunicadaReprocessar(
 			Long expedientPeticioId) throws Throwable {
 		delegate.comunicadaReprocessar(expedientPeticioId);

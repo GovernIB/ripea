@@ -109,13 +109,13 @@ public interface ExpedientPeticioService {
 	public void evictCountAnotacionsPendents(
 			Long entitatId);
 
-	@PreAuthorize("hasRole('IPA_SUPER')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public ResultDto<ExpedientPeticioListDto> findComunicadesAmbFiltre(
 			ExpedientPeticioFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
 			ResultEnumDto resultEnum);
 
-	@PreAuthorize("hasRole('IPA_SUPER')")
+	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void comunicadaReprocessar(
 			Long expedientPeticioId) throws Throwable;
  }
