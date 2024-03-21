@@ -45,5 +45,4 @@
 	<cache name="mostrarLogsGrups" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="mostrarLogsCercadorAnotacio" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	
-	
 </ehcache>

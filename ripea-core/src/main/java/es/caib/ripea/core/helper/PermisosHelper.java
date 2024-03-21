@@ -7,9 +7,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -882,6 +884,40 @@ public class PermisosHelper {
 		aclEntryRepository.deleteInBatch(permisos);
 	}
 
+	public Set<PermisDto> findPermisosObjectes(List<Long> objectsId, Permission[] permissions, Permission[] permissions2) {
+		List<PermisDto> permisos = new ArrayList<PermisDto>();
+		List<Integer> masks = new ArrayList<>();
+		List<Integer> masks2 = new ArrayList<>();
+		
+		for (Permission permission : permissions) {
+            masks.add(permission.getMask());
+        }
+		
+		List<AclObjectIdentityEntity> objectsIdentityAmbPermis = new ArrayList<AclObjectIdentityEntity>();
+		
+		if (permissions2 == null) {
+			objectsIdentityAmbPermis = aclObjectIdentityRepository.findByAclObjectIdentityInAndMaskIn(objectsId, masks);
+		} else {
+			for (Permission permission : permissions2) {
+				masks2.add(permission.getMask());
+	        }
+			objectsIdentityAmbPermis = aclObjectIdentityRepository.findByAclObjectIdentityInAndMaskIn(objectsId, masks, masks2);
+		}
+		
+		for (AclObjectIdentityEntity objectIdentity : objectsIdentityAmbPermis) {
+			// Obté els permisos sobre objecte actual
+			for (AclEntryEntity aclEntryEntity : objectIdentity.getEntries()) {
+				PermisDto permis = new PermisDto();
+				permis.setId(aclEntryEntity.getSid().getId());
+				permis.setPrincipalNom(aclEntryEntity.getSid().getSid());
+				permisos.add(permis);
+			}
+		}
+		
+		// Set per eliminar duplicats
+		return new HashSet<PermisDto>(permisos);
+	}
+	
 	public interface ObjectIdentifierExtractor<T> {
 
 		public Serializable getObjectIdentifier(T object);

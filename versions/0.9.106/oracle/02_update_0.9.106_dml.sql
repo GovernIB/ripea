@@ -52,3 +52,6 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 
 -- Changeset db/changelog/changes/0.9.106/1410.yaml::1705567798214-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.carpetes.mantenir.estat', 'false', 'Mantenir estat carpetes (oberta o tancada) fins que es tanqui el navegador', 'CONTINGUT', '41', '0', 'BOOL', '1');
+
+-- Changeset db/changelog/changes/0.9.106/1433.yaml::1709132700705-1::limit
+INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.mostrar.logs.cercador.anotacions', 'false', 'Activar logs per cercador d''anotacions', 'LOGS', '9', '0', 'BOOL', '0');

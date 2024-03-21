@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.EventTipusEnumDto;
+import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.CarpetaEntity;
@@ -423,105 +424,87 @@ public class EmailHelper {
 				logger.info("dadesUsuariFindAmbGrup(IPA_ORGAN_ADMIN) time:  " + (System.currentTimeMillis() - t3) + " ms");
 
 			long t4 = System.currentTimeMillis();
-			// tothoms
-			List<DadesUsuari> dadesUsuarisTothoms = pluginHelper.dadesUsuariFindAmbGrup("tothom");
 			
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-				logger.info("dadesUsuariFindAmbGrup(tothom) (size=" + Utils.getSize(dadesUsuarisTothoms) + ") isProcedimentNoComu=" + isProcedimentNoComu + " " + organ);
+				logger.info("dadesUsuariFindAmbGrup(tothom) isProcedimentNoComu=" + isProcedimentNoComu + " " + organ);
 			
-			for (DadesUsuari dadesUsuari : dadesUsuarisTothoms) {
-				// 1. Permission on procediment of anotacion (procediments no comuns)
-				boolean grantedProc = permisosHelper.isGrantedAny(
-						metaExpedient.getId(),
-						MetaNodeEntity.class,
-						new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
-						dadesUsuari.getCodi());
-				if (grantedProc) {
-					addDestinatari(
-							dadesUsuari.getCodi(),
-							emailsNoAgrupats,
-							emailsAgrupats,
-							EventTipusEnumDto.NOVA_ANOTACIO,
-							"Email nova anotació. 1. Permission on procediment: " + metaExpedient.getId() + ", user: " + dadesUsuari.getCodi());
-				}
-				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-					logger.info(dadesUsuari.getCodi() + " 1");
+			List<Long> objectesAclIds = new ArrayList<Long>();
+			Set<PermisDto> usuarisUnaCondicio = new HashSet<PermisDto>();
+			Set<PermisDto> usuarisDobleCondicio = new HashSet<PermisDto>();
+			Set<PermisDto> usuarisAmbPermis = new HashSet<PermisDto>();
+			
+			// 1. Permission on procediment of anotacion (procediments no comuns)
+			objectesAclIds.add(metaExpedient.getId());
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio()) {
+				logger.info("1. Permission on procediment of anotacion (procediments no comuns): " + objectesAclIds);
+			}
+			
+			if (isProcedimentNoComu) {
+				// 2. Permission on organ of procediment of anotacio (procediments no comuns)
+				List<Long> organPathIds = organGestorHelper.findParesIds(metaExpedient.getOrganGestor().getId(), true);
 				
-				if (isProcedimentNoComu) {
-					// 2. Permission on organ of procediment of anotacio (procediments no comuns)
-					List<Long> organPathIds = organGestorHelper.findParesIds(metaExpedient.getOrganGestor().getId(), true);
-					for (Long orgId : organPathIds) {
-						boolean granted = permisosHelper.isGrantedAny(
-								orgId,
-								OrganGestorEntity.class,
-								new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
-								dadesUsuari.getCodi());
-						if (granted) {
-							addDestinatari(
-									dadesUsuari.getCodi(),
-									emailsNoAgrupats,
-									emailsAgrupats,
-									EventTipusEnumDto.NOVA_ANOTACIO,
-									"Email nova anotació. 2. Permission on organ of procediment: " + orgId + ", user: " + dadesUsuari.getCodi());
-						}
-					}
-					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-						logger.info(dadesUsuari.getCodi() + " 2");
-
-				} else {
-					// 3. Permission on pair organ-procediment of anotacio (procediments comuns)
-					List<Long> organPathIds = organGestorHelper.findParesIds(organ.getId(), true);
-					for (Long orgId : organPathIds) {
-						MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientIdAndOrganGestorId(metaExpedient.getId(), orgId);
-						if (metaExpedientOrganGestor != null) {
-							boolean granted = permisosHelper.isGrantedAny(
-									metaExpedientOrganGestor.getId(),
-									MetaExpedientOrganGestorEntity.class,
-									new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE},
-									dadesUsuari.getCodi());
-							if (granted) {
-								addDestinatari(
-										dadesUsuari.getCodi(),
-										emailsNoAgrupats,
-										emailsAgrupats,
-										EventTipusEnumDto.NOVA_ANOTACIO,
-										"Email nova anotació. 3. Permission on procediment : " + metaExpedient.getId() + "organ: " + orgId + " pair, user: " + dadesUsuari.getCodi());																
-							}
-						}
-					}
-					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-						logger.info(dadesUsuari.getCodi() + " 3");
-					
-					// 4. Permission on organ per procediments comuns (procediments comuns)
-					for (Long orgId : organPathIds) {
-						boolean granted = permisosHelper.isGrantedAny(
-								orgId,
-								OrganGestorEntity.class,
-								new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE},
-								dadesUsuari.getCodi());
-						boolean granted2 = permisosHelper.isGrantedAll(
-								orgId,
-								OrganGestorEntity.class,
-								new Permission[] { ExtendedPermission.COMU },
-								dadesUsuari.getCodi());						
-						if (granted && granted2) {
-							addDestinatari(
-									dadesUsuari.getCodi(),
-									emailsNoAgrupats,
-									emailsAgrupats,
-									EventTipusEnumDto.NOVA_ANOTACIO,
-									"Email nova anotació. 4. Permission per procediment comuns: " + metaExpedient.getId() +  "on organ: " + orgId +  ", user: " + dadesUsuari.getCodi());	
-								
-						}
-					}
-					if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-						logger.info(dadesUsuari.getCodi() + " 4");
+				objectesAclIds.addAll(organPathIds);
+				
+				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio()) {
+					logger.info("2. Permission on organ of procediment of anotacio (procediments no comuns): " + organPathIds);
 				}
-			}	
+			} else {
+				// 3. Permission on pair organ-procediment of anotacio (procediments comuns)
+				List<Long> organPathIds = organGestorHelper.findParesIds(organ.getId(), true);
+				
+				for (Long orgId : organPathIds) {
+					MetaExpedientOrganGestorEntity metaExpedientOrganGestor = metaExpedientOrganGestorRepository.findByMetaExpedientIdAndOrganGestorId(metaExpedient.getId(), orgId);
+					if (metaExpedientOrganGestor != null)
+						objectesAclIds.add(metaExpedientOrganGestor.getId());
+				}
+				
+				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio()) {
+					logger.info("3. Permission on pair organ-procediment of anotacio (procediments comuns): " + organPathIds);
+				}
+				
+				// 4. Permission on organ per procediments comuns (procediments comuns)
+				usuarisDobleCondicio = permisosHelper.findPermisosObjectes(
+						organPathIds,
+						new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
+						new Permission[] { ExtendedPermission.COMU});
+				
+				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio() && usuarisDobleCondicio != null && ! usuarisDobleCondicio.isEmpty()) {
+					logger.info("4. Permission on organ per procediments comuns (procediments comuns): " + usuarisDobleCondicio.size());
+				}
+				
+				usuarisAmbPermis.addAll(usuarisDobleCondicio);
+			}
+			
+			// Usuaris amb permís sobre procediment o òrgan del procediment
+			usuarisUnaCondicio = permisosHelper.findPermisosObjectes(
+					objectesAclIds,
+					new Permission[] { ExtendedPermission.CREATE, ExtendedPermission.WRITE },
+					null);
+			
 			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 				logger.info("dadesUsuariFindAmbGrup(tothom) time:  " + (System.currentTimeMillis() - t4) + " ms");
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio() && usuarisUnaCondicio != null && ! usuarisUnaCondicio.isEmpty()) {
+				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (objectesAclIds): " + objectesAclIds);
+				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (usuarisUnaCondicio): " + usuarisUnaCondicio.size());
+			}
+			
+			usuarisAmbPermis.addAll(usuarisUnaCondicio);
+			
+			if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio() && usuarisAmbPermis != null && ! usuarisAmbPermis.isEmpty()) {
+				logger.info("Usuaris amb permís sobre procediment o òrgan del procediment (usuarisAmbPermis): " + usuarisAmbPermis.size());
+			}
+			
+			for (PermisDto permisDto : usuarisAmbPermis) {
+				addDestinatari(
+						permisDto.getPrincipalNom(), 
+						emailsNoAgrupats, 
+						emailsAgrupats,
+						EventTipusEnumDto.NOVA_ANOTACIO, 
+						"Email nova anotació. Permission on objects ACL: " + metaExpedient.getId() + ", user: " + permisDto.getPrincipalNom());
+			}		
 		}
-
 		
 		String subject = getPrefixRipea() + " Nova anotació pendent";
 		String text = 
