@@ -32,7 +32,7 @@ ALTER TABLE ipa_grup ADD organ_id NUMBER(19);
 
 ALTER TABLE ipa_grup ADD CONSTRAINT ipa_organ_grup_fk FOREIGN KEY (organ_id) REFERENCES ipa_organ_gestor (id);
 
-ALTER TABLE ipa_metaexpedient ADD grup_per_defecte NUMBER(19) NOT NULL;
+ALTER TABLE ipa_metaexpedient ADD grup_per_defecte NUMBER(19);
 
 ALTER TABLE ipa_metaexpedient ADD CONSTRAINT ipa_grup_metaexp_fk FOREIGN KEY (grup_per_defecte) REFERENCES ipa_grup (id);
 
