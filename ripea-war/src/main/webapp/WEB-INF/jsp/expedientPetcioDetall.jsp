@@ -281,6 +281,11 @@ tr.clicable {
 		<li role="presentation">
 			<a href="#informacio" aria-controls="informacio" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.informacio"/></a>
 		</li>
+		<c:if test="${peticio.estat == 'REBUTJAT'}">
+			<li role="presentation">
+				<a href="#rebutjadaInfo" aria-controls="rebutjadaInfo" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.rebutjada.info"/></a>
+			</li>
+		</c:if>
 		<li role="presentation">
 			<a href="#interessats" aria-controls="interessats" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.interessats"/>&nbsp;<span class="badge">${fn:length(registre.interessats)}</span></a>
 		</li>
@@ -714,6 +719,27 @@ tr.clicable {
 					</div>
 				</div>
 			</div>
+		</div>
+		
+		<!------------------------------ TABPANEL INFORMACIO ------------------------------------->
+		<div class="tab-pane in" id="rebutjadaInfo" role="tabpanel">
+			<table class="table table-bordered">
+				<tbody>
+					<tr>
+						<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.motiu"/></strong></td>
+						<td>${peticio.observacions}</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.data"/></strong></td>
+						<td>${peticio.dataActualitzacioStr}</td>
+					</tr>
+					<tr>
+						<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.usuari"/></strong></td>
+						<td>${peticio.usuariActualitzacio}</td>
+					</tr>
+		
+				</tbody>
+			</table>
 		</div>
 		
 		<!------------------------------ TABPANEL INTERESSATS ------------------------------------->
