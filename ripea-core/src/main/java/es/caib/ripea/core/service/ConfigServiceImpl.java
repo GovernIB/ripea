@@ -1,20 +1,7 @@
 package es.caib.ripea.core.service;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.google.common.base.Strings;
-
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
@@ -36,6 +23,17 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.config.ConfigGroupRepository;
 import es.caib.ripea.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
@@ -105,6 +103,7 @@ public class ConfigServiceImpl implements ConfigService {
             ConfigEntity nova = new ConfigEntity();
             nova.crearConfigNova(keyOrgan, organGestor.getEntitat().getCodi(), organGestor.getCodi(), configEntity);
             nova.setValue(property.getValue());
+            nova.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
             configRepository.save(nova);
         } else {
         	throw new RuntimeException("La configuració per aquest òrgan ja esta creat");
@@ -123,6 +122,7 @@ public class ConfigServiceImpl implements ConfigService {
         ConfigEntity confOrgan = configRepository.findOne(property.getKey());
         if (confOrgan != null) {
         	confOrgan.setValue(property.getValue());
+            confOrgan.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
         }
         
 //        pluginHelper.reloadProperties(confOrgan.getGroupCode());
