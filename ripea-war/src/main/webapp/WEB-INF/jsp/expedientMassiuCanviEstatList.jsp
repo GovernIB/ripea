@@ -218,7 +218,6 @@ function enableDisableSelection($this, tipus) {
 	<table id="taulaDades" 
 		data-toggle="datatable" 
 		data-url="<c:url value="/massiu/canviEstat/datatable"/>"
-		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
 		data-default-order="5" 
 		data-default-dir="desc"

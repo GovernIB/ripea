@@ -1685,6 +1685,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
 					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
+					expedientFiltreCalculat.getGrup() == null,
+					expedientFiltreCalculat.getGrup(),
 					pageable);
 			if (cacheHelper.mostrarLogsRendiment())
 				logger.info("findByEntitatAndPermesosAndFiltre time:  " + (System.currentTimeMillis() - t10) + " ms");
@@ -1693,7 +1695,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					paginaExpedients,
 					ExpedientDto.class,
 					rolActual,
-					new ConverterParam<ExpedientEntity, ExpedientDto>() {
+					new ConverterParam<ExpedientEntity, ExpedientDto, String>() {
 						@Override
 						public ExpedientDto convert(ExpedientEntity source, String param) {
 							return expedientHelper.toExpedientDto(source, false, true, param, true);
@@ -1761,7 +1763,9 @@ public class ExpedientServiceImpl implements ExpedientService {
 					rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"),
 					filtre.isAmbFirmaPendent(),
 					Utils.isEmpty(filtre.getNumeroRegistre()),
-					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "");
+					! Utils.isEmpty(filtre.getNumeroRegistre()) ? filtre.getNumeroRegistre() : "",
+					expedientFiltreCalculat.getGrup() == null,
+					expedientFiltreCalculat.getGrup());
 
 			result.setIds(expedientsIds);
 			if (cacheHelper.mostrarLogsRendiment())
@@ -1790,6 +1794,11 @@ public class ExpedientServiceImpl implements ExpedientService {
 			metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
 		}
 		expedientFiltreCalculat.setMetaExpedientFiltre(metaExpedientFiltre);
+		
+		if (filtre.getGrupId() != null) {
+			expedientFiltreCalculat.setGrup(grupRepository.findOne(filtre.getGrupId()));
+		}
+		
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("comprovarMetaExpedientPerExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
@@ -1976,7 +1985,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					paginaExpedientsRelacionats,
 					ExpedientDto.class,
 					"tothom",
-					new ConverterParam<ExpedientEntity, ExpedientDto>() {
+					new ConverterParam<ExpedientEntity, ExpedientDto, String>() {
 						@Override
 						public ExpedientDto convert(ExpedientEntity source, String param) {
 							return expedientHelper.toExpedientDto(source, false, false, param, true);

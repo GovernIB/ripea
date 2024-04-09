@@ -10,6 +10,7 @@ import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
@@ -29,6 +30,8 @@ public class ExpedientFiltreCalculat implements Serializable {
 	private List<ExpedientEntity> expedientsToBeExluded;
 	
 	private List<Long> idsMetaExpedientsDomini;
+	
+	private GrupEntity grup;
 	
 	
 	public OrganGestorEntity getOrganGestorFiltre() {
@@ -58,6 +61,11 @@ public class ExpedientFiltreCalculat implements Serializable {
 
 	public List<Long> getIdsMetaExpedientsDomini() {
 		return Utils.getNullIfEmpty(idsMetaExpedientsDomini);
+	}
+
+
+	public GrupEntity getGrup() {
+		return grup;
 	}
 
 

@@ -3,6 +3,8 @@
  */
 package es.caib.ripea.war.command;
 
+import javax.validation.constraints.NotNull;
+
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
@@ -13,6 +15,7 @@ import lombok.Setter;
 @Setter
 public class RelacionarGrupCommand {
 
+	@NotNull
     private Long grupId;
     private Long organId;
     private boolean perDefecte;

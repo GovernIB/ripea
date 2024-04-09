@@ -149,7 +149,7 @@ public class ExpedientPeticioHelper0 {
 				
 				long t6 = System.currentTimeMillis();
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-					logger.info("anotacioGuardar evictCountAnotacionsPendents start (" + identificador + ", " + expedientPeticioId + ")");
+					logger.info("anotacioGuardar novaAnotacioPendent start (" + identificador + ", " + expedientPeticioId + ")");
 				
 				try {
 					emailHelper.novaAnotacioPendent(expedientPeticioId);
@@ -158,7 +158,7 @@ public class ExpedientPeticioHelper0 {
 				}
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
-					logger.info("anotacioGuardar evictCountAnotacionsPendents end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t6) + " ms");
+					logger.info("anotacioGuardar novaAnotacioPendent end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t6) + " ms");
 
 			} catch (Throwable e) {
 

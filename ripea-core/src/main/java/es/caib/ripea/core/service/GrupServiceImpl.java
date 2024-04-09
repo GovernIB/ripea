@@ -2,6 +2,7 @@ package es.caib.ripea.core.service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,6 +35,7 @@ import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.GrupHelper;
+import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
@@ -330,6 +332,10 @@ public class GrupServiceImpl implements GrupService {
 		
 		metaExpedientEntity.addGrup(grupEntity);
 		
+		if (marcarPerDefecte) {
+			metaExpedientEntity.setGrupPerDefecte(grupEntity);
+		}
+		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
 		}
@@ -357,12 +363,13 @@ public class GrupServiceImpl implements GrupService {
 		
 		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(metaExpedientId);
 		
-		GrupEntity grupEntity = grupRepository.findOne(id);
+		GrupEntity grupEntity = HibernateHelper.deproxy(grupRepository.findOne(id));
+
+		metaExpedientEntity.removeGrup(grupEntity);
 		
-		if (grupEntity.equals(metaExpedientEntity.getGrupPerDefecte())) {
+		if (metaExpedientEntity.getGrupPerDefecte() != null && grupEntity.getId().equals(metaExpedientEntity.getGrupPerDefecte().getId())) {
 			metaExpedientEntity.setGrupPerDefecte(null);
 		}
-		metaExpedientEntity.removeGrup(grupEntity);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientEntity.getId(), organId);
@@ -417,45 +424,65 @@ public class GrupServiceImpl implements GrupService {
 		
 	}
 	
+	@Transactional
+	@Override
+	public boolean checkIfHasGrupPerDefecte(
+			Long procedimentId) throws NotFoundException {
+		
+		MetaExpedientEntity metaExpedientEntity = metaExpedientRepository.findOne(procedimentId);
+		return metaExpedientEntity.getGrupPerDefecte() != null;
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
-	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long organGestorId) {
+	public List<GrupDto> findGrupsNoRelacionatAmbMetaExpedient(Long entitatId, Long metaExpedientId, Long adminOrganId) {
 	
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 		
-		List<GrupEntity> grupsProcediment = metaExpedientRepository.findOne(metaExpedientId).getGrups();
+		MetaExpedientEntity metaExpedient = metaExpedientRepository.findOne(metaExpedientId);
+		Long procedimentOrganId = metaExpedient.getOrganGestor() != null ? metaExpedient.getOrganGestor().getId() : null;
+		List<GrupEntity> grupsProcedimentExisting = metaExpedient.getGrups();
 		
-		List<GrupEntity> grupsAll = grupRepository.findByEntitatId(entitatId);
+		List<GrupEntity> grups = grupRepository.findByEntitatId(entitatId);
 		
-		List<GrupDto> grupsDto = new ArrayList<>();
-	
-		for (GrupEntity grupEntity : grupsAll) {
+		
+		// remove grups already related to procediment
+		for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+			GrupEntity grup = iter.next();
 			
-			boolean keepChecking = false;
-			if (organGestorId != null) {
-				if (grupEntity.getOrganGestor() != null && organGestorHelper.findParesIds(grupEntity.getOrganGestor().getId(), true).contains(organGestorId)) {
-					keepChecking = true;
+			boolean contains = false;
+			for (GrupEntity gr : grupsProcedimentExisting) {
+				if (gr.getId().equals(grup.getId())) {
+					contains = true;
+					break;
 				}
-			} else {
-				keepChecking = true;
 			}
-			
-			if (keepChecking) {
-				boolean contains = false;
-				for (GrupEntity gr : grupsProcediment) {
-					if (gr.getId().equals(grupEntity.getId())) {
-						contains = true;
-						break;
-					}
+			if (contains) {
+				iter.remove();
+			}
+		}
+		
+		// if is called by administador d'organ only leave grups assigned to organ or descendents
+		if (adminOrganId != null) {
+			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+				GrupEntity grup = iter.next();
+				if (grup.getOrganGestor() == null || !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(adminOrganId)) {
+					iter.remove();
 				}
-				if (!contains) {
-					grupsDto.add( conversioTipusHelper.convertir(grupEntity, GrupDto.class));
-				} 
 			}
-
+		} 
+		
+		// if procediment belongs to organ remove grups that belong to other organ
+		if (procedimentOrganId != null) {
+			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+				GrupEntity grup = iter.next();
+				if (grup.getOrganGestor() != null && !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(procedimentOrganId)) {
+					iter.remove();
+				}
+			}
 		}
 
-		return grupsDto;
+		return conversioTipusHelper.convertirList(grups, GrupDto.class);
 	}
 	
 	
@@ -567,15 +594,8 @@ public class GrupServiceImpl implements GrupService {
 			
 			if (cacheHelper.mostrarLogsGrups())
 				logger.info("exPet=" + exPet.getId() + ", " + exPet.getIdentificador());
-			
-			OrganGestorEntity org = metaExpedient.getOrganGestor();
-			if (cacheHelper.mostrarLogsGrups())
-				logger.info("orgMetaExpedient");
-			if (org == null) {
-				org = organGestorRepository.findByCodi(exPet.getRegistre().getDestiCodi());
-				if (cacheHelper.mostrarLogsGrups())
-					logger.info("orgPeticio=");
-			}
+
+			OrganGestorEntity org = organGestorRepository.findByCodi(exPet.getRegistre().getDestiCodi());
 
 			while (grup == null && org != null) {
 				

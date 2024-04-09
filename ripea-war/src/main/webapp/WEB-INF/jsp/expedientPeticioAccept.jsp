@@ -93,8 +93,8 @@ $(document).ready(function(){
 
 	$('#metaExpedientId').on('change', function() {
 		var tipus = $(this).val();
-		var expedientId = $('#expedientId').val();
-		
+		// var expedientId = $('#expedientId').val();
+
 		$('#expedientId').select2('val', '', true);
 		$('#expedientId option[value!=""]').remove();
 		
@@ -104,11 +104,12 @@ $(document).ready(function(){
 			$.get("<c:url value="/expedientPeticio/expedients/"/>"+${entitatId}+"/"+tipus)
 			.done(function(data){
 				for (var i = 0; i < data.length; i++) {
-					if (data[i].id == expedientId) {
-						$('#expedientId').append('<option value="' + data[i].id + '" selected>' + data[i].numeroINom + '</option>');
-					} else {
-						$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].numeroINom + '</option>');
-					}
+                    $('#expedientId').append('<option value="' + data[i].id + '">' + data[i].numeroINom + '</option>');
+					// if (data[i].id == expedientId) {
+					// 	$('#expedientId').append('<option value="' + data[i].id + '" selected>' + data[i].numeroINom + '</option>');
+					// } else {
+					// 	$('#expedientId').append('<option value="' + data[i].id + '">' + data[i].numeroINom + '</option>');
+					// }
 				}
 				$('#expedientId').next().find('span.fa-circle-o-notch').addClass('select2-selection__arrow').removeClass('fa fa-spin fa-circle-o-notch  fa-1x');
 			})
@@ -233,9 +234,18 @@ function refrescarGrups() {
 		if (gestioAmbGrupsActiva) {
 			$("#grupsActiu").removeClass("hidden");
 
-			if (typeof firstTime === 'undefined' && '${expedientPeticioAcceptarCommand.grupId}') {
-				$('#grupId').val(${expedientPeticioAcceptarCommand.grupId});
-				grupIdDefault = '${expedientPeticioAcceptarCommand.grupId}';
+			<c:choose>
+				<c:when test="${not empty expedientPeticioAcceptarCommand.grupId}">
+					let grupId = ${expedientPeticioAcceptarCommand.grupId};
+				</c:when>
+				<c:otherwise>
+					let grupId = '';
+				</c:otherwise>
+			</c:choose>
+
+			if (typeof firstTime === 'undefined' && grupId) {
+				$('#grupId').val(grupId);
+				grupIdDefault = grupId;
 				firstTime = 'defined';	
 			} else {
 				grupIdDefault = '';

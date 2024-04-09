@@ -29,4 +29,12 @@ public class GrupDto {
 			return permisos.size();
 	}
 
+	public String getCodiDescripcioIsEntitat() {
+		String result = "";
+		if (organGestor == null) {
+			result = "isEntitat";
+		}
+		result += codi + " - " + descripcio;
+		return result;
+	}
 }

@@ -334,11 +334,7 @@ body {
 								<%---- Integracions ----%>
 								<li><a href="<c:url value="/integracio"/>"><spring:message code="decorator.menu.integracions"/></a></li>
 								<%---- Excepcions ----%>
-								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>
-								<%---- Annotacions comunicadas ----%>
-								<li><a href="<c:url value="/expedientPeticioComunicades"></c:url>">
-									<spring:message code="decorator.menu.anotacionsComunicades"/>
-								</a></li>					
+								<li><a href="<c:url value="/excepcio"/>"><spring:message code="decorator.menu.excepcions"/></a></li>				
 								<li><a href="<c:url value="/monitor"/>" data-toggle="modal" data-maximized="true"><spring:message code="decorator.menu.monitor"/></a></li>											
 							</ul>
 						</div>
@@ -434,6 +430,12 @@ body {
 									</a>
 								</li>															
 								
+								<%---- Annotacions comunicadas ----%>
+								<li>
+									<a href="<c:url value="/expedientPeticioComunicades"></c:url>">
+										<spring:message code="decorator.menu.anotacionsComunicades"/>
+									</a>
+								</li>	
 								
 																
 							</ul>

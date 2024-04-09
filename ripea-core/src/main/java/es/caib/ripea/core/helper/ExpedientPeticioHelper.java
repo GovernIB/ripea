@@ -321,13 +321,13 @@ public class ExpedientPeticioHelper {
 	private void calcularGrup(ExpedientPeticioEntity expedientPeticioEntity) {
 		
 		if (cacheHelper.mostrarLogsGrups())
-			logger.info("calcularGrupAlRecibirAnotacio start (expedientPeticio=" + expedientPeticioEntity.getId() + ", " + expedientPeticioEntity.getIdentificador());
+			logger.info("calcularGrupAlRecibirAnotacio start (expedientPeticio=" + expedientPeticioEntity.getId() + " - " + expedientPeticioEntity.getIdentificador());
 		
 		GrupEntity grup = null;
 		MetaExpedientEntity metaExpedient = expedientPeticioEntity.getMetaExpedient();
 		
 		if (cacheHelper.mostrarLogsGrups())
-			logger.info("metaExpedient= " + metaExpedient.getId() + ", " + metaExpedient.getCodi());
+			logger.info("metaExpedient= " + metaExpedient.getId() + " - " + metaExpedient.getCodi());
 		
 		if (metaExpedient != null && metaExpedient.isGestioAmbGrupsActiva()) {
 			
@@ -345,11 +345,11 @@ public class ExpedientPeticioHelper {
 				while (grup == null && org != null) {
 					
 					if (cacheHelper.mostrarLogsGrups())
-						logger.info("organ=" + org.getId() + ", " + org.getCodi());
+						logger.info("organ=" + org.getId() + " - " + org.getCodi());
 					
 					for (GrupEntity grupEntity : grups) {
 						if (cacheHelper.mostrarLogsGrups())
-							logger.info("grup=" + grupEntity.getId() + ", " + grupEntity.getCodi() + ", " + grupEntity.getOrganGestor());
+							logger.info("grup=" + grupEntity.getId() + " - " + grupEntity.getCodi() + " - " + grupEntity.getOrganGestor());
 						
 						if (grupEntity.getOrganGestor() != null && grupEntity.getOrganGestor().getId().equals(org.getId())) {
 							grup = grupEntity;
@@ -366,6 +366,8 @@ public class ExpedientPeticioHelper {
 				}
 			}
 		}
+		
+		expedientPeticioEntity.setGrup(grup);
 		
 		if (cacheHelper.mostrarLogsGrups())
 			logger.info("calcularGrupAlRecibirAnotacio end (expedientPeticio=" + expedientPeticioEntity.getId() + ", " + expedientPeticioEntity.getIdentificador());

@@ -56,6 +56,7 @@ import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.AvisEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientCarpetaEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
@@ -910,7 +911,8 @@ public class MetaExpedientHelper {
 	
 	
 	public MetaExpedientDto toMetaExpedientDto(
-			MetaExpedientEntity metaExpedient) {
+			MetaExpedientEntity metaExpedient, 
+			Long adminOrganId) {
 		MetaExpedientDto metaExpedientDto = conversioTipusHelper.convertir(metaExpedient, MetaExpedientDto.class);
 		
 		metaNodeHelper.omplirMetaDadesPerMetaNode(metaExpedientDto);
@@ -920,7 +922,18 @@ public class MetaExpedientHelper {
 		metaExpedientDto.setExpedientEstatsCount(expedientEstatRepository.countByMetaExpedient(metaExpedient));
 		metaExpedientDto.setExpedientTasquesCount(
 				metaExpedientTascaRepository.countByMetaExpedient(metaExpedient));
-		metaExpedientDto.setGrupsCount(metaExpedient.getGrups().size());
+		
+		List<GrupEntity> grups = metaExpedient.getGrups();
+		if (adminOrganId != null) {
+			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+				GrupEntity grup = iter.next();
+				if (grup.getOrganGestor() == null || !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(adminOrganId)) {
+					iter.remove();
+				}
+			}
+		}
+		metaExpedientDto.setGrupsCount(grups.size());
+		
 		metaExpedientDto.setNumComentaris(metaExpedient.getComentaris().size());
 		if (metaExpedient.getOrganGestor() != null) {
 			metaExpedientDto.setOrganEstat(metaExpedient.getOrganGestor().getEstat());

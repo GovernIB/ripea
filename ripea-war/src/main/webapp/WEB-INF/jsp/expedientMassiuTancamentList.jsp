@@ -123,7 +123,6 @@ $(document).ready(function() {
 	<table id="taulaDades" 
 		data-toggle="datatable" 
 		data-url="<c:url value="/massiu/tancament/datatable"/>"
-		data-filter="#contingutMassiuFiltreCommand"
 		class="table table-bordered table-striped" 
 		data-default-order="6" 
 		data-default-dir="desc"

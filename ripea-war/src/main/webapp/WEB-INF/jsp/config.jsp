@@ -196,6 +196,7 @@ $(document).ready(function() {
         		
         		var url = '<c:url value="/config/' + keyUnderscore + '/datatable"/>';
         		var scriptAccionsId = 'cellAccionsTemplate_' + keyUnderscore;
+        		var scriptDescendentsId = 'cellDescendentsTemplate_' + keyUnderscore;
         		var scriptValueId = 'cellValueTemplate_' + keyUnderscore;
 
         		var tableHtml ='';
@@ -212,8 +213,8 @@ $(document).ready(function() {
         		tableHtml += '	<tr> '
             	tableHtml += '		<th data-col-name="typeCode" data-visible="false"></th> '            		
                 tableHtml += '		<th data-col-name="key" data-visible="false"></th> '                   	
-        		tableHtml += '		<th data-col-name="organGestorCodiNom" data-orderable="true" width="45%"><spring:message code="metaexpedient.form.camp.organgestor"/></th> '
-        		tableHtml += '		<th data-col-name="value" data-template="#' + scriptValueId + '" data-orderable="true" width="45%"><spring:message code="config.propietats.form.camp.value"/> '
+        		tableHtml += '		<th data-col-name="organGestorCodiNom" data-orderable="true" width="40%"><spring:message code="metaexpedient.form.camp.organgestor"/></th> '
+        		tableHtml += '		<th data-col-name="value" data-template="#' + scriptValueId + '" data-orderable="true" width="40%"><spring:message code="config.propietats.form.camp.value"/> '
         		tableHtml += '			<script id="' + scriptValueId + '" type="text/x-jsrender"> '  
         		tableHtml += '				<div style="min-height: 20px;"> '        		     	
         		tableHtml += '				{{if typeCode == "BOOL"}} '
@@ -227,7 +228,13 @@ $(document).ready(function() {
                 tableHtml += '				<div class="table-organ-key">{{:key}}</div> '                                             						
             	tableHtml += '				</div> '                	          		
         		tableHtml += '			</'+'script> '
-       			tableHtml += '		</th> '        		
+       			tableHtml += '		</th> '
+                tableHtml += '		<th data-col-name="configurableOrgansDescendents" data-template="#' + scriptDescendentsId + '" data-orderable="true" width="15%">'
+                tableHtml += '          <spring:message code="config.propietats.form.camp.organs.descendents"/>'
+                tableHtml += '			<script id="' + scriptDescendentsId + '" type="text/x-jsrender"> '
+                tableHtml += '				{{if configurableOrgansDescendents}}<span class="fa fa-check"></span>{{/if}} '
+                tableHtml += '			</'+'script> '
+                tableHtml += '      </th> '
         		tableHtml += '		<th data-col-name="key" data-template="#' + scriptAccionsId + '" data-orderable="false" width="1%"> '
         		tableHtml += '			<script id="' + scriptAccionsId + '" type="text/x-jsrender"> '       	
         		tableHtml += '				<div class="flex-space-between"> '

@@ -1,8 +1,12 @@
 package es.caib.ripea.core.entity.config;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.core.entity.UsuariEntity;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,15 +18,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.entity.UsuariEntity;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Classe del model de dades que representa una alerta d'error en segón pla.
@@ -72,6 +70,9 @@ public class ConfigEntity {
     
     @Column(name = "configurable_organ_actiu")
     private boolean configurableOrganActiu;
+
+    @Column(name = "configurable_org_descendents")
+    private boolean configurableOrgansDescendents;
     
     @Column(name = "organ_codi", length = 64)
     private String organCodi;

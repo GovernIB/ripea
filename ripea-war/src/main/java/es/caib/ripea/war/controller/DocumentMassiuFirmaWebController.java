@@ -48,6 +48,7 @@ import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.FirmaSimpleWebCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -59,7 +60,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/massiu/firmasimpleweb")
 public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuFirmaWebController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "DocumentMassiuFirmaWebController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "DocumentMassiuFirmaWebController.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_DATA_INICI = "DocumentMassiuFirmaWebController.session.data.inici";
 
@@ -466,7 +467,7 @@ public class DocumentMassiuFirmaWebController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new ContingutMassiuFiltreCommand();
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

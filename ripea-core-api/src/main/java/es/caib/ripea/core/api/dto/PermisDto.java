@@ -41,6 +41,20 @@ public class PermisDto implements Serializable {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		PermisDto permis = (PermisDto) obj;
+		return (id.equals(permis.getId()) && principalNom.equals(permis.getPrincipalNom()));
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		return prime + ((id == null) ? 0 : id.hashCode());
+	}
+	
 	public boolean getAmbOrganGestor() {
 		return organGestorId != null;
 	}

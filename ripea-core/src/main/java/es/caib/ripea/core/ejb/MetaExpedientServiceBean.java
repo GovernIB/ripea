@@ -489,8 +489,12 @@ public class MetaExpedientServiceBean implements MetaExpedientService {
 	@RolesAllowed({"tothom"})
 	public MetaExpedientDto findByIdAmbElements(
 			Long entitatId,
-			Long id) {
-		return delegate.findByIdAmbElements(entitatId, id);
+			Long id, 
+			Long adminOrganId) {
+		return delegate.findByIdAmbElements(
+				entitatId,
+				id,
+				adminOrganId);
 	}
 
 //    @Override

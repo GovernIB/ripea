@@ -272,10 +272,16 @@ public class AplicacioServiceBean implements AplicacioService {
 		return delegate.doesCurrentUserHasRol(rol);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public Long getProcedimentPerDefecte(Long entitatId, String rolActual) {
+		return delegate.getProcedimentPerDefecte(entitatId, rolActual);
+	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public Long getProcedimentPerDefecte() {
-		return delegate.getProcedimentPerDefecte();
+	public boolean mostrarLogsCercadorAnotacio() {
+		return delegate.mostrarLogsCercadorAnotacio();
 	}
+	
 }

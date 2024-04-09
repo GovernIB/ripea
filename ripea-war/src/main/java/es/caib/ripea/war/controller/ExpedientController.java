@@ -96,7 +96,7 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/expedient")
 public class ExpedientController extends BaseUserOAdminOOrganController {
 
-	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientUserController.session.filtre";
 	public static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientUserController.session.seleccio";
 	public static final String SESSION_ATTRIBUTE_RELACIONAR_SELECCIO = "ExpedientUserController.relacionar.session.seleccio";
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
@@ -1948,7 +1948,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			filtreCommand.setExpedientEstatId(Long.valueOf(0));
 			
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			
 		}
 		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);

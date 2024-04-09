@@ -49,6 +49,30 @@ public interface AclObjectIdentityRepository extends JpaRepository<AclObjectIden
 			@Param("sids") List<AclSidEntity> sids, 
 			@Param("mask1") Integer mask1,
 			@Param("mask2") Integer mask2);
+	
+	@Query(	"select " +
+			"    distinct oi " +
+			"from " +
+			"    AclObjectIdentityEntity oi " +
+			"where " +
+			"    oi.objectId in (:objectsIdentityIdx) " +
+			"and (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.mask in (:masksIn1) and entry.granting = true) > 0")
+	public List<AclObjectIdentityEntity> findByAclObjectIdentityInAndMaskIn(
+			@Param("objectsIdentityIdx") List<Long> objectsIdentityIdx,
+			@Param("masksIn1") List<Integer> masksIn1);
+	
+	@Query(	"select " +
+			"    distinct oi " +
+			"from " +
+			"    AclObjectIdentityEntity oi " +
+			"where " +
+			"    oi.objectId in (:objectsIdentityIdx) " +
+			"and (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.mask in (:masksIn1) and entry.granting = true) > 0 " +
+			"and (:masksIn2 is null or (select count(entry) from AclEntryEntity entry where entry.aclObjectIdentity = oi and entry.mask in (:masksIn2) and entry.granting = true) > 0) ")
+	public List<AclObjectIdentityEntity> findByAclObjectIdentityInAndMaskIn(
+			@Param("objectsIdentityIdx") List<Long> objectsIdentityIdx,
+			@Param("masksIn1") List<Integer> masksIn1, 
+    		@Param("masksIn2") List<Integer> masksIn2);
 
     AclObjectIdentityEntity findByClassnameAndObjectId(AclClassEntity classname, Long id);
 }

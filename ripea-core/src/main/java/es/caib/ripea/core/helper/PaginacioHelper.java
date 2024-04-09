@@ -109,7 +109,7 @@ public class PaginacioHelper {
 	}
 	
 	
-	public <S, T> PaginaDto<T> toPaginaDto(Page<S> page, Class<T> targetType, String param, ConverterParam<S, T> converter) {
+	public <S, T, P> PaginaDto<T> toPaginaDto(Page<S> page, Class<T> targetType, P param, ConverterParam<S, T, P> converter) {
 		PaginaDto<T> dto = new PaginaDto<T>();
 		dto.setNumero(page.getNumber());
 		dto.setTamany(page.getSize());
@@ -193,10 +193,13 @@ public class PaginacioHelper {
 
 	}
 	
-	public interface ConverterParam<S, T> {
+	public interface ConverterParam<S, T, P> {
 
-		T convert(S source, String param);
+		T convert(S source, P param);
 
 	}
+	
+
+	
 
 }

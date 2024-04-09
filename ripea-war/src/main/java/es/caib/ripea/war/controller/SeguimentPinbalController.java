@@ -23,6 +23,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.war.command.SeguimentConsultaFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -32,7 +33,7 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/seguimentPinbal")
 public class SeguimentPinbalController extends BaseAdminController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentPinbalController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentPinbalController.session.filtre";
 	
     @Autowired
     private SeguimentService seguimentService;
@@ -112,7 +113,7 @@ public class SeguimentPinbalController extends BaseAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentConsultaFiltreCommand();
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

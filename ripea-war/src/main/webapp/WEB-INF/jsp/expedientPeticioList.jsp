@@ -177,9 +177,6 @@ table.dataTable td {
 								{{if estatView == 'ACCEPTAT'}}
 									<li><a href="contingut/{{:expedientId}}"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.expedient"/></a></li>
 								{{/if}}
-								{{if estatView == 'REBUTJAT'}}
-									<li><a href="<c:url value="/expedientPeticio/rebutjadaInfo/{{:id}}"/>" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.rebutjadaInfo"/></a></li>
-								{{/if}}
 								<c:if test="${isRolActualAdmin}">
 									{{if pendentEnviarDistribucio}}
 										<li><a href="<c:url value="/expedientPeticio/canviarEstatDistribucio/{{:id}}"/>"><span class="fa fa-mail-forward"></span>&nbsp;&nbsp;<spring:message code="expedient.peticio.list.btn.canviar.estat.anotacio.distribucio"/>{{:expedientId}}</a></li>

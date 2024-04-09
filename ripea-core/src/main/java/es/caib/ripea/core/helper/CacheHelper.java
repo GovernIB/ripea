@@ -718,12 +718,15 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsIntegracio")
 	public boolean mostrarLogsIntegracio() {
-		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.integracio");
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.integracio");
 		if (prop != null && prop.equals("true")) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	@CacheEvict(value = "mostrarLogsIntegracio")
+	public void evictMostrarLogsIntegracio() {
 	}
 	
 	@CacheEvict(value = "mostrarLogsEmail")
@@ -772,12 +775,15 @@ public class CacheHelper {
 	
 	@Cacheable(value = "mostrarLogsSegonPla")
 	public boolean mostrarLogsSegonPla() {
-		String prop = PropertiesHelper.getProperties().getProperty("es.caib.ripea.mostrar.logs.segonpla");
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.segonpla");
 		if (prop != null && prop.equals("true")) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+	@CacheEvict(value = "mostrarLogsSegonPla")
+	public void evictMostrarLogsSegonPla() {
 	}
 	
 	@Cacheable(value = "mostrarLogsRendiment")
@@ -806,6 +812,20 @@ public class CacheHelper {
 	
 	@CacheEvict(value = "mostrarLogsRendimentDescarregarAnotacio")
 	public void evictMostrarLogsRendimentDescarregarAnotacio() {
+	}
+	
+	@Cacheable(value = "mostrarLogsCercadorAnotacio")
+	public boolean mostrarLogsCercadorAnotacio() {
+		String prop = configHelper.getConfig("es.caib.ripea.mostrar.logs.cercador.anotacions");
+		if (prop != null && prop.equals("true")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	@CacheEvict(value = "mostrarLogsCercadorAnotacio")
+	public void evictMostrarLogsCercadorAnotacio() {
 	}
 	
 	

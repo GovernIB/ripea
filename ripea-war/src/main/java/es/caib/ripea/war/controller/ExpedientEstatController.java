@@ -62,7 +62,8 @@ public class ExpedientEstatController extends BaseAdminController {
 		}
 		MetaExpedientDto metaExpedient = metaExpedientService.findByIdAmbElements(
 				entitatActual.getId(),
-				metaExpedientId);
+				metaExpedientId, 
+				RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null);
 		model.addAttribute(
 				"metaExpedient",
 				metaExpedient);

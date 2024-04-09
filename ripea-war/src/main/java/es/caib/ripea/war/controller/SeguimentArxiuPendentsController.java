@@ -45,6 +45,7 @@ import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.service.SeguimentService;
 import es.caib.ripea.war.command.SeguimentArxiuPendentsFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
@@ -59,9 +60,9 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/seguimentArxiuPendents")
 public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganController {
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS = "SeguimentPortafirmesController.session.filtre.expedients";
-	private static final String SESSION_ATTRIBUTE_FILTRE_DOCUMENTS = "SeguimentPortafirmesController.session.filtre.documents";
-	private static final String SESSION_ATTRIBUTE_FILTRE_INTERESSATS = "SeguimentPortafirmesController.session.filtre.interessats";
+	public static final String SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS = "SeguimentPortafirmesController.session.filtre.expedients";
+	public static final String SESSION_ATTRIBUTE_FILTRE_DOCUMENTS = "SeguimentPortafirmesController.session.filtre.documents";
+	public static final String SESSION_ATTRIBUTE_FILTRE_INTERESSATS = "SeguimentPortafirmesController.session.filtre.interessats";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_EXPEDIENTS = "SeguimentPortafirmesController.session.seleccio.expedients";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_DOCUMENTS = "SeguimentPortafirmesController.session.seleccio.documents";
 	private static final String SESSION_ATTRIBUTE_SELECCIO_INTERESSATS = "SeguimentPortafirmesController.session.seleccio.interessats";
@@ -175,7 +176,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentArxiuPendentsFiltreCommand();
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE_EXPEDIENTS,
@@ -243,7 +244,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE_DOCUMENTS);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentArxiuPendentsFiltreCommand();
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE_DOCUMENTS,
@@ -312,7 +313,7 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				SESSION_ATTRIBUTE_FILTRE_INTERESSATS);
 		if (filtreCommand == null) {
 			filtreCommand = new SeguimentArxiuPendentsFiltreCommand();
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE_INTERESSATS,

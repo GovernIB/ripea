@@ -3,8 +3,53 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.*;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -26,8 +71,28 @@ import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
 import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DistribucioReglaHelper;
+import es.caib.ripea.core.helper.DominiHelper;
+import es.caib.ripea.core.helper.EmailHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.ExpedientEstatHelper;
+import es.caib.ripea.core.helper.GrupHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaDadaHelper;
+import es.caib.ripea.core.helper.MetaDocumentHelper;
+import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.MetaNodeHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
+import es.caib.ripea.core.helper.PaginacioHelper.ConverterParam;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.DominiRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
@@ -42,21 +107,6 @@ import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -519,13 +569,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	
 	@Transactional(readOnly = true)
 	@Override
-	public MetaExpedientDto findByIdAmbElements(Long entitatId, Long id) {
+	public MetaExpedientDto findByIdAmbElements(Long entitatId, Long id, Long adminOrganId) {
 		
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
 
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, id);
 
-		MetaExpedientDto resposta = metaExpedientHelper.toMetaExpedientDto(metaExpedient);
+		MetaExpedientDto resposta = metaExpedientHelper.toMetaExpedientDto(metaExpedient, adminOrganId);
 		
 		return resposta;
 	}
@@ -833,7 +883,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
 					@Override
 					public MetaExpedientDto convert(MetaExpedientEntity source) {
-						return metaExpedientHelper.toMetaExpedientDto(source);
+						return metaExpedientHelper.toMetaExpedientDto(source, null);
 					}
 				});
 
@@ -885,10 +935,11 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						filtre.getRevisioEstat(),
 						paginacioHelper.toSpringDataPageable(paginacioParams)),
 				MetaExpedientDto.class,
-				new Converter<MetaExpedientEntity, MetaExpedientDto>() {
+				organGestorId,
+				new ConverterParam<MetaExpedientEntity, MetaExpedientDto, Long>() {
 					@Override
-					public MetaExpedientDto convert(MetaExpedientEntity source) {
-						return metaExpedientHelper.toMetaExpedientDto(source);
+					public MetaExpedientDto convert(MetaExpedientEntity source, Long param) {
+						return metaExpedientHelper.toMetaExpedientDto(source, param);
 					}
 				});
 		

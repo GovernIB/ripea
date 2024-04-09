@@ -57,7 +57,7 @@ import es.caib.ripea.war.helper.RolHelper;
 public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganController {
 	
 	
-	private static final String SESSION_ATTRIBUTE_FILTRE = "MassiuAnnexProcesarController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "MassiuAnnexProcesarController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "MassiuAnnexProcesarController.session.seleccio";
 
 	@Autowired
@@ -461,7 +461,7 @@ public class MassiuAnnexProcesarController extends BaseUserOAdminOOrganControlle
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new MassiuAnnexProcesarFiltreCommand();
-			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte());
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
 			RequestSessionHelper.actualitzarObjecteSessio(
 					request,
 					SESSION_ATTRIBUTE_FILTRE,

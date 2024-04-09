@@ -69,7 +69,8 @@ public class MetaExpedientGrupController extends BaseAdminController {
 				"metaExpedient",
 				metaExpedientService.findByIdAmbElements(
 						entitatActual.getId(),
-						metaExpedientId));
+						metaExpedientId, 
+						RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null));
 		
 		if (metaExpedient != null // es tracta d'una modificació
 				&& RolHelper.isRolActualAdministradorOrgan(request) && metaExpedientService.isRevisioActiva() 
@@ -114,7 +115,14 @@ public class MetaExpedientGrupController extends BaseAdminController {
 	    				true));
 	}
 	
+	@RequestMapping(value = "/checkIfHasGrupPerDefecte/{metaExpedientId}", method = RequestMethod.GET)
+	@ResponseBody
+	public boolean checkIfHasGrupPerDefecte(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientId) {
 
+		return grupService.checkIfHasGrupPerDefecte(metaExpedientId);
+	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/grup/{grupId}/marcarPerDefecte", method = RequestMethod.GET)
 	public String marcarPerDefecte(
@@ -187,6 +195,17 @@ public class MetaExpedientGrupController extends BaseAdminController {
 			@Valid RelacionarGrupCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		
+		if (bindingResult.hasErrors()) {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
+			List<GrupDto> grups = grupService.findGrupsNoRelacionatAmbMetaExpedient(
+					entitatActual.getId(),
+					metaExpedientId, 
+					RolHelper.isRolActualAdministradorOrgan(request) ? EntitatHelper.getOrganGestorActualId(request) : null);
+			model.addAttribute("grups", grups);
+			model.addAttribute("metaExpedientId", metaExpedientId);
+			return "metaExpedientRelacionarGrupForm";
+		}
 
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		

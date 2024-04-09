@@ -34,14 +34,16 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.HistoricService;
 import es.caib.ripea.war.command.HistoricFiltreCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 @Controller
 @RequestMapping("/historic")
 public class HistoricController extends BaseAdminController {
 
-	private static final String SESSION_ATTRIBUTE_FILTRE = "HistoricController.session.filtre";
+	public static final String SESSION_ATTRIBUTE_FILTRE = "HistoricController.session.filtre";
 //	private static final String SESSION_ATTRIBUTE_METRIQUES = "HistoricController.session.metriques";
 	private static final String SESSION_ATTRIBUTE_USUARIS = "HistoricController.session.usuaris";
 	private static final String SESSION_ATTRIBUTE_INTERESSATS = "HistoricController.session.interessats";
@@ -369,8 +371,8 @@ public class HistoricController extends BaseAdminController {
 				SESSION_ATTRIBUTE_FILTRE);
 		if (filtreCommand == null) {
 			filtreCommand = new HistoricFiltreCommand();
-			Long id = aplicacioService.getProcedimentPerDefecte();
-			filtreCommand.setMetaExpedientsIds(id != null ? Arrays.asList(aplicacioService.getProcedimentPerDefecte()) : null);
+			Long id = aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request));
+			filtreCommand.setMetaExpedientsIds(id != null ? Arrays.asList(id) : null);
 			RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
 		}
 //		Cookie cookie = WebUtils.getCookie(request, COOKIE_MEUS_EXPEDIENTS);
