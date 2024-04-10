@@ -143,19 +143,19 @@ table.dataTable td {
 				<th data-col-name="estatView" width="10%" data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
-
 						{{if estatView == 'PENDENT'}}
 							<span class='fa fa-spinner'></span> <spring:message code="expedient.peticio.estat.view.enum.PENDENT"/>
 						{{else estatView == 'ACCEPTAT'}}
 							<span class='fa fa-check'></span> <spring:message code="expedient.peticio.estat.view.enum.ACCEPTAT"/>
+							{{:dataActualitzacioStr}}
 						{{else estatView == 'REBUTJAT'}}
 							<span class='fa fa-close'></span> <spring:message code="expedient.peticio.estat.view.enum.REBUTJAT"/>
-						{{/if}}
+							{{:dataActualitzacioStr}}
+                    	{{/if}}
 
-						{{:dataActualitzacioStr}}
-						{{if pendentEnviarDistribucio}}
-							<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
-							class="fa fa-exclamation-triangle text-danger"></span>
+                    	{{if pendentEnviarDistribucio}}
+                        	<span title="<spring:message code="expedient.peticio.controller.canviar.estat.anotacio.distribucio.avis"/>"
+								class="fa fa-exclamation-triangle text-danger"></span>
 						{{/if}}
 					</script>
 				</th>

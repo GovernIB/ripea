@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.Date;
-
 import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 /**
  * Informació d'un expedient peticio.
@@ -39,6 +39,10 @@ public class ExpedientPeticioDto {
 		return Utils.convertDateToString(dataActualitzacio, "dd-MM-yyyy HH:mm:ss");
 	}
 
+	public String getDataAltaStr() {
+		return Utils.convertDateToString(dataAlta, "dd-MM-yyyy HH:mm:ss");
+	}
+
 	@SuppressWarnings("incomplete-switch")
 	public ExpedientPeticioEstatViewEnumDto getEstatView() {
 		ExpedientPeticioEstatViewEnumDto estatView = null;
@@ -58,4 +62,5 @@ public class ExpedientPeticioDto {
 		}
 		return estatView;
 	}
+
 }

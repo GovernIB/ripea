@@ -3,12 +3,27 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
+import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
+import es.caib.ripea.core.aggregation.HistoricAggregation;
+import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
+import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.config.OrganConfigDto;
+import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
+import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
+import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.entity.config.ConfigEntity;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.TipusDocumentalRepository;
+import ma.glasnost.orika.CustomConverter;
+import ma.glasnost.orika.CustomMapper;
+import ma.glasnost.orika.MapperFacade;
+import ma.glasnost.orika.MapperFactory;
+import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.impl.DefaultMapperFactory;
+import ma.glasnost.orika.metadata.Type;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -20,85 +35,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
 
-import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
-import es.caib.ripea.core.aggregation.HistoricAggregation;
-import es.caib.ripea.core.aggregation.HistoricExpedientAggregation;
-import es.caib.ripea.core.aggregation.HistoricUsuariAggregation;
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.CodiValorDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatPendentDistribucioEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioListDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.NtiTipoDocumentoEnumDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.dto.PermisOrganGestorDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.dto.SeguimentArxiuPendentsDto;
-import es.caib.ripea.core.api.dto.SeguimentConsultaPinbalDto;
-import es.caib.ripea.core.api.dto.SeguimentDto;
-import es.caib.ripea.core.api.dto.SicresTipoDocumentoEnumDto;
-import es.caib.ripea.core.api.dto.SicresValidezDocumentoEnumDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.config.OrganConfigDto;
-import es.caib.ripea.core.api.dto.historic.HistoricExpedientDto;
-import es.caib.ripea.core.api.dto.historic.HistoricInteressatDto;
-import es.caib.ripea.core.api.dto.historic.HistoricUsuariDto;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.AlertaEntity;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ConsultaPinbalEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.DocumentNotificacioEntity;
-import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
-import es.caib.ripea.core.entity.ExpedientTascaEntity;
-import es.caib.ripea.core.entity.InteressatAdministracioEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
-import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.RegistreAnnexEntity;
-import es.caib.ripea.core.entity.RegistreInteressatEntity;
-import es.caib.ripea.core.entity.TipusDocumentalEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.entity.config.ConfigEntity;
-import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import ma.glasnost.orika.CustomConverter;
-import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MapperFacade;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.impl.DefaultMapperFactory;
-import ma.glasnost.orika.metadata.Type;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper per a convertir entre diferents formats de documents.
@@ -443,8 +384,15 @@ public class ConversioTipusHelper {
 						target.setIdentificador(source.getIdentificador());
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
 						target.setNotificaDistError(source.getNotificaDistError());
+						target.setDataAlta(source.getDataAlta());
 						target.setDataActualitzacio(source.getDataActualitzacio());
+						if (target.getDataActualitzacio() == null && source.getLastModifiedDate() != null) {
+							target.setDataActualitzacio(source.getLastModifiedDate().toDate());
+						}
 						target.setUsuariActualitzacio(source.getUsuariActualitzacio() != null ? source.getUsuariActualitzacio().getCodiAndNom() : "");
+						if ("".equals(target.getUsuariActualitzacio()) && source.getLastModifiedBy() != null) {
+							target.setUsuariActualitzacio(source.getLastModifiedBy().getCodiAndNom());
+						}
 						target.setObservacions(source.getObservacions());
 						target.setGrupId(source.getGrup() != null ? source.getGrup().getId() : null);
 						
@@ -486,6 +434,9 @@ public class ConversioTipusHelper {
 						target.setPendentCanviEstatDistribucio(source.isPendentCanviEstatDistribucio());
 						target.setReintentsCanviEstatDistribucio(source.getReintentsCanviEstatDistribucio());
 						target.setDataActualitzacio(source.getDataActualitzacio());
+						if (target.getDataActualitzacio() == null && source.getLastModifiedDate() != null) {
+							target.setDataActualitzacio(source.getLastModifiedDate().toDate());
+						}
 						
 						target.setGrupNom(source.getGrup() != null ? source.getGrup().getDescripcio() : null);
 						

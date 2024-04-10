@@ -278,14 +278,14 @@ tr.clicable {
 		<li class="active" role="presentation">
 			<a href="#resum" aria-controls="resum" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.resum"/></a>
 		</li>
+<%--		<c:if test="${peticio.estat == 'REBUTJAT'}">--%>
+		<li role="presentation">
+			<a href="#estatInfo" aria-controls="estatInfo" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.estat"/></a>
+		</li>
+<%--		</c:if>--%>
 		<li role="presentation">
 			<a href="#informacio" aria-controls="informacio" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.informacio"/></a>
 		</li>
-		<c:if test="${peticio.estat == 'REBUTJAT'}">
-			<li role="presentation">
-				<a href="#rebutjadaInfo" aria-controls="rebutjadaInfo" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.rebutjada.info"/></a>
-			</li>
-		</c:if>
 		<li role="presentation">
 			<a href="#interessats" aria-controls="interessats" role="tab" data-toggle="tab"><spring:message code="registre.detalls.pipella.interessats"/>&nbsp;<span class="badge">${fn:length(registre.interessats)}</span></a>
 		</li>
@@ -722,22 +722,53 @@ tr.clicable {
 		</div>
 		
 		<!------------------------------ TABPANEL INFORMACIO ------------------------------------->
-		<div class="tab-pane in" id="rebutjadaInfo" role="tabpanel">
+		<div class="tab-pane in" id="estatInfo" role="tabpanel">
 			<table class="table table-bordered">
 				<tbody>
 					<tr>
-						<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.motiu"/></strong></td>
-						<td>${peticio.observacions}</td>
+						<td><strong><spring:message code="registre.detalls.camp.info.estat"/></strong></td>
+						<c:choose>
+							<c:when test="${peticio.estatView == 'PENDENT'}">
+								<td><spring:message code="expedient.peticio.estat.view.enum.PENDENT"/></td>
+							</c:when>
+							<c:when test="${peticio.estatView == 'ACCEPTAT'}">
+								<td><spring:message code="expedient.peticio.estat.view.enum.ACCEPTAT"/></td>
+							</c:when>
+							<c:when test="${peticio.estatView == 'REBUTJAT'}">
+								<td><spring:message code="expedient.peticio.estat.view.enum.REBUTJAT"/></td>
+							</c:when>
+							<c:otherwise>
+								<td>${peticio.estatView}</td>
+							</c:otherwise>
+						</c:choose>
 					</tr>
 					<tr>
-						<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.data"/></strong></td>
-						<td>${peticio.dataActualitzacioStr}</td>
+						<td><strong><spring:message code="registre.detalls.camp.info.data.alta"/></strong></td>
+						<td>${peticio.dataAltaStr}</td>
 					</tr>
-					<tr>
-						<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.usuari"/></strong></td>
-						<td>${peticio.usuariActualitzacio}</td>
-					</tr>
-		
+					<c:if test="${peticio.estat == 'REBUTJAT'}">
+						<tr>
+							<td><strong><spring:message code="registre.detalls.camp.rebutjada.info.motiu"/></strong></td>
+							<td>${peticio.observacions}</td>
+						</tr>
+					</c:if>
+					<c:if test="${peticio.estat != 'PENDENT'}">
+						<tr>
+							<c:choose>
+								<c:when test="${peticio.estat == 'REBUTJAT'}">
+									<td><strong><spring:message code="registre.detalls.camp.info.data.rebuig"/></strong></td>
+								</c:when>
+								<c:otherwise>
+									<td><strong><spring:message code="registre.detalls.camp.info.data.acceptacio"/></strong></td>
+								</c:otherwise>
+							</c:choose>
+							<td>${peticio.dataActualitzacioStr}</td>
+						</tr>
+						<tr>
+							<td><strong><spring:message code="registre.detalls.camp.info.usuari"/></strong></td>
+							<td>${peticio.usuariActualitzacio}</td>
+						</tr>
+					</c:if>
 				</tbody>
 			</table>
 		</div>
