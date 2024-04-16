@@ -1,17 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <datasources>
-	<no-tx-datasource>
-		<jndi-name>es.caib.ripea.db</jndi-name>
-		<connection-url>DATABASE_URL</connection-url>
-		<driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
-		<user-name>DATABASE_USERNAME</user-name>
-		<password>DATABASE_PASSWORD</password>
-	</no-tx-datasource>
-	<no-tx-datasource>
-		<jndi-name>es.caib.ripea.usuaris.db</jndi-name>
-		<connection-url>SEYCON_URL</connection-url>
-		<driver-class>oracle.jdbc.driver.OracleDriver</driver-class>
-		<user-name>SEYCON_USERNAME</user-name>
-		<password>SEYCON_PASSWORD</password>
-	</no-tx-datasource>
+    <local-tx-datasource>
+        <jndi-name>es.caib.ripea.db</jndi-name>
+        <connection-url>${ipa_db_url}</connection-url>
+        <driver-class>>${ipa_db_driver}</driver-class>
+        <user-name>${ipa_db_username}</user-name>
+        <password>${ipa_db_password}</password>
+    </local-tx-datasource>
 </datasources>
+
