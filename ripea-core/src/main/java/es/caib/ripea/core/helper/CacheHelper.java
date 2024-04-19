@@ -3,35 +3,6 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.acls.model.Acl;
-import org.springframework.security.acls.model.MutableAclService;
-import org.springframework.security.acls.model.NotFoundException;
-import org.springframework.security.acls.model.ObjectIdentity;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ComunitatDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
@@ -80,8 +51,33 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import es.caib.ripea.plugin.PropertiesHelper;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.acls.model.Acl;
+import org.springframework.security.acls.model.MutableAclService;
+import org.springframework.security.acls.model.NotFoundException;
+import org.springframework.security.acls.model.ObjectIdentity;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 
 /**
@@ -342,6 +338,63 @@ public class CacheHelper {
 	public void evictUnitatsOrganitzativesPerEntitat(
 			String entitatCodi) {
 	}
+
+//	@Cacheable(value = "organigrama", key="#entitatcodi")
+//	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
+//		Map<String, OrganismeDto> organigrama = new HashMap<>();
+//
+//		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
+//		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);
+//		if (organs == null || organs.isEmpty()) {
+//			return organigrama;
+//		}
+//		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitat.getUnitatArrel());
+//		if (arrel == null) {
+//			return organigrama;
+//		}
+//		Map<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
+//		organToOrganigrama(arrel, organsMap, organigrama);
+//		return organigrama;
+//
+//	}
+//
+//	@CacheEvict(value = "organigrama", key="#entitatcodi")
+//	public void evictFindOrganigramaByEntitat(String entitatcodi) {
+//	}
+//
+//	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
+//
+//		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
+//		for (OrganGestorEntity organ: organs) {
+//			organsMap.put(organ.getCodi(), organ.getFills());
+//		}
+//		return organsMap;
+//	}
+//
+//	private void organToOrganigrama(final OrganGestorEntity organ, final Map<String, List<OrganGestorEntity>> organsMap, Map<String, OrganismeDto> organigrama) {
+//
+//		List<OrganGestorEntity> fills = organsMap.get(organ.getCodi());
+//		List<String> codisFills = null;
+//		if (fills != null && !fills.isEmpty()) {
+//			codisFills = new ArrayList<>();
+//			for (OrganGestorEntity fill: fills) {
+//				codisFills.add(fill.getCodi());
+//			}
+//		}
+//		OrganismeDto organisme = OrganismeDto.builder()
+//				.codi(organ.getCodi())
+//				.nom(organ.getNom())
+//				.pare(organ.getPare() != null ? organ.getPare().getCodi() : null)
+//				.fills(codisFills)
+//				.estat(organ.getEstat()).build();
+//		organigrama.put(organ.getCodi(), organisme);
+//		if (fills == null) {
+//			return;
+//		}
+//		for (OrganGestorEntity fill : fills) {
+//			organToOrganigrama(fill, organsMap, organigrama);
+//		}
+//	}
 
 	@Cacheable(value = "paisos")
 	public List<PaisDto> findPaisos() {

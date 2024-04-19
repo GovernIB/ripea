@@ -1,7 +1,6 @@
 package es.caib.ripea.core.repository.config;
 
-import java.util.List;
-
+import es.caib.ripea.core.entity.config.ConfigEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.entity.config.ConfigEntity;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -82,4 +81,6 @@ public interface ConfigRepository extends JpaRepository<ConfigEntity, String> {
 	
 	@Query( "from ConfigEntity c where c.configurable = true and c.entitatCodi = null" )
 	public List<ConfigEntity> findConfigurablesAmbEntitatNull();
+
+    List<ConfigEntity> findByEntitatCodiAndConfigurableOrganActiuTrueAndOrganCodiIsNotNull(String entitatCodi);
 }

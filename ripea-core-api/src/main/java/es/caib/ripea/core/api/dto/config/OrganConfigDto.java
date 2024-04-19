@@ -19,4 +19,7 @@ public class OrganConfigDto {
 	private String typeCode;
 	
     private boolean jbossProperty;
+
+	private boolean configurableOrgansDescendents;
+
 }

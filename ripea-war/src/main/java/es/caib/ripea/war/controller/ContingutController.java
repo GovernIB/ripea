@@ -260,7 +260,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			return "contingut";
 		
 		} catch (Exception e) {
-			System.out.println("Error al obtenir detalls del contingut" +  ExceptionUtils.getStackTrace(e));
+			logger.info("Error al obtenir detalls del contingut" +  ExceptionUtils.getStackTrace(e));
 			logger.error("Error al obtenir detalls del contingut", e);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(e);
 			if (ModalHelper.isModal(request)) {
@@ -337,7 +337,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute("concsvBaseUrl", aplicacioService.propertyFindByNom("es.caib.ripea.concsv.base.url"));
 		model.addAttribute("isMantenirEstatCarpetaActiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.carpetes.mantenir.estat")));
 		model.addAttribute("imprimibleNoFirmats", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.descarregar.imprimible.nofirmats")));
-		
+		model.addAttribute("convertirDefinitiu", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.conversio.definitiu")));
 		
 		//model.addAttribute("paddingCurrentFill", 60 * contingut.getPath().size());
 		

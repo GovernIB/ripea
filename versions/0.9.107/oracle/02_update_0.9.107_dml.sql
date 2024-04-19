@@ -6,5 +6,4 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 
 -- Changeset db/changelog/changes/0.9.107/1431.yaml::1709132700705-1::limit
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.mostrar.logs.segonpla', 'false', 'Activar logs per segon pla', 'LOGS', '10', '0', 'BOOL', '0');
-
 INSERT INTO ipa_config (key, value, description, group_code, position, jboss_property, type_code, configurable) VALUES ('es.caib.ripea.mostrar.logs.integracio', 'false', 'Activar logs per integracions', 'LOGS', '11', '0', 'BOOL', '0');
