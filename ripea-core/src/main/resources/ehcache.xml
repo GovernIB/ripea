@@ -9,6 +9,9 @@
 	<cache name="tasquesUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="entitatsUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
 	<cache name="errorsValidacioNode" maxElementsInMemory="1000" eternal="false" timeToLiveSeconds="43200" overflowToDisk="false" />
+<!--	<cache name="organigrama" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />-->
+<!--	<cache name="codisOrgansFills" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />-->
+<!--	<cache name="organCodisAncestors" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="604800" overflowToDisk="false" />-->
 	<cache name="unitatsOrganitzatives" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="usuariAmbCodi" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />
 	<cache name="elementsPendentsBustiesUsuari" maxElementsInMemory="100" eternal="false" timeToLiveSeconds="86400" overflowToDisk="false" />

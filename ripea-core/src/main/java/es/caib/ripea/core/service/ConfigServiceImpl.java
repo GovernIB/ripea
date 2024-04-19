@@ -31,9 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Classe que implementa els metodes per consultar i editar les configuracions de l'aplicació.
@@ -105,6 +107,8 @@ public class ConfigServiceImpl implements ConfigService {
             nova.setValue(property.getValue());
             nova.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
             configRepository.save(nova);
+
+            configHelper.resetPropietatsPerOrgan(organGestor.getEntitat().getCodi());
         } else {
         	throw new RuntimeException("La configuració per aquest òrgan ja esta creat");
         }
@@ -123,8 +127,9 @@ public class ConfigServiceImpl implements ConfigService {
         if (confOrgan != null) {
         	confOrgan.setValue(property.getValue());
             confOrgan.setConfigurableOrgansDescendents(property.isConfigurableOrgansDescendents());
+            configHelper.resetPropietatsPerOrgan(confOrgan.getEntitatCodi());
         }
-        
+
 //        pluginHelper.reloadProperties(confOrgan.getGroupCode());
         pluginHelper.resetPlugins();
     }
@@ -137,6 +142,7 @@ public class ConfigServiceImpl implements ConfigService {
         ConfigEntity confOrgan = configRepository.findOne(key);
         if (confOrgan != null) {
         	configRepository.delete(confOrgan);
+            configHelper.resetPropietatsPerOrgan(confOrgan.getEntitatCodi());
         }
         
 //        pluginHelper.reloadProperties(confOrgan.getGroupCode());
@@ -260,9 +266,16 @@ public class ConfigServiceImpl implements ConfigService {
 			List<ConfigEntity> confs = configRepository.findConfOrgansByKey(
 					ConfigDto.prefix,
 					suffix);
+            Set<String> entitatsCodis = new HashSet<>();
 			for (ConfigEntity config : confs) {
+                if (config.getEntitatCodi() != null) {
+                    entitatsCodis.add(config.getEntitatCodi());
+                }
 				configRepository.delete(config);
 			}
+            for (String entitatCodi : entitatsCodis) {
+                configHelper.resetPropietatsPerOrgan(entitatCodi);
+            }
 		}
         
         pluginHelper.resetPlugins();
