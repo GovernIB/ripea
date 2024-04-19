@@ -2,8 +2,8 @@
 <datasources>
     <local-tx-datasource>
         <jndi-name>es.caib.ripea.db</jndi-name>
+        <driver-class>${ipa_db_driver}</driver-class>
         <connection-url>${ipa_db_url}</connection-url>
-        <driver-class>>${ipa_db_driver}</driver-class>
         <user-name>${ipa_db_username}</user-name>
         <password>${ipa_db_password}</password>
     </local-tx-datasource>

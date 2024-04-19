@@ -731,7 +731,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			logger.error("Error guardant document en arxiu", exception);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(exception);
 			String msg = null;
-			if (root instanceof ConnectException || root.getMessage().contains("timed out")) {
+			if (root instanceof ConnectException || (root.getMessage() != null && root.getMessage().contains("timed out"))) {
 				msg = getMessage(request,"error.arxiu.connectTimedOut");
 			} else {
 				msg = ExceptionHelper.getRootCauseOrItself(exception).getMessage();

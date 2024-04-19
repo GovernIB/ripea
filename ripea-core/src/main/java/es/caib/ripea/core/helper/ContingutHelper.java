@@ -1289,7 +1289,7 @@ public class ContingutHelper {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
 		if (!expedientTascaEntity.getExpedient().getId().equals(contingut.getExpedientPare().getId())) {
-			throw new SecurityException("Contingut no pertany a la tasca accesible("
+			throw new SecurityException("La tasca no pertany al contingut especificat ("
 					+ "tascaId=" + expedientTascaEntity.getId() + ", "
 					+ "contingutId=" + contingutId + ", "
 					+ "usuari=" + auth.getName() + ")");
@@ -1303,7 +1303,7 @@ public class ContingutHelper {
 				}
 			}
 			if (!pemitted) {
-				throw new SecurityException("Sense permisos per accedir la tasca ("
+				throw new SecurityException("La tasca a la qual intenta accedir no està assignada al seu usuari ("
 						+ "tascaId=" + expedientTascaEntity.getId() + ", "
 						+ "usuari=" + auth.getName() + ")");
 			}
