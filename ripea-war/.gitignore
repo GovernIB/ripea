@@ -6,4 +6,4 @@ target/
 /.tern-project
 /bin/
 /appserv_jboss
-/appserv_jboss
+/appserv_tomcat

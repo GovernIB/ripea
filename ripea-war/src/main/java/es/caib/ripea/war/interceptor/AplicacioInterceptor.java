@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.war.interceptor;
 
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,20 +45,22 @@ public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 			HttpServletResponse response,
 			Object handler) throws Exception {
 		if (manifestAtributsMap == null) {
-			Manifest manifest = new Manifest(servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME));
-			Attributes manifestAtributs = manifest.getMainAttributes();
-			manifestAtributsMap = new HashMap<String, Object>();
-			for (Object key: new HashMap(manifestAtributs).keySet()) {
-				manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
+			InputStream is = servletContext.getResourceAsStream("/" + JarFile.MANIFEST_NAME);
+			if (is != null) {
+				Manifest manifest = new Manifest(is);
+				Attributes manifestAtributs = manifest.getMainAttributes();
+				manifestAtributsMap = new HashMap<String, Object>();
+				for (Object key: new HashMap(manifestAtributs).keySet()) {
+					manifestAtributsMap.put(key.toString(), manifestAtributs.get(key));
+				}
+				Locale locale = new Locale(RequestContextUtils.getLocale(request).getLanguage(), 
+						RequestContextUtils.getLocale(request).getCountry());
+				manifestAtributsMap.put(
+						"Build-Timestamp",
+						formatBuildTimestamp(
+								manifestAtributsMap.get("Build-Timestamp").toString(), locale));
 			}
-			Locale locale = new Locale(RequestContextUtils.getLocale(request).getLanguage(), 
-					RequestContextUtils.getLocale(request).getCountry());
-			manifestAtributsMap.put(
-					"Build-Timestamp",
-					formatBuildTimestamp(
-							manifestAtributsMap.get("Build-Timestamp").toString(), locale));
 		}
-
 		request.setAttribute(
 				REQUEST_ATTRIBUTE_MANIFEST_ATRIBUTES,
 				manifestAtributsMap);
