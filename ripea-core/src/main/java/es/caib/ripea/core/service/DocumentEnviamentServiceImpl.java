@@ -29,17 +29,12 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
-import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.ContingutLogHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.DocumentNotificacioHelper;
-import es.caib.ripea.core.helper.EmailHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
-import es.caib.ripea.core.helper.MessageHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -67,16 +62,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private EmailHelper emailHelper;
-	@Autowired
-	private AlertaHelper alertaHelper;
-	@Autowired
-	private MessageHelper messageHelper;
-	@Autowired
-	private DocumentEnviamentInteressatRepository documentEnviamentInteressatRepository;
-	@Autowired
 	private DocumentNotificacioHelper documentNotificacioHelper;
 	@Autowired
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
@@ -84,10 +69,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 	private InteressatRepository interessatRepository;
 	@Autowired
 	private DocumentRepository documentRepository;
-
-	
-
-	
 
 	@Transactional
 	@Override

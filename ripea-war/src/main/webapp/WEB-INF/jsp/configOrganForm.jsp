@@ -54,23 +54,18 @@
 		
 				<c:choose>
 					<c:when test="${config.typeCode == 'INT'}">
-					    <form:input cssClass="form-control" path="value"
-					                 type="number" maxlength="2048"/>
+					    <form:input cssClass="form-control" path="value" type="number" maxlength="2048"/>
 					</c:when>
 					<c:when test="${config.typeCode == 'FLOAT'}">
-					    <form:input  cssClass="form-control" path="value" 
-					                 type="number" step="0.01" maxlength="2048"/>
+					    <form:input  cssClass="form-control" path="value" type="number" step="0.01" maxlength="2048"/>
 					</c:when>
 					<c:when test="${config.typeCode == 'CREDENTIALS'}">
-					    <form:input cssClass="form-control" path="value"
-					                 type="password" maxlength="2048"/>
+					    <form:input cssClass="form-control" path="value" type="password" maxlength="2048"/>
 					</c:when>
 					<c:when test="${config.typeCode == 'BOOL'}">
-					<div class="checkbox checkbox-primary">
-					    <label>
-					    	<form:checkbox path="booleanValue" cssClass="visualitzar"/>
-					    </label>
-					</div>
+						<div class="checkbox checkbox-primary">
+							<label><form:checkbox path="booleanValue" cssClass="visualitzar"/></label>
+						</div>
 					</c:when>
 					<c:when test="${config.validValues != null and fn:length(config.validValues) > 2}">
 					    <form:select path="value" cssClass="form-control" style="width:100%" data-toggle="select2">
@@ -89,8 +84,7 @@
 					    </label>
 					</c:when>
 					<c:otherwise>
-					    <form:input cssClass="form-control" path="value" 
-					                 type="text" maxlength="2048" />
+					    <form:input cssClass="form-control" path="value" type="text" maxlength="2048" />
 					</c:otherwise>
 				</c:choose>
 				
@@ -98,6 +92,8 @@
 			</div>
 		</div>	
 	</c:if>
+	<rip:inputCheckbox name="configurableOrgansDescendents" textKey="config.propietats.form.camp.organs.descendents" />
+
 	<div style="min-height: 20px;"></div>
 	
 

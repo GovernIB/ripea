@@ -431,11 +431,12 @@ public class DocumentHelper {
 
 		Document arxiuDocument = null;
 		if (documentEntity.getArxiuUuid() != null) {
+			boolean ambContingut = isEnviarContingutExistentActiu();
 			arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 					documentEntity,
 					null,
 					null,
-					true,
+					ambContingut,
 					false);
 		}
 

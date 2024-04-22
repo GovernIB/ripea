@@ -741,6 +741,7 @@ public class ConversioTipusHelper {
 			            } else {
 			            	target.setValue(source.getValue());
 			            }
+						target.setConfigurableOrgansDescendents(source.isConfigurableOrgansDescendents());
 	
 						return target;
 					}
