@@ -5,7 +5,9 @@ package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,7 +61,7 @@ public class ContingutImportacioController extends BaseUserController {
 	@Autowired
 	private AplicacioService aplicacioService;
 	
-	private final Semaphore semafor = new Semaphore(1, true);
+	private Map<Long, Semaphore> semafors = new HashMap<Long, Semaphore>();
 
 	@RequestMapping(value = "/{contingutId}/importacio/new", method = RequestMethod.GET)
 	public String get(
@@ -109,12 +111,13 @@ public class ContingutImportacioController extends BaseUserController {
 		}
 		int documentsRepetits = 0;
 		try {
-			synchronized (semafor) {
-				documentsRepetits = importacioService.importarDocuments(
-							entitatActual.getId(), 
-							contingutId,
-							ImportacioCommand.asDto(command));
-			}
+			this.entrarSemafor(contingutId);
+			
+			documentsRepetits = importacioService.importarDocuments(
+						entitatActual.getId(), 
+						contingutId,
+						ImportacioCommand.asDto(command));
+			
 		} catch (Exception ex) {
 			emplenarModelImportacio(request, contingutId, command, model);
 			// Excepció si d'alguna forma s'intenta importar el document dues vegades al mateix moment
@@ -140,6 +143,8 @@ public class ContingutImportacioController extends BaseUserController {
 						ex);
 			}
 			return "contingutImportacioForm";
+		} finally {
+			this.sortirSemafor(contingutId);
 		}
 		if (documentsRepetits > 0) {
 			addWarningDocumentExists(request);
@@ -151,6 +156,31 @@ public class ContingutImportacioController extends BaseUserController {
 				"redirect:../../../contingut/" + contingutId,
 				"document.controller.importat.ok");
 		
+	}
+	
+	protected void entrarSemafor(Long contingutId) throws InterruptedException {
+		Semaphore semafor = null;
+		synchronized(semafors) {
+			if (semafors.containsKey(contingutId)) {
+				semafor = semafors.get(contingutId);
+			} else {
+				semafor = new Semaphore(1);
+				semafors.put(contingutId, semafor);
+			}
+		}
+		semafor.acquire();
+	}
+	
+	protected void sortirSemafor(Long contingutId) {
+		synchronized(semafors) {
+			Semaphore semafor = semafors.get(contingutId);
+			if (semafor != null) {
+				if (semafor.getQueueLength()==0) {
+					semafors.remove(contingutId);
+				}
+				semafor.release();
+			}
+		}
 	}
 	
 	private void emplenarModelImportacio(
