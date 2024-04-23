@@ -140,6 +140,7 @@ table.dataTable td {
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="pendentEnviarDistribucio" data-visible="false"></th>
 				<th data-col-name="interessatsResum" data-orderable="false"><spring:message code="expedient.peticio.list.columna.interessats"/></th>
+				<th data-col-name="grupNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.grup"/></th>
 				<th data-col-name="estatView" width="10%" data-orderable="false" data-template="#cellEstatTemplate">
 					<spring:message code="expedient.peticio.list.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
@@ -159,7 +160,6 @@ table.dataTable td {
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="grupNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.grup"/></th>
 				<th data-col-name="expedientId" data-visible="false"></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
