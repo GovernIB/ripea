@@ -183,7 +183,10 @@ public class DocumentEntity extends NodeEntity {
 	
 	@OneToMany(mappedBy = "document")
 	private List<RegistreAnnexEntity> annexos = new ArrayList<RegistreAnnexEntity>();
-	
+
+	@OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+	private List<ConsultaPinbalEntity> consultesPinbal;
+
 	@OneToOne
 	@JoinColumn(name = "id")
 	private ContingutEntity contingut;
