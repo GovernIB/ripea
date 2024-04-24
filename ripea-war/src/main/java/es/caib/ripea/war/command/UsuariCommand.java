@@ -3,15 +3,15 @@
  */
 package es.caib.ripea.war.command;
 
-import java.io.Serializable;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.io.Serializable;
 
 
 /**
@@ -19,7 +19,7 @@ import lombok.Getter;
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Getter 
+@Getter @Setter
 public class UsuariCommand implements Serializable {
 
 	private String codi;
@@ -38,16 +38,11 @@ public class UsuariCommand implements Serializable {
 	private boolean expedientListComentaris;
 	private boolean expedientListGrup;
 	private Long procedimentId;
+	private Long entitatPerDefecteId;
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
 	
 	
-	public void setRebreAvisosNovesAnotacions(boolean rebreAvisosNovesAnotacions) {
-		this.rebreAvisosNovesAnotacions = rebreAvisosNovesAnotacions;
-	}
-	public void setRebreEmailsAgrupats(boolean rebreEmailsAgrupats) {
-		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
-	}
 	public void setCodi(String codi) {
 		this.codi = Utils.trim(codi);
 	}
@@ -62,9 +57,6 @@ public class UsuariCommand implements Serializable {
 	}
 	public void setIdioma(String idioma) {
 		this.idioma = Utils.trim(idioma);
-	}
-	public void setRols(String[] rols) {
-		this.rols = rols;
 	}
 	public void setEmailAlternatiu(String emailAlternatiu) {
 		this.emailAlternatiu = Utils.trim(emailAlternatiu);
@@ -87,49 +79,9 @@ public class UsuariCommand implements Serializable {
 		return ToStringBuilder.reflectionToString(this);
 	}
 
-	public void setNumElementsPagina(Long numElementsPagina) {
-		this.numElementsPagina = numElementsPagina;
-	}
-
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	public void setExpedientListDataDarrerEnviament(
-			boolean expedientListDataDarrerEnviament) {
-		this.expedientListDataDarrerEnviament = expedientListDataDarrerEnviament;
-	}
-	public void setExpedientListAgafatPer(
-			boolean expedientListAgafatPer) {
-		this.expedientListAgafatPer = expedientListAgafatPer;
-	}
-	public void setExpedientListInteressats(
-			boolean expedientListInteressats) {
-		this.expedientListInteressats = expedientListInteressats;
-	}
-	public void setExpedientListComentaris(
-			boolean expedientListComentaris) {
-		this.expedientListComentaris = expedientListComentaris;
-	}
-	public void setExpedientListGrup(
-			boolean expedientListGrup) {
-		this.expedientListGrup = expedientListGrup;
-	}
-
-	public void setProcedimentId(
-			Long procedimentId) {
-		this.procedimentId = procedimentId;
-	}
-
-	public void setVistaActual(
-			ContingutVistaEnumDto vistaActual) {
-		this.vistaActual = vistaActual;
-	}
-
-	public void setExpedientExpandit(
-			boolean expedientExpandit) {
-		this.expedientExpandit = expedientExpandit;
-	}
-
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

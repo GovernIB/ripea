@@ -3,10 +3,10 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.io.Serializable;
-
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 
 /**
@@ -34,6 +34,7 @@ public class UsuariDto implements Serializable {
 	private boolean expedientListComentaris;
 	private boolean expedientListGrup;
 	private Long procedimentId;
+	private Long entitatPerDefecteId;
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
 	

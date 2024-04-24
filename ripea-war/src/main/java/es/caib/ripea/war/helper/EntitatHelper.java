@@ -3,17 +3,16 @@
  */
 package es.caib.ripea.war.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.EntitatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.service.EntitatService;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utilitat per a gestionar les entitats de l'usuari actual.
@@ -70,7 +69,12 @@ public class EntitatHelper {
 		if (entitatActual == null) {
 			List<EntitatDto> entitats = findEntitatsAccessibles(request, entitatService);
 			if (entitats != null && entitats.size() > 0) {
-				entitatActual = entitats.get(0);
+				UsuariDto usuariActual = (UsuariDto)request.getSession().getAttribute(SessioHelper.SESSION_ATTRIBUTE_USUARI_ACTUAL);
+				if (usuariActual != null && usuariActual.getEntitatPerDefecteId() != null) {
+					entitatActual = entitatService.findById(usuariActual.getEntitatPerDefecteId());
+				} else {
+					entitatActual = entitats.get(0);
+				}
 				canviEntitatActual(request, entitatActual, entitatService);
 			}
 		}
