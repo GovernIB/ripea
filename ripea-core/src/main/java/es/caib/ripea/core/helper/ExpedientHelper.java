@@ -345,8 +345,7 @@ public class ExpedientHelper {
 
 
 	@Transactional
-	public List<InteressatDto> associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
-		List<InteressatDto> interessats = new ArrayList<>();
+	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
 		Set<InteressatEntity> interessatsORepresenantsRipea = expedientEntity.getInteressatsORepresentants();
@@ -397,13 +396,7 @@ public class ExpedientHelper {
 						rolActual, 
 						false);
 			}
-
-			InteressatEntity nouInteressat = interessatRepository.findOne(createdInteressat.getId());
-			if (nouInteressat != null) {
-				interessats.add(conversioTipusHelper.convertir(nouInteressat, InteressatDto.class));
-			}
 		}
-		return interessats;
 	}
 	
 	public InteressatEntity checkForInteressatOverwritten(RegistreInteressatEntity interessatDistribucio, Set<InteressatEntity> interessatsORepresenantsRipea) {
@@ -1691,7 +1684,7 @@ public class ExpedientHelper {
 		return interessatDto;
 	}
 
-	private InteressatDto toInteressatMergedDto(RegistreInteressatEntity registreInteressatEntity, InteressatDto existingInteressatDto) {
+	public InteressatDto toInteressatMergedDto(RegistreInteressatEntity registreInteressatEntity, InteressatDto existingInteressatDto) {
 		switch (registreInteressatEntity.getTipus()) {
 			case PERSONA_FISICA:
 				InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto) existingInteressatDto;
