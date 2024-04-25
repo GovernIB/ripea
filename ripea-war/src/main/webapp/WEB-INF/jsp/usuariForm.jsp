@@ -14,18 +14,28 @@
 
 <c:set var="formAction"><rip:modalUrl value="/usuari/configuracio"/></c:set>
 <form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="usuariCommand" role="form">
-	<form:hidden path="codi"/>
-	<rip:inputText name="nom" textKey="usuari.form.camp.nom" readonly="true"/>
-	<rip:inputText name="nif" textKey="usuari.form.camp.nif" readonly="true"/>
-	<rip:inputText name="email" textKey="usuari.form.camp.email" readonly="true"/>
-	<rip:inputText name="emailAlternatiu" textKey="usuari.form.camp.email.alternatiu"/>
-	<rip:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
-	<form:hidden path="rols"/>
-	<rip:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
-
-	<div class="row">
-		<div class="col-md-offset-4 col-md-8">
-			<div class="panel panel-success">
+<%--	<div class="row">--%>
+<%--		<div class="col-md-offset-4 col-md-8">--%>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Dades de l'usuari</h3>
+				</div>
+				<div class="panel-body">
+					<form:hidden path="codi"/>
+					<rip:inputText name="nom" textKey="usuari.form.camp.nom" readonly="true"/>
+					<rip:inputText name="nif" textKey="usuari.form.camp.nif" readonly="true"/>
+					<rip:inputText name="email" textKey="usuari.form.camp.email" readonly="true"/>
+					<rip:inputText name="emailAlternatiu" textKey="usuari.form.camp.email.alternatiu"/>
+					<rip:inputSelect name="rols" textKey="usuari.form.camp.rols" optionItems="${usuariCommand.rols}" disabled="true"/>
+					<form:hidden path="rols"/>
+					<rip:inputSelect name="idioma" optionItems="${idiomaEnumOptions}" textKey="usuari.form.camp.idioma" optionValueAttribute="value" optionTextKeyAttribute="text" disabled="false"/>
+				</div>
+			</div>
+<%--		</div>--%>
+<%--	</div>--%>
+<%--	<div class="row">--%>
+<%--		<div class="col-md-offset-4 col-md-8">--%>
+			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Enviament de correus</h3>
 				</div>
@@ -34,11 +44,11 @@
 					<rip:inputIosCheckbox name="rebreAvisosNovesAnotacions" labelSize="10" textKey="usuari.form.camp.rebre.avisos.noves.anotacions" icon="fa-bell-o"/>
 				</div>
 			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-offset-4 col-md-8">
-			<div class="panel panel-info">
+<%--		</div>--%>
+<%--	</div>--%>
+<%--	<div class="row">--%>
+<%--		<div class="col-md-offset-4 col-md-8">--%>
+			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Configuració genèriques</h3>
 				</div>
@@ -52,11 +62,11 @@
 					</c:if>
 				</div>
 			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-offset-4 col-md-8">
-			<div class="panel panel-warning">
+<%--		</div>--%>
+<%--	</div>--%>
+<%--	<div class="row">--%>
+<%--		<div class="col-md-offset-4 col-md-8">--%>
+			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Configuració de columnes del llistat d'expedients</h3>
 				</div>
@@ -68,10 +78,10 @@
 					<rip:inputIosCheckbox name="expedientListGrup" labelSize="10" textKey="usuari.form.camp.expedientListGrup" icon="fa-user-circle"/>
 				</div>
 			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-offset-4 col-md-8">
+<%--		</div>--%>
+<%--	</div>--%>
+<%--	<div class="row">--%>
+<%--		<div class="col-md-offset-4 col-md-8">--%>
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">Configuració vista de documents d'expedients</h3>
@@ -81,8 +91,8 @@
 					<rip:inputIosCheckbox name="expedientExpandit" labelSize="10" textKey="usuari.form.camp.expedientExpandit" icon="fa-expand"/>
 				</div>
 			</div>
-		</div>
-	</div>
+<%--		</div>--%>
+<%--	</div>--%>
 
 	<div id="modal-botons">
 		<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
