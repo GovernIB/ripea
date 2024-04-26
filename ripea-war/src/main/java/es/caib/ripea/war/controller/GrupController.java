@@ -3,26 +3,10 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.GrupService;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.GrupCommand;
@@ -34,6 +18,21 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Controller
@@ -45,6 +44,8 @@ public class GrupController extends BaseAdminController {
 
 	@Autowired
 	private GrupService grupService;
+	@Autowired
+	private AplicacioService aplicacioService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
@@ -54,6 +55,9 @@ public class GrupController extends BaseAdminController {
 		
 		GrupFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
+
+		model.addAttribute("isRolAdminOrgan", RolHelper.isRolActualAdministradorOrgan(request));
+		model.addAttribute("isActiveGestioPermisPerAdminOrgan", Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.procediment.gestio.permis.administrador.organ")));
 		
 		return "grupList";
 	}

@@ -140,12 +140,14 @@ $(document).ready(function() {
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="grup.columna.codi"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="grup.columna.descripcio"/></th>
-				<th data-col-name="organGestor.codiINom" data-orderable="false"><spring:message code="metaexpedient.grup.columna.organGestor"/></th>				
-				<th data-col-name="permisosCount" data-orderable="false" data-template="#cellPermisosTemplate" width="10%">
-					<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="grupPermis/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="grup.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
-					</script>
-				</th>				
+				<th data-col-name="organGestor.codiINom" data-orderable="false"><spring:message code="metaexpedient.grup.columna.organGestor"/></th>
+				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
+					<th data-col-name="permisosCount" data-orderable="false" data-template="#cellPermisosTemplate" width="10%">
+						<script id="cellPermisosTemplate" type="text/x-jsrender">
+							<a href="grupPermis/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="grup.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+						</script>
+					</th>
+				</c:if>>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
