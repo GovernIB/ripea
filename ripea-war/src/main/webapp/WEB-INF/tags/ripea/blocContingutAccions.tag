@@ -384,12 +384,14 @@
 			<c:choose>
 				<c:when test="${contingut.arxiuUuid != null}">
 					<li><a href="<c:url value="/contingut/${contingut.id}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+					<li><a href="<c:url value="/contingut/${contingut.id}/sincronitzarAmbArxiu"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="expedient.sincronitzar.estat.arxiu"/></a></li>
  				</c:when>
  				<c:otherwise>
  					<li><a class="disabled" href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
+					<li><a class="disabled" href="#"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="expedient.sincronitzar.estat.arxiu"/></a></li>
 				</c:otherwise>
-			</c:choose>			
-			
+			</c:choose>
+
 			<%---- Exportació ENI ----%>
 			<c:if test="${contingut.document && contingut.fitxerExtension!='zip'}">
 				<c:choose>

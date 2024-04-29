@@ -237,8 +237,8 @@
 				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">
 					<th data-col-name="permisosCount" data-template="#cellPermisosTemplate" data-orderable="false" width="1%">
 						<script id="cellPermisosTemplate" type="text/x-jsrender">
-						<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
-					</script>
+							<a href="metaExpedient/{{:id}}/permis" class="btn btn-default"><spring:message code="metaexpedient.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
+						</script>
 					</th>
 				</c:if>
 
