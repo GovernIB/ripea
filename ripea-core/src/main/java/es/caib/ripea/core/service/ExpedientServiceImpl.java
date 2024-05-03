@@ -1450,7 +1450,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 	
 	@Override
-	@Transactional
 	public FitxerDto exportIndexExpedient(
 			Long entitatId, 
 			Set<Long> expedientIds,
@@ -1488,7 +1487,6 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	@Override
-	@Transactional
 	public FitxerDto exportIndexExpedients(
 			Long entitatId, 
 			Set<Long> expedientIds,
