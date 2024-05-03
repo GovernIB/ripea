@@ -1372,18 +1372,19 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniDocumentOrigenId(metadades.getIdentificadorOrigen());
 				
 				final String fechaSelladoKey = "eni:fecha_sellado";
-				if (metadades.getMetadadesAddicionals().containsKey(fechaSelladoKey)) {
+				Map<String, Object> metadadasAddicionals = metadades.getMetadadesAddicionals();
+				if (metadadasAddicionals != null && metadadasAddicionals.containsKey(fechaSelladoKey)) {
 					try {
 						DateFormat dfIn= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 						DateFormat dfOut = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-						Date fechaSelladoValor = dfIn.parse(metadades.getMetadadesAddicionals().get(fechaSelladoKey).toString());
+						Date fechaSelladoValor = dfIn.parse(metadadasAddicionals.get(fechaSelladoKey).toString());
 						String fechaSelladoValorStr = dfOut.format(fechaSelladoValor);
-						metadades.getMetadadesAddicionals().put(fechaSelladoKey, fechaSelladoValorStr);
+						metadadasAddicionals.put(fechaSelladoKey, fechaSelladoValorStr);
 					} catch (ParseException e) {
 						logger.error(e.getMessage(), e);
 					}		
 				}
-				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
+				arxiuDetall.setMetadadesAddicionals(metadadasAddicionals);
 				
 				if (arxiuDocument.getContingut() != null) {
 					arxiuDetall.setContingutArxiuNom(
