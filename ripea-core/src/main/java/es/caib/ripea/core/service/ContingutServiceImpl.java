@@ -1628,9 +1628,10 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		if (estat != null && !estat.equals(document.getArxiuEstat())) {
 			document.updateArxiuEstat(estat);
-//			if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()) {
-//				document.updateEstat(DocumentEstatEnumDto.DEFINITIU);
-//			}
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()
+					&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
+				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+			}
 		}
 	}
 
