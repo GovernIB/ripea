@@ -46,7 +46,7 @@ public class DocumentNotificacioInteressatHelper {
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 
-	public static Map<String, String> notificacionsWithError = new HashMap<String, String>();
+	public Map<String, String> notificacionsWithError = new HashMap<String, String>();
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearEnviarNotificacioInteressat(
