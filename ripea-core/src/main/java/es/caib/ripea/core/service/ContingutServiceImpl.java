@@ -1613,7 +1613,6 @@ public class ContingutServiceImpl implements ContingutService {
 
 	private void sincronitzarEstatDocument(DocumentEntity document) {
 		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
-		arxiuDocument.getEstat();
 		ArxiuEstatEnumDto estat = null;
 		if (arxiuDocument != null && arxiuDocument.getEstat() != null) {
 			switch (arxiuDocument.getEstat()) {
