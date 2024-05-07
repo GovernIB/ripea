@@ -140,35 +140,37 @@ body {
 	padding-top: 120px;
 }
 <%-- If capsaleraColorFons is defined for entitat use it, if not look if there is capsaleraColorFons defined for application and use it, if not default color is used 	--%>
-<c:choose>
-	<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons}">
-		.navbar-app {
-			background-color: ${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons};
-		}
-	</c:when>
-	<c:otherwise>
-		<c:if test="${sessionScope['SessionHelper.capsaleraColorFons']!=null  && not empty sessionScope['SessionHelper.capsaleraColorFons']}">
+<c:if test="${not isRolActualSuperusuari}">
+	<c:choose>
+		<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons}">
 			.navbar-app {
-				background-color: ${sessionScope['SessionHelper.capsaleraColorFons']};
-			}		
-		</c:if>		
-	</c:otherwise>
-</c:choose>
-<%-- If capsaleraColorLletra is defined for entitat use it, if not look if there is capsaleraColorLletra defined for application and use it, if not default color is used 	--%>
-<c:choose>
-	<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra}">
-		.navbar-app .list-inline li.dropdown>a {
-			color: ${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra};
-		}
-	</c:when>
-	<c:otherwise>
-		<c:if test="${sessionScope['SessionHelper.capsaleraColorLletra']!=null  && not empty sessionScope['SessionHelper.capsaleraColorLletra']}">
+				background-color: ${sessionScope['EntitatHelper.entitatActual'].capsaleraColorFons};
+			}
+		</c:when>
+		<c:otherwise>
+			<c:if test="${sessionScope['SessionHelper.capsaleraColorFons']!=null  && not empty sessionScope['SessionHelper.capsaleraColorFons']}">
+				.navbar-app {
+					background-color: ${sessionScope['SessionHelper.capsaleraColorFons']};
+				}
+			</c:if>
+		</c:otherwise>
+	</c:choose>
+	<%-- If capsaleraColorLletra is defined for entitat use it, if not look if there is capsaleraColorLletra defined for application and use it, if not default color is used 	--%>
+	<c:choose>
+		<c:when test="${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra!=null  && not empty sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra}">
 			.navbar-app .list-inline li.dropdown>a {
-				color: ${sessionScope['SessionHelper.capsaleraColorLletra']};
-			}		
-		</c:if>		
-	</c:otherwise>
-</c:choose>
+				color: ${sessionScope['EntitatHelper.entitatActual'].capsaleraColorLletra};
+			}
+		</c:when>
+		<c:otherwise>
+			<c:if test="${sessionScope['SessionHelper.capsaleraColorLletra']!=null  && not empty sessionScope['SessionHelper.capsaleraColorLletra']}">
+				.navbar-app .list-inline li.dropdown>a {
+					color: ${sessionScope['SessionHelper.capsaleraColorLletra']};
+				}
+			</c:if>
+		</c:otherwise>
+	</c:choose>
+</c:if>
 </style>
 </head>
 <body>
@@ -178,7 +180,7 @@ body {
 			<div class="nav navbar-nav navbar-right" style="width:100%;">
 				<ul class="list-inline pull-right" style="margin-bottom: 0px;">
 					<%------------------------ ENTITATS ------------------------%>
-					<c:if test="${hiHaEntitats}">
+					<c:if test="${not isRolActualSuperusuari and hiHaEntitats}">
 						<li class="dropdown">
 							<c:if test="${hiHaMesEntitats}"><a href="#" data-toggle="dropdown"></c:if>
 						<span class="fa fa-institution"></span> ${entitatActual.nom} <c:if test="${hiHaMesEntitats}"><b class="caret caret-white"></b></c:if>
@@ -267,7 +269,7 @@ body {
 						</a>
 						<ul class="dropdown-menu">
 							<li>
-								<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="true" data-refresh-pagina="true">
+								<a href="<c:url value="/usuari/configuracio"/>" data-toggle="modal" data-maximized="false" data-width="1200px" data-refresh-pagina="true">
 									<spring:message code="decorator.menu.configuracio.user"/>
 								</a>
 							</li>
@@ -305,7 +307,7 @@ body {
 					<div id="govern-logo" class="pull-left">
 						<%-- If logo is defined for application in properties file or for entitat in db then take the logo from there, in other case take default logo from the img folder --%>					
 						<c:choose>
-							<c:when test="${sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0}">
+							<c:when test="${not isRolActualSuperusuari && (sessionScope['SessionHelper.capsaleraLogo']!=null  && not empty sessionScope['SessionHelper.capsaleraLogo'] || sessionScope['EntitatHelper.entitatActual'].logoImgBytes!=null && fn:length(sessionScope['EntitatHelper.entitatActual'].logoImgBytes)!=0)}">
 								<img src="<c:url value="/entitat/getEntitatLogo"/>"  height="65" alt="Govern de les Illes Balears" />
 							</c:when>
 							<c:otherwise>

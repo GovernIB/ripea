@@ -1,14 +1,16 @@
-<!DOCTYPE server>
+<?xml version="1.0" encoding="UTF-8"?>
 <server>
   <mbean code="org.jboss.mail.MailService" name="jboss:service=RipeaMail">
-    <attribute name="JNDIName">java:es.caib.ripea.mail</attribute>    
+    <attribute name="JNDIName">java:/es.caib.ripea.mail</attribute>
     <attribute name="Configuration">
         <configuration>
             <property name="mail.transport.protocol" value="smtp"/>
-            <property name="mail.smtp.host" value="mail.limit.es"/>            
-            <property name="mail.debug" value="false"/>
-            <property name="mail.smtp.auth" value="false"/> 
+            <property name="mail.smtp.host" value="${ipa_mail_host}"/>
+            <property name="mail.smtp.port" value="${ipa_mail_port}"/>            
+            <property name="mail.smtp.auth" value="false"/>
+            <property name="mail.from" value="${ipa_mail_from}"/>
         </configuration>
     </attribute>
+    <depends>jboss:service=Naming</depends>
   </mbean>
 </server>

@@ -3,9 +3,10 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
+import lombok.Getter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.hibernate.annotations.ForeignKey;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,12 +21,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Version;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.hibernate.annotations.ForeignKey;
-
-import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
-import lombok.Getter;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Classe de model de dades que conté la informació d'un usuari.
@@ -96,6 +94,11 @@ public class UsuariEntity implements Serializable {
 	@JoinColumn(name = "metaexpedient_id")
 	@ForeignKey(name = "ipa_metaexp_usuari_fk")
 	private MetaExpedientEntity procediment;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "entitat_defecte_id")
+	@ForeignKey(name = "ipa_entitat_usuari_fk")
+	private EntitatEntity entitatPerDefecte;
 	
 	@Column(name = "expedient_expandit")
 	private boolean expedientExpandit = true;
@@ -126,7 +129,8 @@ public class UsuariEntity implements Serializable {
 			boolean expedientListGrup,
 			MetaExpedientEntity procediment,
 			ContingutVistaEnumDto vistaActual, 
-			boolean expedientExpandit) {
+			boolean expedientExpandit,
+			EntitatEntity entitatPerDefecte) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
@@ -139,6 +143,7 @@ public class UsuariEntity implements Serializable {
 		this.procediment = procediment;
 		this.vistaActual = vistaActual;
 		this.expedientExpandit = expedientExpandit;
+		this.entitatPerDefecte = entitatPerDefecte;
 	}
 	
 

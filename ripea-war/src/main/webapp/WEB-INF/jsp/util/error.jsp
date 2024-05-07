@@ -30,6 +30,7 @@ $(document).ready(function() {
 </script>
 </head>
 <body>
+    <br />
 	<table class="table table-bordered" style="width:100%">
 	<tbody>
 		<c:choose>

@@ -26,6 +26,7 @@ import com.sun.jersey.core.util.Base64;
 
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
@@ -663,7 +664,7 @@ public class DocumentHelper {
 				fitxer = new FitxerDto();
 				fitxer.setContentType(documentEntity.getFitxerContentType());
 				fitxer.setNom(documentEntity.getFitxerNom());
-				if (pluginHelper.getArxiuPlugin() instanceof ArxiuPluginCaib) {
+				if (isArxiuCaib()) {
 					Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(
 							documentEntity,
 							null,
@@ -1150,10 +1151,14 @@ public class DocumentHelper {
 	@SuppressWarnings("incomplete-switch")
 	public byte[] getContingutFromArxiuDocument(Document arxiuDocument) {
 		byte[] contingut = null;
-		if (arxiuDocument.getFirmes() == null) {
-			contingut = arxiuDocument.getContingut().getContingut();
+		boolean isArxiuCaib = isArxiuCaib();
+		DocumentContingut document = arxiuDocument.getContingut();
+		List<Firma> firmes = arxiuDocument.getFirmes();
+		
+		if (firmes == null || firmes.isEmpty()) {
+			contingut = document.getContingut();
 		} else {
-			for (Firma firma: arxiuDocument.getFirmes()) {
+			for (Firma firma: firmes) {
 				if (firma.getTipus() != FirmaTipus.CSV) {
 					switch(firma.getTipus()) {
 					case CADES_ATT:
@@ -1162,11 +1167,11 @@ public class DocumentHelper {
 					case ODT:
 					case OOXML:
 					case SMIME:
-						contingut = firma.getContingut();
+						contingut = isArxiuCaib ? firma.getContingut() : document.getContingut();
 						break;
 					case CADES_DET:
 					case XADES_DET:
-						contingut = arxiuDocument.getContingut().getContingut();
+						contingut = isArxiuCaib ? document.getContingut() : firma.getContingut();
 						break;
 					}
 				}
@@ -1526,6 +1531,9 @@ public class DocumentHelper {
 	}
 	public boolean isEnviarContingutExistentActiu(){
 		return configHelper.getAsBoolean("es.caib.ripea.document.enviar.contingut.existent");
+	}
+	public boolean isArxiuCaib() {
+		return pluginHelper.getArxiuPlugin() instanceof ArxiuPluginCaib;
 	}
 	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentHelper.class);

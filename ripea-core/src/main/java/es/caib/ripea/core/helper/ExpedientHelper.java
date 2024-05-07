@@ -4,34 +4,9 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipOutputStream;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
-
 import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
 import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
@@ -43,33 +18,7 @@ import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
-import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.utils.Utils;
@@ -109,6 +58,29 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Mètodes comuns per a la gestió d'expedients.
@@ -380,11 +352,15 @@ public class ExpedientHelper {
 		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
 			
 			InteressatEntity interessatRipeaOverwritten = checkForInteressatOverwritten(interessatDistribucio, interessatsORepresenantsRipea);
-			
+
+			InteressatDto interessat = null;
 			if (interessatRipeaOverwritten != null) {
+				interessat = conversioTipusHelper.convertir(
+						interessatRipeaOverwritten,
+						InteressatDto.class);
 				if (interessatRipeaOverwritten.getRepresentant() != null) {
 					expedientInteressatHelper.deleteRepresentant(
-							entitatId, 
+							entitatId,
 							expedientId, 
 							interessatRipeaOverwritten.getId(), 
 							interessatRipeaOverwritten.getRepresentant().getId(), 
@@ -400,8 +376,10 @@ public class ExpedientHelper {
 			InteressatDto createdInteressat = expedientInteressatHelper.create(
 					entitatId,
 					expedientId,
-					toInteressatDto(interessatDistribucio, null),
-					false, 
+					interessat != null ?
+						toInteressatMergedDto(interessatDistribucio, interessat):
+						toInteressatDto(interessatDistribucio, null),
+					false,
 					permission, 
 					rolActual, 
 					false);
@@ -410,8 +388,10 @@ public class ExpedientHelper {
 						entitatId,
 						expedientId,
 						createdInteressat.getId(),
-						toInteressatDto(interessatDistribucio.getRepresentant(), null),
-						false, 
+						interessat != null && interessat.getRepresentant() != null ?
+							toInteressatMergedDto(interessatDistribucio.getRepresentant(), interessat.getRepresentant()):
+							toInteressatDto(interessatDistribucio.getRepresentant(), null),
+						false,
 						permission, 
 						rolActual, 
 						false);
@@ -1702,6 +1682,91 @@ public class ExpedientHelper {
 			break;
 		}
 		return interessatDto;
+	}
+
+	public InteressatDto toInteressatMergedDto(RegistreInteressatEntity registreInteressatEntity, InteressatDto existingInteressatDto) {
+		switch (registreInteressatEntity.getTipus()) {
+			case PERSONA_FISICA:
+				InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto) existingInteressatDto;
+				if (registreInteressatEntity.getDocumentTipus() != null)
+					interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+				if (registreInteressatEntity.getDocumentNumero() != null)
+					interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+				if (registreInteressatEntity.getPaisCodi() != null)
+					interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
+				if (registreInteressatEntity.getProvinciaCodi() != null)
+					interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+				if (registreInteressatEntity.getMunicipiCodi() != null)
+					interessatPersonaFisicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+				if (registreInteressatEntity.getAdresa() != null)
+					interessatPersonaFisicaDto.setAdresa(registreInteressatEntity.getAdresa());
+				if (registreInteressatEntity.getCp() != null)
+					interessatPersonaFisicaDto.setCodiPostal(registreInteressatEntity.getCp());
+				if (registreInteressatEntity.getEmail() != null)
+					interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
+				if (registreInteressatEntity.getTelefon() != null)
+					interessatPersonaFisicaDto.setTelefon(registreInteressatEntity.getTelefon());
+				if (registreInteressatEntity.getObservacions() != null)
+					interessatPersonaFisicaDto.setObservacions(registreInteressatEntity.getObservacions());
+				if (registreInteressatEntity.getNom() != null)
+					interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
+				if (registreInteressatEntity.getLlinatge1() != null)
+					interessatPersonaFisicaDto.setLlinatge1(registreInteressatEntity.getLlinatge1());
+				if (registreInteressatEntity.getLlinatge2() != null)
+					interessatPersonaFisicaDto.setLlinatge2(registreInteressatEntity.getLlinatge2());
+				break;
+			case PERSONA_JURIDICA:
+				InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto) existingInteressatDto;
+				if (registreInteressatEntity.getDocumentTipus() != null)
+					interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+				if (registreInteressatEntity.getDocumentNumero() != null)
+					interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+				if (registreInteressatEntity.getPaisCodi() != null)
+					interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
+				if (registreInteressatEntity.getProvinciaCodi() != null)
+					interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+				if (registreInteressatEntity.getMunicipiCodi() != null)
+					interessatPersonaJuridicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+				if (registreInteressatEntity.getAdresa() != null)
+					interessatPersonaJuridicaDto.setAdresa(registreInteressatEntity.getAdresa());
+				if (registreInteressatEntity.getCp() != null)
+					interessatPersonaJuridicaDto.setCodiPostal(registreInteressatEntity.getCp());
+				if (registreInteressatEntity.getEmail() != null)
+					interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
+				if (registreInteressatEntity.getTelefon() != null)
+					interessatPersonaJuridicaDto.setTelefon(registreInteressatEntity.getTelefon());
+				if (registreInteressatEntity.getObservacions() != null)
+					interessatPersonaJuridicaDto.setObservacions(registreInteressatEntity.getObservacions());
+				if (registreInteressatEntity.getRaoSocial() != null)
+					interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
+				break;
+			case ADMINISTRACIO:
+				InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) existingInteressatDto;
+				if (registreInteressatEntity.getDocumentTipus() != null)
+					interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+				if (registreInteressatEntity.getDocumentNumero() != null)
+					interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+				if (registreInteressatEntity.getPaisCodi() != null)
+					interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
+				if (registreInteressatEntity.getProvinciaCodi() != null)
+					interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+				if (registreInteressatEntity.getMunicipiCodi() != null)
+					interessatAdministracioDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+				if (registreInteressatEntity.getAdresa() != null)
+					interessatAdministracioDto.setAdresa(registreInteressatEntity.getAdresa());
+				if (registreInteressatEntity.getCp() != null)
+					interessatAdministracioDto.setCodiPostal(registreInteressatEntity.getCp());
+				if (registreInteressatEntity.getEmail() != null)
+					interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());
+				if (registreInteressatEntity.getTelefon() != null)
+					interessatAdministracioDto.setTelefon(registreInteressatEntity.getTelefon());
+				if (registreInteressatEntity.getObservacions() != null)
+					interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
+				if (registreInteressatEntity.getOrganCodi() != null)
+					interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());
+				break;
+		}
+		return existingInteressatDto;
 	}
 
 	private InteressatDocumentTipusEnumDto toInteressatDocumentTipusEnumDto(DocumentTipus documentTipus) {

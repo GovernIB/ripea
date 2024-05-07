@@ -3,17 +3,6 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
@@ -35,6 +24,15 @@ import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -253,7 +251,13 @@ public class ContingutServiceBean implements ContingutService {
 				contingutId);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed("tothom")
+    public void sincronitzarEstatArxiu(Long entitatId, Long contingutId) {
+        delegate.sincronitzarEstatArxiu(entitatId, contingutId);
+    }
+
+    @Override
 	@RolesAllowed("tothom")
 	public FitxerDto exportacioEni(
 			Long entitatId,

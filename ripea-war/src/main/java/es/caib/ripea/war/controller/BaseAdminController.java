@@ -3,16 +3,15 @@
  */
 package es.caib.ripea.war.controller;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controlador base que implementa funcionalitats comunes per als controladors
@@ -40,7 +39,7 @@ public class BaseAdminController extends BaseController {
 			throw new SecurityException("No te cap entitat assignada");
 		}
 
-		if (!entitat.isUsuariActualTeOrgans()) {
+		if (!entitat.isUsuariActualAdministration() && !entitat.isUsuariActualTeOrgans()) {
 			throw new SecurityException("No te permisos per accedir a aquesta entitat com a administrador");
 		}
 		return entitat;

@@ -3,21 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
@@ -42,11 +27,25 @@ import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.RolHelper;
 import es.caib.ripea.core.helper.UsuariHelper;
+import es.caib.ripea.core.repository.EntitatRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.usuari.DadesUsuari;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementació dels mètodes per a gestionar la versió de l'aplicació.
@@ -82,6 +81,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 	private GrupRepository grupRepository;
 	@Resource
 	private RolHelper rolHelper;
+    @Autowired
+    private EntitatRepository entitatRepository;
 
 	@Override
 	public void actualitzarEntiatThreadLocal(EntitatDto entitat) {
@@ -178,7 +179,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.isExpedientListGrup(),
 				dto.getProcedimentId() != null ? metaExpedientRepository.findOne(dto.getProcedimentId()) : null,
 				dto.getVistaActual(), 
-				dto.isExpedientExpandit());
+				dto.isExpedientExpandit(),
+				dto.getEntitatPerDefecteId() != null ? entitatRepository.findOne(dto.getEntitatPerDefecteId()) : null);
 		
 		return toUsuariDtoAmbRols(usuari);
 	}
@@ -429,6 +431,7 @@ public class AplicacioServiceImpl implements AplicacioService {
 			dto.setRols(rols);
 		}
 		dto.setProcedimentId(usuari.getProcediment() != null ? usuari.getProcediment().getId() : null);
+		dto.setEntitatPerDefecteId(usuari.getEntitatPerDefecte() != null ? usuari.getEntitatPerDefecte().getId() : null);
 		return dto;
 	}
 	

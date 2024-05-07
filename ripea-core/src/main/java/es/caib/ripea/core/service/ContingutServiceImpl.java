@@ -3,31 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
@@ -35,40 +10,8 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.plugins.arxiu.api.DocumentMetadades;
 import es.caib.plugins.arxiu.api.ExpedientMetadades;
 import es.caib.plugins.arxiu.api.Firma;
-import es.caib.ripea.core.api.dto.AlertaDto;
-import es.caib.ripea.core.api.dto.ArxiuContingutDto;
-import es.caib.ripea.core.api.dto.ArxiuContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.ContingutFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
-import es.caib.ripea.core.api.dto.ContingutLogDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutMovimentDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DominiDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
-import es.caib.ripea.core.api.dto.ResultDto;
-import es.caib.ripea.core.api.dto.ResultEnumDto;
-import es.caib.ripea.core.api.dto.ResultatConsultaDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -116,6 +59,29 @@ import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
 import es.caib.ripea.core.repository.URLInstruccioRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació dels mètodes per a gestionar continguts.
@@ -1332,14 +1298,14 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniClassificacio(metadades.getClassificacio());
 				if (metadades.getEstat() != null) {
 					switch (metadades.getEstat()) {
-					case OBERT:
-						arxiuDetall.setEniEstat(ExpedientEstatEnumDto.OBERT);
-						break;
-					case TANCAT:
-						arxiuDetall.setEniEstat(ExpedientEstatEnumDto.TANCAT);
-						break;
-					case INDEX_REMISSIO:
-						break;
+						case OBERT:
+							arxiuDetall.setEniEstat(ExpedientEstatEnumDto.OBERT);
+							break;
+						case TANCAT:
+							arxiuDetall.setEniEstat(ExpedientEstatEnumDto.TANCAT);
+							break;
+						case INDEX_REMISSIO:
+							break;
 					}
 				}
 				arxiuDetall.setEniInteressats(metadades.getInteressats());
@@ -1406,18 +1372,19 @@ public class ContingutServiceImpl implements ContingutService {
 				arxiuDetall.setEniDocumentOrigenId(metadades.getIdentificadorOrigen());
 				
 				final String fechaSelladoKey = "eni:fecha_sellado";
-				if (metadades.getMetadadesAddicionals().containsKey(fechaSelladoKey)) {
+				Map<String, Object> metadadasAddicionals = metadades.getMetadadesAddicionals();
+				if (metadadasAddicionals != null && metadadasAddicionals.containsKey(fechaSelladoKey)) {
 					try {
 						DateFormat dfIn= new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 						DateFormat dfOut = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-						Date fechaSelladoValor = dfIn.parse(metadades.getMetadadesAddicionals().get(fechaSelladoKey).toString());
+						Date fechaSelladoValor = dfIn.parse(metadadasAddicionals.get(fechaSelladoKey).toString());
 						String fechaSelladoValorStr = dfOut.format(fechaSelladoValor);
-						metadades.getMetadadesAddicionals().put(fechaSelladoKey, fechaSelladoValorStr);
+						metadadasAddicionals.put(fechaSelladoKey, fechaSelladoValorStr);
 					} catch (ParseException e) {
 						logger.error(e.getMessage(), e);
 					}		
 				}
-				arxiuDetall.setMetadadesAddicionals(metadades.getMetadadesAddicionals());
+				arxiuDetall.setMetadadesAddicionals(metadadasAddicionals);
 				
 				if (arxiuDocument.getContingut() != null) {
 					arxiuDetall.setContingutArxiuNom(
@@ -1574,6 +1541,100 @@ public class ContingutServiceImpl implements ContingutService {
 		}
 		return arxiuDetall;
 	}
+
+	@Transactional
+	@Override
+	public void sincronitzarEstatArxiu(
+			Long entitatId,
+			Long contingutId) {
+
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutId));
+		logger.debug("Sincronitzant estat de l'expedient i documents amb l'arxiu pel contingut ("
+				+ "entitatId=" + entitatId + ", "
+				+ "contingutId=" + contingutId + ")");
+		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
+				entitatId,
+				contingutId,
+				true,
+				false);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
+				entitatId,
+				false,
+				false,
+				false,
+				true, false);
+
+		if (!(contingut instanceof  ExpedientEntity)) {
+			throw new ValidationException(contingutId, ContingutEntity.class,
+					"El contingut amb id=" + contingutId + "a sincronitzar no és de tipus expedient");
+		}
+
+		// ##################### EXPEDIENT ##################################
+		ExpedientEntity expedient = (ExpedientEntity)contingut;
+		sincronitzaEstatExpedient(expedient);
+
+		// ##################### DOCUMENTS ##################################
+		List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
+		sincronitzaEstatDocumetns(documents);
+	}
+
+	private void sincronitzaEstatExpedient(ExpedientEntity expedient) {
+		es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
+		if (arxiuExpedient == null)
+			return;
+		ExpedientMetadades metadades = arxiuExpedient.getMetadades();
+		ExpedientEstatEnumDto estat = null;
+		if (metadades != null) {
+			if (metadades.getEstat() != null) {
+				switch (metadades.getEstat()) {
+					case OBERT:
+						estat = ExpedientEstatEnumDto.OBERT;
+						break;
+					case TANCAT:
+						estat = ExpedientEstatEnumDto.TANCAT;
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		if (estat != null && !estat.equals(expedient.getEstat())) {
+			expedient.updateEstat(estat, ExpedientEstatEnumDto.TANCAT.equals(estat) ? "Sincronització amb l'estat de l'arxiu" : null);
+		}
+	}
+
+	private void sincronitzaEstatDocumetns(List<DocumentEntity> documents) {
+		if (documents != null) {
+			for (DocumentEntity document : documents) {
+				sincronitzarEstatDocument(document);
+			}
+		}
+	}
+
+	private void sincronitzarEstatDocument(DocumentEntity document) {
+		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
+		ArxiuEstatEnumDto estat = null;
+		if (arxiuDocument != null && arxiuDocument.getEstat() != null) {
+			switch (arxiuDocument.getEstat()) {
+				case ESBORRANY:
+					estat = ArxiuEstatEnumDto.ESBORRANY;
+					break;
+				case DEFINITIU:
+					estat = ArxiuEstatEnumDto.DEFINITIU;
+					break;
+				default:
+					break;
+			}
+		}
+		if (estat != null && !estat.equals(document.getArxiuEstat())) {
+			document.updateArxiuEstat(estat);
+			if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()
+					&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
+				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+			}
+		}
+	}
+
 
 	@Transactional(readOnly = true)
 	@Override

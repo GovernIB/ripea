@@ -93,6 +93,7 @@
 								elementRetorn: plugin.settings.elementRetorn,
 								segonaModal: plugin.settings.segonaModal,
 								height: plugin.settings.height,
+								width: plugin.settings.width,
 								funcToCallOnTancar: plugin.settings.funcToCallOnTancar
 							});
 							
@@ -111,6 +112,7 @@
 								elementRetorn: plugin.settings.elementRetorn,
 								segonaModal: plugin.settings.segonaModal,
 								height: plugin.settings.height,
+								width: plugin.settings.width,
 								funcToCallOnTancar: plugin.settings.funcToCallOnTancar
 							});
 						}
@@ -212,6 +214,9 @@
 						var modalForm = (dataForm) ? $(dataForm, $(iframe).contents()) : $(settings.elementForm, $(iframe).contents());
 						if (modalForm.length) {
 							modalForm.attr('action', webutilUrlAmbPrefix(modalForm.attr('action'), '/modal'));
+						}
+						if (settings.width) {
+							$('.modal-dialog', modalobj).css('width', 'min(98%, ' + settings.width + ')');
 						}
 						if (settings.maximized) {
 							// Maximitzar

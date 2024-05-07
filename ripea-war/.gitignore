@@ -5,5 +5,5 @@ target/
 /rebel.xml
 /.tern-project
 /bin/
-/appserv_tomcat
 /appserv_jboss
+/appserv_tomcat

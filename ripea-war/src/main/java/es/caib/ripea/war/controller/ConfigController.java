@@ -1,12 +1,19 @@
 package es.caib.ripea.war.controller;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
+import com.google.common.base.Strings;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.config.ConfigDto;
+import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
+import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.war.command.ConfigCommand;
+import es.caib.ripea.war.command.OrganConfigCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.SessioHelper;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,20 +26,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.base.Strings;
-
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.config.ConfigDto;
-import es.caib.ripea.core.api.dto.config.ConfigGroupDto;
-import es.caib.ripea.core.api.service.ConfigService;
-import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.war.command.ConfigCommand;
-import es.caib.ripea.war.command.OrganConfigCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controlador per a la gestió de la configuració de l'aplicació.
@@ -76,7 +74,7 @@ public class ConfigController extends BaseUserController{
         int status = 1;
         try {
             configService.updateProperty(configCommand.asDto());
-    		
+			SessioHelper.resetPropietats();
         } catch (Exception e) {
             e.printStackTrace();
             msg = "config.controller.edit.error";
@@ -92,6 +90,7 @@ public class ConfigController extends BaseUserController{
 
         try {
             List<String> editedProperties = configService.syncFromJBossProperties();
+			SessioHelper.resetPropietats();
             return SyncResponse.builder().status(true).editedProperties(editedProperties).build();
         } catch (Exception e) {
             return SyncResponse.builder().status(false).build();
@@ -108,11 +107,9 @@ public class ConfigController extends BaseUserController{
 
         try {
         	configService.configurableEntitat(key, configurable);
-        	
-        	 return SimpleResponse.builder().status(1).message(getMessage(request, "config.controller.edit.ok")).build();
+			SessioHelper.resetPropietats();
+        	return SimpleResponse.builder().status(1).message(getMessage(request, "config.controller.edit.ok")).build();
         } catch (Exception ex) {
-            
-
             return SimpleResponse.builder().status(0).message(getMessage(request, "config.controller.edit.error")).build();
         }
         
@@ -126,13 +123,10 @@ public class ConfigController extends BaseUserController{
 			@RequestParam(value = "configurable") boolean configurable) {
 
         try {
-        	
         	configService.configurableOrgan(key, configurable);
-        	
-        	 return SimpleResponse.builder().status(1).message(getMessage(request, "config.controller.edit.ok")).build();
+			SessioHelper.resetPropietats();
+        	return SimpleResponse.builder().status(1).message(getMessage(request, "config.controller.edit.ok")).build();
         } catch (Exception ex) {
-            
-
             return SimpleResponse.builder().status(0).message(getMessage(request, "config.controller.edit.error")).build();
         }
         
@@ -191,17 +185,14 @@ public class ConfigController extends BaseUserController{
 		}
 		
 		configService.createPropertyOrgan(OrganConfigCommand.asDto(command));
-		
+		SessioHelper.resetPropietats();
 
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../config",
 				"config.controller.organ.new.ok");
-			
-
 	}
-	
-	
+
 	@RequestMapping(value = "/organ/update", method = RequestMethod.GET)
 	public String getOrganUpdate(
 			HttpServletRequest request,
@@ -210,13 +201,10 @@ public class ConfigController extends BaseUserController{
 
 		OrganConfigCommand command = OrganConfigCommand.asCommand(configService.findConfigOrgan(key));
 		model.addAttribute(command);
-		
 		model.addAttribute("config", configService.findConfig(key));
-		
 		return "configOrganForm";
 	}
-	
-	
+
 	@RequestMapping(value = "/organ/update", method = RequestMethod.POST)
 	public String postOrganUpdate(
 			HttpServletRequest request,
@@ -233,6 +221,7 @@ public class ConfigController extends BaseUserController{
 		}
 		
 		configService.modificarPropertyOrgan(OrganConfigCommand.asDto(command));
+		SessioHelper.resetPropietats();
 
 		return getModalControllerReturnValueSuccess(
 				request,
@@ -249,6 +238,7 @@ public class ConfigController extends BaseUserController{
 			Model model) {
 
 		configService.deletePropertyOrgan(key);
+		SessioHelper.resetPropietats();
 		
 		return getAjaxControllerReturnValueSuccess(request,
 				"redirect:../../config",

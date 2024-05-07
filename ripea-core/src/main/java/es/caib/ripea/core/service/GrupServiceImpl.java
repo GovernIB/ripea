@@ -1,21 +1,5 @@
 package es.caib.ripea.core.service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.GrupDto;
 import es.caib.ripea.core.api.dto.GrupFiltreDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
@@ -45,6 +29,21 @@ import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class GrupServiceImpl implements GrupService {
@@ -546,7 +545,7 @@ public class GrupServiceImpl implements GrupService {
 					null,
 					organGestorId == null,
 					organGestorId);
-			if (rolActual == "tothom") {
+			if ("tothom".equals(rolActual)) {
 				permisosHelper.filterGrantedAny(
 						grups,
 						GrupEntity.class,

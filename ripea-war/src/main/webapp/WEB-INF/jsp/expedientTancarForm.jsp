@@ -46,7 +46,7 @@
 					<th><spring:message code="contingut.info.tipus"/></th>
 					<th><spring:message code="contingut.info.createl"/></th>
 					<th><spring:message code="contingut.info.creatper"/></th>
-					<th width="10%">&nbsp;</th>
+					<th width="10%"><input id="select-all-docs" type="checkbox" /></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -80,6 +80,14 @@
 <script>
 setTimeout(() => {
 	$(document).ready(function() {
+		$('#select-all-docs').on('click', function(event) {
+			$('input[name=documentsPerFirmar]:checkbox').prop('checked', event.currentTarget.checked);
+		});
+		$('input[name=documentsPerFirmar]').on('change', function(event) {
+			const total = $('input[name=documentsPerFirmar]:checkbox').length;
+			const countSeleccionats = $('input[name=documentsPerFirmar]:checked').length;
+			$('#select-all-docs').prop('checked', total == countSeleccionats);
+		});
 		$('button.btn-success', '#modal-botons').on('click', function(event) {
 			let countSeleccionats = $('input[name=documentsPerFirmar]:checked').length;
 			let total = $('input[name=documentsPerFirmar]:checkbox').length;

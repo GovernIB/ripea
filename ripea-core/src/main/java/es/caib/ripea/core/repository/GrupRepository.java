@@ -1,15 +1,14 @@
 package es.caib.ripea.core.repository;
 
-import java.util.List;
-
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.GrupEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.GrupEntity;
+import java.util.List;
 
 public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 	
@@ -27,7 +26,7 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 	
 	
 	
-	@Query(	"select " +
+	@Query(	"select distinct " +
 			"    grup " +
 			"from " +
 			"    GrupEntity grup " +
@@ -59,7 +58,7 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 	
 	
 	
-	@Query(	"select " +
+	@Query(	"select distinct " +
 			"    grup " +
 			"from " +
 			"    GrupEntity grup " +
@@ -95,7 +94,7 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("organGestorAscendentId") Long organGestorAscendentId,	
 			Pageable pageable);
 	
-	@Query(	"select " +
+	@Query(	"select distinct " +
 			"    grup.id " +
 			"from " +
 			"    GrupEntity grup " +
@@ -131,7 +130,7 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("organGestorAscendentId") Long organGestorAscendentId);
 	
 	
-	@Query(	"select " +
+	@Query(	"select distinct " +
 			"    grup " +
 			"from " +
 			"    GrupEntity grup " +

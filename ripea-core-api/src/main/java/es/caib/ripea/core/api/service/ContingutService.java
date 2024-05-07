@@ -3,12 +3,6 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
@@ -29,6 +23,11 @@ import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.ValidacioErrorDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Declaració dels mètodes per a gestionar continguts.
@@ -441,7 +440,12 @@ public interface ContingutService {
 			Long entitatId,
 			Long contingutId) throws NotFoundException;
 
-	/**
+	@PreAuthorize("hasRole('tothom')")
+    void sincronitzarEstatArxiu(
+            Long entitatId,
+            Long contingutId);
+
+    /**
 	 * Genera l'exportació en format ENI d'un document o expedient.
 	 * 
 	 * @param entitatId

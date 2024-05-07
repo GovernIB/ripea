@@ -384,8 +384,15 @@ public class ConversioTipusHelper {
 						target.setIdentificador(source.getIdentificador());
 						target.setExpedientId(source.getExpedient() != null ? source.getExpedient().getId() : null);
 						target.setNotificaDistError(source.getNotificaDistError());
+						target.setDataAlta(source.getDataAlta());
 						target.setDataActualitzacio(source.getDataActualitzacio());
+						if (target.getDataActualitzacio() == null && source.getLastModifiedDate() != null) {
+							target.setDataActualitzacio(source.getLastModifiedDate().toDate());
+						}
 						target.setUsuariActualitzacio(source.getUsuariActualitzacio() != null ? source.getUsuariActualitzacio().getCodiAndNom() : "");
+						if ("".equals(target.getUsuariActualitzacio()) && source.getLastModifiedBy() != null) {
+							target.setUsuariActualitzacio(source.getLastModifiedBy().getCodiAndNom());
+						}
 						target.setObservacions(source.getObservacions());
 						target.setGrupId(source.getGrup() != null ? source.getGrup().getId() : null);
 						
@@ -427,6 +434,9 @@ public class ConversioTipusHelper {
 						target.setPendentCanviEstatDistribucio(source.isPendentCanviEstatDistribucio());
 						target.setReintentsCanviEstatDistribucio(source.getReintentsCanviEstatDistribucio());
 						target.setDataActualitzacio(source.getDataActualitzacio());
+						if (target.getDataActualitzacio() == null && source.getLastModifiedDate() != null) {
+							target.setDataActualitzacio(source.getLastModifiedDate().toDate());
+						}
 						
 						target.setGrupNom(source.getGrup() != null ? source.getGrup().getDescripcio() : null);
 						
