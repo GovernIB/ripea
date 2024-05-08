@@ -758,9 +758,9 @@ public class CacheHelper {
 				rolActual,
 				permisosPerAnotacions.getProcedimentsPermesos(),
 				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
-				permisosPerAnotacions.isAdminOrganHasPermisAdminComu());
-		
-		
+				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
+				permisosPerAnotacions.getIdsGrupsPermesos() == null,
+				permisosPerAnotacions.getIdsGrupsPermesos());
 	}
 	
 	

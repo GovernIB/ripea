@@ -118,4 +118,7 @@ public interface ExpedientPeticioService {
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public void comunicadaReprocessar(
 			Long expedientPeticioId) throws Throwable;
- }
+
+	@PreAuthorize("hasRole('tothom')")
+    public Long getPeriodeActualitzacioContadorAnotacionsPendents();
+}
