@@ -1,52 +1,17 @@
 package es.caib.ripea.core.helper;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
-//import org.fundaciobit.pluginsib.validatecertificate.InformacioCertificat;
-import org.fundaciobit.plugins.certificate.InformacioCertificat;
-import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
-import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
-import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
-import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
-import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
-import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
-import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.google.common.base.Strings;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.tool.xml.Experimental;
-
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
 import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
 import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
 import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
+import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.DocumentEstat;
@@ -61,61 +26,7 @@ import es.caib.plugins.arxiu.api.Firma;
 import es.caib.plugins.arxiu.api.FirmaTipus;
 import es.caib.plugins.arxiu.api.IArxiuPlugin;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.ArbreNodeDto;
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaPerfilEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuOperacioEnumDto;
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioPerfilDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioTransaccioRespostaDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.FirmaResultatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.ImportacioDto;
-import es.caib.ripea.core.api.dto.IntegracioAccioDto;
-import es.caib.ripea.core.api.dto.IntegracioAccioTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentTipusGenericEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NivellAdministracioDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.PortafirmesCarrecDto;
-import es.caib.ripea.core.api.dto.PortafirmesDocumentTipusDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxEstatDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxInfoDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxRespostaDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxReviserDto;
-import es.caib.ripea.core.api.dto.PortafirmesFluxSignerDto;
-import es.caib.ripea.core.api.dto.PortafirmesIniciFluxRespostaDto;
-import es.caib.ripea.core.api.dto.ProcedimentDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
-import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
-import es.caib.ripea.core.api.dto.TipusDocumentalDto;
-import es.caib.ripea.core.api.dto.TipusImportEnumDto;
-import es.caib.ripea.core.api.dto.TipusViaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
@@ -192,6 +103,39 @@ import es.caib.ripea.plugin.viafirma.ViaFirmaDocument;
 import es.caib.ripea.plugin.viafirma.ViaFirmaParams;
 import es.caib.ripea.plugin.viafirma.ViaFirmaPlugin;
 import es.caib.ripea.plugin.viafirma.ViaFirmaResponse;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
+import org.fundaciobit.plugins.certificate.InformacioCertificat;
+import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
+import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
+import org.fundaciobit.plugins.validatesignature.api.SignatureRequestedInformation;
+import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
+import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
+import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Helper per a interactuar amb els plugins.
@@ -813,7 +757,7 @@ public class PluginHelper {
 			List<ArxiuFirmaDto> firmes,	
 			ArxiuEstatEnumDto arxiuEstat) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(document.getId()));
-		ContingutArxiu documentArxiuCreatOModificat;
+		ContingutArxiu documentArxiuCreatOModificat = null;
 		
 		boolean throwExceptionDocumentArxiu = false;
 		if (throwExceptionDocumentArxiu) { // throwExceptionDocumentArxiu = true;
@@ -838,10 +782,46 @@ public class PluginHelper {
 						firmes,
 						ArxiuOperacioEnumDto.CREACIO,
 						arxiuEstat);
-				
-				documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
-						documentArxiu,
-						contingutPare.getArxiuUuid());
+
+				try {
+					documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
+							documentArxiu,
+							contingutPare.getArxiuUuid());
+				} catch (Exception e) {
+					if (e.getMessage().contains("Duplicate child name not allowed") || e.getMessage().contains("Petición mal formada")) {
+						logger.info("Document a desar a l'arxiu ja existeix");
+
+						List<ContingutArxiu> documents = new ArrayList<>();
+						if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
+							Expedient expedient = arxiuExpedientConsultar(document.getExpedient());
+							documents = documentsExpedientArxiu(expedient);
+						} else if (ContingutTipusEnumDto.CARPETA.equals(contingutPare.getTipus())) {
+							Carpeta carpeta = arxiuCarpetaConsultarPerUuid(contingutPare.getArxiuUuid());
+							documents = documentsCarpetaArxiu(carpeta);
+						}
+
+						for (ContingutArxiu contingutArxiu : documents) {
+                            if (contingutArxiu.getNom().equals(document.getNom())) {
+								documentArxiu.setIdentificador(contingutArxiu.getIdentificador());
+								Document documentJaDesatEnArxiu = getArxiuPlugin().documentDetalls(contingutArxiu.getIdentificador(), null, false);
+
+								if (DocumentEstat.ESBORRANY.equals(documentJaDesatEnArxiu.getEstat())) {
+									documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
+								} else {
+									documentArxiuCreatOModificat = contingutArxiu;
+									if (documentJaDesatEnArxiu.getEstat() != null) {
+										arxiuEstat = ArxiuEstatEnumDto.valueOf(documentJaDesatEnArxiu.getEstat().name());
+									}
+								}
+                                break;
+                            }
+                        }
+
+						if (documentArxiuCreatOModificat == null) {
+							throw new RuntimeException("Error al crear o modificar el documento en el arxiu", e);
+						}
+					}
+				}
 				document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
 				document.updateArxiuEstat(arxiuEstat);
 
@@ -874,7 +854,29 @@ public class PluginHelper {
 					ex);
 		}
 	}
-	
+
+	private List<ContingutArxiu> documentsExpedientArxiu(Expedient arxiuExpedient) {
+		return getDocuments(arxiuExpedient.getContinguts());
+	}
+
+	private List<ContingutArxiu> documentsCarpetaArxiu(Carpeta arxiuCarpeta) {
+		return getDocuments(arxiuCarpeta.getContinguts());
+	}
+
+	private List<ContingutArxiu> getDocuments(List<ContingutArxiu> contingutList) {
+		List<ContingutArxiu> documents = new ArrayList<>();
+
+		for (ContingutArxiu contingut: contingutList) {
+			if (ContingutTipus.DOCUMENT.equals(contingut.getTipus())) {
+				documents.add(contingut);
+//			} else if (ContingutTipus.CARPETA.equals(contingut.getTipus())) {
+//				documents.addAll(documentsCarpetaArxiu(arxiuCarpetaConsultarPerUuid(contingut.getIdentificador())));
+			}
+		}
+
+		return documents;
+	}
+
 	// Plugin arxiu filesystem
 	public String arxiuExpedientDistribucioCrear(
 			String registreNumero,
