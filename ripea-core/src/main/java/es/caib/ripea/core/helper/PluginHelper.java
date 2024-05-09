@@ -787,40 +787,44 @@ public class PluginHelper {
 					documentArxiuCreatOModificat = getArxiuPlugin().documentCrear(
 							documentArxiu,
 							contingutPare.getArxiuUuid());
-				} catch (Exception e) {
-					if (e.getMessage().contains("Duplicate child name not allowed") || e.getMessage().contains("Petición mal formada")) {
-						logger.info("Document a desar a l'arxiu ja existeix");
+				} catch (Exception ex) {
+					if (ex.getMessage().contains("Duplicate child name not allowed") || ex.getMessage().contains("Petición mal formada")) {
+						logger.error("Error al crear o modificar el documento en el arxiu. Document a desar a l'arxiu ja existeix.");
+						logger.error("\t>>> Id pare=" + contingutPare.getArxiuUuid());
+						logger.error("\t>>> Nom pare=" + contingutPare.getNom());
+						logger.error("\t>>> Nom=" + documentArxiu.getNom());
 
-						List<ContingutArxiu> documents = new ArrayList<>();
-						if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
-							Expedient expedient = arxiuExpedientConsultar(document.getExpedient());
-							documents = documentsExpedientArxiu(expedient);
-						} else if (ContingutTipusEnumDto.CARPETA.equals(contingutPare.getTipus())) {
-							Carpeta carpeta = arxiuCarpetaConsultarPerUuid(contingutPare.getArxiuUuid());
-							documents = documentsCarpetaArxiu(carpeta);
-						}
-
-						for (ContingutArxiu contingutArxiu : documents) {
-                            if (contingutArxiu.getNom().equals(document.getNom())) {
-								documentArxiu.setIdentificador(contingutArxiu.getIdentificador());
-								Document documentJaDesatEnArxiu = getArxiuPlugin().documentDetalls(contingutArxiu.getIdentificador(), null, false);
-
-								if (DocumentEstat.ESBORRANY.equals(documentJaDesatEnArxiu.getEstat())) {
-									documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
-								} else {
-									documentArxiuCreatOModificat = contingutArxiu;
-									if (documentJaDesatEnArxiu.getEstat() != null) {
-										arxiuEstat = ArxiuEstatEnumDto.valueOf(documentJaDesatEnArxiu.getEstat().name());
-									}
-								}
-                                break;
-                            }
-                        }
-
-						if (documentArxiuCreatOModificat == null) {
-							throw new RuntimeException("Error al crear o modificar el documento en el arxiu", e);
-						}
+//						List<ContingutArxiu> documents = new ArrayList<>();
+//						if (ContingutTipusEnumDto.EXPEDIENT.equals(contingutPare.getTipus())) {
+//							Expedient expedient = arxiuExpedientConsultar(document.getExpedient());
+//							documents = documentsExpedientArxiu(expedient);
+//						} else if (ContingutTipusEnumDto.CARPETA.equals(contingutPare.getTipus())) {
+//							Carpeta carpeta = arxiuCarpetaConsultarPerUuid(contingutPare.getArxiuUuid());
+//							documents = documentsCarpetaArxiu(carpeta);
+//						}
+//
+//						for (ContingutArxiu contingutArxiu : documents) {
+//                            if (contingutArxiu.getNom().equals(document.getNom())) {
+//								documentArxiu.setIdentificador(contingutArxiu.getIdentificador());
+//								Document documentJaDesatEnArxiu = getArxiuPlugin().documentDetalls(contingutArxiu.getIdentificador(), null, false);
+//
+//								if (DocumentEstat.ESBORRANY.equals(documentJaDesatEnArxiu.getEstat())) {
+//									documentArxiuCreatOModificat = getArxiuPlugin().documentModificar(documentArxiu);
+//								} else {
+//									documentArxiuCreatOModificat = contingutArxiu;
+//									if (documentJaDesatEnArxiu.getEstat() != null) {
+//										arxiuEstat = ArxiuEstatEnumDto.valueOf(documentJaDesatEnArxiu.getEstat().name());
+//									}
+//								}
+//                                break;
+//                            }
+//                        }
+//
+//						if (documentArxiuCreatOModificat == null) {
+//							throw new RuntimeException("Error al crear o modificar el documento en el arxiu", ex);
+//						}
 					}
+					throw ex;
 				}
 				document.updateArxiu(documentArxiuCreatOModificat.getIdentificador());
 				document.updateArxiuEstat(arxiuEstat);
