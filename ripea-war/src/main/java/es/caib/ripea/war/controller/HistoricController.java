@@ -55,7 +55,6 @@ public class HistoricController extends BaseAdminController {
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(HttpServletRequest request, HttpServletResponse response, Model model) throws IOException {
-		getEntitatActualComprovantPermisAdminEntitat(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		model.addAttribute(historicFiltreCommand);
 		model.addAttribute("showDadesEntitat", historicFiltreCommand.showingDadesEntitat());
@@ -64,7 +63,7 @@ public class HistoricController extends BaseAdminController {
 		model.addAttribute("showDadesInteressat", historicFiltreCommand.showingDadesInteressat());
 		model.addAttribute("showingDadesActuals", historicFiltreCommand.getTipusAgrupament() == null);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		String[] usuaris = (String[])RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS);
 		if (usuaris == null) {
 			usuaris = new String[0];
@@ -95,7 +94,7 @@ public class HistoricController extends BaseAdminController {
 			BindingResult bindingResult,
 			Model model,
 			@RequestParam(value = "accio", required = false) String accio) {
-		getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisos(request);
 		if ("netejar".equals(accio)) {
 			RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
 			return "redirect:historic";
@@ -109,7 +108,7 @@ public class HistoricController extends BaseAdminController {
 	@RequestMapping(value = "/expedient/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse expedientsDatatable(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		PaginaDto<HistoricExpedientDto> pagina = null;
@@ -128,7 +127,7 @@ public class HistoricController extends BaseAdminController {
 	@RequestMapping(value = "/chart/entitat", method = RequestMethod.GET)
 	@ResponseBody
 	public List<HistoricExpedientDto> expedientsEntitatChartData(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<HistoricExpedientDto> result = null;
@@ -146,7 +145,7 @@ public class HistoricController extends BaseAdminController {
 	@RequestMapping(value = "/entitat/actual", method = RequestMethod.GET)
 	@ResponseBody
 	public List<HistoricExpedientDto> getHistoricExpedientActual(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<HistoricExpedientDto> result = null;
@@ -168,8 +167,7 @@ public class HistoricController extends BaseAdminController {
 			HttpServletRequest request, 
 			HttpServletResponse response,
 			@RequestParam("metrics[]") HistoricMetriquesEnumDto[] metrics) throws IOException {
-		getEntitatActualComprovantPermisAdminEntitat(request);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		Map<OrganGestorDto, List<HistoricExpedientDto>> dades = null;
@@ -202,7 +200,7 @@ public class HistoricController extends BaseAdminController {
 			HttpServletResponse response) throws IOException {
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		Map<OrganGestorDto, HistoricExpedientDto> dades = null;
 		
 		try {
@@ -231,10 +229,10 @@ public class HistoricController extends BaseAdminController {
 			@RequestParam("usuaris[]") String[] usuarisCodi) throws IOException {
 		// registram els usuaris consultats a la sessió
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS, usuarisCodi);
-		getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
 			try {
@@ -254,10 +252,10 @@ public class HistoricController extends BaseAdminController {
 			HttpServletResponse response,
 			@RequestParam("usuaris[]") String[] usuarisCodi) throws IOException {
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_USUARIS, usuarisCodi);
-		getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		Map<String, List<HistoricUsuariDto>> results = new HashMap<String, List<HistoricUsuariDto>>();
 		for (String codiUsuari : usuarisCodi) {
 			try {
@@ -277,10 +275,10 @@ public class HistoricController extends BaseAdminController {
 			@RequestParam("interessats[]") String[] interessatsDocNum) throws IOException {
 		// registram els usuaris consultats a la sessió
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessatsDocNum);
-		getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
 			try {
@@ -305,10 +303,10 @@ public class HistoricController extends BaseAdminController {
 			HttpServletResponse response,
 			@RequestParam("interessats[]") String[] interessatsDocNum) throws IOException {
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_INTERESSATS, interessatsDocNum);
-		getEntitatActualComprovantPermisAdminEntitat(request);
+		getEntitatActualComprovantPermisos(request);
 		HistoricFiltreCommand historicFiltreCommand = getFiltreCommand(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitat = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
 		Map<String, List<HistoricInteressatDto>> results = new HashMap<String, List<HistoricInteressatDto>>();
 		for (String docNum : interessatsDocNum) {
 			try {
@@ -330,7 +328,7 @@ public class HistoricController extends BaseAdminController {
 			historicFiltreCommand.setTipusAgrupament(HistoricTipusEnumDto.DIARI);
 		}
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		FitxerDto fitxer = null;
 		try {
 			if (historicFiltreCommand.showingDadesEntitat()) {
