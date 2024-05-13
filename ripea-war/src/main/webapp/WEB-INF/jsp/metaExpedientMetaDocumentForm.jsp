@@ -225,7 +225,6 @@ div.dropdown-menu.loading .rmodal_carrecs {
 				url: "<c:url value="/modal/metaDocument/iniciarTransaccio"/>",
 				success: function(transaccioResponse) {
 					if (transaccioResponse != null && !transaccioResponse.error) {
-						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
 						$('#metaDocumentCommand').addClass("hidden");
 						var fluxIframe = '<div class="iframe_container">' + 
 											'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe>' + 
@@ -359,10 +358,6 @@ div.dropdown-menu.loading .rmodal_carrecs {
 		
 		$("#portafirmesFluxId").trigger('change');
 
-		$('.modal-cancel').on('click', function(){
-			localStorage.removeItem('transaccioId');
-		});
-		
 		$(".portafirmesResponsables_btn").attr("title", "<spring:message code="metadocument.form.camp.portafirmes.carrecs"/>");
 		$("#portafirmesResponsables").on('select2:unselecting', function (e) {
 			var optionRemoved = e.params.args.data.id;

@@ -38,7 +38,7 @@ if (fluxIframe) {
 						<span>' + fluxErrorDesc + '</span> \
 					</div>';
 		//desactivar selecció si s'ha creat un nou flux
-		if (localStorage.getItem('transaccioId') == null && localStorage.getItem('transaccioId') == '') {
+		if (localStorage.getItem('tmpTransaccioId') == null && localStorage.getItem('tmpTransaccioId') == '') {
 			$modalFlux.find('#portafirmesFluxId').attr('disabled', false);
 		}
 
