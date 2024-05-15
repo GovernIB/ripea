@@ -1,0 +1,12 @@
+databaseChangeLog:
+- changeSet:
+    id: 1715760072391-1
+    author: limit
+    changes:
+    - update:
+        tableName: ipa_config
+        columns:
+          - column:
+              name: key
+              value: es.caib.ripea.plugin.arxiu.caib.csv_generation_definition
+        where: key='es.caib.ripea.plugin.arxiu.caib.csv.definicio'
