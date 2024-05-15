@@ -119,6 +119,7 @@ $(document).ready(function() {
 			updateSelectionForTipusDocument(tipus);
 		});
 
+		removeTransactionId();
 });//################################################## document ready END ##############################################################
 
 
@@ -163,13 +164,13 @@ function updateSelectionForTipusDocument(currentTipus) {
 function removeTransactionId(idModal) {
 	if (idModal) {
 		$('#' + idModal).on('hidden.bs.modal', function() {
-			var idTransaccio = localStorage.getItem('transaccioId');
+			var idTransaccio = localStorage.getItem('tmpTransaccioId');
 			if (idTransaccio) {
 				$.ajax({
 			    	type: 'GET',
 					url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
 					success: function() {
-						localStorage.removeItem('transaccioId');
+						localStorage.removeItem('tmpTransaccioId');
 					},
 					error: function(err) {
 						console.log("Error tancant la transacció");
@@ -177,6 +178,8 @@ function removeTransactionId(idModal) {
 			    });
 			}
 		});
+	} else {
+		localStorage.removeItem('tmpTransaccioId');
 	}
 }
 </script>

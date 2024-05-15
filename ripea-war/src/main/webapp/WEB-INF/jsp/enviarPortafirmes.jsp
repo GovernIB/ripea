@@ -391,7 +391,7 @@
 				url: "<c:url value="/modal/document/portafirmes/iniciarTransaccio"/>",
 				success: function(transaccioResponse, textStatus, XmlHttpRequest) {
 					if (transaccioResponse != null && !transaccioResponse.error) {
-						localStorage.setItem('transaccioId', transaccioResponse.idTransaccio);
+						localStorage.setItem('tmpTransaccioId', transaccioResponse.idTransaccio);
 						$('.content').addClass("hidden");
 						var fluxIframe = '<div class="iframe_container">' +
 								'<iframe onload="removeLoading()" id="fluxIframe" class="iframe_content" width="100%" height="100%" frameborder="0" allowtransparency="true" src="' + transaccioResponse.urlRedireccio + '"></iframe>' +
