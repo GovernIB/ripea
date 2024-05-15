@@ -4,33 +4,6 @@
 package es.caib.ripea.core.helper;
 
 //import static es.caib.ripea.core.service.MetaExpedientServiceImpl.metaExpedientsAmbOrganNoSincronitzat;
-import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
-
-import java.io.PrintWriter;
-import java.io.Serializable;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ArbreDto;
@@ -80,6 +53,33 @@ import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import static es.caib.ripea.core.service.MetaExpedientServiceImpl.progresActualitzacio;
 
 /**
  * Utilitats comunes pels meta-expedients.
@@ -139,7 +139,9 @@ public class MetaExpedientHelper {
 
 	@Autowired
 	private ExpedientRepository expedientRepository;
-    
+    @Autowired
+    private OrganGestorCacheHelper organGestorCacheHelper;
+
 	public long obtenirProximaSequenciaExpedient(
 			MetaExpedientEntity metaExpedient,
 			Integer any,
@@ -381,11 +383,10 @@ public class MetaExpedientHelper {
 		List<Long> organIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
 				OrganGestorEntity.class,
 				isAdminOrgan ? ExtendedPermission.ADMINISTRATION : permis));
-		organIds = organGestorRepository.findIdsByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organIds));
-		organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
-		organIds = Utils.getUniqueValues(organIds);
+		List<String> organCodis = organGestorRepository.findCodisByEntitatAndVigentIds(entitat, Utils.getNullIfEmpty(organIds));
+		organCodis = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organCodis);
 		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("MetaExpedientHelper.findAmbPermis organIds (" + (Utils.isNotEmpty(organIds) ? organIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t2) + " ms");
+			logger.info("MetaExpedientHelper.findAmbPermis organIds (" + (Utils.isNotEmpty(organCodis) ? organCodis.size() : 0) + ") time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		
 		long t3 = System.currentTimeMillis();
@@ -415,41 +416,66 @@ public class MetaExpedientHelper {
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis organProcedimentsComunsIds (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t4) + " ms");
 		
-		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
-		// in issue #1330 unnecessary ids were removed from the lists
-		// but if despite it there are still 1000+ values new solution must be implemented to not truncate lists.
-		if (Utils.isBiggerThan(metaExpedientIds, 1000)) {
-			logger.info("Truncating metaExpedientIds to 1000 to avoid ORA-01795");
-			metaExpedientIds = metaExpedientIds.subList(0, 1000); 
-		}
-		if (Utils.isBiggerThan(organIds, 1000)) {
-			logger.info("Truncating organIds to 1000 to avoid ORA-01795");
-			organIds = organIds.subList(0, 1000);
-		}
-		if (Utils.isBiggerThan(metaExpedientOrganIds, 1000)) {
-			logger.info("Truncating metaExpedientOrganIds to 1000 to avoid ORA-01795");
-			metaExpedientOrganIds = metaExpedientOrganIds.subList(0, 1000);
-		}
+//		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+//		// in issue #1330 unnecessary ids were removed from the lists
+//		// but if despite it there are still 1000+ values new solution must be implemented to not truncate lists.
+//		if (Utils.isBiggerThan(metaExpedientIds, 1000)) {
+//			logger.info("Truncating metaExpedientIds to 1000 to avoid ORA-01795");
+//			metaExpedientIds = metaExpedientIds.subList(0, 1000);
+//		}
+//		if (Utils.isBiggerThan(organCodis, 1000)) {
+//			logger.info("Truncating organIds to 1000 to avoid ORA-01795");
+//			organCodis = organCodis.subList(0, 1000);
+//		}
+//		if (Utils.isBiggerThan(metaExpedientOrganIds, 1000)) {
+//			logger.info("Truncating metaExpedientOrganIds to 1000 to avoid ORA-01795");
+//			metaExpedientOrganIds = metaExpedientOrganIds.subList(0, 1000);
+//		}
 			
 		long t5 = System.currentTimeMillis();
+		MetaExpedientFiltre filtre = MetaExpedientFiltre.builder()
+				.entitat(entitat)
+				.actiu(nomesActius)
+				.filtre(filtreNomOrCodiSia)
+				.esAdminEntitat(isAdminEntitat)
+				.esAdminOrgan(isAdminOrgan)
+				.metaExpedientIdPermesos(metaExpedientIds)
+				.organCodiPermesos(organCodis)
+				.metaExpedientOrganIdPermesos(metaExpedientOrganIds)
+				.revisioActiva(isRevisioActiva())
+				.organGestorIComu(comu && organId != null)
+				.organ(organId != null ? organGestorRepository.findOne(organId) : null)
+				.allComuns(accessAllComu)
+				.build();
+//		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(filtre); --> Ho deixam preparat per quan passem a jboss7
 		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndActiuAndFiltreAndPermes(
-				entitat,
-				!nomesActius,
-				nomesActius ? nomesActius : null,
-				filtreNomOrCodiSia == null || "".equals(filtreNomOrCodiSia.trim()),
-				filtreNomOrCodiSia == null ? "" : filtreNomOrCodiSia,
-				isAdminEntitat,
-				isAdminOrgan,
-				Utils.isEmpty(metaExpedientIds),
-				Utils.getNullIfEmpty(metaExpedientIds),
-				Utils.isEmpty(organIds),
-				Utils.getNullIfEmpty(organIds),
-				Utils.isEmpty(metaExpedientOrganIds),
-				Utils.getNullIfEmpty(metaExpedientOrganIds), 
-				isRevisioActiva(),
-				comu && organId != null,
-				organId != null ? organGestorRepository.findOne(organId) : null,
-				accessAllComu);
+				filtre.getEntitat(),
+				filtre.isEsNullActiu(),
+				filtre.getActiu(),
+				filtre.isEsNullFiltre(),
+				filtre.getFiltre(),
+				filtre.isEsAdminEntitat(),
+//				filtre.isEsAdminOrgan(),
+				filtre.isEsNullMetaExpedientIdPermesos(),
+				filtre.getMetaExpedientIdPermesos(0),
+				filtre.getMetaExpedientIdPermesos(1),
+				filtre.getMetaExpedientIdPermesos(2),
+				filtre.getMetaExpedientIdPermesos(3),
+				filtre.isEsNullOrganCodiPermesos(),
+				filtre.getOrganCodiPermesos(0),
+				filtre.getOrganCodiPermesos(1),
+				filtre.getOrganCodiPermesos(2),
+				filtre.getOrganCodiPermesos(3),
+				filtre.isEsNullMetaExpedientOrganIdPermesos(),
+				filtre.getMetaExpedientOrganIdPermesos(0),
+				filtre.getMetaExpedientOrganIdPermesos(1),
+				filtre.getMetaExpedientOrganIdPermesos(2),
+				filtre.getMetaExpedientOrganIdPermesos(3),
+				filtre.isRevisioActiva(),
+				filtre.isOrganGestorIComu(),
+				filtre.getOrgan(),
+				filtre.isAllComuns()
+				);
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis findByEntitatAndActiuAndFiltreAndPermes (" + (Utils.isNotEmpty(organProcedimentsComunsIds) ? organProcedimentsComunsIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t5) + " ms");
 		
@@ -458,8 +484,7 @@ public class MetaExpedientHelper {
 		
 		return metaExpedients;
 	}
-	
-	
+
 
 	public MetaExpedientTascaDto tascaCreate(
 			Long entitatId,
@@ -621,10 +646,16 @@ public class MetaExpedientHelper {
 	
 	public List<MetaExpedientEntity> findProcedimentsDeOrganIDeDescendentsDeOrgan(Long organId) {
 
-		List<OrganGestorEntity> organAmbDescendents = organGestorRepository.findOrgansAmbDescendents(Arrays.asList(organId));
 		List<MetaExpedientEntity> procedimentsDeOrganIDeDescendentsDeOrgan = new ArrayList<>();
-		for (OrganGestorEntity organGestorEntity : organAmbDescendents) {
-			procedimentsDeOrganIDeDescendentsDeOrgan.addAll(organGestorEntity.getMetaExpedients());
+
+		OrganGestorEntity organ = organGestorRepository.getOne(organId);
+		List<String> codisOrgansDescendents = organGestorHelper.findCodisDescendents(organ.getEntitat().getCodi(), organId);
+
+		// if there are 1000+ values in IN clause, exception is thrown ORA-01795: el número máximo de expresiones en una lista es 1000
+		List<List<String>> sublists = org.apache.commons.collections4.ListUtils.partition(codisOrgansDescendents, 1000);
+
+		for (List<String> sublist : sublists) {
+			procedimentsDeOrganIDeDescendentsDeOrgan.addAll(metaExpedientRepository.findByOrganGestorCodis(organ.getEntitat(), sublist));
 		}
 		return procedimentsDeOrganIDeDescendentsDeOrgan;
 	}
