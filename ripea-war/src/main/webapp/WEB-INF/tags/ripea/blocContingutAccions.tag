@@ -70,7 +70,7 @@
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
-				<c:when test="${contingut.document && (!contingut.arxiuEstatDefinitiu || isPermesModificarCustodiatsVar) && expedientObert}">
+				<c:when test="${contingut.document && contingut.estat != 'FIRMA_PENDENT' && (!contingut.arxiuEstatDefinitiu || isPermesModificarCustodiatsVar) && expedientObert}">
 					<li class="${(contingut.document && (contingut.arxiuUuid==null || contingut.gesDocFirmatId != null)) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/modificar/${contingut.id}/?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
