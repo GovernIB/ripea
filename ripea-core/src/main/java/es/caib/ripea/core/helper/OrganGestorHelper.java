@@ -1,26 +1,6 @@
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.google.common.base.Strings;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ActualitzacioInfo.ActualitzacioInfoBuilder;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
@@ -29,6 +9,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.OrganismeDto;
 import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
 import es.caib.ripea.core.api.dto.TipusTransicioEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
@@ -55,6 +36,24 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 @Component
@@ -90,6 +89,8 @@ public class OrganGestorHelper {
     private ConversioTipusHelper conversioTipusHelper;
 
 	public static final String ORGAN_NO_SYNC = "Hi ha canvis pendents de sincronitzar a l'organigrama";
+    @Autowired
+    private OrganGestorCacheHelper organGestorCacheHelper;
 
 	public List<OrganGestorEntity> findAmbEntitatPermis(
 			EntitatEntity entitat,
@@ -249,45 +250,67 @@ public class OrganGestorHelper {
 
 	}
 
-	public void afegirOrganGestorFillsIds(
-			EntitatEntity entitat,
-			List<Long> pares) {
-		if (pares != null && !pares.isEmpty()) {
-			pares.addAll(organGestorRepository.findFillsIds(
-					entitat,
-					pares));
-		}
+	public List<OrganismeDto> findArrelFills(
+			String entitatCodi,
+			String filtre) {
+
+		List<OrganismeDto> organismesByEntitat = organGestorCacheHelper.findOrganismesByEntitat(entitatCodi);
+		return filtrarOrganismes(filtre, organismesByEntitat);
 	}
 
-	public void afegirMetaExpedientOrganGestorFillsIds(
-			EntitatEntity entitat,
-			List<Long> pares) {
-		pares.addAll(metaExpedientOrganGestorRepository.findFillsIds(
-				entitat,
-				pares));
-	}
-	
-	
-	public List<OrganGestorEntity> findArrelFills(
-			EntitatEntity entitat,
+	public List<OrganismeDto> findDescendents(
+			String entitatCodi,
+			Long organId,
 			String filtre) {
-		OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
-				entitat,
-				entitat.getUnitatArrel());
-		List<OrganGestorEntity> organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
-				entitat,
-				filtre == null,
-				filtre != null ? filtre.trim() : "",
-				Arrays.asList(organGestorEntitat.getId()));
-//		for (OrganGestorEntity organGestorEntity : organsGestors) {
-//			logger.info("organ: "+ organGestorEntity.getId() +"  "+ organGestorEntity.getCodi() + " - " + organGestorEntity.getNom());
-//		}
-		
-		organsGestors.remove(organGestorEntitat);
-		organsGestors.add(0, organGestorEntitat);
-		return organsGestors;
+		if (organId == null)
+			return new ArrayList<>();
+
+		OrganGestorEntity organ = organGestorRepository.getOne(organId);
+		List<OrganismeDto> organismesByEntitat = organGestorCacheHelper.getOrganismesDescendentsByOrgan(entitatCodi, organ.getCodi());
+		return filtrarOrganismes(filtre, organismesByEntitat);
 	}
-	
+
+	public List<OrganismeDto> findDescendents(
+			String entitatCodi,
+			List<String> organsCodis,
+			String filtre) {
+		if (organsCodis == null || organsCodis.isEmpty())
+			return new ArrayList<>();
+
+		List<OrganismeDto> organismesByEntitat = organGestorCacheHelper.getOrganismesDescendentsByOrgans(entitatCodi, organsCodis);
+		return filtrarOrganismes(filtre, organismesByEntitat);
+	}
+
+	public List<String> findCodisDescendents(
+			String entitatCodi,
+			Long organId) {
+		if (organId == null)
+			return new ArrayList<>();
+
+		OrganGestorEntity organ = organGestorRepository.getOne(organId);
+		return organGestorCacheHelper.getCodisOrgansFills(entitatCodi, organ.getCodi());
+	}
+
+
+	private List<OrganismeDto> filtrarOrganismes(String filtre, List<OrganismeDto> organismes) {
+		if (Strings.isNullOrEmpty(filtre))
+			return organismes;
+
+		List<OrganismeDto> filteredOrganismes = new ArrayList<>();
+		if (organismes != null) {
+			for (OrganismeDto orgDto : organismes) {
+				if (orgDto.getNom().contains(filtre) || orgDto.getCodi().contains(filtre)) {
+					filteredOrganismes.add(orgDto);
+				}
+			}
+//			// Ens assegurem que sempre hi sigui l'organisme arrel. Per què???
+//			OrganismeDto organismeEntitat = organismes.get(0);
+//			filteredOrganismes.remove(organismeEntitat);
+//			filteredOrganismes.add(0, organismeEntitat);
+		}
+		return filteredOrganismes;
+	}
+
 
 	public List<OrganGestorEntity> findPares(
 			OrganGestorEntity organGestor,

@@ -3,25 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
-import es.caib.ripea.core.api.dto.ArbreDto;
-import es.caib.ripea.core.api.dto.ComunitatDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.NivellAdministracioDto;
-import es.caib.ripea.core.api.dto.OrganGestorDto;
-import es.caib.ripea.core.api.dto.PaisDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.ResultatConsultaDto;
-import es.caib.ripea.core.api.dto.ResultatDominiDto;
-import es.caib.ripea.core.api.dto.TipusViaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.dto.ValidacioErrorDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.DominiException;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
@@ -47,7 +29,6 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.ExpedientTascaRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaDocumentRepository;
-import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
@@ -76,8 +57,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -102,19 +85,13 @@ public class CacheHelper {
 	@Resource
 	private MetaDocumentRepository metaDocumentRepository;
 	@Resource
-	private MetaExpedientRepository metaExpedientRepository;
-	@Resource
 	private ConversioTipusHelper conversioTipusHelper;
-	@Resource
-	private ContingutHelper contenidorHelper;
 	@Resource
 	private PermisosHelper permisosHelper;
 	@Resource
 	private PermisosEntitatHelper permisosEntitatHelper;
 //	@Resource
 	private PluginHelper pluginHelper;
-	@Resource
-	private UsuariHelper usuariHelper;
 	@Resource
 	private UsuariRepository usuariRepository;
 	@Resource
@@ -127,8 +104,6 @@ public class CacheHelper {
 	private AclSidRepository aclSidRepository;
 	@Resource
 	private ExpedientPeticioRepository expedientPeticioRepository;
-	@Resource
-	private MetaExpedientHelper metaExpedientHelper;
 	@Resource
 	private EntityComprovarHelper entityComprovarHelper;
 	@Resource
@@ -322,7 +297,7 @@ public class CacheHelper {
 				usuariCodi);
 	}
 
-	@CacheEvict(allEntries = true, value = "usuariAmbCodi", key="#usuariCodi")
+	@CacheEvict(allEntries = true, value = "usuariAmbCodi")
 	@Scheduled(fixedDelay = 86400000)
 	public void evictUsuariAmbCodi() {
 	}
@@ -339,62 +314,63 @@ public class CacheHelper {
 			String entitatCodi) {
 	}
 
-//	@Cacheable(value = "organigrama", key="#entitatcodi")
-//	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
-//		Map<String, OrganismeDto> organigrama = new HashMap<>();
-//
-//		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
-//		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);
-//		if (organs == null || organs.isEmpty()) {
-//			return organigrama;
-//		}
-//		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitat.getUnitatArrel());
-//		if (arrel == null) {
-//			return organigrama;
-//		}
-//		Map<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
-//		organToOrganigrama(arrel, organsMap, organigrama);
-//		return organigrama;
-//
-//	}
-//
-//	@CacheEvict(value = "organigrama", key="#entitatcodi")
-//	public void evictFindOrganigramaByEntitat(String entitatcodi) {
-//	}
-//
-//	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
-//
-//		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
-//		for (OrganGestorEntity organ: organs) {
-//			organsMap.put(organ.getCodi(), organ.getFills());
-//		}
-//		return organsMap;
-//	}
-//
-//	private void organToOrganigrama(final OrganGestorEntity organ, final Map<String, List<OrganGestorEntity>> organsMap, Map<String, OrganismeDto> organigrama) {
-//
-//		List<OrganGestorEntity> fills = organsMap.get(organ.getCodi());
-//		List<String> codisFills = null;
-//		if (fills != null && !fills.isEmpty()) {
-//			codisFills = new ArrayList<>();
-//			for (OrganGestorEntity fill: fills) {
-//				codisFills.add(fill.getCodi());
-//			}
-//		}
-//		OrganismeDto organisme = OrganismeDto.builder()
-//				.codi(organ.getCodi())
-//				.nom(organ.getNom())
-//				.pare(organ.getPare() != null ? organ.getPare().getCodi() : null)
-//				.fills(codisFills)
-//				.estat(organ.getEstat()).build();
-//		organigrama.put(organ.getCodi(), organisme);
-//		if (fills == null) {
-//			return;
-//		}
-//		for (OrganGestorEntity fill : fills) {
-//			organToOrganigrama(fill, organsMap, organigrama);
-//		}
-//	}
+	@Cacheable(value = "organigrama", key="#entitatCodi")
+	public Map<String, OrganismeDto> findOrganigramaByEntitat(String entitatCodi) {
+		Map<String, OrganismeDto> organigrama = new HashMap<>();
+
+		EntitatEntity entitat = entitatRepository.findByCodi(entitatCodi);
+		List<OrganGestorEntity> organs = organGestorRepository.findByEntitatIdAndEstat(entitat.getId(), OrganEstatEnumDto.V);
+		if (organs == null || organs.isEmpty()) {
+			return organigrama;
+		}
+		OrganGestorEntity arrel = organGestorRepository.findByCodi(entitat.getUnitatArrel());
+		if (arrel == null) {
+			return organigrama;
+		}
+		Map<String, List<OrganGestorEntity>> organsMap = organsToMap(organs);
+		organToOrganigrama(arrel, organsMap, organigrama);
+		return organigrama;
+
+	}
+
+	@CacheEvict(value = "organigrama", key="#entitatcodi")
+	public void evictFindOrganigramaByEntitat(String entitatcodi) {
+	}
+
+	private HashMap<String, List<OrganGestorEntity>> organsToMap(final List<OrganGestorEntity> organs) {
+
+		HashMap<String, List<OrganGestorEntity>> organsMap = new HashMap<>();
+		for (OrganGestorEntity organ: organs) {
+			organsMap.put(organ.getCodi(), organ.getFills());
+		}
+		return organsMap;
+	}
+
+	private void organToOrganigrama(final OrganGestorEntity organ, final Map<String, List<OrganGestorEntity>> organsMap, Map<String, OrganismeDto> organigrama) {
+
+		List<OrganGestorEntity> fills = organsMap.get(organ.getCodi());
+		List<String> codisFills = null;
+		if (fills != null && !fills.isEmpty()) {
+			codisFills = new ArrayList<>();
+			for (OrganGestorEntity fill: fills) {
+				codisFills.add(fill.getCodi());
+			}
+		}
+		OrganismeDto organisme = OrganismeDto.builder()
+				.id(organ.getId())
+				.codi(organ.getCodi())
+				.nom(organ.getNom())
+				.pare(organ.getPare() != null ? organ.getPare().getCodi() : null)
+				.fills(codisFills)
+				.estat(organ.getEstat()).build();
+		organigrama.put(organ.getCodi(), organisme);
+		if (fills == null) {
+			return;
+		}
+		for (OrganGestorEntity fill : fills) {
+			organToOrganigrama(fill, organsMap, organigrama);
+		}
+	}
 
 	@Cacheable(value = "paisos")
 	public List<PaisDto> findPaisos() {

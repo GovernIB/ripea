@@ -4,6 +4,7 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
+import es.caib.ripea.core.api.dto.OrganismeDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -160,7 +161,7 @@ public interface OrganGestorService {
 	 * 		      Llistat de tots els organs gestors de l'entitat amb permisos.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<OrganGestorDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+	public List<OrganismeDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
 			String filter, 
