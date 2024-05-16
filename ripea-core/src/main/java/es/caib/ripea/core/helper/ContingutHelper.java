@@ -1737,24 +1737,16 @@ public class ContingutHelper {
 
 		pluginHelper.arxiuExpedientActualitzar(expedient);
 	}
-	
+
 	public void arxiuPropagarModificacio(
-			CarpetaEntity carpeta,
-			boolean fromAnotacio) {
-
-		boolean forceUtilitzarCarpetesArxiu = PropertiesHelper.getProperties().getAsBoolean("es.caib.ripea.propagar.carpetes.arxiu", false);
-
-		boolean utilitzarCarpetesEnArxiu = (fromAnotacio && !isCarpetaLogica()) || forceUtilitzarCarpetesArxiu;
-		
+			CarpetaEntity carpeta) {
+		boolean utilitzarCarpetesEnArxiu = !isCarpetaLogica();
 		if (utilitzarCarpetesEnArxiu) {
 				pluginHelper.arxiuCarpetaActualitzar( 
 						carpeta,
 						carpeta.getPare());
 		}
 	}
-	
-	
-	
 
 	public void arxiuPropagarModificacio(
 			DocumentEntity document,

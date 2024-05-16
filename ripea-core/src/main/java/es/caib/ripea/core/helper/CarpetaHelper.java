@@ -133,9 +133,7 @@ public class CarpetaHelper {
 		if (alreadyCreatedInArxiu) {
 			carpetaEntity.updateArxiu(arxiuUuid);
 		} else {
-			contingutHelper.arxiuPropagarModificacio(
-					carpetaEntity,
-					fromAnotacio);
+			contingutHelper.arxiuPropagarModificacio(carpetaEntity);
 		}
 		CarpetaDto dto = toCarpetaDto(carpetaEntity);
 		return dto;
