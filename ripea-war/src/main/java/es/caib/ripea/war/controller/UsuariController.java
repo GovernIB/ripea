@@ -195,7 +195,9 @@ public class UsuariController  extends BaseAdminController {
 	public String logout(HttpServletRequest request, HttpServletResponse response) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
 		EntitatDto entitat = EntitatHelper.getEntitatActual(request);
-		organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), usuari.getCodi());
+		if (entitat != null) {
+			organGestorService.evictOrganismesEntitatAmbPermis(entitat.getId(), usuari.getCodi());
+		}
 		aplicacioService.evictRolsDisponiblesEnAcls();
 		entitatService.evictEntitatsAccessiblesUsuari();
 		aplicacioService.evictRolsPerUsuari(usuari.getCodi());

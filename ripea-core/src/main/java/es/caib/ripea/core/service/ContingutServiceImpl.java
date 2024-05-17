@@ -399,9 +399,7 @@ public class ContingutServiceImpl implements ContingutService {
 				
 
 			} else if (contingut instanceof CarpetaEntity) {
-				contingutHelper.arxiuPropagarModificacio(
-						(CarpetaEntity) contingut,
-						false);
+				contingutHelper.arxiuPropagarModificacio((CarpetaEntity) contingut);
 			}
 
 			if (fitxer != null) {
