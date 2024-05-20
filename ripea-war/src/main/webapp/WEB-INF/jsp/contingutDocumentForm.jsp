@@ -135,6 +135,16 @@ $(document).ready(function() {
 		mostrarFrima(fileName);
 	}
 
+    const submitValidation = (e) => {
+        $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
+        $('#onlyFileSubmit').val(true);
+        $('#loading').show();
+        $('#arxiuInput').hide();
+        $('#inputAmbFirma').removeClass('hidden');
+        $("#documentCommand").prop("target", 'target_iframe');
+        $('#documentCommand').submit();
+    }
+
 	// METADOCUMENT CHANGE
 	$('#metaNodeId').on('change', function() {
 		if ($(this).val()) {
@@ -205,7 +215,6 @@ $(document).ready(function() {
 		webutilModalAdjustHeight();
 	});
 
-
 	$('input[type=radio][name=origen][value=${documentCommand.origen}]').trigger('change');
 	$('input[type=checkbox][name=ambFirma').trigger('change');
 	$('input[type=radio][name=tipusFirma][value=${documentCommand.tipusFirma}]').trigger('change');
@@ -215,10 +224,11 @@ $(document).ready(function() {
 		if (droppedFilesFiles && droppedFilesFiles.length == 1) {
 			document.querySelector('#arxiu').files = droppedFilesFiles;
 			mostrarDocument(droppedFilesFiles[0].name);
-			
+			window.parent.document.getElementById('dropped-files').files = new DataTransfer().files;
+			setTimeout(() => submitValidation(), 500);
 		}
 	}
-	
+
 	var nom = $('#nom');
 	var invalid = new RegExp('[\/:*?\"<>|]');
 	$(nom).keypress(function(e) {
@@ -450,18 +460,7 @@ $(document).ready(function() {
 			console.log('after reset');
 		});
 		
-		
-		
-		$("#inputDoc .fileinput").on("change.bs.fileinput", function(e){
-			$('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
-		    $('#onlyFileSubmit').val(true);
-		    $('#loading').show();
-		    $('#arxiuInput').hide();
-			$('#inputAmbFirma').removeClass('hidden');
-		    $("#documentCommand").prop("target", 'target_iframe');
-		    $('#documentCommand').submit();
-			
-		});
+		$("#inputDoc .fileinput").on("change.bs.fileinput", submitValidation);
 		
 		$('#target_iframe').load(function() {
 		    $("#documentCommand").prop("target", '');
