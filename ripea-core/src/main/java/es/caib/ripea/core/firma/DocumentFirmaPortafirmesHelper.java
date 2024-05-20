@@ -450,7 +450,9 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 						new Date());
 				logAll(documentPortafirmes, LogTipusEnumDto.PFIRMA_REBUIG);
 				alertaHelper.crearAlerta(
-						"La firma del document " + document.getNom() + " ha estat rebutjada pel següent motiu: " + documentPortafirmes.getMotiuRebuig(),
+						"La firma del document " + document.getNom() + " ha estat rebutjada " + 
+								(documentPortafirmes.getName() != null ? "per " + documentPortafirmes.getName() : "") + 
+								" pel següent motiu: " + documentPortafirmes.getMotiuRebuig(),
 						null,
 						document.getExpedient().getId());
 				emailHelper.canviEstatDocumentPortafirmes(documentPortafirmes);
