@@ -793,11 +793,12 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	 * @param tipusLog
 	 */
 	private void logAll(DocumentEntity document, DocumentPortafirmesEntity documentPortafirmes, LogTipusEnumDto tipusLog) {
+		DocumentEnviamentEstatEnumDto estatEnviament = documentPortafirmes.getEstat();
 		contingutLogHelper.log(
 				document,
 				tipusLog,
 				documentPortafirmes.getPortafirmesId(),
-				documentPortafirmes.getEstat().name(),
+				estatEnviament.equals(DocumentEnviamentEstatEnumDto.REBUTJAT) ? estatEnviament.name() + ": " + documentPortafirmes.getMotiuRebuig() : estatEnviament.name(),
 				false,
 				false);
 		logExpedient(documentPortafirmes, tipusLog);
