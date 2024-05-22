@@ -5,6 +5,7 @@ package es.caib.ripea.core.repository;
 
 import java.util.List;
 
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,6 +22,8 @@ public interface UsuariRepository extends JpaRepository<UsuariEntity, String> {
 	public UsuariEntity findByCodi(String codi);
 
 	public UsuariEntity findByNif(String nif);
+
+	public List<UsuariEntity> findByProcediment(MetaExpedientEntity procediment);
 
 	@Query(   "select "
 			+ "    u "
