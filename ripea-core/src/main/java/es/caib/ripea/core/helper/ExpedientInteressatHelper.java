@@ -1,15 +1,5 @@
 package es.caib.ripea.core.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
@@ -27,6 +17,15 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ExpedientInteressatHelper {
@@ -684,7 +683,15 @@ public class ExpedientInteressatHelper {
 		}
 		return exception;
 	}
-	
+
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public Exception guardarExpedientAndInteressatsArxiu(
+			Long expId) {
+		ExpedientEntity expedient = expedientRepository.findOne(expId);
+		expedient.updateArxiuIntent();
+		return arxiuPropagarInteressats(expedient, null);
+	}
 
 	public Exception arxiuPropagarInteressats(
 			ExpedientEntity expedient,

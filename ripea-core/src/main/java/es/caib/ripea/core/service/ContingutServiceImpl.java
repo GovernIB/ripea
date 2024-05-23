@@ -31,7 +31,9 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.TipusDocumentalEntity;
+import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.core.helper.ArxiuConversions;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
@@ -42,12 +44,16 @@ import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
 import es.caib.ripea.core.helper.DocumentHelper;
 import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExpedientHelper;
+import es.caib.ripea.core.helper.ExpedientInteressatHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.SynchronizationHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
+import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DadaRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
@@ -55,10 +61,8 @@ import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.MetaDadaRepository;
 import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.TipusDocumentalRepository;
-import es.caib.ripea.core.repository.URLInstruccioRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,8 +96,6 @@ import java.util.Map;
 public class ContingutServiceImpl implements ContingutService {
 
 	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
 	private ContingutRepository contingutRepository;
 	@Autowired
 	private MetaDadaRepository metaDadaRepository;
@@ -105,8 +107,6 @@ public class ContingutServiceImpl implements ContingutService {
 	private DocumentRepository documentRepository;
 	@Autowired
 	private AlertaRepository alertaRepository;
-	@Autowired
-	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
 	private PaginacioHelper paginacioHelper;
 	@Autowired
@@ -140,8 +140,14 @@ public class ContingutServiceImpl implements ContingutService {
 	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
-	private URLInstruccioRepository urlInstruccionRepository;
-	
+	private ExpedientInteressatHelper expedientInteressatHelper;
+    @Autowired
+    private ExpedientHelper expedientHelper;
+    @Autowired
+    private DocumentFirmaPortafirmesHelper documentFirmaPortafirmesHelper;
+	@Autowired
+	private CarpetaRepository carpetaRepository;
+
 	@Transactional
 	@Override
 	public void dadaSave(
@@ -1544,12 +1550,14 @@ public class ContingutServiceImpl implements ContingutService {
 
 	@Transactional
 	@Override
-	public void sincronitzarEstatArxiu(
+	public List<CodiValorDto> sincronitzarEstatArxiu(
 			Long entitatId,
 			Long contingutId) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingutId));
-		logger.debug("Sincronitzant estat de l'expedient i documents amb l'arxiu pel contingut ("
+
+		if (cacheHelper.mostrarLogsIntegracio())
+			logger.info("[SYNC] Sincronitzant estat de l'expedient i documents amb l'arxiu pel contingut ("
 				+ "entitatId=" + entitatId + ", "
 				+ "contingutId=" + contingutId + ")");
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientAccessible(
@@ -1569,20 +1577,64 @@ public class ContingutServiceImpl implements ContingutService {
 					"El contingut amb id=" + contingutId + "a sincronitzar no és de tipus expedient");
 		}
 
-		// ##################### EXPEDIENT ##################################
-		ExpedientEntity expedient = (ExpedientEntity)contingut;
-		sincronitzaEstatExpedient(expedient);
+		List<CodiValorDto> resultat = new ArrayList<>();
 
-		// ##################### DOCUMENTS ##################################
-		List<DocumentEntity> documents = documentRepository.findByExpedient(expedient);
-		sincronitzaEstatDocumetns(documents);
+		synchronized (SynchronizationHelper.get0To99Lock(contingutId, SynchronizationHelper.locksExpedients)) {
+
+			// ##################### EXPEDIENT ##################################
+			ExpedientEntity expedient = (ExpedientEntity) contingut;
+			CodiValorDto msgResultatExp = sincronitzaExpedient(expedient);
+
+			// ##################### CARPETES ##################################
+			List<CarpetaEntity> carpetes = carpetaRepository.findByExpedientAndEsborrat(expedient, 0);
+			List<CodiValorDto> msgsResultatCarpetes = sincronitzaCarpetes(carpetes);
+
+			// ##################### DOCUMENTS ##################################
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+			List<CodiValorDto> msgsResultatDocs = sincronitzarDocuments(documents);
+
+			resultat.add(msgResultatExp);
+			resultat.addAll(msgsResultatCarpetes);
+			resultat.addAll(msgsResultatDocs);
+		}
+
+		return resultat;
 	}
 
-	private void sincronitzaEstatExpedient(ExpedientEntity expedient) {
-		es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
-		if (arxiuExpedient == null)
-			return;
-		ExpedientMetadades metadades = arxiuExpedient.getMetadades();
+	private CodiValorDto sincronitzaExpedient(ExpedientEntity expedient) {
+
+		if (cacheHelper.mostrarLogsIntegracio())
+			logger.info("[SYNC] Sincronitzant expedient amb l'arxiu ("
+					+ "expedientNom=" + expedient.getNom() + ", "
+					+ "expedientId=" + expedient.getId() + ", "
+					+ "arxiuId=" + expedient.getArxiuUuid() + ")");
+
+		// Si no s'ha guardat a l'arxiu, ho guardem ara
+		if (expedient.getArxiuUuid() == null) {
+			Exception exception = expedientInteressatHelper.guardarExpedientAndInteressatsArxiu(expedient.getId());
+			if (exception != null) {
+				return setResultatSync(ERROR, "S'ha produït un error al intentar desar l'expedient a l'arxiu: " + exception.getMessage());
+			}
+			return setResultatSync(OK, "Expedient desat a l'arxiu.");
+		} else {
+			// Si ja està guardat, sincronitzam l'estat
+			es.caib.plugins.arxiu.api.Expedient arxiuExpedient = pluginHelper.arxiuExpedientConsultar(expedient);
+			if (arxiuExpedient == null)
+				return setResultatSync(ERROR, "S'ha produït un error al intentar actualitzar l'estat de l'expedient a l'arxiu: no s'ha trobat l'expedient a l'arxiu.");
+			ExpedientMetadades metadades = arxiuExpedient.getMetadades();
+			ExpedientEstatEnumDto estat = getExpedientEstat(metadades);
+			if (estat != null && !estat.equals(expedient.getEstat())) {
+				expedient.updateEstat(estat, ExpedientEstatEnumDto.TANCAT.equals(estat) ? "Sincronització amb l'estat de l'arxiu" : null);
+				return setResultatSync(OK, "Expedient actualitzat a l'estat " + estat);
+			}
+
+			if (cacheHelper.mostrarLogsIntegracio())
+				logger.info("[SYNC] L'expedient no necessita ser actualitzat");
+			return setResultatSync(INFO, "L'expedient no necessita ser actualitzat.");
+		}
+	}
+
+	private ExpedientEstatEnumDto getExpedientEstat(ExpedientMetadades metadades) {
 		ExpedientEstatEnumDto estat = null;
 		if (metadades != null) {
 			if (metadades.getEstat() != null) {
@@ -1598,21 +1650,116 @@ public class ContingutServiceImpl implements ContingutService {
 				}
 			}
 		}
-		if (estat != null && !estat.equals(expedient.getEstat())) {
-			expedient.updateEstat(estat, ExpedientEstatEnumDto.TANCAT.equals(estat) ? "Sincronització amb l'estat de l'arxiu" : null);
-		}
+		return estat;
 	}
 
-	private void sincronitzaEstatDocumetns(List<DocumentEntity> documents) {
-		if (documents != null) {
-			for (DocumentEntity document : documents) {
-				sincronitzarEstatDocument(document);
+	private List<CodiValorDto> sincronitzaCarpetes(List<CarpetaEntity> carpetes) {
+		List<CodiValorDto> resultat = new ArrayList<>();
+		if (carpetes != null) {
+			for (CarpetaEntity carpeta : carpetes) {
+				if (carpeta.getArxiuUuid() == null) {
+					resultat.add(sincronitzarCarpeta(carpeta));
+				} else {
+					resultat.add(setResultatSync(INFO, "La carpeta " + carpeta.getNom() + " no necesita ser actualitzada."));
+				}
 			}
 		}
+		return resultat;
 	}
 
-	private void sincronitzarEstatDocument(DocumentEntity document) {
-		Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
+	private CodiValorDto sincronitzarCarpeta(CarpetaEntity carpeta) {
+		if (cacheHelper.mostrarLogsIntegracio())
+			logger.info("[SYNC] Sincronitzant carpeta amb l'arxiu ("
+					+ "carpetaNom=" + carpeta.getNom() + ", "
+					+ "carpetaId=" + carpeta.getId() + ", "
+					+ "arxiuId=" + carpeta.getArxiuUuid() + ")");
+
+		if (carpeta.getArxiuUuid() == null && !contingutHelper.isCarpetaLogica()) {
+			try {
+				pluginHelper.arxiuCarpetaActualitzar(
+						carpeta,
+						carpeta.getPare());
+				return setResultatSync(OK, "La carpeta " + carpeta.getNom() + "s'ha guardat a l'arxiu.");
+			} catch (Exception ex) {
+				return setResultatSync(ERROR, "S'ha produït un error al intentar desar la carpeta " + carpeta.getNom() + " a l'arxiu: " + ex.getMessage());
+			}
+		}
+		return setResultatSync(INFO, "La carpeta " + carpeta.getNom() + " no s'ha desat a l'arxiu degut a que s'estan utilitzant carpetes lògiques.");
+	}
+
+	private List<CodiValorDto> sincronitzarDocuments(List<DocumentEntity> documents) {
+		List<CodiValorDto> resultat = new ArrayList<>();
+		if (documents != null) {
+			for (DocumentEntity document : documents) {
+				resultat.add(sincronitzarDocument(document));
+			}
+		}
+		return resultat;
+	}
+
+	private CodiValorDto sincronitzarDocument(DocumentEntity document) {
+
+		if (cacheHelper.mostrarLogsIntegracio())
+			logger.info("[SYNC] Sincronitzant document amb l'arxiu ("
+					+ "documentNom=" + document.getNom() + ", "
+					+ "documentId=" + document.getId() + ", "
+					+ "documentEstat=" + document.getEstat() + ", "
+					+ "arxiuId=" + document.getArxiuUuid() + ")");
+
+		Exception exception = null;
+
+		// Guardar a l'arxiu
+		if (document.getArxiuUuid() == null) {
+			try {
+				exception = documentHelper.guardarDocumentArxiu(document.getId());
+				if (exception == null)
+					return setResultatSync(OK, "El document " + document.getNom() + " s'ha guardat a l'arxiu.");
+			} catch (Exception e) {
+				exception = e;
+			}
+			return setResultatSync(ERROR, "S'ha produït un error al intentar desar el document " + document.getNom() + " a l'arxiu: " + exception.getMessage());
+		} else if (isPendentMoureArxiu(document)) {
+			try {
+				exception = expedientHelper.moveDocumentArxiuNewTransaction(document.getAnnexos().get(0).getId());
+				if (exception == null)
+					return setResultatSync(OK, "S'ha mogut el document" + document.getNom() + " a l'arxiu.");
+			} catch (Exception e) {
+				exception = e;
+			}
+			return CodiValorDto.builder()
+					.codi("ERROR")
+					.valor("S'ha produït un error al intentar moure el document " + document.getNom() + " a l'arxiu: " + exception.getMessage()).build();
+		} else if (!StringUtils.isEmpty(document.getGesDocFirmatId())) {
+
+			try {
+				exception = documentFirmaPortafirmesHelper.portafirmesReintentar(
+						document.getEntitat().getId(),
+						document);
+				if (exception == null)
+					return setResultatSync(OK, "El document " + document.getNom() + "s'ha guardat a l'arxiu.");
+			} catch (Exception e) {
+				exception = e;
+			}
+			return CodiValorDto.builder()
+					.codi("ERROR")
+					.valor("S'ha produït un error al intentar desar el document " + document.getNom() + " a l'arxiu: " + exception.getMessage()).build();
+		} else {
+		// Actualitzar estat
+			Document arxiuDocument = pluginHelper.arxiuDocumentConsultar(document.getArxiuUuid());
+			ArxiuEstatEnumDto estat = getDocumentArxiuEstat(arxiuDocument);
+			if (estat != null && !estat.equals(document.getArxiuEstat())) {
+				document.updateArxiuEstat(estat);
+				if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()
+						&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
+					document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+				}
+				return setResultatSync(OK, "Document " + document.getNom() + " actualitzat a l'estat " + estat);
+			}
+			return setResultatSync(INFO, "El document no necessita ser actualitzat.");
+		}
+	}
+
+	private static ArxiuEstatEnumDto getDocumentArxiuEstat(Document arxiuDocument) {
 		ArxiuEstatEnumDto estat = null;
 		if (arxiuDocument != null && arxiuDocument.getEstat() != null) {
 			switch (arxiuDocument.getEstat()) {
@@ -1626,13 +1773,31 @@ public class ContingutServiceImpl implements ContingutService {
 					break;
 			}
 		}
-		if (estat != null && !estat.equals(document.getArxiuEstat())) {
-			document.updateArxiuEstat(estat);
-			if (ArxiuEstatEnumDto.DEFINITIU.equals(estat) && arxiuDocument.getFirmes() != null && !arxiuDocument.getFirmes().isEmpty()
-					&& !DocumentEstatEnumDto.DEFINITIU.equals(document.getEstat())) {
-				document.updateEstat(DocumentEstatEnumDto.CUSTODIAT);
+		return estat;
+	}
+
+	private boolean isPendentMoureArxiu(DocumentEntity document) {
+		if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
+			RegistreAnnexEntity annex = document.getAnnexos().get(0);
+			String error = annex.getError();
+			if (error != null && !error.isEmpty()) {
+				return true;
 			}
 		}
+		return false;
+	}
+
+	private static final String OK = "OK";
+	private static final String INFO = "INFO";
+	private static final String ERROR = "ERROR";
+
+	private CodiValorDto setResultatSync(
+			String estat,
+			String missatge) {
+//			, String dadesAddicionals) {
+		if (cacheHelper.mostrarLogsIntegracio())
+			logger.info("[SYNC] " + missatge); // + (dadesAddicionals != null ? dadesAddicionals : ""));
+		return CodiValorDto.builder().codi(estat).valor(missatge).build();
 	}
 
 

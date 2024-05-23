@@ -3,14 +3,13 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.List;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -29,4 +28,6 @@ public interface CarpetaRepository extends JpaRepository<CarpetaEntity, Long> {
 			ContingutEntity pare, 
 			ExpedientEntity expedient, 
 			int esborrat);
+
+    List<CarpetaEntity> findByExpedientAndEsborrat(ExpedientEntity expedient, int esborrat);
 }

@@ -3,21 +3,6 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
@@ -60,6 +45,19 @@ import es.caib.ripea.core.repository.MetaNodeRepository;
 import es.caib.ripea.core.repository.NodeRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper per a la comprovació de l'existencia d'entitats de base de dades.
@@ -505,22 +503,42 @@ public class EntityComprovarHelper {
 			EntitatEntity entitat,
 			MetaExpedientEntity metaExpedient,
 			Long id) {
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Comprovant metadDocument-metaExpedient (" +
+					"entitatId=" + entitat.getId() + ", " +
+					"metaExpedientId=" + (metaExpedient != null ? metaExpedient.getId() : "") + ", " +
+					"metaDocumentId=" + id + ")");
 		MetaDocumentEntity metaDocument = metaDocumentRepository.findOne(id);
 		if (metaDocument == null) {
 			throw new NotFoundException(id, MetaDocumentEntity.class);
 		}
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Comprovant metadDocument-metaExpedient. Obtingut metaDocument (" +
+					"metaDocumentNom=" + metaDocument.getNom() + ", " +
+					"metaDocumentId=" + metaDocument.getId() + ", " +
+					"metaDocument.metaExpedientId=" + metaDocument.getMetaExpedient().getId() + ")");
+
 		EntitatEntity metaDocumentEntitat = metaDocument.getEntitat();
 		if (HibernateHelper.isProxy(metaDocumentEntitat)) {
 			metaDocumentEntitat = HibernateHelper.deproxy(metaDocumentEntitat);
 		}
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Comprovant metadDocument-metaExpedient. Obtinguda entitat del metaDocument (" +
+					"metaDocumentEntitatNom=" + metaDocumentEntitat.getNom() + ", " +
+					"metaDocumentEntitatId=" + metaDocumentEntitat.getId() + ")");
 		if (!entitat.equals(metaDocumentEntitat)) {
 			throw new ValidationException(id, MetaDocumentEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
 		}
 		if (metaExpedient != null && !metaExpedient.equals(metaDocument.getMetaExpedient())) {
-			throw new ValidationException(id, MetaDocumentEntity.class, "El meta-expedient especificat (id="
-			        + metaExpedient.getId() + ") no coincideix amb el meta-expedient del meta-document");
+			throw new ValidationException(id, MetaDocumentEntity.class,
+					"El meta-expedient especificat (id=" + metaExpedient.getId() + ") " +
+					"no coincideix amb el meta-expedient del meta-document (" + metaDocument.getMetaExpedient().getId() + ")");
 		}
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Comprovat metadDocument-metaExpedient (" +
+					"metaExpedientId=" + metaDocument.getMetaExpedient().getId() + ", " +
+					"metaDocumentId=" + metaDocument.getId() + ")");
 		return metaDocument;
 	}
 
@@ -530,6 +548,12 @@ public class EntityComprovarHelper {
 			Long id,
 			boolean comprovarActiu,
 			boolean comprovarMetaExpedient) {
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Comprovant metadDocument (" +
+					"entitatId=" + entitat.getId() + ", " +
+					"metaExpedientId=" + metaExpedient.getId() + ", " +
+					"metaDocumentId=" + id + ")");
+
 		MetaDocumentEntity metaDocument;
 		if (comprovarMetaExpedient) {
 			metaDocument = comprovarMetaDocument(
@@ -546,6 +570,8 @@ public class EntityComprovarHelper {
 				        "El meta-document no es troba actiu (id=" + id + ")");
 			}
 		}
+		if (cacheHelper.mostrarLogsCreacioContingut())
+			logger.info("[DOC] Comprovat metadDocument correctament");
 		return metaDocument;
 	}
 

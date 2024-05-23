@@ -5,6 +5,7 @@ package es.caib.ripea.core.api.service;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -441,7 +442,7 @@ public interface ContingutService {
 			Long contingutId) throws NotFoundException;
 
 	@PreAuthorize("hasRole('tothom')")
-    void sincronitzarEstatArxiu(
+    List<CodiValorDto> sincronitzarEstatArxiu(
             Long entitatId,
             Long contingutId);
 

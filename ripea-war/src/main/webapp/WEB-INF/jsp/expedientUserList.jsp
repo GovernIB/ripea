@@ -758,7 +758,7 @@ function hexToRgb(hex) {
 									<li><a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=expedientList"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 								{{/if}}
 
-								
+
 								<%---- Assignar ----%>
 								{{if rolActualAdminEntitatOAdminOrgan}}
 									<li><a href="<c:url value="/expedient/{{:id}}/assignar"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-user"></span>&nbsp;<spring:message code="comu.boto.assignar"/></a></li>
@@ -847,11 +847,10 @@ function hexToRgb(hex) {
 
 								{{if arxiuUuid != null}}
 									<li><a href="<c:url value="/contingut/{{:id}}/arxiu"/>" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
-									<li><a href="<c:url value="/contingut/{{:id}}/sincronitzarAmbArxiu?llistat=true"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="expedient.sincronitzar.estat.arxiu"/></a></li>
 								{{else}}
 									<li class="disabled"><a href="#"><span class="fa fa-info-circle"></span>&nbsp;<spring:message code="comu.boto.arxiu"/></a></li>
-									<li class="disabled"><a href="#"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="expedient.sincronitzar.estat.arxiu"/></a></li>
 								{{/if}}
+								<li><a href="<c:url value="/contingut/{{:id}}/sincronitzarAmbArxiu?llistat=true"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="expedient.sincronitzar.estat.arxiu"/></a></li>
 
 							</ul>
 						</div>

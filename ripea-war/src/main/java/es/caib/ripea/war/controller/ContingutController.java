@@ -914,7 +914,15 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		boolean peticioFromLlistat = llistat != null && "true".equals(llistat);
 		String url = peticioFromLlistat ? "redirect:/expedient" : "redirect:../../contingut/" + contingutId;
 		try {
-			contingutService.sincronitzarEstatArxiu(entitatActual.getId(), contingutId);
+			List<CodiValorDto> resultat = contingutService.sincronitzarEstatArxiu(entitatActual.getId(), contingutId);
+			for (CodiValorDto msg: resultat) {
+				if ("OK".equals(msg.getCodi())) {
+					MissatgesHelper.success(request, msg.getValor());
+				} else if ("ERROR".equals(msg.getCodi())) {
+					MissatgesHelper.error(request, msg.getValor());
+				}
+			}
+
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,

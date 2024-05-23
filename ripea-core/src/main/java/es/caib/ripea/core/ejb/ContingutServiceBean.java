@@ -5,6 +5,7 @@ package es.caib.ripea.core.ejb;
 
 import es.caib.ripea.core.api.dto.AlertaDto;
 import es.caib.ripea.core.api.dto.ArxiuDetallDto;
+import es.caib.ripea.core.api.dto.CodiValorDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.ContingutFiltreDto;
 import es.caib.ripea.core.api.dto.ContingutLogDetallsDto;
@@ -253,8 +254,8 @@ public class ContingutServiceBean implements ContingutService {
 
     @Override
 	@RolesAllowed("tothom")
-    public void sincronitzarEstatArxiu(Long entitatId, Long contingutId) {
-        delegate.sincronitzarEstatArxiu(entitatId, contingutId);
+    public List<CodiValorDto> sincronitzarEstatArxiu(Long entitatId, Long contingutId) {
+        return delegate.sincronitzarEstatArxiu(entitatId, contingutId);
     }
 
     @Override
