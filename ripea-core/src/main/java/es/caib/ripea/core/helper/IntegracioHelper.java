@@ -196,10 +196,8 @@ public class IntegracioHelper {
 
 	private void addAccio(String integracioCodi, IntegracioAccioDto accio) {
 		synchronized(lock){
-			
 			if (cacheHelper.mostrarLogsIntegracio()) 
 				log.info("Nova integracio en monitor: integracioCodi= " + integracioCodi + ", accio=" + accio);
-			
 			afegirParametreUsuari(accio);
 			String entitatCodi = configHelper.getEntitatActualCodi();
 			accio.setEntitatCodi(entitatCodi);
@@ -208,6 +206,7 @@ public class IntegracioHelper {
 			while (accions.size() >= max) {
 				accions.remove(accions.size() - 1);
 			}
+			accio.setTimestamp(System.currentTimeMillis());
 			accions.add(0, accio);
 		}
 	}

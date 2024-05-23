@@ -24,6 +24,7 @@ import lombok.ToString;
 public class IntegracioAccioDto implements Serializable {
 
 	private Long index;
+	private Long timestamp;
 	private Date data;
 	private String descripcio;
 	private Map<String, String> parametres;
@@ -37,7 +38,6 @@ public class IntegracioAccioDto implements Serializable {
 	private String errorDescripcio;
 	private String excepcioMessage;
 	private String excepcioStacktrace;
-
 
 	public int getParametresCount() {
 		if (parametres == null) {
@@ -60,7 +60,6 @@ public class IntegracioAccioDto implements Serializable {
 		this.parametres = parametres;
 		this.tempsInici = tempsInici;
 	}
-
 
 	private static final long serialVersionUID = -139254994389509932L;
 
