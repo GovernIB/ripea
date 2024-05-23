@@ -37,9 +37,9 @@
 			<c:when test="${contingut.document && contingut.gesDocFirmatId != null}">
 				<li><a href="<c:url value="/document/${contingut.id}/portafirmes/reintentarGuardarArxiu?tascaId=${tascaId}"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
 			</c:when>			
-			<c:when test="${contingut.expedient && contingut.arxiuUuid==null}">
-				<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-			</c:when>
+<%--			<c:when test="${contingut.expedient && contingut.arxiuUuid==null}">--%>
+<%--				<li><a href="<c:url value="/expedient/${contingut.id}/guardarExpedientArxiu?origin=expDetail"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>--%>
+<%--			</c:when>--%>
 		</c:choose>
 		<c:if test="${(empty mostrarObrir or mostrarObrir)}">
 			<c:choose>

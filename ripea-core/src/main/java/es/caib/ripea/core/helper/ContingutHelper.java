@@ -14,6 +14,7 @@ import es.caib.plugins.arxiu.caib.ArxiuCaibException;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut;
 import es.caib.ripea.core.api.dto.ResultDocumentsSenseContingut.ResultDocumentSenseContingut.ResultDocumentSenseContingutBuilder;
+import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -1704,7 +1705,34 @@ public class ContingutHelper {
 						carpeta.getPare());
 		}
 	}
-	
+
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
+	public Exception guardarCarpetaArxiu(Long carpetaId) {
+
+		Exception exception = null;
+		CarpetaEntity carpeta = carpetaRepository.findOne(carpetaId);
+
+		if (carpeta.getExpedient().getArxiuUuid() != null) {
+			if (carpeta.getArxiuUuid() != null) {
+				exception = new ArxiuJaGuardatException("La carpeta ja s'ha guardat en arxiu per otra persona o el process en segon pla");
+			} else {
+
+				try {
+					expedientHelper.concurrencyCheckExpedientJaTancat(carpeta.getExpedient());
+					pluginHelper.arxiuCarpetaActualitzar(
+							carpeta,
+							carpeta.getPare());
+				} catch (Exception ex) {
+					logger.error("Error al guardar carpeta en arxiu (" + carpetaId + ")", ex);
+					exception = ExceptionHelper.getRootCauseException(ex);
+				}
+			}
+		} else {
+			exception = new RuntimeException("Expedient de aquest document no es guardat en arxiu");
+		}
+		carpeta.updateArxiuIntent();
+		return exception;
+	}
 	
 	
 

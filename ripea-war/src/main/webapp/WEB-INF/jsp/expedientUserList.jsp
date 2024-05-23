@@ -754,10 +754,9 @@ function hexToRgb(hex) {
 								<li role="separator" class="divider"></li>
 
 								<%---- Guardar en arxiu ----%>
-								{{if arxiuUuid == null}}
-									<li><a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=expedientList"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>
-								{{/if}}
-
+<%--								{{if arxiuUuid == null}}--%>
+<%--									<li><a href="<c:url value="/expedient/{{:id}}/guardarExpedientArxiu?origin=expedientList"/>"><span class="fa fa-refresh"></span>&nbsp;<spring:message code="comu.boto.guardarArxiu"/></a></li>--%>
+<%--								{{/if}}--%>
 
 								<%---- Assignar ----%>
 								{{if rolActualAdminEntitatOAdminOrgan}}

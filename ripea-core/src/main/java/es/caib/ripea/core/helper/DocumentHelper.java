@@ -3,27 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.sun.jersey.core.util.Base64;
-
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
@@ -60,6 +40,24 @@ import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.NodeEntity;
 import es.caib.ripea.core.firma.DocumentFirmaAppletHelper;
 import es.caib.ripea.core.repository.DocumentRepository;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -1399,7 +1397,7 @@ public class DocumentHelper {
 				logger.error("Error al custodiar en arxiu document adjunt  (" +
 						"id=" + documentEntity.getId() + ")",
 						ex);
-				exception = ExceptionHelper.getRootCauseException(ex);;
+				exception = ExceptionHelper.getRootCauseException(ex);
 			}
 		} else {
 			exception = new RuntimeException("Expedient de aquest document no es guardat en arxiu");

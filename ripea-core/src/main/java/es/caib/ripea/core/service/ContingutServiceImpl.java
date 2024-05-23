@@ -1601,6 +1601,8 @@ public class ContingutServiceImpl implements ContingutService {
 		return resultat;
 	}
 
+	// [HTTP_400, COD_099] Petición mal formada
+
 	private CodiValorDto sincronitzaExpedient(ExpedientEntity expedient) {
 
 		if (cacheHelper.mostrarLogsIntegracio())
@@ -1675,14 +1677,15 @@ public class ContingutServiceImpl implements ContingutService {
 					+ "arxiuId=" + carpeta.getArxiuUuid() + ")");
 
 		if (carpeta.getArxiuUuid() == null && !contingutHelper.isCarpetaLogica()) {
+			Exception exception = null;
 			try {
-				pluginHelper.arxiuCarpetaActualitzar(
-						carpeta,
-						carpeta.getPare());
-				return setResultatSync(OK, "La carpeta " + carpeta.getNom() + "s'ha guardat a l'arxiu.");
+				exception = contingutHelper.guardarCarpetaArxiu(carpeta.getId());
+				if (exception == null)
+					return setResultatSync(OK, "La carpeta " + carpeta.getNom() + " s'ha guardat a l'arxiu.");
 			} catch (Exception ex) {
-				return setResultatSync(ERROR, "S'ha produït un error al intentar desar la carpeta " + carpeta.getNom() + " a l'arxiu: " + ex.getMessage());
+				exception = ex;
 			}
+			return setResultatSync(ERROR, "S'ha produït un error al intentar desar la carpeta " + carpeta.getNom() + " a l'arxiu: " + exception.getMessage());
 		}
 		return setResultatSync(INFO, "La carpeta " + carpeta.getNom() + " no s'ha desat a l'arxiu degut a que s'estan utilitzant carpetes lògiques.");
 	}
