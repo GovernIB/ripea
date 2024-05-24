@@ -3,11 +3,11 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.Date;
-
 import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Date;
 
 
 /**
@@ -60,7 +60,7 @@ public class ExpedientPeticioListDto {
     }
     
 	public String getDataActualitzacioStr() {
-		return Utils.surroundWithParenthesis(Utils.convertDateToString(dataActualitzacio, "dd-MM-yyyy HH:mm:ss"));
+		return Utils.surroundWithParenthesis(Utils.convertDateToString(dataActualitzacio, "dd/MM/yyyy HH:mm:ss"));
 	}
 
 	
