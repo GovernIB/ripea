@@ -242,21 +242,23 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		logger.debug("Obtenint informació del darrer enviament a portafirmes ("
 				+ "entitatId=" + entitatId + ", "
 				+ "id=" + document.getId() + ")");
-
-		List<DocumentPortafirmesEntity> enviamentsPendents = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
+		List<DocumentPortafirmesEntity> enviaments = documentPortafirmesRepository.findByDocumentAndEstatInOrderByCreatedDateDesc(
 				document,
 				new DocumentEnviamentEstatEnumDto[] {
 						DocumentEnviamentEstatEnumDto.PENDENT,
-						DocumentEnviamentEstatEnumDto.ENVIAT
+						DocumentEnviamentEstatEnumDto.ENVIAT,
+						DocumentEnviamentEstatEnumDto.PROCESSAT,
+						DocumentEnviamentEstatEnumDto.REBUTJAT,
+						DocumentEnviamentEstatEnumDto.CANCELAT
 				});
-		if (enviamentsPendents.size() == 0) {
+		if (enviaments.isEmpty()) {
 			throw new ValidationException(
 					document.getId(),
 					DocumentEntity.class,
 					"Aquest document no te enviaments a portafirmes");
 		}
 		return conversioTipusHelper.convertir(
-				enviamentsPendents.get(0),
+				enviaments.get(0),
 				DocumentPortafirmesDto.class);
 	}	
 	
