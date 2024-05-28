@@ -56,7 +56,7 @@ public class DocumentNotificacioHelper {
 	@Autowired
 	private DocumentNotificacioInteressatHelper documentNotificacioInteressatHelper;
 
-	public static Map<String, String> notificacionsWithError = new HashMap<String, String>();
+	public Map<String, String> notificacionsWithError = new HashMap<String, String>();
 	
 	public void crear(
 			DocumentNotificacioDto notificacioDto, 
@@ -71,6 +71,7 @@ public class DocumentNotificacioHelper {
 		notificacionsWithError = new HashMap<String, String>();
 		for (Long interessatId : notificacioDto.getInteressatsIds()) {
 			documentNotificacioInteressatHelper.crearEnviarNotificacioInteressat(
+					notificacionsWithError,
 					notificacioDto, 
 					expedientEntity, 
 					documentEntity, 
@@ -79,7 +80,7 @@ public class DocumentNotificacioHelper {
 	}
 	
 	public Map<String, String> consultaErrorsNotificacio() {
-		return documentNotificacioInteressatHelper.consultaErrorsNotificacio();
+		return notificacionsWithError;
 	}
 	
 	public DocumentNotificacioDto update (DocumentNotificacioDto notificacio, DocumentEntity document) {
