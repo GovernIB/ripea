@@ -60,6 +60,12 @@ $(document).ready(function(){
 			optionTextAttribute="nom"
 			required="true" /> 
 			
+		<rip:inputTextarea 
+			name="metaExpedientTascaDescripcio" 
+			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
+			disabled="true"
+			required="true"
+			textareaRows="2"/> 
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
@@ -72,11 +78,6 @@ $(document).ready(function(){
 			required="true"
 			multiple="true"/>				
 		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
-		<rip:inputTextarea 
-			name="metaExpedientTascaDescripcio" 
-			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
-			disabled="true"
-			required="true"/> 
 		<rip:inputText 
 			name="titol"
 			textKey="expedient.tasca.form.camp.titol"
