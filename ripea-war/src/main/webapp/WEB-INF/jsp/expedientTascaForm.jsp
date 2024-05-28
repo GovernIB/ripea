@@ -77,6 +77,14 @@ $(document).ready(function(){
 			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
 			disabled="true"
 			required="true"/> 
+		<rip:inputText 
+			name="titol"
+			textKey="expedient.tasca.form.camp.titol"
+			required="false"/>
+		<rip:inputTextarea 
+			name="observacions" 
+			textKey="expedient.tasca.form.camp.observacions" 
+			required="false"/>
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.crear"/></button>
  			<a href="<c:url value="/expedientTasca"/>" class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

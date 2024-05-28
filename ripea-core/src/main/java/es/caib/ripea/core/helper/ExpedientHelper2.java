@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.repository.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -29,9 +32,6 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
-import es.caib.ripea.core.repository.DocumentRepository;
-import es.caib.ripea.core.repository.ExpedientRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
 
 /**
 For new transactions
@@ -39,9 +39,10 @@ For new transactions
 @Component
 public class ExpedientHelper2 {
 
-
 	@Autowired
 	private DocumentRepository documentRepository;
+	@Autowired
+	private InteressatRepository interessatRepository;
 	@Autowired
 	private ExpedientRepository expedientRepository;
 	@Autowired
@@ -62,14 +63,16 @@ public class ExpedientHelper2 {
 	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
 	@Autowired
 	private AplicacioService aplicacioService;
-	
-	
+	@Autowired
+	private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkIfExpedientCanBeClosed(Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-
 		expedientHelper.concurrencyCheckExpedientJaTancat(expedient);
-		
+		if (anyExecucioMassiva(expedient)) {
+			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
+		}
 		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
 			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}
@@ -78,18 +81,18 @@ public class ExpedientHelper2 {
 		}
 		if (CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient))) {
 			throw new ValidationException("No es pot tancar un expedient amb documents en procés de firma");
-		}	
+		}
 		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient))) {
 			throw new ValidationException("No es pot tancar un expedient amb documents firmats de portafirmes pendents de custodiar");
 		}
 		if (CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, contingutHelper.getArxiuMaxReintentsDocuments()))) {
 			throw new ValidationException("No es pot tancar un expedient amb documents amb reintents pendents de guardar a l'arxiu");
-		}	
+		}
 		if (CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient))) {
 			throw new ValidationException("No es pot tancar un expedient amb documents d'anotacions no moguts a la sèrie documental final");
-		}		
+		}
 	}
-	
+
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void deleteDocumentsEsborranysArxiu(Long expedientId) {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
@@ -199,6 +202,23 @@ public class ExpedientHelper2 {
 		String dies = aplicacioService.propertyFindByNom("es.caib.ripea.expedient.tancament.logic.dies");
 		
 		return dies != null ? Integer.parseInt(dies) : 60;
+	}
+
+	private boolean anyExecucioMassiva(ExpedientEntity expedient) {
+		List<Long> elementIds = new ArrayList<Long>();
+		elementIds.add(expedient.getId());
+		List<DocumentEntity> documentsExpedient = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+		for (DocumentEntity document: documentsExpedient) {
+			elementIds.add(document.getId());
+		}
+		List<InteressatEntity> interessatsExpedient = interessatRepository.findByExpedient(expedient);
+		for (InteressatEntity interessat: interessatsExpedient) {
+			elementIds.add(interessat.getId());
+		}
+		long pendentsCount = execucioMassivaContingutRepository.countByElementIdInAndEstat(
+				elementIds,
+				ExecucioMassivaEstatDto.ESTAT_PENDENT);
+		return pendentsCount > 0;
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientHelper2.class);

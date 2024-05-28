@@ -116,7 +116,6 @@ public class IntegracioHelper {
 			return accionsFiltered;
 		}
 	}
-	
 
 	public void addAccioOk(
 			String integracioCodi,
@@ -162,7 +161,6 @@ public class IntegracioHelper {
 		addAccio(integracioCodi, accio);
 	}
 
-	
 	private LinkedList<IntegracioAccioDto> getLlistaAccions(
 			String integracioCodi) {
 			LinkedList<IntegracioAccioDto> accions = accionsIntegracio.get(integracioCodi);
@@ -210,7 +208,7 @@ public class IntegracioHelper {
 			accions.add(0, accio);
 		}
 	}
-	
+
 	private void afegirParametreUsuari(IntegracioAccioDto accio) {
 
 		String usuariNomCodi = null;

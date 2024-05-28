@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.repository;
 
+import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
 import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
 import es.caib.ripea.core.entity.ExecucioMassivaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,5 +48,7 @@ public interface ExecucioMassivaContingutRepository extends JpaRepository<Execuc
 	@Modifying
 	@Query(value = "delete from ipa_massiva_contingut where contingut_id = :contingutId ", nativeQuery = true)
 	int deleteExecucioMassivaFromContingutsOrfes(@Param("contingutId") Long contingutId);
+
+	long countByElementIdInAndEstat(List<Long> elementIds, ExecucioMassivaEstatDto estat);
 
 }
