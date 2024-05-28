@@ -530,7 +530,7 @@ public class EntityComprovarHelper {
 			throw new ValidationException(id, MetaDocumentEntity.class, "L'entitat especificada (id="
 			        + entitat.getId() + ") no coincideix amb l'entitat del meta-document");
 		}
-		if (metaExpedient != null && !metaExpedient.equals(metaDocument.getMetaExpedient())) {
+		if (metaExpedient != null && !metaExpedient.getId().equals(metaDocument.getMetaExpedient().getId())) {
 			throw new ValidationException(id, MetaDocumentEntity.class,
 					"El meta-expedient especificat (id=" + metaExpedient.getId() + ") " +
 					"no coincideix amb el meta-expedient del meta-document (" + metaDocument.getMetaExpedient().getId() + ")");

@@ -3,9 +3,13 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -21,15 +25,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
-import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
-import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa un meta-expedient.
@@ -287,22 +286,31 @@ public class MetaExpedientEntity extends MetaNodeEntity {
     }
     
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		CarpetaEntity other = (CarpetaEntity) obj;
-		if (getId() == null) {
-			if (other.getId() != null)
-				return false;
-		} else if (!getId().equals(other.getId()))
-			return false;
-		return true;
+	public final boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof MetaExpedientEntity)) return false;
+		if (!super.equals(o)) return false;
+
+		MetaExpedientEntity that = (MetaExpedientEntity) o;
+		if (this.getId() == null) {
+			if (that.getId() != null) return false;
+			else
+				return Objects.equals(this.getClassificacio(), that.getClassificacio()) &&
+						this.getEntitatPropia().equals(that.getEntitatPropia()) &&
+						this.getCodiPropi().equals(that.getCodiPropi());
+		} else
+			return this.getId().equals(that.getId());
 	}
-	
+
+	@Override
+	public int hashCode() {
+		int result = super.hashCode();
+		result = 31 * result + Objects.hashCode(classificacio);
+		result = 31 * result + entitatPropia.hashCode();
+		result = 31 * result + codiPropi.hashCode();
+		return result;
+	}
+
 	@Override
 	public String toString() {
 		return "MetaExpedientEntity: [" +
@@ -321,7 +329,6 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 			GrupEntity grupPerDefecte) {
 		this.grupPerDefecte = grupPerDefecte;
 	}
-
 
 	private static final long serialVersionUID = -2299453443943600172L;
 
