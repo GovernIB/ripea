@@ -777,6 +777,8 @@ function updateTableEvents() {
 			$('#drag_container').css('background-color', '#f5f5f5');
 		},
 		drop: function(e) {
+<c:choose>
+	<c:when test="${not empty metaDocumentsNoPinbalLeft}">
 			if (e.originalEvent.dataTransfer != null) {
 				let files = e.originalEvent.dataTransfer.files;
 				$('#drag_container').css('background-color', '#f5f5f5');
@@ -785,6 +787,12 @@ function updateTableEvents() {
 					$('#document-new').trigger('click');
 				}
 			}
+	</c:when>
+	<c:otherwise>
+			alert("<spring:message code="contingut.document.alerta.max"/>");
+			e.preventDefault();
+	</c:otherwise>
+</c:choose>
 		}
 	});
 	
@@ -2159,13 +2167,11 @@ function showLoadingCurrentFolder(carpetaId) {
 					</c:otherwise>
 				</c:choose>	
 			</c:when>
-			
-			
+
 			<%--################################################################# VIEW GRID ################################################################--%>
 			<c:when test="${vistaIcones}">
 				<c:choose>
 					<c:when test="${fn:length(fills) > 0}">
-		
 						<%--------------------- GRID -------------------%>
 						<ul id="grid-documents" class="list-inline row">
 							<c:forEach var="fill" items="${fills}">
@@ -2178,7 +2184,6 @@ function showLoadingCurrentFolder(carpetaId) {
 											<c:set var="firmat" value="false"/> 
 										</c:if>
 									</c:if>
-
 									<li id="${fill.id}"
 										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>">
 										<div id="${fill.id}" class="thumbnail element-noclick">
@@ -2253,17 +2258,10 @@ function showLoadingCurrentFolder(carpetaId) {
 			</c:when>	
 		</c:choose>
 
-
-		
-		
-		
-		
-		
 		<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >
 			<iframe id="container" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
 		</div>  
-					
-		
+
 		<c:if test="${potModificar}">
 			<div id="drag_container" class="drag_activated">
 				<span class="down fa fa-upload"></span>
@@ -2273,7 +2271,7 @@ function showLoadingCurrentFolder(carpetaId) {
 			</div>
 		</c:if>
 		<input class="hidden" id="dropped-files" type="file"/>
-		
-	</c:otherwise> 
+
+	</c:otherwise>
 </c:choose> 
 
