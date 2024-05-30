@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.war.command.UsuariTascaFiltreCommand;
@@ -111,15 +112,16 @@ public class UsuariTascaController extends BaseUserController {
 			@RequestParam(value = "redirectATasca", required = false) Boolean redirectATasca,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarTascaEstat(
+		ExpedientTascaDto tasca = expedientTascaService.canviarTascaEstat(
 				expedientTascaId,
 				TascaEstatEnumDto.INICIADA,
 				null,
 				RolHelper.getRolActual(request));
 		
+		Long expedientId = tasca.getExpedient().getId();
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				redirectATasca != null && redirectATasca == true ? "redirect:/usuariTasca/" + expedientTascaId + "/tramitar" : "redirect:/usuariTasca",
+				redirectATasca != null && redirectATasca == true ? "redirect:/contingut/" + expedientId + "?tascaId=" + expedientTascaId : "redirect:/usuariTasca",
 				"expedient.tasca.controller.iniciada.ok");
 		
 	}

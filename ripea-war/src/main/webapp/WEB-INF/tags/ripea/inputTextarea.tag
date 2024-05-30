@@ -13,10 +13,12 @@
 <%@ attribute name="exempleLabel" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxlength" required="false" rtexprvalue="true"%>
 <%@ attribute name="showsize" required="false" rtexprvalue="true"%>
+<%@ attribute name="textareaRows" required="false" rtexprvalue="true"%>
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
 <c:set var="campLabelSize"><c:choose><c:when test="${not empty labelSize}">${labelSize}</c:when><c:otherwise>4</c:otherwise></c:choose></c:set>
 <c:set var="campInputSize">${12 - campLabelSize}</c:set>
+<c:set var="textareaRows"><c:choose><c:when test="${not empty textareaRows}">${textareaRows}</c:when><c:otherwise>6</c:otherwise></c:choose></c:set>
 <script>
 $(document).ready(function() {
 	//Comptador
@@ -49,7 +51,7 @@ $(document).ready(function() {
 		<c:if test="${required}">*</c:if>
 	</label>
 	<div class="controls col-xs-${campInputSize}">
-		<form:textarea path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" rows="6" maxlength="${maxlength}"/>
+		<form:textarea path="${campPath}" cssClass="form-control" id="${campPath}" disabled="${disabled}" rows="${textareaRows}" maxlength="${maxlength}"/>
 		<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 		<c:if test="${showsize && not empty maxlength}">
 			<p class="info-length text-success" style="font-size: 12px; margin: 2px 0 0 0 !important;">

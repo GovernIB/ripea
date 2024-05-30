@@ -46,10 +46,9 @@ public class DocumentNotificacioInteressatHelper {
 	@Autowired
 	private ContingutLogHelper contingutLogHelper;
 
-	public Map<String, String> notificacionsWithError = new HashMap<String, String>();
-
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void crearEnviarNotificacioInteressat(
+			Map<String, String> notificacionsWithError, 
 			DocumentNotificacioDto notificacioDto, 
 			ExpedientEntity expedientEntity,
 			DocumentEntity documentEntity, 
@@ -116,10 +115,6 @@ public class DocumentNotificacioInteressatHelper {
 		cacheHelper.evictErrorsValidacioPerNode(expedientEntity);
 		cacheHelper.evictNotificacionsPendentsPerExpedient(expedientEntity);
 		logAll(notificacioEntity, LogTipusEnumDto.NOTIFICACIO_ENVIADA, destinitariAmbDocument);
-	}
-	
-	public Map<String, String> consultaErrorsNotificacio() {
-		return notificacionsWithError;
 	}
 
 	private void logAll(DocumentNotificacioEntity notificacioEntity, LogTipusEnumDto tipusLog, String param1) {

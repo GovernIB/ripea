@@ -30,6 +30,8 @@ public class ExpedientTascaDto {
 	private String comentari;
 	private long numComentaris;
 	private boolean usuariActualResponsable;
+	private String titol;
+	private String observacions;
 	
 	public String getDataLimitString() {
 		if (dataLimit != null) {

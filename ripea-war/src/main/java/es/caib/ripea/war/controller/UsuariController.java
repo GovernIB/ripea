@@ -6,6 +6,7 @@ package es.caib.ripea.war.controller;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.IdNomDto;
 import es.caib.ripea.core.api.dto.IdiomaEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -20,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -54,8 +57,9 @@ public class UsuariController  extends BaseAdminController {
 			HttpServletRequest request,
 			Model model) {
 		UsuariDto usuari = aplicacioService.getUsuariActual();
-		model.addAttribute(UsuariCommand.asCommand(usuari));
-		emplenaModel(request, model);
+		UsuariCommand usuariCommand = UsuariCommand.asCommand(usuari);
+		model.addAttribute(usuariCommand);
+		emplenaModel(request, model, usuariCommand);
 
 		return "usuariForm";
 	}
@@ -79,7 +83,7 @@ public class UsuariController  extends BaseAdminController {
 		}
 
 		if (bindingResult.hasErrors()) {
-			emplenaModel(request, model);
+			emplenaModel(request, model, command);
 			return "usuariForm";
 		}
 
@@ -155,12 +159,10 @@ public class UsuariController  extends BaseAdminController {
 					"usuari.controller.modificat.ok");
 	}
 
-	private void emplenaModel(HttpServletRequest request, Model model) {
+	private void emplenaModel(HttpServletRequest request, Model model, UsuariCommand usuari) {
 		model.addAttribute(
 				"idiomaEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						IdiomaEnumDto.class,
-						"usuari.form.camp.idioma.enum."));
+				EnumHelper.getOptionsForEnum(IdiomaEnumDto.class, "usuari.form.camp.idioma.enum."));
 
 		List<IdNomDto> numElementsPagina = new ArrayList<>();
 		numElementsPagina.add(new IdNomDto(10l, "10"));
@@ -169,22 +171,63 @@ public class UsuariController  extends BaseAdminController {
 		numElementsPagina.add(new IdNomDto(100l, "100"));
 		numElementsPagina.add(new IdNomDto(250l, "250"));
 
-		model.addAttribute(
-				"numElementsPagina",
-				numElementsPagina);
+		model.addAttribute("numElementsPagina", numElementsPagina);
 
 		String rolActual = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
-		model.addAttribute("procediments",
-				metaExpedientService.findActius(
-						entitatActual.getId(),
-						null,
-						rolActual,
-						false,
-						null));
+		List<EntitatDto> entitatsAccessibles = EntitatHelper.findEntitatsAccessibles(request, entitatService);
+		model.addAttribute("entitats", entitatsAccessibles);
 
-		model.addAttribute("entitats", EntitatHelper.findEntitatsAccessibles(request, entitatService));
+		// Obtindrem els procediments de la entitat per defecte, si hi té permís
+		// En cas de no tenir definida entitat per defecte, mirarem si l'usuari només té accés a una entitat
+		Long entitatPerObtenirProcediments = null;
+
+		List<MetaExpedientDto> procediments = new ArrayList<>();
+		if (usuari.getEntitatPerDefecteId() != null) {
+			EntitatDto entitatPerDefecte = entitatService.findById(usuari.getEntitatPerDefecteId());
+			if (entitatPerDefecte != null) {
+				// Si no té permís sobre l'entitat per defecte configurada, com si no la tingúes configurada!
+				if (entitatsAccessibles == null || entitatsAccessibles.isEmpty() || !entitatsAccessibles.contains(entitatPerDefecte)) {
+					usuari.setEntitatPerDefecteId(null);
+				} else {
+					entitatPerObtenirProcediments = usuari.getEntitatPerDefecteId();
+				}
+			}
+		}
+		// Si no té entitat per defecte, però només té accés a una entitat
+		if (entitatPerObtenirProcediments == null && entitatsAccessibles!= null && entitatsAccessibles.size() == 1) {
+			entitatPerObtenirProcediments = entitatsAccessibles.get(0).getId();
+		}
+		if (entitatPerObtenirProcediments != null) {
+			procediments = metaExpedientService.findActius(
+					entitatPerObtenirProcediments,
+					null,
+					rolActual,
+					false,
+					null);
+		}
+		model.addAttribute("procediments", procediments);
+
+	}
+
+	@RequestMapping(value = "/entitat/procedimentsAccessibles/{entitatId}", method =RequestMethod.GET)
+	@ResponseBody
+	public List<MetaExpedientDto> getProcedimentsAccessiblesPerEntitat(
+			HttpServletRequest request,
+			@PathVariable Long entitatId) {
+
+		if (entitatId == null) {
+			return new ArrayList<>();
+		}
+
+		String rolActual = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		return metaExpedientService.findActius(
+				entitatId,
+				null,
+				rolActual,
+				false,
+				null);
+
 	}
 
 	
