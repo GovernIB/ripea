@@ -191,7 +191,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
-				true,
+				false,
 				ambFills,
 				true,
 				true,
