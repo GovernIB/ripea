@@ -155,21 +155,7 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("procedimentId") Long procedimentId,	
 			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
 			@Param("organGestorId") Long organGestorId);
-	
-	
-	
-	@Query(	"from " +
-			"    GrupEntity grup " +
-			"where " +
-			"    grup.entitat = :entitat " +
-			"and grup.rol = :rol " +
-			"and grup.descripcio = :descripcio ")
-	List<GrupEntity> findByRolDescricpio(
-			@Param("entitat") EntitatEntity entitat, 
-			@Param("rol") String rol,
-			@Param("descripcio") String descripcio);
-	
-	
+
 
 	List<GrupEntity> findByEntitatId(
 			@Param("entitatId") Long entitatId);
