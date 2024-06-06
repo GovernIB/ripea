@@ -81,6 +81,13 @@ public class ConfigHelper {
         if (entitatCodi == null) {
             return;
         }
+
+        ConfigEntity mostrarLogsConfig = configRepository.findByKey("es.caib.ripea.mostrar.logs.integracio");
+        boolean mostrarLogs = mostrarLogsConfig != null && Boolean.parseBoolean(mostrarLogsConfig.getValue());
+        if (mostrarLogs) {
+            log.info("[CFG] Inicialitzant propietats");
+        }
+
         Map<String, Map<String, String>> propietatsPerOrgan = new HashMap<>();
         List<ConfigEntity> configuracionsPerOrgan = configRepository.findByEntitatCodiAndConfigurableOrganActiuTrueAndOrganCodiIsNotNull(entitatCodi);
 
@@ -96,33 +103,57 @@ public class ConfigHelper {
                 continue;
             }
 
+            if (mostrarLogs) {
+                log.info("[CFG] Inicialitzant propietat " + globalKey);
+            }
+
+            boolean isPassword = config.getType() != null && "PASSWORD".equals(config.getType().getCode());
+
             Map<String, String> propertiesMap = new HashMap<>();
             String prefix = ConfigDto.prefix + "." + entitatCodi + ".";
             String valor = getValue(config);
             propertiesMap.put(config.getOrganCodi(), valor);
-            propertiesMap.putAll(getValorsPerFills(config.getOrganCodi(), prefix, subKey, valor, config.isConfigurableOrgansDescendents()));
+            propertiesMap.putAll(getValorsPerFills(config.getOrganCodi(), prefix, subKey, valor, config.isConfigurableOrgansDescendents(), isPassword ? false : mostrarLogs));
+            if (mostrarLogs) {
+                if (isPassword) {
+                    log.info("[CFG] Propietat de tipus password. No es mostren els valors.");
+                } else {
+                    for (Map.Entry<String, String> entry : propertiesMap.entrySet()) {
+                        log.info("[CFG] Organ: " + entry.getKey() + ", Valor: " + entry.getValue());
+                    }
+                }
+            }
             propietatsPerOrgan.put(globalKey, propertiesMap);
         }
         propietatsPerEntitatOrgan.put(entitatCodi, propietatsPerOrgan);
 
     }
 
-    private Map<String, String> getValorsPerFills(String organCodi, String prefix, String sufix, String valor, boolean aplicaDescencents) {
+    private Map<String, String> getValorsPerFills(String organCodi, String prefix, String sufix, String valor, boolean aplicaDescencents, boolean mostrarLogs) {
+        if (mostrarLogs) {
+            log.info("[CFG-Fill] Inicialitzant propietat per organ [Organ: " + organCodi + ", Prop: " + sufix + ", Valor: " + valor + ", Descendents: " + aplicaDescencents + "].");
+        }
         Map<String, String> propertiesMap = new HashMap<>();
         OrganGestorEntity organGestor = organGestorRepository.findByCodi(organCodi);
 
         if (aplicaDescencents) {
             for (OrganGestorEntity fill : organGestor.getFills()) {
                 ConfigEntity config = configRepository.findByKey(prefix + fill.getCodi() + sufix);
+                if (mostrarLogs && config != null) {
+                    log.info("[CFG-Fill] Configuracio [key: " + config.getKey() + ", ConfigurableOrganActiu: " + config.isConfigurableOrganActiu() + ", ConfigurableOrgansDescendents: " + config.isConfigurableOrgansDescendents() +  "].");
+                }
                 if (config != null && config.isConfigurableOrganActiu()) {
                     propertiesMap.put(fill.getCodi(), getValue(config));
                     if (config.isConfigurableOrgansDescendents()) {
                         valor = getValue(config);
+                        if (mostrarLogs) {
+                            log.info("[CFG-Fill] Valor: " + valor);
+                        }
                     }
-                    propertiesMap.putAll(getValorsPerFills(fill.getCodi(), prefix, sufix, valor, aplicaDescencents));
+                    propertiesMap.putAll(getValorsPerFills(fill.getCodi(), prefix, sufix, valor, aplicaDescencents, mostrarLogs));
                 } else {
                     propertiesMap.put(fill.getCodi(), valor);
-                    propertiesMap.putAll(getValorsPerFills(fill.getCodi(), prefix, sufix, valor, aplicaDescencents));
+                    propertiesMap.putAll(getValorsPerFills(fill.getCodi(), prefix, sufix, valor, aplicaDescencents, mostrarLogs));
                 }
             }
         }
