@@ -9,6 +9,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
 import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
+import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
 import es.caib.distribucio.rest.client.integracio.domini.NtiEstadoElaboracion;
 import es.caib.distribucio.rest.client.integracio.domini.NtiOrigen;
 import es.caib.distribucio.rest.client.integracio.domini.NtiTipoDocumento;
@@ -20,27 +21,9 @@ import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
+import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.CarpetaEntity;
-import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DadaEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExpedientEntity;
-import es.caib.ripea.core.entity.ExpedientEstatEntity;
-import es.caib.ripea.core.entity.ExpedientPeticioEntity;
-import es.caib.ripea.core.entity.GrupEntity;
-import es.caib.ripea.core.entity.InteressatEntity;
-import es.caib.ripea.core.entity.MetaDadaEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
-import es.caib.ripea.core.entity.MetaExpedientEntity;
-import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
-import es.caib.ripea.core.entity.MetaNodeEntity;
-import es.caib.ripea.core.entity.OrganGestorEntity;
-import es.caib.ripea.core.entity.RegistreAnnexEntity;
-import es.caib.ripea.core.entity.RegistreInteressatEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.entity.*;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.CarpetaRepository;
@@ -77,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -348,37 +332,45 @@ public class ExpedientHelper {
 	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
-		Set<InteressatEntity> interessatsORepresenantsRipea = expedientEntity.getInteressatsORepresentants();
-		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
-			
-			InteressatEntity interessatRipeaOverwritten = checkForInteressatOverwritten(interessatDistribucio, interessatsORepresenantsRipea);
+//		Map<String, InteressatEntity> interessatsORepresenantsRipea = convertInteressatListToMap(expedientEntity.getInteressatsORepresentants());
+		Map<String, InteressatDto> interessatsOvewritten = getInteressatsOverwritten(expedientEntity, expedientPeticioEntity.getRegistre().getInteressats());
 
-			InteressatDto interessat = null;
-			if (interessatRipeaOverwritten != null) {
-				interessat = conversioTipusHelper.convertir(
-						interessatRipeaOverwritten,
-						InteressatDto.class);
-				if (interessatRipeaOverwritten.getRepresentant() != null) {
-					expedientInteressatHelper.deleteRepresentant(
-							entitatId,
-							expedientId, 
-							interessatRipeaOverwritten.getId(), 
-							interessatRipeaOverwritten.getRepresentant().getId(), 
-							rolActual);
+		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
+
+				InteressatDto interessatOvewritten = interessatsOvewritten.get(interessatDistribucio.getDocumentNumero());
+				InteressatDto representantOvewritten = null;
+				if (interessatDistribucio.getRepresentant() != null) {
+					representantOvewritten = interessatsOvewritten.get(interessatDistribucio.getRepresentant().getDocumentNumero());
 				}
-				expedientInteressatHelper.delete(
-						entitatId,
-						expedientId,
-						interessatRipeaOverwritten.getId(),
-						rolActual);
-			}
-			
+
+				if (interessatOvewritten != null || representantOvewritten != null) {
+					InteressatEntity interessatRipea = getInteressatOvewritten(
+							expedientId,
+							interessatOvewritten != null ? interessatOvewritten.getDocumentNum() : null,
+							representantOvewritten != null ? representantOvewritten.getDocumentNum() : null);
+					if (interessatRipea != null) {
+						if (interessatRipea.getRepresentant() != null) {
+							expedientInteressatHelper.deleteRepresentant(
+									entitatId,
+									expedientId,
+									interessatRipea.getId(),
+									interessatRipea.getRepresentant().getId(),
+									rolActual);
+						}
+						expedientInteressatHelper.delete(
+								entitatId,
+								expedientId,
+								interessatRipea.getId(),
+								rolActual);
+					}
+				}
+
 			InteressatDto createdInteressat = expedientInteressatHelper.create(
 					entitatId,
 					expedientId,
-					interessat != null ?
-						toInteressatMergedDto(interessatDistribucio, interessat):
-						toInteressatDto(interessatDistribucio, null),
+					interessatsOvewritten.containsKey(interessatDistribucio.getDocumentNumero()) ?
+							interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) :
+							toInteressatDto(interessatDistribucio, null),
 					false,
 					permission, 
 					rolActual, 
@@ -388,9 +380,9 @@ public class ExpedientHelper {
 						entitatId,
 						expedientId,
 						createdInteressat.getId(),
-						interessat != null && interessat.getRepresentant() != null ?
-							toInteressatMergedDto(interessatDistribucio.getRepresentant(), interessat.getRepresentant()):
-							toInteressatDto(interessatDistribucio.getRepresentant(), null),
+						interessatsOvewritten.containsKey(interessatDistribucio.getRepresentant().getDocumentNumero()) ?
+								interessatsOvewritten.get(interessatDistribucio.getRepresentant().getDocumentNumero()) :
+								toInteressatDto(interessatDistribucio.getRepresentant(), null),
 						false,
 						permission, 
 						rolActual, 
@@ -398,26 +390,135 @@ public class ExpedientHelper {
 			}
 		}
 	}
-	
-	public InteressatEntity checkForInteressatOverwritten(RegistreInteressatEntity interessatDistribucio, Set<InteressatEntity> interessatsORepresenantsRipea) {
-		List<InteressatEntity> interessatsRipea = new ArrayList<>();
-		for (InteressatEntity inter : interessatsORepresenantsRipea) {
-			if (!inter.isEsRepresentant()) {
-				interessatsRipea.add(inter);
-			}
-		}
-		
-		InteressatEntity interessatRipeaOverwritten = null;
-		for (InteressatEntity interessatRipea : interessatsRipea) {
 
-			if (Utils.isNotNullAndEquals(interessatRipea.getDocumentNum(), interessatDistribucio.getDocumentNumero()) || // interessatRipea == interessatDistribucio
-					interessatRipea.getRepresentant() != null && Utils.isNotNullAndEquals(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getDocumentNumero()) ||  // representantRipea == interessatDistribucio
-					interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEquals(interessatRipea.getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero()) || // interessatRipea == representantDistribucio
-					interessatRipea.getRepresentant() != null && interessatDistribucio.getRepresentant() != null && Utils.isNotNullAndEquals(interessatRipea.getRepresentant().getDocumentNum(), interessatDistribucio.getRepresentant().getDocumentNumero())) { // representantRipea == representantDistribucio
-				interessatRipeaOverwritten = interessatRipea;
+	private InteressatEntity getInteressatOvewritten(Long expedientId, String interessatNumDocument, String representantNumDocument) {
+		if (interessatNumDocument != null) {
+			List<InteressatEntity> interessats = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, interessatNumDocument);
+			if (!interessats.isEmpty()) {
+				return interessats.get(0);
 			}
 		}
-		return interessatRipeaOverwritten;
+		if (representantNumDocument != null) {
+			List<InteressatEntity> representants = interessatRepository.findByExpedientIdAndRepresentantDocumentNum(expedientId, representantNumDocument);
+			if (!representants.isEmpty()) {
+				return representants.get(0);
+			}
+		}
+		return null;
+	}
+
+//	private Map<String, InteressatEntity> convertInteressatListToMap(Set<InteressatEntity> interessatsORepresenantsRipea) {
+//		Map<String, InteressatEntity> result = new HashMap<>();
+//		if (interessatsORepresenantsRipea != null) {
+//			for (InteressatEntity interessat : interessatsORepresenantsRipea) {
+//				result.put(interessat.getDocumentNum(), interessat);
+//			}
+//		}
+//		return result;
+//	}
+
+	public Map<String, InteressatDto> getInteressatsOverwritten(ExpedientEntity expedientEntity, List<RegistreInteressatEntity> interessatsDistribucio) {
+
+		Map<String, InteressatDto> interessatsOverwritten = new HashMap<>();
+
+		Set<InteressatEntity> interessatsORepresenantsRipea = expedientEntity.getInteressatsORepresentants();
+		Set<RegistreInteressatEntity> interessatsOrRepresentantsDistribucio = getInteressatOrRepresentantsDistribucio(interessatsDistribucio);
+
+
+		for (InteressatEntity interessatRipea : interessatsORepresenantsRipea) {
+			for (RegistreInteressatEntity interessatDistribucio : interessatsOrRepresentantsDistribucio) {
+				if (interessatRipea.getDocumentNum().equals(interessatDistribucio.getDocumentNumero())) {
+
+					if (!sameTipusInteressat(interessatDistribucio.getTipus(), interessatRipea)) {
+						throw new InteressatTipusDocumentException(
+								interessatRipea.getDocumentNum(),
+								null,
+								interessatDistribucio.getTipus().name(),
+								expedientEntity.getId());
+					}
+                    interessatsOverwritten.put(
+							interessatRipea.getDocumentNum(),
+							toInteressatMergedDto(
+									interessatDistribucio,
+									conversioTipusHelper.convertir(interessatRipea, InteressatDto.class)));
+                }
+			}
+		}
+
+		return interessatsOverwritten;
+	}
+
+	private static Set<RegistreInteressatEntity> getInteressatOrRepresentantsDistribucio(List<RegistreInteressatEntity> interessatsDistribucio) {
+		Set<RegistreInteressatEntity> interessatsOrRepresentantsDistribucio = new HashSet<>();
+		for (RegistreInteressatEntity inter : interessatsDistribucio) {
+			interessatsOrRepresentantsDistribucio.add(inter);
+			if (inter.getRepresentant() != null) {
+				interessatsOrRepresentantsDistribucio.add(inter.getRepresentant());
+			}
+		}
+		return interessatsOrRepresentantsDistribucio;
+	}
+
+//	public InteressatOvewritten checkForInteressatOverwritten(RegistreInteressatEntity interessatDistribucio, Set<InteressatEntity> interessatsORepresenantsRipea) {
+//
+//		List<InteressatEntity> interessatsRipea = getInteressatRipea(interessatsORepresenantsRipea);
+//		InteressatOvewritten interessatRipeaOverwritten = null;
+//
+//		for (InteressatEntity interessatRipea : interessatsRipea) {
+//
+//			InteressatEntity representantRipea = interessatRipea.getRepresentant();
+//			RegistreInteressatEntity representantDistribucio = interessatDistribucio.getRepresentant();
+//			boolean sameInteressats = sameInteressat(interessatRipea, interessatDistribucio);					// interessatRipea == interessatDistribucio
+//			boolean interessatEqualsRepresentant = sameInteressat(interessatRipea, representantDistribucio);	// interessatRipea == representantDistribucio
+//			boolean representantEqualsInteressat = sameInteressat(representantRipea, interessatDistribucio);	// representantRipea == interessatDistribucio
+//			boolean sameRepresentants = sameInteressat(representantRipea, representantDistribucio);				// representantRipea == representantDistribucio
+//
+//			if (sameInteressats || interessatEqualsRepresentant || representantEqualsInteressat || sameRepresentants) {
+//				return  InteressatOvewritten.builder()
+//						.interessat(interessatRipea)
+//						.ovewriteInteressat(sameInteressats)
+//						.ovewriteInteressatAmbRepresentant(interessatEqualsRepresentant)
+//						.ovewriteRepresentantAmbInteressat(representantEqualsInteressat)
+//						.ovewriteRepresentant(sameRepresentants)
+//						.build();
+//
+//			}
+//		}
+//		return interessatRipeaOverwritten;
+//	}
+//
+//	@Data @Builder
+//	public static class InteressatOvewritten {
+//		private InteressatEntity interessat;
+//		private boolean ovewriteInteressat;
+//		private boolean ovewriteInteressatAmbRepresentant;
+//		private boolean ovewriteRepresentantAmbInteressat;
+//		private boolean ovewriteRepresentant;
+//	}
+//
+//	private static List<InteressatEntity> getInteressatRipea(Set<InteressatEntity> interessatsORepresenantsRipea) {
+//		List<InteressatEntity> interessatsRipea = new ArrayList<>();
+//		for (InteressatEntity inter : interessatsORepresenantsRipea) {
+//			if (!inter.isEsRepresentant()) {
+//				interessatsRipea.add(inter);
+//			}
+//		}
+//		return interessatsRipea;
+//	}
+//
+//	private boolean sameInteressat(InteressatEntity interessatRipea, RegistreInteressatEntity interessatDistribucio) {
+//		if (interessatRipea == null || interessatDistribucio == null) return false;
+//
+//		return Utils.isNotNullAndEquals(interessatRipea.getDocumentNum(), interessatDistribucio.getDocumentNumero()) &&
+//				sameTipusInteressat(interessatDistribucio.getTipus(), interessatRipea);
+//	}
+
+	private boolean sameTipusInteressat(InteressatTipus tipus, InteressatEntity interessat) {
+		if (tipus == null || interessat == null) return false;
+
+		return interessat instanceof InteressatPersonaFisicaEntity && InteressatTipus.PERSONA_FISICA.equals(tipus) ||
+				interessat instanceof InteressatPersonaJuridicaEntity && InteressatTipus.PERSONA_JURIDICA.equals(tipus) ||
+				interessat instanceof InteressatAdministracioEntity && InteressatTipus.ADMINISTRACIO.equals(tipus);
 	}
 	
 

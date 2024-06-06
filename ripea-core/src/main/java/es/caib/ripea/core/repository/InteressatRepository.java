@@ -3,15 +3,6 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatAdministracioEntity;
@@ -20,6 +11,14 @@ import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
 import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -32,9 +31,23 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	List<InteressatEntity> findByExpedientAndDocumentNum(
 			ExpedientEntity expedient, String documentNum);
 
+	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.documentNum = :documentNum")
+	List<InteressatEntity> findByExpedientIdAndDocumentNum(
+			@Param("expedientId")Long expedientId,
+			@Param("documentNum")String documentNum);
+
+	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.representant.documentNum = :documentNum")
+	List<InteressatEntity> findByExpedientIdAndRepresentantDocumentNum(
+			@Param("expedientId")Long expedientId,
+			@Param("documentNum")String documentNum);
+
 	InteressatEntity findByExpedientAndId(
 			ExpedientEntity expedient,
 			Long id);
+
+//	InteressatEntity findByExpedientAndDocumentNum(
+//			ExpedientEntity expedient,
+//			String documentNum);
 
 	List<InteressatEntity> findByDocumentNum(String documentNum); 
 

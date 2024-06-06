@@ -3,14 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
 import es.caib.ripea.core.api.dto.ComunitatDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.NivellAdministracioDto;
@@ -18,6 +10,13 @@ import es.caib.ripea.core.api.dto.PaisDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.helper.CacheHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementació dels mètodes per obtenir dades de fonts
@@ -53,21 +52,27 @@ public class DadesExternesServiceImpl implements DadesExternesService {
 	public List<ProvinciaDto> findProvinciesPerComunitat(String comunitatCodi) {
 		LOGGER.debug("Cercant totes les províncies de la comunitat (" +
 				"comunitatCodi=" + comunitatCodi + ")");
-		return cacheHelper.findProvinciesPerComunitat(comunitatCodi);
+		if (comunitatCodi != null)
+			return cacheHelper.findProvinciesPerComunitat(comunitatCodi);
+		return new ArrayList<>();
 	}
 
 	@Override
 	public List<MunicipiDto> findMunicipisPerProvincia(String provinciaCodi) {
 		LOGGER.debug("Cercant els municipis de la província (" +
 				"provinciaCodi=" + provinciaCodi + ")");
-		return cacheHelper.findMunicipisPerProvincia(provinciaCodi);
+		if (provinciaCodi != null)
+			return cacheHelper.findMunicipisPerProvincia(provinciaCodi);
+		return new ArrayList<>();
 	}
 	
 	@Override
 	public List<MunicipiDto> findMunicipisPerProvinciaPinbal(String provinciaCodi) {
 		LOGGER.debug("Cercant els municipis de la província per a consultes a PINBAL (" +
 				"provinciaCodi=" + provinciaCodi + ")");
-		return cacheHelper.findMunicipisPerProvinciaPinbal(provinciaCodi);
+		if (provinciaCodi != null)
+			return cacheHelper.findMunicipisPerProvinciaPinbal(provinciaCodi);
+		return new ArrayList<>();
 	}
 
 
