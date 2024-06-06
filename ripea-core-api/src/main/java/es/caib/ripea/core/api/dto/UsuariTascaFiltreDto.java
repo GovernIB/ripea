@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter @Setter
 public class UsuariTascaFiltreDto implements Serializable {
 
-	private TascaEstatEnumDto estat;
+	private TascaEstatEnumDto[] estats;
 	private Long expedientId;
 	private Date dataInici;
 	private Date dataFi;

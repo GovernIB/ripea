@@ -65,7 +65,7 @@
 				<rip:inputDate name="dataLimitFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitFi"/>
 			</div>					
 			<div class="col-md-4">
-				<rip:inputSelect name="estat" optionEnum="TascaEstatEnumDto" emptyOption="true" placeholderKey="expedient.tasca.list.columna.estat" inline="true"/>
+				<rip:inputSelect name="estats" optionEnum="TascaEstatEnumDto" emptyOption="true" placeholderKey="expedient.tasca.list.columna.estat" multiple="true" inline="true"/>
 			</div>
 			
 			<div class="col-md-4 pull-right">

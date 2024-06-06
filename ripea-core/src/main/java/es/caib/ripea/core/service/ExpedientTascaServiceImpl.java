@@ -143,28 +143,44 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					null);
 		}
 		
+		Page<ExpedientTascaEntity> tasques = null;
 		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 		Date dataLimitInici = DateHelper.toDateInicialDia(filtre.getDataLimitInici());
 		Date dataLimitFi = DateHelper.toDateFinalDia(filtre.getDataLimitFi());
 		
-		Page<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
-				usuariEntity,
-				filtre.getEstat() == null,
-				filtre.getEstat(), 
-				expedient == null,
-				expedient,
-				dataInici == null,
-				dataInici,
-				dataFi == null,
-				dataFi,		
-				dataLimitInici == null,
-				dataLimitInici,
-				dataLimitFi == null,
-				dataLimitFi,
-				paginacioHelper.toSpringDataPageable(
-						paginacioParams));
-		
+		if (filtre.getEstats().length == 0) {
+			tasques = expedientTascaRepository.findByResponsable(
+					usuariEntity,
+					expedient == null,
+					expedient,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,		
+					dataLimitInici == null,
+					dataLimitInici,
+					dataLimitFi == null,
+					dataLimitFi,
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams));
+		} else {
+			tasques = expedientTascaRepository.findByResponsableAndEstat(
+					usuariEntity,
+					filtre.getEstats(), 
+					expedient == null,
+					expedient,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,		
+					dataLimitInici == null,
+					dataLimitInici,
+					dataLimitFi == null,
+					dataLimitFi,
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams));
+		}
 		
 		return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
 		
