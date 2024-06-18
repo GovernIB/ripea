@@ -41,8 +41,6 @@ public class ExpedientInteressatHelper {
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
@@ -50,10 +48,25 @@ public class ExpedientInteressatHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ContingutHelper contingutHelper;
-	
+
+
+	@Transactional
+	public InteressatEntity create(
+			Long expedientId,
+			InteressatDto interessat,
+			PermissionEnumDto permission,
+			String rolActual){
+
+		logger.debug("Creant nou interessatEntity (expedientId=" + expedientId + ", interessat=" + interessat + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity interessatEntity = createDB(expedient, interessat);
+
+		return interessatEntity;
+	}
+
 	@Transactional
 	public InteressatDto create(
-			Long entitatId,
 			Long expedientId,
 			InteressatDto interessat,
 			boolean propagarArxiu,
@@ -61,30 +74,10 @@ public class ExpedientInteressatHelper {
 			String rolActual, 
 			boolean comprovarAgafat){
 		
+		logger.debug("Creant nou interessat (expedientId=" + expedientId + ", interessat=" + interessat + ")");
 
-		logger.debug("Creant nou interessat ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "interessat=" + interessat + ")");
-	
-		
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				comprovarAgafat,
-				permission.equals(PermissionEnumDto.READ),
-				permission.equals(PermissionEnumDto.WRITE),
-				permission.equals(PermissionEnumDto.CREATE),
-				permission.equals(PermissionEnumDto.DELETE),
-				rolActual);
-		
-		InteressatEntity interessatEntity = createDB(
-				entitatId,
-				expedient,
-				interessat,
-				propagarArxiu,
-				permission,
-				rolActual,
-				comprovarAgafat);
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, comprovarAgafat);
+		InteressatEntity interessatEntity = createDB(expedient, interessat);
 		
 		if (propagarArxiu && expedient.getArxiuUuid() != null) {
 			arxiuPropagarInteressats(expedient, interessatEntity);
@@ -94,10 +87,32 @@ public class ExpedientInteressatHelper {
 							interessatEntity,
 							InteressatDto.class);
 	}
-	
+
+	@Transactional
+	public InteressatEntity createRepresentant(
+			Long expedientId,
+			Long interessatId, //interessatId to which representant will be related to
+			InteressatDto representant,
+			PermissionEnumDto permission,
+			String rolActual){
+
+		logger.debug("Creant nou representantEntity (expedientId=" + expedientId + ", interessatId=" + interessatId + ", representant=" + representant + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity representantEntity = createDB(expedient, representant);
+
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		if (interessat == null) {
+			throw new NotFoundException(interessatId, InteressatEntity.class);
+		}
+		representantEntity.updateEsRepresentant(true);
+		interessat.updateRepresentant(representantEntity);
+
+		return representantEntity;
+	}
+
 	@Transactional
 	public InteressatDto createRepresentant(
-			Long entitatId,
 			Long expedientId,
 			Long interessatId, //interessatId to which representant will be related to
 			InteressatDto representant,
@@ -108,37 +123,17 @@ public class ExpedientInteressatHelper {
 		
 
 		logger.debug("Creant nou representant ("
-				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
 				+ "interessatId=" + interessatId + ", "
 				+ "representant=" + representant + ")");
 
-		
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				comprovarAgafat,
-				permission.equals(PermissionEnumDto.READ),
-				permission.equals(PermissionEnumDto.WRITE),
-				permission.equals(PermissionEnumDto.CREATE),
-				permission.equals(PermissionEnumDto.DELETE),
-				rolActual);
-		
-		InteressatEntity representantEntity = createDB(
-				entitatId,
-				expedient,
-				representant,
-				propagarArxiu,
-				permission,
-				rolActual,
-				comprovarAgafat);
-		
-		
-		InteressatEntity interessat = null;
-		interessat = interessatRepository.findOne(interessatId);
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, comprovarAgafat);
+		InteressatEntity representantEntity = createDB(expedient, representant);
+
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat == null) {
-			throw new NotFoundException(
-					interessatId,
-					InteressatEntity.class);
+			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
 		representantEntity.updateEsRepresentant(true);
 		interessat.updateRepresentant(representantEntity);
@@ -155,13 +150,8 @@ public class ExpedientInteressatHelper {
 	
 	@Transactional
 	public InteressatEntity createDB(
-			Long entitatId,
 			ExpedientEntity expedient,
-			InteressatDto interessat,
-			boolean propagarArxiu, 
-			PermissionEnumDto permission, 
-			String rolActual, 
-			boolean comprovarAgafat){
+			InteressatDto interessat){
 
 		InteressatEntity interessatEntity = null;
 		if (interessat.isPersonaFisica()) {
@@ -253,6 +243,18 @@ public class ExpedientInteressatHelper {
 				false);
 		
 		return interessatEntity;
+	}
+
+	private ExpedientEntity getExpedientComprovantPermisos(Long expedientId, PermissionEnumDto permission, String rolActual, boolean comprovarAgafat) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				comprovarAgafat,
+				permission.equals(PermissionEnumDto.READ),
+				permission.equals(PermissionEnumDto.WRITE),
+				permission.equals(PermissionEnumDto.CREATE),
+				permission.equals(PermissionEnumDto.DELETE),
+				rolActual);
+		return expedient;
 	}
 	
 	
@@ -552,6 +554,100 @@ public class ExpedientInteressatHelper {
 				InteressatDto.class);
 	}
 
+	public InteressatEntity update(
+			Long expedientId,
+			InteressatDto interessat,
+			PermissionEnumDto permission,
+			String rolActual) {
+
+		logger.debug("Modificant un interessat (expedientId=" + expedientId + ", interessat=" + interessat + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity interessatEntity = interessatRepository.findOne(interessat.getId());
+
+//		InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
+//		deproxied.update(interessat);
+		interessatEntity.update(interessat);
+		interessatEntity.updateEsRepresentant(false);
+		interessatEntity = interessatRepository.save(interessatEntity);
+
+		// Registra al log la modificació de l'interessat
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				interessatEntity,
+				LogObjecteTipusEnumDto.INTERESSAT,
+				LogTipusEnumDto.MODIFICACIO,
+				null,
+				null,
+				false,
+				false);
+
+		return interessatEntity;
+	}
+
+	public InteressatEntity updateRepresentant(
+			Long expedientId,
+			Long interessatId,
+			InteressatDto representant,
+			PermissionEnumDto permission,
+			String rolActual) {
+
+		logger.debug("Modificant un representant (expedientId=" + expedientId + ", representant=" + representant + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity representantEntity = interessatRepository.findOne(representant.getId());
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		if (interessat == null) {
+			throw new NotFoundException(interessatId, InteressatEntity.class);
+		}
+
+		// Actualitzam les dades del representant
+		representantEntity.update(representant);
+		representantEntity = interessatRepository.save(representantEntity);
+
+		// Si canviam de representant, l'eliminam de l'interessant actual
+		if (interessat.getRepresentant() != null && !representantEntity.getDocumentNum().equalsIgnoreCase(interessat.getRepresentant().getDocumentNum())) {
+			removeRepresentant(interessat);
+		}
+		interessat.updateRepresentant(representantEntity);
+		interessatRepository.save(interessat);
+
+		// Registra al log la modificació de l'interessat
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				representantEntity,
+				LogObjecteTipusEnumDto.INTERESSAT,
+				LogTipusEnumDto.MODIFICACIO,
+				null,
+				null,
+				false,
+				false);
+
+		return representantEntity;
+	}
+
+	// Treure representant de l'interessat, i borrar-lo de BBDD si és necessari
+	public void removeRepresentant(InteressatEntity interessat) {
+		InteressatEntity representant = interessat.getRepresentant();
+		if (representant == null) return;
+
+		Long representantId = representant.getId();
+		interessat.updateRepresentant(null);
+		interessatRepository.save(interessat);
+
+		// Si el representant també és interessat (esRepresentant == false), no l'eliminam de BBDD
+		if (!representant.isEsRepresentant()) return;
+
+		// Si només s'està utilitzant una vegada (en l'interessat, l'eliminam de BBDD
+		Integer usosRepresentant = interessatRepository.countByRepresentantId(representantId);
+		if (usosRepresentant <= 1) {
+			representant.getExpedient().deleteInteressat(representant);
+			interessatRepository.delete(representant.getId());
+		}
+
+	}
 	
 	
 
@@ -574,6 +670,19 @@ public class ExpedientInteressatHelper {
 				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
+			// Primer eliminam el representant
+			removeRepresentant(interessat);
+
+			// Si aquest interessat s'està utilitzant en més d'un interressat-representant, no es borra de BBDD
+			Integer usosRepresentant = interessatRepository.countByRepresentantId(interessatId);
+			interessat.updateRepresentant(null);
+			// Marcar com a representant si s'està utilitzant com a representant d'altres interessats
+			if (usosRepresentant > 0) {
+				interessat.updateEsRepresentant(true);
+				interessatRepository.save(interessat);
+				return;
+			}
+
 			interessatRepository.delete(interessat);
 			expedient.deleteInteressat(interessat);
 			// Registra al log la baixa de l'interessat
@@ -620,11 +729,18 @@ public class ExpedientInteressatHelper {
 				false,
 				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		// Si aquest representant s'està utilitzant com a interessat o com a representant d'un altre interessat, no es borra de BBDD
 		if (interessat != null) {
-			if (interessat.getRepresentant() != null && 
-				interessat.getRepresentant().getId().equals(representantId)) {
-				InteressatEntity representant = interessatRepository.findOne(representantId);
+			InteressatEntity representant = interessat.getRepresentant();
+			if (representant != null && representant.getId().equals(representantId)) {
+//				InteressatEntity representant = interessatRepository.findOne(representantId);
+				Integer usosRepresentant = interessatRepository.countByRepresentantId(representantId);
 				interessat.updateRepresentant(null);
+				// representant també és interessat || representant de més d'un interessat
+				if (!representant.isEsRepresentant() || usosRepresentant > 1) {
+					return;
+				}
+
 				interessatRepository.delete(representant);
 				expedient.deleteInteressat(representant);
 				// Registra al log la baixa de l'interessat

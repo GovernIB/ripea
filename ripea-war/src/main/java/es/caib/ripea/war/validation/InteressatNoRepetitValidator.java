@@ -3,18 +3,15 @@
  */
 package es.caib.ripea.war.validation;
 
-import java.util.List;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import es.caib.ripea.war.command.InteressatCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.war.command.InteressatCommand;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * Constraint de validació que controla que no es repeteixi
@@ -40,8 +37,8 @@ public class InteressatNoRepetitValidator implements ConstraintValidator<Interes
 			InteressatCommand interessat = (InteressatCommand)value;
 			if (interessat.getId() != null)
 				return true;
-			List<InteressatDto> interessats = expedientInteressatService.findByExpedientAndDocumentNum(interessat.getDocumentNum(), interessat.getExpedientId());
-			return interessats.isEmpty();
+			InteressatDto interessatDto = expedientInteressatService.findByExpedientAndDocumentNum(interessat.getDocumentNum(), interessat.getExpedientId());
+			return interessatDto == null;
 			
 		} catch (final Exception ex) {
         	LOGGER.error("Error al comprovar si l'interessat ja està donat d'alta", ex);

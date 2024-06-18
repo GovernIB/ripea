@@ -171,8 +171,18 @@ public class RegistreInteressatDto {
 			RegistreInteressatDto representant) {
 		this.representant = representant;
 	}
-	
-	
+
+	public String getDocumentNom() {
+		return documentNumero + " - " + getNomSencer();
+	}
+
+	public String getNomSencer() {
+
+		if (nom == null) {
+			return raoSocial;
+		}
+		return llinatge1 != null ? llinatge2 != null ? nom + " " + llinatge1 + " " + llinatge2 : nom + " " + llinatge1 : nom;
+	}
 	
 
 }

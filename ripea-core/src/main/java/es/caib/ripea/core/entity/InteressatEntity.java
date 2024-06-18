@@ -3,11 +3,13 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.audit.RipeaAuditable;
+import lombok.Getter;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,15 +28,9 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.util.CollectionUtils;
-
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
-import es.caib.ripea.core.audit.RipeaAuditable;
-import lombok.Getter;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa un interessat.
@@ -203,6 +199,22 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		this.arxiuIntentData = new Date();
 	}
 
+	public void update(InteressatDto dto) {
+		this.documentTipus = dto.getDocumentTipus();
+		this.documentNum = dto.getDocumentNum();
+		this.pais = dto.getPais();
+		this.provincia =  dto.getProvincia();
+		this.municipi =  dto.getMunicipi();
+		this.adresa =  dto.getAdresa();
+		this.codiPostal =  dto.getCodiPostal();
+		this.email =  dto.getEmail();
+		this.telefon =  dto.getTelefon();
+		this.observacions =  dto.getObservacions();
+		this.preferenciaIdioma =  dto.getPreferenciaIdioma();
+		this.entregaDeh = dto.getEntregaDeh();
+		this.entregaDehObligat = dto.getEntregaDehObligat();
+		this.incapacitat = dto.getIncapacitat();
+	}
 	
 	public String getNom() {
 		if (this instanceof InteressatAdministracioEntity) {

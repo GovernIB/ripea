@@ -45,7 +45,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long grupId,
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
-			Long justificantIdMetaDoc) {
+			Long justificantIdMetaDoc,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -58,7 +59,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				grupId,
 				rolActual,
 				anexosIdsMetaDocsIdsMap, 
-				justificantIdMetaDoc);
+				justificantIdMetaDoc,
+				interessatsAccionsMap);
 	}
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
@@ -276,7 +278,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			String rolActual, 
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc,
-			boolean agafarExpedient) {
+			boolean agafarExpedient,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
 		return delegate.incorporar(
 				entitatId, 
 				expedientId, 
@@ -285,7 +288,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				rolActual, 
 				anexosIdsMetaDocsIdsMap,
 				justificantIdMetaDoc,
-				agafarExpedient);
+				agafarExpedient,
+				interessatsAccionsMap);
 		
 	}
 

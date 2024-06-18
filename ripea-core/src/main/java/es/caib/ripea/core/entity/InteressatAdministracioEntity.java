@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 
 /**
  * Classe del model de dades que representa un interessat de tipus administració pública.
@@ -92,6 +95,20 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		this.entregaDehObligat = entregaDehObligat;
 		this.incapacitat = incapacitat;
 		this.ambOficinaSir = ambOficinaSir;
+	}
+
+	@Override
+	public void update(InteressatDto dto) {
+
+		if (!(dto instanceof InteressatAdministracioDto))
+			throw new InteressatTipusDocumentException(dto.getDocumentNum(), InteressatTipusEnumDto.ADMINISTRACIO.name(), dto.getTipus().name(), this.expedient.getId());
+
+		super.update(dto);
+
+		InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) dto;
+		this.organCodi = interessatAdministracioDto.getOrganCodi();
+		this.organNom = interessatAdministracioDto.getOrganNom();
+		this.ambOficinaSir = interessatAdministracioDto.getAmbOficinaSir();
 	}
 
 	/**

@@ -28,16 +28,15 @@ import java.util.List;
  */
 public interface InteressatRepository extends JpaRepository<InteressatEntity, Long> {
 
-	List<InteressatEntity> findByExpedientAndDocumentNum(
-			ExpedientEntity expedient, String documentNum);
+	InteressatEntity findByExpedientAndDocumentNum(ExpedientEntity expedient, String documentNum);
 
 	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.documentNum = :documentNum")
-	List<InteressatEntity> findByExpedientIdAndDocumentNum(
+	InteressatEntity findByExpedientIdAndDocumentNum(
 			@Param("expedientId")Long expedientId,
 			@Param("documentNum")String documentNum);
 
-	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.representant.documentNum = :documentNum")
-	List<InteressatEntity> findByExpedientIdAndRepresentantDocumentNum(
+	@Query(value = "SELECT distinct i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.representant.documentNum = :documentNum")
+	InteressatEntity findByExpedientIdAndRepresentantDocumentNum(
 			@Param("expedientId")Long expedientId,
 			@Param("documentNum")String documentNum);
 
@@ -320,5 +319,5 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("creacioFi") Date creacioFi);
 
 
-	
+	Integer countByRepresentantId(Long representantId);
 }

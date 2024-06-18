@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 
 /**
  * Classe del model de dades que representa un interessat de tipus persona física.
@@ -98,6 +101,20 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 		this.incapacitat = incapacitat;
 	}
 
+	@Override
+	public void update(InteressatDto dto) {
+
+		if (!(dto instanceof InteressatPersonaFisicaDto))
+			throw new InteressatTipusDocumentException(dto.getDocumentNum(), InteressatTipusEnumDto.PERSONA_FISICA.name(), dto.getTipus().name(), this.expedient.getId());
+
+		super.update(dto);
+
+		InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto) dto;
+		this.nom = interessatPersonaFisicaDto.getNom();
+        this.llinatge1 = interessatPersonaFisicaDto.getLlinatge1();
+        this.llinatge2 = interessatPersonaFisicaDto.getLlinatge2();
+	}
+
 	/**
 	 * Obté el Builder per a crear objectes de tipus interessat-persona física.
 	 * 
@@ -116,7 +133,7 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 	 * @param observacions	Camp per introduir observacions sobre l'interessat.
 	 * @param expedient	Expedient on està vinculat l'interessat.
 	 * @param representant	Representant de l'interessat.
-	 * @param notificacioIdioma	Idioma en que l'interessat desitja rebre les notificacions.
+	 * @param preferenciaIdioma	Idioma en que l'interessat desitja rebre les notificacions.
 	 * @return
 	 */
 	public static Builder getBuilder(

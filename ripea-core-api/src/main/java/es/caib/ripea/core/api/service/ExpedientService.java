@@ -60,7 +60,8 @@ public interface ExpedientService {
 			Long grupId,
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
-			Long justificantIdMetaDoc) throws NotFoundException, ValidationException;
+			Long justificantIdMetaDoc,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) throws NotFoundException, ValidationException;
 
 
 
@@ -369,7 +370,8 @@ public interface ExpedientService {
 			String rolActual, 
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc,
-			boolean agafarExpedient);
+			boolean agafarExpedient,
+		   Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap);
 	
 	/**
 	 * Genera un índex amb el continut de l'expedient.
@@ -378,8 +380,8 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param format 
 	 * 			  Format exportació (PDF/ZIP)
-	 * @param expedientId
-	 *            Atribut id de l'expedient que es vol consultar.
+	 * @param expedientIds
+	 *            Atribut id dels expedients que es volen consultar.
 	 * @return Un document amb l'índex.
 	 * @throws IOException 
 	 */
@@ -486,7 +488,7 @@ public interface ExpedientService {
 	 * @return La llista d'expedients relacionats.
 	 */
 	public PaginaDto<ExpedientDto> relacioFindAmbExpedientPaginat(
-			Long id, 
+			Long entitatId,
 			ExpedientFiltreDto filtre, 
 			Long expedientId,
 			PaginacioParamsDto paginacioDtoFromRequest);
@@ -518,7 +520,7 @@ public interface ExpedientService {
 	 *            Atribut id de l'entitat.
 	 * @param expedientPareId
 	 *            Atribut id de l'expedient pare.
-	 * @param relacionatId
+	 * @param expedientId
 	 *            Atribut id de l'expedient fill.
 	 * @param rolActual Rol actual de l'usuari que realitza l'acció
 	 * @throws NotFoundException

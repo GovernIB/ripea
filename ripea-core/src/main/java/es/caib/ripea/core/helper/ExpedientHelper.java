@@ -159,6 +159,7 @@ public class ExpedientHelper {
 			String nom,
 			Long expedientPeticioId,
 			boolean associarInteressats,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			Long grupId,
 			String rolActual) {
 
@@ -176,7 +177,6 @@ public class ExpedientHelper {
 //		try {
 //			Thread.sleep(5000L);
 //		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 
@@ -269,7 +269,13 @@ public class ExpedientHelper {
 		if (expedientPeticioId != null) {
 			relateExpedientWithPeticioAndSetAnnexosPendent(expedientPeticioId, expedient.getId());
 			if (associarInteressats) {
-				associateInteressats(expedient.getId(), entitatId, expedientPeticioId, PermissionEnumDto.CREATE, rolActual);
+				associateInteressats(
+						expedient.getId(),
+						entitatId,
+						expedientPeticioId,
+						PermissionEnumDto.CREATE,
+						rolActual,
+						interessatsAccionsMap);
 			}
 			ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 			expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
@@ -329,83 +335,252 @@ public class ExpedientHelper {
 
 
 	@Transactional
-	public void associateInteressats(Long expedientId, Long entitatId, Long expedientPeticioId, PermissionEnumDto permission, String rolActual) {
+	public void associateInteressats(
+			Long expedientId,
+			Long entitatId,
+			Long expedientPeticioId,
+			PermissionEnumDto permission,
+			String rolActual,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		ExpedientEntity expedientEntity = expedientRepository.findOne(expedientId);
-//		Map<String, InteressatEntity> interessatsORepresenantsRipea = convertInteressatListToMap(expedientEntity.getInteressatsORepresentants());
 		Map<String, InteressatDto> interessatsOvewritten = getInteressatsOverwritten(expedientEntity, expedientPeticioEntity.getRegistre().getInteressats());
 
 		for (RegistreInteressatEntity interessatDistribucio : expedientPeticioEntity.getRegistre().getInteressats()) {
 
-				InteressatDto interessatOvewritten = interessatsOvewritten.get(interessatDistribucio.getDocumentNumero());
-				InteressatDto representantOvewritten = null;
-				if (interessatDistribucio.getRepresentant() != null) {
-					representantOvewritten = interessatsOvewritten.get(interessatDistribucio.getRepresentant().getDocumentNumero());
-				}
+			InteressatAssociacioAccioEnum accioARealitzar = interessatsAccionsMap.get(interessatDistribucio.getDocumentNumero());
+			RegistreInteressatEntity representantDistribucio = interessatDistribucio.getRepresentant();
+			boolean hasRepresentantDistribucio = representantDistribucio != null;
 
-				if (interessatOvewritten != null || representantOvewritten != null) {
-					InteressatEntity interessatRipea = getInteressatOvewritten(
+			InteressatDto interessatOverwritten = interessatsOvewritten.get(interessatDistribucio.getDocumentNumero());
+			InteressatDto representantOverwritten = hasRepresentantDistribucio ? interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) : null;
+
+
+			switch (accioARealitzar) {
+				case ASSOCIAR:
+					associarInteressat(
 							expedientId,
-							interessatOvewritten != null ? interessatOvewritten.getDocumentNum() : null,
-							representantOvewritten != null ? representantOvewritten.getDocumentNum() : null);
-					if (interessatRipea != null) {
-						if (interessatRipea.getRepresentant() != null) {
-							expedientInteressatHelper.deleteRepresentant(
-									entitatId,
-									expedientId,
-									interessatRipea.getId(),
-									interessatRipea.getRepresentant().getId(),
-									rolActual);
-						}
-						expedientInteressatHelper.delete(
-								entitatId,
-								expedientId,
-								interessatRipea.getId(),
-								rolActual);
-					}
-				}
+							permission,
+							rolActual,
+							interessatDistribucio,
+							interessatOverwritten,
+							hasRepresentantDistribucio,
+							representantOverwritten,
+							representantDistribucio);
+					break;
+//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) != null) {
+//						throw new InteressatAssociarException("No es pot associar el nou interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a que ja existeix un interessat amb el mateix document.");
+//					}
+//					if (representantDistribucio != null && interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) != null) {
+//						throw new InteressatAssociarException("No es pot associar el nou representant amb document número " + representantDistribucio.getDocumentNumero() + " degut a que ja existeix un interessat o representant amb el mateix document.");
+//					}
+//					crearInteressatIRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
+//					break;
+//				case SOBREESCRIURE:
+//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) == null) {
+//						throw new InteressatAssociarException("No es actualitzar l'interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a no existeix cap interessat amb aquest document a l'expedient.");
+//					}
+//					updateInteressat();
+//					if (representantDistribucio != null) {
+//						if (interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) == null) {
+//							throw new InteressatAssociarException("No es actualitzar el representant amb document número " + representantDistribucio.getDocumentNumero() + " degut a no existeix cap interessat o representant amb aquest document a l'expedient.");
+//						}
+//						updateRepresentant(entitatId, interessatsOvewritten.get(representantDistribucio.getDocumentNumero()));
+//					}
+//					break;
+//				case SOBREESCRIURE_REPRESENTANT:
+//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) == null) {
+//						throw new InteressatAssociarException("No es actualitzar l'interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a no existeix cap interessat amb aquest document a l'expedient.");
+//					}
+//					if (representantDistribucio == null) {
+//						throw new InteressatAssociarException("");
+//					}
+//					updateInteressat();
+//					if (isRepresentantUsedOnce) {
+//						deleteRepresentant();
+//					}
+//					createRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten, interessatDto);
+//					break;
+//				case ASSOCIAR_SOBREESCRIURE_REPRESENTANT:
+//					if (interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) != null) {
+//						throw new InteressatAssociarException("No es pot associar el nou interessat amb document número " + interessatDistribucio.getDocumentNumero() + " degut a que ja existeix un interessat amb el mateix document.");
+//					}
+//					if (representantDistribucio == null || interessatsOvewritten.get(representantDistribucio.getDocumentNumero()) == null) {
+//						throw new InteressatAssociarException("No es actualitzar el representant amb document número " + representantDistribucio.getDocumentNumero() + " degut a no existeix cap interessat o representant amb aquest document a l'expedient.");
+//					}
+//					createInteressat(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
+//					updateRepresentant();
+//					break;
+//				// Si s'ha seleccionat NO_ASSOCIAR, no associarem l'interessat a l'expedient
+				case NO_ASSOCIAR:
+				default:
+					continue;
+			}
 
-			InteressatDto createdInteressat = expedientInteressatHelper.create(
-					entitatId,
-					expedientId,
-					interessatsOvewritten.containsKey(interessatDistribucio.getDocumentNumero()) ?
-							interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) :
-							toInteressatDto(interessatDistribucio, null),
-					false,
-					permission, 
-					rolActual, 
-					false);
-			if (interessatDistribucio.getRepresentant() != null) {
-				expedientInteressatHelper.createRepresentant(
-						entitatId,
-						expedientId,
-						createdInteressat.getId(),
-						interessatsOvewritten.containsKey(interessatDistribucio.getRepresentant().getDocumentNumero()) ?
-								interessatsOvewritten.get(interessatDistribucio.getRepresentant().getDocumentNumero()) :
-								toInteressatDto(interessatDistribucio.getRepresentant(), null),
-						false,
-						permission, 
-						rolActual, 
-						false);
+//			InteressatDto interessatOvewritten = interessatsOvewritten.get(interessatDistribucio.getDocumentNumero());
+//			InteressatDto representantOvewritten = null;
+//			if (representantDistribucio != null) {
+//				representantOvewritten = interessatsOvewritten.get(representantDistribucio.getDocumentNumero());
+//			}
+//
+//			if (interessatOvewritten != null || representantOvewritten != null) {
+//				InteressatEntity interessatRipea = getInteressatOvewritten(
+//						expedientId,
+//						interessatOvewritten != null ? interessatOvewritten.getDocumentNum() : null,
+//						representantOvewritten != null ? representantOvewritten.getDocumentNum() : null);
+//				if (interessatRipea != null) {
+//					if (interessatRipea.getRepresentant() != null) {
+//						expedientInteressatHelper.deleteRepresentant(
+//								entitatId,
+//								expedientId,
+//								interessatRipea.getId(),
+//								interessatRipea.getRepresentant().getId(),
+//								rolActual);
+//					}
+//					expedientInteressatHelper.delete(
+//							entitatId,
+//							expedientId,
+//							interessatRipea.getId(),
+//							rolActual);
+//				}
+//			}
+//
+//			crearInteressatIRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
+		}
+	}
+
+	private void associarInteressat(
+			Long expedientId,
+			PermissionEnumDto permission,
+			String rolActual,
+			RegistreInteressatEntity interessatDistribucio,
+			InteressatDto interessatOverwritten,
+			boolean hasRepresentantDistribucio,
+			InteressatDto representantOverwritten,
+			RegistreInteressatEntity representantDistribucio) {
+		InteressatEntity interessat = null;
+		 // L'interessat ja existeix: actualitzam les seves dades
+		if (interessatOverwritten != null) {
+			interessat = updateInteressat(expedientId, permission, rolActual, interessatOverwritten);
+		// L'interessat no existeix: cream el nou interessat
+		} else {
+			interessat = createInteressat(expedientId, permission, rolActual, interessatDistribucio);
+		}
+
+		// L'interessat que estam associant té un representant
+		if (hasRepresentantDistribucio) {
+			if (representantOverwritten != null) {
+				updateRepresentant(expedientId, interessat.getId(), permission, rolActual, representantOverwritten);
+			} else {
+				createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
+			}
+		// L'interessat que estam associant no té representant
+		} else {
+			// L'interessat existent té un representant assignat
+			if (interessat.getRepresentant() != null) {
+				// Treure representant de l'interessat, i borrar-lo de BBDD si és necessari
+				expedientInteressatHelper.removeRepresentant(interessat);
 			}
 		}
 	}
 
-	private InteressatEntity getInteressatOvewritten(Long expedientId, String interessatNumDocument, String representantNumDocument) {
-		if (interessatNumDocument != null) {
-			List<InteressatEntity> interessats = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, interessatNumDocument);
-			if (!interessats.isEmpty()) {
-				return interessats.get(0);
-			}
-		}
-		if (representantNumDocument != null) {
-			List<InteressatEntity> representants = interessatRepository.findByExpedientIdAndRepresentantDocumentNum(expedientId, representantNumDocument);
-			if (!representants.isEmpty()) {
-				return representants.get(0);
-			}
-		}
-		return null;
+	private InteressatEntity createInteressat(Long expedientId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio) {
+		InteressatEntity createdInteressat = expedientInteressatHelper.create(
+				expedientId,
+				toInteressatDto(interessatDistribucio, null),
+				permission,
+				rolActual);
+		return createdInteressat;
 	}
+
+	private void createRepresentant(Long expedientId, Long interessatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio) {
+		expedientInteressatHelper.createRepresentant(
+				expedientId,
+				interessatId,
+				toInteressatDto(interessatDistribucio.getRepresentant(), null),
+				permission,
+				rolActual);
+	}
+
+	private InteressatEntity updateInteressat(Long expedientId, PermissionEnumDto permission, String rolActual, InteressatDto interessatOverwritten) {
+		InteressatEntity createdInteressat = expedientInteressatHelper.update(
+				expedientId,
+				interessatOverwritten,
+				permission,
+				rolActual);
+		return createdInteressat;
+	}
+
+	private void updateRepresentant(Long expedientId, Long interessatId, PermissionEnumDto permission, String rolActual, InteressatDto representantOverwritten) {
+		expedientInteressatHelper.updateRepresentant(
+				expedientId,
+				interessatId,
+				representantOverwritten,
+				permission,
+				rolActual);
+	}
+
+
+//	private void updateInteressat(ExpedientEntity expedient, Long entitatId, InteressatDto interessat, String rolActual) {
+//		InteressatEntity interessatEntity = interessatRepository.findByExpedientAndDocumentNum(expedient, interessat.getDocumentNum());
+//		if (!sameTipusInteressat(interessat, interessatEntity)) {
+//			throw new InteressatTipusDocumentException(
+//					interessat.getDocumentNum(),
+//					getTipusInteressat(interessatEntity).name(),
+//					interessat.getTipus().name(),
+//					expedient.getId());
+//		}
+//		expedientInteressatHelper.update(entitatId, expedient.getId(), null, interessat, rolActual, false, false);
+//	}
+//
+//	private void crearInteressatIRepresentant(Long expedientId, Long entitatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio, Map<String, InteressatDto> interessatsOvewritten) {
+//		InteressatDto createdInteressat = createInteressat(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten);
+//		if (interessatDistribucio.getRepresentant() != null) {
+//			createRepresentant(expedientId, entitatId, permission, rolActual, interessatDistribucio, interessatsOvewritten, createdInteressat);
+//		}
+//	}
+
+//	private void createRepresentant(Long expedientId, Long entitatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio, Map<String, InteressatDto> interessatsOvewritten, InteressatDto createdInteressat) {
+//		expedientInteressatHelper.createRepresentant(
+//				expedientId,
+//				createdInteressat.getId(),
+//				interessatsOvewritten.containsKey(interessatDistribucio.getRepresentant().getDocumentNumero()) ?
+//						interessatsOvewritten.get(interessatDistribucio.getRepresentant().getDocumentNumero()) :
+//						toInteressatDto(interessatDistribucio.getRepresentant(), null),
+//				false,
+//				permission,
+//				rolActual,
+//				false);
+//	}
+//
+//	private InteressatDto createInteressat(Long expedientId, Long entitatId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio, Map<String, InteressatDto> interessatsOvewritten) {
+//		InteressatDto createdInteressat = expedientInteressatHelper.create(
+//				expedientId,
+//				interessatsOvewritten.containsKey(interessatDistribucio.getDocumentNumero()) ?
+//						interessatsOvewritten.get(interessatDistribucio.getDocumentNumero()) :
+//						toInteressatDto(interessatDistribucio, null),
+//				false,
+//				permission,
+//				rolActual,
+//				false);
+//		return createdInteressat;
+//	}
+
+//	private InteressatEntity getInteressatOvewritten(Long expedientId, String interessatNumDocument, String representantNumDocument) {
+//		if (interessatNumDocument != null) {
+//			InteressatEntity interessat = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, interessatNumDocument);
+//			if (interessat != null) {
+//				return interessat;
+//			}
+//		}
+//		if (representantNumDocument != null) {
+//			InteressatEntity representant = interessatRepository.findByExpedientIdAndRepresentantDocumentNum(expedientId, representantNumDocument);
+//			if (representant != null) {
+//				return representant;
+//			}
+//		}
+//		return null;
+//	}
 
 //	private Map<String, InteressatEntity> convertInteressatListToMap(Set<InteressatEntity> interessatsORepresenantsRipea) {
 //		Map<String, InteressatEntity> result = new HashMap<>();
@@ -520,6 +695,20 @@ public class ExpedientHelper {
 				interessat instanceof InteressatPersonaJuridicaEntity && InteressatTipus.PERSONA_JURIDICA.equals(tipus) ||
 				interessat instanceof InteressatAdministracioEntity && InteressatTipus.ADMINISTRACIO.equals(tipus);
 	}
+
+//	private boolean sameTipusInteressat(InteressatDto dto, InteressatEntity interessat) {
+//		if (dto == null || interessat == null) return false;
+//
+//		return interessat instanceof InteressatPersonaFisicaEntity && dto instanceof InteressatPersonaFisicaDto ||
+//				interessat instanceof InteressatPersonaJuridicaEntity && dto instanceof InteressatPersonaJuridicaDto ||
+//				interessat instanceof InteressatAdministracioEntity && dto instanceof InteressatAdministracioDto;
+//	}
+//
+//	private InteressatTipusEnumDto getTipusInteressat(InteressatEntity interessat) {
+//		return interessat instanceof InteressatPersonaFisicaEntity ? InteressatTipusEnumDto.PERSONA_FISICA :
+//				interessat instanceof InteressatPersonaJuridicaEntity ? InteressatTipusEnumDto.PERSONA_JURIDICA :
+//				interessat instanceof InteressatAdministracioEntity ? InteressatTipusEnumDto.ADMINISTRACIO : null;
+//	}
 	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -528,7 +717,8 @@ public class ExpedientHelper {
 			Long expedientId, 
 			String rolActual, 
 			Long entitatId, 
-			boolean associarInteressats, 
+			boolean associarInteressats,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			boolean agafarExpedient) {
 		
 		ExpedientPeticioEntity expedientPeticio = expedientPeticioRepository.findOne(expedientPeticioId);
@@ -556,7 +746,7 @@ public class ExpedientHelper {
 		expedientPeticioHelper.canviEstatExpedientPeticio(expedientPeticioEntity, ExpedientPeticioEstatEnumDto.PROCESSAT_PENDENT);
 		
 		if (associarInteressats) {
-			associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual);
+			associateInteressats(expedientId, entitatId, expedientPeticioId, PermissionEnumDto.WRITE, rolActual, interessatsAccionsMap);
 			arxiuPropagarExpedientAmbInteressats(expedientId);
 		}
 	}
@@ -580,7 +770,7 @@ public class ExpedientHelper {
 	 * @param registreAnnexId
 	 * @param expedientPeticioId
 	 * @param metaDocumentId
-	 * @param rolActual TODO
+	 * @param rolActual
 	 * @return
 	 */
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -1786,29 +1976,31 @@ public class ExpedientHelper {
 	}
 
 	public InteressatDto toInteressatMergedDto(RegistreInteressatEntity registreInteressatEntity, InteressatDto existingInteressatDto) {
+
+		if (registreInteressatEntity.getDocumentTipus() != null)
+			existingInteressatDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
+		if (registreInteressatEntity.getDocumentNumero() != null)
+			existingInteressatDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
+		if (registreInteressatEntity.getPaisCodi() != null)
+			existingInteressatDto.setPais(registreInteressatEntity.getPaisCodi());
+		if (registreInteressatEntity.getProvinciaCodi() != null)
+			existingInteressatDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
+		if (registreInteressatEntity.getMunicipiCodi() != null)
+			existingInteressatDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
+		if (registreInteressatEntity.getAdresa() != null)
+			existingInteressatDto.setAdresa(registreInteressatEntity.getAdresa());
+		if (registreInteressatEntity.getCp() != null)
+			existingInteressatDto.setCodiPostal(registreInteressatEntity.getCp());
+		if (registreInteressatEntity.getEmail() != null)
+			existingInteressatDto.setEmail(registreInteressatEntity.getEmail());
+		if (registreInteressatEntity.getTelefon() != null)
+			existingInteressatDto.setTelefon(registreInteressatEntity.getTelefon());
+		if (registreInteressatEntity.getObservacions() != null)
+			existingInteressatDto.setObservacions(registreInteressatEntity.getObservacions());
+
 		switch (registreInteressatEntity.getTipus()) {
 			case PERSONA_FISICA:
 				InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto) existingInteressatDto;
-				if (registreInteressatEntity.getDocumentTipus() != null)
-					interessatPersonaFisicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-				if (registreInteressatEntity.getDocumentNumero() != null)
-					interessatPersonaFisicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-				if (registreInteressatEntity.getPaisCodi() != null)
-					interessatPersonaFisicaDto.setPais(registreInteressatEntity.getPaisCodi());
-				if (registreInteressatEntity.getProvinciaCodi() != null)
-					interessatPersonaFisicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
-				if (registreInteressatEntity.getMunicipiCodi() != null)
-					interessatPersonaFisicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
-				if (registreInteressatEntity.getAdresa() != null)
-					interessatPersonaFisicaDto.setAdresa(registreInteressatEntity.getAdresa());
-				if (registreInteressatEntity.getCp() != null)
-					interessatPersonaFisicaDto.setCodiPostal(registreInteressatEntity.getCp());
-				if (registreInteressatEntity.getEmail() != null)
-					interessatPersonaFisicaDto.setEmail(registreInteressatEntity.getEmail());
-				if (registreInteressatEntity.getTelefon() != null)
-					interessatPersonaFisicaDto.setTelefon(registreInteressatEntity.getTelefon());
-				if (registreInteressatEntity.getObservacions() != null)
-					interessatPersonaFisicaDto.setObservacions(registreInteressatEntity.getObservacions());
 				if (registreInteressatEntity.getNom() != null)
 					interessatPersonaFisicaDto.setNom(registreInteressatEntity.getNom());
 				if (registreInteressatEntity.getLlinatge1() != null)
@@ -1818,53 +2010,15 @@ public class ExpedientHelper {
 				break;
 			case PERSONA_JURIDICA:
 				InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto) existingInteressatDto;
-				if (registreInteressatEntity.getDocumentTipus() != null)
-					interessatPersonaJuridicaDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-				if (registreInteressatEntity.getDocumentNumero() != null)
-					interessatPersonaJuridicaDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-				if (registreInteressatEntity.getPaisCodi() != null)
-					interessatPersonaJuridicaDto.setPais(registreInteressatEntity.getPaisCodi());
-				if (registreInteressatEntity.getProvinciaCodi() != null)
-					interessatPersonaJuridicaDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
-				if (registreInteressatEntity.getMunicipiCodi() != null)
-					interessatPersonaJuridicaDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
-				if (registreInteressatEntity.getAdresa() != null)
-					interessatPersonaJuridicaDto.setAdresa(registreInteressatEntity.getAdresa());
-				if (registreInteressatEntity.getCp() != null)
-					interessatPersonaJuridicaDto.setCodiPostal(registreInteressatEntity.getCp());
-				if (registreInteressatEntity.getEmail() != null)
-					interessatPersonaJuridicaDto.setEmail(registreInteressatEntity.getEmail());
-				if (registreInteressatEntity.getTelefon() != null)
-					interessatPersonaJuridicaDto.setTelefon(registreInteressatEntity.getTelefon());
-				if (registreInteressatEntity.getObservacions() != null)
-					interessatPersonaJuridicaDto.setObservacions(registreInteressatEntity.getObservacions());
 				if (registreInteressatEntity.getRaoSocial() != null)
 					interessatPersonaJuridicaDto.setRaoSocial(registreInteressatEntity.getRaoSocial());
 				break;
 			case ADMINISTRACIO:
 				InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) existingInteressatDto;
-				if (registreInteressatEntity.getDocumentTipus() != null)
-					interessatAdministracioDto.setDocumentTipus(toInteressatDocumentTipusEnumDto(registreInteressatEntity.getDocumentTipus()));
-				if (registreInteressatEntity.getDocumentNumero() != null)
-					interessatAdministracioDto.setDocumentNum(registreInteressatEntity.getDocumentNumero());
-				if (registreInteressatEntity.getPaisCodi() != null)
-					interessatAdministracioDto.setPais(registreInteressatEntity.getPaisCodi());
-				if (registreInteressatEntity.getProvinciaCodi() != null)
-					interessatAdministracioDto.setProvincia(registreInteressatEntity.getProvinciaCodi());
-				if (registreInteressatEntity.getMunicipiCodi() != null)
-					interessatAdministracioDto.setMunicipi(registreInteressatEntity.getMunicipiCodi());
-				if (registreInteressatEntity.getAdresa() != null)
-					interessatAdministracioDto.setAdresa(registreInteressatEntity.getAdresa());
-				if (registreInteressatEntity.getCp() != null)
-					interessatAdministracioDto.setCodiPostal(registreInteressatEntity.getCp());
-				if (registreInteressatEntity.getEmail() != null)
-					interessatAdministracioDto.setEmail(registreInteressatEntity.getEmail());
-				if (registreInteressatEntity.getTelefon() != null)
-					interessatAdministracioDto.setTelefon(registreInteressatEntity.getTelefon());
-				if (registreInteressatEntity.getObservacions() != null)
-					interessatAdministracioDto.setObservacions(registreInteressatEntity.getObservacions());
-				if (registreInteressatEntity.getOrganCodi() != null)
+				if (registreInteressatEntity.getOrganCodi() != null && !registreInteressatEntity.getOrganCodi().equals(interessatAdministracioDto.getOrganCodi())) {
 					interessatAdministracioDto.setOrganCodi(registreInteressatEntity.getOrganCodi());
+					interessatAdministracioDto.setOrganNom(null);
+				}
 				break;
 		}
 		return existingInteressatDto;

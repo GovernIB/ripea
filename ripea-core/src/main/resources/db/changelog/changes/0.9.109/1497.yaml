@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1718262082962-1
+      author: limit
+      changes:
+        - addUniqueConstraint:
+            tableName: IPA_INTERESSAT
+            constraintName: IPA_INTERESSAT_EXP_UK
+            columnNames: DOCUMENT_NUM, EXPEDIENT_ID

@@ -75,7 +75,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			boolean propagarArxiu, 
 			String rolActual) {
 		return expedientInteressatHelper.create(
-				entitatId,
 				expedientId,
 				interessat,
 				propagarArxiu,
@@ -93,7 +92,6 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			boolean propagarArxiu, 
 			String rolActual) {
 		return expedientInteressatHelper.createRepresentant(
-				entitatId,
 				expedientId,
 				interessatId,
 				interessat,
@@ -436,11 +434,11 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<InteressatDto> findByExpedientAndDocumentNum(
+	public InteressatDto findByExpedientAndDocumentNum(
 			String documentNum,
 			Long expedientId) throws NotFoundException {
 		ExpedientEntity expedient = expedientRepository.findOne(expedientId);
-		return conversioTipusHelper.convertirList(
+		return conversioTipusHelper.convertir(
 				interessatRepository.findByExpedientAndDocumentNum(expedient, documentNum),
 				InteressatDto.class);
 	}
