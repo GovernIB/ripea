@@ -127,7 +127,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	 * @param observacions	Camp per introduir observacions sobre l'òrgan de l'administració pública.
 	 * @param expedient	Expedient on està vinculat l'òrgan de l'administració pública.
 	 * @param representant	Representant de l'òrgan de l'administració pública.
-	 * @param notificacioIdioma	Idioma en que l'òrgan de l'administració pública desitja rebre les notificacions.
+	 * @param preferenciaIdioma	Idioma en que l'òrgan de l'administració pública desitja rebre les notificacions.
 	 * @return
 	 */
 	public static Builder getBuilder(
@@ -171,13 +171,38 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				incapacitat,
 				ambOficinaSir);
 	}
+	public static Builder getBuilder(
+			InteressatAdministracioDto dto,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
+		return new Builder(
+				dto.getOrganCodi(),
+				dto.getOrganNom(),
+				dto.getDocumentTipus(),
+				dto.getDocumentNum(),
+				dto.getPais(),
+				dto.getProvincia(),
+				dto.getMunicipi(),
+				dto.getAdresa(),
+				dto.getCodiPostal(),
+				dto.getEmail(),
+				dto.getTelefon(),
+				dto.getObservacions(),
+				dto.getPreferenciaIdioma(),
+				expedient,
+				representant,
+				dto.getEntregaDeh(),
+				dto.getEntregaDehObligat(),
+				dto.getIncapacitat(),
+				dto.getAmbOficinaSir());
+	}
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta classe.
 	 * 
 	 * @author Limit Tecnologies <limit@limit.es>
 	 */
-	public static class Builder {
+	public static class Builder extends InteressatEntity.Builder {
 		InteressatAdministracioEntity built;
 		Builder(
 				String organCodi,

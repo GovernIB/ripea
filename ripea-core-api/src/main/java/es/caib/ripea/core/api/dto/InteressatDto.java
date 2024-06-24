@@ -3,9 +3,9 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.io.Serializable;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.io.Serializable;
 
 
 /**

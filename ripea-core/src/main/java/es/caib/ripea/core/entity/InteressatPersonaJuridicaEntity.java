@@ -105,7 +105,7 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 	 * @param observacions	Camp per introduir observacions sobre l'interessat.
 	 * @param expedient	Expedient on està vinculat l'interessat.
 	 * @param representant	Representant de l'interessat.
-	 * @param notificacioIdioma	Idioma en que l'interessat desitja rebre les notificacions.
+	 * @param preferenciaIdioma	Idioma en que l'interessat desitja rebre les notificacions.
 	 * @return
 	 */
 	public static Builder getBuilder(
@@ -145,13 +145,36 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 				entregaDehObligat,
 				incapacitat);
 	}
+	public static Builder getBuilder(
+			InteressatPersonaJuridicaDto dto,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
+		return new Builder(
+				dto.getRaoSocial(),
+				dto.getDocumentTipus(),
+				dto.getDocumentNum(),
+				dto.getPais(),
+				dto.getProvincia(),
+				dto.getMunicipi(),
+				dto.getAdresa(),
+				dto.getCodiPostal(),
+				dto.getEmail(),
+				dto.getTelefon(),
+				dto.getObservacions(),
+				dto.getPreferenciaIdioma(),
+				expedient,
+				representant,
+				dto.getEntregaDeh(),
+				dto.getEntregaDehObligat(),
+				dto.getIncapacitat());
+	}
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta classe.
 	 * 
 	 * @author Limit Tecnologies <limit@limit.es>
 	 */
-	public static class Builder {
+	public static class Builder extends InteressatEntity.Builder {
 		InteressatPersonaJuridicaEntity built;
 		Builder(
 				String raoSocial,

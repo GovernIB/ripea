@@ -3,9 +3,12 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.Getter;
 import org.hibernate.annotations.ForeignKey;
@@ -193,6 +196,18 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 	}
 	public abstract String getIdentificador();
 
+	public String getNom() {
+		if (this instanceof InteressatAdministracioEntity) {
+			return ((InteressatAdministracioEntity) this).getOrganNom();
+		} else if (this instanceof InteressatPersonaFisicaEntity) {
+			InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity) this;
+			return fis.getNom() + " " + fis.getLlinatge1() + " " + fis.getLlinatge2();
+		} else if (this instanceof InteressatPersonaJuridicaEntity) {
+			return ((InteressatPersonaJuridicaEntity) this).getRaoSocial();
+		}
+		return null;
+	}
+
 	public void updateArxiuIntent(boolean arxiuPropagat) {
 		this.arxiuPropagat = arxiuPropagat;
 		this.arxiuReintents++;
@@ -215,25 +230,28 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		this.entregaDehObligat = dto.getEntregaDehObligat();
 		this.incapacitat = dto.getIncapacitat();
 	}
-	
-	public String getNom() {
-		if (this instanceof InteressatAdministracioEntity) {
-			return ((InteressatAdministracioEntity) this).getOrganNom();
-		} else if (this instanceof InteressatPersonaFisicaEntity) {
-			InteressatPersonaFisicaEntity fis = (InteressatPersonaFisicaEntity) this;
-			return fis.getNom() + " " + fis.getLlinatge1() + " " + fis.getLlinatge2();
-		} else if (this instanceof InteressatPersonaJuridicaEntity) {
-			return ((InteressatPersonaJuridicaEntity) this).getRaoSocial();
+
+	public static Builder getBuilder(
+			InteressatDto dto,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
+		if (dto.isPersonaFisica()) {
+			return InteressatPersonaFisicaEntity.getBuilder((InteressatPersonaFisicaDto)dto, expedient, representant);
+		} else if (dto.isPersonaJuridica()) {
+			return InteressatPersonaJuridicaEntity.getBuilder((InteressatPersonaJuridicaDto)dto, expedient, representant);
+		} else if (dto.isAdministracio()) {
+			return InteressatAdministracioEntity.getBuilder((InteressatAdministracioDto)dto, expedient, representant);
 		}
 		return null;
 	}
-	
 
-	
 //	public InteressatEntity getRepresentat() {
 //		return !CollectionUtils.isEmpty(representats) ? representats.get(0) : null;
 //	}
 
+	public abstract static class Builder {
+		public abstract InteressatEntity build();
+	}
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

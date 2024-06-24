@@ -177,13 +177,38 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 				entregaDehObligat,
 				incapacitat);
 	}
+	public static Builder getBuilder(
+			InteressatPersonaFisicaDto dto,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
+		return new Builder(
+				dto.getNom(),
+				dto.getLlinatge1(),
+				dto.getLlinatge2(),
+				dto.getDocumentTipus(),
+				dto.getDocumentNum(),
+				dto.getPais(),
+				dto.getProvincia(),
+				dto.getMunicipi(),
+				dto.getAdresa(),
+				dto.getCodiPostal(),
+				dto.getEmail(),
+				dto.getTelefon(),
+				dto.getObservacions(),
+				dto.getPreferenciaIdioma(),
+				expedient,
+				representant,
+				dto.getEntregaDeh(),
+				dto.getEntregaDehObligat(),
+				dto.getIncapacitat());
+	}
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta classe.
 	 * 
 	 * @author Limit Tecnologies <limit@limit.es>
 	 */
-	public static class Builder {
+	public static class Builder extends InteressatEntity.Builder {
 		InteressatPersonaFisicaEntity built;
 		Builder(
 				String nom,
