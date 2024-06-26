@@ -62,7 +62,7 @@
 		</c:forEach>
 	</ul>
 	<br/>
-	<script id="rowhrefTemplate" type="text/x-jsrender">../nodeco/integracio/${codiActual}/{{:index}}</script>	
+	<script id="rowhrefTemplate" type="text/x-jsrender">../nodeco/integracio/${codiActual}/{{:timestamp}}</script>
 	<table id="missatges-integracions" data-toggle="datatable" data-url="<c:url value="/integracio/datatable"/>" class="table table-striped table-bordered" style="width:100%"
 	data-rowhref-template="#rowhrefTemplate" data-rowhref-toggle="modal">
 		<thead>
@@ -87,9 +87,9 @@
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="index" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="timestamp" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
-						<a href="<c:url value="/integracio"/>/${codiActual}/{{:index}}" class="btn btn-default" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>
+						<a href="<c:url value="/integracio"/>/${codiActual}/{{:timestamp}}" class="btn btn-default" data-toggle="modal"><span class="fa fa-info-circle"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a>
 					</script>
 				</th>
 			</tr>

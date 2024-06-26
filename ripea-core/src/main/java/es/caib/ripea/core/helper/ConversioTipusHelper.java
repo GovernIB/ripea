@@ -147,6 +147,8 @@ public class ConversioTipusHelper {
 						target.setResponsableActual(convertir(source.getResponsableActual(), UsuariDto.class));
 						target.setDataInici(source.getDataInici());
 						target.setDataFi(source.getDataFi());
+						target.setTitol(source.getTitol());
+						target.setObservacions(source.getObservacions());
 						target.setEstat(source.getEstat());
 						target.setMotiuRebuig(source.getMotiuRebuig());
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));

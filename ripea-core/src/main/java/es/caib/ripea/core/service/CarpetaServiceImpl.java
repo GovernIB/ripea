@@ -131,9 +131,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 				null,
 				true,
 				true);
-		contingutHelper.arxiuPropagarModificacio(
-				carpeta,
-				false);
+		contingutHelper.arxiuPropagarModificacio(carpeta);
 	}
 
 	@Transactional(readOnly = true)

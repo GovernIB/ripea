@@ -3,64 +3,9 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.zip.ZipOutputStream;
-
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.jopendocument.dom.spreadsheet.SpreadSheet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Persistable;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.Estat;
-import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.CodiValorDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.ExpedientComentariDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientFiltreDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
-import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
-import es.caib.ripea.core.api.dto.ResultDto;
-import es.caib.ripea.core.api.dto.ResultEnumDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
@@ -84,31 +29,9 @@ import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.RegistreAnnexEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
-import es.caib.ripea.core.helper.CacheHelper;
-import es.caib.ripea.core.helper.CarpetaHelper;
-import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.ContingutHelper;
-import es.caib.ripea.core.helper.ContingutLogHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.CsvHelper;
-import es.caib.ripea.core.helper.DateHelper;
-import es.caib.ripea.core.helper.DistribucioHelper;
-import es.caib.ripea.core.helper.DocumentHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExpedientHelper;
-import es.caib.ripea.core.helper.ExpedientPeticioHelper;
-import es.caib.ripea.core.helper.MessageHelper;
-import es.caib.ripea.core.helper.MetaExpedientHelper;
-import es.caib.ripea.core.helper.OrganGestorHelper;
-import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.*;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PaginacioHelper.ConverterParam;
-import es.caib.ripea.core.helper.PermisosHelper;
-import es.caib.ripea.core.helper.PluginHelper;
-import es.caib.ripea.core.helper.RolHelper;
-import es.caib.ripea.core.helper.SynchronizationHelper;
-import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.DadaRepository;
@@ -123,6 +46,39 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.jopendocument.dom.spreadsheet.SpreadSheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Persistable;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Implementació dels mètodes per a gestionar expedients.
@@ -715,9 +671,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		
 		List<ExpedientEntity> expedientsEnt;
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
-			List<Long> organsIdsPermitted = organGestorRepository.findFillsIds(entitat, Arrays.asList(organActualId));
-			organsIdsPermitted.add(organActualId);
-			expedientsEnt = expedientRepository.findByEntitatAndMetaExpedientAndOrgans(entitat, organsIdsPermitted, metaExpedient);
+			List<String> organsCodisPermitted = organGestorHelper.findCodisDescendents(entitat.getCodi(), organActualId);
+			expedientsEnt = expedientRepository.findByEntitatAndMetaExpedientAndOrgans(entitat, organsCodisPermitted, metaExpedient);
 		} else {
 			expedientsEnt = expedientRepository.findByEntitatAndMetaExpedient(entitat, metaExpedient);
 		}

@@ -80,16 +80,26 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@OrderBy("createdDate")
 	private List<ExpedientTascaComentariEntity> comentaris = new ArrayList<>();
 	
+	@Column(name = "titol", length = 255)
+	private String titol;
+	
+	@Column(name = "observacions", length = 1024)
+	private String observacions;
+	
 	public static Builder getBuilder(
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
 			List<UsuariEntity> responsables,
-			Date dataLimit) {
+			Date dataLimit,
+			String titol,
+			String observacions) {
 		return new Builder(
 				expedient,
 				metaExpedientTasca,
 				responsables,
-				dataLimit);
+				dataLimit,
+				titol,
+				observacions);
 	}
 	
 	public static class Builder {
@@ -98,7 +108,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
 				List<UsuariEntity> responsables,
-				Date dataLimit) {
+				Date dataLimit,
+				String titol,
+				String observacions) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
@@ -106,6 +118,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
+			built.titol = titol;
+			built.observacions = observacions;
 		}
 		public ExpedientTascaEntity build() {
 			return built;
@@ -177,6 +191,12 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	}
 	public void updateComentaris(List<ExpedientTascaComentariEntity> comentaris) {
 		this.comentaris = comentaris;
+	}
+	public String getTitol() {
+		return titol;
+	}
+	public String getObservacions() {
+		return observacions;
 	}
 	public String getTextLastComentari() {
 		String comentariText = null;

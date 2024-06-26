@@ -60,6 +60,12 @@ $(document).ready(function(){
 			optionTextAttribute="nom"
 			required="true" /> 
 			
+		<rip:inputTextarea 
+			name="metaExpedientTascaDescripcio" 
+			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
+			disabled="true"
+			required="true"
+			textareaRows="2"/> 
 		<c:url value="/userajax/usuariDades" var="urlConsultaInicial"/>
 		<c:url value="/userajax/usuarisDades" var="urlConsultaLlistat"/>
 		<rip:inputSuggest 
@@ -72,11 +78,14 @@ $(document).ready(function(){
 			required="true"
 			multiple="true"/>				
 		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
+		<rip:inputText 
+			name="titol"
+			textKey="expedient.tasca.form.camp.titol"
+			required="false"/>
 		<rip:inputTextarea 
-			name="metaExpedientTascaDescripcio" 
-			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
-			disabled="true"
-			required="true"/> 
+			name="observacions" 
+			textKey="expedient.tasca.form.camp.observacions" 
+			required="false"/>
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.crear"/></button>
  			<a href="<c:url value="/expedientTasca"/>" class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

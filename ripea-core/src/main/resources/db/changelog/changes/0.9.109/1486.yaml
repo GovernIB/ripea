@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1716384985679-2
+      author: limit
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: titol
+                  type: varchar(256 ${varcharunit})
+              - column:
+                  name: observacions
+                  type: varchar(1024 ${varcharunit})
+            tableName: ipa_expedient_tasca

@@ -405,9 +405,7 @@ public class ContingutServiceImpl implements ContingutService {
 				
 
 			} else if (contingut instanceof CarpetaEntity) {
-				contingutHelper.arxiuPropagarModificacio(
-						(CarpetaEntity) contingut,
-						false);
+				contingutHelper.arxiuPropagarModificacio((CarpetaEntity) contingut);
 			}
 
 			if (fitxer != null) {
@@ -457,6 +455,12 @@ public class ContingutServiceImpl implements ContingutService {
 				false, 
 				false, 
 				true, rolActual);
+		
+		// Comprova que no es mou dins de un fill
+		if (contingutOrigen instanceof CarpetaEntity && contingutHelper.isCarpetaLogica()) {
+			comprovarContingutDesti(contingutOrigen, contingutDesti);
+		}
+		
 		// Comprova el tipus del contingut que es vol moure
 		if (contingutOrigen instanceof CarpetaEntity && !contingutHelper.isCarpetaLogica()) {
 			throw new ValidationException(
@@ -2355,7 +2359,21 @@ public class ContingutServiceImpl implements ContingutService {
 		return contingut;
 	}*/
 
-
+	private void comprovarContingutDesti(ContingutEntity origen, ContingutEntity desti) {
+		if (desti == null)
+			return;
+		
+		ContingutEntity contingutPare = desti.getPare();
+		if (contingutPare == null || (contingutPare != null && ! contingutPare.equals(origen))) {
+			comprovarContingutDesti(origen, desti.getPare());
+			return;
+		}
+		
+		throw new ValidationException(
+				origen,
+				origen.getClass(),
+				"No es pot moure una carpeta a un fill");
+	}
 
 	private ContingutEntity copiarContingut(
 			EntitatEntity entitat,

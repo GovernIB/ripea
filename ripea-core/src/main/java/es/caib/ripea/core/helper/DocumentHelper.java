@@ -390,6 +390,13 @@ public class DocumentHelper {
 					DocumentEntity.class,
 					"No es poden actualitzar un document definitiu");
 		}
+		if (documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
+			throw new ValidationException(
+					documentEntity.getId(),
+					DocumentEntity.class,
+					"No es pot modificar un document enviat a portafirmes");
+		}
+
 		contingutHelper.comprovarNomValid(
 				documentEntity.getPare(),
 				document.getNom(),
@@ -450,7 +457,7 @@ public class DocumentHelper {
 					documentEntity,
 					document,
 					arxiuDocument);
-	
+
 			documentEntity.updateEstat(DocumentEstatEnumDto.REDACCIO);
 			
 		} else  if (documentFirmaTipus == DocumentFirmaTipusEnumDto.FIRMA_ADJUNTA) {
@@ -501,7 +508,7 @@ public class DocumentHelper {
 			
 		}
 		
-		if ((estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU) || estatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) && isConversioDefinitiuActiu()) {
+		if ((estatAnterior.equals(DocumentEstatEnumDto.FIRMA_PENDENT) || estatAnterior.equals(DocumentEstatEnumDto.DEFINITIU) || estatAnterior.equals(DocumentEstatEnumDto.CUSTODIAT)) && isConversioDefinitiuActiu()) {
 			documentEntity.updateEstat(estatAnterior);
 		}
 		

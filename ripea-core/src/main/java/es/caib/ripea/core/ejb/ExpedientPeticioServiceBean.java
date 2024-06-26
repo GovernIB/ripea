@@ -3,15 +3,6 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
@@ -29,6 +20,13 @@ import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientPeticioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -251,6 +249,12 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 			Long expedientPeticioId) throws Throwable {
 		delegate.comunicadaReprocessar(expedientPeticioId);
 	}
+
+    @Override
+	@RolesAllowed("tothom")
+    public Long getPeriodeActualitzacioContadorAnotacionsPendents() {
+        return delegate.getPeriodeActualitzacioContadorAnotacionsPendents();
+    }
 
 
 }

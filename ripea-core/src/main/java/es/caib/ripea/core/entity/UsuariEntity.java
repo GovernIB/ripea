@@ -145,7 +145,6 @@ public class UsuariEntity implements Serializable {
 		this.expedientExpandit = expedientExpandit;
 		this.entitatPerDefecte = entitatPerDefecte;
 	}
-	
 
 	public void update(
 			String nom,
@@ -156,6 +155,10 @@ public class UsuariEntity implements Serializable {
 		this.email = trimAndShorten(email, 200);
 		this.nif = trimAndShortenNif(nif);
 		this.inicialitzat = true;
+	}
+
+	public void updateProcediment(MetaExpedientEntity procediment) {
+		this.procediment = procediment;
 	}
 	
 	private static String trimAndShortenNif(String value) {

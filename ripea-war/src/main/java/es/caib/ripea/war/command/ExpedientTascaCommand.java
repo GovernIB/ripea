@@ -25,7 +25,12 @@ public class ExpedientTascaCommand {
 	private Date dataLimit;
 	@Size(max=256)
 	private String comentari;
-
+	
+	@Size(max=256)
+	private String titol;
+	@Size(max=1024)
+	private String observacions;
+	
 	public Date getDataLimit() {
 		return dataLimit;
 	}
@@ -67,6 +72,18 @@ public class ExpedientTascaCommand {
 	}
 	public void setComentari(String comentari) {
 		this.comentari = comentari != null ? comentari.trim() : null;
+	}
+	public String getTitol() {
+		return titol;
+	}
+	public void setTitol(String titol) {
+		this.titol = titol;
+	}
+	public String getObservacions() {
+		return observacions;
+	}
+	public void setObservacions(String observacions) {
+		this.observacions = observacions;
 	}
 	
 	public static ExpedientTascaCommand asCommand(ExpedientTascaDto dto) {

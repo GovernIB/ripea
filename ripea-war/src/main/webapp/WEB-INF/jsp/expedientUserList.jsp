@@ -121,13 +121,12 @@ $(document).ready(function() {
 		});
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
 		$("span[class^='stateColor-']").each(function( index ) {
-		    var fullClassNameString = this.className;
-		    var colorString = fullClassNameString.substring(11);
+			var fullClassNameString = this.className;
+			var colorString = fullClassNameString.substring(11);
 			if (colorString != "") {
-				$(this).parent().css( "background-color", colorString );
-				if (adaptColor(colorString)) {
-					$(this).parent().css( "color", "white" );
-				}
+			    $(this).parent().css( "background-color", colorString );
+				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
+				$(this).parent().css( "color", textColor );
 				$(this).parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
 			}
 		});
@@ -431,21 +430,22 @@ function removeCookie(cname) {
     document.cookie = cname + "=; path=/; expires=" + expires + ";";
 }
 
-function adaptColor(hexColor) {
-	let adapt = false;
-
-	let rgb = hexToRgb(hexColor);
-	if (rgb != null) {
-		var hsp = Math.sqrt(
-				0.299 * (rgb.r * rgb.r) +
-				0.587 * (rgb.g * rgb.g) +
-				0.114 * (rgb.b * rgb.b)
-		);
-	}
-	if (hsp < 127.5) {
-		adapt = true;
-	}
-	return adapt;
+function getTextColorOnBackground(darkTextColor, lightTextColor, backgroundColor) {
+    const getLuminance = (c) => {
+        const hexStr = c.substring(1);
+        const hex = hexStr.length == 3 ? hexStr.replace(/(.)/g, '$1$1') : hexStr;
+        const dec = parseInt(hex, 16);
+        const rgb = [(dec >> 16) & 255, (dec >> 8) & 255, dec & 255];
+        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+    }
+    const getContrast = (c1, c2) => {
+        const l1 = getLuminance(c1);
+        const l2 = getLuminance(c2);
+        return (l1 > l2) ? (l1 + 0.05) / (l2 + 0.05) : (l2 + 0.05) / (l1 + 0.05);
+    }
+    const cDark = getContrast(darkTextColor, backgroundColor);
+    const cLight = getContrast(lightTextColor, backgroundColor);
+    return cDark > cLight ? darkTextColor : lightTextColor;
 }
 
 function hexToRgb(hex) {

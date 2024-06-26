@@ -3,20 +3,6 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.LockModeType;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import es.caib.ripea.core.aggregation.MetaExpedientCountAggregation;
 import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -27,6 +13,15 @@ import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Definició dels mètodes necessaris per a gestionar una entitat de base
@@ -45,16 +40,9 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	List<ExpedientEntity> findByMetaExpedient(
 			MetaExpedientEntity metaExpedient);
 
-	ExpedientEntity findByEntitatAndMetaNodeAndAnyAndSequencia(
-			EntitatEntity entitat,
-			MetaNodeEntity metaNode,
-			int any,
-			long sequencia);
-	
 	List<ExpedientEntity> findByEntitatOrderByNomAsc(EntitatEntity entitat);
-	
-	List<ExpedientEntity> findByArxiuUuid(String arxiuUuid);
-	
+
+
 	@Query(	"select " +
 			"    e.id " +
 			"from " +
@@ -62,7 +50,8 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"where " +
 			"    e.numero is null")
 	List<Long> findAllIdsNumeroNotNull();
-	
+
+
 	@Query(	"from" +
 			"    ExpedientEntity e "
 			+ "where "
@@ -74,14 +63,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("metaNode") MetaNodeEntity metaNode,
 			@Param("numero") String numero);
 
-
-	@Query(	"select "
-			+ "e.relacionatsAmb from" +
-			"    ExpedientEntity e "
-			+ "where "
-			+ " e = :expedient")
-	List<ExpedientEntity> findExpedientsRelacionats(
-			@Param("expedient") ExpedientEntity expedient);
 
 	@Query(	"select " +
 			"    distinct e " +
@@ -187,8 +168,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("grup") GrupEntity grup,
 			Pageable pageable);
 
-	
-	
 	
 	@Query(	"select " +
 			"    distinct e.id " +
@@ -323,20 +302,17 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("estat") ExpedientEstatEntity estat,
 			@Param("expedientsRelacionatsIdx") Collection<Long> ids,
 			Pageable pageable);
-	
-	
-	
+
 	
 	List<ExpedientEntity> findByEntitatAndIdInOrderByIdAsc(
 			EntitatEntity entitat,
 			Collection<Long> id);
 	
-	List<ExpedientEntity> findByOrganGestor(
-			OrganGestorEntity organGestor);
-	
+
 	List<ExpedientEntity> findByOrganGestorAndEstat(
 			OrganGestorEntity organGestor,
 			ExpedientEstatEnumDto estat);
+
 
 	@Query(	"select" +
 			"    e " +
@@ -424,28 +400,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") ExpedientEstatEntity estat);
 
-//	@Query(	"select" +
-//			"    count(e) " +
-//			"from" +
-//			"    ExpedientEntity e " +
-//			"where " +
-//			"   e.alertes IS NOT EMPTY " +
-//			"and e.metaNode = :metaNode ")
-//	int findByMetaExpedientAndAlertesNotEmpty(
-//			@Param("metaNode") MetaNodeEntity metaNode);
-
-	@Query(	"select" +
-			"    new es.caib.ripea.core.aggregation.MetaExpedientCountAggregation( " +
-			"	     e.metaExpedient, " +
-			"        count(e) " +
-			"    ) " +
-			"from" +
-			"    ExpedientEntity e " +
-			"where " +
-			"   e.alertes IS NOT EMPTY " +
-			"group by" +
-			"  e.metaExpedient ")
-	List<MetaExpedientCountAggregation> countByAlertesNotEmptyGroupByMetaExpedient();
 
 	@Query(	"select " +
 			"    e " +
@@ -547,34 +501,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullDataFi") boolean esNullDataFi,
 			@Param("dataFi") Date dataFi);
 	
-	
-	
-//	@Query(	"select " +
-//			"    distinct e " +
-//			"from " +
-//			"    ExpedientEntity e " +
-//			"    join MetaExpedientOrganGestorEntity mo on e.organGestor = mo.organGestor and e.metaExpedient = mo.metaExpedient " +
-//			"where " +
-//			"    e.esborrat = 0 " +
-//			"and ((:esNullMetaExpedientIdPermesos = false and e.metaExpedient.id in (:metaExpedientIdPermesos)) " +
-//			"     or (:esNullOrganIdPermesos = false and e.organGestor.id in (:organIdPermesos)) " +
-//			"     or (:esNullMetaExpedientOrganIdPermesos = false and mo in (:metaExpedientOrganIdPermesos)))"
-//			)
-//	Page<ExpedientEntity> findExpedientsPermittedOneWay(
-//			@Param("esNullMetaExpedientIdPermesos") boolean esNullMetaExpedientIdPermesos, 
-//			@Param("metaExpedientIdPermesos") List<Long> metaExpedientIdPermesos,
-//			@Param("esNullOrganIdPermesos") boolean esNullOrganIdPermesos, 
-//			@Param("organIdPermesos") List<Long> organIdPermesos,
-//			@Param("esNullMetaExpedientOrganIdPermesos") boolean esNullMetaExpedientOrganIdPermesos, 
-//			@Param("metaExpedientOrganIdPermesos") List<Long> metaExpedientOrganIdPermesos,
-//			Pageable pageable);
-//	
 
-
-	
-
-	
-	
 	@Query(	"select " +
 			"    distinct e " +
 			"from " +
@@ -675,20 +602,6 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("creacioFi") Date creacioFi);	
 
 
-
-	@Query(	"select " +
-			"    e " +
-			"from " +
-			"    ExpedientEntity e " +
-			"where " +
-			"    e.entitat = :entitat " +
-			"and (lower(e.nom) like lower('%'||:text||'%') or lower(e.numero) like lower('%'||:text||'%')) ")
-	public List<ExpedientEntity> findByText(
-			@Param("entitat") EntitatEntity entitat,
-			@Param("text") String text);
-	
-	
-	
 	@Query(	"select " +
 			"    distinct e " +
 			"from " +
@@ -725,8 +638,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient);
 	
-	
-	
+
 	@Query(	"select" +
 			"    e " +
 			"from" +
@@ -743,14 +655,15 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			"    e " +
 			"from" +
 			"    ExpedientEntity e " +
+			"	left outer join e.organGestor og " +
 			"where " +
 			"e.esborrat = 0 " +
 			"and e.entitat = :entitat " +
-			"and e.organGestor.id in (:organsIdsPermitted) " +
+			"and og.codi in (:organsCodisPermitted) " +
 			"and e.metaNode = :metaNode ORDER BY e.nom DESC")
 	List<ExpedientEntity> findByEntitatAndMetaExpedientAndOrgans(
 			@Param("entitat") EntitatEntity entitat,
-			@Param("organsIdsPermitted") List<Long> organsIdsPermitted,
+			@Param("organsCodisPermitted") List<String> organsCodisPermitted,
 			@Param("metaNode") MetaNodeEntity metaNode);
 	
 	
@@ -769,6 +682,7 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 	@Query(	"select count(e.id) from ExpedientEntity e where e.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);
 
+
 	@Query(	"from" +
 			"    ExpedientEntity e "
 			+ "where " + 
@@ -781,14 +695,5 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("estat") ExpedientEstatEnumDto estat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("tancatProgramat") Date tancatProgramat);
-	
-	@Lock(LockModeType.PESSIMISTIC_READ)
-	@Query(	"select " +
-			"    e " +
-			"from " +
-			"    ExpedientEntity e " +
-			"where " +
-			"    e.id = :id")
-	public ExpedientEntity findWithLock(@Param("id") Long id);
 	
 }

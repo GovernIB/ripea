@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.util.List;
 
 /**
  * Informació d'una entitat.
@@ -16,9 +16,11 @@ import lombok.Setter;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class EntitatDto extends AuditoriaDto {
 
 	private Long id;
+	@EqualsAndHashCode.Include
 	private String codi;
 	private String nom;
 	private String descripcio;

@@ -36,11 +36,11 @@ public class ExpedientPeticioDto {
 
 	
 	public String getDataActualitzacioStr() {
-		return Utils.convertDateToString(dataActualitzacio, "dd-MM-yyyy HH:mm:ss");
+		return Utils.convertDateToString(dataActualitzacio, "dd/MM/yyyy HH:mm:ss");
 	}
 
 	public String getDataAltaStr() {
-		return Utils.convertDateToString(dataAlta, "dd-MM-yyyy HH:mm:ss");
+		return Utils.convertDateToString(dataAlta, "dd/MM/yyyy HH:mm:ss");
 	}
 
 	@SuppressWarnings("incomplete-switch")

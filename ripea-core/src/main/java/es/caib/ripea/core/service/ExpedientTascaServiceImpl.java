@@ -143,28 +143,44 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					null);
 		}
 		
+		Page<ExpedientTascaEntity> tasques = null;
 		Date dataInici = DateHelper.toDateInicialDia(filtre.getDataInici());
 		Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 		Date dataLimitInici = DateHelper.toDateInicialDia(filtre.getDataLimitInici());
 		Date dataLimitFi = DateHelper.toDateFinalDia(filtre.getDataLimitFi());
 		
-		Page<ExpedientTascaEntity> tasques = expedientTascaRepository.findByResponsableAndEstat(
-				usuariEntity,
-				filtre.getEstat() == null,
-				filtre.getEstat(), 
-				expedient == null,
-				expedient,
-				dataInici == null,
-				dataInici,
-				dataFi == null,
-				dataFi,		
-				dataLimitInici == null,
-				dataLimitInici,
-				dataLimitFi == null,
-				dataLimitFi,
-				paginacioHelper.toSpringDataPageable(
-						paginacioParams));
-		
+		if (filtre.getEstats().length == 0) {
+			tasques = expedientTascaRepository.findByResponsable(
+					usuariEntity,
+					expedient == null,
+					expedient,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,		
+					dataLimitInici == null,
+					dataLimitInici,
+					dataLimitFi == null,
+					dataLimitFi,
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams));
+		} else {
+			tasques = expedientTascaRepository.findByResponsableAndEstat(
+					usuariEntity,
+					filtre.getEstats(), 
+					expedient == null,
+					expedient,
+					dataInici == null,
+					dataInici,
+					dataFi == null,
+					dataFi,		
+					dataLimitInici == null,
+					dataLimitInici,
+					dataLimitFi == null,
+					dataLimitFi,
+					paginacioHelper.toSpringDataPageable(
+							paginacioParams));
+		}
 		
 		return paginacioHelper.toPaginaDto(tasques, ExpedientTascaDto.class);
 		
@@ -191,7 +207,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		
 		ContingutDto dto = contingutHelper.toContingutDto(
 				contingut,
-				true,
+				false,
 				ambFills,
 				true,
 				true,
@@ -334,10 +350,18 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		if(tascaEstat == TascaEstatEnumDto.INICIADA) {
 			tasca.updateResponsableActual(responsableActual);
 		}
+
+		ExpedientEntity expedientEntity = tasca.getExpedient();
 		
 		if (tascaEstat == TascaEstatEnumDto.FINALITZADA && tasca.getMetaTasca().getEstatFinalitzarTasca() != null) {
-			ExpedientEntity expedientEntity = tasca.getExpedient();
 			expedientEntity.updateEstatAdditional(tasca.getMetaTasca().getEstatFinalitzarTasca());
+		}
+		
+		// Tornar a l'estat inicial 'OBERT' si no hi ha un estat addicional en finalitzar tasca
+		if (tascaEstat == TascaEstatEnumDto.FINALITZADA 
+				&& tasca.getMetaTasca().getEstatFinalitzarTasca() == null
+				&& expedientEntity.getEstatAdditional() != null) {
+			expedientEntity.updateEstatAdditional(null);
 		}
 		
 		emailHelper.enviarEmailCanviarEstatTasca(tasca, tascaEstatAnterior);
@@ -430,13 +454,27 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				expedient, 
 				metaExpedientTascaEntity, 
 				responsables, 
-				expedientTasca.getDataLimit()).build();
+				expedientTasca.getDataLimit(),
+				expedientTasca.getTitol(),
+				expedientTasca.getObservacions()).build();
 
 		if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
 			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, expedientTasca.getComentari()).build();
 			expedientTascaEntity.addComentari(comentari);
 		}
 		
+		String titol = expedientTasca.getTitol();
+		String observacions = expedientTasca.getObservacions();
+		boolean isTitolNotEmtpy = titol != null && ! titol.isEmpty();
+		boolean isObservacionsNotEmpty = observacions != null && ! observacions.isEmpty();
+		
+		if (isTitolNotEmtpy || isObservacionsNotEmpty) {
+			String comentariTitol = (isTitolNotEmtpy ? "Títol: " + titol + "\n" : "") +
+									(isObservacionsNotEmpty ? "\tObservacions: " + observacions + "\n" : "");
+			
+ 			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, comentariTitol).build();
+			expedientTascaEntity.addComentari(comentari);
+		}
 		if (metaExpedientTascaEntity.getEstatCrearTasca() != null) {
 			expedient.updateEstatAdditional(metaExpedientTascaEntity.getEstatCrearTasca());
 		}
@@ -448,9 +486,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		expedientTascaRepository.save(expedientTascaEntity);
 		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
 		
-		emailHelper.enviarEmailCanviarEstatTasca(
-				expedientTascaEntity,
-				null);
+		//emailHelper.enviarEmailCanviarEstatTasca(
+		//		expedientTascaEntity,
+		//		null);
 
 		return conversioTipusHelper.convertir(
 				expedientTascaEntity,

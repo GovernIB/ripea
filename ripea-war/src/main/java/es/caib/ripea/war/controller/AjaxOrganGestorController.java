@@ -90,7 +90,9 @@ public class AjaxOrganGestorController extends BaseAdminController{
 		try {
 			text = URLDecoder.decode(request.getRequestURI().split("/")[4], StandardCharsets.UTF_8.name());
 		} catch (UnsupportedEncodingException e) { }
-		
+
+		text = text.trim();
+
 		List<OrganGestorDto> organGestorsList = new ArrayList<OrganGestorDto>();
  		if (RolHelper.isRolActualAdministradorOrgan(request)) {
 			organGestorsList = organGestorService.findAccessiblesUsuariActualRolAdmin(
@@ -102,7 +104,10 @@ public class AjaxOrganGestorController extends BaseAdminController{
 					entitatActual.getId(),
 					text);
 		} else if (RolHelper.isRolActualUsuari(request)) {
-			organGestorsList = organGestorService.findAccessiblesUsuariActualRolUsuari(entitatActual.getId(), text, directOrganPermisRequired);
+			organGestorsList = organGestorService.findAccessiblesUsuariActualRolUsuari(
+					entitatActual.getId(),
+					text,
+					directOrganPermisRequired);
 		} else if(RolHelper.isRolActualSuperusuari(request)) {
 			organGestorsList = organGestorService.findAll(
 					text);

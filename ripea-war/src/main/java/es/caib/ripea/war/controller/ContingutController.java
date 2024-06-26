@@ -525,11 +525,19 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			isTheSame = true;
 		}
 		if (!isTheSame) {
-			contingutService.move(
-					entitatActual.getId(),
-					contingutOrigenId,
-					contingutDestiId, 
-					RolHelper.getRolActual(request));
+			try {
+				contingutService.move(
+						entitatActual.getId(),
+						contingutOrigenId,
+						contingutDestiId, 
+						RolHelper.getRolActual(request));
+			} catch (Exception ex) {
+				return getAjaxControllerReturnValueError(
+						request, 
+						"redirect:../../" + contingutOrigen.getExpedientPare().getId(), 
+						"contingut.controller.element.mogut.ko", 
+						ex);
+			}
 		}
 
 		return getAjaxControllerReturnValueSuccess(

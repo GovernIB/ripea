@@ -8,6 +8,8 @@ import org.hibernate.annotations.ForeignKey;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.Subselect;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,10 +59,14 @@ public class ExpedientCarpetaArbreEntity {
 	@Column(name = "pare_id")
 	protected Long pare;
 	
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-	@JoinColumn(name = "expedient_id")
-	@ForeignKey(name = "ipa_expedient_contingut_fk")
-	protected ExpedientEntity expedient;
+//	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+//	@JoinColumn(name = "expedient_id")
+//	@ForeignKey(name = "ipa_expedient_contingut_fk")
+//	protected ExpedientEntity expedient;
+	
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "expedient_id", referencedColumnName = "expedient_id")
+	protected ExpedientSimplificatEntity expedient;
 	
 	@OneToMany(
 			mappedBy = "pare", 
@@ -93,11 +99,11 @@ public class ExpedientCarpetaArbreEntity {
 //		this.pare = pare;
 //	}
 
-	public ExpedientEntity getExpedient() {
+	public ExpedientSimplificatEntity getExpedient() {
 		return expedient;
 	}
 
-	public void setExpedient(ExpedientEntity expedient) {
+	public void setExpedient(ExpedientSimplificatEntity expedient) {
 		this.expedient = expedient;
 	}
 

@@ -3,20 +3,6 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.distribucio.rest.client.integracio.domini.Annex;
 import es.caib.distribucio.rest.client.integracio.domini.AnnexEstat;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
@@ -49,6 +35,17 @@ import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Mètodes per a la gestió de peticions de crear expedients 
@@ -90,7 +87,9 @@ public class ExpedientPeticioHelper {
 	private OrganGestorRepository organGestorRepository;
 	@Resource
 	private PluginHelper pluginHelper;
-	
+    @Autowired
+    private OrganGestorCacheHelper organGestorCacheHelper;
+
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public void crearExpedientPeticion(es.caib.distribucio.ws.backoffice.AnotacioRegistreId anotacioRegistreId) {
 			
@@ -439,8 +438,10 @@ public class ExpedientPeticioHelper {
 			// in this case all annotations of entitat are permitted, it is not equal to annotations belonging to any procediment of entitat because some of the annotations might not have procediment assigned
 			// so this is wrong -> permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientRepository.findByEntitatId(entitatId));
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
+			EntitatEntity entitat = entitatRepository.getOne(entitatId);
+			OrganGestorEntity organGestor = organGestorRepository.getOne(organActualId);
 			permisosPerAnotacionsDto.setAdminOrganHasPermisAdminComu(organGestorHelper.hasPermisAdminComu(organActualId));
-			permisosPerAnotacionsDto.setAdminOrganCodisOrganAmbDescendents(organGestorRepository.findCodisOrgansAmbDescendents(Arrays.asList(organActualId)));
+			permisosPerAnotacionsDto.setAdminOrganCodisOrganAmbDescendents(organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organGestor.getCodi()));
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId));
 		} else if (rolActual.equals("tothom")) {
 			permisosPerAnotacionsDto.setProcedimentsPermesos(metaExpedientHelper.getCreateWritePermesos(entitatId));

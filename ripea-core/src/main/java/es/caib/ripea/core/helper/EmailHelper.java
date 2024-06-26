@@ -871,7 +871,14 @@ public class EmailHelper {
 				}
 			}
 			
-			//Persona que té agafat l'expedient
+			//Persona que té agafat l'expedient sempre en cas de ser un canvi d'estat d'una tasca
+			if (isTasca && ! isTascaNova && agafatPer != null) {
+				DadesUsuari propietariExpedient = pluginHelper.dadesUsuariFindAmbCodi(expedient.getAgafatPer().getCodi());
+				if (propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
+					responsables.add(propietariExpedient);
+			}
+			
+			//Persona que té agafat l'expedient si no és la mateixa que ha creat l'enviament, notificació o tasca
 			if (agafatPer != null && (!agafatPer.getCodi().equals(createdByCodi))) {
 				DadesUsuari propietariExpedient = pluginHelper.dadesUsuariFindAmbCodi(expedient.getAgafatPer().getCodi());
 				if (propietariExpedient.getEmail() != null && !propietariExpedient.getEmail().isEmpty())
@@ -935,12 +942,16 @@ public class EmailHelper {
 			rebutjMotiu = "\tMotiu: " + expedientTascaEntity.getMotiuRebuig() + "\n";
 		}
 		String enllacTramitar = "Pot accedir a la tasca utilizant el següent enllaç: " + configHelper.getConfig("es.caib.ripea.base.url") + "/contingut/" + expedientTascaEntity.getExpedient().getId() + "?tascaId=" + expedientTascaEntity.getId() + "\n"; 
+		String titol = expedientTascaEntity.getTitol();
+		String observacions = expedientTascaEntity.getObservacions();
 		if (estatAnterior == null) {
 			subject = getPrefixRipea() + " Nova tasca: " + expedientTascaEntity.getMetaTasca().getNom();
 			text = 					
 					"S'ha creat una nova tasca a RIPEA:\n" +
 					"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
 					"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
+					((titol != null && ! titol.isEmpty()) ? "\tTítol: " + titol + "\n" : "") +
+					((observacions != null && ! observacions.isEmpty()) ? "\tObservacions: " + observacions + "\n" : "") +
 					"\tEstat: " + estat + "\n" +
 					((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari + "\n" : "") +
 					"\tExpedient: " + expedientTascaEntity.getExpedient().getNomINumero() + "\n" +

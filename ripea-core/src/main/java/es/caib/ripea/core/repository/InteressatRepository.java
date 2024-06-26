@@ -41,13 +41,11 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("expedientId")Long expedientId,
 			@Param("documentNum")String documentNum);
 
+	List<InteressatEntity> findByExpedient(ExpedientEntity expedient);
+
 	InteressatEntity findByExpedientAndId(
 			ExpedientEntity expedient,
 			Long id);
-
-//	InteressatEntity findByExpedientAndDocumentNum(
-//			ExpedientEntity expedient,
-//			String documentNum);
 
 	List<InteressatEntity> findByDocumentNum(String documentNum); 
 

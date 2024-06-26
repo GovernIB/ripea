@@ -17,7 +17,7 @@ import lombok.ToString;
 public class UsuariTascaFiltreCommand {
 
 
-	private TascaEstatEnumDto estat;
+	private TascaEstatEnumDto[] estats;
 	private Long expedientId;
 	private Date dataInici;
 	private Date dataFi;
@@ -38,8 +38,8 @@ public class UsuariTascaFiltreCommand {
 		return dto;
 	}
 
-	public void setEstat(TascaEstatEnumDto estat) {
-		this.estat = estat;
+	public void setEstats(TascaEstatEnumDto[] estats) {
+		this.estats = estats;
 	}
 
 	public void setExpedientId(Long expedientId) {

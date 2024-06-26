@@ -1,29 +1,5 @@
 package es.caib.ripea.core.service;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.collections.ListUtils;
-import org.apache.commons.collections.MultiHashMap;
-import org.apache.commons.collections.MultiMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.ActualitzacioInfo;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
@@ -31,6 +7,7 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganEstatEnumDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.OrganGestorFiltreDto;
+import es.caib.ripea.core.api.dto.OrganismeDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
@@ -69,6 +46,28 @@ import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.MultiHashMap;
+import org.apache.commons.collections.MultiMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class OrganGestorServiceImpl implements OrganGestorService {
@@ -884,14 +883,14 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<OrganGestorDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+	public List<OrganismeDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
 			String filter, 
 			Long expedientId,
 			String rolActual, 
 			Long organActualId) {
-		List<OrganGestorEntity> organsPermesos = findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+		return findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 				entitatId,
 				metaExpedientId,
 				expedientId == null ? ExtendedPermission.CREATE : ExtendedPermission.WRITE,
@@ -899,9 +898,6 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				expedientId,
 				rolActual, 
 				organActualId);
-		return conversioTipusHelper.convertirList(
-				organsPermesos,
-				OrganGestorDto.class);	
 	}
 	
 	
@@ -1106,85 +1102,69 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	public String getOrganCodiFromMetaExpedientId(Long metaExpedientId) {
 		return organGestorHelper.getOrganCodiFromMetaExpedientId(metaExpedientId);
 	}
-	
-	
-	private List<OrganGestorEntity> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
+
+
+	private List<OrganismeDto> findPermesosByEntitatAndExpedientTipusIdAndFiltre(
 			Long entitatId,
 			Long metaExpedientId,
 			Permission permis,
-			String filtre, 
+			String filtre,
 			Long expedientId,
-			String rolActual, Long organActualId) {
+			String rolActual,
+			Long organActualId) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
-		List<OrganGestorEntity> organsGestors = null;
-		
+		List<OrganismeDto> organsGestors = null;
+
 		if (RolHelper.isAdminEntitat(rolActual)) {
-			organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
-		} else if (RolHelper.isAdminOrgan(rolActual)){
-			organsGestors = organGestorRepository.findDescendents(entitat, Arrays.asList(organActualId));
-			OrganGestorEntity organGestorEntitat = organGestorRepository.findByEntitatAndCodi(
-					entitat,
-					entitat.getUnitatArrel());
-			organsGestors.add(0, organGestorEntitat);
-			
+			organsGestors = organGestorHelper.findArrelFills(entitat.getCodi(), filtre);
+		} else if (RolHelper.isAdminOrgan(rolActual)) {
+			organsGestors = organGestorHelper.findDescendents(entitat.getCodi(), organActualId, filtre);
 		} else {
-		
+
 			if (metaExpedient.getOrganGestor() != null) {
 				// S'han de retornar els fills de l'òrgan gestor del metaExpedient si l'usuari actual
 				// te permisos per l'òrgan gestor.
-				organsGestors = organGestorRepository.findByEntitatAndFiltreAndPareIdIn(
-						entitat,
-						filtre == null,
-						filtre != null ? filtre.trim() : "",
-						Arrays.asList(metaExpedient.getOrganGestor().getId()));
+				organsGestors = organGestorHelper.findDescendents(entitat.getCodi(), metaExpedient.getOrganGestor().getId(), filtre);
 			} else {
-				
+
 				// Cercam las parelles metaExpedient-organ amb permisos assignats 
 				List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
 				permisosHelper.filterGrantedAll(
 						metaExpedientOrgansGestors,
 						MetaExpedientOrganGestorEntity.class,
-						new Permission[] { permis });
-				List<Long> organIds = new ArrayList<>();
+						new Permission[]{permis});
+				Set<String> organCodis = new HashSet<>();
 				if (!metaExpedientOrgansGestors.isEmpty()) {
-					organIds = metaExpedientOrganGestorRepository.findOrganGestorIdsByMetaExpedientOrganGestors(metaExpedientOrgansGestors);
+					organCodis.addAll(metaExpedientOrganGestorRepository.findOrganGestorCodisByMetaExpedientOrganGestors(metaExpedientOrgansGestors));
 				}
 				// Cercam els òrgans amb permisos per procediments comuns
 				if (metaExpedient.getOrganGestor() == null) {
 					List<Long> organProcedimentsComunsIds = toListLong(
 							permisosHelper.getObjectsIdsWithTwoPermissions(
-							OrganGestorEntity.class,
-							ExtendedPermission.COMU,
-							permis));
-	
-					organIds.addAll(organProcedimentsComunsIds);
-					organIds = new ArrayList<>(new HashSet<>(organIds));
+									OrganGestorEntity.class,
+									ExtendedPermission.COMU,
+									permis));
+
+					organCodis.addAll(organGestorRepository.findCodisByIdList(organProcedimentsComunsIds));
 				}
-					organGestorHelper.afegirOrganGestorFillsIds(entitat, organIds);
-					
-					organsGestors = organGestorRepository.findByEntitatAndFiltreAndIds(
-							entitat,
-							filtre == null || filtre.isEmpty(),
-							filtre != null ? filtre.trim() : "", 
-							organIds);
-					
-				
+				organsGestors = organGestorHelper.findDescendents(entitat.getCodi(), new ArrayList<>(organCodis), filtre);
+
 				// Si l'usuari actual te permis direct al metaExpedient, automaticament te permis per tots unitats fills del entitat
 				if (organsGestors == null || organsGestors.isEmpty()) {
 					Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 					boolean metaNodeHasPermis = permisosHelper.isGrantedAll(
 							metaExpedientId,
 							MetaNodeEntity.class,
-							new Permission[] {permis},
+							new Permission[]{permis},
 							auth);
 					if (metaNodeHasPermis) {
-						organsGestors = organGestorHelper.findArrelFills(entitat, filtre);
+						organsGestors = organGestorHelper.findArrelFills(entitat.getCodi(), filtre);
 					}
 				}
 			}
-			
-			// if we modify expedient we have to insure that we can still see its organ in dropdown even if permissions were removed 
+
+			// if we modify expedient we have to ensure that we can still see its organ in dropdown even if permissions were removed
 			if (expedientId != null) {
 				ExpedientEntity expedientEntity = entityComprovarHelper.comprovarExpedient(
 						expedientId,
@@ -1194,23 +1174,23 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 						false,
 						false,
 						null);
-				
+
 				OrganGestorEntity organGestorEntity = expedientEntity.getOrganGestor();
-				
+
 				if (organsGestors == null) {
 					organsGestors = new ArrayList<>();
 				}
 				boolean alreadyInTheList = false;
-				for (OrganGestorEntity organGestor : organsGestors) {
+				for (OrganismeDto organGestor : organsGestors) {
 					if (organGestor.getId().equals(organGestorEntity.getId())) {
 						alreadyInTheList = true;
 					}
 				}
 				if (!alreadyInTheList) {
-					organsGestors.add(0, organGestorEntity);
+					organsGestors.add(0, cacheHelper.findOrganigramaByEntitat(entitat.getCodi()).get(organGestorEntity.getCodi()));
 				}
 			}
-		
+
 		}
 		return organsGestors;
 	}

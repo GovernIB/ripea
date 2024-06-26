@@ -461,33 +461,31 @@ body {
 						</div>
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
-<%-- 						<c:if test="${teAccesEstadistiques}"> --%>
-<%-- 							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary"> --%>
-<%-- 								<spring:message code="decorator.menu.accions.estadistiques"/> --%>
-<!-- 							</a> -->
-<%-- 						</c:if> --%>
 						<%---- Expedients ----%>
 						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary">
 								<spring:message code="decorator.menu.expedients"/>
 						</a>
-						
 						<%---- Annotacions pendents ----%>
 						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.expedientPeticions"/>
 							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
 						</a>
-						
-						<%---- Tasques ----%>								
+						<%---- Tasques ----%>
 						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary">
 							<spring:message code="decorator.menu.tasques"/>
 							<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
-						</a>	
-						
+						</a>
+						<%---- Estadístiques ----%>
+ 						<c:if test="${teAccesEstadistiques}">
+ 							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary">
+ 								<spring:message code="decorator.menu.accions.estadistiques"/>
+ 							</a>
+ 						</c:if>
+						<%-- Fluxos --%>
 						<c:if test="${isCreacioFluxUsuariActiu}">
-							<%-- Fluxos --%>
 							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary">
 									<spring:message code="decorator.menu.fluxosusuari"/>
-							</a>					
+							</a>
 						</c:if>
 					</c:when>
 				</c:choose>

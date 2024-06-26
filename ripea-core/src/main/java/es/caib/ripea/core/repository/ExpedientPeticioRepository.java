@@ -3,21 +3,20 @@
  */
 package es.caib.ripea.core.repository;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientPeticioEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Date;
+import java.util.List;
 
 public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPeticioEntity, Long> {
 
@@ -165,8 +164,8 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullEstat") boolean esNullEstat,
 			@Param("estat") ExpedientPeticioEstatEnumDto estat,
 			@Param("nomesAmbErrorsConsulta") boolean nomesAmbErrorsConsulta);
-	
-	
+
+
 	@Query("select " +
 			"	count(ep) " +
 			"from " +
@@ -175,15 +174,17 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"ep.registre.entitat = :entitat " +
 			"and ((:rolActual = 'IPA_ADMIN') " +
 			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ((me.organGestor is not null and ep.metaExpedient in (:metaExpedientsPermesos)) or (me.organGestor is null and :hasPermisAdminComu = true and ep.registre.destiCodi in (:organsPermesos)))) " +
-			"	or (:rolActual = 'tothom' and ep.metaExpedient in (:metaExpedientsPermesos))) " +	
-			"and ep.estat='PENDENT' " 
+			"	or (:rolActual = 'tothom' and ep.metaExpedient in (:metaExpedientsPermesos) and me.gestioAmbGrupsActiva = false or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +
+			"and ep.estat='PENDENT' "
 			)
 	long countAnotacionsPendentsPerMetaExpedients(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("rolActual") String rolActual,
 			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
 			@Param("organsPermesos") List<String> organsPermesos,
-			@Param("hasPermisAdminComu") boolean hasPermisAdminComu);
+			@Param("hasPermisAdminComu") boolean hasPermisAdminComu,
+			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
+			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos);
 
 
 

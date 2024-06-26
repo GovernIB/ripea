@@ -259,7 +259,7 @@ body.loading .rmodal {
 .btn-top {
 	position: fixed;
 	z-index: 1000;
-	right: 60px;
+	right: 10px;
 	bottom: 50px;
 	background-color: #FFF;
 	padding: 0 5px 0 5px;
