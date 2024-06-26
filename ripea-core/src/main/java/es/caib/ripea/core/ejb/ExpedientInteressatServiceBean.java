@@ -3,21 +3,19 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
 
 /**
  * Implementació de InteressatService com a EJB que empra una clase delegada per
@@ -134,7 +132,7 @@ public class ExpedientInteressatServiceBean implements ExpedientInteressatServic
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<InteressatDto> findByExpedientAndDocumentNum(
+	public InteressatDto findByExpedientAndDocumentNum(
 			String documentNum,
 			Long expedientId) throws NotFoundException {
 		return delegate.findByExpedientAndDocumentNum(documentNum, expedientId);

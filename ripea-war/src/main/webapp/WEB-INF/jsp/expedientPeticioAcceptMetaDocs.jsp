@@ -16,6 +16,10 @@
 <title>${titol}</title>
 <rip:modalHead />
 
+<script src="<c:url value="/webjars/jquery/1.12.4/dist/jquery.min.js"/>"></script>
+<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
+<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
+<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 <script src="<c:url value="/js/webutil.common.js"/>"></script>
 <link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
@@ -247,7 +251,14 @@ function closeViewer() {
 	<c:set var="formAction">
 	<c:choose>
 		<c:when test="${isLast}">
-			<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
+			<c:choose>
+				<c:when test="${isAssociarInteressats}">
+					<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/getInteressats" />
+				</c:when>
+				<c:otherwise>
+					<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}" />
+				</c:otherwise>
+			</c:choose>
 		</c:when>
 		<c:otherwise>
 			<rip:modalUrl value="/expedientPeticio/acceptar/${expedientPeticioId}/getNextAnnex" />
@@ -328,7 +339,7 @@ function closeViewer() {
 				
 			<button id="btnSave" type="submit" class="btn btn-success">
 				<c:choose>
-					<c:when test="${isLast}">
+					<c:when test="${isLast and not isAssociarInteressats}">
 						<c:choose>
 							<c:when test="${isCrearNewExpedient}">
 								<span class="fa fa-save"></span> <spring:message code="comu.boto.crear" />
@@ -336,7 +347,7 @@ function closeViewer() {
 							<c:otherwise>
 								<span class="fa fa-save"></span> <spring:message code="expedient.peticio.accio.enum.INCORPORAR" />
 							</c:otherwise>
-						</c:choose>					
+						</c:choose>
 					</c:when>
 					<c:otherwise>
 						<span class="fa fa-arrow-right"></span> <spring:message code="comu.boto.next" />

@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 
 /**
  * Classe del model de dades que representa un interessat de tipus administració pública.
@@ -94,7 +97,21 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		this.ambOficinaSir = ambOficinaSir;
 	}
 
-	/**
+	@Override
+	public void update(InteressatDto dto) {
+
+		if (!(dto instanceof InteressatAdministracioDto))
+			throw new InteressatTipusDocumentException(dto.getDocumentNum(), InteressatTipusEnumDto.ADMINISTRACIO.name(), dto.getTipus().name(), this.expedient.getId());
+
+		super.update(dto);
+
+		InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) dto;
+		this.organCodi = interessatAdministracioDto.getOrganCodi();
+		this.organNom = interessatAdministracioDto.getOrganNom();
+		this.ambOficinaSir = interessatAdministracioDto.getAmbOficinaSir();
+	}
+
+    /**
 	 * Obté el Builder per a crear objectes de tipus interessat-administració pública.
 	 * 
 	 * @param organCodi El codi DIR3 de l'òrgan de l'administració pública.
@@ -110,7 +127,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	 * @param observacions	Camp per introduir observacions sobre l'òrgan de l'administració pública.
 	 * @param expedient	Expedient on està vinculat l'òrgan de l'administració pública.
 	 * @param representant	Representant de l'òrgan de l'administració pública.
-	 * @param notificacioIdioma	Idioma en que l'òrgan de l'administració pública desitja rebre les notificacions.
+	 * @param preferenciaIdioma	Idioma en que l'òrgan de l'administració pública desitja rebre les notificacions.
 	 * @return
 	 */
 	public static Builder getBuilder(
@@ -154,13 +171,38 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				incapacitat,
 				ambOficinaSir);
 	}
+	public static Builder getBuilder(
+			InteressatAdministracioDto dto,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
+		return new Builder(
+				dto.getOrganCodi(),
+				dto.getOrganNom(),
+				dto.getDocumentTipus(),
+				dto.getDocumentNum(),
+				dto.getPais(),
+				dto.getProvincia(),
+				dto.getMunicipi(),
+				dto.getAdresa(),
+				dto.getCodiPostal(),
+				dto.getEmail(),
+				dto.getTelefon(),
+				dto.getObservacions(),
+				dto.getPreferenciaIdioma(),
+				expedient,
+				representant,
+				dto.getEntregaDeh(),
+				dto.getEntregaDehObligat(),
+				dto.getIncapacitat(),
+				dto.getAmbOficinaSir());
+	}
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta classe.
 	 * 
 	 * @author Limit Tecnologies <limit@limit.es>
 	 */
-	public static class Builder {
+	public static class Builder extends InteressatEntity.Builder {
 		InteressatAdministracioEntity built;
 		Builder(
 				String organCodi,
@@ -247,6 +289,11 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		} else if (!organCodi.equals(other.organCodi))
 			return false;
 		return true;
+	}
+
+	@Override
+	public InteressatTipusEnumDto getTipus() {
+		return InteressatTipusEnumDto.ADMINISTRACIO;
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

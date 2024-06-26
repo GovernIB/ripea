@@ -3,7 +3,9 @@
  */
 package es.caib.ripea.war.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -14,12 +16,15 @@ import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
 import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.dto.RegistreAnnexDto;
 import es.caib.ripea.core.api.dto.RegistreDto;
+import es.caib.ripea.core.api.dto.RegistreInteressatDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -36,6 +41,7 @@ import es.caib.ripea.war.command.ExpedientPeticioModificarCommand;
 import es.caib.ripea.war.command.ExpedientPeticioRebutjarCommand;
 import es.caib.ripea.war.command.RegistreAnnexCommand;
 import es.caib.ripea.war.helper.AnotacionsPendentsHelper;
+import es.caib.ripea.war.command.RegistreInteressatsCommand;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -69,10 +75,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per al llistat d'expedients peticions.
@@ -133,7 +143,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		// Actualitzar nombre d'anotacions pendents
 		AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
-		
+
 		if (aplicacioService.mostrarLogsCercadorAnotacio())
     		logger.info("findMetaExpedientsPermesosPerAnotacions time:  " + (System.currentTimeMillis() - t3) + " ms");
 		
@@ -435,7 +445,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				expedientPeticioAcceptarCommand.getAnnexos().size());
 		
 		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
-		
+		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
+
 
 		return "expedientPeticioAcceptMetaDocs";
 
@@ -516,7 +527,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		
 		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
-		
+		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
+
 		return expedientPeticioAcceptarCommand;
 		
 	}
@@ -575,7 +587,138 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		return "expedientPeticioAcceptMetaDocs";
 		
 	}
-	
+
+	@RequestMapping(value = "/acceptar/{expedientPeticioId}/getInteressats", method = RequestMethod.POST)
+	public String acceptarPostInteressats(
+			HttpServletRequest request,
+			@Valid RegistreAnnexCommand registreAnnexCommand,
+			@PathVariable Long expedientPeticioId,
+			BindingResult bindingResult,
+			Model model) throws JsonProcessingException {
+
+		processAnnex(
+				request,
+				registreAnnexCommand,
+				model,
+				bindingResult,
+				false);
+
+		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_COMMAND);
+		Integer index = (Integer)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_INDEX);
+		index++;
+		setIndexAndSize(
+				request,
+				model,
+				index,
+				expedientPeticioAcceptarCommand.getAnnexos().size());
+
+		boolean isCrearNew = expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR;
+
+		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		RegistreDto registre = expedientPeticioDto.getRegistre();
+		EntitatDto entitat = entitatService.findByUnitatArrel(registre.getEntitatCodi());
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+
+		List<RegistreInteressatDto> interessatsDistribucio = getSortedInteressatsDistribucio(registre.getInteressats());
+		List<InteressatDto> interessatsRipea = new ArrayList<>();
+		List<String> documentInteressatsOverwritten = new ArrayList<>();
+
+		ExpedientDto expedient = null;
+		if (!isCrearNew) {
+			expedient = expedientService.findById(entitat.getId(), expedientPeticioAcceptarCommand.getExpedientId(), rolActual);
+			interessatsRipea = getSortedInteressatRipea(expedient);
+			documentInteressatsOverwritten = getDocumentInteressatsOverwritten(interessatsRipea, interessatsDistribucio);
+		}
+
+		ObjectMapper mapper = new ObjectMapper();
+		model.addAttribute("interessatsRipea", interessatsRipea);
+		model.addAttribute("jsonInteressatsRipea", mapper.writeValueAsString(interessatsRipea));
+		model.addAttribute("interessatsDistribucio", interessatsDistribucio);
+		model.addAttribute("jsonInteressatsDistribucio", mapper.writeValueAsString(interessatsDistribucio));
+		model.addAttribute("documentInteressatsOverwritten", documentInteressatsOverwritten);
+		model.addAttribute("jsonDocumentInteressatsOverwritten", mapper.writeValueAsString(documentInteressatsOverwritten));
+
+		carregaInteressats(expedientPeticioAcceptarCommand, registre, expedient);
+		model.addAttribute(expedientPeticioAcceptarCommand);
+
+		model.addAttribute("isCrearNewExpedient", isCrearNew);
+
+		return "expedientPeticioAcceptInteressats";
+	}
+
+	private List<InteressatDto> getSortedInteressatRipea(ExpedientDto expedient) {
+		List<InteressatDto> sortedInteressatsRipea = new ArrayList<>();
+		Set<InteressatDto> interessatsRipea = expedient.getInteressats();
+		if (interessatsRipea != null) {
+			sortedInteressatsRipea.addAll(interessatsRipea);
+			Collections.sort(sortedInteressatsRipea, new Comparator<InteressatDto>() {
+				@Override
+				public int compare(InteressatDto a, InteressatDto b) {
+					return compareByDocumentNum(a, b);
+				}
+			});
+		}
+		return sortedInteressatsRipea;
+	}
+
+	private int compareByDocumentNum(InteressatDto a, InteressatDto b) {
+		if (a.getDocumentNum() == null && b.getDocumentNum() == null) return 0;
+		if (a.getDocumentNum() == null) return 1;
+		if (b.getDocumentNum() == null) return -1;
+		return a.getDocumentNum().compareTo(b.getDocumentNum());
+	}
+
+	private List<RegistreInteressatDto> getSortedInteressatsDistribucio(List<RegistreInteressatDto> interessatsDistribucio) {
+		if (interessatsDistribucio == null) return null;
+
+		Collections.sort(interessatsDistribucio, new Comparator<RegistreInteressatDto>() {
+			@Override
+			public int compare(RegistreInteressatDto a, RegistreInteressatDto b) {
+				return compareByDocumentNum(a, b);
+			}
+		});
+		return interessatsDistribucio;
+	}
+
+	private int compareByDocumentNum(RegistreInteressatDto a, RegistreInteressatDto b) {
+		if (a.getDocumentNumero() == null && b.getDocumentNumero() == null) return 0;
+		if (a.getDocumentNumero() == null) return 1;
+		if (b.getDocumentNumero() == null) return -1;
+		return a.getDocumentNumero().compareTo(b.getDocumentNumero());
+	}
+
+	private static List<String> getDocumentInteressatsOverwritten(List<InteressatDto> interessatsRipea, List<RegistreInteressatDto> interessatsDistribucio) {
+
+		Set<String> interessatsOverwritten = new HashSet<>();
+		Set<RegistreInteressatDto> interessatsOrRepresentantsDistribucio = getInteressatOrRepresentantsDistribucio(interessatsDistribucio);
+		for (InteressatDto interessatRipea : interessatsRipea) {
+			for (RegistreInteressatDto interessatDistribucio : interessatsOrRepresentantsDistribucio) {
+				if (interessatRipea.getDocumentNum().equals(interessatDistribucio.getDocumentNumero())) {
+					interessatsOverwritten.add(interessatRipea.getDocumentNum());
+				}
+			}
+		}
+
+		List<String> sortedList = new ArrayList<>(interessatsOverwritten);
+		Collections.sort(sortedList);
+		return sortedList;
+	}
+
+	private static Set<RegistreInteressatDto> getInteressatOrRepresentantsDistribucio(List<RegistreInteressatDto> interessatsDistribucio) {
+		Set<RegistreInteressatDto> interessatsOrRepresentantsDistribucio = new HashSet<>();
+		for (RegistreInteressatDto inter : interessatsDistribucio) {
+			interessatsOrRepresentantsDistribucio.add(inter);
+			if (inter.getRepresentant() != null) {
+				interessatsOrRepresentantsDistribucio.add(inter.getRepresentant());
+			}
+		}
+		return interessatsOrRepresentantsDistribucio;
+	}
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/previousPage", method = RequestMethod.GET)
 	public String previousPage(
@@ -610,9 +753,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
 		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
 
+		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
+		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
+
 		return "expedientPeticioAcceptMetaDocs";
 	}
-	
+
 
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
 	public String acceptarPost(
@@ -634,18 +780,41 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return "expedientPeticioAcceptMetaDocs";
 		}
 		
+		return processarAnotacio(request, expedientPeticioId, expedientPeticioAcceptarCommand);
+	}
 
+	@RequestMapping(value = "/acceptarAmbInteressats/{expedientPeticioId}", method = RequestMethod.POST)
+	public String acceptarInteressatsPost(
+			HttpServletRequest request,
+			ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand,
+			@PathVariable Long expedientPeticioId,
+			Model model) {
+
+		List<RegistreInteressatsCommand> interessats = expedientPeticioAcceptarCommand.getInteressats();
+		expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_COMMAND);
+		expedientPeticioAcceptarCommand.setInteressats(interessats);
+
+		return processarAnotacio(request, expedientPeticioId, expedientPeticioAcceptarCommand);
+	}
+
+	private String  processarAnotacio(HttpServletRequest request, Long expedientPeticioId, ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand) {
 		RegistreAnnexCommand last = Utils.getLast(expedientPeticioAcceptarCommand.getAnnexos());
 		Long justificantIdMetaDoc = null;
 		if (last != null && last.getId() == -1) { // if is justificant
 			justificantIdMetaDoc = last.getMetaDocumentId();
 			Utils.removeLast(expedientPeticioAcceptarCommand.getAnnexos());
 		}
-		
-		
+
 		Map<Long, Long> anexosIdsMetaDocsIdsMap = new HashMap<Long, Long>();
 		for (RegistreAnnexCommand registreAnnex : expedientPeticioAcceptarCommand.getAnnexos()) {
 			anexosIdsMetaDocsIdsMap.put(registreAnnex.getId(), registreAnnex.getMetaDocumentId());
+		}
+
+		Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap = new HashMap<>();
+		for (RegistreInteressatsCommand interessat: expedientPeticioAcceptarCommand.getInteressats()) {
+			interessatsAccionsMap.put(interessat.getInteressatDocNumero(), interessat.getAccio());
 		}
 
 		boolean processatOk = true;
@@ -666,25 +835,27 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						expedientPeticioAcceptarCommand.isAssociarInteressats(),
 						expedientPeticioAcceptarCommand.getGrupId(),
 						RolHelper.getRolActual(request),
-						anexosIdsMetaDocsIdsMap, 
-						justificantIdMetaDoc);
+						anexosIdsMetaDocsIdsMap,
+						justificantIdMetaDoc,
+						interessatsAccionsMap);
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				expedientId = expedientDto.getId();
-				
+
 				logger.info("Expedient creat per anotacio: id=" + expedientDto.getId() + ", numero=" + expedientDto.getMetaExpedient().getCodi() + "/" +  expedientDto.getSequencia() + "/" + expedientDto.getAny());
-				
+
 			} else if (expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.INCORPORAR) {
 					processatOk = expedientService.incorporar(
 							entitat.getId(),
 							expedientPeticioAcceptarCommand.getExpedientId(),
 							expedientPeticioDto.getId(),
-							expedientPeticioAcceptarCommand.isAssociarInteressats(), 
-							RolHelper.getRolActual(request), 
-							anexosIdsMetaDocsIdsMap, 
+							expedientPeticioAcceptarCommand.isAssociarInteressats(),
+							RolHelper.getRolActual(request),
+							anexosIdsMetaDocsIdsMap,
 							justificantIdMetaDoc,
-							expedientPeticioAcceptarCommand.isAgafarExpedient());
-					
+							expedientPeticioAcceptarCommand.isAgafarExpedient(),
+							interessatsAccionsMap);
+
 					expedientId = expedientPeticioAcceptarCommand.getExpedientId();
 				logger.info("Expedient incorporat per anotacio: " + processatOk);
 			}
@@ -703,18 +874,18 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					getMessage(request, "expedient.peticio.controller.acceptat.ko") + ": " + ExceptionHelper.getRootCauseOrItself(ex).getMessage(), ex);
 
 		}
-		
+
 		String expNom = expedientService.getNom(expedientId);
-		
+
 		if (!expCreatArxiuOk) {
 			return getModalControllerReturnValueWarning(
 					request,
 					"redirect:expedientPeticio",
 					"expedient.peticio.controller.acceptat.warning.arxiu",
-					new Object[] { 
-							expedientId.toString(), 
+					new Object[]{
+							expedientId.toString(),
 							expNom,
-							expedientPeticioDto.getRegistre().getIdentificador() });
+							expedientPeticioDto.getRegistre().getIdentificador()});
 		}
 		if (!processatOk) {
 			MissatgesHelper.warning(
@@ -727,24 +898,23 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					request,
 					"redirect:expedientPeticio",
 					"expedient.peticio.controller.acceptat.ok",
-					new Object[] { 
-							expedientId.toString(), 
-							expNom, 
-							expedientPeticioDto.getRegistre().getIdentificador() });
+					new Object[]{
+							expedientId.toString(),
+							expNom,
+							expedientPeticioDto.getRegistre().getIdentificador()});
 		} else {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientPeticio",
 					"expedient.peticio.controller.acceptat.incorporat.ok",
-					new Object[] {
+					new Object[]{
 							expedientPeticioDto.getRegistre().getIdentificador(),
-							expedientId.toString(), 
+							expedientId.toString(),
 							expNom});
 		}
 	}
-	
-	
-	
+
+
 	@RequestMapping(value = "/retornarPendent/{expedientPeticioId}", method = RequestMethod.GET)
 	public String retornarPendent(HttpServletRequest request, @PathVariable Long expedientPeticioId) {
 
@@ -1076,8 +1246,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	private void omplirModel(Long expedientPeticioId, HttpServletRequest request, Model model, ExpedientPeticioAcceptarCommand command) {
 
 		ExpedientPeticioDto expedientPeticioDto = expedientPeticioService.findOne(expedientPeticioId);
+		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
 		ExpedientDto expedient = null;
-		EntitatDto entitat = entitatService.findByUnitatArrel(expedientPeticioDto.getRegistre().getEntitatCodi());
+		EntitatDto entitat = entitatService.findByUnitatArrel(registre.getEntitatCodi());
 		model.addAttribute("entitatId", entitat.getId());
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		List<MetaExpedientDto> metaExpedients =  metaExpedientService.findCreateWritePerm(entitat.getId(), rolActual);
@@ -1097,7 +1268,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					command.setMetaExpedientId(expedientPeticioDto.getMetaExpedientId());
 				}
 				expedients = (List<ExpedientDto>) expedientService.findByEntitatAndMetaExpedient(entitat.getId(), expedientPeticioDto.getMetaExpedientId(), rolActual, EntitatHelper.getOrganGestorActualId(request));
-				String expedientNumero = expedientPeticioDto.getRegistre().getExpedientNumero();
+				String expedientNumero = registre.getExpedientNumero();
 				if (expedientNumero != null && !expedientNumero.isEmpty()) {
 					expedient = expedientPeticioService.findByEntitatAndMetaExpedientAndExpedientNumero(entitat.getId(), expedientPeticioDto.getMetaExpedientId(), expedientNumero);
 					if (expedient == null) {
@@ -1121,6 +1292,69 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("expedientPeticioAcceptarCommand", command);
 		
 		model.addAttribute("rolActual", rolActual);
+	}
+
+	private void carregaInteressats(ExpedientPeticioAcceptarCommand command, RegistreDto registre, ExpedientDto expedient) {
+		if (command.getInteressats() == null || command.getInteressats().isEmpty()) {
+			List<RegistreInteressatDto> interessatsDistribucio = getSortedInteressatsDistribucio(registre.getInteressats());
+			List<RegistreInteressatsCommand> associacionsInteressats = new ArrayList<>();
+			for (RegistreInteressatDto interessatDistribucio : interessatsDistribucio) {
+				associacionsInteressats.add(RegistreInteressatsCommand.builder()
+						.interessatDocNumero(interessatDistribucio.getDocumentNumero())
+//						.accio(calculaAccioInteressat(interessatDistribucio, expedient != null ? expedient.getInteressats() : null))
+						.accio(InteressatAssociacioAccioEnum.ASSOCIAR)
+						.build());
+			}
+			command.setInteressats(associacionsInteressats);
+		}
+	}
+
+//	private InteressatAssociacioAccioEnum calculaAccioInteressat(RegistreInteressatDto interessat, Set<InteressatDto> interessatsRipea) {
+//		// Si s'està creant l'expedient, o l'expedient no té cap interessat associam els nous interessats
+//		if (interessatsRipea == null || interessatsRipea.isEmpty()) return InteressatAssociacioAccioEnum.ASSOCIAR;
+//		RegistreInteressatDto representant = interessat.getRepresentant();
+//
+//		String interessatDoc = interessat.getDocumentNumero();
+//		String representantDoc = representant != null ? representant.getDocumentNumero() : null;
+//		boolean interessatExists = false;
+//		boolean representantExists = false;
+//		InteressatDto interessatRipea = null;
+//
+//		// Obtenim l'interessat i representant ja existent a Ripea (si existeix)
+//		for (InteressatDto interessatDto: interessatsRipea) {
+//			if (interessatDoc.equalsIgnoreCase(interessatDto.getDocumentNum())) {
+//				interessatExists = true;
+//				interessatRipea = interessatDto;
+//			}
+//			if (representantDoc != null) {
+//				if (representantDoc.equalsIgnoreCase(interessatDto.getDocumentNum())) {
+//                    representantExists = true;
+//                } else if (interessatDto.getRepresentant() != null && representantDoc.equalsIgnoreCase(interessatDto.getRepresentant().getDocumentNum())) {
+//					representantExists = true;
+//				}
+//			}
+//			if (representantExists && interessatExists)
+//				break;
+//
+//		}
+//
+//		if (interessatExists) {
+//			if (sameRepresentant(interessatRipea.getRepresentant(), representantDoc)){
+//				return InteressatAssociacioAccioEnum.SOBREESCRIURE;
+//			} else {
+//				return InteressatAssociacioAccioEnum.SOBREESCRIURE_REPRESENTANT;
+//			}
+//		} else if (representantExists) {
+//			return InteressatAssociacioAccioEnum.ASSOCIAR_SOBREESCRIURE_REPRESENTANT;
+//		} else {
+//			return InteressatAssociacioAccioEnum.ASSOCIAR;
+//		}
+//	}
+
+	private boolean sameRepresentant(InteressatDto representant, String representantDoc) {
+		if (representant == null)
+			return representantDoc == null;
+		return representant.getDocumentNum().equals(representantDoc);
 	}
 
 	private boolean isIncorporacioJustificantActiva() {

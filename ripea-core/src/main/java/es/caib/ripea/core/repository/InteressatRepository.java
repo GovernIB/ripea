@@ -28,11 +28,10 @@ import java.util.List;
  */
 public interface InteressatRepository extends JpaRepository<InteressatEntity, Long> {
 
-	List<InteressatEntity> findByExpedientAndDocumentNum(
-			ExpedientEntity expedient, String documentNum);
+	InteressatEntity findByExpedientAndDocumentNum(ExpedientEntity expedient, String documentNum);
 
 	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.documentNum = :documentNum")
-	List<InteressatEntity> findByExpedientIdAndDocumentNum(
+	InteressatEntity findByExpedientIdAndDocumentNum(
 			@Param("expedientId")Long expedientId,
 			@Param("documentNum")String documentNum);
 
@@ -47,7 +46,10 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			ExpedientEntity expedient,
 			Long id);
 
-	List<InteressatEntity> findByDocumentNum(String documentNum); 
+	List<InteressatEntity> findByDocumentNum(String documentNum);
+
+	@Query(value = "SELECT distinct i FROM InteressatEntity i WHERE i.representant.id = :representantId")
+	List<InteressatEntity> findByRepresentantId(@Param("representantId") Long representantId);
 
 	@Query(	  "select "
 			+ "    inter "
@@ -72,10 +74,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "    inter.id asc")
 	List<InteressatEntity> findByExpedientAndNotRepresentant(
 			@Param("expedient") ExpedientEntity expedient);
-	
-	
-	
-	
+
 	@Query(	  "select "
 			+ "    inter "
 			+ "from "
@@ -133,11 +132,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	long countByExpedient(
 			@Param("expedient") ExpedientEntity expedient);
 
-	@Query(	  "select inter "
-			+ "from InteressatPersonaFisicaEntity inter "
-			+ "where inter.id = :id")
-	InteressatPersonaFisicaEntity findPersonaFisicaById(@Param("id") Long id);
-	
 	@Query(	  "select "
 			+ "    distinct inter "
 			+ "from "
@@ -162,11 +156,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("llinatge2") String llinatge2,
 			@Param("expedient") ExpedientEntity expedient);
 
-	@Query(	  "select inter "
-			+ "from InteressatPersonaJuridicaEntity inter "
-			+ "where inter.id = :id")
-	InteressatPersonaJuridicaEntity findPersonaJuridicaById(@Param("id") Long id);
-	
 	@Query(	  "select "
 			+ "    distinct inter "
 			+ "from "
@@ -184,12 +173,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("esNullRaoSocial") boolean esNullRaoSocial,
 			@Param("raoSocial") String raoSocial,
 			@Param("expedient") ExpedientEntity expedient);
-	
-	@Query(	  "select inter "
-			+ "from InteressatAdministracioEntity inter "
-			+ "where inter.id = :id")
-	InteressatAdministracioEntity findAdministracioById(@Param("id") Long id);
-	
+
 	@Query(	  "select "
 			+ "    distinct inter "
 			+ "from "
@@ -204,20 +188,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("organCodi") String organCodi,
 			@Param("expedient") ExpedientEntity expedient);
 	
-	@Query(	  "select "
-			+ "    inter.documentNum "
-			+ "from "
-			+ "    MetaExpedientEntity me, ExpedientEntity e JOIN e.interessats inter"
-			+ " WHERE "
-			+ "        e.metaExpedient = me "
-			+ "    AND me = :metaExpedient "
-			+ "group by "
-			+ "    inter.documentNum ")
-	List<String> findAllDocumentNumbers(
-			@Param("metaExpedient") MetaExpedientEntity metaExpedient
-			);
-	
-	@Query(	 
+	@Query(
 //			"select "
 //			+ "    distinct inter.documentNum "
 //			+ 
@@ -318,5 +289,8 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("creacioFi") Date creacioFi);
 
 
-	
+	@Query(	"select count(i.id) " +
+			"from InteressatEntity i " +
+			"where i.representant.id = :representantId")
+	Integer countByRepresentantId(@Param("representantId") Long representantId);
 }

@@ -8,7 +8,6 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.MunicipiDto;
 import es.caib.ripea.core.api.dto.ProvinciaDto;
 import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
-import es.caib.ripea.core.api.exception.NotDefinedConfigException;
 import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -371,6 +370,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long interessatId,
 			@PathVariable Long representantId,
 			Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		expedientInteressatService.deleteRepresentant(
 				entitatActual.getId(),
@@ -383,6 +383,20 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 				"redirect:../../../../../../contenidor/" + expedientId,
 				"interessat.controller.representant.eliminat.ok");
 		
+	}
+
+	@RequestMapping(value = "/{expedientId}/representant/{documentNum}", method = RequestMethod.GET)
+	@ResponseBody
+	public InteressatDto getInteressatExpedient(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@PathVariable String documentNum) {
+		if (documentNum == null || documentNum.trim().isEmpty()) {
+			return null;
+		}
+
+		InteressatDto interessatDto = expedientInteressatService.findByExpedientAndDocumentNum(documentNum, expedientId);
+		return interessatDto;
 	}
 	
 	

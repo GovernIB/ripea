@@ -30,6 +30,16 @@
 	grid-column: 2;
 	margin-left: 10px;
 }
+table.font-decresed {
+	font-size: small;
+	margin-bottom: 0px;
+}
+table.font-decresed td {
+	padding: 4px 8px !important;
+}
+td.prop-col {
+	font-weight: bold;
+}
 
 </style>
 
@@ -46,58 +56,13 @@ $(document).ready(function() {
 
 
 	//=======================  list additonal info on clicking desplegable in interessats table =============================
-	$('#taulaInteressats').on('rowinfo.dataTable', function(e, td, rowData) {
+	$('#taulaInteressats').on('rowinfo.dataTable', function (e, td, rowData) {
 		var getUrl = "<c:url value="/expedient/interessat/"/>" + rowData.id + "?dadesExternes=true";
-		$.get(getUrl).done(function(data) {
+		$.get(getUrl).done(function (data) {
 			$(td).empty();
-			var rowinfo_content = 
-				    			'<div class="rowinfo-interessat">' + 
-								'<h5><spring:message code="contingut.interessat.info.interessat"/>:</h5>' + 
-				    			'<div class="interessaat-info">' +
-				    				'<dl>' +
-				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.pais"/>', data.paisNom) +
-				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.email"/>', data.email) +
-				    				'</dl>' +
-					    			'<dl>' +
-					    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.provincia"/>', data.provinciaNom) +
-					    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.telefon"/>', data.telefon) +
-								    '</dl>'+
-								    '<dl>' +
-								    	showInteressatFieldInfo('<spring:message code="contingut.interessat.info.municipi"/>', data.municipiNom) +
-				    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.observacions"/>', data.observacions) +
-							    	'</dl>'+
-							    	'<dl>' +
-							    		showInteressatFieldInfo('<spring:message code="contingut.interessat.info.adresa"/>', data.adresa) +
-									'</dl>'+
-									'<dl>' +
-										showInteressatFieldInfo('<spring:message code="contingut.interessat.info.codipostal"/>', data.codiPostal) +
-									'</dl>'+
-								'</div>';
-								if (data.representant) {
-									rowinfo_content += '<h5><spring:message code="contingut.interessat.info.representant"/>:</h5>' +
-														'<div class="interessaat-info">' +
-										    				'<dl>' +
-										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.pais"/>', data.representant.paisNom) +
-										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.email"/>', data.representant.email) +
-										    				'</dl>' +
-											    			'<dl>' +
-											    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.provincia"/>', data.representant.provinciaNom) +
-											    				showInteressatFieldInfo('<spring:message code="contingut.interessat.info.telefon"/>', data.representant.telefon) +
-														    '</dl>'+
-														    '<dl>' +
-														    	showInteressatFieldInfo('<spring:message code="contingut.interessat.info.municipi"/>', data.representant.municipiNom) +
-										    					showInteressatFieldInfo('<spring:message code="contingut.interessat.info.observacions"/>', data.representant.observacions) +
-													    	'</dl>'+
-													    	'<dl>' +
-													    		showInteressatFieldInfo('<spring:message code="contingut.interessat.info.adresa"/>', data.representant.adresa) +
-															'</dl>'+
-															'<dl>' +
-																showInteressatFieldInfo('<spring:message code="contingut.interessat.info.codipostal"/>', data.representant.codiPostal) +
-															'</dl>'+
-														'</div>';
-								}
-								rowinfo_content += '</div>';
-	    	$(td).append(rowinfo_content);
+			$(td).css({backgroundColor: '#EFF2F5'});
+			const rowinfo_content = generateInteressatTable(data) + generateRepresentantTable(data.representant);
+			$(td).append(rowinfo_content);
 		});
 	});
 	
@@ -114,6 +79,75 @@ function showInteressatFieldInfo(fieldName, fieldValue) {
 	}
 }
 
+const generateInteressatTable = (interessat) => {
+	return 	'<table class="table table-bordered table-striped font-decresed">' +
+			'	<thead>' +
+			'		<tr>' +
+			'			<th colspan="4"><spring:message code="contingut.interessat.info.interessat"/></th>' +
+			'		</tr>' +
+			'	</thead>' +
+			'	<tbody>' +
+			'	<tr>' +
+			'		<td class="prop-col" style="width: 160px;"><spring:message code="contingut.interessat.columna.identificador"/></td><td>' + getPropertyValue(interessat, 'identificador') + '</td>' +
+			'		<td class="prop-col" style="width: 160px;"><spring:message code="contingut.interessat.columna.document"/></td><td>' + getPropertyValue(interessat, 'documentNum') + '</td>' +
+			'	</tr>' +
+			'	<tr>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.pais"/></td><td>' + getPropertyValue(interessat, 'paisNom') + '</td>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.codipostal"/></td><td>' + getPropertyValue(interessat, 'codiPostal') + '</td>' +
+			'	</tr>' +
+			'	<tr>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.provincia"/></td><td>' + getPropertyValue(interessat, 'provinciaNom') + '</td>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.email"/></td><td>' + getPropertyValue(interessat, 'email') + '</td>' +
+			'	</tr>' +
+			'	<tr>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.municipi"/></td><td>' + getPropertyValue(interessat, 'municipiNom') + '</td>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.telefon"/></td><td>' + getPropertyValue(interessat, 'telefon') + '</td>' +
+			'	</tr>' +
+			'	<tr>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.adresa"/></td><td>' + getPropertyValue(interessat, 'adresa') + '</td>' +
+			'		<td class="prop-col"><spring:message code="contingut.interessat.info.observacions"/></td><td>' + getPropertyValue(interessat, 'observacions') + '</td>' +
+			'	</tr>' +
+			'	</tbody>' +
+			'</table>';
+}
+const generateRepresentantTable = (representant) => {
+	if (representant) {
+		return 	'<table class="table table-bordered table-striped font-decresed">' +
+				'	<thead>' +
+				'		<tr>' +
+				'			<th colspan="4"><spring:message code="contingut.interessat.info.representant"/></th>' +
+				'		</tr>' +
+				'	</thead>' +
+				'	<tbody>' +
+				'	<tr>' +
+				'		<td class="prop-col" style="width: 160px;"><spring:message code="contingut.interessat.columna.identificador"/></td><td>' + getPropertyValue(representant, 'identificador') + '</td>' +
+				'		<td class="prop-col" style="width: 160px;"><spring:message code="contingut.interessat.columna.document"/></td><td>' + getPropertyValue(representant, 'documentNum') + '</td>' +
+				'	</tr>' +
+				'	<tr>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.pais"/></td><td>' + getPropertyValue(representant, 'paisNom') + '</td>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.codipostal"/></td><td>' + getPropertyValue(representant, 'codiPostal') + '</td>' +
+				'	</tr>' +
+				'	<tr>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.provincia"/></td><td>' + getPropertyValue(representant, 'provinciaNom') + '</td>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.email"/></td><td>' + getPropertyValue(representant, 'email') + '</td>' +
+				'	</tr>' +
+				'	<tr>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.municipi"/></td><td>' + getPropertyValue(representant, 'municipiNom') + '</td>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.telefon"/></td><td>' + getPropertyValue(representant, 'telefon') + '</td>' +
+				'	</tr>' +
+				'	<tr>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.adresa"/></td><td>' + getPropertyValue(representant, 'adresa') + '</td>' +
+				'		<td class="prop-col"><spring:message code="contingut.interessat.info.observacions"/></td><td>' + getPropertyValue(representant, 'observacions') + '</td>' +
+				'	</tr>' +
+				'	</tbody>' +
+				'</table>';
+	}
+	return "";
+}
+const getPropertyValue = (obj, prop) => {
+	return (obj && obj[prop]) ? obj[prop] : '--';
+}
+
 
 function enableNotificar() {
 	$('.btnNotificar').closest('li').removeClass('disabled');
@@ -122,7 +156,6 @@ function enableNotificar() {
 	let url = '<c:url value="/document/"/>' + $('.btnNotificar').closest('tr').attr("id") + '/notificar';
 	$('.btnNotificar').attr("href", url);
 }
-
 
 </script>
 

@@ -3,30 +3,9 @@
  */
 package es.caib.ripea.core.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.ripea.core.api.dto.CarpetaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
@@ -44,6 +23,21 @@ import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientEstatService;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests per al servei de gestió d'expedients.
@@ -459,6 +453,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null,
 								null, 
 								null, 
+								null,
 								null);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(

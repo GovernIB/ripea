@@ -467,7 +467,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				null,
 				true);
 
-		if (document != null) {
+		if (document != null && document.getFirmes() != null) {
 			for (Firma arxiuFirma : document.getFirmes()) {
 
 				if (!FirmaTipus.CSV.equals(arxiuFirma.getTipus())) {

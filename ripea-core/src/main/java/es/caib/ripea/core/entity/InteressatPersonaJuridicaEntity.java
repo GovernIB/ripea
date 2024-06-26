@@ -3,14 +3,17 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 
 /**
  * Classe del model de dades que representa un interessat de tipus persona jurídica.
@@ -74,7 +77,19 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 		this.incapacitat = incapacitat;
 	}
 
-	/**
+	@Override
+	public void update(InteressatDto dto) {
+
+		if (!(dto instanceof InteressatPersonaJuridicaDto))
+			throw new InteressatTipusDocumentException(dto.getDocumentNum(), InteressatTipusEnumDto.PERSONA_JURIDICA.name(), dto.getTipus().name(), this.expedient.getId());
+
+		super.update(dto);
+
+		InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto) dto;
+		this.raoSocial = interessatPersonaJuridicaDto.getRaoSocial();
+	}
+
+    /**
 	 * Obté el Builder per a crear objectes de tipus interessat-persona jurídica.
 	 * 
 	 * @param raoSocial La raó social de l'interessat.
@@ -90,7 +105,7 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 	 * @param observacions	Camp per introduir observacions sobre l'interessat.
 	 * @param expedient	Expedient on està vinculat l'interessat.
 	 * @param representant	Representant de l'interessat.
-	 * @param notificacioIdioma	Idioma en que l'interessat desitja rebre les notificacions.
+	 * @param preferenciaIdioma	Idioma en que l'interessat desitja rebre les notificacions.
 	 * @return
 	 */
 	public static Builder getBuilder(
@@ -130,13 +145,36 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 				entregaDehObligat,
 				incapacitat);
 	}
+	public static Builder getBuilder(
+			InteressatPersonaJuridicaDto dto,
+			ExpedientEntity expedient,
+			InteressatEntity representant) {
+		return new Builder(
+				dto.getRaoSocial(),
+				dto.getDocumentTipus(),
+				dto.getDocumentNum(),
+				dto.getPais(),
+				dto.getProvincia(),
+				dto.getMunicipi(),
+				dto.getAdresa(),
+				dto.getCodiPostal(),
+				dto.getEmail(),
+				dto.getTelefon(),
+				dto.getObservacions(),
+				dto.getPreferenciaIdioma(),
+				expedient,
+				representant,
+				dto.getEntregaDeh(),
+				dto.getEntregaDehObligat(),
+				dto.getIncapacitat());
+	}
 
 	/**
 	 * Builder per a crear noves instàncies d'aquesta classe.
 	 * 
 	 * @author Limit Tecnologies <limit@limit.es>
 	 */
-	public static class Builder {
+	public static class Builder extends InteressatEntity.Builder {
 		InteressatPersonaJuridicaEntity built;
 		Builder(
 				String raoSocial,
@@ -220,7 +258,12 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public InteressatTipusEnumDto getTipus() {
+		return InteressatTipusEnumDto.PERSONA_JURIDICA;
+	}
+
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

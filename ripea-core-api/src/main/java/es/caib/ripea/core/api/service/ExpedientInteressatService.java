@@ -3,15 +3,14 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a gestionar els interessats dels expedients.
@@ -230,7 +229,7 @@ public interface ExpedientInteressatService {
 	 * @throws NotFoundException Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public List<InteressatDto> findByExpedientAndDocumentNum(
+	public InteressatDto findByExpedientAndDocumentNum(
 			String documentNum,
 			Long expedientId) throws NotFoundException;
 

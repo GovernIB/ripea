@@ -934,7 +934,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,
-					"expedient.controller.sincronitzar.amb.arxiu.ok");
+					resultat == null || resultat.isEmpty() ? "expedient.controller.sincronitzar.amb.arxiu.ok" : null);
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(
 					request,

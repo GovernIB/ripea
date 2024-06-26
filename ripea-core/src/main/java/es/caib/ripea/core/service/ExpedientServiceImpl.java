@@ -172,7 +172,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long grupId,
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
-			Long justificantIdMetaDoc) {
+			Long justificantIdMetaDoc,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
 		
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorRepository.findOne(organGestorId).getCodi());
@@ -198,6 +199,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 					nom,
 					expedientPeticioId,
 					associarInteressats,
+					interessatsAccionsMap,
 					grupId,
 					rolActual);
 		}
@@ -298,14 +300,22 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap,
 			Long justificantIdMetaDoc,
-			boolean agafarExpedient) {
+			boolean agafarExpedient,
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
 		logger.info("Incorporant a l'expedient existent (" + "entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ", " +
 				"expedientPeticioId=" + expedientPeticioId + ")");
 
 		synchronized (lock) {
-			expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(expedientPeticioId, expedientId, rolActual, entitatId, associarInteressats, agafarExpedient);
+			expedientHelper.relateExpedientWithPeticioAndSetAnnexosPendentNewTransaction(
+					expedientPeticioId,
+					expedientId,
+					rolActual,
+					entitatId,
+					associarInteressats,
+					interessatsAccionsMap,
+					agafarExpedient);
 		}
 		ExpedientPeticioEntity expedientPeticioEntity = expedientPeticioRepository.findOne(expedientPeticioId);
 		expedientHelper.inicialitzarExpedientsWithImportacio();

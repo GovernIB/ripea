@@ -4,6 +4,7 @@ import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
@@ -41,8 +42,6 @@ public class ExpedientInteressatHelper {
 	@Autowired
 	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
 	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
 	private ConfigHelper configHelper;
 	@Autowired
 	private ExpedientRepository expedientRepository;
@@ -50,10 +49,25 @@ public class ExpedientInteressatHelper {
 	private ExpedientHelper expedientHelper;
 	@Autowired
 	private ContingutHelper contingutHelper;
-	
+
+
+	@Transactional
+	public InteressatEntity create(
+			Long expedientId,
+			InteressatDto interessat,
+			PermissionEnumDto permission,
+			String rolActual){
+
+		logger.debug("Creant nou interessatEntity (expedientId=" + expedientId + ", interessat=" + interessat + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity interessatEntity = createDB(expedient, interessat);
+
+		return interessatEntity;
+	}
+
 	@Transactional
 	public InteressatDto create(
-			Long entitatId,
 			Long expedientId,
 			InteressatDto interessat,
 			boolean propagarArxiu,
@@ -61,30 +75,10 @@ public class ExpedientInteressatHelper {
 			String rolActual, 
 			boolean comprovarAgafat){
 		
+		logger.debug("Creant nou interessat (expedientId=" + expedientId + ", interessat=" + interessat + ")");
 
-		logger.debug("Creant nou interessat ("
-				+ "entitatId=" + entitatId + ", "
-				+ "expedientId=" + expedientId + ", "
-				+ "interessat=" + interessat + ")");
-	
-		
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				comprovarAgafat,
-				permission.equals(PermissionEnumDto.READ),
-				permission.equals(PermissionEnumDto.WRITE),
-				permission.equals(PermissionEnumDto.CREATE),
-				permission.equals(PermissionEnumDto.DELETE),
-				rolActual);
-		
-		InteressatEntity interessatEntity = createDB(
-				entitatId,
-				expedient,
-				interessat,
-				propagarArxiu,
-				permission,
-				rolActual,
-				comprovarAgafat);
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, comprovarAgafat);
+		InteressatEntity interessatEntity = createDB(expedient, interessat);
 		
 		if (propagarArxiu && expedient.getArxiuUuid() != null) {
 			arxiuPropagarInteressats(expedient, interessatEntity);
@@ -94,10 +88,32 @@ public class ExpedientInteressatHelper {
 							interessatEntity,
 							InteressatDto.class);
 	}
-	
+
+	@Transactional
+	public InteressatEntity createRepresentant(
+			Long expedientId,
+			Long interessatId, //interessatId to which representant will be related to
+			InteressatDto representant,
+			PermissionEnumDto permission,
+			String rolActual){
+
+		logger.debug("Creant nou representantEntity (expedientId=" + expedientId + ", interessatId=" + interessatId + ", representant=" + representant + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity representantEntity = createDB(expedient, representant);
+
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		if (interessat == null) {
+			throw new NotFoundException(interessatId, InteressatEntity.class);
+		}
+		representantEntity.updateEsRepresentant(true);
+		interessat.updateRepresentant(representantEntity);
+
+		return representantEntity;
+	}
+
 	@Transactional
 	public InteressatDto createRepresentant(
-			Long entitatId,
 			Long expedientId,
 			Long interessatId, //interessatId to which representant will be related to
 			InteressatDto representant,
@@ -108,37 +124,17 @@ public class ExpedientInteressatHelper {
 		
 
 		logger.debug("Creant nou representant ("
-				+ "entitatId=" + entitatId + ", "
 				+ "expedientId=" + expedientId + ", "
 				+ "interessatId=" + interessatId + ", "
 				+ "representant=" + representant + ")");
 
-		
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId,
-				comprovarAgafat,
-				permission.equals(PermissionEnumDto.READ),
-				permission.equals(PermissionEnumDto.WRITE),
-				permission.equals(PermissionEnumDto.CREATE),
-				permission.equals(PermissionEnumDto.DELETE),
-				rolActual);
-		
-		InteressatEntity representantEntity = createDB(
-				entitatId,
-				expedient,
-				representant,
-				propagarArxiu,
-				permission,
-				rolActual,
-				comprovarAgafat);
-		
-		
-		InteressatEntity interessat = null;
-		interessat = interessatRepository.findOne(interessatId);
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, comprovarAgafat);
+		InteressatEntity representantEntity = createDB(expedient, representant);
+
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat == null) {
-			throw new NotFoundException(
-					interessatId,
-					InteressatEntity.class);
+			throw new NotFoundException(interessatId, InteressatEntity.class);
 		}
 		representantEntity.updateEsRepresentant(true);
 		interessat.updateRepresentant(representantEntity);
@@ -155,13 +151,8 @@ public class ExpedientInteressatHelper {
 	
 	@Transactional
 	public InteressatEntity createDB(
-			Long entitatId,
 			ExpedientEntity expedient,
-			InteressatDto interessat,
-			boolean propagarArxiu, 
-			PermissionEnumDto permission, 
-			String rolActual, 
-			boolean comprovarAgafat){
+			InteressatDto interessat){
 
 		InteressatEntity interessatEntity = null;
 		if (interessat.isPersonaFisica()) {
@@ -254,116 +245,62 @@ public class ExpedientInteressatHelper {
 		
 		return interessatEntity;
 	}
-	
-	
-//	@Transactional
-//	public InteressatDto update(
-//			Long entitatId,
-//			Long expedientId,
-//			Long interessatId,
-//			InteressatDto interessatDto,
-//			boolean propagarArxiu,
-//			InteressatDto representantDto, 
-//			String rolActual){
-//		
-//		logger.debug("Actualitzant interessat ("
-//				+ "entitatId=" + entitatId + ", "
-//				+ "expedientId=" + expedientId + ", "
-//				+ "interessatId=" + interessatId + ")");
-//		
-//		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-//				entitatId,
-//				expedientId,
-//				false,
-//				false,
-//				true,
-//				false,
-//				false, 
-//				false, 
-//				rolActual);
-//		InteressatEntity interessatEntity = entityComprovarHelper.comprovarInteressat(
-//				expedient, 
-//				interessatId); 
-//		if (interessatEntity == null) {
-//			throw new NotFoundException(
-//					interessatId,
-//					InteressatEntity.class);
-//		}
-//		
-//		//### Actualitza la informació de l'interessat
-//		update(
-//				entitatId,
-//				expedientId,
-//				null,
-//				interessatDto, 
-//				rolActual, 
-//				false);
-//		
-//		//### Actualitza la informació del representant
-//		if (representantDto != null && interessatEntity.getRepresentant() != null) {
-//			update(
-//					entitatId,
-//					expedientId,
-//					interessatId,
-//					representantDto, 
-//					rolActual, 
-//					false);
-//		}
-//		
-//		//### Crear nou representant de l'interessat
-//		if (representantDto != null && interessatEntity.getRepresentant() == null) {
-//			create(
-//					entitatId,
-//					expedientId,
-//					interessatId,
-//					representantDto,
-//					propagarArxiu, 
-//					PermissionEnumDto.WRITE, 
-//					rolActual, 
-//					true);
-//		}
-//		
-//		//### Esborra un representant si no s'ha informat en la petició
-//		if (representantDto == null && interessatEntity.getRepresentant() != null) {
-//			deleteRepresentant(
-//					entitatId, 
-//					expedientId, 
-//					interessatId, 
-//					interessatEntity.getRepresentant().getId(), 
-//					rolActual);
-//		}
-//		
-//		if (propagarArxiu) {
-//			pluginHelper.arxiuExpedientActualitzar(expedient);
-//		}
-//		
-//		
-//		return conversioTipusHelper.convertir(
-//							interessatRepository.save(interessatEntity),
-//							InteressatDto.class);
-//	}
+
+	private ExpedientEntity getExpedientComprovantPermisos(Long expedientId, PermissionEnumDto permission, String rolActual, boolean comprovarAgafat) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				comprovarAgafat,
+				permission.equals(PermissionEnumDto.READ),
+				permission.equals(PermissionEnumDto.WRITE),
+				permission.equals(PermissionEnumDto.CREATE),
+				permission.equals(PermissionEnumDto.DELETE),
+				rolActual);
+		return expedient;
+	}
 	
 	
 	public InteressatDto update(
-			Long entitatId,
+//			Long entitatId,
 			Long expedientId,
-			Long representatId,
-			InteressatDto interessat, 
+			Long interessatId,
+			InteressatDto interessatRepresentant,
 			String rolActual, 
 			boolean comprovarAgafatPerUsuariActual, 
 			boolean propagarArxiu) {
-		if (representatId != null) {
+		if (interessatId != null) {
 			logger.debug("Modificant un representant ("
-					+ "entitatId=" + entitatId + ", "
+//					+ "entitatId=" + entitatId + ", "
 					+ "expedientId=" + expedientId + ", "
-					+ "interessatId=" + representatId + ", "
-					+ "interessat=" + interessat + ")");
+					+ "interessatId=" + interessatId + ", "
+					+ "interessat=" + interessatRepresentant + ")");
 		} else {
 			logger.debug("Modificant un interessat ("
-					+ "entitatId=" + entitatId + ", "
+//					+ "entitatId=" + entitatId + ", "
 					+ "expedientId=" + expedientId + ", "
-					+ "interessat=" + interessat + ")");
+					+ "interessat=" + interessatRepresentant + ")");
 		}
+
+		InteressatEntity interessatRepresentantEntity = updateInteressatRepresentantEntity(
+				expedientId,
+				interessatId,
+				interessatRepresentant,
+				rolActual,
+				comprovarAgafatPerUsuariActual,
+				propagarArxiu);
+
+		return conversioTipusHelper.convertir(
+				interessatRepresentantEntity,
+				InteressatDto.class);
+	}
+
+	public InteressatEntity updateInteressatRepresentantEntity(
+			Long expedientId,
+			Long interessatId,
+			InteressatDto interessatRepresentant,
+			String rolActual,
+			boolean comprovarAgafatPerUsuariActual,
+			boolean propagarArxiu) {
+
 		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
 				expedientId,
 				comprovarAgafatPerUsuariActual,
@@ -372,163 +309,110 @@ public class ExpedientInteressatHelper {
 				false,
 				false,
 				rolActual);
-		InteressatEntity representat = null;
-		if (representatId != null) {
-			representat = interessatRepository.findOne(representatId);
-			if (representat == null || 
-				representat.getRepresentant() == null || 
-				!representat.getRepresentant().getId().equals(interessat.getId())) {
+
+		InteressatEntity interessat = null;
+		Boolean associarRepresentant = false;
+		if (interessatId != null) {
+			interessat = interessatRepository.findOne(interessatId);
+			if (interessat == null) {
 				throw new NotFoundException(
-						representatId,
+						interessatId,
 						InteressatEntity.class);
 			}
+			// Si canviam de representant, l'eliminam de l'interessant actual
+			if (interessat.getRepresentant() != null && !interessat.getRepresentant().getId().equals(interessatRepresentant.getId())) {
+				removeRepresentant(interessat);
+				associarRepresentant = true;
+			}
+			if (interessat.getRepresentant() == null) {
+				associarRepresentant = true;
+			}
 		}
-		InteressatEntity interessatEntity = null;
-		if (interessat.isPersonaFisica()) {
-			InteressatPersonaFisicaDto interessatPersonaFisicaDto = (InteressatPersonaFisicaDto)interessat;
-			interessatEntity = interessatRepository.findOne(interessat.getId());
-			InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
-			if (deproxied instanceof InteressatPersonaFisicaEntity) {
-				((InteressatPersonaFisicaEntity)deproxied).update(
-						interessatPersonaFisicaDto.getNom(),
-						interessatPersonaFisicaDto.getLlinatge1(),
-						interessatPersonaFisicaDto.getLlinatge2(),
-						interessatPersonaFisicaDto.getDocumentTipus(),
-						interessatPersonaFisicaDto.getDocumentNum(),
-						interessatPersonaFisicaDto.getPais(),
-						interessatPersonaFisicaDto.getProvincia(),
-						interessatPersonaFisicaDto.getMunicipi(),
-						interessatPersonaFisicaDto.getAdresa(),
-						interessatPersonaFisicaDto.getCodiPostal(),
-						interessatPersonaFisicaDto.getEmail(),
-						interessatPersonaFisicaDto.getTelefon(),
-						interessatPersonaFisicaDto.getObservacions(),
-						interessatPersonaFisicaDto.getPreferenciaIdioma(),
-						interessatPersonaFisicaDto.getEntregaDeh(),
-						interessatPersonaFisicaDto.getEntregaDehObligat(),
-						interessatPersonaFisicaDto.getIncapacitat());
-			} else {
-				interessatRepository.delete(interessatEntity);
-				interessatEntity = InteressatPersonaFisicaEntity.getBuilder(
-						interessatPersonaFisicaDto.getNom(),
-						interessatPersonaFisicaDto.getLlinatge1(),
-						interessatPersonaFisicaDto.getLlinatge2(),
-						interessatPersonaFisicaDto.getDocumentTipus(),
-						interessatPersonaFisicaDto.getDocumentNum(),
-						interessatPersonaFisicaDto.getPais(),
-						interessatPersonaFisicaDto.getProvincia(),
-						interessatPersonaFisicaDto.getMunicipi(),
-						interessatPersonaFisicaDto.getAdresa(),
-						interessatPersonaFisicaDto.getCodiPostal(),
-						interessatPersonaFisicaDto.getEmail(),
-						interessatPersonaFisicaDto.getTelefon(),
-						interessatPersonaFisicaDto.getObservacions(),
-						interessatPersonaFisicaDto.getPreferenciaIdioma(),
-						expedient,
-						null,
-						interessatPersonaFisicaDto.getEntregaDeh(),
-						interessatPersonaFisicaDto.getEntregaDehObligat(),
-						interessatPersonaFisicaDto.getIncapacitat()).build();
-			}
-			
-
-		} else if (interessat.isPersonaJuridica()) {
-			InteressatPersonaJuridicaDto interessatPersonaJuridicaDto = (InteressatPersonaJuridicaDto)interessat;
-			interessatEntity = interessatRepository.findOne(interessat.getId());
-			InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
-			
-			if (deproxied instanceof InteressatPersonaJuridicaEntity) {
-			
-				((InteressatPersonaJuridicaEntity)deproxied).update(
-						interessatPersonaJuridicaDto.getRaoSocial(),
-						interessatPersonaJuridicaDto.getDocumentTipus(),
-						interessatPersonaJuridicaDto.getDocumentNum(),
-						interessatPersonaJuridicaDto.getPais(),
-						interessatPersonaJuridicaDto.getProvincia(),
-						interessatPersonaJuridicaDto.getMunicipi(),
-						interessatPersonaJuridicaDto.getAdresa(),
-						interessatPersonaJuridicaDto.getCodiPostal(),
-						interessatPersonaJuridicaDto.getEmail(),
-						interessatPersonaJuridicaDto.getTelefon(),
-						interessatPersonaJuridicaDto.getObservacions(),
-						interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-						interessatPersonaJuridicaDto.getEntregaDeh(),
-						interessatPersonaJuridicaDto.getEntregaDehObligat(),
-						interessatPersonaJuridicaDto.getIncapacitat());
-			} else {
-				interessatRepository.delete(interessatEntity);
-				interessatEntity = InteressatPersonaJuridicaEntity.getBuilder(
-						interessatPersonaJuridicaDto.getRaoSocial(),
-						interessatPersonaJuridicaDto.getDocumentTipus(),
-						interessatPersonaJuridicaDto.getDocumentNum(),
-						interessatPersonaJuridicaDto.getPais(),
-						interessatPersonaJuridicaDto.getProvincia(),
-						interessatPersonaJuridicaDto.getMunicipi(),
-						interessatPersonaJuridicaDto.getAdresa(),
-						interessatPersonaJuridicaDto.getCodiPostal(),
-						interessatPersonaJuridicaDto.getEmail(),
-						interessatPersonaJuridicaDto.getTelefon(),
-						interessatPersonaJuridicaDto.getObservacions(),
-						interessatPersonaJuridicaDto.getPreferenciaIdioma(),
-						expedient,
-						null,
-						interessatPersonaJuridicaDto.getEntregaDeh(),
-						interessatPersonaJuridicaDto.getEntregaDehObligat(),
-						interessatPersonaJuridicaDto.getIncapacitat()).build();
-			}
+		InteressatEntity interessatRepresentantEntity = interessatRepository.findOne(interessatRepresentant.getId());
+		InteressatEntity deproxied = HibernateHelper.deproxy(interessatRepresentantEntity);
+		if (interessatRepresentant.isAdministracio()) {
+			updateOrganNom(interessatRepresentant);
+		}
+		if (sameTipus(interessatRepresentant.getTipus(), deproxied)) {
+			deproxied.update(interessatRepresentant);
+			interessatRepresentantEntity = interessatRepository.save(deproxied);
 		} else {
-			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto)interessat;
-			interessatEntity = interessatRepository.findOne(interessat.getId());
-			InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(
-					interessatAdministracioDto.getOrganCodi());
-			
-			if (deproxied instanceof InteressatAdministracioEntity) {
-			
-				((InteressatAdministracioEntity)deproxied).update(
-						unitat.getCodi(),
-						unitat.getDenominacio(),
-						interessatAdministracioDto.getDocumentTipus(),
-						interessatAdministracioDto.getDocumentNum(),
-						interessatAdministracioDto.getPais(),
-						interessatAdministracioDto.getProvincia(),
-						interessatAdministracioDto.getMunicipi(),
-						interessatAdministracioDto.getAdresa(),
-						interessatAdministracioDto.getCodiPostal(),
-						interessatAdministracioDto.getEmail(),
-						interessatAdministracioDto.getTelefon(),
-						interessatAdministracioDto.getObservacions(),
-						interessatAdministracioDto.getPreferenciaIdioma(),
-						interessatAdministracioDto.getEntregaDeh(),
-						interessatAdministracioDto.getEntregaDehObligat(),
-						interessatAdministracioDto.getIncapacitat(),
-						interessatAdministracioDto.getAmbOficinaSir());
-			} else {
-				interessatRepository.delete(interessatEntity);
-				interessatEntity = InteressatAdministracioEntity.getBuilder(
-						unitat != null ? unitat.getCodi() : null,
-						unitat != null ? unitat.getDenominacio() : null,
-						interessatAdministracioDto.getDocumentTipus(),
-						interessatAdministracioDto.getDocumentNum(),
-						interessatAdministracioDto.getPais(),
-						interessatAdministracioDto.getProvincia(),
-						interessatAdministracioDto.getMunicipi(),
-						interessatAdministracioDto.getAdresa(),
-						interessatAdministracioDto.getCodiPostal(),
-						interessatAdministracioDto.getEmail(),
-						interessatAdministracioDto.getTelefon(),
-						interessatAdministracioDto.getObservacions(),
-						interessatAdministracioDto.getPreferenciaIdioma(),
-						expedient,
-						null,
-						interessatAdministracioDto.getEntregaDeh(),
-						interessatAdministracioDto.getEntregaDehObligat(),
-						interessatAdministracioDto.getIncapacitat(),
-						interessatAdministracioDto.getAmbOficinaSir()).build();
+			InteressatEntity representant = deproxied.getRepresentant();
+			List<InteressatEntity> interessatsAQuiRepresenta = interessatRepository.findByRepresentantId(deproxied.getId());
+			// Eliminam l'interessat de totes les representacions
+			if (interessatsAQuiRepresenta != null && !interessatsAQuiRepresenta.isEmpty()) {
+				for (InteressatEntity inter : interessatsAQuiRepresenta) {
+					inter.updateRepresentant(null);
+				}
+			}
+			// Eliminam l'interessat, i el cream de nou.
+			interessatRepository.delete(deproxied);
+			interessatRepresentantEntity = InteressatEntity.getBuilder(interessatRepresentant, expedient, representant).build();
+			interessatRepresentantEntity = interessatRepository.save(interessatRepresentantEntity);
+			// Afegim el nou interessat a totes les representacions
+			if (interessatsAQuiRepresenta != null && !interessatsAQuiRepresenta.isEmpty()) {
+				for (InteressatEntity inter : interessatsAQuiRepresenta) {
+					inter.updateRepresentant(interessatRepresentantEntity);
+				}
 			}
 		}
-		
+
+		if (associarRepresentant) {
+			interessat.updateRepresentant(interessatRepresentantEntity);
+		}
+		// Registra al log la modificació de l'interessat
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				interessatRepresentantEntity,
+				LogObjecteTipusEnumDto.INTERESSAT,
+				LogTipusEnumDto.MODIFICACIO,
+				null,
+				null,
+				false,
+				false);
+
+		if (propagarArxiu && expedient.getArxiuUuid() != null) {
+			arxiuPropagarInteressats(expedient, interessatRepresentantEntity);
+		}
+
+		return interessatRepresentantEntity;
+	}
+
+	public void updateOrganNom(InteressatDto interessatRepresentant) {
+		if (interessatRepresentant.isAdministracio()) {
+			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) interessatRepresentant;
+			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
+			interessatAdministracioDto.setOrganCodi(unitat != null ? unitat.getCodi() : null);
+			interessatAdministracioDto.setOrganNom(unitat != null ? unitat.getDenominacio() : null);
+		}
+	}
+
+	private boolean sameTipus(InteressatTipusEnumDto tipus, InteressatEntity interessat) {
+		if (tipus == null || interessat == null) return false;
+
+		return interessat instanceof InteressatPersonaFisicaEntity && InteressatTipusEnumDto.PERSONA_FISICA.equals(tipus) ||
+				interessat instanceof InteressatPersonaJuridicaEntity && InteressatTipusEnumDto.PERSONA_JURIDICA.equals(tipus) ||
+				interessat instanceof InteressatAdministracioEntity && InteressatTipusEnumDto.ADMINISTRACIO.equals(tipus);
+	}
+
+	public InteressatEntity update(
+			Long expedientId,
+			InteressatDto interessat,
+			PermissionEnumDto permission,
+			String rolActual) {
+
+		logger.debug("Modificant un interessat (expedientId=" + expedientId + ", interessat=" + interessat + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity interessatEntity = interessatRepository.findOne(interessat.getId());
+
+//		InteressatEntity deproxied = HibernateHelper.deproxy(interessatEntity);
+//		deproxied.update(interessat);
+		interessatEntity.update(interessat);
+		interessatEntity.updateEsRepresentant(false);
 		interessatEntity = interessatRepository.save(interessatEntity);
+
 		// Registra al log la modificació de l'interessat
 		contingutLogHelper.log(
 				expedient,
@@ -541,17 +425,71 @@ public class ExpedientInteressatHelper {
 				false,
 				false);
 
-		
-		if (propagarArxiu && expedient.getArxiuUuid() != null) {
-			
-			arxiuPropagarInteressats(expedient, interessatEntity);
-		}
-		
-		return conversioTipusHelper.convertir(
-				interessatEntity,
-				InteressatDto.class);
+		return interessatEntity;
 	}
 
+	public InteressatEntity updateRepresentant(
+			Long expedientId,
+			Long interessatId,
+			InteressatDto representant,
+			PermissionEnumDto permission,
+			String rolActual) {
+
+		logger.debug("Modificant un representant (expedientId=" + expedientId + ", representant=" + representant + ")");
+
+		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
+		InteressatEntity representantEntity = interessatRepository.findOne(representant.getId());
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		if (interessat == null) {
+			throw new NotFoundException(interessatId, InteressatEntity.class);
+		}
+
+		// Actualitzam les dades del representant
+		representantEntity.update(representant);
+		representantEntity = interessatRepository.save(representantEntity);
+
+		// Si canviam de representant, l'eliminam de l'interessant actual
+		if (interessat.getRepresentant() != null && !representantEntity.getDocumentNum().equalsIgnoreCase(interessat.getRepresentant().getDocumentNum())) {
+			removeRepresentant(interessat);
+		}
+		interessat.updateRepresentant(representantEntity);
+		interessatRepository.save(interessat);
+
+		// Registra al log la modificació de l'interessat
+		contingutLogHelper.log(
+				expedient,
+				LogTipusEnumDto.MODIFICACIO,
+				representantEntity,
+				LogObjecteTipusEnumDto.INTERESSAT,
+				LogTipusEnumDto.MODIFICACIO,
+				null,
+				null,
+				false,
+				false);
+
+		return representantEntity;
+	}
+
+	// Treure representant de l'interessat, i borrar-lo de BBDD si és necessari
+	public void removeRepresentant(InteressatEntity interessat) {
+		InteressatEntity representant = interessat.getRepresentant();
+		if (representant == null) return;
+
+		Long representantId = representant.getId();
+		interessat.updateRepresentant(null);
+		interessatRepository.save(interessat);
+
+		// Si el representant també és interessat (esRepresentant == false), no l'eliminam de BBDD
+		if (!representant.isEsRepresentant()) return;
+
+		// Si només s'està utilitzant una vegada (en l'interessat, l'eliminam de BBDD
+		Integer usosRepresentant = interessatRepository.countByRepresentantId(representantId);
+		if (usosRepresentant <= 1) {
+			representant.getExpedient().deleteInteressat(representant);
+			interessatRepository.delete(representant.getId());
+		}
+
+	}
 	
 	
 
@@ -574,6 +512,19 @@ public class ExpedientInteressatHelper {
 				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
 		if (interessat != null) {
+			// Primer eliminam el representant
+			removeRepresentant(interessat);
+
+			// Si aquest interessat s'està utilitzant en més d'un interressat-representant, no es borra de BBDD
+			Integer usosRepresentant = interessatRepository.countByRepresentantId(interessatId);
+			interessat.updateRepresentant(null);
+			// Marcar com a representant si s'està utilitzant com a representant d'altres interessats
+			if (usosRepresentant > 0) {
+				interessat.updateEsRepresentant(true);
+				interessatRepository.save(interessat);
+				return;
+			}
+
 			interessatRepository.delete(interessat);
 			expedient.deleteInteressat(interessat);
 			// Registra al log la baixa de l'interessat
@@ -620,11 +571,18 @@ public class ExpedientInteressatHelper {
 				false,
 				rolActual);
 		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		// Si aquest representant s'està utilitzant com a interessat o com a representant d'un altre interessat, no es borra de BBDD
 		if (interessat != null) {
-			if (interessat.getRepresentant() != null && 
-				interessat.getRepresentant().getId().equals(representantId)) {
-				InteressatEntity representant = interessatRepository.findOne(representantId);
+			InteressatEntity representant = interessat.getRepresentant();
+			if (representant != null && representant.getId().equals(representantId)) {
+//				InteressatEntity representant = interessatRepository.findOne(representantId);
+				Integer usosRepresentant = interessatRepository.countByRepresentantId(representantId);
 				interessat.updateRepresentant(null);
+				// representant també és interessat || representant de més d'un interessat
+				if (!representant.isEsRepresentant() || usosRepresentant > 1) {
+					return;
+				}
+
 				interessatRepository.delete(representant);
 				expedient.deleteInteressat(representant);
 				// Registra al log la baixa de l'interessat
