@@ -749,6 +749,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
 		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
 
+		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
+		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
+
 		return "expedientPeticioAcceptMetaDocs";
 	}
 

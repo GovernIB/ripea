@@ -89,7 +89,7 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 		this.raoSocial = interessatPersonaJuridicaDto.getRaoSocial();
 	}
 
-	/**
+    /**
 	 * Obté el Builder per a crear objectes de tipus interessat-persona jurídica.
 	 * 
 	 * @param raoSocial La raó social de l'interessat.
@@ -258,7 +258,12 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public InteressatTipusEnumDto getTipus() {
+		return InteressatTipusEnumDto.PERSONA_JURIDICA;
+	}
+
 	private static final long serialVersionUID = -2299453443943600172L;
 
 }

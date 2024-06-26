@@ -9,6 +9,7 @@ import es.caib.ripea.core.api.dto.InteressatDto;
 import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import lombok.Getter;
 import org.hibernate.annotations.ForeignKey;
@@ -244,6 +245,8 @@ public abstract class InteressatEntity extends RipeaAuditable<Long> {
 		}
 		return null;
 	}
+
+	public abstract InteressatTipusEnumDto getTipus();
 
 //	public InteressatEntity getRepresentat() {
 //		return !CollectionUtils.isEmpty(representats) ? representats.get(0) : null;

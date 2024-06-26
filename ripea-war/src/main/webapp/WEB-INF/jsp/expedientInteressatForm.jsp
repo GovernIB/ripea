@@ -102,6 +102,8 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 
 	$(document).ready(function() {
 		var munOrgan = '';
+		var edicio = <c:out value="${not empty interessatCommand.id}"/>;
+		var idEdicio = '${interessatCommand.id}';
 		var netejar = <c:out value="${empty interessatCommand.id and empty netejar}"/>;
 		var organsCarregats = <c:out value="${not empty unitatsOrganitzatives}"/>;
 		$body = $("body");
@@ -200,7 +202,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		});
 
 		$('input#documentNum').change((event) => {
-			$('#id').val("");
+			$('#id').val(edicio ? idEdicio : '');
 			$('#editar-warn').hide();
 			const documentNum = $(event.target).val();
 			console.log('Element has changed:', documentNum);

@@ -109,7 +109,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			InteressatDto interessat, 
 			String rolActual) {
 		return expedientInteressatHelper.update(
-				entitatId,
+//				entitatId,
 				expedientId,
 				null,
 				interessat,
@@ -127,7 +127,7 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 			InteressatDto interessat, 
 			String rolActual) {
 		return expedientInteressatHelper.update(
-				entitatId,
+//				entitatId,
 				expedientId,
 				representatId,
 				interessat,

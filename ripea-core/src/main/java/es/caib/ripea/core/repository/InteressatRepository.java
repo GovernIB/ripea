@@ -46,6 +46,9 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 
 	List<InteressatEntity> findByDocumentNum(String documentNum);
 
+	@Query(value = "SELECT distinct i FROM InteressatEntity i WHERE i.representant.id = :representantId")
+	List<InteressatEntity> findByRepresentantId(@Param("representantId") Long representantId);
+
 	@Query(	  "select "
 			+ "    inter "
 			+ "from "

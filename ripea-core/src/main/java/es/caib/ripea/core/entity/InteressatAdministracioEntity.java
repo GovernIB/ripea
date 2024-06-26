@@ -111,7 +111,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		this.ambOficinaSir = interessatAdministracioDto.getAmbOficinaSir();
 	}
 
-	/**
+    /**
 	 * Obté el Builder per a crear objectes de tipus interessat-administració pública.
 	 * 
 	 * @param organCodi El codi DIR3 de l'òrgan de l'administració pública.
@@ -289,6 +289,11 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 		} else if (!organCodi.equals(other.organCodi))
 			return false;
 		return true;
+	}
+
+	@Override
+	public InteressatTipusEnumDto getTipus() {
+		return InteressatTipusEnumDto.ADMINISTRACIO;
 	}
 
 	private static final long serialVersionUID = -2299453443943600172L;

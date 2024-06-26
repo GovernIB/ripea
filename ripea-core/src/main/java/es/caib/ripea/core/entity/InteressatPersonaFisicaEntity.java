@@ -309,6 +309,11 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 		return true;
 	}
 
+	@Override
+	public InteressatTipusEnumDto getTipus() {
+		return InteressatTipusEnumDto.PERSONA_FISICA;
+	}
+
 	private static final long serialVersionUID = -2299453443943600172L;
 
 

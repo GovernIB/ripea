@@ -55,125 +55,8 @@
 			return true;
 		});
 
-		// $("select").change(function (e) {
-		// 	updateInteressatsRipeaTable($(this).closest('tr').find('td:first').data('docnum'));
-		// });
-
-		// updateAccionsInteressatsDistribucio();
 	});
 
-	// const updateInteressatsRipeaTable = (docnum) => {
-	<%--	if (${!isCrearNewExpedient}) {--%>
-	// 		const interessatDistribucio = getInteressatDistribucio(docnum);
-	// 		const representantDistribucio = interessatDistribucio.representant;
-	// 		const row = getRowWithInteressatDoc(docnum)
-	// 		if (row === null) {
-	// 			// Afegir fila
-	// 			const interessat = interessatDistribucio.documentNom;
-	// 			const representant = isNullOrEmpty(representantDistribucio) ? '--' : representantDistribucio.documentNom;
-	// 			const fila = $('<tr><td data-docnum="' + docnum + '">' + interessat + '</td><td>' + representant + '</td>')
-	// 			$("#interessats-ripea>tbody").append(fila);
-	// 		} else {
-	// 			// Actualitzar fila
-	// 			row.find('td:first').text(interessatDistribucio.documentNom);
-	// 			if (isNullOrEmpty(representantDistribucio)) {
-	// 				row.find('td:nth-child(2)').text('--');
-	// 			} else {
-	// 				row.find('td:nth-child(2)').text(representantDistribucio.documentNom);
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// const getInteressatDistribucio = (docnum) => {
-	// 	var result = $.grep(interessatsDistr, function (e) {
-	// 		return e.documentNumero == docnum;
-	// 	});
-	// 	if (result.length == 0) {
-	// 		return null;
-	// 	} else {
-	// 		return result[0];
-	// 	}
-	// }
-
-	// const getRowWithInteressatDoc = (docnum) => {
-	// 	let selectedRow = null;
-	// 	$("#interessats-ripea>tbody>tr").each(function () {
-	// 		if ($(this).find("td:first").data('docnum') == docnum) {
-	// 			selectedRow = $(this);
-	// 		}
-	// 	});
-	// 	return selectedRow;
-	// }
-
-	// const updateAccionsInteressatsDistribucio = () => {
-	<%--	if (${isCrearNewExpedient}) {--%>
-	// 		$('#interessats-distribucio>tbody>tr').each(function () {
-	// 			const selectAccions = $(this).find('td:nth-child(3)').find('select');
-	// 			$('option[value="ASSOCIAR_SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	// 			$('option[value="SOBREESCRIURE"]', selectAccions).remove();
-	// 			$('option[value="SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	// 		});
-	// 	} else {
-	// 		$('#interessats-distribucio>tbody>tr').each(function () {
-	// 			const interessatDocNum = $(this).find('td:first').data("docnum");
-	// 			const representantDocNum = $(this).find('td:nth-child(2)').data("docnum");
-	// 			const interessatOvewritten = getInteressatRipea(interessatDocNum);
-	// 			const isRepresentantOvewritten = $.inArray(representantDocNum, interessatsOverw) !== -1;
-	//
-	// 			const selectAccions = $(this).find('td:nth-child(3)').find('select');
-	//
-	// 			if (interessatOvewritten != null) {
-	//				// Si existeix l'interessat eliminam la opció d'associar nou interessat
-	//				$('option[value="ASSOCIAR"]', selectAccions).remove();
-	// 				$('option[value="ASSOCIAR_SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	//				// Si l'interessat té un representant diferent al que arriba,
-	//				// o actualment té representant, i arriba sense, eliminam la opció de Actualitzar dades
-	// 				const representantRipea = interessatOvewritten.representant;
-	//
-	// 				if (!sameRepresentant(representantRipea, representantDocNum)) {
-	// 					$('option[value="SOBREESCRIURE"]', selectAccions).remove();
-	// 				} else {
-	// 					$('option[value="SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	// 				}
-	// 			} else if (isRepresentantOvewritten) {
-	//				// Si el representant existeix deixam únicament les opcions d'Associar nou interessat i actualitzar representant i no associar
-	// 				$('option[value="ASSOCIAR"]', selectAccions).remove();
-	// 				$('option[value="SOBREESCRIURE"]', selectAccions).remove();
-	// 				$('option[value="SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	// 			} else {
-	// 				$('option[value="ASSOCIAR_SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	// 				$('option[value="SOBREESCRIURE"]', selectAccions).remove();
-	// 				$('option[value="SOBREESCRIURE_REPRESENTANT"]', selectAccions).remove();
-	// 			}
-	// 		});
-	// 	}
-	// }
-
-	// const getInteressatRipea = (docnum) => {
-	// 	var result = $.grep(interessatsRipea, function (e) {
-	// 		return e.documentNum == docnum;
-	// 	});
-	// 	if (result.length == 0) {
-	// 		return null;
-	// 	} else {
-	// 		return result[0];
-	// 	}
-	// }
-	// const sameRepresentant = (representantRipea, codiRepresentantDistribucio) => {
-	// 	if (representantRipea === null || Object.keys(representantRipea).length === 0) {
-	// 		return isNullOrEmpty(codiRepresentantDistribucio);
-	// 	} else {
-	// 		return representantRipea.documentNum === codiRepresentantDistribucio;
-	// 	}
-	// }
-
-	// const isAttrributeNullOrEmpty = (obj, attr) => {
-	// 	return (obj[attr] === null || obj[attr] === '' || typeof obj[attr] === 'undefined');
-	// }
-	// const isNullOrEmpty = (obj) => {
-	// 	return (obj === null || obj === '' || typeof obj === 'undefined');
-	// }
 </script>
 
 </head>
@@ -184,8 +67,8 @@
 			<table id="interessats-ripea" class="table table-bordered table-striped font-decresed">
 				<thead>
 				<tr>
-					<td><spring:message code="contingut.interessat.info.interessat"/></td>
-					<td><spring:message code="contingut.interessat.info.representant"/></td>
+					<td colspan="3"><strong><spring:message code="contingut.interessat.info.interessat"/></strong></td>
+					<td colspan="3"><strong><spring:message code="contingut.interessat.info.representant"/></strong></td>
 				</tr>
 				</thead>
 				<tbody>
@@ -193,16 +76,19 @@
 					<c:if test="${!interessatRipea.esRepresentant}">
 						<c:set var="interessatsOv" value="${documentInteressatsOverwritten}" />
 						<tr <c:if test="${fn:contains(interessatsOv, interessatRipea.documentNum) or (interessatRipea.representant != null and fn:contains(interessatsOv, interessatRipea.representant.documentNum))}">class="int-ov"</c:if>>
-							<td data-docnum="${interessatRipea.documentNum}">${interessatRipea.nomCompletAmbDocument}</td>
-							<td>
-								<c:choose>
-									<c:when test="${!empty interessatRipea.representant}">
-										${interessatRipea.representant.nomCompletAmbDocument}
-									</c:when>
-									<c:otherwise>
-										--
-									</c:otherwise>
-								</c:choose>
+							<td data-docnum="${interessatRipea.documentNum}" style="width: 140px;"><spring:message code="registre.interessat.tipus.enum.${interessatRipea.tipus}"/></td>
+							<td style="width: 120px;">${interessatRipea.documentNum}</td>
+							<td style="width: calc(50% - 260px);">${interessatRipea.nomComplet}</td>
+							<c:choose>
+								<c:when test="${!empty interessatRipea.representant}">
+									<td style="width: 140px;"><spring:message code="registre.interessat.tipus.enum.${interessatRipea.representant.tipus}"/></td>
+									<td style="width: 120px;">${interessatRipea.representant.documentNum}</td>
+									<td style="width: calc(50% - 260px);">${interessatRipea.representant.nomComplet}</td>
+								</c:when>
+								<c:otherwise>
+									<td colspan="3">--</td>
+								</c:otherwise>
+							</c:choose>
 							</td>
 						</tr>
 					</c:if>
@@ -219,21 +105,25 @@
 				<table id="interessats-distribucio" class="table table-bordered table-striped">
 					<thead>
 					<tr>
-						<td style="width: 35%;"><spring:message code="contingut.interessat.info.interessat"/></td>
-						<td style="width: 35%;"><spring:message code="contingut.interessat.info.representant"/></td>
-						<td></td>
+						<td colspan="3" style="width: calc(50% - 100px);"><strong><spring:message code="contingut.interessat.info.interessat"/></strong></td>
+						<td colspan="3" style="width: calc(50% - 100px);"><strong><spring:message code="contingut.interessat.info.representant"/></strong></td>
+						<td style="width: 200px;"></td>
 					</tr>
 					</thead>
 					<tbody>
 					<c:forEach items="${interessatsDistribucio}" var="interessatDistribucio" varStatus="status">
 						<tr>
-							<td data-docnum="${interessatDistribucio.documentNumero}">${interessatDistribucio.documentNom}</td>
+							<td data-docnum="${interessatDistribucio.documentNumero}" style="width: 140px;"><spring:message code="registre.interessat.tipus.enum.${interessatDistribucio.tipus}"/></td>
+							<td style="width: 120px;">${interessatDistribucio.documentNumero}</td>
+							<td >${interessatDistribucio.nomSencer}</td>
 							<c:choose>
 								<c:when test="${!empty interessatDistribucio.representant}">
-									<td data-docnum="${interessatDistribucio.representant.documentNumero}">${interessatDistribucio.representant.documentNom}</td>
+									<td data-docnum="${interessatDistribucio.representant.documentNumero}" style="width: 140px;"><spring:message code="registre.interessat.tipus.enum.${interessatDistribucio.representant.tipus}"/></td>
+									<td style="width: 120px;">${interessatDistribucio.representant.documentNumero}</td>
+									<td style="width: calc(50% - 360px);">${interessatDistribucio.representant.nomSencer}</td>
 								</c:when>
 								<c:otherwise>
-									<td data-docnum="">--</td>
+									<td data-docnum="" colspan="3">--</td>
 								</c:otherwise>
 							</c:choose>
 							<td style="padding: 8px 24px;">
@@ -247,7 +137,7 @@
 			</c:when>
 			<c:otherwise>
 				<div class="well"> 
-					<spring:message code="registre.annex.buit"/>
+					<spring:message code="registre.interessat.buit"/>
 				</div>
 				<div style="min-height: 50px;"></div>
 			</c:otherwise>
