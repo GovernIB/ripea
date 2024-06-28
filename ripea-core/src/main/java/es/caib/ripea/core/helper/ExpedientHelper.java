@@ -715,7 +715,7 @@ public class ExpedientHelper {
 				null, 
 				arxiuUuid, 
 				null, 
-				false, 
+				true, 
 				false);
 		//registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
@@ -804,7 +804,7 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
 		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
-		if (isCarpetaActive) {
+		if (isCarpetaActive && ! contingutHelper.isCarpetaLogica()) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
