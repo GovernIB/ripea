@@ -1872,6 +1872,15 @@ public class ContingutHelper {
 						desti.getArxiuUuid(),
 						uuidExpedientDesti);
 			}
+			
+			// Si està activada la carpeta lògica moure sempre a l'expedient
+			if (desti instanceof CarpetaEntity && isCarpetaLogica()) {
+				identificador = pluginHelper.arxiuDocumentMoure(
+						uuid,
+						null,
+						uuidExpedientDesti);
+			}
+			
 			return identificador;
 	}
 
