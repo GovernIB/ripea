@@ -3,16 +3,15 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Declaració dels mètodes per a gestionar enviaments dels expedients.
@@ -35,7 +34,7 @@ public interface DocumentEnviamentService {
 	 * @throws NotFoundException
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
-	public void notificacioCreate(
+	public Map<String, String>  notificacioCreate(
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacio) throws NotFoundException;
@@ -235,15 +234,6 @@ public interface DocumentEnviamentService {
 	DocumentNotificacioDto notificacioFindAmbIdAndExpedient(Long entitatId,
 			Long expedientId,
 			Long notificacioId);
-
-	Map<String, String> consultaErrorsNotificacio();
-
-
-
-//	/**
-//	 * Actualitza l'estat de les notificacions pendents de forma periòdica.
-//	 */
-//	public void notificacioActualitzarEstat();
 
 	@PreAuthorize("hasRole('tothom')")
 	public boolean checkIfAnyInteressatIsAdministracio(List<Long> interessatsIds);

@@ -3,16 +3,6 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
@@ -39,6 +29,15 @@ import es.caib.ripea.core.repository.DocumentNotificacioRepository;
 import es.caib.ripea.core.repository.DocumentPublicacioRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.InteressatRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació dels mètodes per a gestionar els enviaments
@@ -72,7 +71,7 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 
 	@Transactional
 	@Override
-	public void notificacioCreate(
+	public Map<String, String> notificacioCreate(
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacioDto) {
@@ -86,11 +85,13 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 				documentId,
 				false,
 				true);
-		documentNotificacioHelper.crear(notificacioDto, documentEntity);
+		Map<String, String> errorsNotificant = documentNotificacioHelper.crear(notificacioDto, documentEntity);
 		
 		if (documentEntity.getFitxerContentType().equals("application/zip")) {
 			documentFirmaServidorFirma.doFirmar(documentEntity.getId(), "Firma de document zip generat per notificar múltiples documents");
 		}
+
+		return errorsNotificant;
 		
 	}
 	
@@ -124,12 +125,6 @@ public class DocumentEnviamentServiceImpl implements DocumentEnviamentService {
 		return doc.getFitxerContentType().equals("application/zip");
 	}
 	
-	@Transactional
-	@Override
-	public Map<String, String> consultaErrorsNotificacio() {
-		return documentNotificacioHelper.consultaErrorsNotificacio();
-	}
-
 	@Transactional
 	@Override
 	public DocumentNotificacioDto notificacioUpdate(

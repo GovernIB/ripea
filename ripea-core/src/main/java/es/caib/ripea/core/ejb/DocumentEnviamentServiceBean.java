@@ -3,22 +3,20 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -35,11 +33,11 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void notificacioCreate(
+	public Map<String, String>  notificacioCreate(
 			Long entitatId,
 			Long documentId,
 			DocumentNotificacioDto notificacio) {
-		 delegate.notificacioCreate(
+		 return delegate.notificacioCreate(
 				entitatId,
 				documentId,
 				notificacio);
@@ -186,12 +184,6 @@ public class DocumentEnviamentServiceBean implements DocumentEnviamentService {
 			Long expedientId,
 			Long notificacioId) {
 		return delegate.notificacioFindAmbIdAndExpedient(entitatId, expedientId, notificacioId);
-	}
-
-	@Override
-	@RolesAllowed("tothom")
-	public Map<String, String> consultaErrorsNotificacio() {
-		return delegate.consultaErrorsNotificacio();
 	}
 
 	@Override

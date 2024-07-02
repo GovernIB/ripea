@@ -1,13 +1,5 @@
 package es.caib.ripea.core.helper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
@@ -28,6 +20,13 @@ import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.repository.DocumentEnviamentInteressatRepository;
 import es.caib.ripea.core.repository.DocumentNotificacioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Utilitat per gestionar l'enviament de notificacions dels documents d'expedients
@@ -56,9 +55,7 @@ public class DocumentNotificacioHelper {
 	@Autowired
 	private DocumentNotificacioInteressatHelper documentNotificacioInteressatHelper;
 
-	public Map<String, String> notificacionsWithError = new HashMap<String, String>();
-	
-	public void crear(
+	public Map<String, String> crear(
 			DocumentNotificacioDto notificacioDto, 
 			DocumentEntity documentEntity) {
 		ExpedientEntity expedientEntity = validateExpedientPerNotificacio(documentEntity, 
@@ -67,8 +64,8 @@ public class DocumentNotificacioHelper {
 		if (!documentEntity.isArxiuEstatDefinitiu() && documentEntity.getDocumentTipus() != DocumentTipusEnumDto.VIRTUAL && !documentEntity.getFitxerContentType().equals("application/zip")) {
 			documentHelper.actualitzarEstatADefinititu(documentEntity.getId());
 		}
-		
-		notificacionsWithError = new HashMap<String, String>();
+
+		Map<String, String> notificacionsWithError = new HashMap<>();
 		for (Long interessatId : notificacioDto.getInteressatsIds()) {
 			documentNotificacioInteressatHelper.crearEnviarNotificacioInteressat(
 					notificacionsWithError,
@@ -77,9 +74,6 @@ public class DocumentNotificacioHelper {
 					documentEntity, 
 					interessatId);
 		}
-	}
-	
-	public Map<String, String> consultaErrorsNotificacio() {
 		return notificacionsWithError;
 	}
 	
