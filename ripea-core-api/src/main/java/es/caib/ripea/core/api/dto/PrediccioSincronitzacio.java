@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.map.MultiValueMap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -18,12 +16,12 @@ import java.util.List;
 @NoArgsConstructor
 public class PrediccioSincronitzacio {
 
-    MultiMap splitMap = new MultiValueMap();
-    MultiMap mergeMap = new MultiValueMap();
-    MultiMap substMap = new MultiValueMap();
-    List<UnitatOrganitzativaDto> unitatsVigents = new ArrayList<>();
-    List<UnitatOrganitzativaDto> unitatsNew = new ArrayList<>();
-    List<UnitatOrganitzativaDto> unitatsExtingides = new ArrayList<>();
+    MultiMap splitMap;
+    MultiMap mergeMap;
+    MultiMap substMap;
+    List<UnitatOrganitzativaDto> unitatsVigents;
+    List<UnitatOrganitzativaDto> unitatsNew;
+    List<UnitatOrganitzativaDto> unitatsExtingides;
     boolean isFirstSincronization;
     boolean noCanvis;
 }

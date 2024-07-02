@@ -16,7 +16,7 @@ import java.util.List;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter @Setter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 public class EntitatDto extends AuditoriaDto {
 
 	private Long id;

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -19,7 +18,7 @@ public class OrganismeDto implements Serializable{
 	private String codi;
 	private String nom;
 	private String pare;
-	private List<String> fills = new ArrayList<>();
+	private List<String> fills;
 	private Boolean sir;
 	private OrganEstatEnumDto estat;
 

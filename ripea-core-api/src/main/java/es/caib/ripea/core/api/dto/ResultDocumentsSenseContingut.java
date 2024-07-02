@@ -40,7 +40,7 @@ public class ResultDocumentsSenseContingut {
         String carpeta;
         List<String> documentsCarpeta;
 
-        boolean error = false;
+        boolean error;
         String errorMessage;
     }
 }

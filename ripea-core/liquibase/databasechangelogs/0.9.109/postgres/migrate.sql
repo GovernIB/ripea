@@ -2,8 +2,8 @@
 -- Update Database Script
 -- *********************************************************************
 -- Change Log: db/changelog/db.changelog-master.yaml
--- Ran at: 01/07/24 11:15
--- Against: null@offline:oracle?changeLogFile=liquibase/databasechangelog.csv
+-- Ran at: 01/07/24 11:18
+-- Against: null@offline:postgresql?changeLogFile=liquibase/databasechangelog.csv
 -- Liquibase version: 4.4.3
 -- *********************************************************************
 
@@ -14,9 +14,9 @@ INSERT INTO ipa_config (key, value, description, group_code, position, jboss_pro
 UPDATE ipa_config SET key = 'es.caib.ripea.plugin.arxiu.caib.csv_generation_definition' WHERE key='es.caib.ripea.plugin.arxiu.caib.csv.definicio';
 
 -- Changeset db/changelog/changes/0.9.109/1486.yaml::1716384985679-2::limit
-ALTER TABLE ipa_expedient_tasca ADD titol VARCHAR2(256 CHAR);
+ALTER TABLE ipa_expedient_tasca ADD titol VARCHAR(256);
 
-ALTER TABLE ipa_expedient_tasca ADD observacions VARCHAR2(1024 CHAR);
+ALTER TABLE ipa_expedient_tasca ADD observacions VARCHAR(1024);
 
 -- Changeset db/changelog/changes/0.9.109/1497.yaml::1718262082962-1::limit
 ALTER TABLE IPA_INTERESSAT ADD CONSTRAINT IPA_INTERESSAT_EXP_UK UNIQUE (DOCUMENT_NUM, EXPEDIENT_ID);

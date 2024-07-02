@@ -3,12 +3,13 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import lombok.Data;
 
 /**
  * DTO amb informació d'una execució massiva
@@ -17,6 +18,7 @@ import lombok.Data;
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 
 

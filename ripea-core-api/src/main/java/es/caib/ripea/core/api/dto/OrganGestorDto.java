@@ -3,18 +3,18 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.List;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * Informació d'una dada.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter
 public class OrganGestorDto extends AuditoriaDto {

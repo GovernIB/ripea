@@ -11,11 +11,36 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.entity.DominiEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.HistoricExpedientEntity;
+import es.caib.ripea.core.entity.HistoricInteressatEntity;
+import es.caib.ripea.core.entity.HistoricUsuariEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.helper.*;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PaginacioHelper.ConverterParam;
-import es.caib.ripea.core.repository.*;
+import es.caib.ripea.core.repository.DominiRepository;
+import es.caib.ripea.core.repository.ExpedientEstatRepository;
+import es.caib.ripea.core.repository.ExpedientRepository;
+import es.caib.ripea.core.repository.GrupRepository;
+import es.caib.ripea.core.repository.MetaDocumentRepository;
+import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
+import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
+import es.caib.ripea.core.repository.MetaExpedientRepository;
+import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
+import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
 import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
@@ -102,8 +127,6 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	private HistoricInteressatRepository historicInteressatRepository;
 	@Autowired
 	private HistoricUsuariRepository historicUsuariRepository;
-	@Autowired
-	private EmailHelper emailHelper;
 	@Autowired
 	private DistribucioReglaHelper distribucioReglaHelper;
 	@Autowired
@@ -490,7 +513,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			if (metaExpedient.getOrganGestor() != null) {
 				resposta.setOrganEstat(metaExpedient.getOrganGestor().getEstat());
 				resposta.setOrganTipusTransicio(metaExpedient.getOrganGestor().getTipusTransicio());
-				resposta.setOrgansNous(conversioTipusHelper.convertirList(metaExpedient.getOrganGestor().getNous(), OrganGestorDto.class));  
+				resposta.setOrgansNous(conversioTipusHelper.convertirList(metaExpedient.getOrganGestor().getNous(), OrganGestorDto.class));
 			}
 		}
 		return resposta;
@@ -747,7 +770,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 			Long organGestorId,
 			MetaExpedientFiltreDto filtre,
 			boolean isRolActualAdministradorOrgan,
-			PaginacioParamsDto paginacioParams, 
+			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			boolean hasPermisAdmComu) {
 		PaginaDto<MetaExpedientDto> resposta = null;
@@ -1145,7 +1168,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 		
-		List<MetaExpedientComentariEntity> expcoms = 
+		List<MetaExpedientComentariEntity> expcoms =
 				metaExpedientComentariRepository.findByMetaExpedientOrderByCreatedDateAsc(metaExpedient);
 
 		return conversioTipusHelper.convertirList(

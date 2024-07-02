@@ -844,7 +844,7 @@ public class EntityComprovarHelper {
 	/**
 	 * checking if expedient estat has modify permissions
 	 * 
-	 * @param estatId
+	 * @param metaExpedientId
 	 * @return
 	 */
 	public boolean hasMetaExpedientWritePermissons(Long metaExpedientId) {
