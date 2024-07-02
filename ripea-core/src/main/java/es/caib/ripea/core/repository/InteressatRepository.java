@@ -30,21 +30,9 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 
 	InteressatEntity findByExpedientAndDocumentNum(ExpedientEntity expedient, String documentNum);
 
-	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.documentNum = :documentNum")
-	InteressatEntity findByExpedientIdAndDocumentNum(
-			@Param("expedientId")Long expedientId,
-			@Param("documentNum")String documentNum);
-
-	@Query(value = "SELECT i FROM InteressatEntity i WHERE i.expedient.id = :expedientId AND i.representant.documentNum = :documentNum")
-	List<InteressatEntity> findByExpedientIdAndRepresentantDocumentNum(
-			@Param("expedientId")Long expedientId,
-			@Param("documentNum")String documentNum);
-
 	List<InteressatEntity> findByExpedient(ExpedientEntity expedient);
 
-	InteressatEntity findByExpedientAndId(
-			ExpedientEntity expedient,
-			Long id);
+	InteressatEntity findByExpedientAndId(ExpedientEntity expedient, Long id);
 
 	List<InteressatEntity> findByDocumentNum(String documentNum);
 
@@ -104,7 +92,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	List<InteressatPersonaJuridicaEntity> findPersJuridByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
 			@Param("expedient") ExpedientEntity expedient);
 	
-	
 	@Query(	  "select "
 			+ "    inter "
 			+ "from "
@@ -119,8 +106,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "    inter.id asc")
 	List<InteressatAdministracioEntity> findAdminByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(
 			@Param("expedient") ExpedientEntity expedient);
-	
-	
 	
 	@Query(	  "select "
 			+ "    count(inter) "
@@ -199,8 +184,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			+ "order by "
 			+ "    inter.id asc")
 	List<InteressatEntity> findByText(String text);
-	
-	
+
 	@Query(	"select " +
 			"    i " +
 			"from " +
@@ -212,10 +196,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			"order by i.arxiuIntentData asc")
 	public List<InteressatEntity> findInteressatsPendentsArxiu(
 			@Param("arxiuMaxReintents") int arxiuMaxReintents);
-	
 
-	
-	
 	@Query(	"select " +
 			"    i " +
 			"from " +
@@ -252,7 +233,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("creacioFi") Date creacioFi,
 			Pageable pageable);
 	
-	
 	@Query(	"select " +
 			"    i.id " +
 			"from " +
@@ -287,7 +267,6 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 			@Param("creacioInici") Date creacioInici,
 			@Param("esNullCreacioFi") boolean esNullCreacioFi,
 			@Param("creacioFi") Date creacioFi);
-
 
 	@Query(	"select count(i.id) " +
 			"from InteressatEntity i " +
