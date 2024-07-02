@@ -278,7 +278,9 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 	List<MetaExpedientEntity> findProcedimentsComunsActive(
 			@Param("entitat") EntitatEntity entitat);
 
-	@Query(	"from" +
+	@Query(	"select " +
+			"   me " +
+			"from" +
 			"    MetaExpedientEntity me " +
 			"	left outer join me.organGestor og " +
 			"where " +

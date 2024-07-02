@@ -127,10 +127,10 @@ $(document).ready(function() {
 	<div class="text-right" data-toggle="botons-titol">
 		<a class="btn btn-default" href="grup/new" data-toggle="modal" data-datatable-id="grup"><span class="fa fa-plus"></span>&nbsp;<spring:message code="grup.boto.nou"/></a>
 	</div>
-	<table 
+	<table
 		id="grup"
-		data-toggle="datatable" 
-		data-url="<c:url value="/grup/datatable"/>" 
+		data-toggle="datatable"
+		data-url="<c:url value="/grup/datatable"/>"
 		class="table table-striped table-bordered"
 		data-default-order="0" <%-- default column number to be sorted  --%>
 		data-default-dir="asc" <%-- default ordering direction  --%>
@@ -147,7 +147,7 @@ $(document).ready(function() {
 							<a href="grupPermis/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="grup.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 						</script>
 					</th>
-				</c:if>>
+				</c:if>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

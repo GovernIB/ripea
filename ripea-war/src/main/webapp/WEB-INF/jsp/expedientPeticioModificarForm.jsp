@@ -51,7 +51,7 @@ $(document).ready(function() {
 
 function refrescarGrup(firstTime) {
 	$("#grupId").empty();
-	
+	debugger
 	const metaExpedientId = $('#metaExpedientId').val();
 	if (metaExpedientId != undefined ) {
 
@@ -60,7 +60,7 @@ function refrescarGrup(firstTime) {
 	        type: "GET",
 	        url: findUrl,
 	        success: function (data) {
-		        
+		        debugger
 
 	        	if (data != undefined && data != 0) {
 

@@ -21,6 +21,7 @@ import es.caib.ripea.core.helper.EntityComprovarHelper;
 import es.caib.ripea.core.helper.GrupHelper;
 import es.caib.ripea.core.helper.HibernateHelper;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.OrganGestorCacheHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PermisosHelper;
@@ -73,9 +74,10 @@ public class GrupServiceImpl implements GrupService {
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
 	private CacheHelper cacheHelper;
+    @Autowired
+    private OrganGestorCacheHelper organGestorCacheHelper;
 
-	
-	
+
 	@Transactional
 	@Override
 	public GrupDto create(
@@ -164,20 +166,26 @@ public class GrupServiceImpl implements GrupService {
 			Long metaExpedientId, 
 			PaginacioParamsDto paginacioParams, 
 			Long organId) throws NotFoundException {
+
+		List<String> codisOrgansFills = null;
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
 				false,
 				false, false, false);
 
+		if (organId != null) {
+			OrganGestorEntity organ = organGestorRepository.findOne(organId);
+			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+		}
 		Page<GrupEntity> page = grupRepository.findByEntitatAndProcediment(
 				entitat,
 				paginacioParams.getFiltre() == null,
 				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 				metaExpedientId == null,
 				metaExpedientId,
-				organId == null,
-				organId,
+				codisOrgansFills == null,
+				codisOrgansFills,
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 		
 		
@@ -219,10 +227,14 @@ public class GrupServiceImpl implements GrupService {
 			GrupFiltreDto filtre, 
 			ResultEnumDto resultEnum) throws NotFoundException {
 		
-		ResultDto<GrupDto> result = new ResultDto<GrupDto>();
-		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId);
+		ResultDto<GrupDto> result = new ResultDto<>();
+		List<String> codisOrgansFills = null;
+
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		if (organId != null) {
+			OrganGestorEntity organ = organGestorRepository.findOne(organId);
+			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+		}
 
 		if (resultEnum == ResultEnumDto.PAGE) {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
@@ -237,8 +249,10 @@ public class GrupServiceImpl implements GrupService {
 					metaExpedientId,
 					filtre.getOrganGestorAscendentId() == null,
 					filtre.getOrganGestorAscendentId(),
-					organId == null,
-					organId,
+//					organId == null,
+//					organId,
+					codisOrgansFills == null,
+					codisOrgansFills,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 			
 			PaginaDto<GrupDto> pageDto = null;
@@ -280,8 +294,10 @@ public class GrupServiceImpl implements GrupService {
 					metaExpedientId,
 					filtre.getOrganGestorAscendentId() == null,
 					filtre.getOrganGestorAscendentId(),
-					organId == null,
-					organId);
+//					organId == null,
+//					organId);
+					codisOrgansFills == null,
+					codisOrgansFills);
 			
 			result.setIds(ids);
 			
@@ -492,15 +508,20 @@ public class GrupServiceImpl implements GrupService {
 			Long organGestorId,
 			Long metaExpedientId) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
+		List<String> codisOrgansFills = null;
+
+		if (organGestorId != null) {
+			OrganGestorEntity organ = organGestorRepository.findOne(organGestorId);
+			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+		}
 		
 		List<GrupEntity> grups = grupRepository.findByEntitatAndOrgan(
 				entitat,
 				metaExpedientId == null,
 				metaExpedientId,
-				organGestorId == null,
-				organGestorId);
+				codisOrgansFills == null,
+				codisOrgansFills);
 		
 		return conversioTipusHelper.convertirList(
 				grups, 
@@ -515,8 +536,7 @@ public class GrupServiceImpl implements GrupService {
 			String rolActual, 
 			Long organGestorId) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
-				entitatId);
+		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId);
 		
 		List<GrupEntity> grups = new ArrayList<>();
 		
@@ -539,12 +559,20 @@ public class GrupServiceImpl implements GrupService {
 		}
 		
 		if (isAnyGestioAmbGrupsActiva) {
+
+			List<String> codisOrgansFills = null;
+
+			if (organGestorId != null) {
+				OrganGestorEntity organ = organGestorRepository.findOne(organGestorId);
+				codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+			}
+
 			grups = grupRepository.findByEntitatAndOrgan(
 					entitat,
 					true,
 					null,
-					organGestorId == null,
-					organGestorId);
+					codisOrgansFills == null,
+					codisOrgansFills);
 			if ("tothom".equals(rolActual)) {
 				permisosHelper.filterGrantedAny(
 						grups,
