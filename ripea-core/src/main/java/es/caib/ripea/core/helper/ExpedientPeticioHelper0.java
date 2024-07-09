@@ -3,15 +3,6 @@
  */
 package es.caib.ripea.core.helper;
 
-import javax.annotation.Resource;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreEntrada;
 import es.caib.distribucio.rest.client.integracio.domini.AnotacioRegistreId;
 import es.caib.distribucio.rest.client.integracio.domini.Estat;
@@ -26,6 +17,14 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.repository.RegistreInteressatRepository;
 import es.caib.ripea.core.repository.RegistreRepository;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 
 @Component
@@ -140,7 +139,7 @@ public class ExpedientPeticioHelper0 {
 				
 				EntitatEntity entitatAnotacio = entitatRepository.findByUnitatArrel(registre.getEntitatCodi());
 				if (entitatAnotacio != null)
-					cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+					cacheHelper.evictAllCountAnotacionsPendents();
 				
 				if (cacheHelper.mostrarLogsRendimentDescarregarAnotacio())
 					logger.info("anotacioGuardar evictCountAnotacionsPendents end (" + identificador + ", " + expedientPeticioId + "):  " + (System.currentTimeMillis() - t5) + " ms");

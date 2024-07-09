@@ -3,22 +3,20 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.service.EntitatService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.List;
 
 /**
  * Implementació de EntitatService com a EJB que empra una clase
@@ -165,5 +163,11 @@ public class EntitatServiceBean implements EntitatService {
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		delegate.setConfigEntitat(entitatDto);		
 	}
-	
+
+    @Override
+	@RolesAllowed("tothom")
+    public void removeEntitatPerDefecteUsuari(String usuariCodi) {
+        delegate.removeEntitatPerDefecteUsuari(usuariCodi);
+    }
+
 }

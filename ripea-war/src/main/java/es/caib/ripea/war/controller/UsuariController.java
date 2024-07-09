@@ -244,6 +244,7 @@ public class UsuariController  extends BaseAdminController {
 		aplicacioService.evictRolsDisponiblesEnAcls();
 		entitatService.evictEntitatsAccessiblesUsuari();
 		aplicacioService.evictRolsPerUsuari(usuari.getCodi());
+		aplicacioService.evictCountAnotacionsPendents(usuari.getCodi());
 		
 		// Es itera sobre totes les cookies
 		for(Cookie c : request.getCookies()) {

@@ -3,20 +3,19 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-import java.util.Properties;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import es.caib.ripea.core.api.dto.IntegracioAccioDto;
 import es.caib.ripea.core.api.dto.IntegracioDto;
+import es.caib.ripea.core.api.dto.IntegracioFiltreDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Declaració dels mètodes comuns de l'aplicació.
@@ -194,6 +193,9 @@ public interface AplicacioService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public void evictRolsPerUsuari(String usuariCodi);
+
+	@PreAuthorize("hasRole('tothom')")
+	public void evictCountAnotacionsPendents(String usuariCodi);
 
 	public boolean mostrarLogsRendiment();
 

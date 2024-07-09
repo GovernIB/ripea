@@ -526,7 +526,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		}
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null)
-			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+			cacheHelper.evictAllCountAnotacionsPendents();
 	}
 	
 	
@@ -534,7 +534,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Override
 	public void evictCountAnotacionsPendents(Long entitatId) {
 		EntitatEntity entitat = entitatRepository.findOne(entitatId);
-		cacheHelper.evictCountAnotacionsPendents(entitat);
+		cacheHelper.evictAllCountAnotacionsPendents();
 	}
 	
 	

@@ -32,29 +32,17 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			"    GrupEntity grup " +
 			"    left join grup.metaExpedients me " +
 			"    left join grup.organGestor og " +
-//			"    left join og.pare pare1 " +
-//			"    left join pare1.pare pare2 " +
-//			"	 left join pare2.pare pare3 " +
-//			"	 left join pare3.pare pare4 " +
 			"where " +
 			"    grup.entitat = :entitat " +
 			"and (:esNullProcedimentId = true or me.id = :procedimentId) " +
 			"and (:esNullFiltre = true or lower(grup.rol) like lower('%'||:filtre||'%') or lower(grup.descripcio) like lower('%'||:filtre||'%')) " +
 			"and (:esNullOrgansFills = true or og.codi in (:organsFills))")
-//			"and (:esNullOrganGestorId = true " +
-//			"	  or og.id = :organGestorId " +
-//			"     or pare1.id = :organGestorId " +
-//			"     or pare2.id = :organGestorId " +
-//			"     or pare3.id = :organGestorId " +
-//			"     or pare4.id = :organGestorId)")
 	Page<GrupEntity> findByEntitatAndProcediment(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			@Param("esNullProcedimentId") boolean esNullProcedimentId,
 			@Param("procedimentId") Long procedimentId,	
-//			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
-//			@Param("organGestorId") Long organGestorId,
 			@Param("esNullOrgansFills") boolean esNullOrgansFills,
 			@Param("organsFills") List<String> organsFills,
 			Pageable pageable);
@@ -121,26 +109,14 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			"    GrupEntity grup " +
 			"    left join grup.metaExpedients me " +
 			"    left join grup.organGestor og " +
-//			"    left join og.pare pare1 " +
-//			"    left join pare1.pare pare2 " +
-//			"	 left join pare2.pare pare3 " +
-//			"	 left join pare3.pare pare4 " +
 			"where " +
 			"    grup.entitat = :entitat " +
 			"and (:esNullProcedimentId = true or me.id = :procedimentId) " +
 			"and (:esNullOrgansFills = true or og.codi in (:organsFills))")
-//			"and (:esNullOrganGestorId = true " +
-//			"	  or og.id = :organGestorId " +
-//			"     or pare1.id = :organGestorId " +
-//			"     or pare2.id = :organGestorId " +
-//			"     or pare3.id = :organGestorId " +
-//			"     or pare4.id = :organGestorId)")
 	List<GrupEntity> findByEntitatAndOrgan(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullProcedimentId") boolean esNullProcedimentId,
 			@Param("procedimentId") Long procedimentId,	
-//			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
-//			@Param("organGestorId") Long organGestorId,
 			@Param("esNullOrgansFills") boolean esNullOrgansFills,
 			@Param("organsFills") List<String> organsFills);
 

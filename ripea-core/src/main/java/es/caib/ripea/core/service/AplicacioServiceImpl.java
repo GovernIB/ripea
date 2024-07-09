@@ -158,6 +158,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
 		usuari.updateRolActual(rolActual);
+
+		cacheHelper.evictCountAnotacionsPendents(usuari.getCodi());
 	}
 	
 	@Transactional
@@ -324,6 +326,12 @@ public class AplicacioServiceImpl implements AplicacioService {
 	public void evictRolsPerUsuari(String usuariCodi) {
 		logger.debug("Evict rols per usuari");
 		cacheHelper.evictFindRolsAmbCodi(usuariCodi);
+	}
+
+	@Override
+	public void evictCountAnotacionsPendents(String usuariCodi) {
+		logger.debug("Evict count anotacions per usuari");
+		cacheHelper.evictCountAnotacionsPendents(usuariCodi);
 	}
 
 	@Override

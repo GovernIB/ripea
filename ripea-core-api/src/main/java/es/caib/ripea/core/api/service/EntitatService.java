@@ -3,17 +3,16 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.io.IOException;
-import java.nio.file.NoSuchFileException;
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.PermisDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.io.IOException;
+import java.nio.file.NoSuchFileException;
+import java.util.List;
 
 /**
  * Declaració dels mètodes per a la gestió d'entitats.
@@ -227,4 +226,7 @@ public interface EntitatService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public void setConfigEntitat(EntitatDto entitatDto);
+
+	@PreAuthorize("hasRole('tothom')")
+    void removeEntitatPerDefecteUsuari(String usuariCodi);
 }

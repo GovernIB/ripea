@@ -6,9 +6,11 @@ package es.caib.ripea.war.helper;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.OrganGestorDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class EntitatHelper {
 		return entitats;
 	}
 
-	public static void processarCanviEntitats(HttpServletRequest request, EntitatService entitatService) {
+	public static void processarCanviEntitats(HttpServletRequest request, EntitatService entitatService, AplicacioService aplicacioService) {
 		String canviEntitat = request.getParameter(REQUEST_PARAMETER_CANVI_ENTITAT);
 		if (canviEntitat != null && canviEntitat.length() > 0) {
 			LOGGER.debug("Processant canvi entitat (id=" + canviEntitat + ")");
@@ -56,6 +58,11 @@ public class EntitatHelper {
 					}
 				}
 			} catch (NumberFormatException ignored) {
+			}
+			String usuariCodi = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+			if (usuariCodi != null) {
+				aplicacioService.evictCountAnotacionsPendents(usuariCodi);
+				AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
 			}
 		}
 	}
@@ -72,6 +79,12 @@ public class EntitatHelper {
 				UsuariDto usuariActual = (UsuariDto)request.getSession().getAttribute(SessioHelper.SESSION_ATTRIBUTE_USUARI_ACTUAL);
 				if (usuariActual != null && usuariActual.getEntitatPerDefecteId() != null) {
 					entitatActual = entitatService.findById(usuariActual.getEntitatPerDefecteId());
+					// en cas que s'hagin eliminat els permisos sobre la entitat per defecte, l'esborram
+					if (!entitats.contains(entitatActual)) {
+						usuariActual.setEntitatPerDefecteId(null);
+						entitatService.removeEntitatPerDefecteUsuari(usuariActual.getCodi());
+						entitatActual = entitats.get(0);
+					}
 				} else {
 					entitatActual = entitats.get(0);
 				}

@@ -136,7 +136,7 @@ public class ExpedientPeticioHelper {
 		}
 		EntitatEntity entitatAnotacio = expedientPeticioEntity.getRegistre().getEntitat();
 		if (entitatAnotacio != null) {
-			cacheHelper.evictCountAnotacionsPendents(entitatAnotacio);
+			cacheHelper.evictAllCountAnotacionsPendents();
 		}
 	}
 	

@@ -3,14 +3,24 @@
  */
 package es.caib.ripea.core.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.service.EntitatService;
+import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
+import es.caib.ripea.core.helper.PermisosEntitatHelper;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.repository.EntitatRepository;
+import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +31,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermisDto;
-import es.caib.ripea.core.api.service.EntitatService;
-import es.caib.ripea.core.api.utils.Utils;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.repository.EntitatRepository;
-import es.caib.ripea.core.security.ExtendedPermission;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Implementació del servei de gestió d'entitats.
@@ -41,7 +48,8 @@ public class EntitatServiceImpl implements EntitatService {
 
 	@Autowired
 	private EntitatRepository entitatRepository;
-
+	@Autowired
+	private UsuariRepository usuariRepository;
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
 	@Autowired
@@ -281,6 +289,13 @@ public class EntitatServiceImpl implements EntitatService {
 	@Override
 	public void setConfigEntitat(EntitatDto entitatDto) {
 		ConfigHelper.setEntitat(entitatDto);		
+	}
+
+	@Transactional
+	@Override
+	public void removeEntitatPerDefecteUsuari(String usuariCodi) {
+		UsuariEntity usuari = usuariRepository.findByCodi(usuariCodi);
+		usuari.removeEntitatPerDefecte();
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(EntitatServiceImpl.class);

@@ -484,7 +484,7 @@ public class ExpedientInteressatHelper {
 
 		// Si només s'està utilitzant una vegada (en l'interessat, l'eliminam de BBDD
 		Integer usosRepresentant = interessatRepository.countByRepresentantId(representantId);
-		if (usosRepresentant <= 1) {
+		if (usosRepresentant < 1) {
 			representant.getExpedient().deleteInteressat(representant);
 			interessatRepository.delete(representant.getId());
 		}

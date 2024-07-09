@@ -3,16 +3,14 @@
  */
 package es.caib.ripea.war.helper;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.service.AplicacioService;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utilitat per a gestionar el canvi de rol de l'usuari actual.
@@ -41,6 +39,7 @@ public class RolHelper {
 				request.getSession().setAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL, canviRol);
 				aplicacioService.setRolUsuariActual(canviRol);
 			}
+			AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
 		}
 	}
 	

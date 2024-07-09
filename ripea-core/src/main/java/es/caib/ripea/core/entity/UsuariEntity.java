@@ -160,6 +160,10 @@ public class UsuariEntity implements Serializable {
 	public void updateProcediment(MetaExpedientEntity procediment) {
 		this.procediment = procediment;
 	}
+
+	public void removeEntitatPerDefecte() {
+		this.entitatPerDefecte = null;
+	}
 	
 	private static String trimAndShortenNif(String value) {
 		String valueProcessed = null;

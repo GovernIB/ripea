@@ -720,16 +720,16 @@ public class CacheHelper {
 	
 	
 
-	@Cacheable(value = "anotacionsUsuari", key="{#entitat, #rolActual, #usuariCodi, #organActualId}")
+	@Cacheable(value = "anotacionsUsuari", key="{#usuariCodi}")
 	public long countAnotacionsPendents(EntitatEntity entitat, String rolActual, String usuariCodi, Long organActualId) {
-		logger.debug("Consulta anotacions pendents de processar");
+		logger.debug("Consulta anotacions pendents de processar per l'usuari " + usuariCodi);
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
 				entitat.getId(),
 				rolActual,
 				organActualId);
 
-		return expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(
+		long numAnotacionsPendents = expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(
 				entitat,
 				rolActual,
 				permisosPerAnotacions.getProcedimentsPermesos(),
@@ -737,11 +737,18 @@ public class CacheHelper {
 				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos());
+		return numAnotacionsPendents;
 	}
 	
 	
-	@CacheEvict(value = "anotacionsUsuari", key="{#entitat, #rolActual, #usuariCodi, #organActualId}", allEntries=true)
-	public void evictCountAnotacionsPendents(EntitatEntity entitat) {
+	@CacheEvict(value = "anotacionsUsuari", key="{#usuariCodi}")
+	public void evictCountAnotacionsPendents(String usuariCodi) {
+		logger.debug("Buidant cache de número d'anotacions pendents per l'usuari " + usuariCodi);
+	}
+
+	@CacheEvict(value = "anotacionsUsuari", allEntries=true)
+	public void evictAllCountAnotacionsPendents() {
+		logger.debug("Buidant cache de número d'anotacions pendents per tots els usuaris ");
 	}
 
 	
