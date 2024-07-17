@@ -92,9 +92,11 @@
 			<tr>
 				<th data-col-name="expedient.id" data-visible="false"></th>
 				<th data-col-name="expedient.nomINumero" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.expedient"/></th>
+				<th data-col-name="titol" width="15%"><spring:message code="expedient.tasca.list.columna.titol"/></th>
+				<th data-col-name="observacions" width="15%"><spring:message code="expedient.tasca.list.columna.observacions"/></th>
 				<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
 				<th data-col-name="metaExpedientTasca.descripcio" data-orderable="false" width="30%" data-template="#cellTascaDescripcio" >
-					<spring:message code="expedient.tasca.list.columna.metaExpedientDescripcio"/>
+					<spring:message code="expedient.tasca.list.columna.metaExpedientTascaDescripcio"/>
 					<script id="cellTascaDescripcio" type="text/x-jsrender">
 						<span title="{{:metaExpedientTasca.descripcio}}">{{:metaExpedientTascaDescAbrv}}</span>
 					</script>
