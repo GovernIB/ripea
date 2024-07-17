@@ -239,7 +239,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
-					"metadocument.controller.modificat.ok");
+					"metadocument.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			metaDocumentService.create(
 					entitatActual.getId(),
@@ -255,7 +256,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
-					"metadocument.controller.creat.ok");
+					"metadocument.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -270,8 +272,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
-			
-			metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId, rolActual, organActual != null ? organActual.getId() : null);
+
+			MetaDocumentDto metaDocumentDto = metaDocumentService.delete(entitatActual.getId(), metaExpedientId, metaDocumentId, rolActual, organActual != null ? organActual.getId() : null);
 
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -279,7 +281,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
-					"metadocument.controller.esborrat.ok");
+					"metadocument.controller.esborrat.ok",
+					new Object[] { metaDocumentDto.getNom() });
 		} catch (Exception ex) {
 
 			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);
@@ -339,8 +342,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		
-		metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, true, rolActual);
+
+		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, true, rolActual);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -348,7 +351,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
-				"metadocument.controller.activat.ok");
+				"metadocument.controller.activat.ok",
+				new Object[] { metaDocumentDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/disable", method = RequestMethod.GET)
@@ -357,8 +361,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
-		
-		metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, false, rolActual);
+
+		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), metaExpedientId, metaDocumentId, false, rolActual);
 		
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
@@ -366,7 +370,8 @@ public class MetaExpedientMetaDocumentController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
-				"metadocument.controller.desactivat.ok");
+				"metadocument.controller.desactivat.ok",
+				new Object[] { metaDocumentDto.getNom() });
 	}
 	
 	@RequestMapping(value = "/{metaExpedientId}/metaDocument/{metaDocumentId}/default", method = RequestMethod.GET)

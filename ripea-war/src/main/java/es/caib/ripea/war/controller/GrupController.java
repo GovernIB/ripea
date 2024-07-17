@@ -160,7 +160,8 @@ public class GrupController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../grup",
-					"grup.controller.modificat.ok");
+					"grup.controller.modificat.ok",
+					new Object[] { command.getCodi() });
 		} else {
 			grupService.create(
 					entitatActual.getId(), 
@@ -168,7 +169,8 @@ public class GrupController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../grup",
-					"grup.controller.creat.ok");
+					"grup.controller.creat.ok",
+					new Object[] { command.getCodi() });
 		}
 	}
 	
@@ -178,13 +180,14 @@ public class GrupController extends BaseAdminController {
 			@PathVariable Long grupId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
 		try {
-			grupService.delete(
+			GrupDto grupDto = grupService.delete(
 					entitatActual.getId(),
 					grupId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../grup",
-					"grup.controller.esborrat.ok");
+					"grup.controller.esborrat.ok",
+					new Object[] { grupDto.getCodi() });
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueErrorMessage(
 					request,

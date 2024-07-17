@@ -256,13 +256,15 @@ public class OrganGestorController extends BaseUserOAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					redirectAOrganigrama != null && redirectAOrganigrama == true ? "redirect:organGestorOrganigrama" : "redirect:organgestor",
-					"organgestor.controller.modificat.ok");
+					"organgestor.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			organGestorService.create(entitatActual.getId(), OrganGestorCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:organGestor",
-					"organgestor.controller.creat.ok");
+					"organgestor.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -273,13 +275,14 @@ public class OrganGestorController extends BaseUserOAdminController {
 			@RequestParam(value = "redirectAOrganigrama", required = false) Boolean redirectAOrganigrama) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		try {
-			organGestorService.delete(
+			String organNom = organGestorService.delete(
 					entitatActual.getId(),
 					organGestorId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					redirectAOrganigrama != null && redirectAOrganigrama == true ? "redirect:../../organGestorOrganigrama" : "redirect:../../organgestor",
-					"organgestor.controller.esborrat.ok");
+					"organgestor.controller.esborrat.ok",
+					new Object[] { organNom });
 		} catch (Exception ex) {
 			logger.error("Error al esborrar organ gestor");
 			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);

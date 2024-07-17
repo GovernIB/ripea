@@ -103,7 +103,8 @@ public class ContingutCarpetaController extends BaseUserController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + contingutId,
-					"carpeta.controller.creada.ok");
+					"carpeta.controller.creada.ok",
+					new Object[] { command.getNom() });
 		} else {
 			carpetaService.update(
 					entitatActual.getId(),
@@ -112,7 +113,8 @@ public class ContingutCarpetaController extends BaseUserController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + command.getPareId(),
-					"carpeta.controller.modificada.ok");
+					"carpeta.controller.modificada.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 

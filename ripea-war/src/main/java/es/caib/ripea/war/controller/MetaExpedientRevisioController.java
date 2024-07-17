@@ -164,7 +164,7 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 			return "metaExpedientRevisioForm";
 		}
 
-		metaExpedientRevisioService.canviarEstatRevisioASellecionat(
+		MetaExpedientDto metaExpedientDto = metaExpedientRevisioService.canviarEstatRevisioASellecionat(
 				entitatActual.getId(),
 				dto,
 				RolHelper.getRolActual(request));
@@ -172,7 +172,8 @@ public class MetaExpedientRevisioController extends BaseAdminORevisorController 
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:metaExpedientRevisio",
-				"metaexpedient.revisio.controller.estat.canviat.ok");
+				"metaexpedient.revisio.controller.estat.canviat.ok",
+				new Object[] { metaExpedientDto.getNom() });
 
 	}
 

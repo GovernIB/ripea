@@ -178,7 +178,8 @@ public class ExpedientEstatController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientEstat/" + command.getMetaExpedientId(),
-					"expedient.estat.controller.modificat.ok");
+					"expedient.estat.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			expedientEstatService.createExpedientEstat(
 					entitatActual.getId(),
@@ -191,7 +192,8 @@ public class ExpedientEstatController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientEstat/" + command.getMetaExpedientId(),
-					"expedient.estat.controller.creat.ok");
+					"expedient.estat.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -229,8 +231,9 @@ public class ExpedientEstatController extends BaseAdminController {
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
+		ExpedientEstatDto expedientEstatDto = null;
 		try {
-			expedientEstatService.deleteExpedientEstat(
+			expedientEstatDto = expedientEstatService.deleteExpedientEstat(
 					entitatActual.getId(),
 					expedientEstatId, 
 					rolActual, organActual != null ? organActual.getId() : null);
@@ -246,7 +249,8 @@ public class ExpedientEstatController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:expedientEstat",
-				"expedient.estat.controller.esborrat.ok");
+				"expedient.estat.controller.esborrat.ok",
+				new Object[] { expedientEstatDto!=null?expedientEstatDto.getNom():"" });
 	}
 
 }

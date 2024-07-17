@@ -72,12 +72,14 @@ public class PinbalServeiController extends BaseUserController {
 
 		if (bindingResult.hasErrors()) {
 			return "pinbalServeiForm";
-
 		}
 		
 		pinbalServeiService.update(PinbalServeiCommand.asDto(command));
 
-		return getModalControllerReturnValueSuccess(request, "redirect:pinbalServei", "pinbalServei.controller.modificat.ok");
+		return getModalControllerReturnValueSuccess(request,
+				"redirect:pinbalServei",
+				"pinbalServei.controller.modificat.ok",
+				new Object[] { command.getCodi() });
 	}
 	
 

@@ -179,11 +179,11 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 	
 	@Transactional
 	@Override
-	public void delete(Long entitatId, Long id) {
+	public String delete(Long entitatId, Long id) {
 		logger.debug("Esborrant organ gestor (id=" + id + ")");
 		OrganGestorEntity organGestor = entityComprovarHelper.comprovarOrganGestorAdmin(entitatId, id);
-		
 		organGestorRepository.delete(organGestor);
+		return organGestor.getNom();
 	}
 	
 	

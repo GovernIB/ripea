@@ -164,7 +164,7 @@ public interface ExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void agafarUser(
+	public String agafarUser(
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
@@ -183,7 +183,7 @@ public interface ExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	public void agafarAdmin(
+	public String agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
 			Long id,
@@ -200,7 +200,7 @@ public interface ExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void alliberarUser(
+	public String alliberarUser(
 			Long entitatId,
 			Long id) throws NotFoundException;
 
@@ -237,7 +237,7 @@ public interface ExpedientService {
 	 *             Si l'expedient no conté cap document definitiu.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void tancar(
+	public String tancar(
 			Long entitatId,
 			Long id,
 			String motiu,

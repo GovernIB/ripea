@@ -1385,13 +1385,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					document.getId(),
 					command.getMetaNodeId(), 
 					tascaId);
-			
 
 			if (document.getArxiuUuid() != null) {
 				return getModalControllerReturnValueSuccess(
 						request,
 						"redirect:../../contingut/" + pareId,
-						"document.controller.creat.ok");
+						"document.controller.creat.ok",
+						new Object[] { command.getNom() });
 			} else {
 				return getModalControllerReturnValueWarning(
 						request,
@@ -1412,7 +1412,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../contingut/" + pareId,
-					"document.controller.modificat.ok");
+					"document.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 	

@@ -102,7 +102,8 @@ public class DominiController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../domini",
-					"domini.controller.modificat.ok");
+					"domini.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			dominiService.create(
 					entitatActual.getId(), 
@@ -110,7 +111,8 @@ public class DominiController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../domini",
-					"domini.controller.creat.ok");
+					"domini.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 	
@@ -119,13 +121,14 @@ public class DominiController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long dominiId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		dominiService.delete(
+		DominiDto dominiDto = dominiService.delete(
 				entitatActual.getId(),
 				dominiId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../domini",
-				"domini.controller.esborrat.ok");
+				"domini.controller.esborrat.ok",
+				new Object[] { dominiDto.getNom() });
 	}
 	
 	@RequestMapping(value = "/cache/refrescar", method = RequestMethod.GET)

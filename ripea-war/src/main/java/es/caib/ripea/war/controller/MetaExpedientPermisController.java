@@ -125,23 +125,28 @@ public class MetaExpedientPermisController extends BaseAdminController {
 				metaExpedientService.findById(
 						entitatActual.getId(),
 						metaExpedientId));
-		PermisDto permis = null;
+		PermisDto permis = findPermisById(entitatActual, metaExpedientId, permisId);
+
+		if (permis != null)
+			model.addAttribute("permisCommand", PermisCommand.asCommand(permis));
+		else
+			model.addAttribute("permisCommand", new PermisCommand());
+
+		return "metaExpedientPermisForm";
+	}
+
+	private PermisDto findPermisById(EntitatDto entitatActual, Long metaExpedientId, Long permisId) {
 		if (permisId != null) {
 			List<PermisDto> permisos = metaExpedientService.permisFind(
 					entitatActual.getId(),
 					metaExpedientId);
 			for (PermisDto p: permisos) {
 				if (p.getId().equals(permisId)) {
-					permis = p;
-					break;
+					return p;
 				}
 			}
 		}
-		if (permis != null)
-			model.addAttribute("permisCommand", PermisCommand.asCommand(permis));
-		else
-			model.addAttribute("permisCommand", new PermisCommand());
-		return "metaExpedientPermisForm";
+		return null;
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/permis", method = RequestMethod.POST)
@@ -181,7 +186,8 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient/" + metaExpedientId + "/permis",
-				"metaexpedient.controller.permis.modificat.ok");
+				"metaexpedient.controller.permis.modificat.ok",
+				new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/permis/{permisId}/delete", method = RequestMethod.GET)
@@ -207,10 +213,11 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
+		PermisDto permisDto = findPermisById(entitatActual, metaExpedientId, permisId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../metaExpedient/" + metaExpedientId + "/permis",
-				"metaexpedient.controller.permis.esborrat.ok");
+				"metaexpedient.controller.permis.esborrat.ok",
+				new Object[] { permisDto.getPrincipalTipus()+ " "+permisDto.getPrincipalNom() });
 	}
-
 }

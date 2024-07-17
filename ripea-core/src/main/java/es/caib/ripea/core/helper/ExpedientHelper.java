@@ -1312,11 +1312,12 @@ public class ExpedientHelper {
 	}
 	
 	
-	public void tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+	public ExpedientEntity tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
+
 		logger.debug("Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + expedientId + "," + "motiu=" + motiu + ")");
 
-		
 		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
 		
 		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar);
@@ -1328,8 +1329,8 @@ public class ExpedientHelper {
 		expedientHelper2.deleteDocumentsEsborranysArxiu(expedientId);
 		
 		expedientHelper2.closeExpedientDbAndArxiu(expedientId, motiu);
-		
-		
+
+		return expedientRepository.findOne(expedientId);
 	}
 	
 	
@@ -1406,7 +1407,7 @@ public class ExpedientHelper {
 
 		return dto;
 	}
-	public void agafar(ExpedientEntity expedient, String usuariCodi) {
+	public String agafar(ExpedientEntity expedient, String usuariCodi) {
 
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, null);
 		if (expedientSuperior != null) {
@@ -1422,9 +1423,11 @@ public class ExpedientHelper {
 			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
 		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, null, false, false);
+
+		return expedient.getNom();
 	}
 	
-	public void alliberar(ExpedientEntity expedient) {
+	public String alliberar(ExpedientEntity expedient) {
 		UsuariEntity usuariActual = expedient.getAgafatPer();
 		UsuariEntity usuariCreador = expedient.getCreatedBy();
 
@@ -1442,6 +1445,7 @@ public class ExpedientHelper {
 			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
 		}
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, usuariActual.getCodi(), null, false, false);
+		return expedient.getNom();
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)

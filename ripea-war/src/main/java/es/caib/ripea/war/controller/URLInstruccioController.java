@@ -114,7 +114,8 @@ public class URLInstruccioController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:urlInstruccio",
-					"url.instruccio.controller.modificat.ok");
+					"url.instruccio.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			urlInstruccioService.create(
 					entitatActual.getId(),
@@ -122,7 +123,8 @@ public class URLInstruccioController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:urlInstruccio",
-					"url.instruccio.controller.creat.ok");
+					"url.instruccio.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 	
@@ -161,15 +163,16 @@ public class URLInstruccioController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long urlInstruccioId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-		urlInstruccioService.delete(
+
+		URLInstruccioDto  urlInstruccioDto = urlInstruccioService.delete(
 				entitatActual.getId(), 
 				urlInstruccioId);
 		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../urlInstruccio",
-				"url.instruccio.controller.esborrat.ok");
+				"url.instruccio.controller.esborrat.ok",
+				new Object[] { urlInstruccioDto.getNom() });
 	}
 	
 	private URLInstruccioFiltreCommand getFiltreCommand(
