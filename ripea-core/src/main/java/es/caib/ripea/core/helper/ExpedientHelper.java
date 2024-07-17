@@ -17,6 +17,7 @@ import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
@@ -1023,7 +1024,7 @@ public class ExpedientHelper {
 				null, 
 				arxiuUuid, 
 				null, 
-				false, 
+				true, 
 				false);
 		//registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
@@ -1112,7 +1113,7 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
 		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
-		if (isCarpetaActive) {
+		if (isCarpetaActive && ! contingutHelper.isCarpetaLogica()) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
@@ -1910,19 +1911,21 @@ public class ExpedientHelper {
 		String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
 		String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  numeroRegistre.replace('/', '_')) : documentArxiu.getNom();
 		
+		DocumentContingut contingut = documentArxiu.getContingut();
+		
 		document.setDocumentTipus(DocumentTipusEnumDto.IMPORTAT);
 		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
 		document.setData(new Date());
 		document.setNom(nomDocument);
-		document.setFitxerNom(documentArxiu.getNom());
-		document.setFitxerTamany(documentArxiu.getContingut().getTamany());
+		document.setFitxerNom(contingut.getArxiuNom() != null ? contingut.getArxiuNom() : documentArxiu.getNom());
+		document.setFitxerTamany(contingut.getTamany());
 		document.setArxiuUuid(documentArxiu.getIdentificador());
 		document.setDataCaptura(documentArxiu.getMetadades().getDataCaptura());
 		document.setNtiOrigen(ArxiuConversions.getOrigen(documentArxiu));
 		document.setNtiTipoDocumental(ArxiuConversions.getTipusDocumental(documentArxiu));
 		document.setNtiEstadoElaboracion(ArxiuConversions.getEstatElaboracio(documentArxiu));
 		document.setNtiTipoFirma(ArxiuConversions.getNtiTipoFirma(documentArxiu));
-		document.setFitxerContentType(documentArxiu.getContingut().getTipusMime());
+		document.setFitxerContentType(contingut.getTipusMime());
 		document.setNtiVersion("1.0");
 		document.setNtiOrgano(getOrgans(documentArxiu));
 		return document;
