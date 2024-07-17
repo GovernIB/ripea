@@ -92,6 +92,23 @@ $(document).ready(function() {
 			enableDisableSelection($(this), metaExpedientId);
 		});
 
+		$("span[class^='stateColor-']").each(function( index ) {
+			var fullClassNameString = this.className;
+			var colorString = fullClassNameString.substring(11);
+			if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
+				$(this).parent().css( "border", "dashed 1px #AAA" );
+				$(this).parent().css( "color", '#666666' );
+			} else if (colorString == 'TANCAT') {
+				$(this).parent().css( "background-color", "#777" );
+			} else {
+				$(this).parent().css( "background-color", colorString );
+				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
+				$(this).parent().css( "color", textColor );
+				// $(this).parent().css( "fontSize", 'small' );
+				$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+			}
+		});
+
 	});	
 
 
@@ -125,7 +142,6 @@ $(document).ready(function() {
 		});
 		
 	});
-
 
 });//################################################## document ready END ##############################################################
 
@@ -229,15 +245,16 @@ function enableDisableSelection($this, tipus) {
 				<th data-col-name="id" data-visible="false"></th>
 				<th data-col-name="expedientEstat" data-visible="false"></th>
 				
-				<th data-col-name="numeroINom" data-template="#cellExpedientLink" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.expedient"/>
+				<th data-col-name="numeroINom" data-template="#cellExpedientLink" width="15%"><spring:message code="accio.massiva.list.column.expedient"/>
 					<script id="cellExpedientLink" type="text/x-jsrender">
 						<a href="<c:url value="/contingut/{{:id}}"/>">{{:numeroINom}}</a>	
 					</script>
 				</th>
-				<th data-col-name="metaExpedient.codiSiaINom" data-orderable="false" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
-				<th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate" width="11%">
+				<th data-col-name="metaExpedient.codiSiaINom" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
+				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
+						<span class="label">
 						{{if expedientEstat != null && estat != 'TANCAT'}}
 							<span class="fa fa-folder-open"></span>&nbsp;{{:expedientEstat.nom}}
 						{{else}}
@@ -250,11 +267,38 @@ function enableDisableSelection($this, tipus) {
 
 						{{if expedientEstat != null && expedientEstat.color!=null}}
 							<span class="stateColor-{{:expedientEstat.color}}"></span>
+						{{else expedientEstat != null && estat != 'TANCAT'}}
+							<span class="stateColor-ESTAT"></span>
+						{{else expedientEstat == null && estat == 'OBERT'}}
+							<span class="stateColor-OBERT"></span>
+						{{else}}
+							<span class="stateColor-TANCAT"></span>
 						{{/if}}
+						</span>
 					</script>
-				</th>				
-				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
-				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
+				</th>
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="8%">
+					<spring:message code="contingut.expedient.form.camp.prioritat"/>
+					<script id="cellPrioritatTemplate" type="text/x-jsrender">
+						<span class="label label-{{:prioritat}}">
+						{{if prioritat == 'MOLT_BAIXA'}}
+						<spring:message code="prioritat.enum.MOLT_BAIXA"/>
+						{{else prioritat == 'BAIXA'}}
+						<spring:message code="prioritat.enum.BAIXA"/>
+						{{else prioritat == 'ALTA'}}
+						<spring:message code="prioritat.enum.ALTA"/>
+						{{else prioritat == 'MOLT_ALTA'}}
+						<spring:message code="prioritat.enum.MOLT_ALTA"/>
+						{{else prioritat == 'CRITICA'}}
+						<spring:message code="prioritat.enum.CRITICA"/>
+						{{else}}
+						<spring:message code="prioritat.enum.NORMAL"/>
+						{{/if}}
+						</span>
+					</script>
+				</th>
+				<th data-col-name="createdDate" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
+				<th data-col-name="createdBy.codiAndNom" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="1%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<a href="<c:url value="/expedient/{{:id}}/canviarEstat"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/></a>	

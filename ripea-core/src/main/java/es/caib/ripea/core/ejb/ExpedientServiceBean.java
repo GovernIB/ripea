@@ -46,7 +46,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
-			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
+			PrioritatEnumDto prioritat) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -60,7 +61,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				rolActual,
 				anexosIdsMetaDocsIdsMap, 
 				justificantIdMetaDoc,
-				interessatsAccionsMap);
+				interessatsAccionsMap,
+				prioritat);
 	}
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
@@ -251,8 +253,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
-		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId);
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat) {
+		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId, prioritat);
 	}
 
 
@@ -460,4 +462,19 @@ public class ExpedientServiceBean implements ExpedientService {
 	public String getNom(Long id) {
 		return delegate.getNom(id);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientDto changeExpedientPrioritat(
+			Long entitatId,
+			Long expedientId,
+			PrioritatEnumDto prioritat) {
+		return delegate.changeExpedientPrioritat(entitatId, expedientId, prioritat);
+	}
+
+    @Override
+	@RolesAllowed("tothom")
+    public void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat) {
+        delegate.changeExpedientsPrioritat(entitatId, expedientsId, prioritat);
+    }
 }

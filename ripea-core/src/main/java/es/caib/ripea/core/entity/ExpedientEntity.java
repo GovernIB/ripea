@@ -3,18 +3,18 @@
  */
 package es.caib.ripea.core.entity;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
+import org.hibernate.annotations.ForeignKey;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -25,12 +25,13 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.ForeignKey;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Classe del model de dades que representa un expedient.
@@ -188,6 +189,10 @@ public class ExpedientEntity extends NodeEntity {
 	  joinColumns = @JoinColumn(name = "expedient_id"), 
 	  inverseJoinColumns = @JoinColumn(name = "meta_expedient_organ_id"))
 	Set<MetaExpedientOrganGestorEntity> metaexpedientOrganGestorPares;
+
+	@Column(name = "prioritat")
+	@Enumerated(EnumType.STRING)
+	private PrioritatEnumDto prioritat;
 	
 
 	public GrupEntity getGrup() {
@@ -289,6 +294,10 @@ public class ExpedientEntity extends NodeEntity {
 	public String getRegistresImportats() {
 		return registresImportats;
 	}
+	public PrioritatEnumDto getPrioritat() {
+		return this.prioritat;
+	}
+
 	public void updateNom(
 			String nom) {
 		this.nom = nom;
@@ -427,6 +436,10 @@ public class ExpedientEntity extends NodeEntity {
 	public boolean isTancamentProgramat() {
 		return this.estat == ExpedientEstatEnumDto.TANCAT && this.tancatProgramat != null && this.tancatData == null;
 	}
+
+	public void updatePrioritat(PrioritatEnumDto prioritat) {
+		this.prioritat = prioritat;
+	}
 	
 	public static Builder getBuilder(
 			String nom,
@@ -437,7 +450,8 @@ public class ExpedientEntity extends NodeEntity {
 			String ntiOrgano,
 			Date ntiFechaApertura,
 			String ntiClasificacionSia,
-			OrganGestorEntity organGestor) {
+			OrganGestorEntity organGestor,
+			PrioritatEnumDto prioritat) {
 		return new Builder(
 				nom,
 				metaExpedient,
@@ -447,7 +461,8 @@ public class ExpedientEntity extends NodeEntity {
 				ntiOrgano,
 				ntiFechaApertura,
 				ntiClasificacionSia,
-				organGestor);
+				organGestor,
+				prioritat);
 	}
 
 	public static class Builder {
@@ -461,7 +476,8 @@ public class ExpedientEntity extends NodeEntity {
 				String ntiOrgano,
 				Date ntiFechaApertura,
 				String ntiClasificacionSia,
-				OrganGestorEntity organGestor) {
+				OrganGestorEntity organGestor,
+				PrioritatEnumDto prioritat) {
 			built = new ExpedientEntity();
 			built.nom = nom;
 			built.metaNode = metaExpedient;
@@ -476,6 +492,7 @@ public class ExpedientEntity extends NodeEntity {
 			built.organGestor = organGestor;
 			built.estat = ExpedientEstatEnumDto.OBERT;
 			built.tipus = ContingutTipusEnumDto.EXPEDIENT;
+			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.NORMAL;
 		}
 		public Builder agafatPer(UsuariEntity agafatPer) {
 			built.agafatPer = agafatPer;
@@ -498,11 +515,12 @@ public class ExpedientEntity extends NodeEntity {
 				"id: " + this.getId() + ", " +
 				"codi: " + this.codi + ", " +
 				"tipus: " + this.tipus + ", " +
+				"prrioritat: " + this.prioritat + ", " +
 				"ntiVersion: " + this.ntiVersion + ", " +
 				"ntiIdentificador: " + this.ntiIdentificador + ", " +
 				"ntiOrgano: " + this.ntiOrgano + ", " +
 				"ntiFechaApertura: " + this.ntiFechaApertura + ", " +
-				"ntiClasificacionSia: " + this.ntiClasificacionSia +
+				"ntiClasificacionSia: " + this.ntiClasificacionSia + ", " +
 				"organGestor: " + this.organGestor + "]";
 	}
 

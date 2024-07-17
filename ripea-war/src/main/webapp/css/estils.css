@@ -403,3 +403,25 @@ table .dropdown {
 
 .form-switch input:checked + input + i::after { transform: translate3d(22px, 2px, 0); }
 
+/* Prioritats */
+.pr-CRITICA { border-left: solid 6px #c30000; padding-left: 4px; }
+.pr-MOLT_ALTA { border-left: solid 6px #d99b9d; padding-left: 4px; }
+.pr-ALTA { border-left: solid 6px #ffebae; padding-left: 4px; }
+/*.pr-NORMAL { border-left: dashed 6px #AAA; padding-left: 4px; }*/
+.pr-NORMAL { display: inline;bottom: 5px;position: relative;padding-left: 4px; }
+.pr-BAIXA { border-left: solid 6px #c3e8d1; padding-left: 4px; }
+.pr-MOLT_BAIXA { border-left: solid 6px #afcee9; padding-left: 4px; }
+
+.label-CRITICA { background-color: #c30000; color: #ffffff; }
+.label-MOLT_ALTA { background-color: #d99b9d;  color: #ffffff; }
+.label-ALTA { background-color: #ffebae; color: #666666; }
+.label-NORMAL { border: dashed 1px #AAA; color: #666666; }
+.label-BAIXA { background-color: #c3e8d1;  color: #666666; }
+.label-MOLT_BAIXA { background-color: #afcee9;  color: #666666; }
+
+span.no_color {	width: 6px; border: dashed 1px #AAA; height: 23px; margin-top: 2px; }
+dd.no_color { display: inline;bottom: 5px;position: relative;padding-left: 4px; }
+
+.h50 { min-height: 50px !important; }
+.h100 { min-height: 100px !important; }
+.h200 { min-height: 200px !important; }

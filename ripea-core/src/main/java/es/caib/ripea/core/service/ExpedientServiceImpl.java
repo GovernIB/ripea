@@ -173,7 +173,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
-			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
+			PrioritatEnumDto prioritat) {
 		
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorRepository.findOne(organGestorId).getCodi());
@@ -201,7 +202,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					associarInteressats,
 					interessatsAccionsMap,
 					grupId,
-					rolActual);
+					rolActual,
+					prioritat);
 		}
 
 		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
@@ -461,7 +463,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat) {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
@@ -481,9 +483,37 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (grupId != null) {
 			expedient.setGrup(grupRepository.findOne(grupId));
 		}
+		expedientHelper.updatePrioritat(expedient, prioritat);
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
+	}
+
+	@Transactional
+	@Override
+	public ExpedientDto changeExpedientPrioritat(Long entitatId, Long expedientId, PrioritatEnumDto prioritat) {
+
+		logger.debug("Canviant la prioritat de l'expedient (entitatId=" + entitatId + ", expedientId=" + expedientId + ", prioritat=" + prioritat + ")");
+		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false,
+				null);
+
+		expedientHelper.updatePrioritat(expedient, prioritat);
+		return expedientHelper.toExpedientDto(expedient, false, false, null, false);
+	}
+
+	@Transactional
+	@Override
+	public void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat) {
+		logger.debug("Canviant la prioritat dels expedients (entitatId=" + entitatId + ", expedientsId=" + expedientsId + ", prioritat=" + prioritat + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		expedientRepository.updatePrioritats(expedientsId, prioritat.name());
 	}
 
 	@Transactional(readOnly = true)
@@ -928,6 +958,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerTancamentMassiu(
 					entitat,
 					nomesAgafats,
@@ -1596,7 +1627,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 			
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			long t10 = System.currentTimeMillis();
-			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			Map<String, String[]> ordenacioMap = new HashMap<>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
+			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,

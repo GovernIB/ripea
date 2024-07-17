@@ -40,6 +40,7 @@
 	<div id="grupsActiu" style="display:none;">
 		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
 	</div>
+	<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" labelSize="2"/>
 	<div id="modal-botons" class="well">
 		<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 			<c:choose>
@@ -58,155 +59,163 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
-<script type="text/javascript">
-var metaExpedientOrgan = {};
-var metaExpedientGrup = {};
-<c:forEach var="metaExpedient" items="${metaExpedients}">
-<c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${fn:escapeXml(metaExpedient.organGestor.nom)}'};</c:if>
-metaExpedientGrup['${metaExpedient.id}'] = {gestioAmbGrupsActiva: ${metaExpedient.gestioAmbGrupsActiva}};
-</c:forEach>
-function refrescarSequencia() {
-	let metaExpedientId = $('#metaNodeId').val();
-	let any = $('input#any').val();
-	if (metaExpedientId != undefined && metaExpedientId != "" && any != undefined && any != "") {
-		$.ajax({
-			type: 'GET',
-			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
-			success: function(sequencia) {
-				$('input#sequencia').val(sequencia);
-			}
-		});
-	} else {
-		$('input#sequencia').val(undefined);
-	}
-}
+	<script type="text/javascript">
+		var metaExpedientOrgan = {};
+		var metaExpedientGrup = {};
+		<c:forEach var="metaExpedient" items="${metaExpedients}">
+		<c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {
+			id: ${metaExpedient.organGestor.id},
+			codi: '${metaExpedient.organGestor.codi}',
+			nom: '${fn:escapeXml(metaExpedient.organGestor.nom)}'
+		};
+		</c:if>
+		metaExpedientGrup['${metaExpedient.id}'] = {gestioAmbGrupsActiva: ${metaExpedient.gestioAmbGrupsActiva}};
+		</c:forEach>
 
-function recuperarDominisMetaExpedient() {
-	let metaExpedientId = $('select#metaNodeId').val();
-	if (metaExpedientId != undefined) {
-		$.ajax({
-			type: 'GET',
-			url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/findMetaExpedientDominis',
-			success: function(dominis) {
-				var selDominis = $('select#metaNodeDominiId');
-				var selDominisOriginal = ${expedientCommand.metaNodeDominiId}
-				selDominis.empty();
-				selDominis.append("<option value=\"\"><spring:message code='contingut.expedient.form.camp.domini.cap'/></option>");
-				if (dominis && dominis.length > 0) {
-					$.each(dominis, function(i, domini) {
-						if (domini.id == selDominisOriginal) {
-
-							console.log(selDominisOriginal);
-							console.log(domini.id);
-							
-							selDominis.append("<option value=\"" + domini.id + "\" selected>" + domini.nom + "</option>");
-						} else {
-							selDominis.append("<option value=\"" + domini.id + "\">" + domini.nom + "</option>");
-						}
-					});
-				}
-				var select2Options = {
-						theme: 'bootstrap',
-						width: 'auto'};
-				selDominis.select2(select2Options);
-			},
-			error: function(e) {
-				console.log("error recuperant els dominis..." + e);
-			}
-		});
-	}
-}
-
-function refrescarGrups() {
-	let expedientId = $('#id').val();
-	let metaExpedientId = $('#metaNodeId').val();
-	if (metaExpedientId) {
-		let gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
-		$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
-		if (gestioAmbGrupsActiva) {
-			$("#grupsActiu").show();
-			if (!expedientId) {
+		function refrescarSequencia() {
+			let metaExpedientId = $('#metaNodeId').val();
+			let any = $('input#any').val();
+			if (metaExpedientId != undefined && metaExpedientId != "" && any != undefined && any != "") {
 				$.ajax({
 					type: 'GET',
-					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
-					success: function(data) {
-						$('#grupId').closest('.form-group').show();
-						$('#grupId option[value!=""]').remove();
-						for (var i = 0; i < data.length; i++) {
-							$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/proximNumeroSequencia/' + any,
+					success: function (sequencia) {
+						$('input#sequencia').val(sequencia);
+					}
+				});
+			} else {
+				$('input#sequencia').val(undefined);
+			}
+		}
+
+		function recuperarDominisMetaExpedient() {
+			let metaExpedientId = $('select#metaNodeId').val();
+			if (metaExpedientId != undefined) {
+				$.ajax({
+					type: 'GET',
+					url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/findMetaExpedientDominis',
+					success: function (dominis) {
+						var selDominis = $('select#metaNodeDominiId');
+						var selDominisOriginal = ${expedientCommand.metaNodeDominiId}
+								selDominis.empty();
+						selDominis.append("<option value=\"\"><spring:message code='contingut.expedient.form.camp.domini.cap'/></option>");
+						if (dominis && dominis.length > 0) {
+							$.each(dominis, function (i, domini) {
+								if (domini.id == selDominisOriginal) {
+
+									console.log(selDominisOriginal);
+									console.log(domini.id);
+
+									selDominis.append("<option value=\"" + domini.id + "\" selected>" + domini.nom + "</option>");
+								} else {
+									selDominis.append("<option value=\"" + domini.id + "\">" + domini.nom + "</option>");
+								}
+							});
 						}
+						var select2Options = {
+							theme: 'bootstrap',
+							width: 'auto'
+						};
+						selDominis.select2(select2Options);
+					},
+					error: function (e) {
+						console.log("error recuperant els dominis..." + e);
 					}
 				});
 			}
-		} else {
-			$('#grupId option[value!=""]').remove();
-			$("#grupsActiu").hide();
 		}
-	}
-}
 
-function refrescarOrgan() {
-	const metaExpedientId = $('#metaNodeId').val();
-	if (metaExpedientId != undefined && metaExpedientId != "") {
-		const organ = metaExpedientOrgan[metaExpedientId];
-		if (organ) {
-			$('#organFixed').show();
-			$('#organSelect').hide();
-			$('#organFixedNom').text(organ.codi + ' - ' + organ.nom);
-			$('#organFixedNom').after($('<input>').attr({
-				type: 'hidden',
-				name: 'organGestorId',
-				value: organ.id
-			}));
-		} else {
-			$.ajax({
-				type: 'GET',
-				url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos/${expedientCommand.id!=null ? expedientCommand.id : ''}',
-				success: function(organs) {
-					const selOrgans = $('select#organGestorId');
-					const organGestorId = '${expedientCommand.organGestorId}';
-					selOrgans.empty();
-					if (organs && organs.length > 0) {
-						$.each(organs, function(i, organ) {
-							const selected = (organ.id == organGestorId) ? ' selected' : '';
-							selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.nomComplet + '</option>');
+		function refrescarGrups() {
+			let expedientId = $('#id').val();
+			let metaExpedientId = $('#metaNodeId').val();
+			if (metaExpedientId) {
+				let gestioAmbGrupsActiva = metaExpedientGrup[metaExpedientId].gestioAmbGrupsActiva;
+				$("#gestioAmbGrupsActiva").val(gestioAmbGrupsActiva);
+				if (gestioAmbGrupsActiva) {
+					$("#grupsActiu").show();
+					if (!expedientId) {
+						$.ajax({
+							type: 'GET',
+							url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/grup',
+							success: function (data) {
+								$('#grupId').closest('.form-group').show();
+								$('#grupId option[value!=""]').remove();
+								for (var i = 0; i < data.length; i++) {
+									$('#grupId').append('<option value="' + data[i].id + '">' + data[i].descripcio + '</option>');
+								}
+							}
 						});
 					}
-					selOrgans.select2({
-						theme: 'bootstrap',
-						width: 'auto'
-					});
+				} else {
+					$('#grupId option[value!=""]').remove();
+					$("#grupsActiu").hide();
 				}
-			});
-			$('#organFixed').hide();
-			$('#organSelect').show();
-			$('input', $('#organFixedNom').parent()).remove();
+			}
 		}
-	} else {
-		const selOrgans = $('select#organGestorId');
-		selOrgans.empty();
-		selOrgans.select2({ theme: 'bootstrap', width: 'auto' });
-		$('#organFixed').hide();
-		$('#organSelect').show();
-		$('input', $('#organFixedNom').parent()).remove();
-	}
-}
 
-//################################################## document ready START ##############################################################
-$(document).ready(function() {
-	$('select#metaNodeId').change(function(event) {
-		refrescarSequencia();
-		refrescarGrups();
-		refrescarOrgan();
-	});
-	$('input#any').change(function(event) {
-		refrescarSequencia();
-	});
-	refrescarSequencia();
-	refrescarGrups();
-	refrescarOrgan();
-	$('input#any').trigger('change');
-});//################################################## document ready END ##############################################################
-</script>
+		function refrescarOrgan() {
+			const metaExpedientId = $('#metaNodeId').val();
+			if (metaExpedientId != undefined && metaExpedientId != "") {
+				const organ = metaExpedientOrgan[metaExpedientId];
+				if (organ) {
+					$('#organFixed').show();
+					$('#organSelect').hide();
+					$('#organFixedNom').text(organ.codi + ' - ' + organ.nom);
+					$('#organFixedNom').after($('<input>').attr({
+						type: 'hidden',
+						name: 'organGestorId',
+						value: organ.id
+					}));
+				} else {
+					$.ajax({
+						type: 'GET',
+						url: '<c:url value="/expedient/metaExpedient"/>/' + metaExpedientId + '/organsGestorsPermesos/${expedientCommand.id!=null ? expedientCommand.id : ''}',
+						success: function (organs) {
+							const selOrgans = $('select#organGestorId');
+							const organGestorId = '${expedientCommand.organGestorId}';
+							selOrgans.empty();
+							if (organs && organs.length > 0) {
+								$.each(organs, function (i, organ) {
+									const selected = (organ.id == organGestorId) ? ' selected' : '';
+									selOrgans.append('<option value="' + organ.id + '"' + selected + '>' + organ.nomComplet + '</option>');
+								});
+							}
+							selOrgans.select2({
+								theme: 'bootstrap',
+								width: 'auto'
+							});
+						}
+					});
+					$('#organFixed').hide();
+					$('#organSelect').show();
+					$('input', $('#organFixedNom').parent()).remove();
+				}
+			} else {
+				const selOrgans = $('select#organGestorId');
+				selOrgans.empty();
+				selOrgans.select2({theme: 'bootstrap', width: 'auto'});
+				$('#organFixed').hide();
+				$('#organSelect').show();
+				$('input', $('#organFixedNom').parent()).remove();
+			}
+		}
+
+		//################################################## document ready START ##############################################################
+		$(document).ready(function () {
+			$('select#metaNodeId').change(function (event) {
+				refrescarSequencia();
+				refrescarGrups();
+				refrescarOrgan();
+			});
+			$('input#any').change(function (event) {
+				refrescarSequencia();
+			});
+			refrescarSequencia();
+			refrescarGrups();
+			refrescarOrgan();
+			$('input#any').trigger('change');
+		});//################################################## document ready END ##############################################################
+
+	</script>
 </head>
 </html>

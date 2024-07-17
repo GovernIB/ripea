@@ -6,25 +6,7 @@ package es.caib.ripea.war.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioDto;
-import es.caib.ripea.core.api.dto.ExpedientPeticioEstatViewEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.InteressatAssociacioAccioEnum;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.RegistreAnnexDto;
-import es.caib.ripea.core.api.dto.RegistreDto;
-import es.caib.ripea.core.api.dto.RegistreInteressatDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -341,6 +323,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
 		command.setAgafarExpedient(true);
+		command.setPrioritat(PrioritatEnumDto.NORMAL);
 		omplirModel(expedientPeticioId, request, model, command);
 		return "expedientPeticioAccept";
 
@@ -837,7 +820,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						RolHelper.getRolActual(request),
 						anexosIdsMetaDocsIdsMap,
 						justificantIdMetaDoc,
-						interessatsAccionsMap);
+						interessatsAccionsMap,
+						expedientPeticioAcceptarCommand.getPrioritat());
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				expedientId = expedientDto.getId();

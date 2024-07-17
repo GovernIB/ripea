@@ -83,6 +83,57 @@ function formatDate(date) {
 	return dateFormatted;
 }
 
+var colorsPrioritats = {
+	'CRITICA': '#c30000',
+	'MOLT_ALTA': '#d99b9d',
+	'ALTA': '#ffebae',
+	// 'NORMAL': '',
+	'BAIXA': '#c3e8d1',
+	'MOLT_BAIXA': '#afcee9'
+};
+
+function showColorPriritats(element) {
+	const id = element.id;
+	const color = colorsPrioritats[id];
+	if (!color) {
+		return $('<span class="no-icon"></span><span>' + element.text + '</span>');
+	}
+	return $('<span class="color-icon" style="background-color: ' + color + '"></span><span>' + element.text + '</span>');
+}
+
+function getTextColorOnBackground(darkTextColor, lightTextColor, backgroundColor) {
+	const getLuminance = (c) => {
+		const hexStr = c.substring(1);
+		const hex = hexStr.length == 3 ? hexStr.replace(/(.)/g, '$1$1') : hexStr;
+		const dec = parseInt(hex, 16);
+		const rgb = [(dec >> 16) & 255, (dec >> 8) & 255, dec & 255];
+		return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+	}
+	const getContrast = (c1, c2) => {
+		const l1 = getLuminance(c1);
+		const l2 = getLuminance(c2);
+		return (l1 > l2) ? (l1 + 0.05) / (l2 + 0.05) : (l2 + 0.05) / (l1 + 0.05);
+	}
+	const cDark = getContrast(darkTextColor, backgroundColor);
+	const cLight = getContrast(lightTextColor, backgroundColor);
+	return cDark > cLight ? darkTextColor : lightTextColor;
+}
+
+function hexToRgb(hex) {
+	// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+	hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+		return r + r + g + g + b + b;
+	});
+
+	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+	return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+	} : null;
+}
+
 $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 	var message = "Error AJAX: [" + jqxhr.status + "] " + thrownError;
 	/*var statusErrorMap = {

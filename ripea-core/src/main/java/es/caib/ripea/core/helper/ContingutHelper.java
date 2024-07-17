@@ -257,6 +257,7 @@ public class ContingutHelper {
 			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
+			dto.setPrioritat(expedient.getPrioritat());
 
 			if (onlyForList) {
 				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
@@ -306,8 +307,6 @@ public class ContingutHelper {
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
 						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
-			
-			
 			
 				if (ambMapPerTipusDocument) {
 					if (cacheHelper.mostrarLogsRendiment())
@@ -1509,7 +1508,8 @@ public class ContingutHelper {
 			Date ntiFechaApertura,
 			Integer any,
 			boolean agafar,
-			Long grupId) {
+			Long grupId,
+			PrioritatEnumDto prioritat) {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1528,7 +1528,8 @@ public class ContingutHelper {
 				ntiOrgano,
 				ntiFechaApertura,
 				metaExpedient.getClassificacio(),
-				organGestor).
+				organGestor,
+				prioritat).
 				agafatPer(agafatPer).
 				grup(grupEntity).
 				build();

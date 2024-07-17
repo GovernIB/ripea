@@ -321,8 +321,6 @@ var notificacioEstatText = new Array();
 
 
 
-
-
 //################################################## document ready START ##############################################################
 $(document).ready(function() {
 
@@ -655,16 +653,27 @@ function removeCookie(cname) {
 
 							<dt><spring:message code="contingut.info.nti.data.obertura"/></dt>
 							<dd><fmt:formatDate value="${expedient.ntiFechaApertura}" pattern="dd/MM/yyyy HH:mm:ss"/></dd>
-							
+
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
 								<c:when test="${expedient.expedientEstat!=null}">
-									<dd style="<c:if test='${not empty expedient.expedientEstat.color}'>border-left: solid 6px ${expedient.expedientEstat.color}; padding-left: 4px;</c:if>">${expedient.expedientEstat.nom}</dd>
+									<c:choose>
+										<c:when test="${not empty expedient.expedientEstat.color}"></span><dd style="border-left: solid 6px ${expedient.expedientEstat.color}; padding-left: 4px;">${expedient.expedientEstat.nom}</dd></c:when>
+										<c:otherwise><span class="no_color"></span><dd style="display: inline;bottom: 5px;position: relative;padding-left: 4px;">${expedient.expedientEstat.nom}</dd></c:otherwise>
+									</c:choose>
 								</c:when>
 								<c:otherwise>
+									<c:choose>
+										<c:when test="${expedient.estat == 'TANCAT'}"><dd style="border-left: solid 6px #777; padding-left: 4px;"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:when>
+										<c:otherwise><span class="no_color"></span><dd class="no_color"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:otherwise>
+									</c:choose>
 									<dd><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd>
 								</c:otherwise>
-							</c:choose>	
+							</c:choose>
+
+							<dt><spring:message code="contingut.info.prioritat"/></dt>
+							<c:if test="${expedient.prioritat == 'NORMAL'}"><span class="no_color"></span></c:if>
+							<dd class="pr-${expedient.prioritat}"><spring:message code="prioritat.enum.${expedient.prioritat}"/></dd>
 								
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
 							<dd>${expedient.ntiClasificacionSia}</dd>
@@ -691,14 +700,25 @@ function removeCookie(cname) {
 							
 							<dt><spring:message code="contingut.info.estat"/></dt>
 							<c:choose>
-								<c:when test="${contingut.expedientEstat!=null}">
-									<dd style="<c:if test='${not empty contingut.expedientEstat.color}'>border-left: solid 6px ${contingut.expedientEstat.color}; padding-left: 4px;</c:if>">${contingut.expedientEstat.nom}</dd>
+								<c:when test="${expedient.expedientEstat!=null}">
+									<c:choose>
+										<c:when test="${not empty expedient.expedientEstat.color}"><dd style="border-left: solid 6px ${expedient.expedientEstat.color}; padding-left: 4px;">${expedient.expedientEstat.nom}</dd></c:when>
+										<c:otherwise><span class="no_color"></span><dd style="display: inline;bottom: 5px;position: relative;padding-left: 4px;">${expedient.expedientEstat.nom}</dd></c:otherwise>
+									</c:choose>
 								</c:when>
 								<c:otherwise>
-									<dd><spring:message code="expedient.estat.enum.${contingut.estat}"/></dd>
+									<c:choose>
+										<c:when test="${expedient.estat == 'TANCAT'}"><dd style="border-left: solid 6px #777; padding-left: 4px;"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:when>
+										<c:otherwise><span class="no_color"></span><dd style="display: inline;bottom: 5px;position: relative;padding-left: 4px;"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:otherwise>
+									</c:choose>
+									<dd><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd>
 								</c:otherwise>
-							</c:choose>	
-								
+							</c:choose>
+
+							<dt><spring:message code="contingut.info.prioritat"/></dt>
+							<c:if test="${expedient.prioritat == 'NORMAL'}"><span class="no_color"></span></c:if>
+							<dd class="pr-${expedient.prioritat}"><spring:message code="prioritat.enum.${expedient.prioritat}"/></dd>
+
 							<c:if test="${expedientTancat}">
 								<dt><spring:message code="contingut.info.motiu"/></dt>
 								<dd>${contingut.tancatMotiu}</dd>

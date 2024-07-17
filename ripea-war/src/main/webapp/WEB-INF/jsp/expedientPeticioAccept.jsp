@@ -334,8 +334,8 @@ function refrescarGrups() {
 	 		<rip:inputCheckbox name="agafarExpedient" textKey="expedient.peticio.form.acceptar.camp.agafarExpedient"/> 
 		</div>
 		<div id="input-accio-crear" class="hidden">
-			<rip:inputText name="newExpedientTitol" textKey="expedient.peticio.form.acceptar.camp.newExpedientTitol"
-				required="true" />
+			<rip:inputText name="newExpedientTitol" textKey="expedient.peticio.form.acceptar.camp.newExpedientTitol" required="true" />
+			<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
 			<div id="organFixed" style="display: none;">
 				<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true"><span id="organFixedNom"></span></rip:inputFixed>
 			</div>

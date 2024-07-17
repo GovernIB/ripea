@@ -104,6 +104,8 @@
 		</c:if>
 		<c:if test="${(potModificar) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
+				<%---- Canviar prioritat... ----%>
+				<li><a href="<c:url value="/expedient/${contingut.id}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
 				<%---- Canviar estat... ----%>
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>

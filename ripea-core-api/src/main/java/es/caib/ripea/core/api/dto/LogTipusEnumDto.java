@@ -71,7 +71,7 @@ public enum LogTipusEnumDto {
 	DOC_FIRMAT, // 42
 
 	CANVI_ESTAT,
-	
+	CANVI_PRIORITAT,
 	CANVI_RESPONSABLES,
 	
 	// Tancament logic expedient

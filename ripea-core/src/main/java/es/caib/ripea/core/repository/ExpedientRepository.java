@@ -16,6 +16,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -695,5 +696,10 @@ public interface ExpedientRepository extends JpaRepository<ExpedientEntity, Long
 			@Param("estat") ExpedientEstatEnumDto estat,
 			@Param("entitat") EntitatEntity entitat,
 			@Param("tancatProgramat") Date tancatProgramat);
-	
+
+	@Modifying
+	@Query(value = "update ipa_expedient set prioritat = :prioritat where id in (:expedientsId)", nativeQuery = true)
+    void updatePrioritats(
+			@Param("expedientsId") Collection<Long> expedientsId,
+			@Param("prioritat") String  prioritat);
 }

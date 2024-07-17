@@ -161,7 +161,8 @@ public class ExpedientHelper {
 			boolean associarInteressats,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			Long grupId,
-			String rolActual) {
+			String rolActual,
+			PrioritatEnumDto prioritat) {
 
 		logger.info(
 				"Expedient crear Helper START(" +
@@ -238,7 +239,8 @@ public class ExpedientHelper {
 				new Date(),
 				any,
 				true,
-				grupId);
+				grupId,
+				prioritat);
 		contingutLogHelper.logCreacio(expedient, false, false);
 		crearDadesPerDefecte(
 				metaExpedient,
@@ -1243,7 +1245,25 @@ public class ExpedientHelper {
 		
 		return expedient;
 	}
-	
+
+	public ExpedientEntity updatePrioritat(ExpedientEntity expedient, PrioritatEnumDto prioritat) {
+
+		PrioritatEnumDto prioritatAnterior = expedient.getPrioritat();
+		expedient.updatePrioritat(prioritat);
+
+		// log change of state
+		if(!prioritatAnterior.equals(prioritat)){
+			contingutLogHelper.log(
+					expedient,
+					LogTipusEnumDto.CANVI_PRIORITAT,
+					messageHelper.getMessage("prioritat.enum." + prioritatAnterior.name()),
+					messageHelper.getMessage("prioritat.enum." + prioritat.name()),
+					false,
+					false);
+		}
+
+		return expedient;
+	}
 
 
 	public Long checkIfExistsByMetaExpedientAndNom(

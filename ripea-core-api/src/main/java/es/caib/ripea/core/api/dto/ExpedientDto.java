@@ -3,12 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
-import lombok.Getter;
-import lombok.Setter;
 
 
 
@@ -80,6 +80,8 @@ public class ExpedientDto extends NodeDto {
 	private boolean potModificar;
 	private boolean expedientAgafatPerUsuariActual;
 	private boolean potReobrir;
+
+	private PrioritatEnumDto prioritat;
 	
 	
 	public boolean isPotTancar() {

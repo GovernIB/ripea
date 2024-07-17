@@ -61,11 +61,11 @@ public interface ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
-			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) throws NotFoundException, ValidationException;
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
+			PrioritatEnumDto prioritat) throws NotFoundException, ValidationException;
 
 
-
-	/**
+    /**
 	 * Consulta un expedient donat el seu id.
 	 * 
 	 * @param entitatId
@@ -353,7 +353,7 @@ public interface ExpedientService {
 	boolean hasWritePermission(Long expedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId);
+	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat);
 
 	@PreAuthorize("hasRole('tothom')")
 	Exception retryCreateDocFromAnnex(
@@ -553,4 +553,12 @@ public interface ExpedientService {
 	public String getNom(
 			Long id);
 
+	@PreAuthorize("hasRole('tothom')")
+	ExpedientDto changeExpedientPrioritat(
+			Long entitatId,
+			Long expedientId,
+			PrioritatEnumDto prioritat);
+
+	@PreAuthorize("hasRole('tothom')")
+	void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat);
 }

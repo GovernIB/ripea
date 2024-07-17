@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganismeDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
@@ -537,6 +538,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		} else {
 			command = new ExpedientCommand();
 			command.setAny(Calendar.getInstance().get(Calendar.YEAR));
+			command.setPrioritat(PrioritatEnumDto.NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
@@ -593,7 +595,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					RolHelper.getRolActual(request),
 					null, 
 					null,
-					null);
+					null,
+					command.getPrioritat());
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			
@@ -679,7 +682,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getMetaNodeDominiId(), 
 					command.getOrganGestorId(), 
 					RolHelper.getRolActual(request), 
-					command.getGrupId());
+					command.getGrupId(),
+					command.getPrioritat());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
@@ -1319,6 +1323,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			
 		} else {
 			command = new ExpedientCommand();
+			command.setPrioritat(PrioritatEnumDto.NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
@@ -1349,6 +1354,53 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:../expedient",
 				"expedient.controller.estatModificat.ok");
+	}
+
+	@RequestMapping(value = "/{expedientId}/canviarPrioritat", method = RequestMethod.GET)
+	public String canviarPrioritatGet(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = null;
+		if (expedientId != null) {
+			expedient = expedientService.findById(
+					entitatActual.getId(),
+					expedientId, null);
+		}
+		ExpedientCommand command = null;
+		if (expedient != null) {
+			command = ExpedientCommand.asCommand(expedient);
+			if (expedient.getPrioritat() == null) {
+				command.setPrioritat(PrioritatEnumDto.NORMAL);
+			}
+		} else {
+			command = new ExpedientCommand();
+			command.setPrioritat(PrioritatEnumDto.NORMAL);
+		}
+		command.setEntitatId(entitatActual.getId());
+		model.addAttribute(command);
+		return "expedientChoosePrioritatForm";
+	}
+
+	@RequestMapping(value = "/canviarPrioritat", method = RequestMethod.POST)
+	public String canviarPrioritatPost(
+			HttpServletRequest request,
+			ExpedientCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			return "expedientChoosePrioritatForm";
+		}
+		expedientService.changeExpedientPrioritat(
+				entitatActual.getId(),
+				command.getId(),
+				command.getPrioritat());
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../expedient",
+				"expedient.controller.prioritatModificat.ok");
 	}
 	
 	@RequestMapping(value = "/{expedientId}/relacionarList/select", method = RequestMethod.GET)

@@ -4,6 +4,7 @@
 package es.caib.ripea.war.command;
 
 import es.caib.ripea.core.api.dto.ExpedientPeticioAccioEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.utils.Utils;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,6 +26,7 @@ public class ExpedientPeticioAcceptarCommand {
 	private Long expedientId;
 	
 	private String newExpedientTitol;
+	private PrioritatEnumDto prioritat;
 	private int any;
 	private Long sequencia;
 	private boolean associarInteressats;
