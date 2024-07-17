@@ -106,7 +106,8 @@ public class TipusDocumentalController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../tipusDocumental",
-					"tipusdocumental.controller.modificat.ok");
+					"tipusdocumental.controller.modificat.ok",
+					new Object[] { command.getNomCatala()!=null?command.getNomCatala():command.getNomEspanyol() });
 		} else {
 			tipusDocumentalService.create(
 					entitatActual.getId(), 
@@ -114,7 +115,8 @@ public class TipusDocumentalController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../tipusDocumental",
-					"tipusdocumental.controller.creat.ok");
+					"tipusdocumental.controller.creat.ok",
+					new Object[] { command.getNomCatala()!=null?command.getNomCatala():command.getNomEspanyol() });
 		}
 	}
 	
@@ -123,13 +125,14 @@ public class TipusDocumentalController extends BaseAdminController {
 			HttpServletRequest request,
 			@PathVariable Long tipusDocumentalId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitat(request);
-		tipusDocumentalService.delete(
+		TipusDocumentalDto tipusDoc = tipusDocumentalService.delete(
 				entitatActual.getId(),
 				tipusDocumentalId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../tipusDocumental",
-				"tipusdocumental.controller.esborrat.ok");
+				"tipusdocumental.controller.esborrat.ok",
+				new Object[] { tipusDoc.getNomCatala()!=null?tipusDoc.getNomCatala():tipusDoc.getNomEspanyol() });
 	}
 
 }

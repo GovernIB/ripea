@@ -238,7 +238,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDada",
-					"metadada.controller.modificat.ok");
+					"metadada.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			metaDadaService.create(
 					entitatActual.getId(),
@@ -251,7 +252,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDada",
-					"metadada.controller.creat.ok");
+					"metadada.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -267,7 +269,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaDadaService.updateActiva(
+		MetaDadaDto metaDadaDto = metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
 				metaDadaId,
@@ -280,7 +282,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
-				"metadada.controller.activada.ok");
+				"metadada.controller.activada.ok",
+				new Object[] { metaDadaDto.getNom() });
 	}
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
 	public String disable(
@@ -293,7 +296,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaDadaService.updateActiva(
+		MetaDadaDto metaDadaDto = metaDadaService.updateActiva(
 				entitatActual.getId(),
 				metaExpedientId,
 				metaDadaId,
@@ -306,7 +309,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
-				"metadada.controller.desactivada.ok");
+				"metadada.controller.desactivada.ok",
+				new Object[] { metaDadaDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
@@ -321,7 +325,7 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		try {
-			metaDadaService.delete(
+			MetaDadaDto metaDadaDto = metaDadaService.delete(
 					entitatActual.getId(),
 					metaExpedientId,
 					metaDadaId, 
@@ -333,7 +337,8 @@ public class MetaExpedientMetaDadaController extends BaseAdminController {
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDada",
-					"metadada.controller.esborrat.ok");
+					"metadada.controller.esborrat.ok",
+					new Object[] { metaDadaDto.getNom() });
 		} catch (Exception e) {
 			logger.error("Error al esborrar metadada", e);
 			if (ExceptionHelper.getRootCauseOrItself(e) instanceof DataIntegrityViolationException) {

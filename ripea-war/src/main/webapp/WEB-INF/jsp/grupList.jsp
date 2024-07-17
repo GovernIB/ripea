@@ -68,15 +68,7 @@ $(document).ready(function() {
 			return false;
 		});
 	});
-
-	
-
-
 });//################################################## document ready END ##############################################################
-
-	
-
-
 </script>
 	
 </head>
@@ -147,7 +139,7 @@ $(document).ready(function() {
 							<a href="grupPermis/{{:id}}/permis" class="btn btn-default"><span class="fa fa-key"></span>&nbsp;<spring:message code="grup.list.boto.permisos"/>&nbsp;<span class="badge">{{:permisosCount}}</span></a>
 						</script>
 					</th>
-				</c:if>>
+				</c:if>
 				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">

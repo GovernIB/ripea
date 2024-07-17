@@ -97,29 +97,29 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void agafarUser(
+	public String agafarUser(
 			Long entitatId,
 			Long id) {
-		delegate.agafarUser(entitatId, id);
+		return delegate.agafarUser(entitatId, id);
 	}
 
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public void agafarAdmin(
+	public String agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
 			Long id,
 			String usuariCodi) {
-		delegate.agafarAdmin(entitatId, arxiuId, id, usuariCodi);
+		return delegate.agafarAdmin(entitatId, arxiuId, id, usuariCodi);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public void alliberarUser(
+	public String alliberarUser(
 			Long entitatId,
 			Long id) {
-		delegate.alliberarUser(entitatId, id);
+		return delegate.alliberarUser(entitatId, id);
 	}
 
 	@Override
@@ -132,12 +132,12 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void tancar(
+	public String tancar(
 			Long entitatId,
 			Long id,
 			String motiu,
 			Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
-		delegate.tancar(entitatId, id, motiu, documentsPerFirmar, checkPerMassiuAdmin);
+		return delegate.tancar(entitatId, id, motiu, documentsPerFirmar, checkPerMassiuAdmin);
 	}
 
 	@Override

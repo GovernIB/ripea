@@ -300,7 +300,8 @@ public class MetaExpedientController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
-					"metaexpedient.controller.modificat.ok");
+					"metaexpedient.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 
 			try {
@@ -315,7 +316,8 @@ public class MetaExpedientController extends BaseAdminController {
 				MissatgesHelper.success(
 						request,
 						getMessage(request,
-								"metaexpedient.controller.creat.ok"));
+								"metaexpedient.controller.creat.ok",
+								new Object[] { command.getNom() }));
 				
 				if (crearReglaResponse != null) {
 					if (crearReglaResponse.getStatus() == StatusEnumDto.OK) {
@@ -351,7 +353,7 @@ public class MetaExpedientController extends BaseAdminController {
 						request,
 						"redirect:metaExpedient",
 						"metaexpedient.controller.creat.error",
-						new String[] {throwable.getMessage()},
+						new String[] {command.getNom(), throwable.getMessage()},
 						throwable);
 			}
 		}
@@ -990,7 +992,7 @@ public class MetaExpedientController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaExpedientService.updateActiu(
+		MetaExpedientDto metaExpedientDto = metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
 				true, 
@@ -1002,7 +1004,8 @@ public class MetaExpedientController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
-				"metaexpedient.controller.activat.ok");
+				"metaexpedient.controller.activat.ok",
+				new Object[] { metaExpedientDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/disable", method = RequestMethod.GET)
@@ -1012,7 +1015,7 @@ public class MetaExpedientController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaExpedientService.updateActiu(
+		MetaExpedientDto metaExpedientDto = metaExpedientService.updateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
 				false, 
@@ -1024,7 +1027,8 @@ public class MetaExpedientController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
-				"metaexpedient.controller.desactivat.ok");
+				"metaexpedient.controller.desactivat.ok",
+				new Object[] { metaExpedientDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/delete", method = RequestMethod.GET)
@@ -1033,14 +1037,15 @@ public class MetaExpedientController extends BaseAdminController {
 		comprovarAccesMetaExpedient(request, metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		try {
-			metaExpedientService.delete(
+			MetaExpedientDto  metaExpedientDto = metaExpedientService.delete(
 					entitatActual.getId(),
 					metaExpedientId,
 					organActual == null ? null : organActual.getId());
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaExpedient",
-					"metaexpedient.controller.esborrat.ok");
+					"metaexpedient.controller.esborrat.ok",
+					new Object[] { metaExpedientDto.getNom() });
 		} catch (Exception ex) {
 			logger.error("Error al esborrar metaexpedient", ex);
 			Throwable root = ExceptionHelper.getRootCauseOrItself(ex);

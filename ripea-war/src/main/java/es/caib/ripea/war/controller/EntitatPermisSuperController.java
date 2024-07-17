@@ -78,24 +78,27 @@ public class EntitatPermisSuperController extends BaseController {
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
-		model.addAttribute(
-				"entitat",
-				entitatService.findById(entitatId));
-		PermisDto permis = null;
-		if (permisId != null) {
-			List<PermisDto> permisos = entitatService.findPermisSuper(entitatId);
-			for (PermisDto p: permisos) {
-				if (p.getId().equals(permisId)) {
-					permis = p;
-					break;
-				}
-			}
-		}
+		model.addAttribute("entitat", entitatService.findById(entitatId));
+		PermisDto permis = getPermisSuperById(entitatId, permisId);
+
 		if (permis != null)
 			model.addAttribute(PermisCommand.asCommand(permis));
 		else
 			model.addAttribute(new PermisCommand());
+
 		return "entitatPermisForm";
+	}
+
+	private PermisDto getPermisSuperById(Long entitatId, Long permisId) {
+		if (permisId != null) {
+			List<PermisDto> permisos = entitatService.findPermisSuper(entitatId);
+			for (PermisDto p: permisos) {
+				if (p.getId().equals(permisId)) {
+					return p;
+				}
+			}
+		}
+		return null;
 	}
 
 	@RequestMapping(value = "/{entitatId}/permis", method = RequestMethod.POST)
@@ -117,7 +120,8 @@ public class EntitatPermisSuperController extends BaseController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../entitat/" + entitatId + "/permis",
-				"entitat.controller.permis.modificat.ok");
+				"entitat.controller.permis.modificat.ok",
+				new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 	}
 
 	@RequestMapping(value = "/{entitatId}/permis/{permisId}/delete", method = RequestMethod.GET)
@@ -126,11 +130,12 @@ public class EntitatPermisSuperController extends BaseController {
 			@PathVariable Long entitatId,
 			@PathVariable Long permisId,
 			Model model) {
+		PermisDto permis = getPermisSuperById(entitatId, permisId);
 		entitatService.deletePermisSuper(entitatId, permisId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../entitat/" + entitatId + "/permis",
-				"entitat.controller.permis.esborrat.ok");
+				"entitat.controller.permis.esborrat.ok",
+				new Object[] { permis.getPrincipalTipus()+ " "+permis.getPrincipalNom() });
 	}
-
 }

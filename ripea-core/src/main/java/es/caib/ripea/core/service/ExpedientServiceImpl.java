@@ -754,7 +754,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void agafarUser(Long entitatId, Long id) {
+	public String agafarUser(Long entitatId, Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug(
 				"Agafant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "usuari=" +
@@ -767,7 +767,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+		return expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 	}
 
 	@Transactional
@@ -791,18 +791,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
+	public String agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
 		logger.debug(
 				"Agafant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "arxiuId=" + arxiuId +
 						", " + "id=" + id + ", " + "usuariCodi=" + usuariCodi + ")");
 		ExpedientEntity expedient = expedientRepository.findOne(id);
 
-		expedientHelper.agafar(expedient, usuariCodi);
+		return expedientHelper.agafar(expedient, usuariCodi);
 	}
 
 	@Transactional
 	@Override
-	public void alliberarUser(Long entitatId, Long id) {
+	public String alliberarUser(Long entitatId, Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug(
 				"Alliberant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
@@ -815,7 +815,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		expedientHelper.alliberar(expedient);
+		return expedientHelper.alliberar(expedient);
 	}
 
 	@Transactional
@@ -828,14 +828,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	@Override
-	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+	public String tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
 		synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksExpedients)) {
-			expedientHelper.tancar(
+			return expedientHelper.tancar(
 					entitatId,
 					id,
 					motiu,
 					documentsPerFirmar,
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin).getNom();
 		}
 	}
 	

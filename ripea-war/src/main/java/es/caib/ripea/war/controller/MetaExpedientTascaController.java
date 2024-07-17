@@ -223,7 +223,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientEstat/" + metaExpedientId,
-					"metaexpedient.controller.tasca.creada.ok");
+					"metaexpedient.controller.tasca.creada.ok",
+					new Object[] { command.getNom() });
 		} else {
 			metaExpedientService.tascaUpdate(
 					entitatActual.getId(),
@@ -236,7 +237,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientEstat/" + metaExpedientId,
-					"metaexpedient.controller.tasca.modificada.ok");
+					"metaexpedient.controller.tasca.modificada.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -251,7 +253,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaExpedientService.tascaUpdateActiu(
+		MetaExpedientTascaDto metaExpedientTascaDto = metaExpedientService.tascaUpdateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
 				id,
@@ -264,7 +266,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
-				"metaexpedient.controller.tasca.activada.ok");
+				"metaexpedient.controller.tasca.activada.ok",
+				new Object[] { metaExpedientTascaDto.getNom() });
 	}
 	@RequestMapping(value = "/{metaExpedientId}/tasca/{id}/disable", method = RequestMethod.GET)
 	public String disable(
@@ -277,7 +280,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaExpedientService.tascaUpdateActiu(
+		MetaExpedientTascaDto metaExpedientTascaDto = metaExpedientService.tascaUpdateActiu(
 				entitatActual.getId(),
 				metaExpedientId,
 				id,
@@ -290,7 +293,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaExpedient",
-				"metaexpedient.controller.tasca.desactivada.ok");
+				"metaexpedient.controller.tasca.desactivada.ok",
+				new Object[] { metaExpedientTascaDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaExpedientId}/tasca/{id}/delete", method = RequestMethod.GET)
@@ -304,7 +308,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		
 		comprovarAccesMetaExpedient(request, metaExpedientId);
-		metaExpedientService.tascaDelete(
+		MetaExpedientTascaDto metaExpedientTascaDto = metaExpedientService.tascaDelete(
 				entitatActual.getId(),
 				metaExpedientId,
 				id, rolActual, organActual != null ? organActual.getId() : null);
@@ -316,7 +320,8 @@ public class MetaExpedientTascaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:expedientEstat",
-				"metaexpedient.controller.tasca.esborrada.ok");
+				"metaexpedient.controller.tasca.esborrada.ok",
+				new Object[] { metaExpedientTascaDto.getNom() });
 	}
 
 }

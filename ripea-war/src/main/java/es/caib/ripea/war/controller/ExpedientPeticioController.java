@@ -825,10 +825,9 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		return grup;
 	}
-	
-	
-	
-	
+
+
+
 	@RequestMapping(value = "/canviarProcediment", method = RequestMethod.POST)
 	public String canviarProcedimentPost(
 			HttpServletRequest request,
@@ -847,7 +846,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:expedientPeticio",
-					"metaexpedient.controller.modificat.ok");
+					"metaexpedient.controller.modificat.ok",
+					new Object[] { command.getNumero() });
 
 		} catch (Exception e) {
 			logger.error("Error al canvair procediemnt de expedient peticio", e);
@@ -856,13 +856,13 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 					request,
 					"redirect:expedientPeticio",
 					"metaexpedient.controller.modificar.error",
-					new String[] {throwable.getMessage()},
+					new String[] {command.getNumero(), throwable.getMessage()},
 					throwable);
 		}
 		
 	}
-	
-	
+
+
 
 	@RequestMapping(value = "/canviarEstatDistribucio/{id}", method = RequestMethod.GET)
 	public String canviarEstatDistribucio(HttpServletRequest request, @PathVariable Long id, Model model) {

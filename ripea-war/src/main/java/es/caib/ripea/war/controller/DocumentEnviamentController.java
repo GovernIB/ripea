@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import es.caib.ripea.core.api.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,20 +38,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
-import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
-import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DadesExternesService;
@@ -247,7 +234,6 @@ public class DocumentEnviamentController extends BaseUserController {
 
 	
 	
-	
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/descarregarJustificantEnviamentNotib", method = RequestMethod.GET)
 	public String notificacioConsultarIDescarregarJustificant(
 			HttpServletRequest request,
@@ -257,7 +243,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		getEntitatActualComprovantPermisos(request);
 		RespostaJustificantEnviamentNotibDto info = documentService.notificacioDescarregarJustificantEnviamentNotib(
 				notificacioId);
-		
+
 		if (info.getJustificant() != null) {
 			writeFileToResponse(
 					"justificant.pdf",
@@ -272,7 +258,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		}
 		return null;
 	}
-	
+
 
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}", method = RequestMethod.GET)
@@ -315,14 +301,15 @@ public class DocumentEnviamentController extends BaseUserController {
 					model, null);
 			return "notificacioForm";
 		}
-		documentEnviamentService.notificacioUpdate(
+		DocumentNotificacioDto documentNotificacioDto = documentEnviamentService.notificacioUpdate(
 				entitatActual.getId(),
 				documentId,
 				DocumentNotificacionsCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + documentId,
-				"expedient.controller.notificacio.modificada.ok");
+				"expedient.controller.notificacio.modificada.ok",
+				new Object[] { documentNotificacioDto.getRegistreNumeroFormatat() });
 	}
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/delete", method = RequestMethod.GET)
@@ -331,14 +318,15 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			@PathVariable Long notificacioId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentEnviamentService.notificacioDelete(
+		DocumentNotificacioDto documentNotificacioDto= documentEnviamentService.notificacioDelete(
 				entitatActual.getId(),
 				documentId,
 				notificacioId);
 		return this.getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../contingut/" + documentId,
-				"expedient.controller.notificacio.esborrada.ok");
+				"expedient.controller.notificacio.esborrada.ok",
+				new Object[] { documentNotificacioDto.getRegistreNumeroFormatat() });
 	}
 	
 	
@@ -515,14 +503,15 @@ public class DocumentEnviamentController extends BaseUserController {
 					model);
 			return "publicacioForm";
 		}
-		documentEnviamentService.publicacioUpdate(
+		DocumentPublicacioDto documentPublicacioDto = documentEnviamentService.publicacioUpdate(
 				entitatActual.getId(),
 				documentId,
 				DocumentPublicacioCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + documentId,
-				"expedient.controller.publicacio.modificada.ok");
+				"expedient.controller.publicacio.modificada.ok",
+				new Object[] { documentPublicacioDto.getDocumentNom() });
 	}
 
 	@RequestMapping(value = "/{documentId}/publicacio/{publicacioId}/delete", method = RequestMethod.GET)
@@ -531,14 +520,15 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			@PathVariable Long publicacioId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentEnviamentService.publicacioDelete(
+		DocumentPublicacioDto documentPublicacioDto = documentEnviamentService.publicacioDelete(
 				entitatActual.getId(),
 				documentId,
 				publicacioId);
 		return this.getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../contingut/" + documentId,
-				"expedient.controller.publicacio.esborrada.ok");
+				"expedient.controller.publicacio.esborrada.ok",
+				new Object[] { documentPublicacioDto.getDocumentNom() });
 	}
 
 	@InitBinder

@@ -187,14 +187,18 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDada",
-					"metadada.controller.modificat.ok");
+					"metadada.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			metaDadaService.create(entitatActual.getId(), metaDocumentId, MetaDadaCommand.asDto(command), rolActual, organActual != null ? organActual.getId() : null);
 			
 			if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 				MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 			}
-			return getModalControllerReturnValueSuccess(request, "redirect:metaDada", "metadada.controller.creat.ok");
+			return getModalControllerReturnValueSuccess(request,
+					"redirect:metaDada",
+					"metadada.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -203,8 +207,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true, rolActual, organActual != null ? organActual.getId() : null);
-		
+		MetaDadaDto metaDadaDto = metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, true, rolActual, organActual != null ? organActual.getId() : null);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		
 		if (metaDocument.getMetaExpedientId() != null) {
@@ -217,7 +220,8 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
-				"metadada.controller.activada.ok");
+				"metadada.controller.activada.ok",
+				new Object[] { metaDadaDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/disable", method = RequestMethod.GET)
@@ -228,8 +232,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-		metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false, rolActual, organActual != null ? organActual.getId() : null);
-		
+		MetaDadaDto metaDadaDto = metaDadaService.updateActiva(entitatActual.getId(), metaDocumentId, metaDadaId, false, rolActual, organActual != null ? organActual.getId() : null);
 		MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 		
 		if (metaDocument.getMetaExpedientId() != null) {
@@ -242,7 +245,8 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDada",
-				"metadada.controller.desactivada.ok");
+				"metadada.controller.desactivada.ok",
+				new Object[] { metaDadaDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaDocumentId}/metaDada/{metaDadaId}/delete", method = RequestMethod.GET)
@@ -251,7 +255,7 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 		try {
 			String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);	
 			EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
-			metaDadaService.delete(entitatActual.getId(), metaDocumentId, metaDadaId, rolActual, organActual != null ? organActual.getId() : null);
+			MetaDadaDto metaDadaDto = metaDadaService.delete(entitatActual.getId(), metaDocumentId, metaDadaId, rolActual, organActual != null ? organActual.getId() : null);
 			
 			MetaDocumentDto metaDocument = metaDocumentService.findById(metaDocumentId);
 			boolean metaExpedientPendentRevisio = metaDocument.getMetaExpedientId() != null ? metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaDocument.getMetaExpedientId()) : false;
@@ -262,7 +266,8 @@ public class MetaDocumentMetaDadaController extends BaseAdminController {
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDada",
-					"metadada.controller.esborrat.ok");
+					"metadada.controller.esborrat.ok",
+					new Object[] { metaDadaDto.getNom() });
 		} catch (Exception e) {
 			logger.error("Error al esborrar metadada", e);
 			
