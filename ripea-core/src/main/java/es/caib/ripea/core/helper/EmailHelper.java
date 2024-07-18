@@ -819,6 +819,25 @@ public class EmailHelper {
 						expedientTascaEntity.getResponsables()));
 
 	}	
+	
+	
+	public void enviarEmailModificacioDataLimitTasca(
+			ExpedientTascaEntity expedientTascaEntity) {
+		logger.debug("Enviant correu electrònic per a reassignar responsable de tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		Set<DadesUsuari> responsables = getGestors(
+				true,
+				false,
+				expedientTascaEntity.getExpedient(),
+				expedientTascaEntity.getCreatedBy().getCodi(),
+				expedientTascaEntity.getResponsables());
+		
+		enviarEmailModificacioDataLimitTasca(
+				expedientTascaEntity, 
+				responsables);
+
+	}	
 
 	public void sendEmailAvisMencionatComentari(
 			String emailDestinatari, 
@@ -1001,6 +1020,28 @@ public class EmailHelper {
 
 	}
 	
+	private void enviarEmailModificacioDataLimitTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			Set<DadesUsuari> responsables) {
+		logger.debug("Enviant correu electrònic modificació data límit tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		String subject = getPrefixRipea() + " Modificació data límit de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+		String text = 			
+					"S'ha modificat la data límit de la tasca a RIPEA:\n" +
+							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
+							"\tResponsable:" + expedientTascaEntity.getResponsables().get(0).getNom() + " (" +
+							expedientTascaEntity.getResponsables().get(0).getCodi() + ")" + "\n" + 
+							"\tData límit: " + expedientTascaEntity.getDataLimit();
+		
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.MODIFICACIO_DATALIMIT_TASCA);
+
+	}
 	
 	private void sendOrSaveEmail(
 			String codi,

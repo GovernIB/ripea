@@ -1,6 +1,7 @@
 package es.caib.ripea.core.api.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +67,10 @@ public interface ExpedientTascaService {
 			Long expedientTascaId, 
 			List<String> responsablesCodi);
 
+	public ExpedientTascaDto updateDataLimit(
+			Long expedientTascaId, 
+			Date dataLimit);
+	
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
 
 	public boolean publicarComentariPerExpedientTasca(

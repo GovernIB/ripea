@@ -139,7 +139,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public void updateDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
-	
+	public void updateDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
 	public void updateRebutjar(String motiuRebuig) {
 		this.motiuRebuig = motiuRebuig;
 		this.estat = TascaEstatEnumDto.REBUTJADA;

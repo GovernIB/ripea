@@ -597,6 +597,27 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		return conversioTipusHelper.convertirList(tascacoms, ExpedientTascaComentariDto.class);
 	}
 
+
+	@Transactional
+	@Override
+	public ExpedientTascaDto updateDataLimit(Long expedientTascaId, Date dataLimit) {
+		logger.debug("Canviant responsable de la tasca " +
+				"expedientTascaId=" + expedientTascaId +", "+
+				"dataLimit=" + dataLimit +
+				")");
+
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
+				
+		expedientTascaEntity.updateDataLimit(dataLimit);	
+		
+		emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
+		
+		log(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
+		
+		return conversioTipusHelper.convertir(expedientTascaEntity,
+				ExpedientTascaDto.class);
+	}
+	
 	private void log (ExpedientTascaEntity expedientTascaEntity, LogTipusEnumDto tipusLog) {
 		contingutLogHelper.log(
 				expedientTascaEntity.getExpedient(),

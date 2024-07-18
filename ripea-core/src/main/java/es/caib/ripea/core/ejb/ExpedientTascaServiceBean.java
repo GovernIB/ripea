@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -161,6 +162,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	@RolesAllowed("tothom")
 	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId) {
 		return delegate.findByTascaBasicInfo(contingutId, tascaId);
+	}
+
+	@Override
+	public ExpedientTascaDto updateDataLimit(Long expedientTascaId, Date dataLimit) {
+		return delegate.updateDataLimit(expedientTascaId, dataLimit);
 	}
 
 }

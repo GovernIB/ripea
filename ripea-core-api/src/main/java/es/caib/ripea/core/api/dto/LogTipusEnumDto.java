@@ -77,5 +77,7 @@ public enum LogTipusEnumDto {
 	// Tancament logic expedient
 	TANCAMENT_LOGIC,
 	
-	ESCANEIG
+	ESCANEIG,
+	
+	CANVI_DATALIMIT_TASCA
 }

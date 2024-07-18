@@ -13,6 +13,7 @@ import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.war.command.ExpedientTascaCommand;
+import es.caib.ripea.war.command.TascaDataLimitCommand;
 import es.caib.ripea.war.command.TascaReassignarCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
@@ -212,6 +213,45 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.reassignat.ok");
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.GET)
+	public String datalimit(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		
+		TascaDataLimitCommand command = new TascaDataLimitCommand();
+		command.setDataLimit(expedientTascaDto.getDataLimit());
+		
+		model.addAttribute(command);
+		
+		return "expedientTascaDataLimit";
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.POST)
+	public String datalimitPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@Valid TascaDataLimitCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			return "expedientTascaDataLimit";
+		}
+	
+		expedientTascaService.updateDataLimit(expedientTascaId, command.getDataLimit());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"expedient.tasca.controller.dataLimit.ok");
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/comentaris", method = RequestMethod.GET)

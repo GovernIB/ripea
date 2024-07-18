@@ -79,6 +79,7 @@ $(document).ready(function() {
 						{{/if}}
 						<c:if test="${potModificar}">
 							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
+								<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
 								<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
 							{{/if}}
 						</c:if>
