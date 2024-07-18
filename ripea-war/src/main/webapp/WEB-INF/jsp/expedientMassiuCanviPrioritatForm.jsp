@@ -4,10 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
-
 <c:set var="titol"><spring:message code="expedient.massiu.prioritat.modificar.titol"/></c:set>
-
 <html>
 <head>
 	<title>${titol}</title>
@@ -18,16 +15,13 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 </head>
 <body>
-
-
-	<c:set var="formAction"><rip:modalUrl value="/expedient/canviPrioritats"/></c:set>
-
+	<c:set var="formAction"><rip:modalUrl value="/massiu/canviPrioritats/canviar"/></c:set>
 	<form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientMassiuCanviPrioritatCommand">
 		<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
 		<div class="h200" />
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
-			<a href="<c:url value="/expedient"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
+			<a href="<c:url value="/massiu/canviPrioritats"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>
 		</div>
 	</form:form>
 </body>

@@ -107,7 +107,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null, 
 								null,
 								null,
-								PrioritatEnumDto.NORMAL);
+								PrioritatEnumDto.B_NORMAL);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -457,7 +457,7 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null, 
 								null,
 								null,
-								PrioritatEnumDto.NORMAL);
+								PrioritatEnumDto.B_NORMAL);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),

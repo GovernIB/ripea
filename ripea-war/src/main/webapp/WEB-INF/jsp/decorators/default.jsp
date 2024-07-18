@@ -511,7 +511,8 @@ body {
 							<c:if test="${isRolActualAdministrador}">
 								<li><a href="<c:url value="/massiu/expedientPeticioCanviEstatDistribucio"/>"><spring:message code="massiu.anotacions.pendents.canvi.estat"/></a></li>
 							</c:if>
-							<li class="divider"></li>		
+							<li><a href="<c:url value="/massiu/canviPrioritats"/>"><spring:message code="expedient.massiu.prioritat.modificar.titol"/></a></li>
+							<li class="divider"></li>
 							<li><a href="<c:url value="/massiu/consulta/0"/>" data-toggle="modal" data-maximized="true">
 									<spring:message code="decorator.menu.accions.massives.user"/>
 							</a></li>												

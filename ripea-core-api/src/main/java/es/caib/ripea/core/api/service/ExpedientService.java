@@ -425,8 +425,7 @@ public interface ExpedientService {
 			Long entitatId, 
 			Set<Long> expedientIds,
 			boolean ambDocuments) throws IOException;
-	
-	
+
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,

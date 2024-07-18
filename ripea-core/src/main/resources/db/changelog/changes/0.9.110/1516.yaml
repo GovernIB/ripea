@@ -15,6 +15,6 @@ databaseChangeLog:
             columns:
               - column:
                   name: prioritat
-                  type: varchar(10 ${varcharunit})
-                  defaultValue: NORMAL
+                  type: varchar(16 ${varcharunit})
+                  defaultValue: B_NORMAL
             tableName: ipa_expedient

@@ -85,10 +85,10 @@ function formatDate(date) {
 
 var colorsPrioritats = {
 	'CRITICA': '#c30000',
-	'MOLT_ALTA': '#d99b9d',
-	'ALTA': '#ffebae',
+	'D_MOLT_ALTA': '#d99b9d',
+	'C_ALTA': '#ffebae',
 	// 'NORMAL': '',
-	'BAIXA': '#c3e8d1',
+	'A_BAIXA': '#c3e8d1',
 	'MOLT_BAIXA': '#afcee9'
 };
 

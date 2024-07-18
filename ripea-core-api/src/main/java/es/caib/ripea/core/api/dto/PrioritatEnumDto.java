@@ -10,10 +10,10 @@ package es.caib.ripea.core.api.dto;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public enum PrioritatEnumDto {
-	CRITICA,
-	MOLT_ALTA,
-	ALTA,
-	NORMAL,
-	BAIXA,
-	MOLT_BAIXA
+	//CRITICA,
+	D_MOLT_ALTA,
+	C_ALTA,
+	B_NORMAL,
+	A_BAIXA,
+	//MOLT_BAIXA
 }

@@ -595,7 +595,7 @@ function removeCookie(cname) {
 						<li><a href="expedient/alliberar"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.alliberar"/></a></li>
 						<li><a href="expedient/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.follow"/></a></li>		
 						<li><a href="expedient/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.unfollow"/></a></li>
-						<li><a href="expedient/canviPrioritats" data-toggle="modal"><span class="fa fa-signal fa-rotate-90"></span>&nbsp;&nbsp;<spring:message code="comu.boto.canviarPrioritat"/></a></li>
+						<%-- li><a href="expedient/canviPrioritats" data-toggle="modal"><span class="fa fa-signal fa-rotate-90"></span>&nbsp;&nbsp;<spring:message code="comu.boto.canviarPrioritat"/></a></li --%>
 						<li><a href="expedient/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node.multiple"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="expedient.list.user.esborrar"/></a></li>
 						<li><a href="expedient/export/ODS"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.CSV"/></a></li>
@@ -703,16 +703,16 @@ function removeCookie(cname) {
 						<span class="label label-{{:prioritat}}">
 						{{if prioritat == 'MOLT_BAIXA'}}
 							<spring:message code="prioritat.enum.MOLT_BAIXA"/>
-						{{else prioritat == 'BAIXA'}}
-							<spring:message code="prioritat.enum.BAIXA"/>
-						{{else prioritat == 'ALTA'}}
-							<spring:message code="prioritat.enum.ALTA"/>
-						{{else prioritat == 'MOLT_ALTA'}}
-							<spring:message code="prioritat.enum.MOLT_ALTA"/>
+						{{else prioritat == 'A_BAIXA'}}
+							<spring:message code="prioritat.enum.A_BAIXA"/>
+						{{else prioritat == 'C_ALTA'}}
+							<spring:message code="prioritat.enum.C_ALTA"/>
+						{{else prioritat == 'D_MOLT_ALTA'}}
+							<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
 						{{else prioritat == 'CRITICA'}}
 							<spring:message code="prioritat.enum.CRITICA"/>
 						{{else}}
-							<spring:message code="prioritat.enum.NORMAL"/>
+							<spring:message code="prioritat.enum.B_NORMAL"/>
 						{{/if}}
 						</span>
 					</script>

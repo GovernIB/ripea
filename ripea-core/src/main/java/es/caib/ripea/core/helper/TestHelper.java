@@ -57,7 +57,7 @@ public class TestHelper {
 				new Date(),
 				"ntiClasificacionSia",
 				new OrganGestorEntity(),
-				PrioritatEnumDto.NORMAL).build();
+				PrioritatEnumDto.B_NORMAL).build();
 		
 		
 		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(
@@ -130,7 +130,7 @@ public class TestHelper {
 				new Date(),
 				"ntiClasificacionSia",
 				new OrganGestorEntity(),
-				PrioritatEnumDto.NORMAL).build();
+				PrioritatEnumDto.B_NORMAL).build();
 		
 		
 		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(

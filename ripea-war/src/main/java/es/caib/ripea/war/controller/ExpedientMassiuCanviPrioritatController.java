@@ -4,13 +4,14 @@
 package es.caib.ripea.war.controller;
 
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
+import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.ExpedientMassiuCanviPrioritatCommand;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -18,14 +19,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Controlador per canvi estat massiu del expedients
@@ -34,51 +33,100 @@ import java.util.Set;
  */
 @Slf4j
 @Controller
-@RequestMapping("/expedient/canviPrioritats")
+@RequestMapping("/massiu/canviPrioritats")
 public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrganController {
 	
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private AplicacioService aplicacioService;
+	private static final String SESSION_ATTRIBUTE_FILTRE = "ExpedientMassiuCanviPrioritatController.session.filtre";
+	private static final String SESSION_ATTRIBUTE_SELECCIO = "ExpedientMassiuCanviPrioritatController.session.seleccio";
 
-	@Autowired
-	private AplicacioService aplicacioService;
+	@RequestMapping(method = RequestMethod.GET)
+	public String get(
+			HttpServletRequest request,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
 
+		model.addAttribute(filtreCommand);
+		model.addAttribute("seleccio", RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO));
+		model.addAttribute("metaExpedients", metaExpedientService.findActiusAmbEntitatPerModificacio(entitatActual.getId(), rolActual));
+
+		return "expedientMassiuCanviPrioritatList";
+	}
+
+	@RequestMapping(method = RequestMethod.POST)
+	public String post(
+			HttpServletRequest request,
+			@Valid ContingutMassiuFiltreCommand filtreCommand,
+			BindingResult bindingResult,
+			Model model,
+			@RequestParam(value = "accio", required = false) String accio) {
+
+		if ("netejar".equals(accio)) {
+			RequestSessionHelper.esborrarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE);
+		} else {
+			if (!bindingResult.hasErrors()) {
+				RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_FILTRE, filtreCommand);
+			}
+		}
+		return "redirect:/massiu/canviPrioritats";
+	}
+
+	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
+	@ResponseBody
+	public DatatablesHelper.DatatablesResponse datatable(HttpServletRequest request) {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+		ContingutMassiuFiltreCommand contingutMassiuFiltreCommand = getFiltreCommand(request);
+
+		try {
+			return DatatablesHelper.getDatatableResponse(
+					request,
+					 expedientService.findExpedientsPerTancamentMassiu(
+								entitatActual.getId(),
+								ContingutMassiuFiltreCommand.asDto(contingutMassiuFiltreCommand),
+								DatatablesHelper.getPaginacioDtoFromRequest(request),
+								rolActual),
+					 "id",
+					SESSION_ATTRIBUTE_SELECCIO);
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
 	@SuppressWarnings("unchecked")
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value = "/canviar", method = RequestMethod.GET)
 	public String canviarPrioritatsGet(HttpServletRequest request, Model model) {
-		
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-//		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request));
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, ExpedientController.SESSION_ATTRIBUTE_SELECCIO);
 
-		if (seleccio == null || seleccio.isEmpty()) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		Set<Long> seleccio = getSessionAttributeSelecio(request);
+
+		if (seleccio.isEmpty()) {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/expedient",
 					"accio.massiva.seleccio.buida",
 					null);
-		} else if (seleccio != null && seleccio.size() > 1000) {
+		} else if (seleccio.size() > 1000) {
 			return getModalControllerReturnValueError(
 					request,
 					"redirect:/expedient",
 					"accio.massiva.seleccio.max.error",
 					null);
 		}
-		
+
 		ExpedientMassiuCanviPrioritatCommand command = new ExpedientMassiuCanviPrioritatCommand();
 		model.addAttribute(command);
-	
+
 		return "expedientMassiuCanviPrioritatForm";
 	}
-	
-	
-	@SuppressWarnings("unchecked")
-	@RequestMapping(method = RequestMethod.POST)
+
+	@RequestMapping(value = "/canviar", method = RequestMethod.POST)
 	public String canviarsPrioritatsPost(
 			HttpServletRequest request,
 			ExpedientMassiuCanviPrioritatCommand command,
@@ -89,9 +137,7 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 		if (bindingResult.hasErrors()) {
 			return "expedientEstatsForm";
 		}
-		
-//		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, getSessionAttributeSelecio(request));
-		Set<Long> seleccio = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, ExpedientController.SESSION_ATTRIBUTE_SELECCIO);
+		Set<Long> seleccio = getSessionAttributeSelecio(request);
 
 		try {
 			expedientService.changeExpedientsPrioritat(
@@ -107,48 +153,73 @@ public class ExpedientMassiuCanviPrioritatController extends BaseUserOAdminOOrga
 
 		return modalUrlTancar();
 	}
-	
-	
-	
-//	private String getSessionAttributeSelecio(HttpServletRequest request) {
-//		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
-//		String sessionAttribute;
-//		if (rolActual.equals("tothom")) {
-//			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_USER;
-//		} else if (rolActual.equals("IPA_ADMIN")) {
-//			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_ADMIN;
-//		} else if (rolActual.equals("IPA_ORGAN_ADMIN")){
-//			sessionAttribute = SESSION_ATTRIBUTE_SELECCIO_ORGAN;
-//		} else {
-//			throw new RuntimeException("No rol permitido");
-//		}
-//		return sessionAttribute;
-//	}
-	
-	
 
-	@InitBinder
-	protected void initBinder(WebDataBinder binder) {
-	    binder.registerCustomEditor(
-	    		Date.class,
-	    		new CustomDateEditor(new SimpleDateFormat("dd/MM/yyyy"), true));
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/select", method = RequestMethod.GET)
+	@ResponseBody
+	public int select(
+			HttpServletRequest request,
+			@RequestParam(value="ids[]", required = false) Long[] ids) {
+
+		Set<Long> seleccio = getSessionAttributeSelecio(request);
+
+		if (ids != null) {
+            Collections.addAll(seleccio, ids);
+		} else {
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			ContingutMassiuFiltreCommand filtreCommand = getFiltreCommand(request);
+			String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
+			seleccio.addAll(
+					expedientService.findIdsExpedientsPerTancamentMassiu(
+							entitatActual.getId(),
+							ContingutMassiuFiltreCommand.asDto(filtreCommand), rolActual));
+		}
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
+		return seleccio.size();
 	}
 
+	@RequestMapping(value = "/deselect", method = RequestMethod.GET)
+	@ResponseBody
+	public int deselect(
+			HttpServletRequest request,
+			@RequestParam(value="ids[]", required = false) Long[] ids) {
 
-//	private ContingutMassiuFiltreCommand getFiltreCommand(
-//			HttpServletRequest request) {
-//		ContingutMassiuFiltreCommand filtreCommand = (ContingutMassiuFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
-//				request,
-//				SESSION_ATTRIBUTE_FILTRE);
-//		if (filtreCommand == null) {
-//			filtreCommand = new ContingutMassiuFiltreCommand();
-//			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
-//			RequestSessionHelper.actualitzarObjecteSessio(
-//					request,
-//					SESSION_ATTRIBUTE_FILTRE,
-//					filtreCommand);
-//		}
-//		return filtreCommand;
-//	}
+		Set<Long> seleccio = getSessionAttributeSelecio(request);
 
+		if (ids != null) {
+			for (Long id: ids) {
+				seleccio.remove(id);
+			}
+		} else {
+			seleccio.clear();
+		}
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
+		return seleccio.size();
+	}
+
+	private ContingutMassiuFiltreCommand getFiltreCommand(
+			HttpServletRequest request) {
+		ContingutMassiuFiltreCommand filtreCommand = (ContingutMassiuFiltreCommand)RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_FILTRE);
+		if (filtreCommand == null) {
+			filtreCommand = new ContingutMassiuFiltreCommand();
+			filtreCommand.setMetaExpedientId(aplicacioService.getProcedimentPerDefecte(EntitatHelper.getEntitatActual(request).getId(), RolHelper.getRolActual(request)));
+			RequestSessionHelper.actualitzarObjecteSessio(
+					request,
+					SESSION_ATTRIBUTE_FILTRE,
+					filtreCommand);
+		}
+		return filtreCommand;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<Long> getSessionAttributeSelecio(HttpServletRequest request) {
+		Object listExpSel = request.getSession().getAttribute(SESSION_ATTRIBUTE_SELECCIO);
+		if (listExpSel!=null) {
+            return (Set<Long>) listExpSel;
+		} else {
+			return new HashSet<Long>();
+		}
+	}
 }

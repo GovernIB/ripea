@@ -18,6 +18,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ExpedientMassiuCanviPrioritatCommand {
 
-	private PrioritatEnumDto prioritat = PrioritatEnumDto.NORMAL;
+	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 
 }

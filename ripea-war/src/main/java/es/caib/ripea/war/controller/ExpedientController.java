@@ -538,7 +538,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		} else {
 			command = new ExpedientCommand();
 			command.setAny(Calendar.getInstance().get(Calendar.YEAR));
-			command.setPrioritat(PrioritatEnumDto.NORMAL);
+			command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
@@ -1328,7 +1328,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			
 		} else {
 			command = new ExpedientCommand();
-			command.setPrioritat(PrioritatEnumDto.NORMAL);
+			command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
@@ -1378,11 +1378,11 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		if (expedient != null) {
 			command = ExpedientCommand.asCommand(expedient);
 			if (expedient.getPrioritat() == null) {
-				command.setPrioritat(PrioritatEnumDto.NORMAL);
+				command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 			}
 		} else {
 			command = new ExpedientCommand();
-			command.setPrioritat(PrioritatEnumDto.NORMAL);
+			command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);

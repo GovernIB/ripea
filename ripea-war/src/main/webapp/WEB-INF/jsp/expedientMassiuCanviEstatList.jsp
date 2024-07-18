@@ -283,16 +283,16 @@ function enableDisableSelection($this, tipus) {
 						<span class="label label-{{:prioritat}}">
 						{{if prioritat == 'MOLT_BAIXA'}}
 						<spring:message code="prioritat.enum.MOLT_BAIXA"/>
-						{{else prioritat == 'BAIXA'}}
-						<spring:message code="prioritat.enum.BAIXA"/>
-						{{else prioritat == 'ALTA'}}
-						<spring:message code="prioritat.enum.ALTA"/>
-						{{else prioritat == 'MOLT_ALTA'}}
-						<spring:message code="prioritat.enum.MOLT_ALTA"/>
+						{{else prioritat == 'A_BAIXA'}}
+						<spring:message code="prioritat.enum.A_BAIXA"/>
+						{{else prioritat == 'C_ALTA'}}
+						<spring:message code="prioritat.enum.C_ALTA"/>
+						{{else prioritat == 'D_MOLT_ALTA'}}
+						<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
 						{{else prioritat == 'CRITICA'}}
 						<spring:message code="prioritat.enum.CRITICA"/>
 						{{else}}
-						<spring:message code="prioritat.enum.NORMAL"/>
+						<spring:message code="prioritat.enum.B_NORMAL"/>
 						{{/if}}
 						</span>
 					</script>

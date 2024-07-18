@@ -323,7 +323,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		
 		ExpedientPeticioAcceptarCommand command = new ExpedientPeticioAcceptarCommand();
 		command.setAgafarExpedient(true);
-		command.setPrioritat(PrioritatEnumDto.NORMAL);
+		command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		omplirModel(expedientPeticioId, request, model, command);
 		return "expedientPeticioAccept";
 

@@ -492,7 +492,7 @@ public class ExpedientEntity extends NodeEntity {
 			built.organGestor = organGestor;
 			built.estat = ExpedientEstatEnumDto.OBERT;
 			built.tipus = ContingutTipusEnumDto.EXPEDIENT;
-			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.NORMAL;
+			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
 		}
 		public Builder agafatPer(UsuariEntity agafatPer) {
 			built.agafatPer = agafatPer;

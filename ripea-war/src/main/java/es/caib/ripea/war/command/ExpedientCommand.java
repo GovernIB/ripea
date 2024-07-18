@@ -63,7 +63,7 @@ public class ExpedientCommand extends ContenidorCommand {
 		if (dto.getPare() != null) command.setPareId(dto.getPare().getId());
 		if (dto.getMetaNode() != null) command.setMetaNodeId(dto.getMetaNode().getId());
 		if (dto.getMetaExpedientDomini() != null) command.setMetaNodeDominiId(dto.getMetaExpedientDomini().getId());
-		if (dto.getPrioritat() == null) command.setPrioritat(PrioritatEnumDto.NORMAL);
+		if (dto.getPrioritat() == null) command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		return command;
 	}
 	public static ExpedientDto asDto(ExpedientCommand command) {
