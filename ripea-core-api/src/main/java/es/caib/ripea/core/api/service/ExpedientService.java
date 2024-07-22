@@ -115,7 +115,9 @@ public interface ExpedientService {
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, String rolActual) throws NotFoundException;
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			Long organActual) throws NotFoundException;
 	
 	/**
 	 * Consulta els expedients soble els que té permís un usuari per procediment
@@ -151,7 +153,8 @@ public interface ExpedientService {
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
 			ExpedientFiltreDto filtre, 
-			String rolActual) throws NotFoundException;
+			String rolActual,
+			Long organActual) throws NotFoundException;
 
 	/**
 	 * Posa un expedient a l'escriptori de l'usuari actual.
@@ -336,7 +339,8 @@ public interface ExpedientService {
 	PaginaDto<ExpedientDto> findAmbFiltreNoRelacionat(
 			Long entitatId, ExpedientFiltreDto filtre, Long expedientId,
 			PaginacioParamsDto paginacioParams, 
-			String rolActual);
+			String rolActual,
+			Long organActual);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	List<CodiValorDto> findByEntitat(Long entitatId);
@@ -461,7 +465,8 @@ public interface ExpedientService {
 			Long entitatId,
 			String text, 
 			String rolActual,
-			Long procedimentId);
+			Long procedimentId,
+			Long organActual);
 
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")

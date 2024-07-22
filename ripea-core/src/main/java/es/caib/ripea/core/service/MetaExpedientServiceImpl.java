@@ -867,7 +867,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				entitatId,
 				organGestorId,
 				hasPermisAdmComu);
-
+		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+		ordenacioMap.put("organGestor.codiINom", new String[] {"organGestor.codi", "organGestor.nom"});
 		return paginacioHelper.toPaginaDto(
 				metaExpedientRepository.findByOrganGestor(
 						entitat,
@@ -885,7 +886,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 						Utils.getNullIfEmpty(candidateMetaExpIds),
 						filtre.getRevisioEstat() == null,
 						filtre.getRevisioEstat(),
-						paginacioHelper.toSpringDataPageable(paginacioParams)),
+						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap)),
 				MetaExpedientDto.class,
 				organGestorId,
 				new ConverterParam<MetaExpedientEntity, MetaExpedientDto, Long>() {

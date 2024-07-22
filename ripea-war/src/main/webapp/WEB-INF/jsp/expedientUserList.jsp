@@ -119,7 +119,9 @@ $(document).ready(function() {
 			);
 			return false;
 		});
+
 		$('#taulaDades').DataTable().column(columnaAgafatPer).visible(!mostrarMeusExpedients);
+
 		$("span[class^='stateColor-']").each(function( index ) {
 			var fullClassNameString = this.className;
 			var colorString = fullClassNameString.substring(11);

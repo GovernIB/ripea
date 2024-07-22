@@ -175,7 +175,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				rolActual,
 				permisosPerAnotacions.getProcedimentsPermesos(),
 				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
-				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedient == null,

@@ -955,14 +955,14 @@ public class MetaExpedientHelper {
 				metaExpedientTascaRepository.countByMetaExpedient(metaExpedient));
 		
 		List<GrupEntity> grups = metaExpedient.getGrups();
-		if (adminOrganId != null) {
-			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
-				GrupEntity grup = iter.next();
-				if (grup.getOrganGestor() == null || !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(adminOrganId)) {
-					iter.remove();
-				}
-			}
-		}
+//		if (adminOrganId != null) {
+//			for (Iterator<GrupEntity> iter = grups.iterator(); iter.hasNext();) {
+//				GrupEntity grup = iter.next();
+//				if (grup.getOrganGestor() == null || !organGestorHelper.findParesIds(grup.getOrganGestor().getId(), true).contains(adminOrganId)) {
+//					iter.remove();
+//				}
+//			}
+//		}
 		metaExpedientDto.setGrupsCount(grups.size());
 		
 		metaExpedientDto.setNumComentaris(metaExpedient.getComentaris().size());

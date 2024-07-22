@@ -178,17 +178,17 @@ public class GrupServiceImpl implements GrupService {
 			OrganGestorEntity organ = organGestorRepository.findOne(organId);
 			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
 		}
+
 		Page<GrupEntity> page = grupRepository.findByEntitatAndProcediment(
 				entitat,
 				paginacioParams.getFiltre() == null,
 				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
 				metaExpedientId == null,
 				metaExpedientId,
-				codisOrgansFills == null,
+				true, //No filtram per organs
 				codisOrgansFills,
 				paginacioHelper.toSpringDataPageable(paginacioParams));
-		
-		
+
 		PaginaDto<GrupDto> pageDto = null;
 		if (metaExpedientId != null) {
 			GrupEntity grupPerDefecte = metaExpedientRepository.findOne(metaExpedientId).getGrupPerDefecte();
@@ -211,6 +211,14 @@ public class GrupServiceImpl implements GrupService {
 					GrupDto.class);
 			
 			omplirPermisosPerGrups(pageDto.getContingut());
+		}
+
+		if (pageDto!=null && pageDto.getContingut()!=null) {
+			for (GrupDto grup : pageDto.getContingut()) {
+				grup.setEditableUsuari(
+						codisOrgansFills == null ||
+								(grup.getOrganGestor()!=null && codisOrgansFills.contains(grup.getOrganGestor().getCodi())));
+			}
 		}
 
 		return pageDto;
@@ -251,7 +259,8 @@ public class GrupServiceImpl implements GrupService {
 					filtre.getOrganGestorAscendentId(),
 //					organId == null,
 //					organId,
-					codisOrgansFills == null,
+//					codisOrgansFills == null,
+					true, //No filtram per organs del usuari
 					codisOrgansFills,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 			
@@ -296,16 +305,26 @@ public class GrupServiceImpl implements GrupService {
 					filtre.getOrganGestorAscendentId(),
 //					organId == null,
 //					organId);
-					codisOrgansFills == null,
+//					codisOrgansFills == null,
+					true, //No filtram per organs del usuari
 					codisOrgansFills);
 			
 			result.setIds(ids);
 			
 		}
-		return result;
 
+		if (result.getPagina()!=null && result.getPagina().getContingut()!=null) {
+			for (GrupDto grup : result.getPagina().getContingut()) {
+				grup.setEditableUsuari(
+						codisOrgansFills == null ||
+						(grup.getOrganGestor()!=null && codisOrgansFills.contains(grup.getOrganGestor().getCodi())));
+			}
+		}
+
+		return result;
 	}
-	
+
+
 	
 	public void omplirPermisosPerGrups(List<GrupDto> grups) {
 

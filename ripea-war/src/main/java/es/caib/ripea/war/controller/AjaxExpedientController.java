@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import es.caib.ripea.war.helper.EntitatHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -44,7 +45,8 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 				entitat.getId(), 
 				Utils.trim(term), 
 				getRolActual(request), 
-				procedimentId);
+				procedimentId,
+				EntitatHelper.getOrganGestorActualId(request));
 		
 		return expedients;
 	}
@@ -62,7 +64,8 @@ public class AjaxExpedientController extends BaseUserOAdminOOrganController {
 				entitat.getId(), 
 				Utils.trim(term), 
 				getRolActual(request), 
-				null);
+				null,
+				EntitatHelper.getOrganGestorActualId(request));
 		
 		return expedients;
 	}

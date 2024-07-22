@@ -11,15 +11,13 @@ public class GrupDto {
     private Long id;
     private String codi;
     private String descripcio;
-    
     private Long entitatId;
-    
     private OrganGestorDto organGestor;
-    
     private Long organGestorId;
-    
     private boolean perDefecte;
-
+	//Quant filtres per organ gestor (ets admin d'organ), tendras permisos sobre organ + fills.
+	//Els grups que no vagin per organ, es mostrarán deshabilitats.
+	private boolean editableUsuari;
 	private List<PermisDto> permisos;
     
 	public int getPermisosCount() {

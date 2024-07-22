@@ -15,6 +15,18 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
+	<script>
+		$(document).ready(function() {
+			$('#metadades').on('draw.dt', function (e, settings) {
+				debugger;
+				$("span[class^='editable-false']").each(function( index ) {
+					var tr = this.parentNode.parentNode;
+					tr.cells[4].innerHTML="";
+					tr.style.color="darkgray";
+				});
+			});
+		});
+	</script>
 </head>
 <body>
 
@@ -54,9 +66,11 @@
 									{{/if}}
 								</ul>
 							</div>
-					</script>
-					</th>		
-				</c:if>		
+							<span class="editable-{{:editableUsuari}}"></span>
+						</script>
+					</th>
+					<th data-col-name="editableUsuari" data-orderable="false" data-visible="false"></th>
+				</c:if>
 			</tr>
 		</thead>
 	</table>

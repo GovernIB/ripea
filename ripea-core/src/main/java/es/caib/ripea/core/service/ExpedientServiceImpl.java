@@ -633,12 +633,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long entitatId,
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
-			String rolActual) {
+			String rolActual,
+			Long organActual) {
 		logger.trace(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, rolActual, ResultEnumDto.PAGE).getPagina();
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, null, rolActual, organActual, ResultEnumDto.PAGE).getPagina();
 	}
 
 	@Transactional(readOnly = true)
@@ -648,13 +649,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams, 
-			String rolActual) {
+			String rolActual,
+			Long organActual) {
 		logger.trace(
 				"Consultant els expedients segons el filtre per usuaris (" + "entitatId=" + entitatId + ", " +
 						"filtre=" + filtre + ", " + "paginacioParams=" + paginacioParams +
 						"id del expedient relacionat" + expedientId + ")");
 		entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
-		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, rolActual, ResultEnumDto.PAGE).getPagina();
+		return findAmbFiltrePaginat(entitatId, filtre, paginacioParams, expedientId, rolActual, organActual, ResultEnumDto.PAGE).getPagina();
 	}
 
 	@Transactional
@@ -755,11 +757,15 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<Long> findIdsAmbFiltre(Long entitatId, ExpedientFiltreDto filtre, String rolActual) throws NotFoundException {
+	public List<Long> findIdsAmbFiltre(
+			Long entitatId,
+			ExpedientFiltreDto filtre,
+			String rolActual,
+			Long organActual) throws NotFoundException {
 		logger.debug(
 				"Consultant els ids d'expedient segons el filtre (" + "entitatId=" + entitatId + ", " + "filtre=" +
 						filtre + ")");
-		return findAmbFiltrePaginat(entitatId, filtre, null, null, rolActual, ResultEnumDto.IDS).getIds();
+		return findAmbFiltrePaginat(entitatId, filtre, null, null, rolActual, organActual, ResultEnumDto.IDS).getIds();
 	}
 
 	@Transactional
@@ -1147,7 +1153,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Long entitatId,
 			String text,
 			String rolActual, 
-			Long procedimentId) {
+			Long procedimentId,
+			Long organActual) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -1159,7 +1166,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 		
 		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
 				entitatId,
-				rolActual);
+				rolActual,
+				organActual);
 		
 		MetaExpedientEntity metaExpedient = null;
 		if (procedimentId != null) {
@@ -1567,7 +1575,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
 			Long expedientId, 
-			String rolActual, 
+			String rolActual,
+			Long organActual,
 			ResultEnumDto resultEnum) {
 		
 		ResultDto<ExpedientDto> result = new ResultDto<ExpedientDto>();
@@ -1584,7 +1593,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
 				entitatId,
-				rolActual);
+				rolActual,
+				organActual);
 				
 		ExpedientFiltreCalculat expedientFiltreCalculat = calculateFilter(
 				filtre,

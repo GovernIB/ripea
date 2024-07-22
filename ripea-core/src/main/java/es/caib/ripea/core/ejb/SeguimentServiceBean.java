@@ -94,14 +94,16 @@ public  class SeguimentServiceBean implements SeguimentService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			ResultEnumDto resultEnum,
-			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum) {
+			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum,
+			Long organActual) {
 		return delegate.findPendentsArxiu(
 				entitatId,
 				filtre,
 				paginacioParams,
 				rolActual,
 				resultEnum,
-				arxiuPendentTipusEnum);
+				arxiuPendentTipusEnum,
+				organActual);
 	}
 
 	@Override

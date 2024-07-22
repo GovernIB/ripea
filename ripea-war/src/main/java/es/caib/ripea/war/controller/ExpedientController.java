@@ -267,7 +267,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				entitatActual.getId(),
 				ExpedientFiltreCommand.asDto(filtreCommand),
 				DatatablesHelper.getPaginacioDtoFromRequest(request), 
-				RolHelper.getRolActual(request));
+				RolHelper.getRolActual(request),
+				EntitatHelper.getOrganGestorActualId(request));
 		
 		if (aplicacioService.mostrarLogsRendiment())
 			logger.info("ExpedientController.datatable end " + (System.currentTimeMillis() - t0) + " ms");
@@ -311,7 +312,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			seleccio.addAll(
 					expedientService.findIdsAmbFiltre(
 							entitatActual.getId(),
-							ExpedientFiltreCommand.asDto(filtreCommand), rolActual));
+							ExpedientFiltreCommand.asDto(filtreCommand),
+							rolActual,
+							EntitatHelper.getOrganGestorActualId(request)));
 		}
 		return seleccio.size();
 	}
@@ -1381,7 +1384,9 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			seleccio.addAll(
 					expedientService.findIdsAmbFiltre(
 							entitatActual.getId(),
-							ExpedientFiltreCommand.asDto(filtreCommand), rolActual));
+							ExpedientFiltreCommand.asDto(filtreCommand),
+							rolActual,
+							EntitatHelper.getOrganGestorActualId(request)));
 		}
 		return seleccio.size();
 	}
@@ -1563,7 +1568,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 						ExpedientFiltreCommand.asDto(filtreCommand), 
 						expedientId,
 						DatatablesHelper.getPaginacioDtoFromRequest(request), 
-						RolHelper.getRolActual(request)),
+						RolHelper.getRolActual(request),
+						EntitatHelper.getOrganGestorActualId(request)),
 				"id",
 				SESSION_ATTRIBUTE_RELACIONAR_SELECCIO + "_" + expedientId);
 		

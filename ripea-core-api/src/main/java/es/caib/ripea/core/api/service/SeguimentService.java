@@ -54,7 +54,8 @@ public interface SeguimentService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			ResultEnumDto resultEnum,
-			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum);
+			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum,
+			Long organActual);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('tothom')")
 	public PaginaDto<SeguimentConsultaPinbalDto> findConsultesPinbal(

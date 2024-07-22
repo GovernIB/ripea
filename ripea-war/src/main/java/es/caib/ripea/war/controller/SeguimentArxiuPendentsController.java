@@ -160,7 +160,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
 				rolActual,
 				ResultEnumDto.PAGE,
-				ArxiuPendentTipusEnumDto.EXPEDIENT).getPagina();
+				ArxiuPendentTipusEnumDto.EXPEDIENT,
+				EntitatHelper.getOrganGestorActualId(request)).getPagina();
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
@@ -228,7 +229,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				DatatablesHelper.getPaginacioDtoFromRequest(request),
 				rolActual,
 				ResultEnumDto.PAGE,
-				ArxiuPendentTipusEnumDto.DOCUMENT).getPagina();
+				ArxiuPendentTipusEnumDto.DOCUMENT,
+				EntitatHelper.getOrganGestorActualId(request)).getPagina();
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
@@ -297,7 +299,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 				DatatablesHelper.getPaginacioDtoFromRequest(request), 
 				rolActual,
 				ResultEnumDto.PAGE,
-				ArxiuPendentTipusEnumDto.INTERESSAT).getPagina();
+				ArxiuPendentTipusEnumDto.INTERESSAT,
+				EntitatHelper.getOrganGestorActualId(request)).getPagina();
 		
         return DatatablesHelper.getDatatableResponse(
 				request,
@@ -360,7 +363,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 							null,
 							rolActual,
 							ResultEnumDto.IDS,
-							ArxiuPendentTipusEnumDto.EXPEDIENT).getIds());
+							ArxiuPendentTipusEnumDto.EXPEDIENT,
+							EntitatHelper.getOrganGestorActualId(request)).getIds());
 		}
 		return seleccio.size();
 	}
@@ -424,7 +428,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 							null,
 							rolActual,
 							ResultEnumDto.IDS,
-							ArxiuPendentTipusEnumDto.DOCUMENT).getIds());
+							ArxiuPendentTipusEnumDto.DOCUMENT,
+							EntitatHelper.getOrganGestorActualId(request)).getIds());
 		}
 		return seleccio.size();
 	}
@@ -489,7 +494,8 @@ public class SeguimentArxiuPendentsController extends BaseUserOAdminOOrganContro
 							null,
 							rolActual,
 							ResultEnumDto.IDS,
-							ArxiuPendentTipusEnumDto.INTERESSAT).getIds());
+							ArxiuPendentTipusEnumDto.INTERESSAT,
+							EntitatHelper.getOrganGestorActualId(request)).getIds());
 		}
 		return seleccio.size();
 	}

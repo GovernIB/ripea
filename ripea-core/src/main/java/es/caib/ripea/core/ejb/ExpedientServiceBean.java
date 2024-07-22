@@ -85,16 +85,20 @@ public class ExpedientServiceBean implements ExpedientService {
 	public PaginaDto<ExpedientDto> findAmbFiltreUser(
 			Long entitatId,
 			ExpedientFiltreDto filtre,
-			PaginacioParamsDto paginacioParams, String rolActual) {
-		return delegate.findAmbFiltreUser(entitatId, filtre, paginacioParams, rolActual);
+			PaginacioParamsDto paginacioParams,
+			String rolActual,
+			Long organActual) {
+		return delegate.findAmbFiltreUser(entitatId, filtre, paginacioParams, rolActual, organActual);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
 	public List<Long> findIdsAmbFiltre(
 			Long entitatId,
-			ExpedientFiltreDto filtre, String rolActual) throws NotFoundException {
-		return delegate.findIdsAmbFiltre(entitatId, filtre, rolActual);
+			ExpedientFiltreDto filtre,
+			String rolActual,
+			Long organActual) throws NotFoundException {
+		return delegate.findIdsAmbFiltre(entitatId, filtre, rolActual, organActual);
 	}
 
 	@Override
@@ -210,13 +214,15 @@ public class ExpedientServiceBean implements ExpedientService {
 			ExpedientFiltreDto filtre,
 			Long expedientId,
 			PaginacioParamsDto paginacioParams, 
-			String rolActual) {
+			String rolActual,
+			Long organActual) {
 		return delegate.findAmbFiltreNoRelacionat(
 				entitatId,
 				filtre,
 				expedientId,
 				paginacioParams, 
-				rolActual);
+				rolActual,
+				organActual);
 	}
 
 	@Override
@@ -365,12 +371,14 @@ public class ExpedientServiceBean implements ExpedientService {
 			Long entitatId,
 			String text, 
 			String rolActual, 
-			Long procedimentId){
+			Long procedimentId,
+			Long organActual){
 		return delegate.findByText(
 				entitatId,
 				text,
 				rolActual, 
-				procedimentId);
+				procedimentId,
+				organActual);
 	}
 
 	@Override

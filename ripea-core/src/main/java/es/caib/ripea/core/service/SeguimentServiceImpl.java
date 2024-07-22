@@ -379,7 +379,6 @@ public class SeguimentServiceImpl implements SeguimentService {
 				rolActual,
 				permisosPerAnotacions.getProcedimentsPermesos(),
 				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
-				permisosPerAnotacions.isAdminOrganHasPermisAdminComu(),
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedientFiltre == null,
@@ -420,7 +419,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 			PaginacioParamsDto paginacioParams,
 			String rolActual,
 			ResultEnumDto resultEnum,
-			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum) {
+			ArxiuPendentTipusEnumDto arxiuPendentTipusEnum,
+			Long organActual) {
 		ResultDto<SeguimentArxiuPendentsDto> result = new ResultDto<SeguimentArxiuPendentsDto>();
 	
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(
@@ -453,8 +453,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 		
 		PermisosPerExpedientsDto permisosPerExpedients = expedientHelper.findPermisosPerExpedients(
 				entitatId,
-				rolActual);
-
+				rolActual,
+				organActual);
 
 		// =========================================== EXPEDIENT =======================================================
 		if (arxiuPendentTipusEnum == ArxiuPendentTipusEnumDto.EXPEDIENT) {

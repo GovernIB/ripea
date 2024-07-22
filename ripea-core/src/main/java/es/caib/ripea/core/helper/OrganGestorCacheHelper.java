@@ -1,6 +1,7 @@
 package es.caib.ripea.core.helper;
 
 import es.caib.ripea.core.api.dto.OrganismeDto;
+import es.caib.ripea.core.repository.OrganGestorRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -26,6 +27,8 @@ public class OrganGestorCacheHelper {
     private CacheHelper cacheHelper;
     @Autowired
     OrganGestorCacheHelper self;
+    @Autowired
+    private OrganGestorRepository organGestorRepository;
 
     @Cacheable(value = "codisOrgansFills", key="#codiEntitat.concat('-').concat(#codiDir3Organ)")
     public List<String> getCodisOrgansFills(String codiEntitat, String codiDir3Organ) {
@@ -52,6 +55,17 @@ public class OrganGestorCacheHelper {
             }
         }
         return unitats;
+    }
+
+    public List<Long> getIdsOrgansFills(String codiEntitat, String codiDir3Organ) {
+        List<Long> resultat = new ArrayList<Long>();
+        List<String> organs = getCodisOrgansFills(codiEntitat, codiDir3Organ);
+        if (organs!=null) {
+            for (String organ: organs) {
+                resultat.add(organGestorRepository.findByCodi(organ).getId());
+            }
+        }
+        return resultat;
     }
 
     public List<String> getCodisOrgansFills(String codiEntitat, List<String> codiDir3Organs) {
