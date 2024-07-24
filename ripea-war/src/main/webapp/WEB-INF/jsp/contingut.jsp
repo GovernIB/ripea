@@ -667,12 +667,11 @@ function removeCookie(cname) {
 										<c:when test="${expedient.estat == 'TANCAT'}"><dd style="border-left: solid 6px #777; padding-left: 4px;"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:when>
 										<c:otherwise><span class="no_color"></span><dd class="no_color"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:otherwise>
 									</c:choose>
-									<dd><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd>
 								</c:otherwise>
 							</c:choose>
 
 							<dt><spring:message code="contingut.info.prioritat"/></dt>
-							<c:if test="${expedient.prioritat == 'NORMAL'}"><span class="no_color"></span></c:if>
+							<c:if test="${expedient.prioritat == 'B_NORMAL'}"><span class="no_color"></span></c:if>
 							<dd class="pr-${expedient.prioritat}"><spring:message code="prioritat.enum.${expedient.prioritat}"/></dd>
 								
 							<dt><spring:message code="contingut.info.nti.classificacio"/></dt>
@@ -711,12 +710,11 @@ function removeCookie(cname) {
 										<c:when test="${expedient.estat == 'TANCAT'}"><dd style="border-left: solid 6px #777; padding-left: 4px;"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:when>
 										<c:otherwise><span class="no_color"></span><dd style="display: inline;bottom: 5px;position: relative;padding-left: 4px;"><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd></c:otherwise>
 									</c:choose>
-									<dd><spring:message code="expedient.estat.enum.${expedient.estat}"/></dd>
 								</c:otherwise>
 							</c:choose>
 
 							<dt><spring:message code="contingut.info.prioritat"/></dt>
-							<c:if test="${expedient.prioritat == 'NORMAL'}"><span class="no_color"></span></c:if>
+							<c:if test="${expedient.prioritat == 'B_NORMAL'}"><span class="no_color"></span></c:if>
 							<dd class="pr-${expedient.prioritat}"><spring:message code="prioritat.enum.${expedient.prioritat}"/></dd>
 
 							<c:if test="${expedientTancat}">

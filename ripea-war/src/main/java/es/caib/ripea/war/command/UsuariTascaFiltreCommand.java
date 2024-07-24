@@ -23,6 +23,7 @@ public class UsuariTascaFiltreCommand {
 	private Date dataFi;
 	private Date dataLimitInici;
 	private Date dataLimitFi;
+	private String duracio;
 	
 	
 	public static UsuariTascaFiltreCommand asCommand(UsuariTascaFiltreDto dto) {

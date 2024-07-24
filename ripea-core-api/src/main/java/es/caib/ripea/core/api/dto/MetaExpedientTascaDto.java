@@ -27,6 +27,8 @@ public class MetaExpedientTascaDto implements Serializable {
 	private String responsable;
 	private boolean activa;
 	private Date dataLimit;
+	private String duracio = "1d";
+	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	private Long estatIdCrearTasca;
 	private String estatNomCrearTasca;
 	private String estatColorCrearTasca;

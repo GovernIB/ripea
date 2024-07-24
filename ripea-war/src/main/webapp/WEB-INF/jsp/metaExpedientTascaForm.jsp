@@ -65,9 +65,9 @@
 			suggestText="nom"
 			placeholderKey="metaexpedient.tasca.form.camp.responsable"
 			disabled="${bloquejarCamps}"/>	
-		<rip:inputDate name="dataLimit" textKey="metaexpedient.tasca.form.camp.dataLimit" readonly="${bloquejarCamps}"/>
+		<rip:inputText name="duracio" textKey="tasca.list.column.duracio" comment="tasca.list.column.duracio.tip" tooltip="true" tooltipMsg="tasca.list.column.duracio.tip" readonly="${bloquejarCamps}"/>
 		<rip:inputTextarea name="descripcio" textKey="metaexpedient.tasca.form.camp.descripcio" required="true" disabled="${bloquejarCamps}"/>
-		
+		<rip:inputSelect id="prioritat" name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats"/>
 		<rip:inputSelect id="estatIdCrearTasca" name="estatIdCrearTasca" textKey="metaexpedient.tasca.form.camp.estat.crearTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 		<rip:inputSelect id="estatIdFinalitzarTasca" name="estatIdFinalitzarTasca" textKey="metaexpedient.tasca.form.camp.estat.finalitzarTasca" emptyOption="true" optionItems="${expedientEstats}" optionValueAttribute="id" optionTextAttribute="nom" disabled="${bloquejarCamps}" templateResultFunction="showColor" />
 		<div id="modal-botons" class="well">

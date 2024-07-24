@@ -32,6 +32,8 @@ public class ExpedientTascaDto {
 	private boolean usuariActualResponsable;
 	private String titol;
 	private String observacions;
+	private String duracio;
+	private PrioritatEnumDto prioritat;
 	
 	public String getDataLimitString() {
 		if (dataLimit != null) {

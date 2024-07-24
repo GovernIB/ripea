@@ -6,28 +6,13 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<style>
-
-
-
-</style>
-
+<style></style>
 
 <script>
-
 //################################################## document ready START ##############################################################
-$(document).ready(function() {
-
-
-	
-	
-});//################################################## document ready END ##############################################################
-
-
+$(document).ready(function() { });
+//################################################## document ready END ##############################################################
 </script>
-
-
-
 
 <table
 	id="taulaTasques"
@@ -40,14 +25,27 @@ $(document).ready(function() {
 	<thead>
 		<tr>
 			<th data-col-name="id" data-visible="false"></th>
-			<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>									
-			<th data-col-name="dataInici" data-converter="datetime" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
-			<th data-col-name="dataFi" data-converter="datetime"data-orderable="false"  width="15%"><spring:message code="expedient.tasca.list.columna.dataFi"/></th>
+			<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+			<th data-col-name="metaExpedientTasca.nom" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
+			<th data-col-name="dataInici" data-converter="datetime" width="15%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
+			<th data-col-name="duracio" width="15%" data-template="#cellTascaDeadlineTemplate" >
+				<spring:message code="tasca.list.column.duracio"/>
+				<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
+					{{if shouldNotifyAboutDeadline}}
+                            <span style="color: red;">
+                                {{:duracio}}
+                                <span class="fa fa-clock-o"></span>
+                            </span>
+                    {{else}}
+                        {{:duracio}}
+                    {{/if}}
+				</script>
+			</th>
 			<th data-col-name="titol" width="15%"><spring:message code="expedient.tasca.list.columna.titol"/></th>
 			<th data-col-name="observacions" width="15%"><spring:message code="expedient.tasca.list.columna.observacions"/></th>
 			<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>	
 			<th data-col-name="responsableActual.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>								
-			<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
+			<th data-col-name="estat" data-template="#cellTascaEstatTemplate" width="10%">
 				<spring:message code="expedient.tasca.list.columna.estat"/>
 				<script id="cellTascaEstatTemplate" type="text/x-jsrender">
 				{{if estat == 'PENDENT'}}
@@ -62,6 +60,26 @@ $(document).ready(function() {
 					<spring:message code="expedient.tasca.estat.enum.REBUTJADA"/>
 				{{/if}}
 			</script>
+			</th>
+			<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="11%">
+				<spring:message code="tasca.list.column.prioritat"/>
+				<script id="cellPrioritatTemplate" type="text/x-jsrender">
+					<span class="label label-{{:prioritat}}">
+                    {{if prioritat == 'MOLT_BAIXA'}}
+					<spring:message code="prioritat.enum.MOLT_BAIXA"/>
+					{{else prioritat == 'A_BAIXA'}}
+					<spring:message code="prioritat.enum.A_BAIXA"/>
+					{{else prioritat == 'C_ALTA'}}
+					<spring:message code="prioritat.enum.C_ALTA"/>
+					{{else prioritat == 'D_MOLT_ALTA'}}
+					<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
+					{{else prioritat == 'CRITICA'}}
+					<spring:message code="prioritat.enum.CRITICA"/>
+					{{else}}
+					<spring:message code="prioritat.enum.B_NORMAL"/>
+					{{/if}}
+                    </span>
+				</script>
 			</th>
 			<th data-col-name="numComentaris" data-orderable="false" data-template="#cellComentarisTemplate" width="1%">
 				<script id="cellComentarisTemplate" type="text/x-jsrender">
@@ -80,7 +98,17 @@ $(document).ready(function() {
 						<c:if test="${potModificar}">
 							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
 								<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
-								<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
+								<li><a 	href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>"
+										data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>">
+											<span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/>
+									</a>
+								</li>
+								<li><a 	href="<c:url value="/expedientTasca/{{:id}}/canviarPrioritat"/>"
+										data-toggle="modal"
+										data-refresh-pagina="true">
+											<span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...
+										</a>
+								</li>
 							{{/if}}
 						</c:if>
 					</ul>

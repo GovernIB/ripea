@@ -4,14 +4,15 @@ import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
-
 
 public class ExpedientTascaCommand {
 	
@@ -25,7 +26,9 @@ public class ExpedientTascaCommand {
 	private Date dataLimit;
 	@Size(max=256)
 	private String comentari;
-	
+	@Pattern(regexp = "\\d+\\s*[hHdD]?")
+	private String duracio = "1d";
+	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	@Size(max=256)
 	private String titol;
 	@Size(max=1024)
@@ -85,7 +88,11 @@ public class ExpedientTascaCommand {
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
 	}
-	
+	public PrioritatEnumDto getPrioritat() { return prioritat; }
+	public void setPrioritat(PrioritatEnumDto prioritat) { this.prioritat = prioritat; }
+	public String getDuracio() { return duracio; }
+	public void setDuracio(String duracio) { this.duracio = duracio; }
+
 	public static ExpedientTascaCommand asCommand(ExpedientTascaDto dto) {
 		ExpedientTascaCommand command = ConversioTipusHelper.convertir(
 				dto,
@@ -103,6 +110,4 @@ public class ExpedientTascaCommand {
 				command,
 				ExpedientTascaDto.class);
 	}
-	
-	
 }

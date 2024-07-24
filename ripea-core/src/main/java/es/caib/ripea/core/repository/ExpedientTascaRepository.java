@@ -22,9 +22,7 @@ import es.caib.ripea.core.entity.UsuariEntity;
 
 public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEntity, Long> {
 
-	
-	List<ExpedientTascaEntity> findByExpedient(
-			ExpedientEntity expedient);
+	List<ExpedientTascaEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 	
 	@Query(	"select " +
 			"    tasca " +

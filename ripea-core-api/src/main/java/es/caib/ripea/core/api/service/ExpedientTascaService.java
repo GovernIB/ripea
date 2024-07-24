@@ -22,7 +22,8 @@ public interface ExpedientTascaService {
 
 	public List<ExpedientTascaDto> findAmbExpedient(
 			Long entitatId,
-			Long expedientId);
+			Long expedientId,
+			PaginacioParamsDto paginacioParam);
 
 	public List<MetaExpedientTascaDto> findAmbMetaExpedient(
 			Long entitatId,
@@ -86,5 +87,6 @@ public interface ExpedientTascaService {
 	@PreAuthorize("hasRole('tothom')")
 	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId);
 
+	@PreAuthorize("hasRole('tothom')")
+	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto);
 }
-	

@@ -32,7 +32,27 @@
 				<th data-col-name="codi" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.codi"/></th>
 				<th data-col-name="nom" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.nom"/></th>
 				<th data-col-name="responsable" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.responsable"/></th>
-				<th data-col-name="dataLimit" data-converter="date"><spring:message code="metaexpedient.tasca.form.camp.dataLimit"/></th>
+				<th data-col-name="duracio"><spring:message code="tasca.list.column.duracio"/></th>
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="11%">
+					<spring:message code="tasca.list.column.prioritat"/>
+					<script id="cellPrioritatTemplate" type="text/x-jsrender">
+						<span class="label label-{{:prioritat}}">
+						{{if prioritat == 'MOLT_BAIXA'}}
+						<spring:message code="prioritat.enum.MOLT_BAIXA"/>
+						{{else prioritat == 'A_BAIXA'}}
+						<spring:message code="prioritat.enum.A_BAIXA"/>
+						{{else prioritat == 'C_ALTA'}}
+						<spring:message code="prioritat.enum.C_ALTA"/>
+						{{else prioritat == 'D_MOLT_ALTA'}}
+						<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
+						{{else prioritat == 'CRITICA'}}
+						<spring:message code="prioritat.enum.CRITICA"/>
+						{{else}}
+						<spring:message code="prioritat.enum.B_NORMAL"/>
+						{{/if}}
+						</span>
+					</script>
+				</th>
 				<th data-col-name="estatColorCrearTasca" data-visible="false"></th>
 				<th data-col-name="estatNomCrearTasca" data-template="#cellTascaCrearTemplate" data-orderable="false">
 					<spring:message code="metaexpedient.tasca.list.camp.estat.crearTasca"/>

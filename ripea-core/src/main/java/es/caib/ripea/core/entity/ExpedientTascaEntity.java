@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import org.hibernate.annotations.ForeignKey;
@@ -69,7 +70,14 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_limit")
 	private Date dataLimit;
-	
+
+	@Column(name = "DURACIO", length = 16)
+	private String duracio;
+
+	@Column(name = "PRIORITAT", length = 16)
+	@Enumerated(EnumType.STRING)
+	private PrioritatEnumDto prioritat;
+
 //	@Column(name = "comentari", length = 1024)
 //	private String comentari;
 
@@ -92,6 +100,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			List<UsuariEntity> responsables,
 			Date dataLimit,
 			String titol,
+			String duracio,
+			PrioritatEnumDto prioritat,
 			String observacions) {
 		return new Builder(
 				expedient,
@@ -99,6 +109,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				responsables,
 				dataLimit,
 				titol,
+				duracio,
+				prioritat,
 				observacions);
 	}
 	
@@ -110,6 +122,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				List<UsuariEntity> responsables,
 				Date dataLimit,
 				String titol,
+				String duracio,
+				PrioritatEnumDto prioritat,
 				String observacions) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
@@ -118,6 +132,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
+			built.duracio = duracio;
+			built.prioritat = prioritat;
 			built.titol = titol;
 			built.observacions = observacions;
 		}
@@ -200,6 +216,11 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public String getObservacions() {
 		return observacions;
 	}
+	public String getDuracio() { return duracio; }
+	public void setDuracio(String duracio) { this.duracio = duracio; }
+	public PrioritatEnumDto getPrioritat() { return prioritat; }
+	public void setPrioritat(PrioritatEnumDto prioritat) { this.prioritat = prioritat; }
+
 	public String getTextLastComentari() {
 		String comentariText = null;
 		if (this.getComentaris() != null && !this.getComentaris().isEmpty()) {

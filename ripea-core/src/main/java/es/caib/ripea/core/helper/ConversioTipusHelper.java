@@ -153,10 +153,11 @@ public class ConversioTipusHelper {
 						target.setMotiuRebuig(source.getMotiuRebuig());
 						target.setCreatedBy(convertir(source.getCreatedBy(), UsuariDto.class));
 						target.setDataLimit(source.getDataLimit());
-						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source.getDataLimit()));
+						target.setShouldNotifyAboutDeadline(tascaHelper.shouldNotifyAboutDeadline(source));
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
 						target.setNumComentaris(source.getComentaris() == null ? 0L :source.getComentaris().size());
-						
+						target.setDuracio(source.getDuracio());
+						target.setPrioritat(source.getPrioritat()!=null?source.getPrioritat():PrioritatEnumDto.B_NORMAL);
 						Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 						boolean usuariActualReposnable = false;
 						for (UsuariEntity usuari : source.getResponsables()) {
@@ -186,6 +187,8 @@ public class ConversioTipusHelper {
 						target.setId(source.getId());
 						target.setNom(source.getNom());
 						target.setResponsable(source.getResponsable());
+						target.setDuracio(source.getDuracio());
+						target.setPrioritat(source.getPrioritat()!=null?source.getPrioritat():PrioritatEnumDto.B_NORMAL);
 						return target;
 					}
 				});

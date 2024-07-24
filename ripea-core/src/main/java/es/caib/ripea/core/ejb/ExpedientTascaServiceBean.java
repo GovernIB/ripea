@@ -45,10 +45,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientTascaDto> findAmbExpedient(Long entitatId,
-			Long expedientId) {
-		return delegate.findAmbExpedient(entitatId,
-				expedientId);
+	public List<ExpedientTascaDto> findAmbExpedient(
+			Long entitatId,
+			Long expedientId,
+			PaginacioParamsDto paginacioParam) {
+		return delegate.findAmbExpedient(entitatId, expedientId, paginacioParam);
 	}
 
 	@Override
@@ -169,4 +170,9 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 		return delegate.updateDataLimit(expedientTascaId, dataLimit);
 	}
 
+	@Override
+	@RolesAllowed("tothom")
+	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto) {
+		delegate.changeTascaPrioritat(expedientTascaDto);
+	}
 }

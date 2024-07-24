@@ -101,7 +101,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 	@Override
 	public List<ExpedientTascaDto> findAmbExpedient(
 			Long entitatId,
-			Long expedientId) {
+			Long expedientId,
+			PaginacioParamsDto paginacioParams) {
 		logger.debug("Obtenint la llista de l'expedient tasques (" +
 				"entitatId=" + entitatId + ", " +
 				"expedientId=" + expedientId + ")");
@@ -114,7 +115,10 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				null);
 		
-		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(expedient);
+		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(
+				expedient,
+				paginacioHelper.toSpringDataPageable(paginacioParams));
+
 		return conversioTipusHelper.convertirList(tasques, ExpedientTascaDto.class);
 	}
 
@@ -242,6 +246,12 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 					contingutId);
 
 		return contingutHelper.getBasicInfo(contingut);
+	}
+
+	@Transactional
+	@Override
+	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto) {
+		expedientTascaRepository.findOne(expedientTascaDto.getId()).setPrioritat(expedientTascaDto.getPrioritat());
 	}
 
 	@Transactional(readOnly = true)
@@ -456,6 +466,8 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				responsables, 
 				expedientTasca.getDataLimit(),
 				expedientTasca.getTitol(),
+				expedientTasca.getDuracio(),
+				expedientTasca.getPrioritat(),
 				expedientTasca.getObservacions()).build();
 
 		if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
@@ -482,7 +494,7 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		for (String responsableCodi: expedientTasca.getResponsablesCodi()) {
 			cacheHelper.evictCountTasquesPendents(responsableCodi);	
 		}
-		
+
 		expedientTascaRepository.save(expedientTascaEntity);
 		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
 		

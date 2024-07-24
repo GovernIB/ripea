@@ -1050,7 +1050,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientTasca.getDataLimit(),
 				estatCrearTasca,
 				estatFinalitzarTasca);
-		
+		entity.setDuracio(metaExpedientTasca.getDuracio());
+		entity.setPrioritat(metaExpedientTasca.getPrioritat());
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}

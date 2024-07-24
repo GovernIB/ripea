@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - property:
+      name: booleanFalse
+      value: 0
+      dbms: oracle
+  - property:
+      name: booleanFalse
+      value: false
+      dbms: postgresql
+  - changeSet:
+      id: 0
+      author: admin
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: DURACIO
+                  type: varchar(16 ${varcharunit})
+              - column:
+                  name: PRIORITAT
+                  type: varchar(16 ${varcharunit})
+            tableName: ipa_expedient_tasca
+        - addColumn:
+            columns:
+              - column:
+                  name: DURACIO
+                  type: varchar(16 ${varcharunit})
+              - column:
+                  name: PRIORITAT
+                  type: varchar(16 ${varcharunit})
+            tableName: ipa_metaexp_tasca
+        - update:
+            tableName: IPA_EXPEDIENT_TASCA
+            columns:
+              - column:
+                  name: DURACIO
+                  valueComputed: "CASE WHEN TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) < 0 THEN NULL ELSE TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) END"
+                  where: "DATA_LIMIT is not null"
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.duracio.tasca
+              - column:
+                  name: value
+                  value: 10d
+              - column:
+                  name: description
+                  value: Duració per defecte de una tasca (10 dies)
+              - column:
+                  name: group_code
+                  value: ALTRES
+              - column:
+                  name: position
+                  value: 16
+              - column:
+                  name: jboss_property
+                  value: ${booleanFalse}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanFalse}
+              - column:
+                  name: configurable_organ
+                  value: ${booleanFalse}

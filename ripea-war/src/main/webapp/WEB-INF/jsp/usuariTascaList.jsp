@@ -62,7 +62,7 @@
 				<rip:inputDate name="dataLimitInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitInici"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="dataLimitFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitFi"/>
+				<rip:inputDate name="duracio" inline="true" placeholderKey="tasca.list.column.duracio"/>
 			</div>					
 			<div class="col-md-4">
 				<rip:inputSelect name="estats" optionEnum="TascaEstatEnumDto" emptyOption="true" placeholderKey="expedient.tasca.list.columna.estat" multiple="true" inline="true"/>
@@ -101,25 +101,42 @@
 						<span title="{{:metaExpedientTasca.descripcio}}">{{:metaExpedientTascaDescAbrv}}</span>
 					</script>
 				</th>
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="11%">
+					<spring:message code="contingut.expedient.form.camp.prioritat"/>
+					<script id="cellPrioritatTemplate" type="text/x-jsrender">
+						<span class="label label-{{:prioritat}}">
+						{{if prioritat == 'MOLT_BAIXA'}}
+						<spring:message code="prioritat.enum.MOLT_BAIXA"/>
+						{{else prioritat == 'A_BAIXA'}}
+						<spring:message code="prioritat.enum.A_BAIXA"/>
+						{{else prioritat == 'C_ALTA'}}
+						<spring:message code="prioritat.enum.C_ALTA"/>
+						{{else prioritat == 'D_MOLT_ALTA'}}
+						<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
+						{{else prioritat == 'CRITICA'}}
+						<spring:message code="prioritat.enum.CRITICA"/>
+						{{else}}
+						<spring:message code="prioritat.enum.B_NORMAL"/>
+						{{/if}}
+						</span>
+					</script>
+				</th>
 				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
 				<th data-col-name="agafada" data-visible="false"></th>
 				<th data-col-name="responsableActual.codi" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
-				<th data-col-name="dataLimitString" width="20%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
-					<spring:message code="expedient.tasca.list.columna.dataLimit"/>
+				<th data-col-name="duracio" width="20%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
+					<spring:message code="tasca.list.column.duracio"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
-					{{if dataLimitString}}	
-							{{if shouldNotifyAboutDeadline}}
-									<span style="color: red;">
-										{{:dataLimitString}}
-										<span class="fa fa-clock-o"></span>
-									</span>
-							{{else}}
-								{{:dataLimitString}}
-							{{/if}}
-					{{/if}}
-						
+						{{if shouldNotifyAboutDeadline}}
+								<span style="color: red;">
+									{{:duracio}}
+									<span class="fa fa-clock-o"></span>
+								</span>
+						{{else}}
+							{{:duracio}}
+						{{/if}}
 					</script>
 				</th>
 				<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">

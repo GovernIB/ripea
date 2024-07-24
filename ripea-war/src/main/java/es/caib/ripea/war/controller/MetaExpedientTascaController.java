@@ -10,6 +10,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import es.caib.ripea.core.helper.ConfigHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -46,10 +47,9 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/metaExpedient")
 public class MetaExpedientTascaController extends BaseAdminController {
 
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExpedientEstatService expedientEstatService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExpedientEstatService expedientEstatService;
+	@Autowired private ConfigHelper configHelper;
 	
 	@RequestMapping(value = "/{metaExpedientId}/tasca", method = RequestMethod.GET)
 	public String get(
@@ -148,6 +148,9 @@ public class MetaExpedientTascaController extends BaseAdminController {
 					metaExpedientId,
 					id);
 			model.addAttribute(tasca);
+		} else {
+			tasca = new MetaExpedientTascaDto();
+			tasca.setDuracio(configHelper.getConfig("es.caib.ripea.duracio.tasca", "10d"));
 		}
 		
 		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstatsByMetaExpedient(
@@ -210,6 +213,13 @@ public class MetaExpedientTascaController extends BaseAdminController {
 							metaExpedientId));
 			
 			return "metaExpedientTascaForm";
+		}
+		if (command!=null && command.getDuracio()!=null) {
+			String duracio = command.getDuracio().toLowerCase().trim();
+			if (!duracio.endsWith("h") && !duracio.endsWith("d")) {
+				duracio += "d";
+			}
+			command.setDuracio(duracio);
 		}
 		if (command.getId() == null) {
 			metaExpedientService.tascaCreate(
