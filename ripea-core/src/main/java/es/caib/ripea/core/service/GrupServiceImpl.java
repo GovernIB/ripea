@@ -257,10 +257,7 @@ public class GrupServiceImpl implements GrupService {
 					metaExpedientId,
 					filtre.getOrganGestorAscendentId() == null,
 					filtre.getOrganGestorAscendentId(),
-//					organId == null,
-//					organId,
-//					codisOrgansFills == null,
-					true, //No filtram per organs del usuari
+					codisOrgansFills == null,
 					codisOrgansFills,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 			
@@ -303,22 +300,11 @@ public class GrupServiceImpl implements GrupService {
 					metaExpedientId,
 					filtre.getOrganGestorAscendentId() == null,
 					filtre.getOrganGestorAscendentId(),
-//					organId == null,
-//					organId);
-//					codisOrgansFills == null,
-					true, //No filtram per organs del usuari
+					codisOrgansFills == null,
 					codisOrgansFills);
 			
 			result.setIds(ids);
 			
-		}
-
-		if (result.getPagina()!=null && result.getPagina().getContingut()!=null) {
-			for (GrupDto grup : result.getPagina().getContingut()) {
-				grup.setEditableUsuari(
-						codisOrgansFills == null ||
-						(grup.getOrganGestor()!=null && codisOrgansFills.contains(grup.getOrganGestor().getCodi())));
-			}
 		}
 
 		return result;

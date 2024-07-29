@@ -43,14 +43,6 @@ $(document).ready(function() {
 				}
 		);
 	}).on('draw.dt', function (e, settings) {
-		debugger;
-		$("span[class^='editable-false']").each(function( index ) {
-			var tr = this.parentNode.parentNode;
-			tr.cells[0].innerHTML="";
-			tr.cells[4].innerHTML="";
-			tr.cells[5].innerHTML="";
-			tr.style.color="darkgray";
-		});
 
 		$('#seleccioAll').on('click', function() {
 			$.get(
@@ -80,10 +72,7 @@ $(document).ready(function() {
 
 });//################################################## document ready END ##############################################################
 
-function provaCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-	debugger;
-}
-	
+
 
 
 </script>
@@ -166,10 +155,8 @@ function provaCallback(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
 								<li><a href="grup/{{:id}}/delete" data-toggle="ajax" data-confirm="<spring:message code="grup.list.confirmacio.esborrar"/>"><span class="fa fa-trash-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.esborrar"/></a></li>
 							</ul>
 						</div>
-						<span class="editable-{{:editableUsuari}}"></span>
 					</script>
 				</th>
-				<th data-col-name="editableUsuari" data-orderable="false" data-visible="false"></th>
 			</tr>
 		</thead>
 	</table>
