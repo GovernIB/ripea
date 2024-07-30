@@ -491,7 +491,7 @@ function calculateClassificacioId() {
 			<c:if test="${isCarpetaDefecte}">
 				<div role="carpetes" class="tab-pane" id="carpetes">
 					
-					<rip:arbreMultiple id="arbreCarpetes" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
+					<rip:arbreMultiple id="arbreCarpetes" atributId="id" atributNom="nom" arbre="${carpetes}" isContextMenuEnabled="true" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
 					<form:hidden path="estructuraCarpetesJson"/>
 					<div id="botons_container" class="well">
 						<input id="add_folder" onclick="addFolder();" type="button" class="btn btn-default" value="<spring:message code="metaexpedient.form.camp.estructura.subcarpeta"/>" readonly="${bloquejarCamps}">

@@ -85,7 +85,32 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 			@Param("esborrat") int esborrat,
 			Sort sort);
 
-
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"c.pare = :carpeta " +
+			"and c.esborrat = :esborrat " +
+			"and c.ordre != 0")
+	List<DocumentEntity> findByCarpetaAndEsborratAndOrdenat(
+			@Param("carpeta") CarpetaEntity carpeta,
+			@Param("esborrat") int esborrat,
+			Sort sort);
+	
+	@Query(	"select " +
+			"    c " +
+			"from " +
+			"    DocumentEntity c " +
+			"where " +
+			"c.pare = :carpeta " +
+			"and c.esborrat = :esborrat " +
+			"and c.ordre = 0")
+	List<DocumentEntity> findByCarpetaAndEsborratSenseOrdre(
+			@Param("carpeta") CarpetaEntity carpeta,
+			@Param("esborrat") int esborrat,
+			Sort sort);
+	
 	@Query(	" SELECT " +
 			"    count(d) " +
 			" FROM " +

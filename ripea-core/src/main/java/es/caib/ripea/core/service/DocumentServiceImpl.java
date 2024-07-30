@@ -78,12 +78,16 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -493,6 +497,134 @@ public class DocumentServiceImpl implements DocumentService {
 			Long expedientId) {
 		
 		return documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
+			Long id, 
+			Long expedientId,
+			String rolActual,
+			Long tascaId) throws IOException {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId, 
+				false, 
+				true, 
+				false, 
+				false, 
+				false, 
+				rolActual);
+		
+		FitxerDto resultat = new FitxerDto();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		
+		List<Long> documents = documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
+		
+		for (Long documentId : documents) {
+			documentHelper.crearEntradaDocument(
+					zos, 
+					documentId, 
+					tascaId, 
+					rolActual);
+		}
+
+		zos.close();
+		
+		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
+		resultat.setContentType("application/zip");
+		resultat.setContingut(baos.toByteArray());
+		
+		return resultat;
+	}
+	
+	@Transactional(readOnly = true)
+	@Override
+	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
+			Long entitatId,
+			Long expedientId,
+			List<ArbreJsonDto> selectedElements,
+			String rolActual,
+			Long tascaId) throws IOException {
+		entityComprovarHelper.comprovarEntitat(
+				entitatId, 
+				false, 
+				false, 
+				false, 
+				true, 
+				false);
+		
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId, 
+				false, 
+				true, 
+				false, 
+				false, 
+				false, 
+				rolActual);
+		
+		FitxerDto resultat = new FitxerDto();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+		
+		cercarCrearEntradaSelectedDocument(selectedElements, zos, tascaId, rolActual);
+
+		zos.close();
+		
+		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
+		resultat.setContentType("application/zip");
+		resultat.setContingut(baos.toByteArray());
+		
+		return resultat;
+	}
+	
+	private void cercarCrearEntradaSelectedDocument(List<ArbreJsonDto> childrens, ZipOutputStream zos, Long tascaId, String rolActual) throws IOException {
+		for (ArbreJsonDto children: childrens) {
+			Long contingutId = Long.valueOf(children.getId());
+			ContingutEntity contingut = entityComprovarHelper.comprovarContingut(contingutId);
+			
+			if (contingut instanceof DocumentEntity) {
+				// Si és document, crear document dins zip mantenint l'estructura
+				documentHelper.crearEntradaDocument(
+						zos, 
+						contingutId, 
+						tascaId, 
+						rolActual);
+			} else {
+				// Fills
+				cercarCrearEntradaSelectedDocument(children.getChildren(), zos, tascaId, rolActual);
+			}
+		}
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public List<DocumentDto> findByExpedient(Long id, Long expedientId, String rolActual) {
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId, 
+				false, 
+				true, 
+				false, 
+				false, 
+				false, 
+				rolActual);
+		
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(
+				expedient, 
+				0);
+		
+		List<DocumentDto> documentsDto = new ArrayList<DocumentDto>();
+		if (Utils.isNotEmpty(documents)) {
+			for (DocumentEntity documentEntity : documents) {
+				DocumentDto documentDto = new DocumentDto();
+				documentDto.setId(documentEntity.getId());
+				documentDto.setNom(documentEntity.getNom());
+				documentDto.setPareId(documentEntity.getPareId());
+				documentsDto.add(documentDto);
+			}
+		}
+		
+		return documentsDto;
 	}
 	
 	@Transactional(readOnly = true)

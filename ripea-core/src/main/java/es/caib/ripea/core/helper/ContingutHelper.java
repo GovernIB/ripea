@@ -1968,6 +1968,30 @@ public class ContingutHelper {
 		return fitxer;
 	}
 	
+	public FitxerDto generarIndexPdf(
+			EntitatEntity entitatActual,
+			List<CarpetaEntity> carpetes) throws IOException {
+
+		byte[] indexGenerated = indexHelper.generarIndexPdfPerCarpetes(
+				carpetes,
+				entitatActual);
+
+		FitxerDto fitxer = new FitxerDto();
+		if (carpetes.size() > 1) {
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".pdf");
+		} else {
+			String carpetaNom = carpetes.get(0).getNom();
+			if (carpetaNom.contains("\"")) {
+				carpetaNom = carpetaNom.replace("\"", "\\\"");
+			}
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + carpetaNom + ".pdf");
+		}
+		fitxer.setContentType("application/pdf");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+	
 	public FitxerDto generarIndexXlsx(
 			EntitatEntity entitatActual,
 			List<ExpedientEntity> expedients,
@@ -1994,6 +2018,30 @@ public class ContingutHelper {
 		return fitxer;
 	}
 
+	public FitxerDto generarIndexXlsx(
+			EntitatEntity entitatActual,
+			List<CarpetaEntity> carpetes) throws IOException {
+
+		byte[] indexGenerated = indexHelper.generarIndexXlsxPerCarpetes(
+				carpetes,
+				entitatActual);
+
+		FitxerDto fitxer = new FitxerDto();
+		if (carpetes.size() > 1) {
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".xlsx");
+		} else {
+			String carpetaNom = carpetes.get(0).getNom();
+			if (carpetaNom.contains("\"")) {
+				carpetaNom = "\"" + carpetaNom.replace("\"", "\\\"") + "\"";
+			}
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + carpetaNom + ".xlsx");
+		}
+		fitxer.setContentType("application/vnd.ms-excel");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+	
 	public void crearNovaEntrada(
 			String nom,
 			FitxerDto fitxer,

@@ -1457,7 +1457,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
 //		comprovar accés expedients
 		for (Long expedientId : expedientIds) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
 					expedientId,
 					false,
 					true,
@@ -1481,7 +1481,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return resultat;
 	}
-
+	
 	@Override
 	public FitxerDto exportIndexExpedients(
 			Long entitatId, 

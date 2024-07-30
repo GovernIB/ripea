@@ -27,10 +27,12 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ValidacioFirmaException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -50,14 +52,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Mètodes per a gestionar els arxius associats a un document
@@ -1518,6 +1523,56 @@ public class DocumentHelper {
         }
 	}
 	
+	public void crearEntradaDocument(
+			ZipOutputStream zos,
+			Long documentId, 
+			Long tascaId, 
+			String rolActual) throws IOException {
+		DocumentEntity document = documentRepository.findOne(documentId);
+		
+		if (tascaId == null) {
+			contingutHelper.checkIfPermitted(
+					documentId,
+					rolActual,
+					PermissionEnumDto.READ);
+
+		} else {
+			contingutHelper.comprovarDocumentPerTasca(
+					tascaId,
+					documentId);
+		}
+		
+		ContingutEntity pare = document.getPare();
+		List<String> estructuraCarpetes = new ArrayList<String>();
+		while (pare instanceof CarpetaEntity) {
+			estructuraCarpetes.add(pare.getNom());
+			if (pare.getPare() instanceof CarpetaEntity)
+				pare = (CarpetaEntity) pare.getPare();
+			else
+				pare = (ExpedientEntity) pare.getPare();
+		}
+		
+		String ruta = "";
+		Collections.reverse(estructuraCarpetes);
+		for (String folder: estructuraCarpetes) {
+			ruta += revisarContingutNom(folder).replace(":", "") + "/";
+		}
+		
+		FitxerDto fitxer = getFitxerAssociat(document, null);
+		String rutaDoc = ruta + revisarContingutNom(document.getNom()) + "." + FilenameUtils.getExtension(fitxer.getNom());
+
+		contingutHelper.crearNovaEntrada(
+				rutaDoc, 
+				fitxer, 
+				zos);
+	}
+	
+	private static String revisarContingutNom(String nom) {
+		if (nom == null) {
+			return null;
+		}
+		return nom.replace("&", "&amp;").replaceAll("[\\\\/:*?\"<>|]", "_");
+	}
 	
 	public boolean isModificacioCustodiatsActiva() {
 		return configHelper.getAsBoolean("es.caib.ripea.document.modificar.custodiats");

@@ -173,7 +173,7 @@ $(document).ready(function() {
 		<rip:inputRadio name="destiTipus" textKey="contingut.importacio.form.camp.desti" botons="true" optionItems="${tipusDestiOptions}" optionValueAttribute="value" optionTextKeyAttribute="text"/>
 		<rip:inputText name="carpetaNom" textKey="contingut.importacio.form.camp.carpeta" required="true"/> 
 		--%>
-		<rip:arbreMultiple name="estructuraCarpetesJson" id="arbreCarpetes" withlabel="true" textKey="contingut.importacio.form.camp.desti" required="true" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
+		<rip:arbreMultiple name="estructuraCarpetesJson" id="arbreCarpetes" withlabel="true" isContextMenuEnabled="true" textKey="contingut.importacio.form.camp.desti" required="true" atributId="id" atributNom="nom" arbre="${carpetes}" changedCallback="changedCallback" renamedCallback="renamedCallback" deletedCallback="deletedCallback"/>				
 		<form:hidden path="destiId"/>
 				
 		<%-- <rip:inputDateTime name="dataPresentacio" textKey="contingut.importacio.form.camp.data" required="true"/>--%>

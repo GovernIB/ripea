@@ -22,8 +22,10 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.joda.time.LocalDateTime;
@@ -32,7 +34,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -40,15 +45,20 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DadaDto;
+import es.caib.ripea.core.api.dto.DescarregaDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
 import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -59,6 +69,7 @@ import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.FitxerTemporalDto;
 import es.caib.ripea.core.api.dto.MetaDadaDto;
@@ -69,9 +80,9 @@ import es.caib.ripea.core.api.dto.SignatureInfoDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DigitalitzacioService;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -81,6 +92,7 @@ import es.caib.ripea.core.api.service.MetaDadaService;
 import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.OrganGestorService;
 import es.caib.ripea.core.api.utils.Utils;
+import es.caib.ripea.war.command.DescarregaCommand;
 import es.caib.ripea.war.command.DocumentCommand;
 import es.caib.ripea.war.command.DocumentCommand.CreateDigital;
 import es.caib.ripea.war.command.DocumentCommand.CreateFirmaSeparada;
@@ -141,7 +153,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private OrganGestorService organGestorService;
 	@Autowired
 	private ExpedientTascaService expedientTascaService;
-	
+	@Autowired
+	private CarpetaService carpetaService;
 	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
@@ -808,8 +821,87 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		response.getOutputStream().flush();
 	}
 	
+	@RequestMapping(value = "/{expedientId}/descarregarAllDocumentsOfExpedientEstructurat", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public void descarregarAllDocumentsOfExpedientEstructurat(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long expedientId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		FitxerDto fitxer = documentService.descarregarAllDocumentsOfExpedientWithFolders(
+				entitatActual.getId(),
+				expedientId,
+				RolHelper.getRolActual(request),
+				tascaId);
+		
+		response.setHeader("Content-Disposition", "attachment; filename=" + fitxer.getNom());
+		response.getOutputStream().write(fitxer.getContingut());
+		response.getOutputStream().flush();
+	}
 	
+	@RequestMapping(value = "/{expedientId}/descarregarSelectedDocuments", method = RequestMethod.GET)
+	public String descarregarSelectedDocuments(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			Model model,
+			@PathVariable Long expedientId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DescarregaCommand command = new DescarregaCommand();
+
+		emplenarModelDescarrega(
+				request, 
+				model, 
+				command, 
+				entitatActual, 
+				expedientId);
+		
+		return "contingutDescarregarForm";
+	}
 	
+	@RequestMapping(value = "/{expedientId}/descarregarSelectedDocuments", method = RequestMethod.POST)
+	@ResponseBody
+	public ResponseEntity<String> descarregarSelectedDocuments(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long expedientId,
+			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			@Valid @RequestBody DescarregaCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+	
+		try {
+			DescarregaDto dto = DescarregaCommand.asDto(command);
+			
+			if (bindingResult.hasErrors()) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			
+			FitxerDto fitxer = documentService.descarregarAllDocumentsOfExpedientWithSelectedFolders(
+					entitatActual.getId(),
+					expedientId, 
+					dto.getEstructuraCarpetes(), 
+					RolHelper.getRolActual(request), 
+					tascaId);
+			
+			HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+	        headers.setContentDispositionFormData("attachment", fitxer.getNom());
+	        	        
+	        String base64Encoded = Base64.encodeBase64String(fitxer.getContingut());
+	        
+	        return new ResponseEntity<>(base64Encoded, headers, HttpStatus.OK);
+	        
+		} catch (JsonMappingException | ParseException e) {
+			logger.error(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.GET)
 	public String chooseTipusDocument(
@@ -1312,6 +1404,28 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	    binder.registerCustomEditor(
 		        Long[].class,
 		        new StringArrayPropertyEditor(null)); 
+	}
+	
+	private void emplenarModelDescarrega(
+			HttpServletRequest request,
+			Model model,
+			DescarregaCommand command, 
+			EntitatDto entitatActual,
+			Long expedientId) {
+		command.setPareId(expedientId);
+		model.addAttribute(command);
+		
+		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
+				entitatActual.getId(),
+				expedientId);
+		
+		List<DocumentDto> documents = documentService.findByExpedient(
+				entitatActual.getId(), 
+				expedientId, 
+				RolHelper.getRolActual(request));
+		
+		model.addAttribute("carpetes", carpetes);
+		model.addAttribute("documents", documents);
 	}
 	
 	private String obtenirEstatsElaboracioIdentificadorEniObligat() {

@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArbreNodeDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -279,6 +281,22 @@ public class CarpetaHelper {
 							currentArbreNode));
 		}
 		return currentArbreNode;
+	}
+	
+	public FitxerDto exportarCarpetes(
+			EntitatEntity entitatActual, 
+			List<CarpetaEntity> carpetes,
+			String format) throws IOException {
+		FitxerDto resultat = new FitxerDto();
+	
+		if ("PDF".equalsIgnoreCase(format))
+			resultat = contingutHelper.generarIndexPdf(entitatActual, carpetes);
+		else if ("XLSX".equalsIgnoreCase(format))
+			resultat = contingutHelper.generarIndexXlsx(entitatActual, carpetes);
+		else
+			resultat = contingutHelper.generarIndexPdf(entitatActual, carpetes);
+		
+		return resultat;
 	}
 	
 	private List<ExpedientCarpetaArbreDto> findCarpetesExpedient(Long entitatId, ExpedientEntity expedient) {

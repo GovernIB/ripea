@@ -46,10 +46,12 @@ import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.repository.ContingutRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 
@@ -87,6 +89,37 @@ public class IndexHelper {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private IndexBatchHelper indexBatchHelper;
+	
+	//### Genera índex PDF ###
+	public byte[] generarIndexPdfPerCarpetes(
+			List<CarpetaEntity> carpetes, 
+			EntitatEntity entitatActual) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			Document index = inicialitzaDocument(out);
+			
+			for (Iterator<CarpetaEntity> it = carpetes.iterator(); it.hasNext();) {
+				CarpetaEntity carpeta = it.next();
+				crearTitol(
+						index, 
+						carpeta,
+						false);
+				
+				crearTaulaDocuments(
+						index, 
+						carpeta, 
+						entitatActual,
+						false);
+			}
+			index.close();
+		} catch (Exception ex) {
+			throw new RuntimeException(
+					"S'ha produït un error generant l'índex de la carpeta",
+					ex);
+		}
+		
+		return out.toByteArray();
+	}
 	
 	//### Genera índex PDF ###
 	public byte[] generarIndexPdfPerExpedient(
@@ -172,9 +205,9 @@ public class IndexHelper {
 	
 	private void crearTitol(
 			Document index,
-			ExpedientEntity expedient,
+			ContingutEntity contingut,
 			boolean isRelacio) {
-		logger.debug("Creant el títol de l'índex per l'expedient [expedientId=" + expedient.getId() + "]");
+		logger.debug("Creant el títol de l'índex pel contingut [contingutId=" + contingut.getId() + "]");
 		try {
 //			## [TAULA QUE CONTÉ TÍTOL I INTRODUCCIÓ]
 			PdfPTable titolIntroduccioTable = new PdfPTable(1);
@@ -185,11 +218,18 @@ public class IndexHelper {
 			titolIntroduccioCell.setBorder(Rectangle.NO_BORDER);
 
 			Paragraph titolParagraph = new Paragraph();
-			Chunk localDest = new Chunk(expedient.getNom(), frutiger11TitolBold);
-			localDest.setLocalDestination("expedient_" + expedient.getId());
+			Chunk localDest = new Chunk(contingut.getNom(), frutiger11TitolBold);
+			localDest.setLocalDestination("expedient_" + contingut.getId());
 			titolParagraph.add(localDest);
 			titolParagraph.setAlignment(Element.ALIGN_CENTER);
-			String subtitol = expedient.getMetaExpedient().getNom() + " [" + expedient.getMetaExpedient().getClassificacio() + "] (" + expedient.getNumero() + ")";
+			String subtitol = "";
+			
+			if (contingut instanceof ExpedientEntity) {
+				ExpedientEntity expedient = (ExpedientEntity)contingut;
+				MetaExpedientEntity metaExpedient = contingut instanceof ExpedientEntity ? ((ExpedientEntity)contingut).getMetaExpedient() : null;
+				subtitol = metaExpedient.getNom() + " [" + metaExpedient.getClassificacio() + "] (" + expedient.getNumero() + ")";
+			}
+			
 			Paragraph subTitolParagraph = new Paragraph(subtitol, frutiger9TitolBold);
 			subTitolParagraph.setAlignment(Element.ALIGN_CENTER);
 			subTitolParagraph.add(Chunk.NEWLINE);
@@ -207,10 +247,10 @@ public class IndexHelper {
 	
 	private void crearTaulaDocuments(
 			Document index, 
-			ExpedientEntity expedient,
+			ContingutEntity contingut,
 			EntitatEntity entitatActual,
 			boolean isRelacio) {
-		logger.debug("Generant la taula amb els documents de l'expedient [expedientId=" + expedient.getId() + "]");
+		logger.debug("Generant la taula amb els documents del contingut [contingutId=" + contingut.getId() + "]");
 		try {
 //			## [DEFINICIÓ TAULA]
 			float [] pointColumnWidths;
@@ -242,15 +282,15 @@ public class IndexHelper {
 			crearCapsaleraTaula(taulaDocuments, isRelacio);
 			
 			if (aplicacioService.mostrarLogsRendiment())
-	    		logger.info("crearTaulaDocuments start (" + expedient.getId() + ")");
+	    		logger.info("crearTaulaDocuments start (" + contingut.getId() + ")");
 	    	
 			long t1 = System.currentTimeMillis();
 			
 //			## [CONTINGUT]
-			crearContingutTaula(taulaDocuments, expedient, entitatActual, isRelacio);
+			crearContingutTaula(taulaDocuments, contingut, entitatActual, isRelacio);
 			
 			if (aplicacioService.mostrarLogsRendiment())
-	    		logger.info("crearTaulaDocuments end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	    		logger.info("crearTaulaDocuments end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 			
 			index.add(taulaDocuments);
 			if (!isRelacio)
@@ -262,7 +302,7 @@ public class IndexHelper {
 	
 	private void crearContingutTaula(
 			PdfPTable taulaDocuments,
-			ExpedientEntity expedient,
+			ContingutEntity contingut,
 			EntitatEntity entitatActual,
 			boolean isRelacio) throws Exception {
 		logger.debug("Generant la capçalera de la taula de documents");
@@ -272,19 +312,19 @@ public class IndexHelper {
 //			contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
 		
 		if (aplicacioService.mostrarLogsRendiment())
-    		logger.info("findByPareAndEsborratAndOrdenatOrdre start (" + expedient.getId() + ")");
+    		logger.info("findByPareAndEsborratAndOrdenatOrdre start (" + contingut.getId() + ")");
     	
 		long t1 = System.currentTimeMillis();
 		
 		List<ContingutEntity> continguts = new ArrayList<ContingutEntity>();
 		if (contingutHelper.isOrdenacioPermesa()) {
-			continguts = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(expedient, 0);
+			continguts = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(contingut, 0);
 		} else {
-			continguts = contingutRepository.findByPareAndEsborratAndOrdenat(expedient, 0);
+			continguts = contingutRepository.findByPareAndEsborratAndOrdenat(contingut, 0);
 		}
 
 		if (aplicacioService.mostrarLogsRendiment())
-    		logger.info("findByPareAndEsborratAndOrdenatOrdre end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+    		logger.info("findByPareAndEsborratAndOrdenatOrdre end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		
 		BigDecimal num = new BigDecimal(0);
 		BigDecimal sum = new BigDecimal(1);
@@ -404,6 +444,40 @@ public class IndexHelper {
 		return titolCell;
 	}
 	
+	//### Genera índex XSL/XLSX ###
+	public byte[] generarIndexXlsxPerCarpetes(
+			List<CarpetaEntity> carpetes, 
+			EntitatEntity entitatActual) {
+
+		try (Workbook workbook = new XSSFWorkbook()) {			
+			for (CarpetaEntity carpeta : carpetes) {
+				Sheet sheet = workbook.createSheet(validarNombreHoja(carpeta.getNom()));
+	            crearTitol(sheet, carpeta);
+	            crearTaulaDocuments(sheet, carpeta, entitatActual, workbook, false, false, true);
+	            
+	            List<ContingutEntity> fills = contingutRepository.findByPareAndEsborratAndOrdenat(carpeta, 0);
+	            for (ContingutEntity fill: fills) {
+					if (fill instanceof CarpetaEntity) {
+						Sheet sheetFill = workbook.createSheet(validarNombreHoja(fill.getNom()));
+			            crearTitol(sheetFill, fill);
+			            crearTaulaDocuments(sheetFill, fill, entitatActual, workbook, false, false, true);
+			            
+			         // Le da formato a la hoja
+			            formatExcel(workbook, sheetFill, false, false, true);
+					}
+				}
+	         // Le da formato a la hoja
+	            formatExcel(workbook, sheet, false, false, true);
+			}
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+	        workbook.write(out);
+	        
+	        return out.toByteArray();
+	    } catch (Exception ex) {
+	        throw new RuntimeException("S'ha produït un error generant l'índex de l'expedient", ex);
+	    }
+		
+	}
 
 	//### Genera índex XSL/XLSX ###
 	public byte[] generarIndexXlsxPerExpedient(List<ExpedientEntity> expedients, EntitatEntity entitatActual, boolean exportar) {
@@ -414,7 +488,7 @@ public class IndexHelper {
 	        	boolean hasRelacions = !expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty();
 		        Sheet sheet = workbook.createSheet(validarNombreHoja(expedient.getNom()));
 	            crearTitol(sheet, expedient);
-	            crearTaulaDocuments(sheet, expedient, entitatActual, workbook, false, hasRelacions);
+	            crearTaulaDocuments(sheet, expedient, entitatActual, workbook, false, hasRelacions, false);
 
 	            if ((!expedient.getRelacionatsPer().isEmpty() || !expedient.getRelacionatsAmb().isEmpty()) && indexExpedientsRelacionats()) {
 	                crearTitolRelacio(sheet, expedient.getRelacionatsAmb(), expedient.getRelacionatsPer());
@@ -423,20 +497,20 @@ public class IndexHelper {
 	                    for (ExpedientEntity expedient_relacionat : expedient.getRelacionatsAmb()) {
 	                    	Sheet sheetRelacio = workbook.createSheet(validarNombreHoja(expedient_relacionat.getNom()));
 	                        crearTitol(sheetRelacio, expedient_relacionat);
-	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions);
+	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions, false);
 	                        
 	                        // Le da formato a la hoja
-	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions);
+	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions, false);
 	                    }
 	                }
 	                if (!expedient.getRelacionatsPer().isEmpty()) {
 	                    for (ExpedientEntity expedient_relacionat : expedient.getRelacionatsPer()) {
 	                    	Sheet sheetRelacio = workbook.createSheet(validarNombreHoja(expedient_relacionat.getNom()));
 	                        crearTitol(sheetRelacio, expedient_relacionat);
-	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions);
+	                        crearTaulaDocuments(sheetRelacio, expedient_relacionat, entitatActual, workbook, true, hasRelacions, false);
 	                        
 	                        // Le da formato a la hoja
-	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions);
+	        	            formatExcel(workbook, sheetRelacio, true, hasRelacions, false);
 	                    }
 	                }
 
@@ -446,7 +520,7 @@ public class IndexHelper {
 	            }
 		        
 	            // Le da formato a la hoja
-	            formatExcel(workbook, sheet, false, hasRelacions);
+	            formatExcel(workbook, sheet, false, hasRelacions, false);
 	        }
 
 
@@ -458,12 +532,16 @@ public class IndexHelper {
 	    }
 	}
 
-	private void formatExcel(Workbook workbook, Sheet sheet, boolean isRelacio, boolean hasRelacions) {
-        // Combina las celdas título, subtítulo y descripción expedientes relacionados
-        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 8));
-        sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 8));
-        sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, 8));
-        sheet.addMergedRegion(new CellRangeAddress(5, 5, 0, 2));
+	private void formatExcel(Workbook workbook, Sheet sheet, boolean isRelacio, boolean hasRelacions, boolean isCarpeta) {
+		
+		if (! isCarpeta) {
+	        // Combina las celdas título, subtítulo y descripción expedientes relacionados
+	        sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 8));
+	        sheet.addMergedRegion(new CellRangeAddress(2, 2, 0, 8));
+	        sheet.addMergedRegion(new CellRangeAddress(3, 3, 0, 8));
+	        sheet.addMergedRegion(new CellRangeAddress(5, 5, 0, 2));
+		}
+		
         if (hasRelacions && ! isRelacio)
         	sheet.addMergedRegion(new CellRangeAddress(8, 8, 0, 8));
         
@@ -494,7 +572,8 @@ public class IndexHelper {
                     
                     if ((isRelacio && row.getRowNum() == 8) 
                     		|| (!isRelacio && row.getRowNum() == 10 && hasRelacions) 
-                    		|| (!isRelacio && row.getRowNum() == 8 && !hasRelacions)) {
+                    		|| (!isCarpeta && !isRelacio && row.getRowNum() == 8 && !hasRelacions)
+                    		|| (isCarpeta && row.getRowNum() == 3)) {
                 		CellStyle headerStyle = workbook.createCellStyle();
                 		headerStyle.setFillForegroundColor(IndexedColors.AQUA.getIndex());
                 		headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
@@ -516,10 +595,12 @@ public class IndexHelper {
             row.setHeightInPoints(maxCellHeight);
         }
 	}
-	private void crearTitol(Sheet sheet, ExpedientEntity expedient) {
+	private void crearTitol(
+			Sheet sheet, 
+			ContingutEntity contingut) {
 	    Row row = sheet.createRow(sheet.getLastRowNum() + 1); //1
 	    Cell cell = row.createCell(0);
-	    cell.setCellValue(expedient.getNom());
+	    cell.setCellValue(contingut.getNom());
 
 	    // Título
 	    CellStyle titleStyle = sheet.getWorkbook().createCellStyle();
@@ -538,35 +619,40 @@ public class IndexHelper {
 	    font.setFontHeightInPoints((short) 10);
 	    style.setFont(font);
 	    
-	    // Número
-	    row = sheet.createRow(sheet.getLastRowNum() + 1); //2
-	    cell = row.createCell(0);
-	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.numero") + (expedient.getNumero() != null ? expedient.getNumero() : expedientHelper.calcularNumero(expedient)));
-	    row.setRowStyle(style);
+	    if (contingut instanceof ExpedientEntity) {
+	    	ExpedientEntity expedient = (ExpedientEntity)contingut;
+	    	
+		    // Número
+		    row = sheet.createRow(sheet.getLastRowNum() + 1); //2
+		    cell = row.createCell(0);
+		    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.numero") + (expedient.getNumero() != null ? expedient.getNumero() : expedientHelper.calcularNumero(expedient)));
+		    row.setRowStyle(style);
+		    
+		    // Serie documental
+		    row = sheet.createRow(sheet.getLastRowNum() + 1); //3
+		    cell = row.createCell(0);
+		    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.serie") + expedient.getMetaExpedient().getSerieDocumental());
+		    row.setRowStyle(style);
+		    
+		    // Clasificacion
+		    row = sheet.createRow(sheet.getLastRowNum() + 1); //4
+		    cell = row.createCell(0);
+		    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.classificacio") + expedient.getMetaExpedient().getClassificacio());
+		    row.setRowStyle(style);
+		    
+		    // Fecha apertura
+		    row = sheet.createRow(sheet.getLastRowNum() + 1); //5
+		    cell = row.createCell(0);
+		    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.data") + sdtTime.format(expedient.getNtiFechaApertura()));
+		    row.setRowStyle(style);
+		    
+		    // Estado
+		    row = sheet.createRow(sheet.getLastRowNum() + 1); //6
+		    cell = row.createCell(0);
+		    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.estat") + messageHelper.getMessage("expedient.service.exportacio.index.expedient.estat." + expedient.getEstat()));
+		    row.setRowStyle(style);
 	    
-	    // Serie documental
-	    row = sheet.createRow(sheet.getLastRowNum() + 1); //3
-	    cell = row.createCell(0);
-	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.serie") + expedient.getMetaExpedient().getSerieDocumental());
-	    row.setRowStyle(style);
-	    
-	    // Clasificacion
-	    row = sheet.createRow(sheet.getLastRowNum() + 1); //4
-	    cell = row.createCell(0);
-	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.classificacio") + expedient.getMetaExpedient().getClassificacio());
-	    row.setRowStyle(style);
-	    
-	    // Fecha apertura
-	    row = sheet.createRow(sheet.getLastRowNum() + 1); //5
-	    cell = row.createCell(0);
-	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.data") + sdtTime.format(expedient.getNtiFechaApertura()));
-	    row.setRowStyle(style);
-	    
-	    // Estado
-	    row = sheet.createRow(sheet.getLastRowNum() + 1); //6
-	    cell = row.createCell(0);
-	    cell.setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.expedient.estat") + messageHelper.getMessage("expedient.service.exportacio.index.expedient.estat." + expedient.getEstat()));
-	    row.setRowStyle(style);
+	    }
 	    
 //	    CellStyle subtitleStyle = sheet.getWorkbook().createCellStyle();
 //	    org.apache.poi.ss.usermodel.Font subtitleFont = sheet.getWorkbook().createFont();
@@ -576,7 +662,14 @@ public class IndexHelper {
 //	    cell.setCellStyle(subtitleStyle);
 	}
 
-	private void crearTaulaDocuments(Sheet sheet, ExpedientEntity expedient, EntitatEntity entitatActual, Workbook workbook, boolean isRelacio, boolean hasRelacions) throws NoSuchFileException, IOException {
+	private void crearTaulaDocuments(
+			Sheet sheet, 
+			ContingutEntity contingut, 
+			EntitatEntity entitatActual, 
+			Workbook workbook, 
+			boolean isRelacio, 
+			boolean hasRelacions,
+			boolean isCarpeta) throws NoSuchFileException, IOException {
         // Crea un estilo de celda
         CellStyle cellDataStyle = workbook.createCellStyle();
         cellDataStyle.setAlignment(HorizontalAlignment.LEFT);
@@ -586,7 +679,7 @@ public class IndexHelper {
         
 		// Crear la tabla y establecer los estilos
 	    // Agregar las filas y celdas correspondientes a los documentos del expediente
-		int rowTitleIdx = isRelacio ? 8 : (hasRelacions ? 10 : 8);
+		int rowTitleIdx = isCarpeta ? 3 : (isRelacio || !hasRelacions ? 8 : 10);
 		int colIdx = 0;
 		Row headerRow = sheet.createRow(rowTitleIdx);
 		
@@ -607,20 +700,38 @@ public class IndexHelper {
 		headerRow.createCell(colIdx++).setCellValue(messageHelper.getMessage("expedient.service.exportacio.index.link"));
         
 		List<DocumentEntity> documents = new ArrayList<DocumentEntity>();
-		List<DocumentEntity> fillsOrder1 = documentRepository.findByExpedientAndEsborratAndOrdenat(
-				expedient,
-				0,
-				contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+		List<DocumentEntity> fillsOrder1 = new ArrayList<DocumentEntity>();
+		List<DocumentEntity> fillsOrder2 = new ArrayList<DocumentEntity>();
 		
-		List<DocumentEntity> fillsOrder2 = documentRepository.findByExpedientAndEsborratSenseOrdre(
-				expedient,
-				0,
-				new Sort("createdDate"));
+		if (contingut instanceof ExpedientEntity) {
+			ExpedientEntity expedient = (ExpedientEntity)contingut;
+			fillsOrder1 = documentRepository.findByExpedientAndEsborratAndOrdenat(
+					expedient,
+					0,
+					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+			
+			fillsOrder2 = documentRepository.findByExpedientAndEsborratSenseOrdre(
+					expedient,
+					0,
+					new Sort("createdDate"));
+		} else {
+			CarpetaEntity carpeta = (CarpetaEntity)contingut;
+			fillsOrder1 = documentRepository.findByCarpetaAndEsborratAndOrdenat(
+					carpeta,
+					0,
+					contingutHelper.isOrdenacioPermesa() ? new Sort("ordre") : new Sort("createdDate"));
+			
+			fillsOrder2 = documentRepository.findByCarpetaAndEsborratSenseOrdre(
+					carpeta,
+					0,
+					new Sort("createdDate"));
+		}
+		
 		
 		documents.addAll(fillsOrder1);
 		documents.addAll(fillsOrder2);
 		
-		int contentRowIdx = isRelacio ? 9 : (hasRelacions ? 11 : 9);
+		int contentRowIdx = isCarpeta ? 4 : (isRelacio || !hasRelacions ? 9 : 11);
 		
 		if (! documents.isEmpty()) {
 			List<List<DocumentEntity>> documentsBatches = Lists.partition(documents, BATCH_SIZE);
@@ -639,8 +750,8 @@ public class IndexHelper {
 	
 	private String validarNombreHoja(String nombreHoja) {
 	    // Lista de caracteres no válidos en el nombre de una hoja de cálculo en Excel
-	    String caracteresNoValidos = "[\\\\/*?\\[\\]]";
-	    String nombreValido = nombreHoja.replaceAll(caracteresNoValidos, "");
+	    String caracteresNoValidos = "[\\\\/:*?\\[\\]]";
+	    String nombreValido = nombreHoja.replaceAll(caracteresNoValidos, "_");
 	    
 	    // Limitar la longitud del nombre a 31 caracteres (límite de Excel)
 	    if (nombreValido.length() > 31) {

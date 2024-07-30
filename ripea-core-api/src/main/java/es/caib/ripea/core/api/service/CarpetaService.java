@@ -3,13 +3,16 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -104,5 +107,8 @@ public interface CarpetaService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto exportIndexCarpetes(Long entitatId, Set<Long> carpetaIds, String format) throws IOException;
 
 }

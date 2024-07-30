@@ -14,6 +14,7 @@ public class ArbreJsonDto  implements Serializable {
 
 	private String id;
 	private String text;
+	private ArbreJsonStateDto state;
 	private List<ArbreJsonDto> children;
 	
 	public String getText() {

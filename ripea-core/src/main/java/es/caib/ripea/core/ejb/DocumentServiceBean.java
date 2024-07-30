@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,7 @@ import javax.interceptor.Interceptors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -566,6 +568,45 @@ public class DocumentServiceBean implements DocumentService {
 				motiu,
 				urlReturnToRipea,
 				entitatId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(Long id, Long expedientId, String rolActual,
+			Long tascaId) throws IOException {
+		return delegate.descarregarAllDocumentsOfExpedientWithFolders(
+				id, 
+				expedientId, 
+				rolActual, 
+				tascaId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public List<DocumentDto> findByExpedient(
+			Long id, 
+			Long expedientId, 
+			String rolActual) {
+		return delegate.findByExpedient(
+				id, 
+				expedientId, 
+				rolActual);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
+			Long entitatId,
+			Long expedientId, 
+			List<ArbreJsonDto> selectedElements,
+			String rolActual, 
+			Long tascaId) throws IOException {
+		return delegate.descarregarAllDocumentsOfExpedientWithSelectedFolders(
+				entitatId,
+				expedientId, 
+				selectedElements, 
+				rolActual, 
+				tascaId);
 	}
 
 }

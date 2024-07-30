@@ -53,6 +53,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
@@ -741,7 +743,24 @@ public class EntityComprovarHelper {
 		return expedient.getAgafatPer() != null ? expedient.getAgafatPer().getCodi().equals(auth.getName()) : false;
 	}
 
-	
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public ExpedientEntity comprovarExpedientNewTransaction(
+			Long expedientId,
+			boolean comprovarAgafatPerUsuariActual,
+			boolean comprovarPermisRead,
+			boolean comprovarPermisWrite,
+			boolean comprovarPermisCreate,
+			boolean comprovarPermisDelete,
+			String rolActual) {
+		return comprovarExpedient(
+				expedientId, 
+				comprovarAgafatPerUsuariActual, 
+				comprovarPermisRead, 
+				comprovarPermisWrite, 
+				comprovarPermisCreate, 
+				comprovarPermisDelete, 
+				rolActual);
+	}
 
 	public ExpedientEntity comprovarExpedient(
 			Long expedientId,
