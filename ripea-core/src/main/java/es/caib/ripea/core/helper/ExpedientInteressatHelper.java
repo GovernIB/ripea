@@ -627,17 +627,19 @@ public class ExpedientInteressatHelper {
 		
 		Exception exception = null;
 		ExpedientEntity expedient = expedientRepository.findOne(expId);
-		
-		expedientHelper.concurrencyCheckExpedientJaTancat(expedient);
+
+		try {
+			expedientHelper.concurrencyCheckExpedientJaTancat(expedient);
+		} catch (Exception ex) {
+			updateArxiuIntentInteressats(expedient, null, false);
+			return new RuntimeException("Error guardant interessat en arxiu", ex);
+		}
 			
 		if (expedient.getArxiuUuid() != null) {
 			exception = arxiuPropagarInteressats(expedient, null);
 		} else {
-			updateArxiuIntentInteressats(
-					expedient,
-					null,
-					false);
-			exception = new RuntimeException("Expedient de aquest interessat no es guardat en arxiu");
+			updateArxiuIntentInteressats(expedient, null, false);
+			exception = new RuntimeException("Error guardant interessat en arxiu: expedient no guardat en arxiu");
 		}
 		return exception;
 	}
