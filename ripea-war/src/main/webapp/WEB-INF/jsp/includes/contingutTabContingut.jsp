@@ -662,6 +662,13 @@ function dragAndDropVistaCarpetes() {
 		revert: true,
 		revertDuration: 200,
 		opacity: 0.50,
+		start: function(event, ui) {
+	        var dropdownVisible = $(this).find('.dropdown-menu').is(':visible');
+	        if (dropdownVisible) {
+	            ui.helper.remove();
+	            return false;
+	        }
+		}
 	});	
 	$('.element-droppable').droppable({
 		accept: '.element-draggable',
