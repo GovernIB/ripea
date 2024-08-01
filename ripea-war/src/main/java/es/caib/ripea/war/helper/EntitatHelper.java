@@ -151,7 +151,7 @@ public class EntitatHelper {
 		}
 	}
 	
-	public static void processarCanviOrganGestor(HttpServletRequest request) {
+	public static void processarCanviOrganGestor(HttpServletRequest request, AplicacioService aplicacioService) {
 		String canviOrganGestor = request.getParameter(REQUEST_PARAMETER_CANVI_GESTOR_ACTUAL);
 		if (canviOrganGestor != null && canviOrganGestor.length() > 0) {
 			LOGGER.debug("Processant canvi òrgan gestor (id=" + canviOrganGestor + ")");
@@ -164,6 +164,11 @@ public class EntitatHelper {
 					}
 				}
 			} catch (NumberFormatException ignored) {
+			}
+			String usuariCodi = SecurityContextHolder.getContext().getAuthentication() != null ? SecurityContextHolder.getContext().getAuthentication().getName() : null;
+			if (usuariCodi != null) {
+				aplicacioService.evictCountAnotacionsPendents(usuariCodi);
+				AnotacionsPendentsHelper.resetCounterAnotacionsPendents(request);
 			}
 		}
 	}

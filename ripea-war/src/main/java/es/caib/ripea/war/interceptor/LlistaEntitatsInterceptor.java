@@ -36,7 +36,7 @@ public class LlistaEntitatsInterceptor extends HandlerInterceptorAdapter {
         if (!ContingutEstaticHelper.isContingutEstatic(request)) {
             EntitatHelper.processarCanviEntitats(request, entitatService, aplicacioService);
 			OrganGestorHelper.findOrganismesEntitatAmbPermisCache(request, organGestorService);
-            EntitatHelper.processarCanviOrganGestor(request);
+            EntitatHelper.processarCanviOrganGestor(request, aplicacioService);
             EntitatHelper.findEntitatsAccessibles(request, entitatService);
         }
         
