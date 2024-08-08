@@ -26,6 +26,8 @@ import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.war.command.TascaCancelarDelegacioCommand;
+import es.caib.ripea.war.command.TascaDelegarCommand;
 import es.caib.ripea.war.command.UsuariTascaFiltreCommand;
 import es.caib.ripea.war.command.UsuariTascaRebuigCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
@@ -198,8 +200,81 @@ public class UsuariTascaController extends BaseUserController {
 	    				true));
 	}
 	
+	@RequestMapping(value = "/{expedientTascaId}/delegar", method = RequestMethod.GET)
+	public String delegar(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+
+		TascaDelegarCommand command = new TascaDelegarCommand();
+		model.addAttribute(command);
+		
+		return "expedientTascaDelegar";
+	}
 	
+	@RequestMapping(value = "/{expedientTascaId}/delegar", method = RequestMethod.POST)
+	public String delegarPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@Valid TascaDelegarCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			return "expedientTascaDelegar";
+		}
 	
+		expedientTascaService.updateDelegat(
+				expedientTascaId, 
+				command.getDelegatCodi(),
+				command.getComentari());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"expedient.tasca.controller.delegar.ok",
+				new String [] {command.getDelegatCodi()});
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/retomar", method = RequestMethod.GET)
+	public String retomar(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+
+		TascaCancelarDelegacioCommand command = new TascaCancelarDelegacioCommand();
+		model.addAttribute(command);
+		
+		return "expedientTascaCancelarDelegacio";
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/retomar", method = RequestMethod.POST)
+	public String retomarPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@Valid TascaCancelarDelegacioCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			return "expedientTascaCancelarDelegacio";
+		}
+	
+		expedientTascaService.cancelarDelegacio(
+				expedientTascaId, 
+				command.getComentari());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"expedient.tasca.controller.cancelar.delegacio.ok");
+	}
 	
 	private UsuariTascaFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {

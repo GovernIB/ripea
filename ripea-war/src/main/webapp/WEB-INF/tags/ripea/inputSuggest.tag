@@ -11,6 +11,7 @@
 <%@ attribute name="urlConsultaLlistat" required="true" rtexprvalue="true"%>
 <%@ attribute name="urlConsultaInicial" required="true" rtexprvalue="true"%>
 <%@ attribute name="inline" required="false" rtexprvalue="true"%>
+<%@ attribute name="comment" required="false" rtexprvalue="true"%>
 <%@ attribute name="disabled" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="netejar" required="false" rtexprvalue="true"%>
@@ -97,6 +98,7 @@
 						<c:if test="${not empty campErrors}"><p class="help-block"><span class="fa fa-exclamation-triangle"></span>&nbsp;<form:errors path="${campPath}"/></p></c:if>
 				</c:otherwise>
 			</c:choose>
+			<c:if test="${not empty comment}"><p class="comentari"><spring:message code="${comment}"/></p></c:if>
 			</div>
 		</div>
 	</c:when>

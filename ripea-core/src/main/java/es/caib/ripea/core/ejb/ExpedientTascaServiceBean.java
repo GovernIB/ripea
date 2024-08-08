@@ -175,4 +175,16 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto) {
 		delegate.changeTascaPrioritat(expedientTascaDto);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientTascaDto updateDelegat(Long expedientTascaId, String delegatCodi, String comentari) {
+		return delegate.updateDelegat(expedientTascaId, delegatCodi, comentari);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientTascaDto cancelarDelegacio(Long expedientTascaId, String comentari) {
+		return delegate.cancelarDelegacio(expedientTascaId, comentari);
+	}
 }

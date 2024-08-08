@@ -79,5 +79,9 @@ public enum LogTipusEnumDto {
 	
 	ESCANEIG,
 	
-	CANVI_DATALIMIT_TASCA
+	CANVI_DATALIMIT_TASCA,
+	
+	//Delegació tasques
+	DELEGAR_TASCA,
+	CANCELAR_DELEGACIO_TASCA
 }

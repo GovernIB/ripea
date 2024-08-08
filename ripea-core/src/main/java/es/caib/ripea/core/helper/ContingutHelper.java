@@ -1253,6 +1253,10 @@ public class ContingutHelper {
 					pemitted = true;
 				}
 			}
+			UsuariEntity delegat = expedientTascaEntity.getDelegat();
+			if (delegat != null && delegat.getCodi().equals(auth.getName())) {
+				pemitted = true;
+			}
 			if (!pemitted) {
 				throw new SecurityException("La tasca a la qual intenta accedir no està assignada al seu usuari ("
 						+ "tascaId=" + expedientTascaEntity.getId() + ", "
