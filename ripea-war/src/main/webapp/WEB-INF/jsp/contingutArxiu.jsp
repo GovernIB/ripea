@@ -172,8 +172,8 @@
 									<tr>
 										<td><strong><spring:message code="contingut.arxiu.camp.eni.interessats"/></strong></td>
 										<td>
-											<c:forEach var="interessat" items="${arxiuDetall.eniInteressats}" varStatus="status">
-												${interessat}<c:if test="${not status.last}">,</c:if>
+											<c:forEach var="intFis" items="${arxiuDetall.eniInteressats}" varStatus="status">
+												${intFis}<c:if test="${not status.last}">,</c:if>
 											</c:forEach>
 										</td>
 									</tr>

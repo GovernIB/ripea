@@ -163,7 +163,7 @@ $(document).ready(function(){
 				
 				<!----------------- ENVIAMENTS INFO ------------------->
 				<c:forEach var="enviament" items="${notificacio.documentEnviamentInteressats}" varStatus="status">
-					<c:set var="interessat" value="${enviament.interessat}"/>				
+					<c:set var="intFis" value="${enviament.interessat}"/>
 					<div class="panel panel-default">
 						<div class="panel-heading">
 							<h3 class="panel-title"><strong><spring:message code="notificacio.info.camp.enviament"/> ${status.index+1}</strong></h3>
@@ -180,22 +180,22 @@ $(document).ready(function(){
 										<tr>
 											<td style="border: none;">
 												<c:choose>
-													<c:when test="${interessat.tipus == 'PERSONA_FISICA'}">
-														${interessat.nom} ${interessat.llinatge1} ${interessat.llinatge2}
+													<c:when test="${intFis.tipus == 'PERSONA_FISICA'}">
+														${intFis.nom} ${intFis.llinatge1} ${intFis.llinatge2}
 													</c:when>
-													<c:when test="${interessat.tipus == 'PERSONA_JURIDICA'}">
-														${interessat.raoSocial}
+													<c:when test="${intFis.tipus == 'PERSONA_JURIDICA'}">
+														${intFis.raoSocial}
 													</c:when>										
-													<c:when test="${interessat.tipus == 'ADMINISTRACIO'}">
-														${interessat.organNom}
+													<c:when test="${intFis.tipus == 'ADMINISTRACIO'}">
+														${intFis.organNom}
 													</c:when>
 												</c:choose>
-												<c:if test="${not empty interessat.documentNum}">
-													(${interessat.documentNum})
+												<c:if test="${not empty intFis.documentNum}">
+													(${intFis.documentNum})
 												</c:if>												
 											</td>
 											<td style="border: none; width:1%">
-												<c:if test="${interessat.tipus != 'ADMINISTRACIO'}">
+												<c:if test="${intFis.tipus != 'ADMINISTRACIO'}">
 													<button type="button" class="btn btn-default desplegable" href="#detalls_${status.index}" data-toggle="collapse" aria-expanded="false" aria-controls="detalls_${status.index}">
 														<span class="fa fa-caret-down"></span>
 													</button>
@@ -207,22 +207,22 @@ $(document).ready(function(){
 												<div class="row">
 													<div class="col-xs-6">
 														<dl class="dl-horizontal">
-															<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${interessat.paisNom}</dd>
-															<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${interessat.provinciaNom}</dd>											
-															<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${interessat.municipiNom}</dd>
-															<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${interessat.adresa}</dd>
-															<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${interessat.codiPostal}</dd>
+															<dt><spring:message code="interessat.form.camp.pais"/></dt><dd>${intFis.paisNom}</dd>
+															<dt><spring:message code="interessat.form.camp.provincia"/></dt><dd>${intFis.provinciaNom}</dd>
+															<dt><spring:message code="interessat.form.camp.municipi"/></dt><dd>${intFis.municipiNom}</dd>
+															<dt><spring:message code="interessat.form.camp.adresa"/></dt><dd>${intFis.adresa}</dd>
+															<dt><spring:message code="interessat.form.camp.codiPostal"/></dt><dd>${intFis.codiPostal}</dd>
 														</dl>
 													</div>
 													<div class="col-xs-6">
 														<dl class="dl-horizontal">
-															<dt><spring:message code="interessat.form.camp.email"/></dt><dd>${interessat.email}</dd>
-															<dt><spring:message code="interessat.form.camp.telefon"/></dt><dd>${interessat.telefon}</dd>
-															<dt><spring:message code="interessat.form.camp.observacions"/></dt><dd>${interessat.observacions}</dd>
+															<dt><spring:message code="interessat.form.camp.email"/></dt><dd>${intFis.email}</dd>
+															<dt><spring:message code="interessat.form.camp.telefon"/></dt><dd>${intFis.telefon}</dd>
+															<dt><spring:message code="interessat.form.camp.observacions"/></dt><dd>${intFis.observacions}</dd>
 														</dl>
 													</div>
-													<c:if test="${not empty interessat.representant}">
-														<c:set var="representant" value="${interessat.representant}"/>
+													<c:if test="${not empty intFis.representant}">
+														<c:set var="representant" value="${intFis.representant}"/>
 														<div class="col-xs-12">
 															<table class="table table-bordered">
 																<thead>

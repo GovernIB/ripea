@@ -1,13 +1,9 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.MunicipiDto;
-import es.caib.ripea.core.api.dto.ProvinciaDto;
-import es.caib.ripea.core.api.dto.UnitatOrganitzativaDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
@@ -16,6 +12,7 @@ import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.InteressatCommand.Administracio;
 import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
+import es.caib.ripea.war.command.InteressatImportCommand;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -26,14 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +68,94 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		model.addAttribute("expedientId", expedientId);
 		ompleModel(request, model, entitatActual.getCodi());
 		return "expedientInteressatForm";
+	}
+
+	@RequestMapping(value = "/{expedientId}/interessat/exportar", method = RequestMethod.GET)
+	public String exportar(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		List<InteressatDto> interessatsExp = expedientInteressatService.findByExpedient(entitatActual.getId(), expedientId, false);
+		if (interessatsExp!=null && interessatsExp.size()>0) {
+			try {
+				//ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				//ObjectOutputStream oos = new ObjectOutputStream(baos);
+				//oos.writeObject(interessatsExp);
+				//oos.flush();
+				//writeFileToResponse("interessats_expedient_"+expedientId+".dat", baos.toByteArray(), response);
+				ObjectMapper objectMapper = new ObjectMapper();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				objectMapper.writerWithDefaultPrettyPrinter().writeValue(baos, interessatsExp);
+				writeFileToResponse("interessats_expedient_"+expedientId+".json", baos.toByteArray(), response);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	@RequestMapping(value = "/{expedientId}/interessat/importar", method = RequestMethod.GET)
+	public String importar(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		InteressatImportCommand iic = new InteressatImportCommand();
+		iic.setExpedientId(expedientId);
+		model.addAttribute(iic);
+		return "interessatImportForm";
+	}
+
+	@RequestMapping(value="/{expedientId}/interessat/importar", method = RequestMethod.POST)
+	public String post(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			@ModelAttribute InteressatImportCommand interessatImportCommand,
+			Model model) {
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		if ("SAVE".equals(interessatImportCommand.getAccio())) {
+			List<InteressatDto> lista = new ArrayList<InteressatDto>();
+			try {
+				if (interessatImportCommand.getInteressatsFisica()!=null) { lista.addAll(interessatImportCommand.getInteressatsFisica()); }
+				if (interessatImportCommand.getInteressatsJuridi()!=null) { lista.addAll(interessatImportCommand.getInteressatsJuridi()); }
+				if (interessatImportCommand.getInteressatsAdmini()!=null) { lista.addAll(interessatImportCommand.getInteressatsAdmini()); }
+				String resultat = expedientInteressatService.importarInteressats(
+						getEntitatActualComprovantPermisos(request).getId(),
+						expedientId,
+						RolHelper.getRolActual(request),
+						lista);
+				MissatgesHelper.success(request, resultat);
+				return modalUrlTancar();
+			} catch (Exception e) {
+				e.printStackTrace();
+				MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.err"), e);
+			}
+		} else {
+            try {
+				if (interessatImportCommand.getFitxerInteressats() == null || interessatImportCommand.getFitxerInteressats().getSize()==0) {
+					MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.file"));
+				} else {
+					List<InteressatDto> lista = objectMapper.readValue(
+							interessatImportCommand.getFitxerInteressats().getInputStream(),
+							new TypeReference<List<InteressatDto>>() {});
+					List<InteressatDto> listaActual = expedientInteressatService.findByExpedient(
+							getEntitatActualComprovantPermisos(request).getId(),
+							expedientId,
+							false);
+					interessatImportCommand.setInteressatsFromInteressatDto(lista, listaActual);
+					interessatImportCommand.setAccio("SAVE");
+					model.addAttribute(interessatImportCommand);
+				}
+            } catch (IOException e) {
+				MissatgesHelper.error(request, getMessage(request, "contingut.importar.interessats.err"), e);
+            }
+		}
+
+		return "interessatImportForm";
 	}
 
 	@RequestMapping(value = "/{expedientId}/interessat/{interessatId}", method = RequestMethod.GET)
@@ -503,8 +586,6 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 				"true".equals(arrel));
 	}
 
-
-
 	private void ompleModel(HttpServletRequest request, Model model, String entitatActualCodi) {
 		try {
 			model.addAttribute("paisos", dadesExternesService.findPaisos());
@@ -532,6 +613,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		} catch (Exception e) {}
 		model.addAttribute("dehActiu", dehActiu);
 	}
+
 	private static final Logger logger = LoggerFactory.getLogger(ExpedientInteressatController.class);
 
 }

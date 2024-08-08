@@ -255,7 +255,17 @@ function enableNotificar() {
 	</thead>
 </table>
 <script id="taulaInteressatsNouBoton" type="text/x-jsrender">
-	<c:if test="${potModificar}">
-		<p style="text-align:right"><a href="<c:url value="/expedient/${expedientId}/interessat/new"/>" id="addInteressatBtn" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="enableNotificar" ><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/></a></p>
-	</c:if>
+	<div style="float: right;">
+		<a href="<c:url value="/expedient/${expedientId}/interessat/exportar"/>" id="exportInteressatBtn" class="btn btn-default">
+			<span class="fa fa-upload"></span>&nbsp;<spring:message code="contingut.boto.exp.interessat"/>
+		</a>
+		<c:if test="${potModificar}">
+			<a href="<c:url value="/expedient/${expedientId}/interessat/importar"/>" id="importInteressatBtn" class="btn btn-default" data-toggle="modal">
+				<span class="fa fa-download"></span>&nbsp;<spring:message code="contingut.boto.imp.interessat"/>
+			</a>
+			<a href="<c:url value="/expedient/${expedientId}/interessat/new"/>" id="addInteressatBtn" style="margin-left: 45px;" class="btn btn-default" data-toggle="modal" data-func-to-call-on-tancar="enableNotificar">
+				<span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.nou.interessat"/>
+			</a>
+		</c:if>
+	</div>
 </script>

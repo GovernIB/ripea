@@ -88,10 +88,10 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 <script type="text/javascript">
 	var interessatNoms = [];
 	var interessatLlinatges = [];
-	<c:forEach var="interessat" items="${interessats}">
-	interessatNoms['${interessat.id}'] = "${interessat.nom}";
-	<c:if test="${interessat.personaFisica}">
-		interessatLlinatges['${interessat.id}'] = "${interessat.llinatges}";
+	<c:forEach var="intFis" items="${interessats}">
+	interessatNoms['${intFis.id}'] = "${intFis.nom}";
+	<c:if test="${intFis.personaFisica}">
+		interessatLlinatges['${intFis.id}'] = "${intFis.llinatges}";
 	</c:if>
 	</c:forEach>
 	const esRepresentant = <c:choose><c:when test="${esRepresentant}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
