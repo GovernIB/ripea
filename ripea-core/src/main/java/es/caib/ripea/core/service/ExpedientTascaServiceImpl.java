@@ -357,6 +357,10 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			tasca.updateEstat(tascaEstat);
 		}
 		
+		if (tascaEstat == TascaEstatEnumDto.FINALITZADA || tascaEstat == TascaEstatEnumDto.CANCELLADA || tascaEstat == TascaEstatEnumDto.REBUTJADA) {
+			tasca.updateDelegat(null);
+		}
+		
 		if(tascaEstat == TascaEstatEnumDto.INICIADA) {
 			tasca.updateResponsableActual(responsableActual);
 		}
@@ -416,6 +420,65 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				ExpedientTascaDto.class);
 	}
 	
+	@Transactional
+	@Override
+	public ExpedientTascaDto updateDelegat(
+			Long expedientTascaId, 
+			String delegatCodi,
+			String comentari) {
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
+		
+		UsuariEntity delegat = usuariHelper.getUsuariByCodiDades(delegatCodi, true, true);
+		
+		expedientTascaEntity.updateDelegat(delegat);
+		
+		if (comentari != null) {
+			ExpedientTascaComentariEntity comentariTasca = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, comentari).build();
+			expedientTascaEntity.addComentari(comentariTasca);
+		}
+		
+		emailHelper.enviarEmailDelegarTasca(expedientTascaEntity);
+		
+		cacheHelper.evictCountTasquesPendents(delegat.getCodi());
+		
+		log(expedientTascaEntity, LogTipusEnumDto.DELEGAR_TASCA);
+		
+		return conversioTipusHelper.convertir(expedientTascaEntity,
+				ExpedientTascaDto.class);
+	}
+	
+	@Transactional
+	@Override
+	public ExpedientTascaDto cancelarDelegacio(
+			Long expedientTascaId, 
+			String comentari) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
+		logger.debug("Obtenint la llista del usuari tasques (" +
+				"auth=" + auth.getName() + ")");
+		
+		UsuariEntity delegat = expedientTascaEntity.getDelegat();
+		
+		expedientTascaEntity.updateDelegat(null);
+		
+		if (comentari != null) {
+			ExpedientTascaComentariEntity comentariTasca = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, comentari).build();
+			expedientTascaEntity.addComentari(comentariTasca);
+		}
+		
+		emailHelper.enviarEmailCancelarDelegacioTasca(
+				expedientTascaEntity, 
+				delegat,
+				comentari);
+		
+		cacheHelper.evictCountTasquesPendents(auth.getName());
+		
+		log(expedientTascaEntity, LogTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
+		
+		return conversioTipusHelper.convertir(expedientTascaEntity,
+				ExpedientTascaDto.class);
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public MetaExpedientTascaDto findMetaExpedientTascaById(Long metaExpedientTascaId) {
@@ -460,16 +523,26 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 			responsables.add(responsable);
 		}
 
+		List<UsuariEntity> observadors = new ArrayList<UsuariEntity>(); // Per coneixement
+		
+		if (expedientTasca.getObservadorsCodi() != null) {
+			for (String observadorCodi : expedientTasca.getObservadorsCodi()) {
+			    UsuariEntity observador = usuariHelper.getUsuariByCodiDades(observadorCodi, true, true);
+			    observadors.add(observador);
+			}
+		}
+		
 		ExpedientTascaEntity expedientTascaEntity = ExpedientTascaEntity.getBuilder(
 				expedient, 
 				metaExpedientTascaEntity, 
 				responsables, 
+				observadors,
 				expedientTasca.getDataLimit(),
 				expedientTasca.getTitol(),
 				expedientTasca.getDuracio(),
 				expedientTasca.getPrioritat(),
 				expedientTasca.getObservacions()).build();
-
+		
 		if (expedientTasca.getComentari() != null && !expedientTasca.getComentari().isEmpty()) {
 			ExpedientTascaComentariEntity comentari = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, expedientTasca.getComentari()).build();
 			expedientTascaEntity.addComentari(comentari);
@@ -494,13 +567,19 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 		for (String responsableCodi: expedientTasca.getResponsablesCodi()) {
 			cacheHelper.evictCountTasquesPendents(responsableCodi);	
 		}
+		
+		if (expedientTasca.getObservadorsCodi() != null) {
+			for (String observadorCodi: expedientTasca.getObservadorsCodi()) {
+				cacheHelper.evictCountTasquesPendents(observadorCodi);	
+			}
+		}
 
 		expedientTascaRepository.save(expedientTascaEntity);
 		log(expedientTascaEntity, LogTipusEnumDto.CREACIO);
 		
-		//emailHelper.enviarEmailCanviarEstatTasca(
-		//		expedientTascaEntity,
-		//		null);
+		emailHelper.enviarEmailCanviarEstatTasca(
+				expedientTascaEntity,
+				null);
 
 		return conversioTipusHelper.convertir(
 				expedientTascaEntity,

@@ -50,6 +50,19 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			inverseName = "ipa_expedient_tascaresp_fk")
 	private List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 	
+	@OneToOne
+	@JoinColumn(name = "delegat")
+	private UsuariEntity delegat;
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "ipa_expedient_tasca_obse",
+			joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
+			inverseJoinColumns = {@JoinColumn(name = "observador_codi")})
+	@ForeignKey(
+			name = "ipa_expedient_obse_tasca_fk",
+			inverseName = "ipa_expedient_tascaobse_fk")
+	private List<UsuariEntity> observadors = new ArrayList<UsuariEntity>();
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_inici", nullable = false)
@@ -98,6 +111,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
 			List<UsuariEntity> responsables,
+			List<UsuariEntity> observadors,
 			Date dataLimit,
 			String titol,
 			String duracio,
@@ -107,6 +121,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				expedient,
 				metaExpedientTasca,
 				responsables,
+				observadors,
 				dataLimit,
 				titol,
 				duracio,
@@ -120,6 +135,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
 				List<UsuariEntity> responsables,
+				List<UsuariEntity> observadors,
 				Date dataLimit,
 				String titol,
 				String duracio,
@@ -129,6 +145,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
 			built.responsables = responsables;
+			built.observadors = observadors;
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
@@ -174,6 +191,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public List<UsuariEntity> getResponsables() {
 		return responsables;
 	}
+	public List<UsuariEntity> getObservadors() {
+		return observadors;
+	}
 	public UsuariEntity getResponsableActual() {
 		return responsableActual;
 	}
@@ -185,6 +205,12 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	}
 	public void updateResponsables(List<UsuariEntity> responsables) {
 		this.responsables = responsables;
+	}
+	public UsuariEntity getDelegat() {
+		return delegat;
+	}
+	public void updateDelegat(UsuariEntity delegat) {
+		this.delegat = delegat;
 	}
 	public Date getDataInici() {
 		return dataInici;

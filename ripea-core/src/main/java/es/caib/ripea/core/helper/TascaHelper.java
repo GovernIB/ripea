@@ -82,6 +82,10 @@ public class TascaHelper {
 					pemitted = true;
 				}
 			}
+			UsuariEntity delegat = tasca.getDelegat();
+			if (delegat != null && delegat.getCodi().equals(auth.getName())) {
+				pemitted = true;
+			}
 			if (!pemitted) {
 				throw new SecurityException("Sense permisos per accedir la tasca ("
 						+ "tascaId=" + tasca.getId() + ", "

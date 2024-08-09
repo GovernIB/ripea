@@ -83,6 +83,15 @@ $(document).ready(function(){
 			suggestText="nom"
 			required="true"
 			multiple="true"/>
+		<rip:inputSuggest 
+			name="observadorsCodi" 
+			urlConsultaInicial="${urlConsultaInicial}" 
+			urlConsultaLlistat="${urlConsultaLlistat}" 
+			textKey="expedient.tasca.form.camp.observador"
+			suggestValue="codi"
+			suggestText="nom"
+			comment="expedient.tasca.form.camp.observador.comentari"
+			multiple="true"/>
 		<rip:inputText
 				name="duracio"
 				textKey="tasca.list.column.duracio"

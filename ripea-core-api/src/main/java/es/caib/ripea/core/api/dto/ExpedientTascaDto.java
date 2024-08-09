@@ -34,6 +34,11 @@ public class ExpedientTascaDto {
 	private String observacions;
 	private String duracio;
 	private PrioritatEnumDto prioritat;
+	private List<String> observadorsCodi;
+	private List<UsuariDto> observadors;
+	private boolean usuariActualObservador;
+	private boolean usuariActualDelegat;
+	private UsuariDto delegat;
 	
 	public String getDataLimitString() {
 		if (dataLimit != null) {
@@ -47,7 +52,11 @@ public class ExpedientTascaDto {
 	public boolean isAgafada() {
 		return responsableActual != null;
 	}
-
+	
+	public boolean isDelegada() {
+		return delegat != null;
+	}
+	
 	public String getResponsablesStr() {
 		List<String> responsablesStr = new ArrayList<String>();
 		for (UsuariDto usuariDto : responsables) {

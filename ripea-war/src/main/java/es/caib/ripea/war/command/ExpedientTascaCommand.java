@@ -33,6 +33,7 @@ public class ExpedientTascaCommand {
 	private String titol;
 	@Size(max=1024)
 	private String observacions;
+	private List<String> observadorsCodi;
 	
 	public Date getDataLimit() {
 		return dataLimit;
@@ -88,6 +89,12 @@ public class ExpedientTascaCommand {
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
 	}
+	public List<String> getObservadorsCodi() {
+		return observadorsCodi;
+	}
+	public void setObservadorsCodi(List<String> observadorsCodi) {
+		this.observadorsCodi = observadorsCodi;
+	}
 	public PrioritatEnumDto getPrioritat() { return prioritat; }
 	public void setPrioritat(PrioritatEnumDto prioritat) { this.prioritat = prioritat; }
 	public String getDuracio() { return duracio; }
@@ -103,6 +110,14 @@ public class ExpedientTascaCommand {
 			command.getResponsablesCodi().add(responsable.getCodi());
 			
 		}
+		
+		if (dto.getObservadors() != null && !dto.getObservadors().isEmpty()) {
+			for (UsuariDto observador : dto.getObservadors()) {
+				command.getObservadorsCodi().add(observador.getCodi());
+				
+			}
+		}
+		
 		return command;
 	}
 	public static ExpedientTascaDto asDto(ExpedientTascaCommand command) {

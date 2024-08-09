@@ -321,6 +321,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 				header = "Elements de l'escriptori alliberats";
 			} else if (entry.getKey() == EventTipusEnumDto.MODIFICACIO_DATALIMIT_TASCA) {
 				header = "Modificació data límit de tasques";
+			} else if (entry.getKey() == EventTipusEnumDto.DELEGAT_TASCA) {
+				header = "Assignació delegat de tasques";
+			} else if (entry.getKey() == EventTipusEnumDto.CANCELAR_DELEGACIO_TASCA) {
+				header = "Cancel·lació delegat de tasques";
 			}
 			
 			text += header + "\n";

@@ -68,6 +68,15 @@ public interface ExpedientTascaService {
 			Long expedientTascaId, 
 			List<String> responsablesCodi);
 
+	public ExpedientTascaDto updateDelegat(
+			Long expedientTascaId, 
+			String delegatCodi,
+			String comentari);
+	
+	public ExpedientTascaDto cancelarDelegacio(
+			Long expedientTascaId,
+			String comentari);
+	
 	public ExpedientTascaDto updateDataLimit(
 			Long expedientTascaId, 
 			Date dataLimit);
