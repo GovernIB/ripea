@@ -27,14 +27,12 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	MetaExpedientEntity findByEntitatAndCodi(EntitatEntity entitat, String codi);
 
-	List<MetaExpedientEntity> findByEntitat(EntitatEntity entitat);
-	
 	@Query( "select " +
 			"	me.id " +
 			"from " +
 			"    MetaExpedientEntity me " +
 			"where " +
-			"  me.organGestor in (:organGestors)")
+			"  me.organGestor in (:organGestors) order by me.nom ASC")
 	List<Long> findByOrgansGestors(@Param("organGestors") List<OrganGestorEntity> organGestors);
 
 	@Query(	"from " +
@@ -128,7 +126,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"from" +
 			"    ExpedientEntity e " +
 			"where " +
-			"    e.id in (:ids) ")
+			"    e.id in (:ids) order by e.metaExpedient.nom ASC")
 	List<Long> findDistinctMetaExpedientIdsByExpedients(
 			@Param("ids") Collection<Long> ids);
 
@@ -196,7 +194,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"						or meog.id in (:metaExpedientOrganIdPermesos1) " +
 			"						or meog.id in (:metaExpedientOrganIdPermesos2) " +
 			"						or meog.id in (:metaExpedientOrganIdPermesos3))) " +
-			"	  		or (:allComuns = true and og is null)))")
+			"	  		or (:allComuns = true and og is null))) order by me.nom ASC")
 	List<MetaExpedientEntity> findByEntitatAndActiuAndFiltreAndPermes(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("esNullActiu") boolean esNullActiu,
@@ -245,7 +243,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"    MetaExpedientEntity me " +
 			"where " +
 			"    me.entitat = :entitat " +
-			"and (me.revisioEstat = :revisioEstat) ")
+			"and (me.revisioEstat = :revisioEstat) order by me.nom ASC")
 	List<MetaExpedientEntity> findByRevisioEstat(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("revisioEstat") MetaExpedientRevisioEstatEnumDto revisioEstat);
@@ -254,7 +252,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 
 	List<MetaExpedientEntity> findByEntitatAndActiuTrueOrderByNomAsc(EntitatEntity entitat);
 
-	List<MetaExpedientEntity> findByEntitatAndClassificacio(EntitatEntity entitat, String classificacio);
+	List<MetaExpedientEntity> findByEntitatAndClassificacioOrderByNomAsc(EntitatEntity entitat, String classificacio);
 	
 	@Query( "select " +
 			"   me.id " +
@@ -263,7 +261,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"where " +
 			"    me.entitat = :entitat " +
 			"and me.organGestor is null " +
-			"and me.actiu = true")
+			"and me.actiu = true order by me.nom ASC")
 	List<Long> findProcedimentsComunsActiveIds(
 			@Param("entitat") EntitatEntity entitat);
 	
@@ -274,7 +272,7 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"where " +
 			"    me.entitat = :entitat " +
 			"and me.organGestor is null " +
-			"and me.actiu = true")
+			"and me.actiu = true order by me.nom ASC")
 	List<MetaExpedientEntity> findProcedimentsComunsActive(
 			@Param("entitat") EntitatEntity entitat);
 
@@ -285,18 +283,17 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			"	left outer join me.organGestor og " +
 			"where " +
 			"	 me.entitat = :entitat " +
-			"and og.codi in (:organGestorCodis) ")
+			"and og.codi in (:organGestorCodis) order by me.nom ASC")
 	List<MetaExpedientEntity> findByOrganGestorCodis(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("organGestorCodis") List<String> organGestorCodis);
-	
-	
+
 	@Query(	"select" +
 			"    me.id " +
 			"from" +
 			"    MetaExpedientEntity me " +
 			" where " +
-			"    (me.entitat = :entitat) ")
+			"    (me.entitat = :entitat) order by me.nom ASC")
 	public List<Long> findAllIdsByEntitat(@Param("entitat") EntitatEntity entitat);
 	
 	@Query(	"select" +
@@ -306,12 +303,11 @@ public interface MetaExpedientRepository extends JpaRepository<MetaExpedientEnti
 			" where " +
 			"    me.entitat = :entitat " + 
 			"and me.actiu = true " + 
-			"and (:isAdmin = true or me.id in (:ids))")
+			"and (:isAdmin = true or me.id in (:ids)) order by me.nom ASC")
 	public List<MetaExpedientEntity> findMetaExpedientsByIds(	
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("ids") List<Long> ids, 
 			@Param("isAdmin") boolean isAdmin);
-
 
 	@Query(	"select count(me.id) from MetaExpedientEntity me where me.organGestor = :organGestor")
 	Integer countByOrganGestor(@Param("organGestor") OrganGestorEntity organGestor);

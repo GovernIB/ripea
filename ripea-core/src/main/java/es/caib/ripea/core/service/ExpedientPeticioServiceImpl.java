@@ -286,36 +286,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		synchronized (SynchronizationHelper.get0To99Lock(expedientPeticioId, SynchronizationHelper.locksAnnotacions)) {
 			expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);
 		}
-		
-		
-	}
-
-	
-	@Transactional(readOnly = true)
-	@Override
-	public MetaExpedientDto findMetaExpedientByEntitatAndProcedimentCodi(
-			String entitatCodi,
-			String procedimentCodi) {
-
-		MetaExpedientDto metaExpedientDto = null;
-
-		if (procedimentCodi != null) {
-
-			EntitatEntity entitat = entitatRepository.findByUnitatArrel(entitatCodi);
-
-			if (entitat != null) {
-				// set metaexpedient to which expedient will belong if peticion is accepted
-				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(
-						entitat,
-						procedimentCodi);
-
-				if (!metaExpedients.isEmpty()) {
-					metaExpedientDto = conversioTipusHelper.convertir(metaExpedients.get(0),
-							MetaExpedientDto.class);
-				}
-			}
-		}
-		return metaExpedientDto;
 	}
 
 	@Transactional
@@ -960,7 +930,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		long t2 = System.currentTimeMillis();
 		List<MetaExpedientEntity> metaExpedientsPermesos = null;
 		if (rolActual.equals("IPA_ADMIN")) {
-			metaExpedientsPermesos = metaExpedientRepository.findByEntitat(entitat);
+			metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientsPermesos = metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId);
 			if (organGestorHelper.hasPermisAdminComu(organActualId)) {
