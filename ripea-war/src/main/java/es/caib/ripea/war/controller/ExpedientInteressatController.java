@@ -13,6 +13,7 @@ import es.caib.ripea.war.command.InteressatCommand.Administracio;
 import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
 import es.caib.ripea.war.command.InteressatImportCommand;
+import es.caib.ripea.war.command.PinbalConsultaCommand;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -64,6 +65,10 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		interessatCommand.setEntitatId(entitatActual.getId());
 		interessatCommand.setPais("724");
 		interessatCommand.setExpedientId(expedientId);
+		//Miram si el formulari actual, s'esta obrint desde una altra modal (PINBAL o NOTIFICACIO)
+		if(request.getSession().getAttribute("ContingutPinbalController.command")!=null) {
+			interessatCommand.setFormulariAnterior("ContingutPinbalController.command");
+		}
 		model.addAttribute("interessatCommand", interessatCommand);
 		model.addAttribute("expedientId", expedientId);
 		ompleModel(request, model, entitatActual.getCodi());
@@ -261,7 +266,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 						"interessat.controller.creat.error.arxiu",
 						null);
 			}
-			
+			interessatDto.setId(interessat.getId());
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
@@ -270,10 +275,22 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 					RolHelper.getRolActual(request));
 			msgKey = "interessat.controller.modificat.ok";
 		}
-		return getModalControllerReturnValueSuccess(
-				request,
-				"redirect:../../../contingut/" + expedientId,
-				msgKey);
+
+		//Sigui el create o el update, s'ha executat correctament, ara en funció del atribut formulariAnterior
+		//hem de tancar modal o bé tornar al formulari original
+		if ("".equals(interessatCommand.getFormulariAnterior())) {
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../../../contingut/" + expedientId,
+					msgKey);
+		} else {
+			String retornar = "contingutPinbalForm";
+			omplirModelFormulari(request, expedientId, model);
+			model.addAttribute("pinbalConsultaCommand", request.getSession().getAttribute("ContingutPinbalController.command"));
+			model.addAttribute("interessatCreat", interessatDto.getId());
+			request.getSession().removeAttribute("ContingutPinbalController.command");
+			return retornar;
+		}
 	}
 
 	@RequestMapping(value = "/{expedientId}/interessat/{interessatId}/delete", method = RequestMethod.GET)

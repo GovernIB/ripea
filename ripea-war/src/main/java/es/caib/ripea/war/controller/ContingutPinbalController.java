@@ -52,15 +52,10 @@ import es.caib.ripea.war.helper.RolHelper;
 @RequestMapping("/contingut")
 public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private ExpedientInteressatService expedientInteressatService;
-	@Autowired
-	private DadesExternesService dadesExternesService;
-	
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private DocumentService documentService;
+	@Autowired private ExpedientInteressatService expedientInteressatService;
+
 	@RequestMapping(value = "/{pareId}/pinbal/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -68,6 +63,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			Model model) {
 		return get(request, pareId, null, model);
 	}
+
 	@RequestMapping(value = "/{pareId}/pinbal/{documentId}", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -85,6 +81,18 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 		model.addAttribute(command);
 		return "contingutPinbalForm";
 	}
+
+	@RequestMapping(value = "/{pareId}/pinbal/guardaFormSessio", method = RequestMethod.POST)
+	@ResponseBody
+	public String guardaFormSessio(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			PinbalConsultaCommand command) {
+		//Guardam en la sessió del usuari actual, el formulari tal i com es troba, no fa falta validar
+		request.getSession().setAttribute("ContingutPinbalController.command", command);
+		return "OK";
+	}
+
 	@RequestMapping(value = "/{pareId}/pinbal/new", method = RequestMethod.POST)
 	public String postNew(
 			HttpServletRequest request,
@@ -150,9 +158,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			omplirModelFormulari(request, pareId, model);
 			return "contingutPinbalForm";
 		}
-		
 
-		
 		Exception e = null;
 		try {
 			e = documentService.pinbalNovaConsulta(
@@ -188,8 +194,7 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 					e);
 		}
 	}
-	
-	
+
 	@RequestMapping(value = "/{pareId}/pinbal/titulars/{metaDocumentId}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<InteressatDto> findTitularsPerTipusDocument(
@@ -256,63 +261,6 @@ public class ContingutPinbalController extends BaseUserOAdminOOrganController {
 			return false;
 		}
 	}
-	
-	
 
-	private void omplirModelFormulari(
-			HttpServletRequest request,
-			Long contingutId,
-			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		List <MetaDocumentDto> metaDocuments = metaDocumentService.findActiusPerCreacio(
-				entitatActual.getId(),
-				contingutId, 
-				null, 
-				false);
-		Iterator<MetaDocumentDto> itmd = metaDocuments.iterator();
-		while (itmd.hasNext()) {
-			MetaDocumentDto metaDocument = itmd.next();
-			if (!metaDocument.isPinbalActiu()) {
-				itmd.remove();
-			}
-		};
-		model.addAttribute("metaDocuments", metaDocuments);
-//		List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
-//				entitatActual.getId(),
-//				contingutId,
-//				false);
-//		Iterator<InteressatDto> itin = interessats.iterator();
-//		while (itin.hasNext()) {
-//			InteressatDto interessat = itin.next();
-//			if (interessat.getTipus() == InteressatTipusEnumDto.ADMINISTRACIO) {
-//				itin.remove();
-//			}
-//			
-//		};
-		model.addAttribute("interessats", new ArrayList<>());
-		model.addAttribute(
-				"consentimentOptions",
-				EnumHelper.getOptionsForEnum(
-						PinbalConsentimentEnumDto.class,
-						"pinbal.consentiment.enum."));
-		model.addAttribute(
-				"comunitats",
-				Arrays.asList(new HtmlOption("04", "Illes Balears")));
-		model.addAttribute(
-				"provincies",
-				Arrays.asList(new HtmlOption("07", "Illes Balears")));
-		model.addAttribute(
-				"municipis",
-				dadesExternesService.findMunicipisPerProvinciaPinbal("07"));
-		
-		model.addAttribute(
-				"paisos",
-				dadesExternesService.findPaisos());
-		
-		
-	}
-
-	
 	private static final Logger logger = LoggerFactory.getLogger(ContingutPinbalController.class); 
-
 }

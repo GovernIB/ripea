@@ -44,6 +44,7 @@ function webutilModalAdjustHeight(iframe) {
 	} else {
 		$iframe.parent().css('height', htmlHeight + 'px');
 		$iframe.css('min-height', htmlHeight + 'px');
+		$iframe.css('height', htmlHeight + 'px');
 		$iframe.closest('div.modal-body').height(htmlHeight + 'px');
 	}
 }

@@ -3,14 +3,15 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.war.helper.AjaxHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
-import es.caib.ripea.war.helper.ModalHelper;
-import es.caib.ripea.war.helper.RolHelper;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
+import es.caib.ripea.war.helper.*;
 
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.support.RequestContext;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Controlador base que implementa funcionalitats comunes.
@@ -295,12 +296,12 @@ public class BaseController implements MessageSourceAware {
 				new RequestContext(request).getLocale());
 		return message;
 	}
+
 	protected String getMessage(
 			HttpServletRequest request,
 			String key) {
 		return getMessage(request, key, null);
 	}
-
 
 	protected String getRolActual(
 			HttpServletRequest request) {
