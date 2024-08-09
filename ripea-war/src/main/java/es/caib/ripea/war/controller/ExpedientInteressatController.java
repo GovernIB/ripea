@@ -1,5 +1,6 @@
 package es.caib.ripea.war.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +9,7 @@ import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.DadesExternesService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.core.api.service.UnitatOrganitzativaService;
+import es.caib.ripea.war.command.DocumentNotificacionsCommand;
 import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.InteressatCommand.Administracio;
 import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
@@ -68,7 +70,9 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		//Miram si el formulari actual, s'esta obrint desde una altra modal (PINBAL o NOTIFICACIO)
 		if(request.getSession().getAttribute("ContingutPinbalController.command")!=null) {
 			interessatCommand.setFormulariAnterior("ContingutPinbalController.command");
-		}
+		} else if(request.getSession().getAttribute("DocumentEnviamentController.command")!=null) {
+            interessatCommand.setFormulariAnterior("DocumentEnviamentController.command");
+        }
 		model.addAttribute("interessatCommand", interessatCommand);
 		model.addAttribute("expedientId", expedientId);
 		ompleModel(request, model, entitatActual.getCodi());
@@ -203,7 +207,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long expedientId,
 			@ModelAttribute InteressatCommand interessatCommand,
 			BindingResult bindingResult,
-			Model model) {
+			Model model) throws JsonProcessingException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		interessatCommand.setNotificacioAutoritzat(true);
@@ -251,22 +255,15 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			interessatDto = InteressatCommand.asAdministracioDto(interessatCommand);
 			break;
 		}
-		
+
+		InteressatDto interessatCreat = null;
 		String msgKey = "interessat.controller.afegit.ok";
 		if (interessatCommand.getId() == null) {
-			InteressatDto interessat = expedientInteressatService.create(
+			interessatCreat = expedientInteressatService.create(
 					entitatActual.getId(),
 					expedientId,
 					interessatDto, 
 					RolHelper.getRolActual(request));	
-			if (!interessat.isArxiuPropagat()) {
-				return getModalControllerReturnValueWarning(
-						request,
-						"redirect:../../../contingut/" + expedientId,
-						"interessat.controller.creat.error.arxiu",
-						null);
-			}
-			interessatDto.setId(interessat.getId());
 		} else {
 			expedientInteressatService.update(
 					entitatActual.getId(),
@@ -278,19 +275,46 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 
 		//Sigui el create o el update, s'ha executat correctament, ara en funció del atribut formulariAnterior
 		//hem de tancar modal o bé tornar al formulari original
-		if ("".equals(interessatCommand.getFormulariAnterior())) {
-			return getModalControllerReturnValueSuccess(
-					request,
-					"redirect:../../../contingut/" + expedientId,
-					msgKey);
-		} else {
+		if ("ContingutPinbalController.command".equals(interessatCommand.getFormulariAnterior())) {
+			if (interessatCreat!=null && !interessatCreat.isArxiuPropagat()) {
+				MissatgesHelper.warning(request, getMessage(request, "interessat.controller.creat.error.arxiu", null));
+			}
 			String retornar = "contingutPinbalForm";
 			omplirModelFormulari(request, expedientId, model);
 			model.addAttribute("pinbalConsultaCommand", request.getSession().getAttribute("ContingutPinbalController.command"));
-			model.addAttribute("interessatCreat", interessatDto.getId());
+			model.addAttribute("interessatCreat", interessatCreat.getId());
 			request.getSession().removeAttribute("ContingutPinbalController.command");
 			return retornar;
-		}
+        } else if ("DocumentEnviamentController.command".equals(interessatCommand.getFormulariAnterior())) {
+			if (interessatCreat!=null && !interessatCreat.isArxiuPropagat()) {
+				MissatgesHelper.warning(request, getMessage(request, "interessat.controller.creat.error.arxiu", null));
+			}
+            String retornar = "notificacioForm";
+			DocumentNotificacionsCommand documentNotificacionsCommand = (DocumentNotificacionsCommand)request.getSession().getAttribute("DocumentEnviamentController.command");
+			model.addAttribute("documentNotificacionsCommand", documentNotificacionsCommand);
+			emplenarModelNotificacio(
+					request,
+					getEntitatActualComprovantPermisos(request),
+					documentNotificacionsCommand.getDocumentId(),
+					documentNotificacionsCommand,
+					model, null);
+            model.addAttribute("interessatCreat", interessatCreat.getId());
+            request.getSession().removeAttribute("DocumentEnviamentController.command");
+            return retornar;
+        } else {
+			if (interessatCreat!=null && !interessatCreat.isArxiuPropagat()) {
+				return getModalControllerReturnValueWarning(
+						request,
+						"redirect:../../../contingut/" + expedientId,
+						"interessat.controller.creat.error.arxiu",
+						null);
+			} else {
+				return getModalControllerReturnValueSuccess(
+						request,
+						"redirect:../../../contingut/" + expedientId,
+						msgKey);
+			}
+        }
 	}
 
 	@RequestMapping(value = "/{expedientId}/interessat/{interessatId}/delete", method = RequestMethod.GET)

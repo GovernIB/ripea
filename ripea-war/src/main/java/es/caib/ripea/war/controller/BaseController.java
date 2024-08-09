@@ -3,11 +3,16 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.PinbalConsentimentEnumDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.service.*;
+import es.caib.ripea.war.command.DocumentNotificacionsCommand;
+import es.caib.ripea.war.command.InteressatCommand;
+import es.caib.ripea.war.command.NotificacioEnviamentCommand;
 import es.caib.ripea.war.helper.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
@@ -29,7 +34,12 @@ import java.util.*;
  * @author Limit Tecnologies <limit@limit.es>
  */
 public class BaseController implements MessageSourceAware {
-	
+
+	@Autowired private ExpedientInteressatService expedientInteressatService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private DadesExternesService dadesExternesService;
+	@Autowired private AplicacioService aplicacioService;
+
 	public static final String SESSION_ATTRIBUTE_ROL_ACTUAL = "RolHelper.rol.actual";
 
 	MessageSource messageSource;
@@ -306,6 +316,121 @@ public class BaseController implements MessageSourceAware {
 	protected String getRolActual(
 			HttpServletRequest request) {
 		return RolHelper.getRolActual(request);
+	}
+
+	public ExpedientDto emplenarModelNotificacio(
+			HttpServletRequest request,
+			EntitatDto entitatActual,
+			Long documentId,
+			DocumentNotificacionsCommand command,
+			Model model,
+			Boolean notificacioConcatenatEntregaPostal) throws JsonProcessingException {
+		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
+				entitatActual.getId(),
+				documentId,
+				false,
+				false,
+				true,
+				null,
+				null);
+		boolean procedimentSenseCodiSia = false;
+		if (document.getExpedientPare()!=null) {
+			if (document.getExpedientPare().getMetaExpedient().getTipusClassificacio() == TipusClassificacioEnumDto.ID) {
+				procedimentSenseCodiSia = true;
+			}
+			command.setExpedientPareId(document.getExpedientPare().getId());
+		}
+		model.addAttribute(
+				"procedimentSenseCodiSia",
+				procedimentSenseCodiSia);
+		model.addAttribute(
+				"document",
+				document);
+		model.addAttribute(
+				"notificacioTipusEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentNotificacioTipusEnumDto.class,
+						"notificacio.tipus.enum.",
+						new Enum<?>[] {DocumentNotificacioTipusEnumDto.MANUAL}));
+		model.addAttribute(
+				"interessatTipus",
+				EnumHelper.getOptionsForEnum(
+						InteressatTipusEnumDto.class,
+						"interessat.tipus.enum."));
+
+		model.addAttribute(
+				"notificacioEstatEnumOptions",
+				EnumHelper.getOptionsForEnum(
+						DocumentEnviamentEstatEnumDto.class,
+						"notificacio.estat.enum.",
+						new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
+		model.addAttribute(
+				"interessats",
+				expedientInteressatService.findByExpedient(
+						entitatActual.getId(),
+						document.getExpedientPare().getId(),
+						true));
+		model.addAttribute(
+				"expedientId",
+				document.getExpedientPare().getId());
+
+		boolean enviamentPostalProperty = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.notificacio.enviament.postal.actiu", true);
+
+		if (enviamentPostalProperty) {
+			if (notificacioConcatenatEntregaPostal != null) {
+				model.addAttribute("entregaPostal", (boolean) notificacioConcatenatEntregaPostal);
+			} else {
+				model.addAttribute("entregaPostal", true);
+			}
+		} else {
+			model.addAttribute("entregaPostal", false);
+		}
+
+		model.addAttribute(
+				"serveiTipusEstats",
+				EnumHelper.getOptionsForEnum(
+						ServeiTipusEnumDto.class,
+						"notificacio.servei.tipus.enum."));
+		if (command != null) {
+			List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
+					entitatActual.getId(),
+					document.getExpedientPare().getId(),
+					true);
+			command.getEnviaments().clear();
+
+			for (InteressatDto interessatDto : interessats) {
+				NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
+
+				notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
+				if (interessatDto.getRepresentant() != null) {
+					notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
+				}
+				command.getEnviaments().add(notificacioParte);
+			}
+			if (command.getEnviaments() != null && !command.getEnviaments().isEmpty()) {
+				ObjectMapper mapper = new ObjectMapper();
+				String notificacions = mapper.writeValueAsString(command.getEnviaments());
+				model.addAttribute("notificacions", notificacions);
+				ompleDadesAdresa(request, model);
+			}
+		}
+		return document.getExpedientPare();
+	}
+
+	private void ompleDadesAdresa(HttpServletRequest request, Model model) {
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String paisos = mapper.writeValueAsString(dadesExternesService.findPaisos());
+			model.addAttribute("paisos", paisos);
+		} catch (Exception e) {
+			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.paisos.error"));
+		}
+		try {
+			String provincies = mapper.writeValueAsString(dadesExternesService.findProvincies());
+			model.addAttribute("provincies", provincies);
+		} catch (Exception e) {
+			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.provincies.error"));
+		}
 	}
 
 	public void setMessageSource(MessageSource messageSource) {

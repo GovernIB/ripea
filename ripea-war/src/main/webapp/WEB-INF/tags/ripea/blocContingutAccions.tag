@@ -298,8 +298,11 @@
 						<c:otherwise>
 							<c:set var="notificarMsg"><spring:message code="comu.boto.comunicar"/></c:set>
 						</c:otherwise>
-					</c:choose>						
-					<c:choose>
+					</c:choose>
+					<li>
+						<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a>
+					</li>
+					<%--c:choose>
 						<c:when test="${!empty expedient.interessatsNotificable}">
 							<li>
 							<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a>
@@ -309,7 +312,7 @@
 							<li class="disabled"><a class="btnNotificar" href="#" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a></li>
 							<p style="font-size: 9px;padding: 1px 15px;">&nbsp;<spring:message code="comu.boto.notificar.comentari"/></p>
 						</c:otherwise>
-					</c:choose>
+					</c:choose-->
 					
 					<%---- Publicar ----%>
 					<c:if test="${isMostrarPublicar}">

@@ -68,11 +68,8 @@ var interessatTipusEnum = [];
 	interessatTipusEnum["${tipus.value}"] = "<spring:message code="${tipus.text}"/>";
 </c:forEach>
 
-//################################################## document ready START ##############################################################
 $(document).ready(function() {
-	
 
-	
 	//select and checkbox elements dont have readonly attribute that allows elements to be greyed out but submitted
 	//in order to send disabled values in POST we need to enable them on submit
 	$('#notificacioForm').on('submit', function () {
@@ -123,7 +120,6 @@ $(document).ready(function() {
 		$('#entregaPostal').trigger('change');
 	});
 
-
 	$(".notificarSubmit").click(function(event) {
 
 		event.stopImmediatePropagation();
@@ -165,7 +161,6 @@ $(document).ready(function() {
 		}
 	});
 
-	
 	$('#entregaPostal').on('change', function() {
 		if ($(this).is(':checked')) {
 			$('.entrega_postal').removeClass('hidden');
@@ -174,7 +169,6 @@ $(document).ready(function() {
 		}
 	})
 	$('#interessatsIds').trigger('change');
-
 
 	// Data caducitat
 	$("#dataCaducitat").change( () => updateCaducitatDiesNaturals($("#dataCaducitat").val()));
@@ -186,25 +180,51 @@ $(document).ready(function() {
 		updateCaducitatAmbDies($("#caducitatDiesNaturals").val());
 	});
 
-
 	let procedimentSenseCodiSia = ${procedimentSenseCodiSia};
 	if (procedimentSenseCodiSia) {
 		$("#tipus option[value='']").remove();
 		$("#tipus option[value='NOTIFICACIO']").remove();
 	}
 
-
-	<c:if test="${fn:length(interessats) == 1}">
+	if ('${interessatCreat}'=='') {
+		<c:if test="${fn:length(interessats) == 1}">
 		let interessatId = ${interessats[0].id};
 		$('#interessatsIds').val(interessatId);
 		$('#interessatsIds').trigger('change');
-	</c:if>
-	
+		</c:if>
+	} else {
+		let currentValues = $('#interessatsIds').val();
+		if (!currentValues.includes('${interessatCreat}')) {
+			currentValues.push('${interessatCreat}');
+		}
+		$('#interessatsIds').val(currentValues).trigger('change');
+	}
 
-
+	var urlNewInt = '<rip:modalUrl value="/expedient/${documentNotificacionsCommand.expedientPareId}/interessat/new"/>';
+	$("#interessatsIds").parent().attr("class", "col-xs-8");
+	$("#interessatsIds").parent().parent().append("<div class='col-xs-2' style='padding-left: 0px;'>"+
+			"<a href='"+urlNewInt+"' onclick='guardarDadesFormActual()' id='addInteressatBtn' class='btn btn-default' data-toggle='modal' data-func-to-call-on-tancar='enableNotificar' data-modal-eval='true'>"+
+			"<span class='fa fa-plus'></span>&nbsp;Nou interessat</a></div>");
 	
 });//################################################## document ready END ##############################################################
 
+function guardarDadesFormActual() {
+	var formData = $("#notificacioForm").serialize();
+	$.ajax({
+		type: 'POST',
+		url: '<rip:modalUrl value="/document/${documentNotificacionsCommand.documentId}/guardaFormSessio"/>',
+		data: formData,
+		async: false,
+		success: function(response) {
+			console.log("Formulari NOTIFICACIO guardat en sessió: ", response);
+			return true;
+		},
+		error: function(xhr, status, error) {
+			console.error("No s'ha pogut redireccionar al formulari de interessat: ", error);
+			return true;
+		}
+	});
+}
 
 function submitNotificacio(){
 	$("#notificacioForm").submit();
@@ -215,7 +235,6 @@ function submitNotificacio(){
 	$('.notificarSubmit', parent.document).attr('disabled', true);
 	
 }
-
 
 function getNotificacionsSenseNif() {
 	var interessatsSelected = $('#interessatsIds').val();
@@ -565,7 +584,6 @@ function replaceAll(string, search, replace) {
 }
 
 
-
 function destinitarisNoResults() {
 	return '<spring:message code="notificacio.form.camp.destinatari.buit"/>';
 }
@@ -617,6 +635,7 @@ function updateCaducitatAmbDies(dies) {
 	<form:form id="notificacioForm" action="${formAction}" method="post" cssClass="form-horizontal" commandName="documentNotificacionsCommand" role="form">
 		<rip:inputHidden name="id"/>
 		<rip:inputHidden name="documentId"/>
+		<rip:inputHidden name="expedientPareId"/>
 		<div id="alertComunicacioSir" style="display: none;" class="alert well-sm alert-warning alert-dismissable"><span class="fa fa-exclamation-triangle"></span> <spring:message code="notificacio.form.camp.comunicacio.sir.alert"/></div>
 		<!---  TIPUS (NOTIFICACIO / COMUNICACIO) ---->
 		<c:choose>

@@ -32,6 +32,7 @@ public class DocumentNotificacionsCommand {
 	private Long id;
 	@NotNull(groups = {Create.class})
 	private Long documentId;
+	private Long expedientPareId;
 	@NotNull(groups = {Create.class, Update.class})
 	private DocumentNotificacioTipusEnumDto tipus;
 	private DocumentEnviamentEstatEnumDto estat;
@@ -108,14 +109,12 @@ public class DocumentNotificacionsCommand {
 	public void setDataCaducitat(Date dataCaducitat) {
 		this.dataCaducitat = dataCaducitat;
 	}
-
 	public List<Long> getAnnexos() {
 		return annexos;
 	}
 	public void setAnnexos(List<Long> annexos) {
 		this.annexos = annexos;
 	}
-
 	public List<Long> getInteressatsIds() {
 		return interessatsIds;
 	}
@@ -134,7 +133,9 @@ public class DocumentNotificacionsCommand {
 	public void setEntregaPostal(Boolean entregaPostal) {
 		this.entregaPostal = entregaPostal;
 	}
-	
+	public Long getExpedientPareId() { return expedientPareId; }
+	public void setExpedientPareId(Long expedientPareId) { this.expedientPareId = expedientPareId; }
+
 	public static DocumentNotificacionsCommand asCommand(DocumentNotificacioDto dto) {
 		return ConversioTipusHelper.convertir(
 				dto,
