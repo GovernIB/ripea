@@ -108,6 +108,10 @@ $(document).ready(function() { });
 										</a>
 								</li>
 							{{/if}}
+
+							{{if estat == 'FINALITZADA'}}
+								<li><a href="<c:url value="/expedientTasca/{{:id}}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reobrir"/></a></li>
+							{{/if}}
 						</c:if>
 					</ul>
 				</div>
