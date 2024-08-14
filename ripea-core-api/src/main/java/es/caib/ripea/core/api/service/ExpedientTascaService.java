@@ -77,6 +77,12 @@ public interface ExpedientTascaService {
 			Long expedientTascaId,
 			String comentari);
 	
+	public ExpedientTascaDto reobrirTasca(
+			Long expedientTascaId, 
+			List<String> responsablesCodi,
+			String motiu, 
+			String rolActual);
+	
 	public ExpedientTascaDto updateDataLimit(
 			Long expedientTascaId, 
 			Date dataLimit);

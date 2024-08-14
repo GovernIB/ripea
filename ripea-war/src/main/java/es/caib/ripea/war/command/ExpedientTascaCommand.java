@@ -1,5 +1,6 @@
 package es.caib.ripea.war.command;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -106,6 +107,7 @@ public class ExpedientTascaCommand {
 				ExpedientTascaCommand.class);
 		command.setMetaExpedientTascaId(dto.getMetaExpedientTasca().getId());
 		command.setMetaExpedientTascaDescripcio(dto.getMetaExpedientTasca().getDescripcio());
+		if (command.getResponsablesCodi() == null && !dto.getResponsables().isEmpty()) command.setResponsablesCodi(new ArrayList<String>());
 		for (UsuariDto responsable : dto.getResponsables()) {
 			command.getResponsablesCodi().add(responsable.getCodi());
 			
