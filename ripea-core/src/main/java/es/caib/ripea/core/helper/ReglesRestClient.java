@@ -1,23 +1,21 @@
 package es.caib.ripea.core.helper;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MultivaluedMap;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-
 import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
 import es.caib.ripea.core.api.utils.Utils;
+
+import javax.ws.rs.core.MultivaluedMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class ReglesRestClient extends RestClient{
 
-	private static final String CARPETA_SERVICE_PATH = "/api/rest/regles";
+	private static final String CARPETA_SERVICE_PATH = "/regla";
 	
 	public ReglesRestClient() {
 		super();
