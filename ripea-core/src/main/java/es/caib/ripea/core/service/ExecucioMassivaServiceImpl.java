@@ -3,49 +3,32 @@
  */
 package es.caib.ripea.core.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.ValidationException;
+import es.caib.ripea.core.api.service.ExecucioMassivaService;
+import es.caib.ripea.core.entity.*;
+import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaTipusDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.ExecucioMassivaService;
-import es.caib.ripea.core.entity.EntitatEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaContingutEntity;
-import es.caib.ripea.core.entity.ExecucioMassivaEntity;
-import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.AlertaHelper;
-import es.caib.ripea.core.helper.ConfigHelper;
-import es.caib.ripea.core.helper.ConversioTipusHelper;
-import es.caib.ripea.core.helper.EmailHelper;
-import es.caib.ripea.core.helper.EntityComprovarHelper;
-import es.caib.ripea.core.helper.ExceptionHelper;
-import es.caib.ripea.core.helper.ExecucioMassivaHelper;
-import es.caib.ripea.core.helper.MessageHelper;
-import es.caib.ripea.core.repository.ContingutRepository;
-import es.caib.ripea.core.repository.ExecucioMassivaContingutRepository;
-import es.caib.ripea.core.repository.ExecucioMassivaRepository;
-import es.caib.ripea.core.repository.ExpedientPeticioRepository;
-import es.caib.ripea.core.repository.InteressatRepository;
-import es.caib.ripea.core.repository.RegistreAnnexRepository;
-import es.caib.ripea.core.repository.RegistreRepository;
-import es.caib.ripea.core.repository.UsuariRepository;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Implementació dels mètodes per a gestionar documents.
@@ -76,13 +59,17 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 	@Autowired
 	private EmailHelper emailHelper;
 	@Autowired
-	private InteressatRepository interessatRepository;
+	private DocumentHelper documentHelper;
 	@Autowired
-	private RegistreRepository registreRepository;
+	private ConfigHelper configHelper;
+	@Autowired
+	private InteressatRepository interessatRepository;
 	@Autowired
 	private RegistreAnnexRepository registreAnnexRepository;
 	@Autowired
 	private ExpedientPeticioRepository expedientPeticioRepository;
+    @Autowired
+    private ExpedientRepository expedientRepository;
 
 	@Transactional
 	@Override
@@ -134,8 +121,30 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		
 		execucioMassivaRepository.save(execucioMassiva);
 	}
-	
-	
+
+	@Override
+	@Transactional(readOnly = true)
+	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
+		ExecucioMassivaEntity execucioMassiva = execucioMassivaRepository.findOne(execMassivaId);
+		if (execucioMassiva!=null && execucioMassiva.getDocumentNom()!=null) {
+			FitxerDto resultat = new FitxerDto();
+			String directoriDesti = configHelper.getConfig("es.caib.ripea.app.data.dir") + execucioMassiva.getDocumentNom();
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(directoriDesti));
+				resultat.setContingut(bytes);
+				if (execucioMassiva.getDocumentNom().lastIndexOf("/")>0) {
+					resultat.setNom(execucioMassiva.getDocumentNom().substring(execucioMassiva.getDocumentNom().lastIndexOf("/")));
+				} else {
+					resultat.setNom(execucioMassiva.getDocumentNom());
+				}
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+			return resultat;
+		}
+		return null;
+	}
+
 	@Transactional
 	@Override
 	public void saveExecucioMassiva(
@@ -171,8 +180,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			} else if (elementTipus == ElementTipusEnumDto.ANNEX) {
 				elementName = registreAnnexRepository.findOne(execElement.getElementId()).getNom();
 			}
-			
-			
+
 			ExecucioMassivaContingutEntity emc = ExecucioMassivaContingutEntity.getBuilder(
 					execucioMassiva, 
 					execElement.getElementId(), 
@@ -201,16 +209,11 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 		execucioMassivaRepository.save(execucioMassiva);
 	}
 
-	
 	@Override
 	public void executarExecucioMassiva(Long execucioMassivaContingutId) {
 //		execucioMassivaHelper.executarExecucioMassiva(execucioMassivaContingutId);
 	}
-	
 
-	
-
-	
 	@Override
 	public List<ExecucioMassivaDto> findExecucionsMassivesPerUsuari(Long entitatId, UsuariDto usuari, int pagina) throws NotFoundException {
 		
@@ -262,13 +265,19 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 
 			if (massives != null) {
 				for (ExecucioMassivaEntity execucioMassiva : massives) {
-					
+
 					EntitatDto entitat = conversioTipusHelper.convertir(execucioMassiva.getEntitat(), EntitatDto.class);
 					ConfigHelper.setEntitat(entitat);
 					
 					if (execucioMassiva.getContinguts() != null) {
-						for (ExecucioMassivaContingutEntity execucioMassivaEntity : execucioMassiva.getContinguts()) {
-							executarExecucioMassivaContingut(execucioMassivaEntity.getId());
+
+						if (ExecucioMassivaTipusDto.EXPORTAR_ZIP.equals(execucioMassiva.getTipus())) {
+							//Cas de exportació a ZIP, no es individual per cada expedient, s'ha de executar per tots els expedients
+							generaZipDocumentsExpedients(execucioMassiva);
+						} else {
+							for (ExecucioMassivaContingutEntity execucioMassivaEntity : execucioMassiva.getContinguts()) {
+								executarExecucioMassivaContingut(execucioMassivaEntity.getId());
+							}
 						}
 					}
 					execucioMassiva.updateDataFi(new Date());
@@ -288,7 +297,118 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			logger.error("Error al fer execucio massiva", e);
 		}
 	}
-	
+
+	private void generaZipDocumentsExpedients(ExecucioMassivaEntity execucioMassiva) throws IOException {
+
+		long t1 = Calendar.getInstance().getTimeInMillis();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream out = new ZipOutputStream(baos);
+		ZipEntry ze;
+		int numFiles = 0;
+		Set<String> nomsArxius = new HashSet<String>();
+		List<DocumentDto> docsExp = new ArrayList<DocumentDto>();
+
+		double maxMbFitxer	= Integer.parseInt(configHelper.getConfig("es.caib.ripea.segonpla.arxiu.maxMb", "100"));
+		double actualMbFitxer = 0;
+		Integer maxMinExec = Integer.parseInt(configHelper.getConfig("es.caib.ripea.segonpla.arxiu.maxTempsExec", "10"));
+		long maxTempsProces	= t1+(maxMinExec*60*1000);
+		boolean error = false;
+
+		for (ExecucioMassivaContingutEntity execucioMassivaContingutEntity : execucioMassiva.getContinguts()) {
+
+			ExpedientEntity expedient = expedientRepository.findOne(execucioMassivaContingutEntity.getElementId());
+			List<ContingutEntity> contingutsExp = contingutRepository.findByPareAndEsborratAndOrdenat(expedient, 0);
+
+			if (contingutsExp != null && contingutsExp.size()>0) {
+				for (ContingutEntity contingutExpedient : contingutsExp) {
+					if (ContingutTipusEnumDto.DOCUMENT.equals(contingutExpedient.getTipus())) {
+						DocumentEntity documentEntity = (DocumentEntity)contingutExpedient;
+
+						DocumentDto doc = new DocumentDto();
+						doc.setId(documentEntity.getId());
+
+						FitxerDto fitxerDto = documentHelper.getFitxerAssociat(documentEntity, null);
+						actualMbFitxer = actualMbFitxer + (fitxerDto.getContingut().length / (1024.0 * 1024.0));
+
+						doc.setFitxerContingut(fitxerDto.getContingut());
+
+						String nomDoc = documentEntity.getFitxerNom().replaceAll("/", "_");
+						if (documentEntity.getPare()!=null) {
+							ContingutEntity pare = documentEntity.getPare();
+							while (pare!=null) {
+								nomDoc = pare.getNom().replaceAll("/", "_") + "/" + nomDoc;
+								pare = pare.getPare(); //Pujam fins a l'arrel
+							}
+						} else {
+							nomDoc = expedient.getCodi().replaceAll("/", "_") + "/" + nomDoc;
+						}
+						doc.setFitxerNom(nomDoc);
+						docsExp.add(doc);
+					}
+				}
+			}
+
+			if (Calendar.getInstance().getTimeInMillis()>maxTempsProces) {
+				execucioMassivaContingutEntity.updateError(new Date(), "El procés ha superat el limit de temps definit per la seva execució: "+maxMinExec+" min. Intenteu seleccionar menys expedients.");
+				error = true;
+				break;
+			} else if (actualMbFitxer>maxMbFitxer) {
+				execucioMassivaContingutEntity.updateError(new Date(), "El fitxer a generar supera el maxim de Mb permesos: "+maxMbFitxer+" Mb. Intenteu seleccionar menys expedients.");
+				error = true;
+				break;
+			} else {
+				execucioMassivaContingutEntity.updateFinalitzat(new Date());
+			}
+		}
+
+		if (!error) {
+
+			if (docsExp != null && docsExp.size() > 0) {
+				for (DocumentDto documentDto : docsExp) {
+					String recursNom = this.getZipRecursNom(documentDto.getFitxerNom(), nomsArxius);
+					ze = new ZipEntry(recursNom);
+					out.putNextEntry(ze);
+					out.write(documentDto.getFitxerContingut());
+					out.closeEntry();
+					numFiles++;
+				}
+			}
+
+			out.close();
+
+			if (numFiles > 0) {
+				String directoriDesti = configHelper.getConfig("es.caib.ripea.app.data.dir");
+				String documentNom = "/exportZip/documentsExpedients_" + Calendar.getInstance().getTimeInMillis() + ".zip";
+				File fContent = new File(directoriDesti + documentNom);
+				fContent.getParentFile().mkdirs();
+				FileOutputStream outContent = new FileOutputStream(fContent);
+				outContent.write(baos.toByteArray());
+				outContent.close();
+				execucioMassiva.setDocumentNom(documentNom);
+			}
+
+		} else {
+			out.close();
+			baos.close();
+		}
+	}
+
+	private String getZipRecursNom(String nomEntrada, Set<String> nomsArxius) {
+		int contador = 0;
+		for (String nom : nomsArxius) {
+			if (nom!=null && nom.equals(nomEntrada)) {
+				contador++;
+			}
+		}
+		if (contador > 0) {
+			nomEntrada = nomEntrada.substring(0, nomEntrada.lastIndexOf(".")) +
+					" (" + contador + ")" +
+					nomEntrada.substring(nomEntrada.lastIndexOf(".")+1);
+		}
+		nomsArxius.add(nomEntrada);
+		return nomEntrada;
+	}
+
 	public Throwable executarExecucioMassivaContingut(Long execucioMassivaContingutId) {
 
 		Throwable throwable = execucioMassivaHelper.executarExecucioMassivaContingutNewTransaction(execucioMassivaContingutId);
@@ -347,6 +467,7 @@ public class ExecucioMassivaServiceImpl implements ExecucioMassivaService {
 			dto.setCancelats(cancelats);
 			Long total = new Long(dto.getContingutIds().size());
 			dto.setExecutades(getPercent((total - pendents), total));
+			dto.setDocumentNom(exm.getDocumentNom());
 			dtos.add(dto);
 		}
 		return dtos;

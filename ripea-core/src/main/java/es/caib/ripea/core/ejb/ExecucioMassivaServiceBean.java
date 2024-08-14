@@ -9,13 +9,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
 
+import es.caib.ripea.core.api.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
-import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExecucioMassivaService;
@@ -37,6 +34,12 @@ public class ExecucioMassivaServiceBean implements ExecucioMassivaService {
 	@RolesAllowed("tothom")
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException {
 		delegate.crearExecucioMassiva(entitatId, dto);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId) {
+		return delegate.descarregarDocumentExecMassiva(entitatId, execMassivaId);
 	}
 
 	@Override

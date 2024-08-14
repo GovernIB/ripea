@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
 
 import java.util.ArrayList;
@@ -28,15 +25,12 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 
-
 @Entity
 @Table(	name = "ipa_execucio_massiva")
 @EntityListeners(AuditingEntityListener.class)
 public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 
 	private static final int MOTIU_TAMANY = 256;
-
-
 
 	@Column(name = "tipus")
 	@Enumerated(EnumType.STRING)
@@ -47,7 +41,6 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_fi")
 	private Date dataFi;
-
 	// Enviament a Portafirmes
 	@Column(name = "pfirmes_motiu", length = MOTIU_TAMANY)
 	private String motiu;
@@ -66,8 +59,6 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	private String portafirmesFluxId;
 	@Column(name = "pfirmes_transid")
 	private String portafirmesTransaccioId;
-	// /////////////////////////////////////////
-
 	@Column(name = "enviar_correu")
 	private Boolean enviarCorreu;
 	@OneToMany(
@@ -75,16 +66,15 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			cascade = {CascadeType.ALL},
 			fetch = FetchType.EAGER)
 	private List<ExecucioMassivaContingutEntity> continguts = new ArrayList<ExecucioMassivaContingutEntity>();
-
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "entitat_id")
 	private EntitatEntity entitat;
-	
 	@Column(name = "rol_actual")
 	private String rolActual;
-	
 	@Column(name = "pfirmes_avis_firma_parcial")
 	private Boolean portafirmesAvisFirmaParcial;
+	@Column(name = "document_nom")
+	private String documentNom;
 	
 	public ExecucioMassivaTipusDto getTipus() {
 		return tipus;
@@ -110,7 +100,6 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public List<ExecucioMassivaContingutEntity> getContinguts() {
 		return continguts;
 	}
-
 	public EntitatEntity getEntitat() {
 		return entitat;
 	}
@@ -132,7 +121,9 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 	public Boolean getPortafirmesAvisFirmaParcial() {
 		return portafirmesAvisFirmaParcial;
 	}
-	
+	public String getDocumentNom() { return documentNom; }
+	public void setDocumentNom(String documentNom) { this.documentNom = documentNom; }
+
 	public void addContingut(ExecucioMassivaContingutEntity contingut) {
 		getContinguts().add(contingut);
 	}
@@ -140,8 +131,7 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 		getContinguts().remove(contingut);
 	}
 
-	public void updateDataFi(
-			Date dataFi) {
+	public void updateDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
 
@@ -217,14 +207,12 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 			built.entitat = entitat;
 			built.rolActual = rolActual;
 		}
-		
-		
+
 		public ExecucioMassivaEntity build() {
 			return built;
 		}
 	}
-	
-	
+
 	public static Builder getBuilder(
 			ExecucioMassivaTipusDto tipus,
 			Date dataInici,
@@ -239,7 +227,5 @@ public class ExecucioMassivaEntity extends RipeaAuditable<Long> {
 				rolActual);
 	}
 
-
 	private static final long serialVersionUID = -2077000626779456363L;
-
 }
