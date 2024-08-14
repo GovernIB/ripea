@@ -29,13 +29,6 @@ databaseChangeLog:
                   name: PRIORITAT
                   type: varchar(16 ${varcharunit})
             tableName: ipa_metaexp_tasca
-        - update:
-            tableName: IPA_EXPEDIENT_TASCA
-            columns:
-              - column:
-                  name: DURACIO
-                  valueComputed: "CASE WHEN TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) < 0 THEN NULL ELSE TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) END"
-                  where: "DATA_LIMIT is not null"
         - insert:
             tableName: ipa_config
             columns:
@@ -66,3 +59,5 @@ databaseChangeLog:
               - column:
                   name: configurable_organ
                   value: ${booleanFalse}
+        - sql:
+            "UPDATE IPA_EXPEDIENT_TASCA SET DURACIO = CASE WHEN TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) < 0 THEN NULL ELSE TRUNC(DATA_LIMIT) - TRUNC(DATA_INICI) END WHERE DATA_LIMIT is not null;"
