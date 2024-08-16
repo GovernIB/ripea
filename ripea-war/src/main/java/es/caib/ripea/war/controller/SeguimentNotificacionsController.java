@@ -122,7 +122,8 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 					entitat.getId(),
 					SeguimentNotificacionsFiltreCommand.asDto(filtreCommand),
 					DatatablesHelper.getPaginacioDtoFromRequest(request), 
-					ResultEnumDto.PAGE).getPagina();
+					ResultEnumDto.PAGE,
+					RolHelper.getRolActual(request)).getPagina();
             
 		return DatatablesHelper.getDatatableResponse(
 				request,
@@ -163,7 +164,8 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 		            		getEntitatActualComprovantPermisos(request).getId(),
 							SeguimentNotificacionsFiltreCommand.asDto(getFiltreCommand(request)),
 							null, 
-							ResultEnumDto.IDS).getIds());
+							ResultEnumDto.IDS,
+							RolHelper.getRolActual(request)).getIds());
 		}
 		return seleccio.size();
 	}

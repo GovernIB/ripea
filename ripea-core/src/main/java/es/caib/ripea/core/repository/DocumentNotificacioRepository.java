@@ -87,6 +87,7 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"    left join dn.documentEnviamentInteressats envInt " +
 			"where " +
 			"    (dn.document.entitat = :entitat) " +
+			"and (:rolActual = 'IPA_ADMIN' or (:esNullMetaExpedientPermesos = true or dn.expedient.metaExpedient.id in (:idMetaExpedientPermesos))) " +
 			"and (:esNullExpedientId = true or dn.expedient.id = :expedientId) " +
 			"and (:esNullDocumentNom = true or lower(dn.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dn.createdDate >= :dataEnviamentInici) " +
@@ -105,6 +106,9 @@ public interface DocumentNotificacioRepository extends JpaRepository<DocumentNot
 			"and (:nomesAmbError = false or dn.error = true) ")
 	public Page<DocumentNotificacioEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("rolActual") String rolActual,
+			@Param("esNullMetaExpedientPermesos") boolean esNullMetaExpedientPermesos,
+			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
 			@Param("esNullExpedientId") boolean esNullExpedientId,
 			@Param("expedientId") Long expedientId,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,

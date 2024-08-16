@@ -732,6 +732,21 @@ public class MetaExpedientHelper {
 		
 	}
 	
+	public List<Long> getIdsReadPermesos(Long entitatId) {
+		List<Long> readPermIds = getIds(
+				findAmbPermis(
+					entitatId,
+					ExtendedPermission.READ,
+					true,
+					null,
+					false,
+					false,
+					null, 
+					false));
+		return readPermIds;
+		
+	}
+	
 	public List<Long> getIds(List<MetaExpedientEntity> entities) {
 		List<Long> ids = new ArrayList<>();
 		for (MetaExpedientEntity entity : entities) {

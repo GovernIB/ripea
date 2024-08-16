@@ -103,15 +103,24 @@ public class SeguimentServiceImpl implements SeguimentService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
-
+	
 	@Override
 	@Transactional(readOnly = true)
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams,
+			String rolActual) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		EntitatEntity entitat = null;
+		List<Long> idMetaExpedientPermesos = null;
+		
+		if ("tothom".equals(rolActual)) {
+			idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitatId);
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+	 	} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+	 	}
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientNom", new String[] { "expedient.nom" });
@@ -120,9 +129,11 @@ public class SeguimentServiceImpl implements SeguimentService {
 		ordenacioMap.put("dataEnviament", new String[] { "enviatData" });
 		ordenacioMap.put("portafirmesEstat", new String[] { "estat" });
 		
-		
 		Page<DocumentPortafirmesEntity> docsEnvs = documentPortafirmesRepository.findAmbFiltrePaginat(
 				entitat,
+				rolActual,
+				idMetaExpedientPermesos == null || idMetaExpedientPermesos.isEmpty(),
+				idMetaExpedientPermesos,
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
 				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
 				filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
@@ -185,9 +196,18 @@ public class SeguimentServiceImpl implements SeguimentService {
 			Long entitatId,
 			SeguimentNotificacionsFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams, 
-			ResultEnumDto resultEnum) {
+			ResultEnumDto resultEnum,
+			String rolActual) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		EntitatEntity entitat = null;
+		List<Long> idMetaExpedientPermesos = null;
+		
+		if ("tothom".equals(rolActual)) {
+			idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitatId);
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+	 	} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+	 	}
 		
 		ResultDto<SeguimentDto> result = new ResultDto<SeguimentDto>();
 		
@@ -245,6 +265,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
 					entitat,
+					rolActual,
+					idMetaExpedientPermesos == null || idMetaExpedientPermesos.isEmpty(),
+					idMetaExpedientPermesos,
 					filtre.getExpedientId() == null,
 					filtre.getExpedientId(),
 					Utils.isEmpty(filtre.getDocumentNom()),

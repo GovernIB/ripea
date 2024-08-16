@@ -607,11 +607,13 @@ public interface DocumentService {
 	 *            Atribut id de l'entitat a la qual pertany el contenidor.
 	 * @param documentId
 	 *            Atribut id del document del que es vol canviar l'estat.
-	 * @param enviamentId TODO
+	 * @param enviamentId
+	 * 			  Atribut id de l'enviament
 	 */
 	List<PortafirmesBlockDto> recuperarBlocksFirmaEnviament(
 			Long entitatId, 
-			Long documentId, Long enviamentId);
+			Long documentId,
+			Long enviamentId);
 
 	public PaginaDto<DocumentDto> findDocumentsPerCustodiarMassiu(
 			Long entitatId,
