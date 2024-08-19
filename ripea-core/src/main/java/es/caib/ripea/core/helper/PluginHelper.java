@@ -1256,19 +1256,22 @@ public class PluginHelper {
 								fitxer.getContingut()));
 			}
 			
-			ArrayList<Firma> arxiuFirmes = new ArrayList<Firma>();
-			for (ArxiuFirmaDto firmaDto: firmes) {
-				Firma firma = getFirma(
-						firmaDto.getFitxerNom(),
-						firmaDto.getTipusMime(),
-						firmaDto.getContingut(),
-						firmaDto.getTipus(),
-						firmaDto.getPerfil(),
-						firmaDto.getCsvRegulacio());
-				arxiuFirmes.add(firma);
+			if (firmes != null) {
+				ArrayList<Firma> arxiuFirmes = new ArrayList<Firma>();
+				for (ArxiuFirmaDto firmaDto: firmes) {
+					Firma firma = getFirma(
+							firmaDto.getFitxerNom(),
+							firmaDto.getTipusMime(),
+							firmaDto.getContingut(),
+							firmaDto.getTipus(),
+							firmaDto.getPerfil(),
+							firmaDto.getCsvRegulacio());
+					arxiuFirmes.add(firma);
+				}
+				
+				documentArxiu.setFirmes(arxiuFirmes);
 			}
-			documentArxiu.setFirmes(arxiuFirmes);
-
+			
 		}
 		
 		// És una modificació de metadades d'un document definitiu
