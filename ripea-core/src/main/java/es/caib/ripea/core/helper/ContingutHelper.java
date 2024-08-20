@@ -317,6 +317,17 @@ public class ContingutHelper {
 
 					List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
 					
+					
+					if (getPropertyGuardarCertificacioExpedient()) {
+						MetaDocumentEntity metaDocumentAcuseRebut = metaDocumentRepository.findByEntitatAndTipusGeneric(
+								true, 
+								null,
+								MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
+						
+						if (metaDocumentAcuseRebut != null)
+							metaDocuments.add(metaDocumentAcuseRebut);
+					}
+					
 					for (MetaDocumentEntity metaDocument : metaDocuments) {
 						
 						List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
@@ -2441,6 +2452,9 @@ public class ContingutHelper {
 	public int getArxiuMaxReintentsDocuments() {
 		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
+	}
+	private boolean getPropertyGuardarCertificacioExpedient() {
+		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 
