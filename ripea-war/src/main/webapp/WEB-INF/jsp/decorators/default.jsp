@@ -115,6 +115,9 @@
 	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
 	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
 	
+	<script src="<c:url value="/js/toastr.min.js"/>"></script>
+	<link href="<c:url value="/css/toastr.min.css"/>" rel="stylesheet"></link>
+	
 	<script>
 		var requestLocale = '${requestLocale}';
 		var contextAddress = '${pageContext.request.contextPath}';

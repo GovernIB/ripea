@@ -200,6 +200,9 @@
 	background: #999999 !important;
 }
 
+.toast-top-right {
+	margin-top: 100px;
+}
 
 </style>
 
