@@ -4,6 +4,7 @@
 package es.caib.ripea.war.command;
 
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
+import es.caib.ripea.core.api.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
@@ -41,6 +42,7 @@ public class UsuariCommand implements Serializable {
 	private Long entitatPerDefecteId;
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
+	private MoureDestiVistaEnumDto vistaMoureActual;
 	
 	
 	public void setCodi(String codi) {

@@ -477,4 +477,10 @@ public class ExpedientServiceBean implements ExpedientService {
     public void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat) {
         delegate.changeExpedientsPrioritat(entitatId, expedientsId, prioritat);
     }
+    
+	@Override
+	@RolesAllowed("tothom")
+	public MoureDestiVistaEnumDto getVistaMoureUsuariActual() {
+		return delegate.getVistaMoureUsuariActual();
+	}
 }

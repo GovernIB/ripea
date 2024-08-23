@@ -560,4 +560,7 @@ public interface ExpedientService {
 
 	@PreAuthorize("hasRole('tothom')")
 	void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat);
+	
+	@PreAuthorize("hasRole('tothom')")
+	public MoureDestiVistaEnumDto getVistaMoureUsuariActual();
 }

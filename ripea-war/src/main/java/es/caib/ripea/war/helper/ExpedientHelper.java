@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExpedientService;
@@ -159,6 +160,17 @@ public class ExpedientHelper {
 		return contingutVista;
 	}
 	
+	public MoureDestiVistaEnumDto getVistaMoureActiva(HttpServletRequest request) {
+		
+		MoureDestiVistaEnumDto contingutVista = SessioHelper.getMoureVista(request);
+		if (contingutVista == null) {
+			contingutVista = expedientService.getVistaMoureUsuariActual();
+			if (contingutVista == null) {
+				contingutVista = MoureDestiVistaEnumDto.LLISTA;
+			}
+		}
+		return contingutVista;
+	}
 	
 
 	
@@ -193,4 +205,8 @@ public class ExpedientHelper {
 		return contingutVista == ContingutVistaEnumDto.TREETABLE_PER_ESTAT;
 	}
 
+	public boolean isVistaArbreMoureDocuments(HttpServletRequest request) {
+		MoureDestiVistaEnumDto contingutVista = getVistaMoureActiva(request);
+		return contingutVista == MoureDestiVistaEnumDto.ARBRE;
+	}
 }

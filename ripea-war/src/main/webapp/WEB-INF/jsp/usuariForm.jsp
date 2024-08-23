@@ -124,6 +124,14 @@
 			<rip:inputIosCheckbox name="expedientExpandit" labelSize="10" textKey="usuari.form.camp.expedientExpandit" icon="fa-expand"/>
 		</div>
 	</div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Configuració vista destí en moure documents</h3>
+		</div>
+		<div class="panel-body">
+			<rip:inputSelect name="vistaMoureActual" optionEnum="MoureDestiVistaEnumDto" textKey="usuari.form.camp.tipusVistaMoureDocuments"/>
+		</div>
+	</div>
 	<div id="modal-botons">
 		<button id="btnSubmit" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 		<a href="<c:url value="/usuari/configuracio"/>" class="btn btn-default" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

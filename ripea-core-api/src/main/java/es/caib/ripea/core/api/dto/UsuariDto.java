@@ -37,6 +37,7 @@ public class UsuariDto implements Serializable {
 	private Long entitatPerDefecteId;
 	private ContingutVistaEnumDto vistaActual;
 	private boolean expedientExpandit;
+	private MoureDestiVistaEnumDto vistaMoureActual;
 	
 	
 	public String getCodiAndNom() {
