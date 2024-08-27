@@ -171,15 +171,30 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"where " +
 			"ep.registre.entitat = :entitat " +
 			"and ((:rolActual = 'IPA_ADMIN') " +
-			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and ep.registre.destiCodi in (:organsPermesos)) " +
-			"	or (:rolActual = 'tothom' and ep.metaExpedient in (:metaExpedientsPermesos) and me.gestioAmbGrupsActiva = false or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +
+			"	or (:rolActual = 'IPA_ORGAN_ADMIN' and (ep.registre.destiCodi in (:organsPermesos0) " +
+			"		or ep.registre.destiCodi in (:organsPermesos1) " +
+			"		or ep.registre.destiCodi in (:organsPermesos2) " +
+			"		or ep.registre.destiCodi in (:organsPermesos3))) " +
+			"	or (:rolActual = 'tothom' " +
+			"		and (ep.metaExpedient in (:metaExpedientsPermesos0) " +
+			"			or ep.metaExpedient in (:metaExpedientsPermesos1) " +
+			"			or ep.metaExpedient in (:metaExpedientsPermesos2) " +
+			"			or ep.metaExpedient in (:metaExpedientsPermesos3)) " +
+			"		and me.gestioAmbGrupsActiva = false " +
+			"		or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +
 			"and ep.estat='PENDENT' "
 			)
 	long countAnotacionsPendentsPerMetaExpedients(
 			@Param("entitat") EntitatEntity entitat,
 			@Param("rolActual") String rolActual,
-			@Param("metaExpedientsPermesos") List<MetaExpedientEntity> metaExpedientsPermesos,
-			@Param("organsPermesos") List<String> organsPermesos,
+			@Param("metaExpedientsPermesos0") List<MetaExpedientEntity> metaExpedientsPermesos0,
+			@Param("metaExpedientsPermesos1") List<MetaExpedientEntity> metaExpedientsPermesos1,
+			@Param("metaExpedientsPermesos2") List<MetaExpedientEntity> metaExpedientsPermesos2,
+			@Param("metaExpedientsPermesos3") List<MetaExpedientEntity> metaExpedientsPermesos3,
+			@Param("organsPermesos0") List<String> organsPermesos0,
+			@Param("organsPermesos1") List<String> organsPermesos1,
+			@Param("organsPermesos2") List<String> organsPermesos2,
+			@Param("organsPermesos3") List<String> organsPermesos3,
 			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
 			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos);
 

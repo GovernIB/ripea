@@ -729,14 +729,34 @@ public class CacheHelper {
 				rolActual,
 				organActualId);
 
+
 		long numAnotacionsPendents = expedientPeticioRepository.countAnotacionsPendentsPerMetaExpedients(
 				entitat,
 				rolActual,
-				permisosPerAnotacions.getProcedimentsPermesos(),
-				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+				permisosPerAnotacions.getProcedimentsPermesos(0),
+				permisosPerAnotacions.getProcedimentsPermesos(1),
+				permisosPerAnotacions.getProcedimentsPermesos(2),
+				permisosPerAnotacions.getProcedimentsPermesos(3),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(0),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(1),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(2),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(3),
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos());
 		return numAnotacionsPendents;
+	}
+
+	private static <T> List<T> getList(List<List<T>> list, int index) {
+		if (list == null) {
+			throw new NullPointerException("La llista és nul·la.");
+		}
+		if (index < 0) {
+			throw new IndexOutOfBoundsException("Index " + index + ". L'índex no pot ser negatiu.");
+		}
+		if (index > list.size()) {
+			throw new IndexOutOfBoundsException("Index " + index + ". La llista només té " + list.size() + " elements.");
+		}
+		return Utils.getNullIfEmpty(list.get(index));
 	}
 	
 	
