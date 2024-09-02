@@ -122,7 +122,7 @@
 		<textarea id="comentari_text" rows="1" style="resize: none;" class="form-control" placeholder="<spring:message code="contingut.comentaris.text.placeholder"/>" maxlength="1024"></textarea>
 	</div>
 	<div class="col-xs-2">
-		<button class="btn btn-success enviar-comentari"><span class="fa fa-paper-plane-o"></span>&nbsp;<spring:message code="comu.boto.enviar"/></button>
+		<button class="btn btn-success enviar-comentari" ${expedientTasca.usuariActualObservador ? 'disabled=disabled' : ''}"><span class="fa fa-paper-plane-o"></span>&nbsp;<spring:message code="comu.boto.enviar"/></button>
 	</div>
 		
 	<div class="col-xs-12" style="height:10px">

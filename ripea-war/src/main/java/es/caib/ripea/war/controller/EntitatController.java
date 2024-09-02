@@ -142,14 +142,22 @@ public class EntitatController extends BaseUserController {
 				return "entitatForm";
 			}
 		}
+		EntitatDto resultat = null;
 		if (command.getId() != null) {
-			entitatService.update(EntitatCommand.asDto(command));
+			resultat = entitatService.update(EntitatCommand.asDto(command));
 			entitatService.evictEntitatsAccessiblesUsuari();
 			request.getSession().setAttribute("EntitatHelper.entitatActual", null);
-			return getModalControllerReturnValueSuccess(request, "redirect:entitat", "entitat.controller.modificada.ok");
+			return getModalControllerReturnValueSuccess(request,
+					"redirect:entitat",
+					"entitat.controller.modificada.ok",
+					new Object[] { resultat.getNom() });
 		} else {
-			entitatService.create(EntitatCommand.asDto(command));
-			return getModalControllerReturnValueSuccess(request, "redirect:entitat", "entitat.controller.creada.ok");
+			resultat = entitatService.create(EntitatCommand.asDto(command));
+			return getModalControllerReturnValueSuccess(request,
+					"redirect:entitat",
+					"entitat.controller.creada.ok",
+					new Object[] { resultat.getNom() });
+
 		}
 	}
 	
@@ -170,14 +178,20 @@ public class EntitatController extends BaseUserController {
 	@RequestMapping(value = "/{entitatId}/enable", method = RequestMethod.GET)
 	public String enable(HttpServletRequest request, @PathVariable Long entitatId) {
 
-		entitatService.updateActiva(entitatId, true);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "entitat.controller.activada.ok");
+		EntitatDto resultat = entitatService.updateActiva(entitatId, true);
+		return getAjaxControllerReturnValueSuccess(request,
+				"redirect:../../entitat",
+				"entitat.controller.activada.ok",
+				new Object[] { resultat.getNom() });
 	}
 	@RequestMapping(value = "/{entitatId}/disable", method = RequestMethod.GET)
 	public String disable(HttpServletRequest request, @PathVariable Long entitatId) {
 
-		entitatService.updateActiva(entitatId, false);
-		return getAjaxControllerReturnValueSuccess(request, "redirect:../../entitat", "entitat.controller.desactivada.ok");
+		EntitatDto resultat = entitatService.updateActiva(entitatId, false);
+		return getAjaxControllerReturnValueSuccess(request,
+				"redirect:../../entitat",
+				"entitat.controller.desactivada.ok",
+				new Object[] { resultat.getNom() });
 	}
 
 	@RequestMapping(value = "/{entitatId}/delete", method = RequestMethod.GET)
@@ -186,10 +200,11 @@ public class EntitatController extends BaseUserController {
 			@PathVariable Long entitatId) {
 
 		try {
-			entitatService.delete(entitatId);
+			EntitatDto resultat = entitatService.delete(entitatId);
 			return getAjaxControllerReturnValueSuccess(request,
 					"redirect:../../entitat",
-					"entitat.controller.esborrada.ok");
+					"entitat.controller.esborrada.ok",
+					new Object[] { resultat.getNom() });
 			
 		} catch (Exception e) {
 			return getAjaxControllerReturnValueError(

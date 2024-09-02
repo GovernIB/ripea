@@ -77,6 +77,10 @@
 				<c:when test="${contingut.carpeta && isCreacioCarpetesActiva}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
+					<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.pdf"/>...</a></li>
+					<c:set var="mostrarSeparador" value="${true}"/>
+					<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/XLSX"/>"><span class="fa fa-th-list"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.xlsx"/>...</a></li>
+					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
 			</c:choose>
 			<c:if test="${contingut.document and !isTasca or (contingut.carpeta && isCreacioCarpetesActiva)}">
@@ -104,6 +108,8 @@
 		</c:if>
 		<c:if test="${(potModificar) || (contingut.carpeta && isCreacioCarpetesActiva)}">
 			<c:if test="${contingut.expedient and !isTasca}">
+				<%---- Canviar prioritat... ----%>
+				<li><a href="<c:url value="/expedient/${contingut.id}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
 				<%---- Canviar estat... ----%>
 				<c:if test="${contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>
@@ -292,8 +298,11 @@
 						<c:otherwise>
 							<c:set var="notificarMsg"><spring:message code="comu.boto.comunicar"/></c:set>
 						</c:otherwise>
-					</c:choose>						
-					<c:choose>
+					</c:choose>
+					<li>
+						<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a>
+					</li>
+					<%--c:choose>
 						<c:when test="${!empty expedient.interessatsNotificable}">
 							<li>
 							<a class="btnNotificar" href="<c:url value="/document/${contingut.id}/notificar"/>" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a>
@@ -303,7 +312,7 @@
 							<li class="disabled"><a class="btnNotificar" href="#" data-missatgeloading="Realitzant enviament..." data-toggle="modal" data-datatable-id="taulaEnviaments" data-maximized="true" data-refresh-pagina="true"><span class="fa fa-envelope-o"></span>&nbsp;${notificarMsg}...</a></li>
 							<p style="font-size: 9px;padding: 1px 15px;">&nbsp;<spring:message code="comu.boto.notificar.comentari"/></p>
 						</c:otherwise>
-					</c:choose>
+					</c:choose-->
 					
 					<%---- Publicar ----%>
 					<c:if test="${isMostrarPublicar}">
@@ -346,10 +355,13 @@
 			<li class="${contingut.document && contingut.gesDocAdjuntId!=null ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.id}/log"/>" data-toggle="modal"><span class="fa fa-list"></span>&nbsp;<spring:message code="comu.boto.historial"/></a></li>
 		</c:if>
 		
-		<%---- Descarregar fitxer comprimit ----%>
 		<c:if test="${contingut.expedient && contingut.conteDocuments}">
+			<%---- Descarregar fitxer comprimit ----%>
 			<li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li>
+			<%---- Descarregar fitxer comprimit mantenint estructura carpetes ----%>
+			<li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedientEstructurat?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit.estructurat"/></a></li>
 		</c:if>
+		
 		<c:if test="${(contingut.expedient or contingut.document) and !isTasca}">
 			<c:if test="${contingut.expedient}">
 				<c:choose>

@@ -89,24 +89,29 @@ public class OrganGestorPermisController extends BaseAdminController {
 			@PathVariable Long permisId,
 			Model model) {
 		EntitatDto entitat = getEntitatActualComprovantPermisos(request);
-		PermisOrganGestorDto permis = null;
-		if (permisId != null) {
-			List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitat.getId(), organId);
-			for (PermisOrganGestorDto p : permisos) {
-				if (p.getId().equals(permisId)) {
-					permis = p;
-					break;
-				}
-			}
-		}
+		PermisOrganGestorDto permis = getPermisOrganById(entitat, organId, permisId);
 		model.addAttribute("organsGestors", organGestorService.findByEntitat(entitat.getId()));
 		PermisOrganGestorCommand command;
+
 		if (permis != null)
 			command = PermisOrganGestorCommand.asCommand(permis);
 		else
 			command = new PermisOrganGestorCommand(organId);
+
 		model.addAttribute("permisOrganGestorCommand", command);
 		return "organGestorPermisForm";
+	}
+
+	private PermisOrganGestorDto getPermisOrganById(EntitatDto entitat, Long organId, Long permisId) {
+		if (permisId != null) {
+			List<PermisOrganGestorDto> permisos = organGestorService.findPermisos(entitat.getId(), organId);
+			for (PermisOrganGestorDto p : permisos) {
+				if (p.getId().equals(permisId)) {
+					return p;
+				}
+			}
+		}
+		return null;
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
@@ -145,12 +150,14 @@ public class OrganGestorPermisController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:permis",
-					"organgestor.controller.permis.creat.ok");
+					"organgestor.controller.permis.creat.ok",
+					new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 		} else {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:permis",
-					"organgestor.controller.permis.modificat.ok");
+					"organgestor.controller.permis.modificat.ok",
+					new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 		}
 
 	}
@@ -172,12 +179,12 @@ public class OrganGestorPermisController extends BaseAdminController {
 				}
 			}
 		}
-		
+		PermisOrganGestorDto permis = getPermisOrganById(entitatActual, organId, permisId);
 		organGestorService.deletePermis(organId, permisId, entitatActual.getId());
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../permis",
-				"entitat.controller.permis.esborrat.ok");
+				"entitat.controller.permis.esborrat.ok",
+				new Object[] { permis.getPrincipalTipus()+ " "+permis.getPrincipalNom() });
 	}
-
 }

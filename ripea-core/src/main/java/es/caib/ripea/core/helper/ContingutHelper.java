@@ -257,6 +257,7 @@ public class ContingutHelper {
 			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
 			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 			dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
+			dto.setPrioritat(expedient.getPrioritat());
 
 			if (onlyForList) {
 				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
@@ -301,13 +302,11 @@ public class ContingutHelper {
 					}
 				}
 
-				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
+				//dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 
 				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
 				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
 						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
-			
-			
 			
 				if (ambMapPerTipusDocument) {
 					if (cacheHelper.mostrarLogsRendiment())
@@ -1254,6 +1253,10 @@ public class ContingutHelper {
 					pemitted = true;
 				}
 			}
+			UsuariEntity delegat = expedientTascaEntity.getDelegat();
+			if (delegat != null && delegat.getCodi().equals(auth.getName())) {
+				pemitted = true;
+			}
 			if (!pemitted) {
 				throw new SecurityException("La tasca a la qual intenta accedir no està assignada al seu usuari ("
 						+ "tascaId=" + expedientTascaEntity.getId() + ", "
@@ -1509,7 +1512,8 @@ public class ContingutHelper {
 			Date ntiFechaApertura,
 			Integer any,
 			boolean agafar,
-			Long grupId) {
+			Long grupId,
+			PrioritatEnumDto prioritat) {
 		UsuariEntity agafatPer = null;
 		if (agafar) {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -1528,7 +1532,8 @@ public class ContingutHelper {
 				ntiOrgano,
 				ntiFechaApertura,
 				metaExpedient.getClassificacio(),
-				organGestor).
+				organGestor,
+				prioritat).
 				agafatPer(agafatPer).
 				grup(grupEntity).
 				build();
@@ -1854,6 +1859,15 @@ public class ContingutHelper {
 						desti.getArxiuUuid(),
 						uuidExpedientDesti);
 			}
+			
+			// Si està activada la carpeta lògica moure sempre a l'expedient
+			if (desti instanceof CarpetaEntity && isCarpetaLogica()) {
+				identificador = pluginHelper.arxiuDocumentMoure(
+						uuid,
+						null,
+						uuidExpedientDesti);
+			}
+			
 			return identificador;
 	}
 
@@ -1958,6 +1972,30 @@ public class ContingutHelper {
 		return fitxer;
 	}
 	
+	public FitxerDto generarIndexPdf(
+			EntitatEntity entitatActual,
+			List<CarpetaEntity> carpetes) throws IOException {
+
+		byte[] indexGenerated = indexHelper.generarIndexPdfPerCarpetes(
+				carpetes,
+				entitatActual);
+
+		FitxerDto fitxer = new FitxerDto();
+		if (carpetes.size() > 1) {
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".pdf");
+		} else {
+			String carpetaNom = carpetes.get(0).getNom();
+			if (carpetaNom.contains("\"")) {
+				carpetaNom = carpetaNom.replace("\"", "\\\"");
+			}
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + carpetaNom + ".pdf");
+		}
+		fitxer.setContentType("application/pdf");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+	
 	public FitxerDto generarIndexXlsx(
 			EntitatEntity entitatActual,
 			List<ExpedientEntity> expedients,
@@ -1984,6 +2022,30 @@ public class ContingutHelper {
 		return fitxer;
 	}
 
+	public FitxerDto generarIndexXlsx(
+			EntitatEntity entitatActual,
+			List<CarpetaEntity> carpetes) throws IOException {
+
+		byte[] indexGenerated = indexHelper.generarIndexXlsxPerCarpetes(
+				carpetes,
+				entitatActual);
+
+		FitxerDto fitxer = new FitxerDto();
+		if (carpetes.size() > 1) {
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + ".xlsx");
+		} else {
+			String carpetaNom = carpetes.get(0).getNom();
+			if (carpetaNom.contains("\"")) {
+				carpetaNom = "\"" + carpetaNom.replace("\"", "\\\"") + "\"";
+			}
+			fitxer.setNom(messageHelper.getMessage("expedient.service.exportacio.index") + " " + carpetaNom + ".xlsx");
+		}
+		fitxer.setContentType("application/vnd.ms-excel");
+		if (indexGenerated != null)
+			fitxer.setContingut(indexGenerated);
+		return fitxer;
+	}
+	
 	public void crearNovaEntrada(
 			String nom,
 			FitxerDto fitxer,

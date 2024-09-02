@@ -4,6 +4,7 @@
 package es.caib.ripea.core.ejb;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -44,10 +45,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ExpedientTascaDto> findAmbExpedient(Long entitatId,
-			Long expedientId) {
-		return delegate.findAmbExpedient(entitatId,
-				expedientId);
+	public List<ExpedientTascaDto> findAmbExpedient(
+			Long entitatId,
+			Long expedientId,
+			PaginacioParamsDto paginacioParam) {
+		return delegate.findAmbExpedient(entitatId, expedientId, paginacioParam);
 	}
 
 	@Override
@@ -163,4 +165,26 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 		return delegate.findByTascaBasicInfo(contingutId, tascaId);
 	}
 
+	@Override
+	public ExpedientTascaDto updateDataLimit(Long expedientTascaId, Date dataLimit) {
+		return delegate.updateDataLimit(expedientTascaId, dataLimit);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto) {
+		delegate.changeTascaPrioritat(expedientTascaDto);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientTascaDto updateDelegat(Long expedientTascaId, String delegatCodi, String comentari) {
+		return delegate.updateDelegat(expedientTascaId, delegatCodi, comentari);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientTascaDto cancelarDelegacio(Long expedientTascaId, String comentari) {
+		return delegate.cancelarDelegacio(expedientTascaId, comentari);
+	}
 }

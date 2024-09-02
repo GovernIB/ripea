@@ -17,6 +17,7 @@ import es.caib.plugins.arxiu.api.Carpeta;
 import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
+import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
 import es.caib.ripea.core.api.dto.*;
@@ -161,7 +162,8 @@ public class ExpedientHelper {
 			boolean associarInteressats,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			Long grupId,
-			String rolActual) {
+			String rolActual,
+			PrioritatEnumDto prioritat) {
 
 		logger.info(
 				"Expedient crear Helper START(" +
@@ -238,7 +240,8 @@ public class ExpedientHelper {
 				new Date(),
 				any,
 				true,
-				grupId);
+				grupId,
+				prioritat);
 		contingutLogHelper.logCreacio(expedient, false, false);
 		crearDadesPerDefecte(
 				metaExpedient,
@@ -1021,7 +1024,7 @@ public class ExpedientHelper {
 				null, 
 				arxiuUuid, 
 				null, 
-				false, 
+				true, 
 				false);
 		//registreAnnexEntity = registreAnnexRepository.findOne(registreAnnexId);
 		entitat = entitatRepository.findByUnitatArrel(expedientPeticioEntity.getRegistre().getEntitatCodi());
@@ -1110,7 +1113,7 @@ public class ExpedientHelper {
 		docEntity.updateArxiu(documentDto.getArxiuUuid());
 		docEntity.updateArxiuEstat(ArxiuEstatEnumDto.DEFINITIU);
 		documentRepository.saveAndFlush(docEntity);
-		if (isCarpetaActive) {
+		if (isCarpetaActive && ! contingutHelper.isCarpetaLogica()) {
 			Carpeta carpeta = pluginHelper.arxiuCarpetaConsultar(carpetaEntity);
 			boolean documentExistsInArxiu = false;
 			String documentUuid = null;
@@ -1243,7 +1246,25 @@ public class ExpedientHelper {
 		
 		return expedient;
 	}
-	
+
+	public ExpedientEntity updatePrioritat(ExpedientEntity expedient, PrioritatEnumDto prioritat) {
+
+		PrioritatEnumDto prioritatAnterior = expedient.getPrioritat();
+		expedient.updatePrioritat(prioritat);
+
+		// log change of state
+		if(!prioritatAnterior.equals(prioritat)){
+			contingutLogHelper.log(
+					expedient,
+					LogTipusEnumDto.CANVI_PRIORITAT,
+					messageHelper.getMessage("prioritat.enum." + prioritatAnterior.name()),
+					messageHelper.getMessage("prioritat.enum." + prioritat.name()),
+					false,
+					false);
+		}
+
+		return expedient;
+	}
 
 
 	public Long checkIfExistsByMetaExpedientAndNom(
@@ -1291,11 +1312,12 @@ public class ExpedientHelper {
 	}
 	
 	
-	public void tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+	public ExpedientEntity tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
+
 		logger.debug("Tancant l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + expedientId + "," + "motiu=" + motiu + ")");
 
-		
 		expedientHelper2.checkIfExpedientCanBeClosed(expedientId);
 		
 		expedientHelper2.signDocumentsSelected(motiu, documentsPerFirmar);
@@ -1307,8 +1329,8 @@ public class ExpedientHelper {
 		expedientHelper2.deleteDocumentsEsborranysArxiu(expedientId);
 		
 		expedientHelper2.closeExpedientDbAndArxiu(expedientId, motiu);
-		
-		
+
+		return expedientRepository.findOne(expedientId);
 	}
 	
 	
@@ -1385,7 +1407,7 @@ public class ExpedientHelper {
 
 		return dto;
 	}
-	public void agafar(ExpedientEntity expedient, String usuariCodi) {
+	public String agafar(ExpedientEntity expedient, String usuariCodi) {
 
 		ExpedientEntity expedientSuperior = contingutHelper.getExpedientSuperior(expedient, false, false, false, null);
 		if (expedientSuperior != null) {
@@ -1401,9 +1423,11 @@ public class ExpedientHelper {
 			emailHelper.contingutAgafatPerAltreUsusari(expedient, usuariOriginal, usuariNou);
 		}
 		contingutLogHelper.log(expedient, LogTipusEnumDto.AGAFAR, usuariCodi, null, false, false);
+
+		return expedient.getNom();
 	}
 	
-	public void alliberar(ExpedientEntity expedient) {
+	public String alliberar(ExpedientEntity expedient) {
 		UsuariEntity usuariActual = expedient.getAgafatPer();
 		UsuariEntity usuariCreador = expedient.getCreatedBy();
 
@@ -1421,6 +1445,7 @@ public class ExpedientHelper {
 			emailHelper.contingutAlliberat(expedient, usuariCreador, usuariActual);
 		}
 		contingutLogHelper.log(expedient, LogTipusEnumDto.ALLIBERAR, usuariActual.getCodi(), null, false, false);
+		return expedient.getNom();
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
@@ -1904,19 +1929,21 @@ public class ExpedientHelper {
 		String tituloDoc = (String) documentArxiu.getMetadades().getMetadadaAddicional("tituloDoc");
 		String nomDocument = tituloDoc != null ? (tituloDoc + " - " +  numeroRegistre.replace('/', '_')) : documentArxiu.getNom();
 		
+		DocumentContingut contingut = documentArxiu.getContingut();
+		
 		document.setDocumentTipus(DocumentTipusEnumDto.IMPORTAT);
 		document.setEstat(DocumentEstatEnumDto.CUSTODIAT);
 		document.setData(new Date());
 		document.setNom(nomDocument);
-		document.setFitxerNom(documentArxiu.getNom());
-		document.setFitxerTamany(documentArxiu.getContingut().getTamany());
+		document.setFitxerNom(contingut.getArxiuNom() != null ? contingut.getArxiuNom() : documentArxiu.getNom());
+		document.setFitxerTamany(contingut.getTamany());
 		document.setArxiuUuid(documentArxiu.getIdentificador());
 		document.setDataCaptura(documentArxiu.getMetadades().getDataCaptura());
 		document.setNtiOrigen(ArxiuConversions.getOrigen(documentArxiu));
 		document.setNtiTipoDocumental(ArxiuConversions.getTipusDocumental(documentArxiu));
 		document.setNtiEstadoElaboracion(ArxiuConversions.getEstatElaboracio(documentArxiu));
 		document.setNtiTipoFirma(ArxiuConversions.getNtiTipoFirma(documentArxiu));
-		document.setFitxerContentType(documentArxiu.getContingut().getTipusMime());
+		document.setFitxerContentType(contingut.getTipusMime());
 		document.setNtiVersion("1.0");
 		document.setNtiOrgano(getOrgans(documentArxiu));
 		return document;

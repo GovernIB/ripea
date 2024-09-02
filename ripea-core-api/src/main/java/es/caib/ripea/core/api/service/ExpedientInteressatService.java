@@ -265,4 +265,7 @@ public interface ExpedientInteressatService {
 			InteressatDto interessat,
 			boolean propagarArxiu,
 			String rolActual);
+
+	@PreAuthorize("hasRole('tothom')")
+	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats) throws NotFoundException;
 }

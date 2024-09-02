@@ -16,12 +16,8 @@
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<rip:modalHead/>
-	
 </head>
 <body>
-
-
-
 	<table class="table table-bordered">
 		<tbody>
 			<tr>
@@ -41,8 +37,8 @@
 				<td><fmt:formatDate value="${expedientTascaDto.dataInici}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
 			</tr>
 			<tr>
-				<td><strong><spring:message code="expedient.tasca.form.camp.dataFi"/></strong></td>
-				<td><fmt:formatDate value="${expedientTascaDto.dataFi}" pattern="dd/MM/yyyy HH:mm:ss"/></td>
+				<td><strong><spring:message code="tasca.list.column.duracio"/></strong></td>
+				<td>${expedientTascaDto.duracio}</td>
 			</tr>	
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.dataLimit"/></strong></td>
@@ -56,8 +52,15 @@
 				<tr>
 					<td><strong><spring:message code="expedient.tasca.form.camp.rebuigMotiu"/></strong></td>
 					<td>${expedientTascaDto.motiuRebuig}</td>
-				</tr>				
+				</tr>
 			</c:if>
+			<tr>
+				<td><strong><spring:message code="tasca.list.column.prioritat"/></strong></td>
+				<td>
+					<c:set var="nomKeyPrioritat">prioritat.enum.${expedientTascaDto.prioritat}</c:set>
+					<spring:message code="${nomKeyPrioritat}" />
+				</td>
+			</tr>
 		</tbody>
 	</table>
 	

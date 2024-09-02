@@ -87,6 +87,11 @@ var mostrarExpedientsFirmaPendent = '${firmaPendent}' === 'true';
 var columnaAgafatPer = 19;
 $(document).ready(function() {
 
+	// $.views.helpers({
+	// 	getPrioritatColor: function(prioritat) {
+	// 		return colorsPrioritats[prioritat];
+	// 	}
+	// });
 
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
@@ -125,11 +130,17 @@ $(document).ready(function() {
 		$("span[class^='stateColor-']").each(function( index ) {
 			var fullClassNameString = this.className;
 			var colorString = fullClassNameString.substring(11);
-			if (colorString != "") {
+			if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
+				$(this).parent().css( "border", "dashed 1px #AAA" );
+				$(this).parent().css( "color", '#666666' );
+			} else if (colorString == 'TANCAT') {
+				$(this).parent().css( "background-color", "#777" );
+			} else {
 			    $(this).parent().css( "background-color", colorString );
 				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
 				$(this).parent().css( "color", textColor );
-				$(this).parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+				// $(this).parent().css( "fontSize", 'small' );
+				$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
 			}
 		});
 		
@@ -432,39 +443,6 @@ function removeCookie(cname) {
     document.cookie = cname + "=; path=/; expires=" + expires + ";";
 }
 
-function getTextColorOnBackground(darkTextColor, lightTextColor, backgroundColor) {
-    const getLuminance = (c) => {
-        const hexStr = c.substring(1);
-        const hex = hexStr.length == 3 ? hexStr.replace(/(.)/g, '$1$1') : hexStr;
-        const dec = parseInt(hex, 16);
-        const rgb = [(dec >> 16) & 255, (dec >> 8) & 255, dec & 255];
-        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
-    }
-    const getContrast = (c1, c2) => {
-        const l1 = getLuminance(c1);
-        const l2 = getLuminance(c2);
-        return (l1 > l2) ? (l1 + 0.05) / (l2 + 0.05) : (l2 + 0.05) / (l1 + 0.05);
-    }
-    const cDark = getContrast(darkTextColor, backgroundColor);
-    const cLight = getContrast(lightTextColor, backgroundColor);
-    return cDark > cLight ? darkTextColor : lightTextColor;
-}
-
-function hexToRgb(hex) {
-	// Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-	hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-		return r + r + g + g + b + b;
-	});
-
-	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	return result ? {
-		r: parseInt(result[1], 16),
-		g: parseInt(result[2], 16),
-		b: parseInt(result[3], 16)
-	} : null;
-}
-
 </script>
 </head>
 <body>
@@ -619,6 +597,7 @@ function hexToRgb(hex) {
 						<li><a href="expedient/alliberar"><span class="fa fa-unlock"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.alliberar"/></a></li>
 						<li><a href="expedient/follow" data-toggle="ajax"><span class="fa fa-user-plus"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.follow"/></a></li>		
 						<li><a href="expedient/unfollow" data-toggle="ajax"><span class="fa fa-user-times"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.unfollow"/></a></li>
+						<%-- li><a href="expedient/canviPrioritats" data-toggle="modal"><span class="fa fa-signal fa-rotate-90"></span>&nbsp;&nbsp;<spring:message code="comu.boto.canviarPrioritat"/></a></li --%>
 						<li><a href="expedient/delete" data-confirm="<spring:message code="contingut.confirmacio.esborrar.node.multiple"/>"><span class="fa fa-trash-o"></span>&nbsp;<spring:message code="expedient.list.user.esborrar"/></a></li>
 						<li><a href="expedient/export/ODS"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.ODS"/></a></li>
 						<li><a href="expedient/export/CSV"><span class="fa fa-download"></span>&nbsp;&nbsp;<spring:message code="expedient.list.user.exportar.CSV"/></a></li>
@@ -691,6 +670,7 @@ function hexToRgb(hex) {
 				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
+						<span class="label">
 						{{if expedientEstat != null && estat != 'TANCAT'}}
 							<span class="fa fa-folder-open"></span>&nbsp;{{:expedientEstat.nom}}
 						{{else}}
@@ -709,11 +689,38 @@ function hexToRgb(hex) {
 						{{/if}}
 						{{if expedientEstat != null && expedientEstat.color!=null}}
 							<span class="stateColor-{{:expedientEstat.color}}"></span>
+						{{else expedientEstat != null && estat != 'TANCAT'}}
+							<span class="stateColor-ESTAT"></span>
+						{{else expedientEstat == null && estat == 'OBERT'}}
+							<span class="stateColor-OBERT"></span>
+						{{else}}
+							<span class="stateColor-TANCAT"></span>
 						{{/if}}
+						</span>
+					</script>
+				</th>
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="11%">
+					<spring:message code="contingut.expedient.form.camp.prioritat"/>
+					<script id="cellPrioritatTemplate" type="text/x-jsrender">
+						<span class="label label-{{:prioritat}}">
+						{{if prioritat == 'MOLT_BAIXA'}}
+							<spring:message code="prioritat.enum.MOLT_BAIXA"/>
+						{{else prioritat == 'A_BAIXA'}}
+							<spring:message code="prioritat.enum.A_BAIXA"/>
+						{{else prioritat == 'C_ALTA'}}
+							<spring:message code="prioritat.enum.C_ALTA"/>
+						{{else prioritat == 'D_MOLT_ALTA'}}
+							<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
+						{{else prioritat == 'CRITICA'}}
+							<spring:message code="prioritat.enum.CRITICA"/>
+						{{else}}
+							<spring:message code="prioritat.enum.B_NORMAL"/>
+						{{/if}}
+						</span>
 					</script>
 				</th>
 				<c:if test="${usuariActual.expedientListAgafatPer}">
-					<th data-col-name="agafatPer.codiAndNom" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
+					<th data-col-name="agafatPer.codiAndNom" width="10%"><spring:message code="expedient.list.user.columna.agafatper"/></th>
 				</c:if>
 				<c:if test="${usuariActual.expedientListInteressats}">
  					<th data-col-name="interessatsResum" data-orderable="false" width="10%"><spring:message code="expedient.list.user.columna.interessats"/></th>
@@ -791,6 +798,8 @@ function hexToRgb(hex) {
 
 
 								{{if potModificar}}
+									<%---- Canviar prioritat... ----%>
+									<li><a href="<c:url value="/expedient/{{:id}}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
 									<%---- Canviar estat... ----%>
 								 	{{if estat == 'OBERT'}}
 										<li><a href="<c:url value="/expedient/{{:id}}/canviarEstat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarEstat"/>...</a></li>

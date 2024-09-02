@@ -21,7 +21,11 @@
 	
 <script>
 $(document).ready(function(){
+
+	let errorsValidacio = parseBoolean('${errorsValidacio}');
+
 	$('#metaExpedientTascaId').on('change', function() {
+
 		var metaTascaId = $(this).val();
 		$('#expedientId').select2('val', '', true);
 		$('#expedientId option[value!=""]').remove();
@@ -29,20 +33,22 @@ $(document).ready(function(){
 		if (metaTascaId != null && metaTascaId != "") {
 			$.get("<c:url value="/expedientTasca/"/>" + metaTascaId + "/getMetaExpedientTasca")
 			.done(function(data){
-
 				$('#metaExpedientTascaDescripcio').val(data.descripcio);
-				
 				$('#responsablesCodi').data('currentValue', data.responsable);
 				$('#responsablesCodi').webutilInputSuggest();
-
-				$('#dataLimit').val(data.dataLimitString);
+				$('#duracio').val(data.duracio);
+				$('#prioritat').val(data.prioritat).change();
 			})
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
 		}
-	});	
-	$('#metaExpedientTascaId').trigger('change');					
+	});
+	//Si venim de guardar amb errors, no volem recarregar les dades, sino mantenir les del command
+	//Al carregar una tasca existent, tampoc volem carregar dades de la meta-tasca, sino les del command
+	if (!errorsValidacio) {
+		$('#metaExpedientTascaId').trigger('change');
+	}
 });
 
 </script>	
@@ -76,8 +82,22 @@ $(document).ready(function(){
 			suggestValue="codi"
 			suggestText="nom"
 			required="true"
-			multiple="true"/>				
-		<rip:inputDate name="dataLimit" textKey="expedient.tasca.form.camp.dataLimit"/>
+			multiple="true"/>
+		<rip:inputSuggest 
+			name="observadorsCodi" 
+			urlConsultaInicial="${urlConsultaInicial}" 
+			urlConsultaLlistat="${urlConsultaLlistat}" 
+			textKey="expedient.tasca.form.camp.observador"
+			suggestValue="codi"
+			suggestText="nom"
+			comment="expedient.tasca.form.camp.observador.comentari"
+			multiple="true"/>
+		<rip:inputText
+				name="duracio"
+				textKey="tasca.list.column.duracio"
+				tooltip="true"
+				comment="tasca.list.column.duracio.tip"
+				tooltipMsg="tasca.list.column.duracio.tip" />
 		<rip:inputText 
 			name="titol"
 			textKey="expedient.tasca.form.camp.titol"
@@ -86,6 +106,12 @@ $(document).ready(function(){
 			name="observacions" 
 			textKey="expedient.tasca.form.camp.observacions" 
 			required="false"/>
+		<rip:inputSelect
+				name="prioritat"
+				optionEnum="PrioritatEnumDto"
+				emptyOption="false"
+				textKey="contingut.expedient.form.camp.prioritat"
+				templateResultFunction="showColorPriritats"/>
 		<div id="modal-botons" class="well">
 			<button id="btnSave" type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.crear"/></button>
  			<a href="<c:url value="/expedientTasca"/>" class="btn btn-default modal-tancar" data-modal-cancel="true"><spring:message code="comu.boto.cancelar"/></a>

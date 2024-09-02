@@ -3,8 +3,10 @@
  */
 package es.caib.ripea.core.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -17,6 +19,7 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -189,6 +192,35 @@ public class CarpetaServiceImpl implements CarpetaService {
 		ExpedientEntity expedient = contingut instanceof ExpedientEntity ? (ExpedientEntity)contingut : ((CarpetaEntity)contingut).getExpedient();
 		
 		return carpetaHelper.obtenirArbreCarpetesPerExpedient(entitatId, expedient);
+	}
+	
+	@Override
+	public FitxerDto exportIndexCarpetes(
+			Long entitatId, 
+			Set<Long> carpetaIds,
+			String format) throws IOException {
+		if (carpetaIds.size() == 1)
+			logger.debug("Exportant índex de  (" + "entitatId=" + entitatId + ", " + "carpetaIds=" + carpetaIds.iterator().next() + ")");
+		EntitatEntity entitatActual = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, true, false);
+		List<CarpetaEntity> carpetes = new ArrayList<CarpetaEntity>();
+		for (Long carpetaId : carpetaIds) {
+			CarpetaEntity carpeta = entityComprovarHelper.comprovarCarpeta(
+					entitatActual,
+					carpetaId);
+			carpetes.add(carpeta);
+		}
+		
+		FitxerDto resultat = new FitxerDto();
+		
+		try {
+			resultat = carpetaHelper.exportarCarpetes(
+					entitatActual, 
+					carpetes,
+					format);	
+		} catch (Exception ex) {
+			throw new RuntimeException("Hi ha hagut un problema generant l'índex de les carpetes", ex);
+		}
+		return resultat;
 	}
 	
 	private boolean checkCarpetaUniqueContraint (String nom, ContingutEntity pare, Long entitatId) {

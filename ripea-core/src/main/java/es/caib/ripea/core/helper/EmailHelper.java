@@ -606,6 +606,7 @@ public class EmailHelper {
 				false,
 				expedient,
 				enviamentCreatedByCodi,
+				null,
 				null);
 
 		sendOrSaveEmail(
@@ -643,6 +644,7 @@ public class EmailHelper {
 				false,
 				expedient,
 				enviamentCreatedByCodi,
+				null,
 				null);
 
 		
@@ -690,6 +692,7 @@ public class EmailHelper {
 				false,
 				expedient,
 				enviamentCreatedByCodi,
+				null,
 				null);
 
 		sendOrSaveEmail(
@@ -730,6 +733,7 @@ public class EmailHelper {
 				false,
 				expedient,
 				notificacioCreatedByCodi,
+				null,
 				null);
 		
 		sendOrSaveEmail(
@@ -775,6 +779,7 @@ public class EmailHelper {
 				false,
 				expedient,
 				notificacioCreatedByCodi,
+				null,
 				null);
 		
 		
@@ -800,7 +805,8 @@ public class EmailHelper {
 						estatAnterior == null,
 						expedientTascaEntity.getExpedient(),
 						expedientTascaEntity.getCreatedBy().getCodi(),
-						expedientTascaEntity.getResponsables()));
+						expedientTascaEntity.getResponsables(),
+						null));
 
 	}	
 	
@@ -816,7 +822,67 @@ public class EmailHelper {
 						false,
 						expedientTascaEntity.getExpedient(),
 						expedientTascaEntity.getCreatedBy().getCodi(),
-						expedientTascaEntity.getResponsables()));
+						expedientTascaEntity.getResponsables(),
+						null));
+
+	}
+	
+	public void enviarEmailDelegarTasca(
+			ExpedientTascaEntity expedientTascaEntity) {
+		logger.debug("Enviant correu electrònic per a delegar de tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + "," + 
+				"delegatCodi=" + expedientTascaEntity.getDelegat().getCodi() + ")");
+		
+		enviarEmailDelegarTasca(
+				expedientTascaEntity, 
+				getGestors(
+						true,
+						false,
+						expedientTascaEntity.getExpedient(),
+						expedientTascaEntity.getCreatedBy().getCodi(),
+						expedientTascaEntity.getResponsables(),
+						expedientTascaEntity.getDelegat()));
+
+	}	
+	
+	public void enviarEmailCancelarDelegacioTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			UsuariEntity delegat,
+			String comentari) {
+		logger.debug("Enviant correu electrònic cancel·lació delegació tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + "," + 
+				(comentari != null ? "comentari=" + comentari + "," : "") + 
+				"delegatCodi=" + delegat.getCodi() + ")");
+		
+		enviarEmailCancelarDelegacioTasca(
+				expedientTascaEntity, 
+				getGestors(
+						true,
+						false,
+						expedientTascaEntity.getExpedient(),
+						expedientTascaEntity.getCreatedBy().getCodi(),
+						expedientTascaEntity.getResponsables(),
+						delegat),
+				comentari);
+
+	}
+	
+	public void enviarEmailModificacioDataLimitTasca(
+			ExpedientTascaEntity expedientTascaEntity) {
+		logger.debug("Enviant correu electrònic per a reassignar responsable de tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		Set<DadesUsuari> responsables = getGestors(
+				true,
+				false,
+				expedientTascaEntity.getExpedient(),
+				expedientTascaEntity.getCreatedBy().getCodi(),
+				expedientTascaEntity.getResponsables(),
+				null);
+		
+		enviarEmailModificacioDataLimitTasca(
+				expedientTascaEntity, 
+				responsables);
 
 	}	
 
@@ -852,7 +918,8 @@ public class EmailHelper {
 			boolean isTascaNova,
 			ExpedientEntity expedient,
 			String createdByCodi,
-			List<UsuariEntity> responsablesTasca) {
+			List<UsuariEntity> responsablesTasca,
+			UsuariEntity delegat) {
 		Set<DadesUsuari> responsables = new HashSet<DadesUsuari>();
 		UsuariEntity agafatPer = expedient.getAgafatPer();
 		
@@ -1001,6 +1068,73 @@ public class EmailHelper {
 
 	}
 	
+	private void enviarEmailDelegarTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			Set<DadesUsuari> responsables) {
+		logger.debug("Enviant correu electrònic delegar tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + "," + 
+				"delegatCodi" + expedientTascaEntity.getDelegat().getCodi() + ")");
+		
+		String subject = getPrefixRipea() + " Delegat tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+		String text = 			
+					"S'ha delegat la tasca a RIPEA:\n" +
+							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
+							"\tDelegat:" + expedientTascaEntity.getDelegat().getNom() + " (" +
+							expedientTascaEntity.getDelegat().getCodi() + ")";
+		
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.DELEGAT_TASCA);
+
+	}
+	
+	private void enviarEmailCancelarDelegacioTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			Set<DadesUsuari> responsables,
+			String comentari) {
+		logger.debug("Enviant correu electrònic cancel·lació delegació tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		String subject = getPrefixRipea() + " Cancel·lació delegació tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+		String text = 			
+					"S'ha cancel·lat la delegació de la tasca a RIPEA:\n" +
+							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
+							((comentari != null && !comentari.isEmpty()) ? "\tComentari: " + comentari : "");
+		
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.CANCELAR_DELEGACIO_TASCA);
+
+	}
+	
+	private void enviarEmailModificacioDataLimitTasca(
+			ExpedientTascaEntity expedientTascaEntity,
+			Set<DadesUsuari> responsables) {
+		logger.debug("Enviant correu electrònic modificació data límit tasca (" +
+				"tascaId=" + expedientTascaEntity.getId() + ")");
+		
+		String subject = getPrefixRipea() + " Modificació data límit de la tasca: " + expedientTascaEntity.getMetaTasca().getNom();
+		String text = 			
+					"S'ha modificat la data límit de la tasca a RIPEA:\n" +
+							"\tNom: " + expedientTascaEntity.getMetaTasca().getNom() + "\n" +
+							"\tDescripció: " + expedientTascaEntity.getMetaTasca().getDescripcio() + "\n" +
+							"\tResponsable:" + expedientTascaEntity.getResponsables().get(0).getNom() + " (" +
+							expedientTascaEntity.getResponsables().get(0).getCodi() + ")" + "\n" + 
+							"\tData límit: " + expedientTascaEntity.getDataLimit();
+		
+		sendOrSaveEmail(
+				responsables,
+				subject,
+				text,
+				EventTipusEnumDto.MODIFICACIO_DATALIMIT_TASCA);
+
+	}
 	
 	private void sendOrSaveEmail(
 			String codi,

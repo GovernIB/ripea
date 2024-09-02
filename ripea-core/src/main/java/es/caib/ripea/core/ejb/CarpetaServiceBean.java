@@ -3,7 +3,9 @@
  */
 package es.caib.ripea.core.ejb;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -15,6 +17,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
 
@@ -75,6 +78,12 @@ public class CarpetaServiceBean implements CarpetaService {
 	@RolesAllowed("tothom")
 	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId) {
 		return delegate.findArbreCarpetesExpedient(entitatId, expedientId);
+	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public FitxerDto exportIndexCarpetes(Long entitatId, Set<Long> carpetaIds, String format) throws IOException {
+		return delegate.exportIndexCarpetes(entitatId, carpetaIds, format);
 	}
 	
 }

@@ -1,18 +1,20 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang.builder.ToStringBuilder;
-
 import java.io.Serializable;
 
-
-/**
- * Informació d'un interessat.
- * 
- * @author Limit Tecnologies <limit@limit.es>
- */
+@JsonTypeInfo(
+		use = JsonTypeInfo.Id.NAME,
+		include = JsonTypeInfo.As.PROPERTY,
+		property = "tipus"
+)
+@JsonSubTypes({
+		@JsonSubTypes.Type(value = InteressatPersonaFisicaDto.class, name = "PERSONA_FISICA"),
+		@JsonSubTypes.Type(value = InteressatPersonaJuridicaDto.class, name = "PERSONA_JURIDICA"),
+		@JsonSubTypes.Type(value = InteressatAdministracioDto.class, name = "ADMINISTRACIO")
+})
 public abstract class InteressatDto implements Serializable {
 
 	protected Long id;
@@ -41,8 +43,10 @@ public abstract class InteressatDto implements Serializable {
 	protected boolean expedientArxiuPropagat;
 	protected Boolean entregaDeh;
 	private Boolean entregaDehObligat;
-	
 	private Boolean incapacitat;
+
+	private boolean jaExistentExpedient = false;
+	private InteressatAssociacioAccioEnum accio;
 	
 	public Boolean getIncapacitat() {
 		return incapacitat;
@@ -162,7 +166,7 @@ public abstract class InteressatDto implements Serializable {
 	public void setMunicipiNom(String municipiNom) {
 		this.municipiNom = municipiNom;
 	}
-	
+
 	public boolean isPersonaFisica() {
 		return this instanceof InteressatPersonaFisicaDto;
 	}
@@ -172,6 +176,11 @@ public abstract class InteressatDto implements Serializable {
 	public boolean isAdministracio() {
 		return this instanceof InteressatAdministracioDto;
 	}
+
+	public InteressatAssociacioAccioEnum getAccio() { return accio; }
+	public void setAccio(InteressatAssociacioAccioEnum accio) { this.accio = accio; }
+	public boolean isJaExistentExpedient() { return jaExistentExpedient; }
+	public void setJaExistentExpedient(boolean jaExistentExpedient) { this.jaExistentExpedient = jaExistentExpedient; }
 
 	public abstract String getNomComplet();
 	public String getNomCompletAmbDocument() {

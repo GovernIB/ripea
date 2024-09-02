@@ -3,12 +3,15 @@
  */
 package es.caib.ripea.core.api.service;
 
+import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import es.caib.ripea.core.api.dto.ArbreJsonDto;
 import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
@@ -726,5 +729,26 @@ public interface DocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public String firmaSimpleWebStartMassiu(Set<Long> ids, String motiu, String urlReturnToRipea, Long entitatId);
+
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
+			Long id, 
+			Long expedientId, 
+			String rolActual,
+			Long tascaId) throws IOException;
+
+	@PreAuthorize("hasRole('tothom')")
+	public List<DocumentDto> findByExpedient(
+			Long id, 
+			Long expedientId, 
+			String rolActual);
+
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto descarregarAllDocumentsOfExpedientWithSelectedFolders(
+			Long entitatId,
+			Long expedientId, 
+			List<ArbreJsonDto> selectedElements, 
+			String rolActual, 
+			Long tascaId) throws IOException;	
 
 }

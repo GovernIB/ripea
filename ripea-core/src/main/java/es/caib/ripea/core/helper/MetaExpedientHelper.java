@@ -511,7 +511,8 @@ public class MetaExpedientHelper {
 				metaExpedientTasca.getDataLimit(),
 				estatCrearTasca,
 				estatFinalitzarTasca).build();
-		
+		entity.setDuracio(metaExpedientTasca.getDuracio());
+		entity.setPrioritat(metaExpedientTasca.getPrioritat());
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}

@@ -5,6 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
+
 <html>
 <head>
 	<title><spring:message code="contingut.pinbal.form.titol"/></title>
@@ -26,29 +27,38 @@ metaDocumentServeiScsp[${metaDocument.id}] = "${metaDocument.pinbalServei}";
 metaDocumentFinalitat[${metaDocument.id}] = "${metaDocument.pinbalFinalitat}";
 </c:forEach>
 $(document).ready(function() {
+
 	$('#metaDocumentId').on('change', function() {
-		
+
 		let serveiNom = metaDocumentServeiScsp[$(this).val()];
 		showHideDatosEspecificos('#div' + serveiNom);
-						
 
-		$('#finalitat').val(metaDocumentFinalitat[$(this).val()]);
+		if ('${interessatCreat}'=='')
+			$('#finalitat').val(metaDocumentFinalitat[$(this).val()]);
 		
 		const metaDocumentId = $(this).val();
 		$.get("<c:url value="/contingut"/>" + "/${pinbalConsultaCommand.pareId}/pinbal/titulars/" + metaDocumentId)
 			.done(function(data) {
-				
-				$('#interessatId').select2('val', '', true);
 				$('#interessatId option[value!=""]').remove();
+				let primerInt = '';
 				for (var i = 0; i < data.length; i++) {
 					$('#interessatId').append('<option value="' + data[i].id + '">' + data[i].identificador + '</option>');
+					if (primerInt=='') {
+						primerInt = data[i].id;
+					}
+				}
+				if ('${interessatCreat}'=='') {
+					$('#interessatId').val(primerInt).trigger('change');
+				} else {
+					$('#interessatId').val('${interessatCreat}').trigger('change');
 				}
 			})
 			.fail(function() {
 				alert("<spring:message code="error.jquery.ajax"/>");
 			});
-		
+
 	});
+
 	$('#metaDocumentId').trigger('change');
 
 	function showHideDatosEspecificos(divToShow) {
@@ -83,11 +93,33 @@ $(document).ready(function() {
 			$('#bloc-datos-especificos').hide();
 			$('#bloc-datos-especificos').find(":input").prop("disabled", true);
 		}
-		
 	}
 
-	
+	var urlNewInt = '<rip:modalUrl value="/expedient/${pinbalConsultaCommand.pareId}/interessat/new"/>';
+	$("#interessatId").parent().attr("class", "col-xs-6");
+	$("#interessatId").parent().parent().append("<div class='col-xs-2' style='padding-left: 0px;'>"+
+			"<a href='"+urlNewInt+"' onclick='guardarDadesFormActual()' id='addInteressatBtn' class='btn btn-default' data-toggle='modal' data-func-to-call-on-tancar='enableNotificar' data-modal-eval='true'>"+
+			"<span class='fa fa-plus'></span>&nbsp;Nou interessat</a></div>");
 });
+
+function guardarDadesFormActual() {
+	var formData = $("#pinbalConsultaCommand").serialize();
+	$.ajax({
+		type: 'POST',
+		url: '<rip:modalUrl value="/contingut/${pinbalConsultaCommand.pareId}/pinbal/guardaFormSessio"/>',
+		data: formData,
+		async: false,
+		success: function(response) {
+			console.log("Formulari PINBAL guardat en sessió: ", response);
+			return true;
+		},
+		error: function(xhr, status, error) {
+			console.error("No s'ha pogut redireccionar al formulari de interessat: ", error);
+			return true;
+		}
+	});
+}
+
 </script>
 </head>
 <body>
@@ -108,9 +140,7 @@ $(document).ready(function() {
 			<br/>
 			<div class="tab-content">
 				<div role="tabpanel" class="tab-pane active" id="datos-especificos">
-				
 
-				
 					<div id="divSVDCCAACPASWS01">
 						<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
 						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
@@ -140,8 +170,7 @@ $(document).ready(function() {
 						<rip:inputSelect name="comunitatAutonomaCodi" textKey="contingut.pinbal.form.camp.comunitat.autonoma" optionItems="${comunitats}" optionValueAttribute="value" optionTextAttribute="text"/>
 						<rip:inputSelect name="provinciaCodi" textKey="contingut.pinbal.form.camp.provincia" optionItems="${provincies}" optionValueAttribute="value" optionTextAttribute="text"/>
 					</div>
-					
-					
+
 					<div id="divSVDDELSEXWS01">
 						<rip:inputSelect name="codiNacionalitat" textKey="contingut.pinbal.form.camp.pais.nacionalitat" optionItems="${paisos}" optionValueAttribute="codi" optionTextAttribute="nom"/>
 					  	<rip:inputSelect name="sexe" textKey="contingut.pinbal.form.camp.sexe" optionEnum="SexeEnumDto" emptyOption="true"/>
@@ -166,7 +195,6 @@ $(document).ready(function() {
 						<rip:inputNumber name="exercici" textKey="contingut.pinbal.form.camp.data.exercici" nombreDecimals="0" required="true"/>
 					</div>
 
-					
 					<div id="divSVDDGPRESIDENCIALEGALDOCWS01">
 						<rip:inputText name="numeroSoporte" textKey="contingut.pinbal.form.camp.numero.soporte" comment="contingut.pinbal.form.camp.tipus.numero.soporte.passaport.comment"/>
 						<rip:inputSelect name="tipusPassaport" textKey="contingut.pinbal.form.camp.tipus.passaport" comment="contingut.pinbal.form.camp.tipus.passaport.comment" optionEnum="TipusPassaportEnumDto" emptyOption="true"/>

@@ -9,7 +9,9 @@ import es.caib.ripea.core.api.dto.ContingutDto;
 import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
 import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
 import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
@@ -26,10 +28,7 @@ import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
 import es.caib.ripea.core.api.service.ExpedientInteressatService;
 import es.caib.ripea.plugin.NotibRepostaException;
-import es.caib.ripea.war.command.DocumentNotificacionsCommand;
-import es.caib.ripea.war.command.DocumentPublicacioCommand;
-import es.caib.ripea.war.command.InteressatCommand;
-import es.caib.ripea.war.command.NotificacioEnviamentCommand;
+import es.caib.ripea.war.command.*;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
@@ -72,19 +71,11 @@ import java.util.concurrent.TimeUnit;
 @RequestMapping("/document")
 public class DocumentEnviamentController extends BaseUserController {
 
-	
-	@Autowired
-	private DocumentEnviamentService documentEnviamentService;
-	@Autowired
-	private ExpedientInteressatService expedientInteressatService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private DadesExternesService dadesExternesService;
-	@Autowired
-	private AplicacioService aplicacioService;
+ 	@Autowired private DocumentEnviamentService documentEnviamentService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private DocumentService documentService;
+	@Autowired private DadesExternesService dadesExternesService;
+
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 	@RequestMapping(value = "/{documentId}/notificar", method = RequestMethod.GET)
@@ -97,11 +88,11 @@ public class DocumentEnviamentController extends BaseUserController {
 		Integer numDies = 10;
 		command.setCaducitatDiesNaturals(numDies.toString());
 		command.setDataCaducitat(sumarDiesNaturals(numDies));
-	
 		command.setDocumentId(documentId);
 		model.addAttribute(command);
 		emplenarModelNotificacio(
 				request,
+				getEntitatActualComprovantPermisos(request),
 				documentId,
 				command,
 				model, null);
@@ -127,6 +118,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		if (bindingResult.hasErrors()) {
 			emplenarModelNotificacio(
 					request,
+					getEntitatActualComprovantPermisos(request),
 					documentId,
 					command,
 					model, null);
@@ -176,7 +168,17 @@ public class DocumentEnviamentController extends BaseUserController {
 					e);
 		}
 	}
-	
+
+	@RequestMapping(value = "/{documentId}/guardaFormSessio", method = RequestMethod.POST)
+	@ResponseBody
+	public String guardaFormSessio(
+			HttpServletRequest request,
+			@PathVariable Long documentId,
+			DocumentNotificacionsCommand command) {
+		//Guardam en la sessió del usuari actual, el formulari tal i com es troba, no fa falta validar
+		request.getSession().setAttribute("DocumentEnviamentController.command", command);
+		return "OK";
+	}
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/info")
 	public String notificacioInfo(
@@ -242,8 +244,7 @@ public class DocumentEnviamentController extends BaseUserController {
 	}
 
 	
-	
-	
+
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/descarregarJustificantEnviamentNotib", method = RequestMethod.GET)
 	public String notificacioConsultarIDescarregarJustificant(
 			HttpServletRequest request,
@@ -253,7 +254,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		getEntitatActualComprovantPermisos(request);
 		RespostaJustificantEnviamentNotibDto info = documentService.notificacioDescarregarJustificantEnviamentNotib(
 				notificacioId);
-		
+
 		if (info.getJustificant() != null) {
 			writeFileToResponse(
 					"justificant.pdf",
@@ -268,7 +269,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		}
 		return null;
 	}
-	
+
 
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}", method = RequestMethod.GET)
@@ -281,6 +282,7 @@ public class DocumentEnviamentController extends BaseUserController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		emplenarModelNotificacio(
 				request,
+				getEntitatActualComprovantPermisos(request),
 				documentId,
 				null,
 				model,
@@ -306,19 +308,21 @@ public class DocumentEnviamentController extends BaseUserController {
 		if (bindingResult.hasErrors()) {
 			emplenarModelNotificacio(
 					request,
+					getEntitatActualComprovantPermisos(request),
 					documentId,
 					null,
 					model, null);
 			return "notificacioForm";
 		}
-		documentEnviamentService.notificacioUpdate(
+		DocumentNotificacioDto documentNotificacioDto = documentEnviamentService.notificacioUpdate(
 				entitatActual.getId(),
 				documentId,
 				DocumentNotificacionsCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + documentId,
-				"expedient.controller.notificacio.modificada.ok");
+				"expedient.controller.notificacio.modificada.ok",
+				new Object[] { documentNotificacioDto.getRegistreNumeroFormatat() });
 	}
 
 	@RequestMapping(value = "/{documentId}/notificacio/{notificacioId}/delete", method = RequestMethod.GET)
@@ -327,14 +331,15 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			@PathVariable Long notificacioId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentEnviamentService.notificacioDelete(
+		DocumentNotificacioDto documentNotificacioDto= documentEnviamentService.notificacioDelete(
 				entitatActual.getId(),
 				documentId,
 				notificacioId);
 		return this.getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../contingut/" + documentId,
-				"expedient.controller.notificacio.esborrada.ok");
+				"expedient.controller.notificacio.esborrada.ok",
+				new Object[] { documentNotificacioDto.getRegistreNumeroFormatat() });
 	}
 	
 	
@@ -511,14 +516,15 @@ public class DocumentEnviamentController extends BaseUserController {
 					model);
 			return "publicacioForm";
 		}
-		documentEnviamentService.publicacioUpdate(
+		DocumentPublicacioDto documentPublicacioDto = documentEnviamentService.publicacioUpdate(
 				entitatActual.getId(),
 				documentId,
 				DocumentPublicacioCommand.asDto(command));
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contingut/" + documentId,
-				"expedient.controller.publicacio.modificada.ok");
+				"expedient.controller.publicacio.modificada.ok",
+				new Object[] { documentPublicacioDto.getDocumentNom() });
 	}
 
 	@RequestMapping(value = "/{documentId}/publicacio/{publicacioId}/delete", method = RequestMethod.GET)
@@ -527,14 +533,15 @@ public class DocumentEnviamentController extends BaseUserController {
 			@PathVariable Long documentId,
 			@PathVariable Long publicacioId) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		documentEnviamentService.publicacioDelete(
+		DocumentPublicacioDto documentPublicacioDto = documentEnviamentService.publicacioDelete(
 				entitatActual.getId(),
 				documentId,
 				publicacioId);
 		return this.getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../contingut/" + documentId,
-				"expedient.controller.publicacio.esborrada.ok");
+				"expedient.controller.publicacio.esborrada.ok",
+				new Object[] { documentPublicacioDto.getDocumentNom() });
 	}
 
 	@InitBinder
@@ -600,118 +607,6 @@ public class DocumentEnviamentController extends BaseUserController {
 	public int getDiesEntreDates(Date inici, Date fi) {
 		long diff = fi.getTime() - inici.getTime();
 		return new Long(TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS) +1).intValue();
-	}
-
-	private ExpedientDto emplenarModelNotificacio(
-			HttpServletRequest request,
-			Long documentId,
-			DocumentNotificacionsCommand command,
-			Model model,
-			Boolean notificacioConcatenatEntregaPostal) throws JsonProcessingException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		DocumentDto document = (DocumentDto)contingutService.findAmbIdUser(
-				entitatActual.getId(),
-				documentId,
-				false,
-				false,
-				true,
-				null, 
-				null);
-		boolean procedimentSenseCodiSia = false;
-		if (document.getExpedientPare().getMetaExpedient().getTipusClassificacio() == TipusClassificacioEnumDto.ID) {
-			procedimentSenseCodiSia = true;
-		}
-		model.addAttribute(
-				"procedimentSenseCodiSia",
-				procedimentSenseCodiSia);
-		model.addAttribute(
-				"document",
-				document);
-		model.addAttribute(
-				"notificacioTipusEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentNotificacioTipusEnumDto.class,
-						"notificacio.tipus.enum.",
-						new Enum<?>[] {DocumentNotificacioTipusEnumDto.MANUAL}));
-		model.addAttribute(
-				"interessatTipus",
-				EnumHelper.getOptionsForEnum(
-						InteressatTipusEnumDto.class,
-						"interessat.tipus.enum."));
-		
-		model.addAttribute(
-				"notificacioEstatEnumOptions",
-				EnumHelper.getOptionsForEnum(
-						DocumentEnviamentEstatEnumDto.class,
-						"notificacio.estat.enum.",
-						new Enum<?>[] {DocumentEnviamentEstatEnumDto.PROCESSAT}));
-		model.addAttribute(
-				"interessats",
-				expedientInteressatService.findByExpedient(
-						entitatActual.getId(),
-						document.getExpedientPare().getId(),
-						true));
-		model.addAttribute(
-				"expedientId",
-				document.getExpedientPare().getId());
-		
-		boolean enviamentPostalProperty = aplicacioService.propertyBooleanFindByKey("es.caib.ripea.notificacio.enviament.postal.actiu", true);
-
-		if (enviamentPostalProperty) {
-			if (notificacioConcatenatEntregaPostal != null) {
-				model.addAttribute("entregaPostal", (boolean) notificacioConcatenatEntregaPostal);
-			} else {
-				model.addAttribute("entregaPostal", true);
-			}
-		} else {
-			model.addAttribute("entregaPostal", false);
-		}
-
-		model.addAttribute(
-				"serveiTipusEstats",
-				EnumHelper.getOptionsForEnum(
-						ServeiTipusEnumDto.class,
-						"notificacio.servei.tipus.enum."));
-		if (command != null) {
-			List<InteressatDto> interessats = expedientInteressatService.findByExpedient(
-					entitatActual.getId(),
-					document.getExpedientPare().getId(),
-					true);
-			command.getEnviaments().clear();
-			
-			for (InteressatDto interessatDto : interessats) {
-				NotificacioEnviamentCommand notificacioParte = new NotificacioEnviamentCommand();
-	
-				notificacioParte.setTitular(InteressatCommand.asCommand(interessatDto));
-				if (interessatDto.getRepresentant() != null) {
-					notificacioParte.setDestinatari(InteressatCommand.asCommand(interessatDto.getRepresentant()));
-				}
-				command.getEnviaments().add(notificacioParte);
-			}
-			if (command.getEnviaments() != null && !command.getEnviaments().isEmpty()) {
-				ObjectMapper mapper = new ObjectMapper();
-				String notificacions = mapper.writeValueAsString(command.getEnviaments());
-				model.addAttribute("notificacions", notificacions);
-				ombleDadesAdresa(request, model);
-			}
-		}
-		return document.getExpedientPare();
-	}
-	
-	private void ombleDadesAdresa(HttpServletRequest request, Model model) {
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			String paisos = mapper.writeValueAsString(dadesExternesService.findPaisos());
-			model.addAttribute("paisos", paisos);
-		} catch (Exception e) {
-			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.paisos.error"));
-		}
-		try {
-			String provincies = mapper.writeValueAsString(dadesExternesService.findProvincies());
-			model.addAttribute("provincies", provincies);
-		} catch (Exception e) {
-			MissatgesHelper.warning(request, getMessage(request, "interessat.controller.provincies.error"));
-		}
 	}
 
 	private void emplenarModelPublicacio(

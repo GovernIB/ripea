@@ -46,7 +46,8 @@ public class ExpedientServiceBean implements ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
-			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
+			PrioritatEnumDto prioritat) {
 		return delegate.create(
 				entitatId,
 				contenidorId,
@@ -60,7 +61,8 @@ public class ExpedientServiceBean implements ExpedientService {
 				rolActual,
 				anexosIdsMetaDocsIdsMap, 
 				justificantIdMetaDoc,
-				interessatsAccionsMap);
+				interessatsAccionsMap,
+				prioritat);
 	}
 	public Long checkIfExistsByMetaExpedientAndNom(
 			Long metaExpedientId,
@@ -103,29 +105,29 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void agafarUser(
+	public String agafarUser(
 			Long entitatId,
 			Long id) {
-		delegate.agafarUser(entitatId, id);
+		return delegate.agafarUser(entitatId, id);
 	}
 
 
 	@Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN"})
-	public void agafarAdmin(
+	public String agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
 			Long id,
 			String usuariCodi) {
-		delegate.agafarAdmin(entitatId, arxiuId, id, usuariCodi);
+		return delegate.agafarAdmin(entitatId, arxiuId, id, usuariCodi);
 	}
 
 	@Override
 	@RolesAllowed("tothom")
-	public void alliberarUser(
+	public String alliberarUser(
 			Long entitatId,
 			Long id) {
-		delegate.alliberarUser(entitatId, id);
+		return delegate.alliberarUser(entitatId, id);
 	}
 
 	@Override
@@ -138,12 +140,12 @@ public class ExpedientServiceBean implements ExpedientService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public void tancar(
+	public String tancar(
 			Long entitatId,
 			Long id,
 			String motiu,
 			Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
-		delegate.tancar(entitatId, id, motiu, documentsPerFirmar, checkPerMassiuAdmin);
+		return delegate.tancar(entitatId, id, motiu, documentsPerFirmar, checkPerMassiuAdmin);
 	}
 
 	@Override
@@ -257,8 +259,8 @@ public class ExpedientServiceBean implements ExpedientService {
 	}
 
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
-		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId);
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat) {
+		return delegate.update(entitatId, id, nom, any, metaExpedientDominiId, organGestorId, rolActual, grupId, prioritat);
 	}
 
 
@@ -468,4 +470,19 @@ public class ExpedientServiceBean implements ExpedientService {
 	public String getNom(Long id) {
 		return delegate.getNom(id);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientDto changeExpedientPrioritat(
+			Long entitatId,
+			Long expedientId,
+			PrioritatEnumDto prioritat) {
+		return delegate.changeExpedientPrioritat(entitatId, expedientId, prioritat);
+	}
+
+    @Override
+	@RolesAllowed("tothom")
+    public void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat) {
+        delegate.changeExpedientsPrioritat(entitatId, expedientsId, prioritat);
+    }
 }

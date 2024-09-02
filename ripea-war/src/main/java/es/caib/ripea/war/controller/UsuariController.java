@@ -156,7 +156,8 @@ public class UsuariController  extends BaseAdminController {
 		return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:/",
-					"usuari.controller.modificat.ok");
+					"usuari.controller.modificat.ok",
+				new Object[] { command.getNom() });
 	}
 
 	private void emplenaModel(HttpServletRequest request, Model model, UsuariCommand usuari) {

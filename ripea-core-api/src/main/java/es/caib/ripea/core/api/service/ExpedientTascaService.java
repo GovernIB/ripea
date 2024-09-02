@@ -1,6 +1,7 @@
 package es.caib.ripea.core.api.service;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +22,8 @@ public interface ExpedientTascaService {
 
 	public List<ExpedientTascaDto> findAmbExpedient(
 			Long entitatId,
-			Long expedientId);
+			Long expedientId,
+			PaginacioParamsDto paginacioParam);
 
 	public List<MetaExpedientTascaDto> findAmbMetaExpedient(
 			Long entitatId,
@@ -66,6 +68,19 @@ public interface ExpedientTascaService {
 			Long expedientTascaId, 
 			List<String> responsablesCodi);
 
+	public ExpedientTascaDto updateDelegat(
+			Long expedientTascaId, 
+			String delegatCodi,
+			String comentari);
+	
+	public ExpedientTascaDto cancelarDelegacio(
+			Long expedientTascaId,
+			String comentari);
+	
+	public ExpedientTascaDto updateDataLimit(
+			Long expedientTascaId, 
+			Date dataLimit);
+	
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
 
 	public boolean publicarComentariPerExpedientTasca(
@@ -81,5 +96,6 @@ public interface ExpedientTascaService {
 	@PreAuthorize("hasRole('tothom')")
 	public ContingutDto findByTascaBasicInfo(Long contingutId, Long tascaId);
 
+	@PreAuthorize("hasRole('tothom')")
+	public void changeTascaPrioritat(ExpedientTascaDto expedientTascaDto);
 }
-	

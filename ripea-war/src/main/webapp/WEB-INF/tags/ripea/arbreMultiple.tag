@@ -22,6 +22,8 @@
 <%@ attribute name="isArbreSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isFullesSeleccionable" type="java.lang.Boolean"%>
 <%@ attribute name="isOcultarCounts" type="java.lang.Boolean"%>
+<%@ attribute name="isContextMenuEnabled" type="java.lang.Boolean"%>
+<%@ attribute name="isCheckboxEnabled" type="java.lang.Boolean"%>
 <%@ attribute name="isError" type="java.lang.Boolean"%>
 <%@ attribute name="height" required="false" rtexprvalue="true"%>
 <%@ attribute name="withlabel" type="java.lang.Boolean"%>
@@ -39,6 +41,9 @@
 
 <c:if test="${empty isArbreSeleccionable and empty isFullesSeleccionable}"><c:set var="isArbreSeleccionable" value="${true}"/><c:set var="isFullesSeleccionable" value="${true}"/></c:if>
 <c:if test="${empty isOcultarCounts}"><c:set var="isOcultarCounts" value="${false}"/></c:if>
+<c:if test="${empty isContextMenuEnabled}"><c:set var="isContextMenuEnabled" value="${false}"/></c:if>
+<c:if test="${empty inicialitzar}"><c:set var="inicialitzar" value="${true}"/></c:if>
+<c:if test="${empty isCheckboxEnabled}"><c:set var="isCheckboxEnabled" value="${false}"/></c:if>
 
 <form:hidden path="${name}"/>
 
@@ -59,7 +64,9 @@
 						<ul>
 							<li id="${pare.arrel.dades[atributId]}" class="jstree-close" data-jstree='{"icon":"fa fa-folder fa-lg"<c:if test="${not empty seleccionatId and pare.arrel.dades[atributId] == seleccionatId}">, "selected": true</c:if>}'>
 								${pare.arrel.dades[atributNom]}
-								<rip:arbreFills pare="${pare.arrel}" fills="${pare.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" seleccionatId="${seleccionatId}"/>
+								<rip:arbreFills pare="${pare.arrel}" fills="${pare.arrel.fills}" atributId="${atributId}" atributNom="${atributNom}" 
+								seleccionatId="${seleccionatId}" fulles="${fulles}" fullesIcona="${fullesIcona}" fullesAtributId="${fullesAtributId}" 
+								fullesAtributNom="${fullesAtributNom}" fullesAtributPare="${fullesAtributPare}" />
 							</li>
 						</ul>
 				</c:if>
@@ -110,7 +117,7 @@
 				<c:when test="${not isArbreSeleccionable and not isFullesSeleccionable}">return false;</c:when>
 			</c:choose>
 		},
-		"plugins": ["conditionalselect", "conditionalhover", "types", "contextmenu", "crrm"],
+		"plugins": ["conditionalselect", "conditionalhover", "types", ${isContextMenuEnabled} ? "contextmenu" : "", "crrm", ${isCheckboxEnabled} ? "checkbox" : ""],
 		"core": {
 			"check_callback": true,
 			strings : {
@@ -174,6 +181,7 @@
 		var json = $('#${id}').data().jstree.get_json()
 		var jsonString = JSON.stringify(json);
 		$('#estructuraCarpetesJson').val(jsonString);
+		webutilModalAdjustHeight();
 	})
 	<c:if test="${not empty renamedCallback}">
 	.on('rename_node.jstree', function (e, data) {
@@ -198,6 +206,10 @@
 		// iframe.height(height + 'px');
 	})<c:if test="${not empty changedCallback}">
 	.on('create_node.jstree', function (e, data) {
+		//console.log('>>> changed.jstree');
+		return ${changedCallback}(e, data);
+	})
+	.on('changed.jstree', function (e, data) {
 		//console.log('>>> changed.jstree');
 		return ${changedCallback}(e, data);
 	})</c:if><c:if test="${not empty deselectAllCallback}">

@@ -20,8 +20,7 @@ import es.caib.ripea.war.helper.EntitatHelper;
  */
 public class BaseUserController extends BaseController {
 
-	@Autowired
-	private EntitatService entitatService;
+	@Autowired private EntitatService entitatService;
 
 	public EntitatDto getEntitatActualComprovantPermisos(
 			HttpServletRequest request) {

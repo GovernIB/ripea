@@ -93,18 +93,21 @@ public class AvisController extends BaseAdminController {
 		if (bindingResult.hasErrors()) {
 			return "avisForm";
 		}
+		AvisDto resultat = null;
 		if (command.getId() != null) {
-			avisService.update(AvisCommand.asDto(command));
+			resultat = avisService.update(AvisCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:avis",
-					"avis.controller.modificat.ok");
+					"avis.controller.modificat.ok",
+					new Object[] { resultat.getAssumpte() });
 		} else {
-			avisService.create(AvisCommand.asDto(command));
+			resultat = avisService.create(AvisCommand.asDto(command));
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:avis",
-					"avis.controller.creat.ok");
+					"avis.controller.creat.ok",
+					new Object[] { resultat.getAssumpte() });
 		}
 	}
 
@@ -112,31 +115,34 @@ public class AvisController extends BaseAdminController {
 	public String enable(
 			HttpServletRequest request,
 			@PathVariable Long avisId) {
-		avisService.updateActiva(avisId, true);
+		AvisDto resultat = avisService.updateActiva(avisId, true);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../avis",
-				"avis.controller.activat.ok");
+				"avis.controller.activat.ok",
+				new Object[] { resultat.getAssumpte() });
 	}
 	@RequestMapping(value = "/{avisId}/disable", method = RequestMethod.GET)
 	public String disable(
 			HttpServletRequest request,
 			@PathVariable Long avisId) {
-		avisService.updateActiva(avisId, false);
+		AvisDto resultat = avisService.updateActiva(avisId, false);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../avis",
-				"avis.controller.desactivat.ok");
+				"avis.controller.desactivat.ok",
+				new Object[] { resultat.getAssumpte() });
 	}
 
 	@RequestMapping(value = "/{avisId}/delete", method = RequestMethod.GET)
 	public String delete(
 			HttpServletRequest request,
 			@PathVariable Long avisId) {
-		avisService.delete(avisId);
+		AvisDto resultat = avisService.delete(avisId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../avis",
-				"avis.controller.esborrat.ok");
+				"avis.controller.esborrat.ok",
+				new Object[] { resultat.getAssumpte() });
 	}
 }

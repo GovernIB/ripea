@@ -173,7 +173,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
-			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) {
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
+			PrioritatEnumDto prioritat) {
 		
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorRepository.findOne(organGestorId).getCodi());
@@ -201,7 +202,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					associarInteressats,
 					interessatsAccionsMap,
 					grupId,
-					rolActual);
+					rolActual,
+					prioritat);
 		}
 
 		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
@@ -461,7 +463,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId) {
+	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat) {
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
@@ -481,9 +483,37 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (grupId != null) {
 			expedient.setGrup(grupRepository.findOne(grupId));
 		}
+		expedientHelper.updatePrioritat(expedient, prioritat);
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
+	}
+
+	@Transactional
+	@Override
+	public ExpedientDto changeExpedientPrioritat(Long entitatId, Long expedientId, PrioritatEnumDto prioritat) {
+
+		logger.debug("Canviant la prioritat de l'expedient (entitatId=" + entitatId + ", expedientId=" + expedientId + ", prioritat=" + prioritat + ")");
+		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
+		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false,
+				null);
+
+		expedientHelper.updatePrioritat(expedient, prioritat);
+		return expedientHelper.toExpedientDto(expedient, false, false, null, false);
+	}
+
+	@Transactional
+	@Override
+	public void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat) {
+		logger.debug("Canviant la prioritat dels expedients (entitatId=" + entitatId + ", expedientsId=" + expedientsId + ", prioritat=" + prioritat + ")");
+		entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+		expedientRepository.updatePrioritats(expedientsId, prioritat.name());
 	}
 
 	@Transactional(readOnly = true)
@@ -770,7 +800,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void agafarUser(Long entitatId, Long id) {
+	public String agafarUser(Long entitatId, Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug(
 				"Agafant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "usuari=" +
@@ -783,7 +813,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
+		return expedientHelper.agafar(expedient, usuariHelper.getUsuariAutenticat().getCodi());
 	}
 
 	@Transactional
@@ -807,18 +837,18 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public void agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
+	public String agafarAdmin(Long entitatId, Long arxiuId, Long id, String usuariCodi) {
 		logger.debug(
 				"Agafant l'expedient com a administrador (" + "entitatId=" + entitatId + ", " + "arxiuId=" + arxiuId +
 						", " + "id=" + id + ", " + "usuariCodi=" + usuariCodi + ")");
 		ExpedientEntity expedient = expedientRepository.findOne(id);
 
-		expedientHelper.agafar(expedient, usuariCodi);
+		return expedientHelper.agafar(expedient, usuariCodi);
 	}
 
 	@Transactional
 	@Override
-	public void alliberarUser(Long entitatId, Long id) {
+	public String alliberarUser(Long entitatId, Long id) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		logger.debug(
 				"Alliberant l'expedient com a usuari (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " +
@@ -831,7 +861,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				false,
 				null);
-		expedientHelper.alliberar(expedient);
+		return expedientHelper.alliberar(expedient);
 	}
 
 	@Transactional
@@ -844,14 +874,14 @@ public class ExpedientServiceImpl implements ExpedientService {
 	}
 
 	@Override
-	public void tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
+	public String tancar(Long entitatId, Long id, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
 		synchronized (SynchronizationHelper.get0To99Lock(id, SynchronizationHelper.locksExpedients)) {
-			expedientHelper.tancar(
+			return expedientHelper.tancar(
 					entitatId,
 					id,
 					motiu,
 					documentsPerFirmar,
-					checkPerMassiuAdmin);
+					checkPerMassiuAdmin).getNom();
 		}
 	}
 	
@@ -934,6 +964,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Date dataFi = DateHelper.toDateFinalDia(filtre.getDataFi());
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerTancamentMassiu(
 					entitat,
 					nomesAgafats,
@@ -1434,7 +1465,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		List<ExpedientEntity> expedients = new ArrayList<ExpedientEntity>();
 //		comprovar accés expedients
 		for (Long expedientId : expedientIds) {
-			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+			ExpedientEntity expedient = entityComprovarHelper.comprovarExpedientNewTransaction(
 					expedientId,
 					false,
 					true,
@@ -1458,7 +1489,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		}
 		return resultat;
 	}
-
+	
 	@Override
 	public FitxerDto exportIndexExpedients(
 			Long entitatId, 
@@ -1606,7 +1637,10 @@ public class ExpedientServiceImpl implements ExpedientService {
 			
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			long t10 = System.currentTimeMillis();
-			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
+			Map<String, String[]> ordenacioMap = new HashMap<>();
+			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
+			ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
+			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,

@@ -190,7 +190,8 @@ public class ConfigController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../config",
-				"config.controller.organ.new.ok");
+				"config.controller.organ.new.ok",
+				new Object[] { command.getKey() });
 	}
 
 	@RequestMapping(value = "/organ/update", method = RequestMethod.GET)
@@ -226,7 +227,8 @@ public class ConfigController extends BaseUserController{
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../config",
-				"config.controller.organ.edit.ok");
+				"config.controller.organ.edit.ok",
+				new Object[] { command.getKey() });
 
 	}
 	
@@ -242,7 +244,8 @@ public class ConfigController extends BaseUserController{
 		
 		return getAjaxControllerReturnValueSuccess(request,
 				"redirect:../../config",
-				"config.controller.organ.esborrada.ok");
+				"config.controller.organ.esborrada.ok",
+				new Object[] { key });
 	}
 	
 	@RequestMapping(value = "/{keyUnderscore}/datatable", method = RequestMethod.GET)

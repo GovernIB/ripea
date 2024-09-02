@@ -3,20 +3,16 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
-import es.caib.ripea.core.api.dto.ExpedientTascaDto;
-import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
-import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientTascaCommand;
+import es.caib.ripea.war.command.TascaDataLimitCommand;
 import es.caib.ripea.war.command.TascaReassignarCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.*;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -64,7 +60,8 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				request,
 				expedientTascaService.findAmbExpedient(
 						entitatActual.getId(),
-						expedientId));		
+						expedientId,
+						DatatablesHelper.getPaginacioDtoFromRequest(request)));
 	}
 
 	@RequestMapping(value = "/{expedientId}/new", method = RequestMethod.GET)
@@ -109,7 +106,32 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		
 		return "expedientTascaDetall";
 	}
-	
+
+	@RequestMapping(value = "/{expedientTascaId}/canviarPrioritat", method = RequestMethod.GET)
+	public String canviarPrioritatGet(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		model.addAttribute(expedientTascaDto);
+		return "tascaChoosePrioritatForm";
+	}
+
+	@RequestMapping(value = "/canviarPrioritat", method = RequestMethod.POST)
+	public String canviarPrioritatPost(
+			HttpServletRequest request,
+			ExpedientTascaDto command,
+			BindingResult bindingResult,
+			Model model) {
+		expedientTascaService.changeTascaPrioritat(command);
+		MissatgesHelper.success(request, getMessage(request, "tasca.controller.prioritatModificat.ok"));
+		return modalUrlTancar();
+//		return getModalControllerReturnValueSuccess(
+//				request,
+//				"redirect:../expedient",
+//				"expedient.controller.prioritatModificat.ok");
+	}
+
 	@RequestMapping(value = "/{expedientTascaId}/cancellar", method = RequestMethod.GET)
 	public String expedientTascaCancellar(
 			HttpServletRequest request,
@@ -155,15 +177,21 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 					expedientTascaService.findAmbMetaExpedient(
 							entitatActual.getId(),
 							expedientDto.getMetaExpedient().getId()));
+			model.addAttribute("errorsValidacio", true);
 			return "expedientTascaForm";
 		}
-
+		if (expedientTascaCommand!=null && expedientTascaCommand.getDuracio()!=null) {
+			String duracio = expedientTascaCommand.getDuracio().toLowerCase().trim();
+			if (!duracio.endsWith("h") && !duracio.endsWith("d")) {
+				duracio += "d";
+			}
+			expedientTascaCommand.setDuracio(duracio);
+		}
 		expedientTascaService.createTasca(
 				entitatActual.getId(),
 				expedientId,
 				ExpedientTascaCommand.asDto(expedientTascaCommand));
-		
-		
+
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
@@ -212,6 +240,45 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.reassignat.ok");
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.GET)
+	public String datalimit(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		
+		TascaDataLimitCommand command = new TascaDataLimitCommand();
+		command.setDataLimit(expedientTascaDto.getDataLimit());
+		
+		model.addAttribute(command);
+		
+		return "expedientTascaDataLimit";
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.POST)
+	public String datalimitPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@Valid TascaDataLimitCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			return "expedientTascaDataLimit";
+		}
+	
+		expedientTascaService.updateDataLimit(expedientTascaId, command.getDataLimit());
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"expedient.tasca.controller.dataLimit.ok");
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/comentaris", method = RequestMethod.GET)

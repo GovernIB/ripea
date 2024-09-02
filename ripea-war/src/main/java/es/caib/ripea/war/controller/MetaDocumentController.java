@@ -130,7 +130,8 @@ public class MetaDocumentController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
-					"metadocument.controller.modificat.ok");
+					"metadocument.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} else {
 			metaDocumentService.create(
 					entitatActual.getId(),
@@ -141,7 +142,8 @@ public class MetaDocumentController extends BaseAdminController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaDocument",
-					"metadocument.controller.creat.ok");
+					"metadocument.controller.creat.ok",
+					new Object[] { command.getNom() });
 		}
 	}
 
@@ -151,11 +153,12 @@ public class MetaDocumentController extends BaseAdminController {
 		try {
 			String rolActual = (String)request.getSession().getAttribute(
 					SESSION_ATTRIBUTE_ROL_ACTUAL);
-			metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId, rolActual, null);
+			MetaDocumentDto metaDocumentDto = metaDocumentService.delete(entitatActual.getId(), null, metaDocumentId, rolActual, null);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../metaDocument",
-					"metadocument.controller.esborrat.ok");
+					"metadocument.controller.esborrat.ok",
+					new Object[] { metaDocumentDto.getNom() });
 		} catch (Exception ex) {
 			if (ExceptionHelper.isExceptionOrCauseInstanceOf(ex, DataIntegrityViolationException.class) ||
 					ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ConstraintViolationException.class))
@@ -176,11 +179,12 @@ public class MetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true, rolActual);
+		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, true, rolActual);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
-				"metadocument.controller.activat.ok");
+				"metadocument.controller.activat.ok",
+				new Object[] { metaDocumentDto.getNom() });
 	}
 
 	@RequestMapping(value = "/{metaDocumentId}/disable", method = RequestMethod.GET)
@@ -188,11 +192,12 @@ public class MetaDocumentController extends BaseAdminController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOrgan(request);
 		String rolActual = (String)request.getSession().getAttribute(
 				SESSION_ATTRIBUTE_ROL_ACTUAL);
-		metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false, rolActual);
+		MetaDocumentDto metaDocumentDto = metaDocumentService.updateActiu(entitatActual.getId(), null, metaDocumentId, false, rolActual);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../metaDocument",
-				"metadocument.controller.desactivat.ok");
+				"metadocument.controller.desactivat.ok",
+				new Object[] { metaDocumentDto.getNom() });
 	}
 
 	@RequestMapping(value = "/findAll", method = RequestMethod.GET)

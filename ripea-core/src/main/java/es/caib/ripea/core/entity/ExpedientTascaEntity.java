@@ -3,6 +3,7 @@
  */
 package es.caib.ripea.core.entity;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.audit.RipeaAuditable;
 import org.hibernate.annotations.ForeignKey;
@@ -49,6 +50,19 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			inverseName = "ipa_expedient_tascaresp_fk")
 	private List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
 	
+	@OneToOne
+	@JoinColumn(name = "delegat")
+	private UsuariEntity delegat;
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "ipa_expedient_tasca_obse",
+			joinColumns = {@JoinColumn(name = "tasca_id", referencedColumnName="id")},
+			inverseJoinColumns = {@JoinColumn(name = "observador_codi")})
+	@ForeignKey(
+			name = "ipa_expedient_obse_tasca_fk",
+			inverseName = "ipa_expedient_tascaobse_fk")
+	private List<UsuariEntity> observadors = new ArrayList<UsuariEntity>();
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "data_inici", nullable = false)
@@ -69,7 +83,14 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_limit")
 	private Date dataLimit;
-	
+
+	@Column(name = "DURACIO", length = 16)
+	private String duracio;
+
+	@Column(name = "PRIORITAT", length = 16)
+	@Enumerated(EnumType.STRING)
+	private PrioritatEnumDto prioritat;
+
 //	@Column(name = "comentari", length = 1024)
 //	private String comentari;
 
@@ -90,15 +111,21 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			ExpedientEntity expedient,
 			MetaExpedientTascaEntity metaExpedientTasca,
 			List<UsuariEntity> responsables,
+			List<UsuariEntity> observadors,
 			Date dataLimit,
 			String titol,
+			String duracio,
+			PrioritatEnumDto prioritat,
 			String observacions) {
 		return new Builder(
 				expedient,
 				metaExpedientTasca,
 				responsables,
+				observadors,
 				dataLimit,
 				titol,
+				duracio,
+				prioritat,
 				observacions);
 	}
 	
@@ -108,16 +135,22 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				ExpedientEntity expedient,
 				MetaExpedientTascaEntity metaExpedientTasca,
 				List<UsuariEntity> responsables,
+				List<UsuariEntity> observadors,
 				Date dataLimit,
 				String titol,
+				String duracio,
+				PrioritatEnumDto prioritat,
 				String observacions) {
 			built = new ExpedientTascaEntity();
 			built.expedient = expedient;
 			built.metaExpedientTasca = metaExpedientTasca;
 			built.responsables = responsables;
+			built.observadors = observadors;
 			built.dataInici = new Date();
 			built.estat = TascaEstatEnumDto.PENDENT;
 			built.dataLimit = dataLimit;
+			built.duracio = duracio;
+			built.prioritat = prioritat;
 			built.titol = titol;
 			built.observacions = observacions;
 		}
@@ -139,7 +172,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public void updateDataFi(Date dataFi) {
 		this.dataFi = dataFi;
 	}
-	
+	public void updateDataLimit(Date dataLimit) {
+		this.dataLimit = dataLimit;
+	}
 	public void updateRebutjar(String motiuRebuig) {
 		this.motiuRebuig = motiuRebuig;
 		this.estat = TascaEstatEnumDto.REBUTJADA;
@@ -156,6 +191,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public List<UsuariEntity> getResponsables() {
 		return responsables;
 	}
+	public List<UsuariEntity> getObservadors() {
+		return observadors;
+	}
 	public UsuariEntity getResponsableActual() {
 		return responsableActual;
 	}
@@ -167,6 +205,12 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	}
 	public void updateResponsables(List<UsuariEntity> responsables) {
 		this.responsables = responsables;
+	}
+	public UsuariEntity getDelegat() {
+		return delegat;
+	}
+	public void updateDelegat(UsuariEntity delegat) {
+		this.delegat = delegat;
 	}
 	public Date getDataInici() {
 		return dataInici;
@@ -198,6 +242,11 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public String getObservacions() {
 		return observacions;
 	}
+	public String getDuracio() { return duracio; }
+	public void setDuracio(String duracio) { this.duracio = duracio; }
+	public PrioritatEnumDto getPrioritat() { return prioritat; }
+	public void setPrioritat(PrioritatEnumDto prioritat) { this.prioritat = prioritat; }
+
 	public String getTextLastComentari() {
 		String comentariText = null;
 		if (this.getComentaris() != null && !this.getComentaris().isEmpty()) {

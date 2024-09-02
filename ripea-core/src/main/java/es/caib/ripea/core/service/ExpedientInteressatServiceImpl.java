@@ -101,6 +101,39 @@ public class ExpedientInteressatServiceImpl implements ExpedientInteressatServic
 				true);
 	}
 
+	@Override
+	@Transactional
+	public String importarInteressats(Long entitatId, Long expedientId, String rolActual, List<InteressatDto> interessats) throws NotFoundException {
+
+		int numInteressatsUpd = 0;
+		int numInteressatsIns = 0;
+		if (interessats!=null && interessats.size()>0) {
+			List<InteressatDto> interessatsActualsExp = findByExpedient(entitatId, expedientId, false);
+			for (InteressatDto interessat : interessats) {
+				if (InteressatAssociacioAccioEnum.ASSOCIAR.equals(interessat.getAccio())) {
+					boolean trobat = false;
+					if (interessatsActualsExp!=null) {
+						for (InteressatDto interessatExistent : interessatsActualsExp) {
+							if (interessatExistent.getDocumentNum().equals(interessat.getDocumentNum())) {
+								trobat = true;
+								break;
+							}
+						}
+						if (trobat) {
+							update(entitatId, expedientId, interessat, rolActual);
+							numInteressatsUpd++;
+						} else {
+							create(entitatId, expedientId, interessat, rolActual);
+							numInteressatsIns++;
+						}
+					}
+				}
+			}
+		}
+
+		return "S'han importat "+numInteressatsIns+" nous interessats, i "+numInteressatsUpd+" s'han actualitzat.";
+	}
+
 	@Transactional
 	@Override
 	public InteressatDto update(

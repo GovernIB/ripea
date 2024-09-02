@@ -18,6 +18,7 @@ import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.MetaDocumentDto;
 import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.CarpetaService;
@@ -105,7 +106,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null, 
 								null, 
 								null,
-								null);
+								null,
+								PrioritatEnumDto.B_NORMAL);
 						assertNotNull(modificat);
 						assertNotNull(modificat.getId());
 						assertEquals(
@@ -454,7 +456,8 @@ public class ExpedientServiceTest extends BaseExpedientServiceTest {
 								null, 
 								null, 
 								null,
-								null);
+								null,
+								PrioritatEnumDto.B_NORMAL);
 						elementsCreats.add(expedientCreat2);
 						List<ExpedientDto> relacionats20 = expedientService.relacioFindAmbExpedient(
 								entitatCreada.getId(),

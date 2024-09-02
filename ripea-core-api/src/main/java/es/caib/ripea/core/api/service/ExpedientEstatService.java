@@ -1,9 +1,5 @@
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
@@ -12,6 +8,9 @@ import es.caib.ripea.core.api.dto.PaginacioParamsDto;
 import es.caib.ripea.core.api.dto.ResultDto;
 import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
 
 
 public interface ExpedientEstatService {
@@ -54,6 +53,5 @@ public interface ExpedientEstatService {
 			PaginacioParamsDto paginacioParams, 
 			String rolActual, 
 			ResultEnumDto resultEnum) throws NotFoundException;
-
 
 }

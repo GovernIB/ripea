@@ -19,6 +19,7 @@ import es.caib.ripea.core.api.dto.MetaExpedientDto;
 import es.caib.ripea.core.api.dto.OrganismeDto;
 import es.caib.ripea.core.api.dto.PaginaDto;
 import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
@@ -540,6 +541,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		} else {
 			command = new ExpedientCommand();
 			command.setAny(Calendar.getInstance().get(Calendar.YEAR));
+			command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
@@ -596,7 +598,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					RolHelper.getRolActual(request),
 					null, 
 					null,
-					null);
+					null,
+					command.getPrioritat());
 			
 			model.addAttribute("redirectUrlAfterClosingModal", "contingut/" + expedientDto.getId());
 			
@@ -682,11 +685,13 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 					command.getMetaNodeDominiId(), 
 					command.getOrganGestorId(), 
 					RolHelper.getRolActual(request), 
-					command.getGrupId());
+					command.getGrupId(),
+					command.getPrioritat());
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../expedient",
-					"expedient.controller.modificat.ok");
+					"expedient.controller.modificat.ok",
+					new Object[] { command.getNom() });
 		} catch (ValidationException ex) {
 			logger.error("Error al modificar expedient", ex);
 			MissatgesHelper.error(request, ex.getMessage(), ex);
@@ -858,6 +863,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		String url = null;
+		String expNom = null;
 		try {
 			if (contingutId != null) {
 				url = "redirect:../../contingut/" + contingutId;
@@ -866,31 +872,32 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			}
 			
 			if (RolHelper.isRolActualAdministrador(request)) {
-				expedientService.agafarAdmin(entitatActual.getId(),
+				expNom = expedientService.agafarAdmin(entitatActual.getId(),
 						null,
 						expedientId,
 						aplicacioService.getUsuariActual().getCodi());
 
 			} else if (RolHelper.isRolActualAdministradorOrgan(request)) {
 				if (expedientService.isOrganGestorPermes(expedientId, RolHelper.getRolActual(request))) {
-					expedientService.agafarAdmin(entitatActual.getId(),
+					expNom = expedientService.agafarAdmin(entitatActual.getId(),
 							null,
 							expedientId,
 							aplicacioService.getUsuariActual().getCodi());
 				} else {
-					expedientService.agafarUser(
+					expNom = expedientService.agafarUser(
 							entitatActual.getId(),
 							expedientId);
 				}
 			} else {
-				expedientService.agafarUser(
+				expNom = expedientService.agafarUser(
 						entitatActual.getId(),
 						expedientId);
 			}
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					url,
-					"expedient.controller.agafat.ok");
+					"expedient.controller.agafat.ok",
+					new Object[] { expNom!=null?expNom:"" });
 		} catch (Exception e) {
 			logger.error("Error agafant expedient", e);
 			Exception permisExcepcion = ExceptionHelper.findExceptionInstance(e, PermissionDeniedException.class, 3);
@@ -1027,13 +1034,14 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 		
 		try {
 			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			expedientService.alliberarUser(
+			String expNom = expedientService.alliberarUser(
 					entitatActual.getId(),
 					expedientId);
 			return getAjaxControllerReturnValueSuccess(
 					request,
 					"redirect:../../contingut/" + (contingutId != null ? contingutId : expedientId),
-					"expedient.controller.alliberat.ok");
+					"expedient.controller.alliberat.ok",
+					new Object[] { expNom });
 			
 		} catch (Exception e) {
 			logger.error("Error al alliberar un expedient", e);
@@ -1184,7 +1192,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "expedientTancarForm";
 		}
 		try {
-			expedientService.tancar(
+			String expNom = expedientService.tancar(
 					entitatActual.getId(),
 					expedientId,
 					command.getMotiu(),
@@ -1192,7 +1200,8 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../contingut/" + expedientId,
-					"expedient.controller.tancar.ok");
+					"expedient.controller.tancar.ok",
+					new Object[] { expNom });
 		} catch (Exception ex) {
 			
 			logger.error("Error al tancar expedient amb id=" + command.getId(), ex);
@@ -1322,6 +1331,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			
 		} else {
 			command = new ExpedientCommand();
+			command.setPrioritat(PrioritatEnumDto.B_NORMAL);
 		}
 		command.setEntitatId(entitatActual.getId());
 		model.addAttribute(command);
@@ -1344,14 +1354,62 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 //					metaExpedientService.findActiusAmbEntitatPerCreacio(entitatActual.getId()));
 			return "expedientEstatsForm";
 		}
-		expedientEstatService.changeExpedientEstat(
+		ExpedientDto expedientDto = expedientEstatService.changeExpedientEstat(
 				entitatActual.getId(),
 				command.getId(),
 				command.getExpedientEstatId());
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../expedient",
-				"expedient.controller.estatModificat.ok");
+				"expedient.controller.estatModificat.ok",
+				new Object[] { expedientDto.getNom() });
+	}
+
+	@RequestMapping(value = "/{expedientId}/canviarPrioritat", method = RequestMethod.GET)
+	public String canviarPrioritatGet(
+			HttpServletRequest request,
+			@PathVariable Long expedientId,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		ExpedientDto expedient = null;
+		if (expedientId != null) {
+			expedient = expedientService.findById(
+					entitatActual.getId(),
+					expedientId, null);
+		}
+		ExpedientCommand command = null;
+		if (expedient != null) {
+			command = ExpedientCommand.asCommand(expedient);
+			if (expedient.getPrioritat() == null) {
+				command.setPrioritat(PrioritatEnumDto.B_NORMAL);
+			}
+		} else {
+			command = new ExpedientCommand();
+			command.setPrioritat(PrioritatEnumDto.B_NORMAL);
+		}
+		command.setEntitatId(entitatActual.getId());
+		model.addAttribute(command);
+		return "expedientChoosePrioritatForm";
+	}
+
+	@RequestMapping(value = "/canviarPrioritat", method = RequestMethod.POST)
+	public String canviarPrioritatPost(
+			HttpServletRequest request,
+			ExpedientCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		if (bindingResult.hasErrors()) {
+			return "expedientChoosePrioritatForm";
+		}
+		expedientService.changeExpedientPrioritat(
+				entitatActual.getId(),
+				command.getId(),
+				command.getPrioritat());
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:../expedient",
+				"expedient.controller.prioritatModificat.ok");
 	}
 	
 	@RequestMapping(value = "/{expedientId}/relacionarList/select", method = RequestMethod.GET)

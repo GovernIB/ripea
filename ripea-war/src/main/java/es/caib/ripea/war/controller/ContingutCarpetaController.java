@@ -3,10 +3,14 @@
  */
 package es.caib.ripea.war.controller;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.war.command.CarpetaCommand;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
@@ -38,7 +44,9 @@ public class ContingutCarpetaController extends BaseUserController {
 
 	@Autowired
 	private CarpetaService carpetaService;
-
+	@Autowired
+	private AplicacioService aplicacioService;
+	
 	@RequestMapping(value = "/{contingutId}/carpeta/new", method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
@@ -103,7 +111,8 @@ public class ContingutCarpetaController extends BaseUserController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + contingutId,
-					"carpeta.controller.creada.ok");
+					"carpeta.controller.creada.ok",
+					new Object[] { command.getNom() });
 		} else {
 			carpetaService.update(
 					entitatActual.getId(),
@@ -112,10 +121,39 @@ public class ContingutCarpetaController extends BaseUserController {
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + command.getPareId(),
-					"carpeta.controller.modificada.ok");
+					"carpeta.controller.modificada.ok",
+					new Object[] { command.getNom() });
 		}
 	}
+	
+	@RequestMapping(value = "/carpeta/{carpetaId}/generarIndex/{format}", method = RequestMethod.GET)
+	public void generarIndex(
+			@PathVariable Long carpetaId,
+			@PathVariable String format,
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
+		if (! isExportacioExcelActiva() && format != null && format.equals("XLSX"))
+			throw new SecurityException("És necessari activar la propietat 'es.caib.ripea.expedient.exportacio.excel' per realitzar la exportació a excel");
+		
+		FitxerDto fitxer = carpetaService.exportIndexCarpetes(
+				entitatActual.getId(),
+				new HashSet<>(Arrays.asList(carpetaId)),
+				format);
 
+		response.setHeader("Set-cookie", "contentLoaded=true; path=/");
+		
+		writeFileToResponse(
+				fitxer.getNom(),
+				fitxer.getContingut(),
+				response);
+	}
+
+	private boolean isExportacioExcelActiva() {
+		return Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.expedient.exportacio.excel"));
+	}
+	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
 	    binder.registerCustomEditor(

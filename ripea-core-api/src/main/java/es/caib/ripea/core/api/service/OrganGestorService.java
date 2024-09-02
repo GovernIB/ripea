@@ -258,7 +258,7 @@ public interface OrganGestorService {
 			OrganGestorDto organGestorDto);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
-	public void delete(
+	public String delete(
 			Long entitatId,
 			Long id);
 

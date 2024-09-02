@@ -22,17 +22,16 @@ import es.caib.ripea.core.entity.UsuariEntity;
 
 public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEntity, Long> {
 
-	
-	List<ExpedientTascaEntity> findByExpedient(
-			ExpedientEntity expedient);
+	List<ExpedientTascaEntity> findByExpedient(ExpedientEntity expedient, Pageable pageable);
 	
 	@Query(	"select " +
 			"    tasca " +
 			"from " +
 			"    ExpedientTascaEntity tasca " +
 			"inner join tasca.responsables responsable " +
+			"left join tasca.observadors observador " +
 			"where " +
-			"	 responsable = :responsable " +
+			"	 (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
 			"and (:esNullExpedient = true or tasca.expedient = :expedient) " +
 			"and (:esNullDataInici = true or tasca.dataInici >= :dataInici) " +
 			"and (:esNullDataFi = true or tasca.dataInici <= :dataFi) " +
@@ -57,8 +56,9 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"from " +
 			"    ExpedientTascaEntity tasca " +
 			"inner join tasca.responsables responsable " +
+			"left join tasca.observadors observador " +
 			"where " +
-			"	 responsable = :responsable " +
+			"	 (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
 			"and (tasca.estat in (:estats)) " + 
 			"and (:esNullExpedient = true or tasca.expedient = :expedient) " +
 			"and (:esNullDataInici = true or tasca.dataInici >= :dataInici) " +
@@ -101,8 +101,9 @@ public interface ExpedientTascaRepository extends JpaRepository<ExpedientTascaEn
 			"from " +
 			"    ExpedientTascaEntity tasca " +
 			"join tasca.responsables responsable " +
+			"left join tasca.observadors observador " +
 			"where " +
-			"       responsable = :responsable " +
+			"       (responsable = :responsable or observador = :responsable or tasca.delegat = :responsable) " +
 			"    and (tasca.estat='PENDENT' or tasca.estat='INICIADA')")
 	long countTasquesPendents(
 			@Param("responsable") UsuariEntity responsable);

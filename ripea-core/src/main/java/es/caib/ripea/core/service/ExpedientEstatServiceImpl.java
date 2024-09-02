@@ -1,19 +1,5 @@
 package es.caib.ripea.core.service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
@@ -47,6 +33,19 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ExpedientEstatServiceImpl implements ExpedientEstatService {
@@ -300,7 +299,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false);
 	}
 
-	@Override
+    @Override
 	@Transactional
 	public ExpedientEstatDto deleteExpedientEstat(
 			Long entitatId,
@@ -435,7 +434,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
-			
+			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
+			ordenacioMap.put("numeroINom", new String[] {"numero", "nom", "id"});
+			ordenacioMap.put("metaExpedient.codiSiaINom", new String[] {"metaExpedient.classificacio", "metaExpedient.nom"});
+
 			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,

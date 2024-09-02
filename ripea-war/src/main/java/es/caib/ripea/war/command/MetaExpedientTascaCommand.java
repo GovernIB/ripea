@@ -5,12 +5,17 @@ package es.caib.ripea.war.command;
 
 import java.util.Date;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 import es.caib.ripea.war.validation.CodiMetaExpedientTascaNoRepetit;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
 
 /**
  * Command per a les tasques del meta-expedient.
@@ -33,7 +38,9 @@ public class MetaExpedientTascaCommand {
     private Date dataLimit;
     private Long estatIdCrearTasca;
     private Long estatIdFinalitzarTasca;
-
+	@Pattern(regexp = "\\d+\\s*[hHdD]?")
+	private String duracio = "10d";
+	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
     private Long entitatId;
     private Long metaExpedientId;
 
@@ -89,6 +96,22 @@ public class MetaExpedientTascaCommand {
 
 	public void setMetaExpedientId(Long metaExpedientId) {
 		this.metaExpedientId = metaExpedientId;
+	}
+
+	public PrioritatEnumDto getPrioritat() {
+		return prioritat;
+	}
+
+	public void setPrioritat(PrioritatEnumDto prioritat) {
+		this.prioritat = prioritat;
+	}
+
+	public String getDuracio() {
+		return duracio;
+	}
+
+	public void setDuracio(String duracio) {
+		this.duracio = duracio;
 	}
 
 	public interface Create {

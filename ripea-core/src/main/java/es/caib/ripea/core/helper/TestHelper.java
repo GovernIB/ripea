@@ -7,6 +7,7 @@ import java.util.Date;
 
 import javax.annotation.Resource;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -55,7 +56,8 @@ public class TestHelper {
 				"ntiOrgano",
 				new Date(),
 				"ntiClasificacionSia",
-				new OrganGestorEntity()).build(); 
+				new OrganGestorEntity(),
+				PrioritatEnumDto.B_NORMAL).build();
 		
 		
 		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(
@@ -127,7 +129,8 @@ public class TestHelper {
 				"ntiOrgano",
 				new Date(),
 				"ntiClasificacionSia",
-				new OrganGestorEntity()).build(); 
+				new OrganGestorEntity(),
+				PrioritatEnumDto.B_NORMAL).build();
 		
 		
 		MetaDocumentEntity metaDocumentEntity = MetaDocumentEntity.getBuilder(

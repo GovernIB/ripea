@@ -5,17 +5,9 @@ package es.caib.ripea.core.entity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import org.hibernate.annotations.ForeignKey;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -51,6 +43,11 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_limit")
 	private Date dataLimit;
+	@Column(name = "DURACIO", length = 16)
+	private String duracio;
+	@Column(name = "PRIORITAT", length = 16)
+	@Enumerated(EnumType.STRING)
+	private PrioritatEnumDto prioritat;
 	@ManyToOne
 	@JoinColumn(name = "estat_crear_tasca_id")
 	private ExpedientEstatEntity estatCrearTasca;

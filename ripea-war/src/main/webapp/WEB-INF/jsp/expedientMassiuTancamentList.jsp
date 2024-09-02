@@ -49,8 +49,7 @@ $(document).ready(function() {
 		);
 	});
 	
-	$('#taulaDades').one('draw.dt', function () {
-		
+	$('#taulaDades').on('draw.dt', function () {
 		$('#seleccioAll').on('click', function() {
 			$.get(
 					"tancament/select",
@@ -71,6 +70,23 @@ $(document).ready(function() {
 					}
 			);
 			return false;
+		});
+
+		$("span[class^='stateColor-']").each(function( index ) {
+			var fullClassNameString = this.className;
+			var colorString = fullClassNameString.substring(11);
+			if (colorString == "" || colorString == 'OBERT' || colorString == 'ESTAT') {
+				$(this).parent().css( "border", "dashed 1px #AAA" );
+				$(this).parent().css( "color", '#666666' );
+			} else if (colorString == 'TANCAT') {
+				$(this).parent().css( "background-color", "#777" );
+			} else {
+				$(this).parent().css( "background-color", colorString );
+				const textColor = getTextColorOnBackground('#666666', '#ffffff', colorString);
+				$(this).parent().css( "color", textColor );
+				// $(this).parent().css( "fontSize", 'small' );
+				$(this).parent().parent().parent().css( "box-shadow", "-6px 0 0 " + colorString );
+			}
 		});
 	});
 
@@ -136,9 +152,10 @@ $(document).ready(function() {
 				<th data-col-name="expedientEstat" data-visible="false"></th>
 				<th data-col-name="metaExpedient.nom" data-orderable="true" width="15%"><spring:message code="accio.massiva.list.column.metaexpedient"/></th>
 				<th data-col-name="nom" data-ordenable="true"><spring:message code="accio.massiva.list.column.nom"/></th>
-				<th data-col-name="estat" data-orderable="false" data-template="#cellEstatTemplate" width="11%">
+				<th data-col-name="estat" data-template="#cellEstatTemplate" width="11%">
 					<spring:message code="expedient.list.user.columna.estat"/>
 					<script id="cellEstatTemplate" type="text/x-jsrender">
+						<span class="label">
 						{{if expedientEstat != null && estat != 'TANCAT'}}
 							<span class="fa fa-folder-open"></span>&nbsp;{{:expedientEstat.nom}}
 						{{else}}
@@ -151,9 +168,36 @@ $(document).ready(function() {
 
 						{{if expedientEstat != null && expedientEstat.color!=null}}
 							<span class="stateColor-{{:expedientEstat.color}}"></span>
+						{{else expedientEstat != null && estat != 'TANCAT'}}
+							<span class="stateColor-ESTAT"></span>
+						{{else expedientEstat == null && estat == 'OBERT'}}
+							<span class="stateColor-OBERT"></span>
+						{{else}}
+							<span class="stateColor-TANCAT"></span>
 						{{/if}}
+						</span>
 					</script>
-				</th>				
+				</th>
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="8%">
+					<spring:message code="contingut.expedient.form.camp.prioritat"/>
+					<script id="cellPrioritatTemplate" type="text/x-jsrender">
+						<span class="label label-{{:prioritat}}">
+						{{if prioritat == 'MOLT_BAIXA'}}
+						<spring:message code="prioritat.enum.MOLT_BAIXA"/>
+						{{else prioritat == 'A_BAIXA'}}
+						<spring:message code="prioritat.enum.A_BAIXA"/>
+						{{else prioritat == 'C_ALTA'}}
+						<spring:message code="prioritat.enum.C_ALTA"/>
+						{{else prioritat == 'D_MOLT_ALTA'}}
+						<spring:message code="prioritat.enum.D_MOLT_ALTA"/>
+						{{else prioritat == 'CRITICA'}}
+						<spring:message code="prioritat.enum.CRITICA"/>
+						{{else}}
+						<spring:message code="prioritat.enum.B_NORMAL"/>
+						{{/if}}
+						</span>
+					</script>
+				</th>
 				<th data-col-name="createdDate" data-ordenable="true" data-converter="datetime" width="15%"><spring:message code="accio.massiva.list.column.datacreacio"/></th>
 				<th data-col-name="createdBy.codiAndNom" data-ordenable="true" width="15%"><spring:message code="accio.massiva.list.column.creatper"/></th>
 			</tr>

@@ -71,11 +71,17 @@ public enum LogTipusEnumDto {
 	DOC_FIRMAT, // 42
 
 	CANVI_ESTAT,
-	
+	CANVI_PRIORITAT,
 	CANVI_RESPONSABLES,
 	
 	// Tancament logic expedient
 	TANCAMENT_LOGIC,
 	
-	ESCANEIG
+	ESCANEIG,
+	
+	CANVI_DATALIMIT_TASCA,
+	
+	//Delegació tasques
+	DELEGAR_TASCA,
+	CANCELAR_DELEGACIO_TASCA
 }

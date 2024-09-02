@@ -65,24 +65,27 @@ public class GrupPermisController extends BaseAdminController {
 			@PathVariable Long grupId,
 			@PathVariable Long permisId,
 			Model model) {
-		model.addAttribute(
-				"grup",
-				grupService.findById(grupId));
-		PermisDto permis = null;
-		if (permisId != null) {
-			List<PermisDto> permisos = grupService.findPermisos(grupId);
-			for (PermisDto p: permisos) {
-				if (p.getId().equals(permisId)) {
-					permis = p;
-					break;
-				}
-			}
-		}
+		model.addAttribute("grup", grupService.findById(grupId));
+		PermisDto permis = getPermisGrupById(grupId, permisId);
+
 		if (permis != null)
 			model.addAttribute(PermisCommand.asCommand(permis));
 		else
 			model.addAttribute(new PermisCommand());
+
 		return "grupPermisForm";
+	}
+
+	private PermisDto getPermisGrupById(Long grupId, Long permisId) {
+		if (permisId != null) {
+			List<PermisDto> permisos = grupService.findPermisos(grupId);
+			for (PermisDto p: permisos) {
+				if (p.getId().equals(permisId)) {
+					return p;
+				}
+			}
+		}
+		return null;
 	}
 
 	@RequestMapping(value = "/{grupId}/permis", method = RequestMethod.POST)
@@ -106,7 +109,8 @@ public class GrupPermisController extends BaseAdminController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../grup/" + grupId + "/permis",
-				"entitat.controller.permis.modificat.ok");
+				"entitat.controller.permis.modificat.ok",
+				new Object[] { command.getPrincipalTipus()+ " "+command.getPrincipalNom() });
 	}
 
 	@RequestMapping(value = "/{grupId}/permis/{permisId}/delete", method = RequestMethod.GET)
@@ -115,11 +119,12 @@ public class GrupPermisController extends BaseAdminController {
 			@PathVariable Long grupId,
 			@PathVariable Long permisId,
 			Model model) {
+		PermisDto permis = getPermisGrupById(grupId, permisId);
 		grupService.deletePermis(grupId, permisId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../grup/" + grupId + "/permis",
-				"entitat.controller.permis.esborrat.ok");
+				"entitat.controller.permis.esborrat.ok",
+				new Object[] { permis.getPrincipalTipus()+ " "+permis.getPrincipalNom() });
 	}
-
 }

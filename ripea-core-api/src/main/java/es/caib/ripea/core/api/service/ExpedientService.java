@@ -61,11 +61,11 @@ public interface ExpedientService {
 			String rolActual,
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
-			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap) throws NotFoundException, ValidationException;
+			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
+			PrioritatEnumDto prioritat) throws NotFoundException, ValidationException;
 
 
-
-	/**
+    /**
 	 * Consulta un expedient donat el seu id.
 	 * 
 	 * @param entitatId
@@ -167,7 +167,7 @@ public interface ExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void agafarUser(
+	public String agafarUser(
 			Long entitatId,
 			Long id) throws NotFoundException;
 	
@@ -186,7 +186,7 @@ public interface ExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN')")
-	public void agafarAdmin(
+	public String agafarAdmin(
 			Long entitatId,
 			Long arxiuId,
 			Long id,
@@ -203,7 +203,7 @@ public interface ExpedientService {
 	 *             Si no s'ha trobat l'objecte amb l'id especificat.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void alliberarUser(
+	public String alliberarUser(
 			Long entitatId,
 			Long id) throws NotFoundException;
 
@@ -240,7 +240,7 @@ public interface ExpedientService {
 	 *             Si l'expedient no conté cap document definitiu.
 	 */
 	@PreAuthorize("hasRole('tothom')")
-	public void tancar(
+	public String tancar(
 			Long entitatId,
 			Long id,
 			String motiu,
@@ -357,7 +357,7 @@ public interface ExpedientService {
 	boolean hasWritePermission(Long expedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId);
+	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat);
 
 	@PreAuthorize("hasRole('tothom')")
 	Exception retryCreateDocFromAnnex(
@@ -429,8 +429,7 @@ public interface ExpedientService {
 			Long entitatId, 
 			Set<Long> expedientIds,
 			boolean ambDocuments) throws IOException;
-	
-	
+
 	@PreAuthorize("hasRole('tothom')")
 	public PaginaDto<ExpedientDto> findExpedientsPerTancamentMassiu(
 			Long entitatId,
@@ -558,4 +557,12 @@ public interface ExpedientService {
 	public String getNom(
 			Long id);
 
+	@PreAuthorize("hasRole('tothom')")
+	ExpedientDto changeExpedientPrioritat(
+			Long entitatId,
+			Long expedientId,
+			PrioritatEnumDto prioritat);
+
+	@PreAuthorize("hasRole('tothom')")
+	void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat);
 }

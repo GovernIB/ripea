@@ -196,10 +196,10 @@ public class OrganGestorServiceBean implements OrganGestorService {
 
 	@Override
 	@RolesAllowed("IPA_ADMIN")
-	public void delete(
+	public String delete(
 			Long entitatId,
 			Long id) {
-		 delegate.delete(
+		 return delegate.delete(
 				 entitatId, 
 				 id);
 	}

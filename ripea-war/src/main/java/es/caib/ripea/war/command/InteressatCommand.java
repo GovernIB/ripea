@@ -98,7 +98,7 @@ public class InteressatCommand  {
 	@NotNull
 	protected InteressatTipusEnumDto tipus;
 	protected boolean comprovat = false;
-	
+	protected String formulariAnterior;
 	
 	// Camps de filtre (No s'utilitzen al fer submit)
 	protected String filtreCodiDir3;
@@ -304,6 +304,9 @@ public class InteressatCommand  {
 	public void setAmbOficinaSir(Boolean ambOficinaSir) {
 		this.ambOficinaSir = ambOficinaSir;
 	}
+	public String getFormulariAnterior() { return formulariAnterior; }
+	public void setFormulariAnterior(String formulariAnterior) { this.formulariAnterior = formulariAnterior; }
+
 	public static InteressatCommand asCommand(InteressatDto dto) {
 		InteressatCommand command = ConversioTipusHelper.convertir(
 				dto,
