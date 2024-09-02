@@ -139,7 +139,7 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
     }
 
     private String getUrl() {
-        return getProperty("plugin.summarize.bert.url");
+        return getProperty("plugin.summarize.url");
     }
     private String getUsuari() {
         return getProperty("plugin.summarize.bert.usuari");
@@ -148,7 +148,7 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
         return getProperty("plugin.summarize.bert.password");
     }
     private Integer getTimeout() {
-        return Integer.valueOf(getProperty("plugin.summarize.bert.service.timeout", "5000"));
+        return Integer.valueOf(getProperty("plugin.summarize.service.timeout", "5000"));
     }
 
     private boolean isDebug() {

@@ -164,7 +164,7 @@ public class SummarizePluginChatGPT extends RipeaAbstractPluginProperties implem
         return getProperty("plugin.summarize.url");
     }
     private String getApiKey() {
-        return getProperty("plugin.summarize.apiKey");
+        return getProperty("plugin.summarize.gpt.apiKey");
     }
     private Integer getTimeout() {
         return Integer.valueOf(getProperty("plugin.summarize.service.timeout", "5000"));
