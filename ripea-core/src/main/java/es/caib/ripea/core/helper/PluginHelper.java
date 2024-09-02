@@ -123,7 +123,6 @@ import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
 import org.jdom.Element;
 import org.jopendocument.dom.ODPackage;
-import org.jopendocument.dom.text.Paragraph;
 import org.jopendocument.dom.text.TextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -4274,7 +4273,7 @@ public class PluginHelper {
 		return resum;
 	}
 
-	private static String extractTextFromDocument(byte[] bytes, String contentType) {
+	public static String extractTextFromDocument(byte[] bytes, String contentType) {
 		String documentText = null;
 
 		// Extreure el text del document
@@ -4328,15 +4327,22 @@ public class PluginHelper {
 			ODPackage odPackage = new ODPackage(bais);
 			TextDocument document = TextDocument.get(odPackage);
 
-			int paragraphCount = document.getParagraphCount();
-			for (int i = 0; i < paragraphCount; i++) {
-				Paragraph paragraph = document.getParagraph(i);
-				List<Element> content = paragraph.getElement().getContent();
-				for (Element element : content) {
-					text.append(element.getText());
-				}
-				text.append("\n");
-			}
+			Element rootElement = document.getContentDocument().getRootElement();
+			extractTextFromElement(rootElement, text);
+
+//			int paragraphCount = document.getParagraphCount();
+//			for (int i = 0; i < paragraphCount; i++) {
+//				Paragraph paragraph = document.getParagraph(i);
+//				List<Content> content = paragraph.getElement().getContent();
+//				for (Content element : content) {
+//					if (element instanceof Element) {
+//						text.append(((Element) element).getText());
+//					} else if (element instanceof Text) {
+//						text.append(((Text) element).getText());
+//					}
+//				}
+//				text.append("\n");
+//			}
 		} catch (Exception e) {
 			logger.error("No s'ha pogut obtenir el text del document ODT", e);
 		} finally {
@@ -4352,7 +4358,29 @@ public class PluginHelper {
 		return text.toString();
 	}
 
+	private static void extractTextFromElement(Element element, StringBuilder text) {
+		List<Element> children = element.getChildren();
 
+		for (Element child : children) {
+			String name = child.getName();
+
+			switch (name) {
+				case "p":
+					text.append(child.getText()).append("\n");
+					break;
+				case "list":
+					extractTextFromElement(child, text);
+					break;
+				case "list-item":
+					text.append("- ");
+					extractTextFromElement(child, text);
+					break;
+				default:
+					extractTextFromElement(child, text);
+					break;
+			}
+		}
+	}
 
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 
