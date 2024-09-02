@@ -828,13 +828,13 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			@PathVariable Long expedientId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
+
 		FitxerDto fitxer = documentService.descarregarAllDocumentsOfExpedientWithFolders(
 				entitatActual.getId(),
 				expedientId,
 				RolHelper.getRolActual(request),
 				tascaId);
-		
+
 		response.setHeader("Content-Disposition", "attachment; filename=" + fitxer.getNom());
 		response.getOutputStream().write(fitxer.getContingut());
 		response.getOutputStream().flush();
@@ -851,15 +851,15 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		DescarregaCommand command = new DescarregaCommand();
 
 		emplenarModelDescarrega(
-				request, 
-				model, 
-				command, 
-				entitatActual, 
+				request,
+				model,
+				command,
+				entitatActual,
 				expedientId);
-		
+
 		return "contingutDescarregarForm";
 	}
-	
+
 	@RequestMapping(value = "/{expedientId}/descarregarSelectedDocuments", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<String> descarregarSelectedDocuments(
@@ -871,29 +871,29 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			BindingResult bindingResult,
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-	
+
 		try {
 			DescarregaDto dto = DescarregaCommand.asDto(command);
-			
+
 			if (bindingResult.hasErrors()) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
-			
+
 			FitxerDto fitxer = documentService.descarregarAllDocumentsOfExpedientWithSelectedFolders(
 					entitatActual.getId(),
-					expedientId, 
-					dto.getEstructuraCarpetes(), 
-					RolHelper.getRolActual(request), 
+					expedientId,
+					dto.getEstructuraCarpetes(),
+					RolHelper.getRolActual(request),
 					tascaId);
-			
+
 			HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 	        headers.setContentDispositionFormData("attachment", fitxer.getNom());
-	        	        
+
 	        String base64Encoded = Base64.encodeBase64String(fitxer.getContingut());
-	        
+
 	        return new ResponseEntity<>(base64Encoded, headers, HttpStatus.OK);
-	        
+
 		} catch (JsonMappingException | ParseException e) {
 			logger.error(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -902,7 +902,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+
 	@RequestMapping(value = "/{expedientId}/chooseTipusDocument", method = RequestMethod.GET)
 	public String chooseTipusDocument(
 			HttpServletRequest request,
@@ -1409,25 +1409,25 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private void emplenarModelDescarrega(
 			HttpServletRequest request,
 			Model model,
-			DescarregaCommand command, 
+			DescarregaCommand command,
 			EntitatDto entitatActual,
 			Long expedientId) {
 		command.setPareId(expedientId);
 		model.addAttribute(command);
-		
+
 		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
 				entitatActual.getId(),
 				expedientId);
-		
+
 		List<DocumentDto> documents = documentService.findByExpedient(
-				entitatActual.getId(), 
-				expedientId, 
+				entitatActual.getId(),
+				expedientId,
 				RolHelper.getRolActual(request));
-		
+
 		model.addAttribute("carpetes", carpetes);
 		model.addAttribute("documents", documents);
 	}
-	
+
 	private String obtenirEstatsElaboracioIdentificadorEniObligat() {
 		return aplicacioService.propertyFindByNom("es.caib.ripea.estat.elaboracio.identificador.origen.obligat");
 	}
@@ -1454,6 +1454,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
 			model.addAttribute("isError", signatureInfoDto.isError());
 			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
+		}
+
+		// Summarize
+		if (command.getDescripcio() == null || command.getDescripcio().isEmpty() ||
+				command.getNom() == null || command.getNom().isEmpty()) {
+
+			Resum resum = documentService.getSummarize(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+
+			if (command.getNom() == null || command.getNom().isEmpty())
+				command.setNom(resum.getTitol());
+			if (command.getDescripcio() == null || command.getDescripcio().isEmpty())
+				command.setDescripcio(resum.getResum());
 		}
 	}
 	

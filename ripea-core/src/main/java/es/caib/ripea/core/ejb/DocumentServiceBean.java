@@ -443,8 +443,14 @@ public class DocumentServiceBean implements DocumentService {
 				contingut,
 				contentType);
 	}
-	
-	@Override
+
+    @Override
+	@RolesAllowed("tothom")
+    public Resum getSummarize(byte[] bytes, String contentType) {
+        return delegate.getSummarize(bytes, contentType);
+    }
+
+    @Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public long countByMetaDocument(
 			Long entitatId,

@@ -4,7 +4,6 @@
 package es.caib.ripea.core.api.service;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -660,6 +659,9 @@ public interface DocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType);
+
+	@PreAuthorize("hasRole('tothom')")
+	public Resum getSummarize(byte[] bytes, String contentType);
 
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public long countByMetaDocument(
