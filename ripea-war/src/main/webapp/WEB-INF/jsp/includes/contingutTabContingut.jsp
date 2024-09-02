@@ -8,231 +8,79 @@
 
 
 <style>
-
-
-
-#grid-documents {
-	margin-left: 0;
-	margin-right: -11px;
-}
-#grid-documents li.element-contingut {
-	margin: 0 0 0px 0;
-	padding: 0 10px 0 0;
-	min-height: 140px;
-	display: -moz-inline-stack;
-	display: inline-block;
-	vertical-align: top;
-	zoom: 1;
-	*display: inline;
-	_height: 140px;
-}
-#grid-documents .thumbnail {
-	margin-bottom: 0 !important;
-	border: 2px solid #f9f9f9;
-}
-#grid-documents .thumbnail:hover {
-	border: 2px solid #ddd;
-	background-color: #f5f5f5;
-	cursor: pointer;
-}
-#grid-documents .thumbnail h4 {
-	margin-top: 4px;
-}
-#grid-documents .thumbnail a {
-	text-decoration: none;
-}
-.element-hover .thumbnail {
-	border: 2px solid #ddd !important;
-	background-color: #f5f5f5;
-}
-#grid-documents .caption p {
-	
-}
-#grid-documents .caption .dropdown-menu {
-	text-align: left;
-}
-#grid-documents .caption .dropdown-menu li {
-	width: 100%;
-	margin: 0;
-	padding: 0;
-}
-
-#contingut-botons {
-	margin-bottom: .8em;
-}
-
-.drag_activated {
-	border: 4px dashed #ffd351;
-	height: 200px;
-	width: 100%;
-	background-color: #f5f5f5;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-}
-
-.ordre-col {
-    cursor: move;
-    vertical-align: middle !important;
-}
-
-.popover{
-	max-width: none;
-    z-index: 100;
-    cursor: default;
-	width: 500px;
-}
-.popover .close {
-	position: relative;
-	top: -3px;
-}
-
-
-#detallSignantsPreview .alert {
-	padding: 10px 15px !important;
-}
-#detallSignantsPreview button.close-alertes {
-    background: none repeat scroll 0 0 transparent;
-    border: 0 none;
-    cursor: pointer;
-    padding: 0;
-}
-#detallSignantsPreview .close-alertes {
-    color: #000000;
-    float: right;
-    font-weight: bold;
-    opacity: 0.2;
-    text-shadow: 0 1px 0 #FFFFFF;
-}
-#detallSignants .alert {
-	padding: 10px 15px !important;
-}
-#detallSignants button.close-alertes {
-    background: none repeat scroll 0 0 transparent;
-    border: 0 none;
-    cursor: pointer;
-    padding: 0;
-}
-#detallSignants .close-alertes {
-    color: #000000;
-    float: right;
-    font-weight: bold;
-    opacity: 0.2;
-    text-shadow: 0 1px 0 #FFFFFF;
-}
-
-
-
-.icona-esborrany {
-	color: #ffab66;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.definitiu.fa.fa-check-square {
-	color: #02cda2;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.firmat.fa.fa-pencil-square {
-	color: #02cda2;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.pendent.fa.fa-pencil-square {
-	color: #67bdff;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.parcial.fa.fa-pencil-square {
-	color: #FFAB66;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.error.fa.fa-pencil-square {
-	color: #ffab66;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.pendent.fa.fa-envelope-square {
-	color: #67bdff;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.enviada.fa.fa-envelope-square {
-	color: #67bdff;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.processada.fa.fa-envelope-square {
-	color: #02cda2;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.error.fa.fa-envelope-square {
-	color: #ffab66;
-	font-size: 16px;
-	vertical-align: text-top;
-}
-.importat.fa.fa-info-circle {
-	color: #02CDA2;
-}
-
-
-.viewer-content {
-	width: 100%;
-	padding-top: 1% !important;
-}
-.viewer-padding {
-	padding: 0% 2% 0% 2%;
-}
-
-.rmodal_loading {
-    background: rgba( 255, 255, 255, .8 ) 
-                url('<c:url value="../img/loading.gif"/>') 
-                50% 50% 
-                no-repeat;
-}
-
-
-
-.ui-droppable-hover{
-	background: #999999 !important;
-}
-
-
+	#grid-documents { margin-left: 0; margin-right: -11px; }
+	#grid-documents li.element-contingut { margin: 0; padding: 0 10px 0 0; min-height: 140px; display: -moz-inline-stack; display: inline-block; vertical-align: top; zoom: 1; *display: inline; _height: 140px; }
+	#grid-documents .thumbnail { margin-bottom: 0 !important; border: 2px solid #f9f9f9; }
+	#grid-documents .thumbnail:hover { border: 2px solid #ddd; background-color: #f5f5f5; cursor: pointer; }
+	#grid-documents .thumbnail h4 { margin-top: 4px; }
+	#grid-documents .thumbnail a { text-decoration: none; }
+	.element-hover .thumbnail { border: 2px solid #ddd !important; background-color: #f5f5f5; }
+	#grid-documents .caption p { }
+	#grid-documents .caption .dropdown-menu { text-align: left; }
+	#grid-documents .caption .dropdown-menu li { width: 100%; margin: 0; padding: 0; }
+	#contingut-botons { margin-bottom: .8em; }
+	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+	.ordre-col { cursor: move; vertical-align: middle !important; }
+	.popover { max-width: none; z-index: 100; cursor: default; width: 500px; }
+	.popover .close { position: relative; top: -3px; }
+	#detallSignantsPreview .alert { padding: 10px 15px !important; }
+	#detallSignantsPreview button.close-alertes { background: none repeat scroll 0 0 transparent; border: 0 none; cursor: pointer; padding: 0; }
+	#detallSignantsPreview .close-alertes { color: #000000; float: right; font-weight: bold; opacity: 0.2; text-shadow: 0 1px 0 #FFFFFF; }
+	#detallSignants .alert { padding: 10px 15px !important; }
+	#detallSignants button.close-alertes { background: none repeat scroll 0 0 transparent; border: 0 none; cursor: pointer; padding: 0; }
+	#detallSignants .close-alertes { color: #000000; float: right; font-weight: bold; opacity: 0.2; text-shadow: 0 1px 0 #FFFFFF; }
+	.icona-esborrany { color: #ffab66; font-size: 16px; vertical-align: text-top; }
+	.definitiu.fa.fa-check-square { color: #02cda2; font-size: 16px; vertical-align: text-top; }
+	.firmat.fa.fa-pencil-square { color: #02cda2; font-size: 16px; vertical-align: text-top; }
+	.pendent.fa.fa-pencil-square { color: #67bdff; font-size: 16px; vertical-align: text-top; }
+	.parcial.fa.fa-pencil-square { color: #FFAB66; font-size: 16px; vertical-align: text-top; }
+	.error.fa.fa-pencil-square { color: #ffab66; font-size: 16px; vertical-align: text-top; }
+	.pendent.fa.fa-envelope-square { color: #67bdff; font-size: 16px; vertical-align: text-top; }
+	.enviada.fa.fa-envelope-square { color: #67bdff; font-size: 16px; vertical-align: text-top; }
+	.processada.fa.fa-envelope-square { color: #02cda2; font-size: 16px; vertical-align: text-top; }
+	.error.fa.fa-envelope-square { color: #ffab66; font-size: 16px; vertical-align: text-top; }
+	.importat.fa.fa-info-circle { color: #02CDA2; }
+	.viewer-content { width: 100%; padding-top: 1% !important; }
+	.viewer-padding { padding: 0% 2% 0% 2%; }
+	.rmodal_loading { background: rgba(255, 255, 255, .8) url('<c:url value="../img/loading.gif"/>') 50% 50% no-repeat; }
+	.ui-droppable-hover { background: #999999 !important; }
+	#drop-area { border: 4px dashed transparent; }
+	#drop-area.dragover { border-color: #ffd351; }
+	#drop-message { font-size: 20px; color: #917421; text-align: center; display: none; position: absolute; width: 420px; background-color: #CCC; opacity: 0.75; font-size: 16px; left: calc(50% - 210px); z-index: 10; border-radius: 8px; margin-top: 5px; }
+	#drop-message-icon { font-size: 70px; }
 </style>
-
-
-
 
 
 <script>
 
+	const quedenDocumentsPerAdjuntar = ${not empty metaDocumentsNoPinbalLeft};
+	const potModificar = ${potModificar};
 
-//################################################## document ready START ##############################################################
-$(document).ready(function() {
+	//################################################## document ready START ##############################################################
+	$(document).ready(function () {
 
 
-	//------------------------- if contingut is not document START ----------------------------------	
-	<c:if test="${!contingut.document}"> 
+	//------------------------- if contingut is not document START ----------------------------------
+	<c:if test="${!contingut.document}">
 
-	
+
 		clearSelection();
 		enableDisableMultipleButtons();
 
 		$("#tascaBtn").appendTo(".panel-heading h2");
-		<c:if test="${isTasca}"> $('title').html("Ripea - ${tascaNom}");</c:if>
-	
+		<c:if test="${isTasca}">
+		$('title').html("Ripea - ${tascaNom}");
+		</c:if>
+
 		<c:choose>
-			<c:when test="${isExpedientExpanditPerDefecte}">
-				$('#table-documents').treeTable();
-			</c:when>
-			<c:otherwise>
-				$('#table-documents').treeTable({ startCollapsed: true });
-			</c:otherwise>
+		<c:when test="${isExpedientExpanditPerDefecte}">
+		$('#table-documents').treeTable();
+		</c:when>
+		<c:otherwise>
+		$('#table-documents').treeTable({startCollapsed: true});
+		</c:otherwise>
 		</c:choose>
-		
+
 		updateTableEvents();
 
 		var popoverFlag = 0;
@@ -242,112 +90,114 @@ $(document).ready(function() {
 			html: true,
 			placement: 'bottom',
 			title: '<spring:message code="massiu.canvi.tipus.document.select"/> <a href="#" class="close" data-dismiss="alert">&times;</a>',
-		    content: function () {	
-		    	popoverFlag = 0;
-		    	return showTipusDocumentals($(this));
-		  	}
+			content: function () {
+				popoverFlag = 0;
+				return showTipusDocumentals($(this));
+			}
 		}).on('shown.bs.popover', function () {
 			if (popoverFlag == 0) {
 				var $selTipusDocument = $('.select-tipus-massiu');
 				var select2Options = {
-						theme: 'bootstrap', 
-						width: 'auto', 
-						minimumResultsForSearch: "0"};
+					theme: 'bootstrap',
+					width: 'auto',
+					minimumResultsForSearch: "0"
+				};
 				$selTipusDocument.select2(select2Options);
-				$selTipusDocument.on('change', function(event) {
+				$selTipusDocument.on('change', function (event) {
 					var tipusDocumentId = $(':selected', $(this)).attr('id');
 					if (tipusDocumentId) {
-						showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.massiu.processant"/>');				
+						showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.massiu.processant"/>');
 						var updateUrl = '<c:url value="/contingut/updateTipusDocumentMassiu/"/>' + tipusDocumentId;
 						$.ajax({
 							type: 'GET',
-					        url: updateUrl,
-					        success: function(json) {
-					        	if (json.error) {
-					        		$('div.modal').modal('hide');
+							url: updateUrl,
+							success: function (json) {
+								if (json.error) {
+									$('div.modal').modal('hide');
 									$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
-					        	} else {
+								} else {
 									location.reload();
 								}
-					        },
-					        error: function(e) {
-					        	alert("Hi ha hagut un error actualitzant algún dels documents seleccionats amb el nou tipus de document");
-					        	location.reload();
-					        }
-					    });	
+							},
+							error: function (e) {
+								alert("Hi ha hagut un error actualitzant algún dels documents seleccionats amb el nou tipus de document");
+								location.reload();
+							}
+						});
 					}
 				});
 			}
 			popoverFlag = 1;
-			
+
 			var $popoverClose = $('.popover .close');
-			$popoverClose.on('click', function() {
+			$popoverClose.on('click', function () {
 				$botoTipusDocumental.popover('hide');
 			});
 		});
-		$botoTipusDocumental.on('click', function() {
+		$botoTipusDocumental.on('click', function () {
 			$botoTipusDocumental.popover("show");
 		});
 		// canvi tipus document single
 		// TODO: revise, element select-tipus-document doesnt exist
-		var selTipusDocument = $('.select-tipus-document'); 
+		var selTipusDocument = $('.select-tipus-document');
 		var select2Options = {
-				theme: 'bootstrap', 
-				width: 'auto', 
-				minimumResultsForSearch: "0"};
+			theme: 'bootstrap',
+			width: 'auto',
+			minimumResultsForSearch: "0"
+		};
 		selTipusDocument.select2(select2Options);
-		selTipusDocument.on('change', function(event){
+		selTipusDocument.on('change', function (event) {
 			var tipusDocumentId = $(':selected', $(this)).attr('id');
-				showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
-				var documentId = $(this).attr('id');
-				
-				var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument"/>' +'?tipusDocumentId=' + tipusDocumentId;
-				$.ajax({
-					type: 'GET',
-			        url: updateUrl,
-			        success: function(json) {
-			        	if (json.error) {
-			        		$('div.modal').modal('hide');
-							$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
-			        	} else {
-							location.reload();
-						}
-			        },
-			        error: function(e) {
-			        	alert("Hi ha hagut un error actualitzant el document amb el nou tipus de document");
-			        	location.reload();
-			        }
-			    });	
+			showLoadingModal('<spring:message code="contingut.info.document.tipusdocument.processant"/>');
+			var documentId = $(this).attr('id');
+
+			var updateUrl = '<c:url value="/contingut/' + documentId + '/document/updateTipusDocument"/>' + '?tipusDocumentId=' + tipusDocumentId;
+			$.ajax({
+				type: 'GET',
+				url: updateUrl,
+				success: function (json) {
+					if (json.error) {
+						$('div.modal').modal('hide');
+						$('#contingut-missatges').append('<div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button>' + 'Hi ha hagut un error actualitzant el document amb el nou tipus de document: ' + json.errorMsg + '</div>');
+					} else {
+						location.reload();
+					}
+				},
+				error: function (e) {
+					alert("Hi ha hagut un error actualitzant el document amb el nou tipus de document");
+					location.reload();
+				}
+			});
 		});
-		
+
 
 		// Ja has afegit tots els documents a l'expedient
-		$(".document-new-empty-metadocuments").click(function(e){
-		    alert("<spring:message code="contingut.document.alerta.max"/>");
-		    e.preventDefault();
-		});	
+		$(".document-new-empty-metadocuments").click(function (e) {
+			alert("<spring:message code="contingut.document.alerta.max"/>");
+			e.preventDefault();
+		});
 
 		// ##### Added to updateTableEvents()
-		
+
 		let vistaActiva = $('#vistes').children("a.active").attr('id');
-		//-------------------------------- VISTA GRID  -----------------------------------------﻿
+		//-------------------------------- VISTA GRID -----------------------------------------﻿
 		if (vistaActiva == 'vistaGrid') {
 			// Habilitar selecció múltiple
-			$('#habilitar-mult').on('click', function() {
+			$('#habilitar-mult').on('click', function () {
 				var contenidorContingut = document.getElementById('grid-documents');
 				var inputs = contenidorContingut.querySelectorAll('li>div');
-				
+
 				if ($(contenidorContingut).hasClass('multiple')) {
 					$('#checkItAll').addClass('disabled');
 					$(contenidorContingut).removeClass('multiple');
 					$(this).removeClass('active');
 					clearSelection();
 					enableDisableMultipleButtons();
-					inputs.forEach(function(element) {
+					inputs.forEach(function (element) {
 						if ($(element).hasClass('selectd')) {
 							$(element).removeClass('selectd');
 						}
-					}); 
+					});
 				} else {
 					$('#checkItAll').removeClass('disabled');
 					$(contenidorContingut).addClass('multiple');
@@ -356,14 +206,14 @@ $(document).ready(function() {
 			});
 
 			// Seleccionar tots
-			$('#checkItAll').on('click', function(){
+			$('#checkItAll').on('click', function () {
 				let docsIdx = [];
 				var listDocuments = document.getElementById('grid-documents');
 				var elements = listDocuments.querySelectorAll('li>div');
 				$('#checkItAll').toggleClass('active');
-	
+
 				if ($('#checkItAll').hasClass('active') && $(listDocuments).hasClass('multiple')) {
-					elements.forEach(function(child) {
+					elements.forEach(function (child) {
 						var childParent = $(child.parentElement);
 						var isCarpeta = childParent.hasClass('element-droppable');
 						if (!isCarpeta) {
@@ -373,25 +223,25 @@ $(document).ready(function() {
 								docsIdx.push(parseInt(child.id));
 							}
 						}
-					}); 
+					});
 					enableDisableMultipleButtons(docsIdx);
 					selectAll(docsIdx);
 				} else if ($(listDocuments).hasClass('multiple')) {
-					elements.forEach(function(input) {
+					elements.forEach(function (input) {
 						$(input).removeClass('selectd');
 						var index = docsIdx.indexOf(parseInt(input.id));
 						if (index > -1) {
 							docsIdx.splice(index, 1);
 						}
-				    });  
+					});
 					enableDisableMultipleButtons(docsIdx);
 					deselectAll();
 				}
 			});
 
 
-			// move to another folder by drag and drop (jquery-ui widget) 
-			// TODO: revise, is necessary for vista icones? 
+			// move to another folder by drag and drop (jquery-ui widget)
+			// TODO: revise, is necessary for vista icones?
 			$('.element-draggable').draggable({
 				containment: 'parent',
 				helper: 'clone',
@@ -399,50 +249,50 @@ $(document).ready(function() {
 				revertDuration: 200,
 				opacity: 0.50,
 				zIndex: 100,
-				start: function() {
+				start: function () {
 					$('div.element-noclick', this).addClass('noclick');
 					$('div.element-noclick', this).tooltip('hide');
 					$('div.element-noclick', this).tooltip('disable');
 				},
-				stop: function() {
+				stop: function () {
 					$('div.element-noclick', this).tooltip('enable');
 				}
-			});	
+			});
 			$('.element-droppable').children(":not('.ordre-col')").droppable({
 				accept: '.element-draggable',
 				tolerance: 'pointer',
 				activeClass: 'element-target',
 				hoverClass: 'element-hover',
-				drop: function(event, ui) {
+				drop: function (event, ui) {
 					showLoadingModal('<spring:message code="contingut.moure.processant"/>');
 					var origenId = ui.draggable.attr('id');
 					var destiId = $(this).parent().attr('id');
 					window.location = origenId + "/moure/" + destiId;
 					dropped = true;
-			        $(event.target).addClass('dropped');
+					$(event.target).addClass('dropped');
 				}
 			});
-			
 
-			$('li.element-contingut .caption p').each(function() {
+
+			$('li.element-contingut .caption p').each(function () {
 				$clamp(this, {
 					clamp: 2,
 					useNativeClamp: true
 				});
 			});
 
-			
-			$('#grid-documents li').mouseover(function() {
+
+			$('#grid-documents li').mouseover(function () {
 				$('a.btn', this).removeClass('hidden');
 			});
-			$('#grid-documents li').mouseout(function() {
+			$('#grid-documents li').mouseout(function () {
 				$('a.btn', this).addClass('hidden');
 			});
-			$('#grid-documents li a.confirm-delete').click(function() {
+			$('#grid-documents li a.confirm-delete').click(function () {
 				return confirm('<spring:message code="contingut.confirmacio.esborrar.node"/>');
 			});
-			
-		//--------------------------------------  VISTA NOT GRID  ------------------------------------
+
+			//-------------------------------------- VISTA NOT GRID ------------------------------------
 		} else {
 
 			if (!$('#table-documents .treetable-expander').length) {
@@ -450,15 +300,15 @@ $(document).ready(function() {
 			}
 
 			// Seleccionar tots
-			$('#checkItAll').on('change', function(){
+			$('#checkItAll').on('change', function () {
 
 				let isChecked = $(this).prop('checked');
 				if (isChecked) {
-					$('#table-documents tbody .checkbox').each(function() {
+					$('#table-documents tbody .checkbox').each(function () {
 						$(this).prop('checked', true);
 					});
 				} else {
-					$('#table-documents tbody .checkbox').each(function() {
+					$('#table-documents tbody .checkbox').each(function () {
 						$(this).prop('checked', false);
 					});
 				}
@@ -470,33 +320,32 @@ $(document).ready(function() {
 				} else {
 					deselectAll();
 				}
-				
+
 			});
 
 			// Select one
-			$('.checkbox').change(function() {
+			$('.checkbox').change(function () {
 				selectCheckbox($(this));
 			});
 
 
-			if (vistaActiva == 'vistaTreetablePerCarpetes'){
+			if (vistaActiva == 'vistaTreetablePerCarpetes') {
 				dragAndDropVistaCarpetes();
-			} else if (vistaActiva == 'vistaTreetablePerTipusDocuments'){
-				// change tipus de document by drag and drop (jquery-ui widget) 
+			} else if (vistaActiva == 'vistaTreetablePerTipusDocuments') {
+				// change tipus de document by drag and drop (jquery-ui widget)
 				$('.element-draggable').draggable({
 					containment: 'parent',
 					helper: 'clone',
 					revert: true,
 					revertDuration: 200,
 					opacity: 0.50,
-				});	
+				});
 
 
-				
 				$('.element-droppable').droppable({
 					accept: '.element-draggable',
 					tolerance: 'pointer',
-					drop: function(event, ui) {
+					drop: function (event, ui) {
 						showLoadingModal('<spring:message code="contingut.canvi.tipus.document.processant"/>');
 						let origenId = ui.draggable.attr('id');
 						let destiId = $(this).attr('id');
@@ -505,387 +354,428 @@ $(document).ready(function() {
 					}
 				});
 			}
-			
+
 		}
 
 		<c:if test="${isMantenirEstatCarpetaActiu}">
-		
-			var $tableDocuments = $("#table-documents");
-			
-			$tableDocuments.on("click", "tr", function(e, showAll) {
-				var $selectedFolder = $(this);
-				var isDocument = $selectedFolder.hasClass('isDocument');
-				var hasFills = $selectedFolder.hasClass('hasFills');
-				
-				if (! isDocument && hasFills) {
-					
-					var $ignoredTds = $selectedFolder.find('td:nth-child(1), td:nth-child(7), td:nth-child(8)');
 
-			        if ($ignoredTds.is(e.target) || $ignoredTds.has(e.target).length > 0) {
-			            return;
-			        }
-			        
-					var nodeId = $selectedFolder.data("node");
-					var attrId = $selectedFolder.attr("id");
-					
-					if (nodeId !== undefined) {
-						updateCurrentNode(nodeId, attrId, showAll);
-						setIcon($selectedFolder);
-					}
-					updateTableEvents();
+		var $tableDocuments = $("#table-documents");
+
+		$tableDocuments.on("click", "tr", function (e, showAll) {
+			var $selectedFolder = $(this);
+			var isDocument = $selectedFolder.hasClass('isDocument');
+			var hasFills = $selectedFolder.hasClass('hasFills');
+
+			if (!isDocument && hasFills) {
+
+				var $ignoredTds = $selectedFolder.find('td:nth-child(1), td:nth-child(7), td:nth-child(8)');
+
+				if ($ignoredTds.is(e.target) || $ignoredTds.has(e.target).length > 0) {
+					return;
 				}
-		    });
-			
-			function updateCurrentNode(nodeId, attrId, showAll) {
-				var currentState = sessionStorage.getItem("nodeState-" + nodeId);
-			    
-			    if (currentState === "collapsed" || currentState == null) {
-			    	showCurrentNode(nodeId, attrId, showAll);
-			    } else {
-			    	hideCurrentNode(nodeId, attrId);
-			    }
+
+				var nodeId = $selectedFolder.data("node");
+				var attrId = $selectedFolder.attr("id");
+
+				if (nodeId !== undefined) {
+					updateCurrentNode(nodeId, attrId, showAll);
+					setIcon($selectedFolder);
+				}
+				updateTableEvents();
 			}
-			
-			// Cambia icono carpetas principales
-			$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
-				setIcon($(this));
-			});
-			
-			if ($('#table-documents .treetable-expander').length > 0) {
-				$('#expandCollapseButtons').show();
+		});
+
+		function updateCurrentNode(nodeId, attrId, showAll) {
+			var currentState = sessionStorage.getItem("nodeState-" + nodeId);
+
+			if (currentState === "collapsed" || currentState == null) {
+				showCurrentNode(nodeId, attrId, showAll);
+			} else {
+				hideCurrentNode(nodeId, attrId);
 			}
-	 	</c:if>
+		}
+
+		// Cambia icono carpetas principales
+		$tableDocuments.find("tbody tr:not(.isDocument)").each(function () {
+			setIcon($(this));
+		});
+
+		if ($('#table-documents .treetable-expander').length > 0) {
+			$('#expandCollapseButtons').show();
+		}
+		</c:if>
 	</c:if>//------------------------- if contingut is not document END ----------------------------------
 
-	$("#mostraDetallSignants").click(function(){
-		let contingutId = ${contingut.id}; 
-		getDetallsSignants($('#detallSignants'), contingutId, false);
-	});
-	
-	removeTransactionId();
-});//################################################## document ready END ##############################################################
+		$("#mostraDetallSignants").click(function () {
+			let contingutId = ${contingut.id};
+			getDetallsSignants($('#detallSignants'), contingutId, false);
+		});
 
-$(document).on('change', '.checkbox', function() {
-	selectCheckbox($(this));
-});
 
-function expandAll() {
-	var $tableDocuments = $("#table-documents");
-	$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
-		var nodeId = $(this).data("node");
-		var attrId = $(this).attr("id");
-		
-		showCurrentNode(nodeId, attrId, true);
-		setIcon($(this));
-	});
-}
+		removeTransactionId();
+		$(window).resize(resizeDropZone);
 
-function collapseAll() {
-	var $tableDocuments = $("#table-documents");
-	$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
-		var nodeId = $(this).data("node");
-		var attrId = $(this).attr("id");
-		
-		hideCurrentNode(nodeId, attrId);
-		setIcon($(this));
-	});
-}
+	});//################################################## document ready END ##############################################################
 
-function showCurrentNode(nodeId, attrId, showAll) {
-	var $tableDocuments = $("#table-documents");
-    var $selectedNode = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
-	sessionStorage.removeItem("nodeState-" + nodeId);
-  	sessionStorage.setItem("nodeState-" + nodeId, "expanded");
-  	
-  	// Mostrar carpeta
-  	$selectedNode.show();
-  	
-  	// Cargar contenido del servidor
-  	loadCurrentFolderFromServer(attrId, showAll);
-}
+	const resizeDropZone = () => {
 
-function hideCurrentNode(nodeId, attrId) {
-	var $tableDocuments = $("#table-documents");
-    var $fillsCarpeta = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
-    sessionStorage.removeItem("nodeState-" + nodeId);
-  	sessionStorage.setItem("nodeState-" + nodeId, "collapsed");
-  	
-    $fillsCarpeta.each(function(i, fill) {	
-      	$(fill).remove();
-      	
-      	// Ocultar de forma recursiva la carpeta
-      	var selectedNodeId = $(fill).data('node');
-      	var selectedAttrId = $(fill).attr("id");
-      	
-      	if (selectedAttrId)
-      		hideCurrentNode(selectedNodeId, selectedAttrId);
-      	
-	    nodeId = $(fill).data('node');
-	    var $fillsSubCarpeta = $(fill).nextUntil(':not([data-pnode="' + nodeId + '"])');
-	});
-}
+		const windowHeight = $(window).height();
+		const capsaleraHeight = 216;
 
-function selectCheckbox($this) {
-	let docsIdx = [];
-	let selectedId = $this.closest('tr').attr('id');
-	docsIdx.push(parseInt(selectedId));
-	
-	if ($this.prop('checked')) {
-		var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
-		$.get(
-				multipleUrl, 
-				{docsIdx: docsIdx},
-				function(data) {
-					$(".seleccioCount").html(data);
-				}
-		);
-	} else {
-		var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
-		$.get(
-				multipleUrl, 
-				{docsIdx: docsIdx},
-				function(data) {
-					$(".seleccioCount").html(data);
-				}
-		);
+		const panelHeight = $('.panel-body').innerHeight();
+		const errorsHeight = $('#botons-errors-validacio').length ? $('#botons-errors-validacio').outerHeight(true) : 0;
+		const tabsHeight = 84;
+
+		const usedHeightInPanel = errorsHeight + tabsHeight;
+		const overallusedHeight = capsaleraHeight + errorsHeight + tabsHeight;
+
+		let alt = panelHeight - usedHeightInPanel;
+		if (windowHeight < panelHeight + capsaleraHeight) {
+			alt = windowHeight - overallusedHeight;
+		}
+
+		$('#drop-area').css('height', alt + 'px');
 	}
 
-	let idsSelected = getIdsSelectedFromTable();
-	enableDisableMultipleButtons(idsSelected);
-}
-
-function dragAndDropVistaCarpetes() {
-	// move to another folder by drag and drop (jquery-ui widget) 
-	$('.element-draggable').draggable({
-		containment: 'parent',
-		helper: 'clone',
-		revert: true,
-		revertDuration: 200,
-		opacity: 0.50,
-	});	
-	$('.element-droppable').droppable({
-		accept: '.element-draggable',
-		tolerance: 'pointer',
-		drop: function(event, ui) {
-			showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-			let origenId = ui.draggable.attr('id');
-			let destiId = $(this).attr('id');
-			window.location = origenId + "/moure/" + destiId;
-		}
-	});
-}
-
-function updateTableEvents() {
-	<c:if test="${isMantenirEstatCarpetaActiu}">
-		//add treetable click events on necessary columns for all rows
-		$('#table-documents > tbody > tr > td:not(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor','pointer');
-	</c:if>
-	//remove treetable click events on unnecessary columns for all rows
-	$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor','default').unbind('click');
-	//remove treetable click events on all columns for document rows
-	$('#table-documents > tbody > tr.isDocument > td').css('cursor','default').unbind('click');
-	//add show viewer click events on all necessary columns for document rows
-	$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6))').css('cursor','pointer').click(function(event) {
-		event.stopPropagation();
-		$('a:first', $(this).parent())[0].click();
+	$(document).on('change', '.checkbox', function () {
+		selectCheckbox($(this));
 	});
 
-	// order by dragging
-	$('.ordre-col').on('mouseover', function() {
-		$('.element-draggable').draggable({ disabled: true });
-		$('.element-draggable').droppable({ disabled: true });
-		$('#table-documents tbody').sortable({
-			handle: ".ordre-col",
-			refreshPositions: true,
-	        helper : 'clone',
-			cursor: "move",
-			cursorAt: { left: 5 },
-			opacity: 0.65,
-			placeholder: "sortable-dest",
-			start: function (event, ui) {
-				$(this).attr('data-previndex', ui.item[0].rowIndex);
-	        },
-	        update: function (event, ui) {
-				//showLoadingModal('<spring:message code="contingut.moure.processant"/>');
-				//var tableDocuments = document.getElementById('table-documents');
-				//$(tableDocuments).addClass("disabled");
-	            //$('#loading').removeClass('hidden');
-				var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'id'});
-	            var filtered = idsInOrder.filter(function (el) {
-	           		return el != '';
-	            });
-	            var orderedElements = new Map();
-				var idx = 1;
-	            filtered.forEach(function(row) {
-	            	orderedElements[idx] = row;
-		            idx++;
-	            });
+	function expandAll() {
+		var $tableDocuments = $("#table-documents");
+		$tableDocuments.find("tbody tr:not(.isDocument)").each(function () {
+			var nodeId = $(this).data("node");
+			var attrId = $(this).attr("id");
 
-	            var nodeId = ui.item.data('pnode');
-	            var indice = nodeId.indexOf("treetable-");
-	            var attrId = nodeId.substring(indice + "treetable-".length);
-	            showLoadingCurrentFolder(attrId);
-	            
-	            $.ajax({
-			        url: '<c:url value="/contingut/${expedientId}/ordenar"/>',
-			        type: "POST",
-			        contentType: "application/json",
-			        data: JSON.stringify(orderedElements),
-			        success: function (data) {
-			        	<c:if test="${! isMantenirEstatCarpetaActiu}">
-			        		location.reload();
-			        	</c:if>
-			        }
-				});
-	            <c:if test="${isMantenirEstatCarpetaActiu}">
-	            	loadCurrentFolderFromServer(attrId);
-	            </c:if>
-	        }
-	    }).disableSelection();
-	});
-	$('.ordre-col').on('mouseleave', function() {
-		$('.element-draggable').draggable("enable");
-		$('.element-draggable').droppable("enable");
-	});
-
-	// add new document by dragging it to #drag_container 
-	$('#drag_container').filedrop({
-		maxfiles: 1,
-		fallback_dropzoneClick : false,
-		error: function(err, file) {
-			switch(err) {
-			case 'BrowserNotSupported':
-				alert('browser does not support HTML5 drag and drop')
-				break;
-			case 'TooManyFiles':
-				alert('Només es pemet adjuntar un document a la vegada!')
-				break;
-			case 'FileTooLarge':
-				break;
-			case 'FileTypeNotAllowed':
-				break;
-			case 'FileExtensionNotAllowed':
-				break;
-			default:
-				break;
-			}
-		},
-		dragOver: function() {
-			$('#drag_container').css('background-color', '#e6e3e3');
-		},
-		dragLeave: function() {
-			$('#drag_container').css('background-color', '#f5f5f5');
-		},
-		drop: function(e) {
-<c:choose>
-	<c:when test="${not empty metaDocumentsNoPinbalLeft}">
-			if (e.originalEvent.dataTransfer != null) {
-				let files = e.originalEvent.dataTransfer.files;
-				$('#drag_container').css('background-color', '#f5f5f5');
-				if (!(files.length > 1)) {
-					document.querySelector('#dropped-files').files = files;
-					$('#document-new').trigger('click');
-				}
-			}
-	</c:when>
-	<c:otherwise>
-			alert("<spring:message code="contingut.document.alerta.max"/>");
-			e.preventDefault();
-	</c:otherwise>
-</c:choose>
-		}
-	});
-	
-	// popover notificacions
-	$("span[class*='popover-']").popover({
-		html: true,
-	    content: function () {
-	    	return getEnviamentsDocument($(this));   
-	  	}
-	}).on('mouseenter', function () {
-	    $(this).popover("show");
-	   
-	    $(".popover").on('mouseleave', function () {
-	        $(this).popover('hide');
-	    });
-	}).on('mouseleave', function () {
-	   	if (!$('.popover:hover').length) {
-	    	$(this).popover('hide');
-	    }
-	});	
-	
-	dragAndDropVistaCarpetes();
-
-}
-
-function setIcon($this) {
-	var $tableDocuments = $("#table-documents");
-	var nodeId = $this.data("node");
-	var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
-	var hasFills = $node.hasClass('hasFills');
-	var nodeState = sessionStorage.getItem("nodeState-" + nodeId);
-	var expanderIcon;
-	
-	if (hasFills && nodeState === "expanded") {
-		expanderIcon = '<span class="treetable-expander fa fa-angle-down" style="margin-right: 8px;"></span>';
-	} else if (hasFills) {
-		expanderIcon = '<span class="treetable-expander fa fa-angle-right" style="margin-right: 8px;"></span>';
+			showCurrentNode(nodeId, attrId, true);
+			setIcon($(this));
+		});
 	}
-	
-	var $folderIcon = $node.find('.fa-folder-o');
-	var hasIcon = $node.find('.treetable-expander').remove();
-	
-	$folderIcon.before(expanderIcon);
-}
 
-function setPadding($this) {
-	var $tableDocuments = $("#table-documents");
-	var nodeId = $this.data("node");
-	var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
-	
-	var padding = calcPadding(false, 10, $node);
-	
-	$node.find('td').eq(1).css('padding-left', padding);
-}
+	function collapseAll() {
+		var $tableDocuments = $("#table-documents");
+		$tableDocuments.find("tbody tr:not(.isDocument)").each(function () {
+			var nodeId = $(this).data("node");
+			var attrId = $(this).attr("id");
 
-function calcPadding(s, padding, $node) {
-	if (s) {
-		return padding;
-	} else {
-		var $parent = $node.prevAll('tr[data-node=' + $node.data('pnode') + ']');
-		if ($parent.length > 0) {
-			padding += 60;
+			hideCurrentNode(nodeId, attrId);
+			setIcon($(this));
+		});
+	}
+
+	function showCurrentNode(nodeId, attrId, showAll) {
+		var $tableDocuments = $("#table-documents");
+		var $selectedNode = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+		sessionStorage.removeItem("nodeState-" + nodeId);
+		sessionStorage.setItem("nodeState-" + nodeId, "expanded");
+
+		// Mostrar carpeta
+		$selectedNode.show();
+
+		// Cargar contenido del servidor
+		loadCurrentFolderFromServer(attrId, showAll);
+	}
+
+	function hideCurrentNode(nodeId, attrId) {
+		var $tableDocuments = $("#table-documents");
+		var $fillsCarpeta = $tableDocuments.find('tr[data-pnode="' + nodeId + '"]');
+		sessionStorage.removeItem("nodeState-" + nodeId);
+		sessionStorage.setItem("nodeState-" + nodeId, "collapsed");
+
+		$fillsCarpeta.each(function (i, fill) {
+			$(fill).remove();
+
+			// Ocultar de forma recursiva la carpeta
+			var selectedNodeId = $(fill).data('node');
+			var selectedAttrId = $(fill).attr("id");
+
+			if (selectedAttrId)
+				hideCurrentNode(selectedNodeId, selectedAttrId);
+
+			nodeId = $(fill).data('node');
+			var $fillsSubCarpeta = $(fill).nextUntil(':not([data-pnode="' + nodeId + '"])');
+		});
+	}
+
+	function selectCheckbox($this) {
+		let docsIdx = [];
+		let selectedId = $this.closest('tr').attr('id');
+		docsIdx.push(parseInt(selectedId));
+
+		if ($this.prop('checked')) {
+			var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+			$.get(
+					multipleUrl,
+					{docsIdx: docsIdx},
+					function (data) {
+						$(".seleccioCount").html(data);
+					}
+			);
 		} else {
-			s = true;
+			var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+			$.get(
+					multipleUrl,
+					{docsIdx: docsIdx},
+					function (data) {
+						$(".seleccioCount").html(data);
+					}
+			);
 		}
-		return calcPadding(s, padding, $parent);
-	}
-}
 
-//------------------------- if contingut is not document START ----------------------------------	
-<c:if test="${!contingut.document}"> 
+		let idsSelected = getIdsSelectedFromTable();
+		enableDisableMultipleButtons(idsSelected);
+	}
+
+	function dragAndDropVistaCarpetes() {
+		// move to another folder by drag and drop (jquery-ui widget)
+		$('.element-draggable').draggable({
+			containment: 'parent',
+			helper: 'clone',
+			revert: true,
+			revertDuration: 200,
+			opacity: 0.50,
+		});
+		$('.element-droppable').droppable({
+			accept: '.element-draggable',
+			tolerance: 'pointer',
+			drop: function (event, ui) {
+				showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+				let origenId = ui.draggable.attr('id');
+				let destiId = $(this).attr('id');
+				window.location = origenId + "/moure/" + destiId;
+			}
+		});
+	}
+
+	function updateTableEvents() {
+		<c:if test="${isMantenirEstatCarpetaActiu}">
+		//add treetable click events on necessary columns for all rows
+		$('#table-documents > tbody > tr > td:not(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor', 'pointer');
+		</c:if>
+		//remove treetable click events on unnecessary columns for all rows
+		$('#table-documents > tbody > tr > td:is(:nth-child(1), :nth-child(7), :nth-child(8))').css('cursor', 'default').unbind('click');
+		//remove treetable click events on all columns for document rows
+		$('#table-documents > tbody > tr.isDocument > td').css('cursor', 'default').unbind('click');
+		//add show viewer click events on all necessary columns for document rows
+		$('#table-documents > tbody > tr.isDocument > td:is(:nth-child(2), :nth-child(3), :nth-child(4), :nth-child(5), :nth-child(6))').css('cursor', 'pointer').click(function (event) {
+			event.stopPropagation();
+			$('a:first', $(this).parent())[0].click();
+		});
+
+		// order by dragging
+		$('.ordre-col').on('mouseover', function () {
+			$('.element-draggable').draggable({disabled: true});
+			$('.element-draggable').droppable({disabled: true});
+			$('#table-documents tbody').sortable({
+				handle: ".ordre-col",
+				refreshPositions: true,
+				helper: 'clone',
+				cursor: "move",
+				cursorAt: {left: 5},
+				opacity: 0.65,
+				placeholder: "sortable-dest",
+				start: function (event, ui) {
+					$(this).attr('data-previndex', ui.item[0].rowIndex);
+				},
+				update: function (event, ui) {
+					//showLoadingModal('<spring:message code="contingut.moure.processant"/>');
+					//var tableDocuments = document.getElementById('table-documents');
+					//$(tableDocuments).addClass("disabled");
+					//$('#loading').removeClass('hidden');
+					var idsInOrder = $('#table-documents tbody').sortable("toArray", {attribute: 'id'});
+					var filtered = idsInOrder.filter(function (el) {
+						return el != '';
+					});
+					var orderedElements = new Map();
+					var idx = 1;
+					filtered.forEach(function (row) {
+						orderedElements[idx] = row;
+						idx++;
+					});
+
+					var nodeId = ui.item.data('pnode');
+					var indice = nodeId.indexOf("treetable-");
+					var attrId = nodeId.substring(indice + "treetable-".length);
+					showLoadingCurrentFolder(attrId);
+
+					$.ajax({
+						url: '<c:url value="/contingut/${expedientId}/ordenar"/>',
+						type: "POST",
+						contentType: "application/json",
+						data: JSON.stringify(orderedElements),
+						success: function (data) {
+							<c:if test="${! isMantenirEstatCarpetaActiu}">
+							location.reload();
+							</c:if>
+						}
+					});
+					<c:if test="${isMantenirEstatCarpetaActiu}">
+					loadCurrentFolderFromServer(attrId);
+					</c:if>
+				}
+			}).disableSelection();
+		});
+		$('.ordre-col').on('mouseleave', function () {
+			$('.element-draggable').draggable("enable");
+			$('.element-draggable').droppable("enable");
+		});
+
+		if (potModificar) {
+			// Add new document by dragging it to #drop-area
+			var $dropArea = $('#drop-area');
+			var $dropMessage = $('#drop-message');
+
+			resizeDropZone();
+
+			$('#drop-area').filedrop({
+				// paramname: 'file', // El nom del paràmetre que es passarà al servidor
+				// url: '/upload', // URL del servidor on es carregaran els fitxers
+				maxfiles: 1, // Màxim número de fitxers a carregar
+				maxfilesize: 10, // Màxim mida de cada fitxer en MB
+				fallback_dropzoneClick: false,
+
+				// Executat en cas d'error
+				error: function (err, file) {
+					// Aquí pots gestionar errors
+					switch (err) {
+						case 'BrowserNotSupported':
+							alert('El teu navegador no suporta càrregues de fitxers mitjançant drag & drop!');
+							break;
+						case 'TooManyFiles':
+							alert('Només es pemet adjuntar un document a la vegada!');
+							break;
+						case 'FileTooLarge':
+							alert(file.name + ' és massa gran! El màxim permès és de ' + this.maxfilesize + 'MB.');
+							break;
+						default:
+							break;
+					}
+				},
+
+				// Executat quan un fitxer està sobre l'àrea
+				dragOver: function () {
+					$dropArea.css('border-color', '#ffd351');
+					$dropMessage.css('display', 'block');
+				},
+
+				// Executat quan un fitxer surt de l'àrea de drop
+				dragLeave: function () {
+					$dropArea.css('border-color', 'transparent');
+					$dropMessage.css('display', 'none');
+				},
+
+				// Executat quan un fitxer es deixa anar a l'àrea de drop, abans de començar la càrrega
+				drop: function (e) {
+					$dropArea.css('border-color', 'transparent');
+					$dropMessage.css('display', 'none');
+					if (quedenDocumentsPerAdjuntar) {
+						let files = e.originalEvent.dataTransfer.files;
+						if (!(files.length > 1)) {
+							document.querySelector('#dropped-files').files = files;
+							$('#document-new').trigger('click');
+						}
+					} else {
+						alert("<spring:message code="contingut.document.alerta.max"/>");
+						e.preventDefault();
+					}
+					return false;
+				},
+			});
+		}
+
+		// popover notificacions
+		$("span[class*='popover-']").popover({
+			html: true,
+			content: function () {
+				return getEnviamentsDocument($(this));
+			}
+		}).on('mouseenter', function () {
+			$(this).popover("show");
+
+			$(".popover").on('mouseleave', function () {
+				$(this).popover('hide');
+			});
+		}).on('mouseleave', function () {
+			if (!$('.popover:hover').length) {
+				$(this).popover('hide');
+			}
+		});
+
+		dragAndDropVistaCarpetes();
+
+	}
+
+	function setIcon($this) {
+		var $tableDocuments = $("#table-documents");
+		var nodeId = $this.data("node");
+		var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
+		var hasFills = $node.hasClass('hasFills');
+		var nodeState = sessionStorage.getItem("nodeState-" + nodeId);
+		var expanderIcon;
+
+		if (hasFills && nodeState === "expanded") {
+			expanderIcon = '<span class="treetable-expander fa fa-angle-down" style="margin-right: 8px;"></span>';
+		} else if (hasFills) {
+			expanderIcon = '<span class="treetable-expander fa fa-angle-right" style="margin-right: 8px;"></span>';
+		}
+
+		var $folderIcon = $node.find('.fa-folder-o');
+		var hasIcon = $node.find('.treetable-expander').remove();
+
+		$folderIcon.before(expanderIcon);
+	}
+
+	function setPadding($this) {
+		var $tableDocuments = $("#table-documents");
+		var nodeId = $this.data("node");
+		var $node = $tableDocuments.find('tr[data-node="' + nodeId + '"]');
+
+		var padding = calcPadding(false, 10, $node);
+
+		$node.find('td').eq(1).css('padding-left', padding);
+	}
+
+	function calcPadding(s, padding, $node) {
+		if (s) {
+			return padding;
+		} else {
+			var $parent = $node.prevAll('tr[data-node=' + $node.data('pnode') + ']');
+			if ($parent.length > 0) {
+				padding += 60;
+			} else {
+				s = true;
+			}
+			return calcPadding(s, padding, $parent);
+		}
+	}
+
+	//------------------------- if contingut is not document START ----------------------------------
+	<c:if test="${!contingut.document}">
 
 
 	function showLoadingModal(message) {
 		var modalDivId = "modalLoading";
-		
+
 		modalData = "";
-		if ($('#' + modalDivId).length == 0 ) {
+		if ($('#' + modalDivId).length == 0) {
 			$('body').append(modalLoading(modalDivId, modalData, message));
-		} 
+		}
 		var modalobj = $('#' + modalDivId + ' > div.modal');
 		modalobj.modal({
-		      backdrop: "static", //remove ability to close modal with click
-		      keyboard: false, //remove option to close with keyboard
-		      show: true //Display loader!
-		    });
+			backdrop: "static", //remove ability to close modal with click
+			keyboard: false, //remove option to close with keyboard
+			show: true //Display loader!
+		});
 	}
+
 	function modalCloseLoadingHandler() {
 		$('body').addClass('loading');
 	}
+
 	function addLoading(idModal) {
 		$('#' + idModal).on('hidden.bs.modal', modalCloseLoadingHandler)
 	}
+
 	function removeLoading(idModal) {
 		if (idModal) {
 			$('#' + idModal).off('hidden.bs.modal', modalCloseLoadingHandler)
@@ -893,51 +783,52 @@ function calcPadding(s, padding, $node) {
 			$('body').removeClass('loading');
 		}
 	}
-	function modalLoading(modalDivId, modalData, message){
-		return  '<div id="' + modalDivId + '"' + modalData + '>' +
+
+	function modalLoading(modalDivId, modalData, message) {
+		return '<div id="' + modalDivId + '"' + modalData + '>' +
 				'	<div class="modal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true">' +
 				'		<div class="modal-dialog modal-sm" role="document">' +
-			    '			<div class="modal-content" style="border-radius: 0px;box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);">' +
-			    '				<div class="modal-body text-center">' +
-			    '					<div class="loader"></div>' +
+				'			<div class="modal-content" style="border-radius: 0px;box-shadow: 0 0 20px 8px rgba(0, 0, 0, 0.7);">' +
+				'				<div class="modal-body text-center">' +
+				'					<div class="loader"></div>' +
 				'					<div clas="loader-txt">' +
 				'						<p>' + message + '</p>' +
 				'					</div>' +
 				'				</div>' +
-			    '			</div>' +
+				'			</div>' +
 				'		</div>' +
 				'	</div>' +
 				'</div>';
 	}
-	
+
 
 	function removeTransactionId(idModal) {
 		if (idModal) {
-			$('#' + idModal).on('hidden.bs.modal', function() {
+			$('#' + idModal).on('hidden.bs.modal', function () {
 				var idTransaccio = localStorage.getItem('tmpTransaccioId');
 				if (idTransaccio) {
 					$.ajax({
-				    	type: 'GET',
+						type: 'GET',
 						url: "<c:url value='/document/portafirmes/tancarTransaccio/" + idTransaccio + "'/>",
-						success: function() {
+						success: function () {
 							localStorage.removeItem('tmpTransaccioId');
 						},
-						error: function(err) {
+						error: function (err) {
 							console.log("Error tancant la transacció");
 						}
-				    });
+					});
 				}
 			});
 		} else {
 			localStorage.removeItem('tmpTransaccioId');
 		}
 	}
-	
+
 
 	//------------------ VISOR ------------------------------
 	function showViewer(event, documentId, contingutNom, contingutCustodiat) {
 		if (event.target.tagName.toLowerCase() !== 'a' && (event.target.cellIndex === undefined || event.target.cellIndex === 5 || event.target.cellIndex === 6)) return;
-	    var resumViewer = $('#resum-viewer');
+		var resumViewer = $('#resum-viewer');
 		// Mostrar/amagar visor
 		if (!resumViewer.is(':visible')) {
 			resumViewer.slideDown(500);
@@ -950,16 +841,16 @@ function calcPadding(s, padding, $node) {
 		resetBackground();
 		event.srcElement.parentElement.closest('tr').style = "background: #c1c0c0";
 		previousDocumentId = documentId;
-		
-	    // Mostrar contingut capçalera visor
-	    resumViewer.find('*').not('#container').remove();
-	    var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px; display: flex; flex-wrap: wrap;">\
+
+		// Mostrar contingut capçalera visor
+		resumViewer.find('*').not('#container').remove();
+		var signantsViewerContent = '<div style="padding: 0% 2% 2% 2%; margin-top: -8px; display: flex; flex-wrap: wrap;">\
 										<table style="width: 453px; flex-basis: calc(100%/3); margin-bottom: 10px;">\
 											<tbody id="detallSignantsPreview">\
 											</tbody>\
 										</table>\
 									 </div>';
-	    var viewerContent = '<div class="panel-heading">\
+		var viewerContent = '<div class="panel-heading">\
 								<span class="fa-stack customIcon" style="font-size: 10px;margin-top: -5px;">\
 								  <i class="fa fa-file-o fa-stack-2x"></i>\
 								  <i class="fa fa-search fa-1x" style="margin-left: 4px;margin-top: 7px;"></i>\
@@ -972,42 +863,42 @@ function calcPadding(s, padding, $node) {
 		        					<dt style="text-align: left;"><spring:message code="contingut.info.nom"/> </dt><dd>' + contingutNom + '</dd>\
 	        					</dl>\
 	    					 </div>';
-	    					 
-	    if (contingutCustodiat) {
-	    	viewerContent += signantsViewerContent;
-	    }
-	    resumViewer.prepend(viewerContent);
-	    if (contingutCustodiat) {
-	    	getDetallsSignants($("#detallSignantsPreview"), documentId, true);
-	    }
-	    
-	
-	    // Recuperar i mostrar document al visor
+
+		if (contingutCustodiat) {
+			viewerContent += signantsViewerContent;
+		}
+		resumViewer.prepend(viewerContent);
+		if (contingutCustodiat) {
+			getDetallsSignants($("#detallSignantsPreview"), documentId, true);
+		}
+
+
+		// Recuperar i mostrar document al visor
 		var urlDescarrega = "<c:url value="/contingut/${contingut.id}/document/"/>" + documentId + "/returnFitxer";
 		$('#container').attr('src', '');
 		$('#container').addClass('rmodal_loading');
 		showDocument(urlDescarrega);
-		
+
 		$([document.documentElement, document.body]).animate({
-	        scrollTop: $("#resum-viewer").offset().top - 110
-	    }, 500);
+			scrollTop: $("#resum-viewer").offset().top - 110
+		}, 500);
 	}
-	
+
 	function resetBackground() {
 		var tableAnnexos = $('#table-documents');
-		tableAnnexos.find('tr').each(function() {
-	    	$(this).removeAttr('style');
-	    });
+		tableAnnexos.find('tr').each(function () {
+			$(this).removeAttr('style');
+		});
 	}
-	
+
 	function showDocument(arxiuUrl) {
 		// Fa la petició a la url de l'arxiu
 		$.ajax({
 			type: 'GET',
 			url: arxiuUrl,
 			responseType: 'arraybuffer',
-			success: function(json) {
-				
+			success: function (json) {
+
 				if (json.error) {
 					$('#container').removeClass('rmodal_loading');
 					$("#resum-viewer .viewer-padding:last").before('<div class="viewer-padding"><div class="alert alert-danger"><spring:message code="contingut.previsualitzacio.error"/>: ' + json.errorMsg + '</div></div>');
@@ -1017,27 +908,27 @@ function calcPadding(s, padding, $node) {
 				} else {
 					response = json.data;
 					var blob = base64toBlob(response.contingut, response.contentType);
-		            var file = new File([blob], response.contentType, {type: response.contentType});
-		            link = URL.createObjectURL(file);
-		            
-		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-				    $('#container').removeClass('rmodal_loading');
-				    $('#container').attr('src', viewerUrl);
+					var file = new File([blob], response.contentType, {type: response.contentType});
+					link = URL.createObjectURL(file);
+
+					var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+					$('#container').removeClass('rmodal_loading');
+					$('#container').attr('src', viewerUrl);
 				}
-			    
+
 			},
-			error: function(xhr, ajaxOptions, thrownError) {
+			error: function (xhr, ajaxOptions, thrownError) {
 				$('#container').removeClass('rmodal_loading');
 				alert(thrownError);
 			}
 		});
 	}
+
 	// Amagar visor
 	function closeViewer() {
-		$('#resum-viewer').slideUp(500, function(){
+		$('#resum-viewer').slideUp(500, function () {
 		});
 	}
-
 
 	function getEnviamentsDocument(document) {
 		var content;
@@ -1046,189 +937,188 @@ function calcPadding(s, padding, $node) {
 			var enviamentsUrl = '<c:url value="/document/' + documentId + '/enviament/datatable"/>';
 			$.ajax({
 				type: 'GET',
-		        url: enviamentsUrl,
-		        async: false,
-		        success: function(data){
-		        	if (data && data.length > 0) {
-		        	content =  "<table data-toggle='datatable' class='table table-bordered table-striped' style='width:100%'>";
-		            content += "<thead>";
-		        	content += "<tr>";
-		        	content += "<th> <spring:message code='contingut.enviament.columna.tipus'/> </th>";
-		        	content += "<th> <spring:message code='contingut.enviament.columna.data'/> </th>";
-		        	content += "<th> <spring:message code='contingut.enviament.columna.estat'/> </th>";
-		        	content += "</tr>";
-		        	content += "</thead>";
-			            $.each(data, function(i, val) {
-			            	content += "<tbody>";
-			             	content += "<tr>";
-			             	content += "<td width='25%'>";
-			             	if (val.tipus == "NOTIFICACIO") {
-			             		content += "<spring:message code='contingut.enviament.notificacio.elec'/>";
-			             	} else if (val.tipus == "COMUNICACIO") {
-			             		content += "<spring:message code='contingut.enviament.comunicacio'/>";
-			             	}
-			             	content += "</td>";
-			             	content += "<td width='20%'>" + new Date (val.createdDate).toLocaleString() + "</td>";
-			             	content += "<td width='10%'>";
-			             	if (val.notificacioEstat == 'PENDENT') {
-			             		content += "<span class='label label-warning'><span class='fa fa-clock-o'></span> ";
-			             		content += "<spring:message code='notificacio.notificacioEstat.enum.PENDENT'/></span> ";
-			             		if (val.error) {
-			             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-			             		}
-			             	} else if (val.notificacioEstat == 'ENVIADA') {
-			             		content += "<span class='label label-info'><span class='fa fa-envelope-o'></span> ";
-			             		content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA'/></span>";
-			             		if (val.error) {
-			             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-			             		}
-			             	} else if (val.notificacioEstat == 'REGISTRADA') {
-			             		content += "<span class='label label-success'><span class='fa fa-check'></span> ";
-			             		content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
-			             	} else if (val.notificacioEstat == 'FINALITZADA') {
-			             		content += "<span class='label label-success'><span class='fa fa-check'></span> ";
-			             		content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA'/></span>";
-			             		if (val.error) {
-			             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-			             		}
-			             	} else if (val.notificacioEstat == 'PROCESSADA') {
-			             		content += "<span class='label label-success'><span class='fa fa-check'></span> ";
-			             		content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
-			             		if (val.error) {
-			             			content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
-			             		}
-			             		content += "<p class='estat_" + val.id +  "' style='display:inline'></p>";
-			             		returnEnviamentsStatusDiv(val.id);
-			             	}
-			             	content += "</td>";
-			             	content += "</tr>";
-			             	content += "</tbody>";
-			            });
-		            content += "</table>";
-		        	}
-		        }
-		    });	
-		    return content;
+				url: enviamentsUrl,
+				async: false,
+				success: function (data) {
+					if (data && data.length > 0) {
+						content = "<table data-toggle='datatable' class='table table-bordered table-striped' style='width:100%'>";
+						content += "<thead>";
+						content += "<tr>";
+						content += "<th> <spring:message code='contingut.enviament.columna.tipus'/> </th>";
+						content += "<th> <spring:message code='contingut.enviament.columna.data'/> </th>";
+						content += "<th> <spring:message code='contingut.enviament.columna.estat'/> </th>";
+						content += "</tr>";
+						content += "</thead>";
+						$.each(data, function (i, val) {
+							content += "<tbody>";
+							content += "<tr>";
+							content += "<td width='25%'>";
+							if (val.tipus == "NOTIFICACIO") {
+								content += "<spring:message code='contingut.enviament.notificacio.elec'/>";
+							} else if (val.tipus == "COMUNICACIO") {
+								content += "<spring:message code='contingut.enviament.comunicacio'/>";
+							}
+							content += "</td>";
+							content += "<td width='20%'>" + new Date(val.createdDate).toLocaleString() + "</td>";
+							content += "<td width='10%'>";
+							if (val.notificacioEstat == 'PENDENT') {
+								content += "<span class='label label-warning'><span class='fa fa-clock-o'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.PENDENT'/></span> ";
+								if (val.error) {
+									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+								}
+							} else if (val.notificacioEstat == 'ENVIADA') {
+								content += "<span class='label label-info'><span class='fa fa-envelope-o'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.ENVIADA'/></span>";
+								if (val.error) {
+									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+								}
+							} else if (val.notificacioEstat == 'REGISTRADA') {
+								content += "<span class='label label-success'><span class='fa fa-check'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.REGISTRADA'/></span>";
+							} else if (val.notificacioEstat == 'FINALITZADA') {
+								content += "<span class='label label-success'><span class='fa fa-check'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.FINALITZADA'/></span>";
+								if (val.error) {
+									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+								}
+							} else if (val.notificacioEstat == 'PROCESSADA') {
+								content += "<span class='label label-success'><span class='fa fa-check'></span> ";
+								content += "<spring:message code='notificacio.notificacioEstat.enum.PROCESSADA'/></span>";
+								if (val.error) {
+									content += "<span class='fa fa-warning text-danger' title='<spring:message code='contingut.enviament.error'/>'></span>";
+								}
+								content += "<p class='estat_" + val.id + "' style='display:inline'></p>";
+								returnEnviamentsStatusDiv(val.id);
+							}
+							content += "</td>";
+							content += "</tr>";
+							content += "</tbody>";
+						});
+						content += "</table>";
+					}
+				}
+			});
+			return content;
 		}
 	}
 
 	function enableDisableMultipleButtons(docsIdx) {
-		
-	    $('#loading').removeClass('hidden');
-	    $('#table-documents').addClass("disabled");
-	    $('#grid-documents ').addClass("disabled");
 
-	    var textNotificar = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>';
-	    var textNotificarNomesFirmats = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar.nomes.firmats"/>';
+		$('#loading').removeClass('hidden');
+		$('#table-documents').addClass("disabled");
+		$('#grid-documents ').addClass("disabled");
 
-
-	    if (docsIdx != undefined && docsIdx.length > 0) { // if at least one row is selected
-
-		    var isTotFirmat = true;
-		    var isTotPdf = true;
-		    var isTotGuardatEnArxiu = true;
+		var textNotificar = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>';
+		var textNotificarNomesFirmats = '<spring:message code="contingut.boto.menu.seleccio.multiple.notificar.nomes.firmats"/>';
 
 
-		    if ($('#vistaGrid').hasClass('active')) { // if view grid 
-		    	for (docId of docsIdx) {
-		    		var isFirmat = $('#grid-documents').find('li#' + docId).hasClass('firmat');
-		    		if (!isFirmat) {
-		    			isTotFirmat = false;
+		if (docsIdx != undefined && docsIdx.length > 0) { // if at least one row is selected
+
+			var isTotFirmat = true;
+			var isTotPdf = true;
+			var isTotGuardatEnArxiu = true;
+
+
+			if ($('#vistaGrid').hasClass('active')) { // if view grid
+				for (docId of docsIdx) {
+					var isFirmat = $('#grid-documents').find('li#' + docId).hasClass('firmat');
+					if (!isFirmat) {
+						isTotFirmat = false;
 					}
-		    		var isPdf = $('#grid-documents').find('li#' + docId).hasClass('isPdf');
-	                if (!isPdf) {
-	                    isTotPdf = false;
-	                }
-		    		var isPendentGuardarArxiu = $('#grid-documents').find('li#' + docId).hasClass('isPendentGuardarEnArxiu');
-	                if (isPendentGuardarArxiu) {
-	                	isTotGuardatEnArxiu = false;
-	                }
-		    	}
-
-		    } else { // if any other view
-
-		    	for (docId of docsIdx) {
-		    		var isFirmat = $('#table-documents').find('tr#' + docId).hasClass('firmat');
-		    		if (!isFirmat) {
-		    			isTotFirmat = false;
+					var isPdf = $('#grid-documents').find('li#' + docId).hasClass('isPdf');
+					if (!isPdf) {
+						isTotPdf = false;
 					}
-		    		var isPdf = $('#table-documents').find('tr#' + docId).hasClass('isPdf');
-	                if (!isPdf) {
-	                    isTotPdf = false;
-	                }
-		    		var isPendentGuardarArxiu = $('#table-documents').find('tr#' + docId).hasClass('isPendentGuardarEnArxiu');
-	                if (isPendentGuardarArxiu) {
-	                	isTotGuardatEnArxiu = false;
-	                }
-		    	}
-		    }
+					var isPendentGuardarArxiu = $('#grid-documents').find('li#' + docId).hasClass('isPendentGuardarEnArxiu');
+					if (isPendentGuardarArxiu) {
+						isTotGuardatEnArxiu = false;
+					}
+				}
 
-		    
-		    if (isTotFirmat && isTotGuardatEnArxiu) {
-			    
-		    	if (isTotPdf && ${isConcatentarMultiplePDFs}) { // if concatanate
+			} else { // if any other view
+
+				for (docId of docsIdx) {
+					var isFirmat = $('#table-documents').find('tr#' + docId).hasClass('firmat');
+					if (!isFirmat) {
+						isTotFirmat = false;
+					}
+					var isPdf = $('#table-documents').find('tr#' + docId).hasClass('isPdf');
+					if (!isPdf) {
+						isTotPdf = false;
+					}
+					var isPendentGuardarArxiu = $('#table-documents').find('tr#' + docId).hasClass('isPendentGuardarEnArxiu');
+					if (isPendentGuardarArxiu) {
+						isTotGuardatEnArxiu = false;
+					}
+				}
+			}
+
+			if (isTotFirmat && isTotGuardatEnArxiu) {
+
+				if (isTotPdf && ${isConcatentarMultiplePDFs}) { // if concatanate
 					// then show modal maximized
-		    		$('#notificar-mult a').data('maximized', 'true');
-		    		$('#notificar-mult a.btn.btn-default').off();
-		    		$('#notificar-mult a').removeData('webutilModal');
-		    		$('#notificar-mult a').webutilModal();
+					$('#notificar-mult a').data('maximized', 'true');
+					$('#notificar-mult a.btn.btn-default').off();
+					$('#notificar-mult a').removeData('webutilModal');
+					$('#notificar-mult a').webutilModal();
 
-			    } else { // if zip
-			    	// then show modal not maximized
-			    	$('#notificar-mult a').removeData('maximized');
-			    	$('#notificar-mult a.btn.btn-default').off();
-		    		$('#notificar-mult a').removeData('webutilModal');
-			    	$('#notificar-mult a').webutilModal();
+				} else { // if zip
+					// then show modal not maximized
+					$('#notificar-mult a').removeData('maximized');
+					$('#notificar-mult a.btn.btn-default').off();
+					$('#notificar-mult a').removeData('webutilModal');
+					$('#notificar-mult a').webutilModal();
 
 				}
 
-		    	$('#notificar-mult').prop('title', textNotificar);
-		        $('#notificar-mult a').removeClass("disabled"); // it is disabling $('#notificar-mult a') instead of $('#notificar-mult') so it is possible to see tooltip on $('#notificar-mult')
-		        $('#definitiu-mult a').addClass("disabled");
-		        
-		    } else if (!isTotGuardatEnArxiu) {
+				$('#notificar-mult').prop('title', textNotificar);
+				$('#notificar-mult a').removeClass("disabled"); // it is disabling $('#notificar-mult a') instead of $('#notificar-mult') so it is possible to see tooltip on $('#notificar-mult')
+				$('#definitiu-mult a').addClass("disabled");
 
-		    	$('#notificar-mult').prop('title', textNotificarNomesFirmats);
-		        $('#notificar-mult a').addClass("disabled");
-		        $('#definitiu-mult a').addClass("disabled");
-		    } else {
-		    	$('#notificar-mult').prop('title', textNotificarNomesFirmats);
-		        $('#notificar-mult a').addClass("disabled");
-		        $('#definitiu-mult a').removeClass("disabled");
-		    }
+			} else if (!isTotGuardatEnArxiu) {
+
+				$('#notificar-mult').prop('title', textNotificarNomesFirmats);
+				$('#notificar-mult a').addClass("disabled");
+				$('#definitiu-mult a').addClass("disabled");
+			} else {
+				$('#notificar-mult').prop('title', textNotificarNomesFirmats);
+				$('#notificar-mult a').addClass("disabled");
+				$('#definitiu-mult a').removeClass("disabled");
+			}
 
 
-	        $('#descarregar-mult a').removeClass("disabled");
-	        $('#moure-mult a').removeClass("disabled");
-	        $('#tipusdocumental-mult').removeClass("disabled");
+			$('#descarregar-mult a').removeClass("disabled");
+			$('#moure-mult a').removeClass("disabled");
+			$('#tipusdocumental-mult').removeClass("disabled");
 
 		} else {
-	        $('#descarregar-mult a').addClass("disabled");
-	        $('#notificar-mult').prop('title', textNotificar);
-	        $('#notificar-mult a').addClass("disabled");
-	        $('#moure-mult a').addClass("disabled");
-	        $('#tipusdocumental-mult').addClass("disabled");
-	    }
-	    
+			$('#descarregar-mult a').addClass("disabled");
+			$('#notificar-mult').prop('title', textNotificar);
+			$('#notificar-mult a').addClass("disabled");
+			$('#moure-mult a').addClass("disabled");
+			$('#tipusdocumental-mult').addClass("disabled");
+		}
 
-	    $('#table-documents').removeClass("disabled");
-	    $('#grid-documents ').removeClass("disabled");
-	    $('#loading').addClass('hidden');
 
-	    
+		$('#table-documents').removeClass("disabled");
+		$('#grid-documents ').removeClass("disabled");
+		$('#loading').addClass('hidden');
+
+
 	}
-	
+
 	function selectAll(docsIdx) {
 		var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
 		$.get(
-				multipleUrl, 
+				multipleUrl,
 				{docsIdx: docsIdx},
-				function(data) {
+				function (data) {
 					$(".seleccioCount").html(data);
 				}
 		);
 	}
-	
+
 	function deselectAll() {
 		clearSelection();
 	}
@@ -1237,17 +1127,16 @@ function calcPadding(s, padding, $node) {
 		var multipleUrl = '<c:url value="/contingut/${contingut.id}/inicialitzar/seleccio"/>';
 		$.get(
 				multipleUrl,
-				function(data) {
+				function (data) {
 					$(".seleccioCount").html(data);
 				}
 		);
 	}
 
 
-
 	function getIdsSelectedFromTable() {
 		let idsSelected = [];
-		$('#table-documents tbody .checkbox').each(function() {
+		$('#table-documents tbody .checkbox').each(function () {
 			if ($(this).prop('checked')) {
 				let id = $(this).closest('tr').attr('id');
 				idsSelected.push(parseInt(id));
@@ -1255,15 +1144,7 @@ function calcPadding(s, padding, $node) {
 		});
 		return idsSelected;
 	}
-	
 
-
-
-	
-
-
-
-	
 
 	function showTipusDocumentals() {
 		var content = '<div> \
@@ -1281,156 +1162,155 @@ function calcPadding(s, padding, $node) {
 
 
 	function returnEnviamentsStatusDiv(notificacioId) {
-	    var content = "";
-	    var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + notificacioId;
+		var content = "";
+		var getUrl = "<c:url value="/expedient/${contingut.id}"/>" + "/enviaments/" + notificacioId;
 
-	    $.getJSON({
-	        url: getUrl,
-	        success: (json) => {
+		$.getJSON({
+			url: getUrl,
+			success: (json) => {
 
 				if (json.error) {
-					 $('.estat_' + notificacioId).append('<div class="viewer-padding"><div class="alert alert-danger"> ' + json.errorMsg + '</div></div>');
+					$('.estat_' + notificacioId).append('<div class="viewer-padding"><div class="alert alert-danger"> ' + json.errorMsg + '</div></div>');
 				} else {
 					var notificacio = json.data;
-		        
+
 					var enviaments = notificacio.documentEnviamentInteressats;
-		            for (i = 0; i < enviaments.length; i++) {
-		                content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
-		            }
-		            if (content !== undefined && content != '') {
-		                content = "("+content.replace(/,\s*$/, "")+")";
-		            }
-		            $('.estat_' + notificacioId).html("");
-		            $('.estat_' + notificacioId).append(content);
+					for (i = 0; i < enviaments.length; i++) {
+						content += (enviaments[i].enviamentDatatEstat) ? notificacioEnviamentEstats[enviaments[i].enviamentDatatEstat] + ',' : '';
+					}
+					if (content !== undefined && content != '') {
+						content = "(" + content.replace(/,\s*$/, "") + ")";
+					}
+					$('.estat_' + notificacioId).html("");
+					$('.estat_' + notificacioId).append(content);
 				}
-	        },
-	        error: function(data){
-	        	console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId);
-	        }
-	    })
+			},
+			error: function (data) {
+				console.log("No s'han pogut recuperar els enviaments de la notificació: " + notificacioId);
+			}
+		})
 	}
+
 	var myHelpers = {
-	recuperarEstatEnviament: returnEnviamentsStatusDiv,
+		recuperarEstatEnviament: returnEnviamentsStatusDiv,
 	};
 	$.views.helpers(myHelpers);
-	
-</c:if>//------------------------- if contingut is not document END ----------------------------------
+
+	</c:if>//------------------------- if contingut is not document END ----------------------------------
 
 
+	function getDetallsSignants(idTbody, contingutId, header) {
 
-
-function getDetallsSignants(idTbody, contingutId, header) {
-
-	idTbody.html("");
-	idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="<c:url value="/img/loading.gif"/>"/></td></tr>');
-	$.get("<c:url value="/contingut/document/"/>" + contingutId + "/mostraDetallSignants", function(json){
-		if (json.error) {
-			idTbody.html('<tr><td colspan="2" style="width:100%"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="contingut.document.info.firma.error"/>: ' + json.errorMsg + '</div></td></tr>');
-		} else {
-			idTbody.html("");
-			if(json.data != null && json.data.length > 0){
-				json.data.forEach(function(firma){
-					if(firma != null){
-						var firmaDataStr = "";
-						if(firma.responsableNom == null){
-							firma.responsableNom = "";
+		idTbody.html("");
+		idTbody.append('<tr class="datatable-dades-carregant"><td colspan="7" style="margin-top: 2em; text-align: center"><img src="<c:url value="/img/loading.gif"/>"/></td></tr>');
+		$.get("<c:url value="/contingut/document/"/>" + contingutId + "/mostraDetallSignants", function (json) {
+			if (json.error) {
+				idTbody.html('<tr><td colspan="2" style="width:100%"><div class="alert alert-danger"><button type="button" class="close-alertes" data-dismiss="alert" aria-hidden="true"><span class="fa fa-times"></span></button><spring:message code="contingut.document.info.firma.error"/>: ' + json.errorMsg + '</div></td></tr>');
+			} else {
+				idTbody.html("");
+				if (json.data != null && json.data.length > 0) {
+					json.data.forEach(function (firma) {
+						if (firma != null) {
+							var firmaDataStr = "";
+							if (firma.responsableNom == null) {
+								firma.responsableNom = "";
+							}
+							if (firma.responsableNif == null) {
+								firma.responsableNif = "";
+							}
+							if (firma.data != null) {
+								firmaDataStr = new Date(firma.data);
+							}
+							if (firma.emissorCertificat == null) {
+								firma.emissorCertificat = "";
+							}
+							if (header) {
+								idTbody.append('<tr><th style="padding-bottom: 2px;"><strong>'
+										+ '<u><spring:message code="contingut.document.info.firma"/></u>'
+										+ "</strong></th><tr>");
+							}
+							idTbody.append(
+									"<tr><th><strong>"
+									+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
+									+ "</strong></th><th>"
+									+ firma.responsableNom
+									+ "</th></tr><tr><td><strong>"
+									+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
+									+ "</strong></td><td>"
+									+ firma.responsableNif
+									+ "</td></tr><tr><td><strong>"
+									+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
+									+ "</strong></td><td>"
+									+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
+									+ "</td></tr><tr><td><strong>"
+									+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
+									+ "</strong></td><td>"
+									+ firma.emissorCertificat
+									+ "</td></tr>");
 						}
-						if(firma.responsableNif == null){
-							firma.responsableNif = "";
-						}
-						if(firma.data != null){
-							firmaDataStr = new Date(firma.data);
-						}
-						if(firma.emissorCertificat == null){
-							firma.emissorCertificat = "";
-						}
-						if (header){
-							idTbody.append('<tr><th style="padding-bottom: 2px;"><strong>'
-									+ '<u><spring:message code="contingut.document.info.firma"/></u>'
-									+ "</strong></th><tr>");
-						} 
-						idTbody.append(
-							  "<tr><th><strong>"
-							+ '<spring:message code="contingut.document.camp.firma.responsable.nom"/>'
-							+ "</strong></th><th>"
-							+ firma.responsableNom
-							+ "</th></tr><tr><td><strong>"
-							+ '<spring:message code="contingut.document.camp.firma.responsable.nif"/>'
-							+ "</strong></td><td>"
-							+ firma.responsableNif
-							+ "</td></tr><tr><td><strong>"
-							+ '<spring:message code="contingut.document.camp.firma.responsable.data"/>'
-							+ "</strong></td><td>"
-							+ (firmaDataStr != "" ? firmaDataStr.toLocaleString() : "")
-							+ "</td></tr><tr><td><strong>"
-							+ '<spring:message code="contingut.document.camp.firma.emissor.certificat"/>'
-							+ "</strong></td><td>"
-							+ firma.emissorCertificat
-							+ "</td></tr>");
-					}
-				})
+					})
+				}
 			}
+			webutilRefreshMissatges();
+		});
+	}
+
+	function loadCurrentFolderFromServer(carpetaId, showAll) {
+		var $tableDocuments = $("#table-documents");
+		var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
+		var currentState = sessionStorage.getItem("nodeState-treetable-" + carpetaId);
+
+		if (currentState === "expanded") {
+			showLoadingCurrentFolder(carpetaId);
+
+			$.ajax({
+				url: '<c:url value="/contingut/tag/"/>' + carpetaId,
+				method: 'get',
+				success: function (response) {
+					$('.loading_carpeta').remove();
+					$selectedCarpeta.after(response);
+				},
+				error: function () {
+					console.log("error");
+				},
+				complete: function () {
+					$('[data-toggle="modal"]').webutilModalEval();
+
+					var $tableDocuments = $("#table-documents");
+					// Cambia icono subcarpetas
+					$tableDocuments.find("tbody tr:not(.isDocument)").each(function () {
+						setIcon($(this));
+					});
+
+					$tableDocuments.find("tbody tr").each(function () {
+						$($(this).find('[data-toggle="modal"]')).webutilModal();
+					});
+
+					// Calcula padding izquierdo hijos
+					$tableDocuments.find("tbody tr").each(function () {
+						setPadding($(this));
+					});
+
+					updateTableEvents();
+
+					if (showAll) {
+						var $fills = $tableDocuments.find('tr[data-pnode="treetable-' + carpetaId + '"]');
+						$fills.each(function () {
+							$(this).trigger('click', [showAll]);
+						});
+					}
+				}
+			});
+
 		}
-		webutilRefreshMissatges();
-	});
-}	
+	}
 
-function loadCurrentFolderFromServer(carpetaId, showAll) {
-	var $tableDocuments = $("#table-documents");
-    var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
-	var currentState = sessionStorage.getItem("nodeState-treetable-" + carpetaId);
-	
-    if (currentState === "expanded") {
-    	showLoadingCurrentFolder(carpetaId);
-    	
-    	$.ajax({
-    		url: '<c:url value="/contingut/tag/"/>' + carpetaId,
-    	    method: 'get',
-    	    success: function(response) {
-    	    	$('.loading_carpeta').remove();
-    	    	$selectedCarpeta.after(response);
-    	    },
-    	    error: function() {
-    	    	console.log("error");
-    	    },
-    	    complete: function() {
-    			$('[data-toggle="modal"]').webutilModalEval();
-    	    
-    	    	var $tableDocuments = $("#table-documents");
-    	    	// Cambia icono subcarpetas
-    	    	$tableDocuments.find("tbody tr:not(.isDocument)").each(function() {
-    	    		setIcon($(this));
-    			});
-    	    	
-    	    	$tableDocuments.find("tbody tr").each(function() {
-					$($(this).find('[data-toggle="modal"]')).webutilModal();
-    	    	});
-    	    	
-    	    	// Calcula padding izquierdo hijos
-    	    	$tableDocuments.find("tbody tr").each(function() {
-    				setPadding($(this));
-    			});
-    	    	    	    	
-    	    	updateTableEvents();
-    	    	
-    	    	if (showAll) {
-	    	    	var $fills = $tableDocuments.find('tr[data-pnode="treetable-' + carpetaId + '"]');
-	    	    	$fills.each(function() {
-	    	    		$(this).trigger('click', [showAll]);
-	    	    	});
-    	    	}
-    	    }
-    	});
-    	
-    }
-}
-
-function showLoadingCurrentFolder(carpetaId) {
-	var $tableDocuments = $("#table-documents");
-	var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
-    $selectedCarpeta.nextUntil(':not([data-pnode="treetable-' + carpetaId + '"])').remove();
-	$selectedCarpeta.after("<tr class='loading_carpeta'><td></td><td colspan='7' style='padding-left: 10px; text-align: center;'><img src='/ripea/img/loading.gif'></td></tr>");
-}
+	function showLoadingCurrentFolder(carpetaId) {
+		var $tableDocuments = $("#table-documents");
+		var $selectedCarpeta = $tableDocuments.find('tr[id="' + carpetaId + '"]');
+		$selectedCarpeta.nextUntil(':not([data-pnode="treetable-' + carpetaId + '"])').remove();
+		$selectedCarpeta.after("<tr class='loading_carpeta'><td></td><td colspan='7' style='padding-left: 10px; text-align: center;'><img src='/ripea/img/loading.gif'></td></tr>");
+	}
 </script>
 
 
@@ -1566,710 +1446,717 @@ function showLoadingCurrentFolder(carpetaId) {
 	</c:when>
 	<%---------------------------- WHEN CONTINGUT IS EXPEDIENT OR CARPETA (SHOWS ARBRE / GRID OF CONTINGUTS) -------------------------%>
 	<c:otherwise>
-	
-		<%----------- TASCA BUTTONS ----------%>
-		<c:if test="${isTasca}">
-			<div id="tascaBtn" style="float: right">
-				<c:if test="${tascaEstat=='INICIADA'}">
-					<a href="<c:url value="/usuariTasca/${tascaId}/finalitzar"/>" class="btn btn-default" style="float: right;" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzarTasca" /></a>
-				</c:if>
-				<c:if test="${tascaEstat=='PENDENT'}">
-					<a href="<c:url value="/usuariTasca/${tascaId}/iniciar?redirectATasca=true"/>" class="btn btn-default" style="float: right;"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a>
-				</c:if>									
-				<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+
+		<div id="drop-area">
+			<div id="drop-message">
+				<span id="drop-message-icon" class="fa fa-upload"></span>
+				<div id="drop-message-text">Deixa anar el document aquí per afegir-lo a l'expedient</div>
 			</div>
-		</c:if>	
-								
-		<%----------------------------------- ACCION BUTTONS --------------------------------%>
-		<div class="text-right" id="contingut-botons">
-		
-			<%---- path ----%>
-			<c:if test="${contingut.expedient or contingut.carpeta}">
-				<rip:blocContenidorPath contingut="${contingut}"/>
-			</c:if>
+			<%----------- TASCA BUTTONS ----------%>
+			<c:if test="${isTasca}">
+				<div id="tascaBtn" style="float: right">
+					<c:if test="${tascaEstat=='INICIADA'}">
+						<a href="<c:url value="/usuariTasca/${tascaId}/finalitzar"/>" class="btn btn-default" style="float: right;" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzarTasca" /></a>
+					</c:if>
+					<c:if test="${tascaEstat=='PENDENT'}">
+						<a href="<c:url value="/usuariTasca/${tascaId}/iniciar?redirectATasca=true"/>" class="btn btn-default" style="float: right;"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a>
+					</c:if>									
+					<a href="<c:url value="/usuariTasca"/>" class="btn btn-default pull-right" style="float: right; margin-right: 3px;"><span class="fa fa-arrow-left"></span>&nbsp;<spring:message code="comu.boto.tornar"/></a>
+				</div>
+			</c:if>	
+									
+			<%----------------------------------- ACCION BUTTONS --------------------------------%>
+			<div class="text-right" id="contingut-botons">
 			
-			<%---- expand/collapse tree ----%>
-			<c:if test="${!vistaIcones}">
-				<div id="expandCollapseButtons" style="float: left;display: inline-block;">
+				<%---- path ----%>
+				<c:if test="${contingut.expedient or contingut.carpeta}">
+					<rip:blocContenidorPath contingut="${contingut}"/>
+				</c:if>
+				
+				<%---- expand/collapse tree ----%>
+				<c:if test="${!vistaIcones}">
+					<div id="expandCollapseButtons" style="float: left;display: inline-block;">
+						<c:choose>
+							<c:when test="${isMantenirEstatCarpetaActiu}">
+								<button class="btn btn-default" onclick="expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
+								<button class="btn btn-default" onclick="collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+							</c:when>
+							<c:otherwise>
+								<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
+								<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+							</c:otherwise>
+						</c:choose>
+						
+					</div>
+				</c:if>
+				<c:if test="${isTasca}">
+					<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
+				</c:if>
+				
+				
+				
+				<c:if test="${vistaIcones}">
+					<%---- Habilitar selecció múltiple ----%>
+					<div class="btn-group">
+						<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.habilitar"/>" id="habilitar-mult" class="btn-group btn btn-default">
+							<span class="glyphicon glyphicon-th"></span>
+						</div>
+					</div>
+					<%---- Seleccionar tots ----%>
+					<div class="btn-group">
+						<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.seleccio"/>" id="checkItAll" class="btn-group btn btn-default disabled">
+							<span class="fa fa-check"></span>
+						</div>
+					</div>
+				</c:if>
+				<%---- Descarregar documents seleccionats ----%>
+				<div class="btn-group">
+					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
+						<a href="<c:url value="/contingut/${contingut.id}/descarregarMultiples?tascaId=${tascaId}"/>" class="btn btn-default con-mult">
+							<span class="fa fa-download"></span>
+							
+							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+						</a>
+					</div>
+				</div>
+				
+				<c:if test="${potModificar && !isTasca}">
+					<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
+					
+					
+					
+					<%---- Button notificar mult ----%>
+					<div class="btn-group">
+						<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>" id="notificar-mult" class="btn-group">
+							<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true">
+								<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
+							</a> 
+						</div>
+						<c:if test="${convertirDefinitiu}">
+							<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
+								<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
+									<span class="fa fa-check-square"></span>
+									
+									<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+								</a> 
+								<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
+									<span class="fa fa-check-square"></span>
+									
+									<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+								</a>
+							</div>
+						</c:if>
+						<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
+							<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default con-mult">
+								<span class="fa fa-arrows"></span>
+								
+								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+							</a>
+						</div>
+						<div data-toggle="popover" class="btn btn-default" id="tipusdocumental-mult">
+							<div data-toggle="tooltip" title="<spring:message code="massiu.canvi.tipus.document"/>">
+								<span class="fa fa-edit"></span>
+								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+							</div>
+						</div>
+					</div>
+					<%---- Button descarregar zip mult 
+					<div class="btn-group">
+						<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
+							<a href="<c:url value="/contingut/${contingut.id}/generarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
+								<span class="glyphicon glyphicon-compressed"></span>
+								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
+							</a>
+						</div>
+					</div>
+					----%>
+				</c:if>
+				<div class="btn-group" id="vistes">
+					<c:if test="${!isTasca}">
+						<%---- Button treetable per estats  ----%>
+						<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_ESTAT?tascaId=${tascaId}"/></c:set>
+						<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.estat"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerEstats ? 'active' : ''}" draggable="false">
+							<span class="fa fa-ellipsis-v" style="padding-left: 5px; padding-right: 5px;"></span>
+						</a>	
+					</c:if>		
+					<%---- Button treetable per tipus de documents  ----%>
+					<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT?tascaId=${tascaId}"/></c:set>
+					<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.tipus.document"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
+						<span class="fa fa-bars"></span>
+					</a>
+					<%---- Button treetable per carpetes  ----%>
+					<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/TREETABLE_PER_CARPETA?tascaId=${tascaId}"/></c:set>
+					<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.carpeta"/>" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
+						<span class="fa fa-th-list"></span>
+					</a>
+					<%---- Button grid ----%>
+					<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/GRID?tascaId=${tascaId}"/></c:set>					
+					<a href="${iconesVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.grid"/>" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
+						<span class="fa fa-th" ></span>
+					</a>	
+					<script>
+						var docsIdx = new Array();
+					</script>							
+				</div>
+				
+				<c:if test="${potModificar && (!contingut.carpeta || isCreacioCarpetesActiva)}">
+					<div id="botons-crear-contingut" class="btn-group">
+						<%---- Crear contingut ----%>
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
+						<ul class="dropdown-menu text-left" role="menu">
+							<c:if test="${contingut.crearExpedients and hasPermissionAnyProcediment}">
+								<li>
+								<a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true">
+									<span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...
+								</a>
+								</li>
+							</c:if>
+							<%---- Document... ----%>
+							<li>
+								<c:choose>
+									<c:when test="${empty metaDocumentsNoPinbalLeft}">
+										<a href="#" class="document-new-empty-metadocuments">
+											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+										</a>
+									</c:when>
+									<c:otherwise>
+										<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true">
+											<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
+										</a>
+									</c:otherwise>
+								</c:choose>
+							</li>
+							<c:if test="${!isTasca}">
+								<%---- Consulta PINBAL... ----%>
+								<c:if test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">
+									<li>
+										<c:choose>
+											<c:when test="${empty metaDocumentsPinbalLeft}">
+												<a href="#" class="document-new-empty-metadocuments">
+													<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+												</a>
+											</c:when>
+											<c:otherwise>
+												<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
+													<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
+												</a>
+											</c:otherwise>	
+										</c:choose>				
+									</li>	
+								</c:if>		
+								<%---- Carpeta... ----%>
+								<c:if test="${isCreacioCarpetesActiva}">
+									<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>
+								</c:if>
+								<c:if test="${isMostrarImportacio}">
+									<li><a href="<c:url value="/contingut/${contingut.id}/importacio/new"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaImportacio}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.importacio"/>...</a></li>
+								</c:if>
+								<c:if test="${isImportacioRelacionatsActiva}">
+									<li><a href="<c:url value="/expedient/${expedientId}/relacionats/${contingut.id}/list"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.expedient.relacionat"/>...</a></li>
+								</c:if>	
+							</c:if>											
+						</ul>
+					</div>
+				</c:if>
+			</div>
+			
+			<%---- TABLE/GRID OF CONTINGUTS ----%>
+			<div id="loading">
+				<img src="<c:url value="/img/loading.gif"/>"/>
+			</div>
+			
+	
+			<c:choose>
+				<c:when test="${!isMostrarCarpetesPerAnotacions}"><c:set var="fills" value="${contingut.fillsFlat}"/></c:when>
+				<c:otherwise><c:set var="fills" value="${contingut.fillsHierarchical}"/></c:otherwise>
+			</c:choose>
+			
+			<c:choose>
+				<%--########################################################### VIEW TREETABLE PER ESTATS ###########################################################--%>
+				<c:when test="${vistaTreetablePerEstats}">
+				
 					<c:choose>
-						<c:when test="${isMantenirEstatCarpetaActiu}">
-							<button class="btn btn-default" onclick="expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
-							<button class="btn btn-default" onclick="collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+						<c:when test="${not empty contingut.mapPerEstat}">
+							<%--------------------- TREETABLE  -------------------%>
+							<table class="table table-striped table-bordered table-hover" id="table-documents">
+								<thead>
+									<tr>
+										<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
+										<th><spring:message code="contingut.info.nom"/></th>
+										<th><spring:message code="contingut.info.descirpcio"/></th>
+										<th><spring:message code="contingut.info.ruta"/></th>
+										<th><spring:message code="contingut.info.createl"/></th>
+										<th><spring:message code="contingut.info.creatper"/></th>
+										<th width="5%">&nbsp;</th>
+										<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+											<th width="1%">&nbsp;</th>
+										</c:if>
+									</tr>
+								</thead>
+								<tbody>
+									<c:forEach items="${contingut.mapPerEstat}" var="entry">
+										<%------------------------------- Tipus de document ------------------------%>
+										<tr id="${entry.key.id}"
+											data-node="treetable-${entry.key.id}"
+											data-pnode="treetable-${contingut.id}">
+											<%------------ checkbox ----------%>
+											<td></td>
+											<%------------ Nom ----------%>
+											<td><b>${entry.key.nom}</b> 
+											
+												<span class="badge">${fn:length(entry.value)}</span>
+												
+	
+											</td>
+											<%------------ Descripció ----------%>
+											<td></td>
+											<%------------ Tipus -----------%>
+											<td width="25%"></td>
+											<%------------ Creat el -----------%>
+											<td></td>
+											<%------------ Creat per -----------%>
+											<td></td>
+											<%------------ Accions -----------%>
+											<td></td>
+											<%------------ sort ----------%>
+											<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+												<td></td>
+											</c:if>
+										</tr>								
+										
+										 <%------------------------------- Documents ----------------------------%>
+										 <c:choose>
+											<c:when test="${!empty entry.value}">
+												 <c:forEach items="${entry.value}" var="fill">
+												 
+													<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+													
+														<c:set var="firmat" value="true"/>
+														<c:if test="${fill.document}">
+															<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
+																<c:set var="firmat" value="false"/> 
+															</c:if>
+														</c:if>
+												
+														<tr id="${fill.id}"
+															class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
+															data-expedient-id="${expedientId}" 
+															data-node="treetable-${fill.id}"
+															data-pnode="treetable-${entry.key.id}">
+															
+												
+															<%------------ checkbox ----------%>
+															<td><c:if test="${fill.document}">
+																<input type="checkbox" class="checkbox" autocomplete="off" />
+															</c:if></td>
+												
+															<%------------ Nom ----------%>
+															<td>
+																<rip:blocIconaContingut contingut="${fill}" /> 
+																<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
+															</td>
+												
+															<%------------ Descripció ----------%>
+															<td><c:if test="${fill.document}">
+																&nbsp;${fill.descripcio}
+															</c:if></td>
+												
+															<%------------ Ruta -----------%>
+															<td width="25%">
+																<c:forEach var="contingutPath" items="${fill.path}" varStatus="status">
+																	<c:if test="${!status.first}">/${contingutPath.nom}</c:if>
+																</c:forEach>
+																<c:if test="${fn:length(fill.path) == 1}">/</c:if>
+															</td>
+												
+															<%------------ Creat el -----------%>
+															<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
+												
+															<%------------ Creat per -----------%>
+															<td>${fill.createdBy.codiAndNom}</td>
+												
+															<%------------ Accions -----------%>
+															<td><rip:blocContingutAccions className="botons-accions-element"
+																	modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingut.id}"/></td>
+												
+															<%------------ sort ----------%>
+															<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+																<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
+																	class="fa fa-sort"></span></td>
+															</c:if>
+														</tr>
+													</c:if>
+												 
+												</c:forEach>
+											 </c:when>
+											 <c:otherwise>
+												<tr	data-node="treetable-0"
+													data-pnode="treetable-${entry.key.id}">
+													<td></td><td colspan="6"><spring:message code="contingut.info.table.tree.estat.no.documents"/></td>
+												</tr>
+											 </c:otherwise>
+										 </c:choose>
+									</c:forEach>							
+								
+	
+								
+								</tbody>
+							</table>			
 						</c:when>
 						<c:otherwise>
-							<button class="btn btn-default" onclick="$('#table-documents').expandAll();"><span class="fa fa-caret-square-o-down"></span> <spring:message code="unitat.arbre.expandeix"/></button> 
-							<button class="btn btn-default" onclick="$('#table-documents').collapseAll();"><span class="fa fa-caret-square-o-up"></span> <spring:message code="unitat.arbre.contreu"/></button> 
+							<%--------------------- EMPTY TREETABLE -------------------%>
+							<table class="table table-striped table-bordered table-hover" id="table-documents">
+									<thead>
+										<tr>
+											<th></th>
+											<th><spring:message code="contingut.info.nom"/></th>
+											<th><spring:message code="contingut.info.descirpcio"/></th>
+											<th><spring:message code="contingut.info.tipus" /></th>
+											<th><spring:message code="contingut.info.createl" /></th>
+											<th><spring:message code="contingut.info.creatper" /></th>
+											<th width="10%">&nbsp;</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="odd">
+											<td colspan="9" valign="top">
+												<h1 style="opacity: .1; text-align: center;">
+													<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
+													<strong><spring:message code="contingut.sense.contingut" /></strong>
+												</h1>
+											</td>
+										</tr>
+									</tbody>
+								</table>
 						</c:otherwise>
-					</c:choose>
-					
-				</div>
-			</c:if>
-			<c:if test="${isTasca}">
-				<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
-			</c:if>
-			
-			
-			
-			<c:if test="${vistaIcones}">
-				<%---- Habilitar selecció múltiple ----%>
-				<div class="btn-group">
-					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.habilitar"/>" id="habilitar-mult" class="btn-group btn btn-default">
-						<span class="glyphicon glyphicon-th"></span>
-					</div>
-				</div>
-				<%---- Seleccionar tots ----%>
-				<div class="btn-group">
-					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.seleccio"/>" id="checkItAll" class="btn-group btn btn-default disabled">
-						<span class="fa fa-check"></span>
-					</div>
-				</div>
-			</c:if>
-			<%---- Descarregar documents seleccionats ----%>
-			<div class="btn-group">
-				<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
-					<a href="<c:url value="/contingut/${contingut.id}/descarregarMultiples?tascaId=${tascaId}"/>" class="btn btn-default con-mult">
-						<span class="fa fa-download"></span>
+					</c:choose>	
+				</c:when>
+				
+				
+				
 						
-						<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-					</a>
-				</div>
-			</div>
-			
-			<c:if test="${potModificar && !isTasca}">
-				<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
+				<%--########################################################### VIEW TREETABLE PER TIPUS DE DOCUMENTS ###########################################################--%>
+				<c:when test="${vistaTreetablePerTipusDocuments}">
 				
-				
-				
-				<%---- Button notificar mult ----%>
-				<div class="btn-group">
-					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.notificar"/>" id="notificar-mult" class="btn-group">
-						<a href="<c:url value="/contingut/${contingut.id}/${isNotificacioMultipleGenerarDocumentVisible ? 'chooseTipusDocument' : 'concatenarOGenerarZip'}"/>" class="btn btn-default" data-toggle="modal" data-refresh-pagina="true">
-							<span class="fa fa-envelope-o"></span><span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</a> 
-					</div>
-					<c:if test="${convertirDefinitiu}">
-						<div data-toggle="tooltip" title="<spring:message code="massiu.estat.definitiu"/>" id="definitiu-mult" class="btn-group">
-							<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult hidden" data-confirm="${definitiuConfirmacioMsg}">
-								<span class="fa fa-check-square"></span>
-								
-								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-							</a> 
-							<a href="<c:url value="/contingut/${contingut.id}/defintiu"/>" class="btn btn-default con-mult" data-confirm="${definitiuConfirmacioMsg}">
-								<span class="fa fa-check-square"></span>
-								
-								<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-							</a>
-						</div>
-					</c:if>
-					<div data-toggle="tooltip" title="<spring:message code="massiu.moure.documents"/>" class="btn-group" id="moure-mult">
-						<a href="<c:url value="/contingut/${contingut.id}/moure"/>" data-toggle="modal" data-refresh-pagina="true" class="btn btn-default con-mult">
-							<span class="fa fa-arrows"></span>
-							
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</a>
-					</div>
-					<div data-toggle="popover" class="btn btn-default" id="tipusdocumental-mult">
-						<div data-toggle="tooltip" title="<spring:message code="massiu.canvi.tipus.document"/>">
-							<span class="fa fa-edit"></span>
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</div>
-					</div>
-				</div>
-				<%---- Button descarregar zip mult 
-				<div class="btn-group">
-					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.concatenarzip"/>" id="notificar-mult" class="btn-group">
-						<a href="<c:url value="/contingut/${contingut.id}/generarZip/new"/>" class="btn btn-default zip-mult" data-toggle="modal">
-							<span class="glyphicon glyphicon-compressed"></span>
-							<span class="badge seleccioCount">${fn:length(seleccio)}</span>
-						</a>
-					</div>
-				</div>
-				----%>
-			</c:if>
-			<div class="btn-group" id="vistes">
-				<c:if test="${!isTasca}">
-					<%---- Button treetable per estats  ----%>
-					<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_ESTAT?tascaId=${tascaId}"/></c:set>
-					<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.estat"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerEstats ? 'active' : ''}" draggable="false">
-						<span class="fa fa-ellipsis-v" style="padding-left: 5px; padding-right: 5px;"></span>
-					</a>	
-				</c:if>		
-				<%---- Button treetable per tipus de documents  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${expedientId}/canviVista/TREETABLE_PER_TIPUS_DOCUMENT?tascaId=${tascaId}"/></c:set>
-				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.tipus.document"/>" id="vistaTreetablePerTipusDocuments" class="btn btn-default ${vistaTreetablePerTipusDocuments ? 'active' : ''}" draggable="false">
-					<span class="fa fa-bars"></span>
-				</a>
-				<%---- Button treetable per carpetes  ----%>
-				<c:set var="llistatVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/TREETABLE_PER_CARPETA?tascaId=${tascaId}"/></c:set>
-				<a href="${llistatVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.treetable.carpeta"/>" id="vistaTreetablePerCarpetes" class="btn btn-default ${vistaLlistat ? 'active' : ''}" draggable="false">
-					<span class="fa fa-th-list"></span>
-				</a>
-				<%---- Button grid ----%>
-				<c:set var="iconesVistaUrl"><c:url value="/contingut/${contingut.id}/canviVista/GRID?tascaId=${tascaId}"/></c:set>					
-				<a href="${iconesVistaUrl}" title="<spring:message code="contingut.boto.menu.vista.grid"/>" id="vistaGrid" class="btn btn-default ${vistaIcones ? 'active' : ''}" draggable="false"> 
-					<span class="fa fa-th" ></span>
-				</a>	
-				<script>
-					var docsIdx = new Array();
-				</script>							
-			</div>
-			
-			<c:if test="${potModificar && (!contingut.carpeta || isCreacioCarpetesActiva)}">
-				<div id="botons-crear-contingut" class="btn-group">
-					<%---- Crear contingut ----%>
-					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
-					<ul class="dropdown-menu text-left" role="menu">
-						<c:if test="${contingut.crearExpedients and hasPermissionAnyProcediment}">
-							<li>
-							<a href="<c:url value="/contingut/${contingut.id}/expedient/new"/>" data-toggle="modal" data-refresh-pagina="true">
-								<span class="fa ${iconaExpedientTancat}"></span>&nbsp;<spring:message code="contingut.boto.crear.expedient"/>...
-							</a>
-							</li>
-						</c:if>
-						<%---- Document... ----%>
-						<li>
-							<c:choose>
-								<c:when test="${empty metaDocumentsNoPinbalLeft}">
-									<a href="#" class="document-new-empty-metadocuments">
-										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
-									</a>
-								</c:when>
-								<c:otherwise>
-									<a id="document-new" href="<c:url value="/contingut/${contingut.id}/document/new?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true">
-										<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.document"/>...
-									</a>
-								</c:otherwise>
-							</c:choose>
-						</li>
-						<c:if test="${!isTasca}">
-							<%---- Consulta PINBAL... ----%>
-							<c:if test="${expedient.metaExpedient.tipusClassificacio == 'SIA'}">
-								<li>
-									<c:choose>
-										<c:when test="${empty metaDocumentsPinbalLeft}">
-											<a href="#" class="document-new-empty-metadocuments">
-												<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
-											</a>
-										</c:when>
-										<c:otherwise>
-											<a id="pinbal-new" href="<c:url value="/contingut/${contingut.id}/pinbal/new"/>" data-toggle="modal" data-refresh-pagina="true">
-												<span class="fa ${iconaDocument}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.pinbal"/>...
-											</a>
-										</c:otherwise>	
-									</c:choose>				
-								</li>	
-							</c:if>		
-							<%---- Carpeta... ----%>
-							<c:if test="${isCreacioCarpetesActiva}">
-								<li><a href="<c:url value="/contingut/${contingut.id}/carpeta/new"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaCarpeta}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.carpeta"/>...</a></li>
-							</c:if>
-							<c:if test="${isMostrarImportacio}">
-								<li><a href="<c:url value="/contingut/${contingut.id}/importacio/new"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa ${iconaImportacio}"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.importacio"/>...</a></li>
-							</c:if>
-							<c:if test="${isImportacioRelacionatsActiva}">
-								<li><a href="<c:url value="/expedient/${expedientId}/relacionats/${contingut.id}/list"/>" data-toggle="modal" data-refresh-pagina="true" data-maximized="true"><span class="fa fa-link"></span>&nbsp;&nbsp;<spring:message code="contingut.boto.crear.expedient.relacionat"/>...</a></li>
-							</c:if>	
-						</c:if>											
-					</ul>
-				</div>
-			</c:if>
-		</div>
-		
-		<%---- TABLE/GRID OF CONTINGUTS ----%>
-		<div id="loading">
-			<img src="<c:url value="/img/loading.gif"/>"/>
-		</div>
-		
-
-		<c:choose>
-			<c:when test="${!isMostrarCarpetesPerAnotacions}"><c:set var="fills" value="${contingut.fillsFlat}"/></c:when>
-			<c:otherwise><c:set var="fills" value="${contingut.fillsHierarchical}"/></c:otherwise>
-		</c:choose>
-		
-		<c:choose>
-			<%--########################################################### VIEW TREETABLE PER ESTATS ###########################################################--%>
-			<c:when test="${vistaTreetablePerEstats}">
-			
-				<c:choose>
-					<c:when test="${not empty contingut.mapPerEstat}">
-						<%--------------------- TREETABLE  -------------------%>
-						<table class="table table-striped table-bordered table-hover" id="table-documents">
-							<thead>
-								<tr>
-									<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
-									<th><spring:message code="contingut.info.nom"/></th>
-									<th><spring:message code="contingut.info.descirpcio"/></th>
-									<th><spring:message code="contingut.info.ruta"/></th>
-									<th><spring:message code="contingut.info.createl"/></th>
-									<th><spring:message code="contingut.info.creatper"/></th>
-									<th width="5%">&nbsp;</th>
-									<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
-										<th width="1%">&nbsp;</th>
-									</c:if>
-								</tr>
-							</thead>
-							<tbody>
-								<c:forEach items="${contingut.mapPerEstat}" var="entry">
-									<%------------------------------- Tipus de document ------------------------%>
-									<tr id="${entry.key.id}"
-										data-node="treetable-${entry.key.id}"
-										data-pnode="treetable-${contingut.id}">
-										<%------------ checkbox ----------%>
-										<td></td>
-										<%------------ Nom ----------%>
-										<td><b>${entry.key.nom}</b> 
-										
-											<span class="badge">${fn:length(entry.value)}</span>
-											
-
-										</td>
-										<%------------ Descripció ----------%>
-										<td></td>
-										<%------------ Tipus -----------%>
-										<td width="25%"></td>
-										<%------------ Creat el -----------%>
-										<td></td>
-										<%------------ Creat per -----------%>
-										<td></td>
-										<%------------ Accions -----------%>
-										<td></td>
-										<%------------ sort ----------%>
-										<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
-											<td></td>
-										</c:if>
-									</tr>								
-					   				
-					   				 <%------------------------------- Documents ----------------------------%>
-					   				 <c:choose>
-					   				 	<c:when test="${!empty entry.value}">
-						   				     <c:forEach items="${entry.value}" var="fill">
-						   				     
-												<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
-												
-													<c:set var="firmat" value="true"/>
-													<c:if test="${fill.document}">
-														<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
-															<c:set var="firmat" value="false"/> 
-														</c:if>
-													</c:if>
-											
-													<tr id="${fill.id}"
-														class="isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
-														data-expedient-id="${expedientId}" 
-														data-node="treetable-${fill.id}"
-														data-pnode="treetable-${entry.key.id}">
-														
-											
-														<%------------ checkbox ----------%>
-														<td><c:if test="${fill.document}">
-															<input type="checkbox" class="checkbox" autocomplete="off" />
-														</c:if></td>
-											
-														<%------------ Nom ----------%>
-														<td>
-															<rip:blocIconaContingut contingut="${fill}" /> 
-															<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
-														</td>
-											
-														<%------------ Descripció ----------%>
-														<td><c:if test="${fill.document}">
-															&nbsp;${fill.descripcio}
-														</c:if></td>
-											
-														<%------------ Ruta -----------%>
-														<td width="25%">
-															<c:forEach var="contingutPath" items="${fill.path}" varStatus="status">
-																<c:if test="${!status.first}">/${contingutPath.nom}</c:if>
-															</c:forEach>
-															<c:if test="${fn:length(fill.path) == 1}">/</c:if>
-														</td>
-											
-														<%------------ Creat el -----------%>
-														<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
-											
-														<%------------ Creat per -----------%>
-														<td>${fill.createdBy.codiAndNom}</td>
-											
-														<%------------ Accions -----------%>
-														<td><rip:blocContingutAccions className="botons-accions-element"
-																modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingut.id}"/></td>
-											
-														<%------------ sort ----------%>
-														<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
-															<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
-																class="fa fa-sort"></span></td>
-														</c:if>
-													</tr>
-												</c:if>
-						   				     
-					    					</c:forEach>
-					   					 </c:when>
-					   					 <c:otherwise>
-					   						<tr	data-node="treetable-0"
-												data-pnode="treetable-${entry.key.id}">
-												<td></td><td colspan="6"><spring:message code="contingut.info.table.tree.estat.no.documents"/></td>
-											</tr>
-					   					 </c:otherwise>
-					   				 </c:choose>
-								</c:forEach>							
-							
-
-							
-							</tbody>
-						</table>			
-					</c:when>
-					<c:otherwise>
-						<%--------------------- EMPTY TREETABLE -------------------%>
-						<table class="table table-striped table-bordered table-hover" id="table-documents">
+					<c:choose>
+						<c:when test="${not empty contingut.mapPerTipusDocument}">
+							<%--------------------- TREETABLE  -------------------%>
+							<table class="table table-striped table-bordered table-hover" id="table-documents">
 								<thead>
 									<tr>
-										<th></th>
+										<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
 										<th><spring:message code="contingut.info.nom"/></th>
 										<th><spring:message code="contingut.info.descirpcio"/></th>
-										<th><spring:message code="contingut.info.tipus" /></th>
-										<th><spring:message code="contingut.info.createl" /></th>
-										<th><spring:message code="contingut.info.creatper" /></th>
-										<th width="10%">&nbsp;</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr class="odd">
-										<td colspan="9" valign="top">
-											<h1 style="opacity: .1; text-align: center;">
-												<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
-												<strong><spring:message code="contingut.sense.contingut" /></strong>
-											</h1>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-					</c:otherwise>
-				</c:choose>	
-			</c:when>
-			
-			
-			
-					
-			<%--########################################################### VIEW TREETABLE PER TIPUS DE DOCUMENTS ###########################################################--%>
-			<c:when test="${vistaTreetablePerTipusDocuments}">
-			
-				<c:choose>
-					<c:when test="${not empty contingut.mapPerTipusDocument}">
-						<%--------------------- TREETABLE  -------------------%>
-						<table class="table table-striped table-bordered table-hover" id="table-documents">
-							<thead>
-								<tr>
-									<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
-									<th><spring:message code="contingut.info.nom"/></th>
-									<th><spring:message code="contingut.info.descirpcio"/></th>
-									<th><spring:message code="contingut.info.ruta"/></th>
-									<th><spring:message code="contingut.info.createl"/></th>
-									<th><spring:message code="contingut.info.creatper"/></th>
-									<th width="5%">&nbsp;</th>
-									<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
-										<th width="1%">&nbsp;</th>
-									</c:if>
-								</tr>
-							</thead>
-							<tbody>
-								<c:forEach items="${contingut.mapPerTipusDocument}" var="entry">
-									<%------------------------------- Tipus de document ------------------------%>
-									<tr id="${entry.key.id}"
-										class="<c:if test="${entry.key.permetMultiple || fn:length(entry.value) == 0}"> element-droppable</c:if>"
-										data-node="treetable-${entry.key.id}"
-										data-pnode="treetable-${contingut.id}">
-										<%------------ checkbox ----------%>
-										<td></td>
-										<%------------ Nom ----------%>
-										<td><b>${entry.key.nom}</b> 
-										
-											<span class="badge">${fn:length(entry.value)}</span>
-											
-											<span class="label label-info" style="float: right;">
-												<spring:message code="multiplicitat.enum.${entry.key.multiplicitat}"/> 
-											</span>
-										</td>
-										<%------------ Descripció ----------%>
-										<td></td>
-										<%------------ Tipus -----------%>
-										<td width="25%"></td>
-										<%------------ Creat el -----------%>
-										<td></td>
-										<%------------ Creat per -----------%>
-										<td></td>
-										<%------------ Accions -----------%>
-										<td></td>
-										<%------------ sort ----------%>
+										<th><spring:message code="contingut.info.ruta"/></th>
+										<th><spring:message code="contingut.info.createl"/></th>
+										<th><spring:message code="contingut.info.creatper"/></th>
+										<th width="5%">&nbsp;</th>
 										<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+											<th width="1%">&nbsp;</th>
+										</c:if>
+									</tr>
+								</thead>
+								<tbody>
+									<c:forEach items="${contingut.mapPerTipusDocument}" var="entry">
+										<%------------------------------- Tipus de document ------------------------%>
+										<tr id="${entry.key.id}"
+											class="<c:if test="${entry.key.permetMultiple || fn:length(entry.value) == 0}"> element-droppable</c:if>"
+											data-node="treetable-${entry.key.id}"
+											data-pnode="treetable-${contingut.id}">
+											<%------------ checkbox ----------%>
 											<td></td>
-										</c:if>
-									</tr>								
-					   				
-					   				 <%------------------------------- Documents ----------------------------%>
-					   				 <c:choose>
-					   				 	<c:when test="${!empty entry.value}">
-						   				     <c:forEach items="${entry.value}" var="fill">
-						   				     
-												<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+											<%------------ Nom ----------%>
+											<td><b>${entry.key.nom}</b> 
+											
+												<span class="badge">${fn:length(entry.value)}</span>
 												
-													<c:set var="firmat" value="true"/>
-													<c:if test="${fill.document}">
-														<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
-															<c:set var="firmat" value="false"/> 
+												<span class="label label-info" style="float: right;">
+													<spring:message code="multiplicitat.enum.${entry.key.multiplicitat}"/> 
+												</span>
+											</td>
+											<%------------ Descripció ----------%>
+											<td></td>
+											<%------------ Tipus -----------%>
+											<td width="25%"></td>
+											<%------------ Creat el -----------%>
+											<td></td>
+											<%------------ Creat per -----------%>
+											<td></td>
+											<%------------ Accions -----------%>
+											<td></td>
+											<%------------ sort ----------%>
+											<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+												<td></td>
+											</c:if>
+										</tr>								
+										
+										 <%------------------------------- Documents ----------------------------%>
+										 <c:choose>
+											<c:when test="${!empty entry.value}">
+												 <c:forEach items="${entry.value}" var="fill">
+												 
+													<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+													
+														<c:set var="firmat" value="true"/>
+														<c:if test="${fill.document}">
+															<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
+																<c:set var="firmat" value="false"/> 
+															</c:if>
 														</c:if>
-													</c:if>
-											
-													<tr id="${fill.id}"
-														class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
-														data-expedient-id="${expedientId}" 
-														data-node="treetable-${fill.id}"
-														data-pnode="treetable-${entry.key.id}">
-														
-											
-														<%------------ checkbox ----------%>
-														<td><c:if test="${fill.document}">
-															<input type="checkbox" class="checkbox" autocomplete="off" />
-														</c:if></td>
-											
-														<%------------ Nom ----------%>
-														<td>
-															<rip:blocIconaContingut contingut="${fill}" /> 
-															<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
-														</td>
-											
-														<%------------ Descripció ----------%>
-														<td><c:if test="${fill.document}">
-															&nbsp;${fill.descripcio}
-														</c:if></td>
-											
-														<%------------ Ruta -----------%>
-														<td width="25%">
-															<c:forEach var="contingutPath" items="${fill.path}" varStatus="status">
-																<c:if test="${!status.first}">/${contingutPath.nom}</c:if>
-															</c:forEach>
-															<c:if test="${fn:length(fill.path) == 1}">/</c:if>
-														</td>
-											
-														<%------------ Creat el -----------%>
-														<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
-											
-														<%------------ Creat per -----------%>
-														<td>${fill.createdBy.codiAndNom}</td>
-											
-														<%------------ Accions -----------%>
-														<td><rip:blocContingutAccions className="botons-accions-element"
-																modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingut.id}" /></td>
-											
-														<%------------ sort ----------%>
-														<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
-															<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
-																class="fa fa-sort"></span></td>
-														</c:if>
-													</tr>
-												</c:if>
-						   				     
-					    					</c:forEach>
-					   					 </c:when>
-					   					 <c:otherwise>
-					   						<tr	data-node="treetable-0"
-												data-pnode="treetable-${entry.key.id}">
-												<td></td><td colspan="6"><spring:message code="contingut.info.table.tree.tipus.document.no.documents"/></td>
-											</tr>
-					   					 </c:otherwise>
-					   				 </c:choose>
-								</c:forEach>							
-							
-
-							
-							</tbody>
-						</table>			
-					</c:when>
-					<c:otherwise>
-						<%--------------------- EMPTY TREETABLE -------------------%>
-						<table class="table table-striped table-bordered table-hover" id="table-documents">
-								<thead>
-									<tr>
-										<th></th>
-										<th><spring:message code="contingut.info.nom"/></th>
-										<th><spring:message code="contingut.info.descirpcio"/></th>
-										<th><spring:message code="contingut.info.tipus" /></th>
-										<th><spring:message code="contingut.info.createl" /></th>
-										<th><spring:message code="contingut.info.creatper" /></th>
-										<th width="10%">&nbsp;</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr class="odd">
-										<td colspan="9" valign="top">
-											<h1 style="opacity: .1; text-align: center;">
-												<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
-												<strong><spring:message code="contingut.sense.contingut" /></strong>
-											</h1>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-					</c:otherwise>
-				</c:choose>	
-			</c:when>
-			
-		
-			<%--############################################################### VIEW TREETABLE PER CARPETES ###############################################################--%>
-			<c:when test="${vistaLlistat}">
-				<c:choose>
-					<c:when test="${fn:length(fills) > 0}">
-						<%--------------------- TREETABLE -------------------%>
-						<table class="table table-striped table-bordered table-hover" id="table-documents">
-							<thead>
-								<tr>
-									<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
-									<th><spring:message code="contingut.info.nom"/></th>
-									<th><spring:message code="contingut.info.descirpcio"/></th>
-									<th><spring:message code="contingut.info.tipus"/></th>
-									<th><spring:message code="contingut.info.createl"/></th>
-									<th><spring:message code="contingut.info.creatper"/></th>
-									<th width="5%">&nbsp;</th>
-									<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
-										<th width="1%">&nbsp;</th>
-									</c:if>
-								</tr>
-							</thead>
-							<tbody>
-								<rip:blocContingutTreeTableFills contingut="${contingut}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}" contingutNavigationId="${contingut.id}"/>
-							</tbody>
-						</table>			
-					</c:when>
-					<c:otherwise>
-						<%--------------------- EMPTY TREETABLE -------------------%>
-						<table class="table table-striped table-bordered table-hover" id="table-documents">
-								<thead>
-									<tr>
-										<th></th>
-										<th><spring:message code="contingut.info.nom" /></th>
-										<th><spring:message code="contingut.info.tipus" /></th>
-										<th><spring:message code="contingut.info.descirpcio"/></th>
-										<th><spring:message code="contingut.info.createl" /></th>
-										<th><spring:message code="contingut.info.creatper" /></th>
-										<th width="10%">&nbsp;</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr class="odd">
-										<td colspan="9" valign="top">
-											<h1 style="opacity: .1; text-align: center;">
-												<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
-												<strong><spring:message code="contingut.sense.contingut" /></strong>
-											</h1>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-					</c:otherwise>
-				</c:choose>	
-			</c:when>
-
-			<%--################################################################# VIEW GRID ################################################################--%>
-			<c:when test="${vistaIcones}">
-				<c:choose>
-					<c:when test="${fn:length(fills) > 0}">
-						<%--------------------- GRID -------------------%>
-						<ul id="grid-documents" class="list-inline row">
-							<c:forEach var="fill" items="${fills}">
-							<%--  && fill.documentTipus != 'VIRTUAL' --%>
-								<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
-								
-									<c:set var="firmat" value="true"/>
-									<c:if test="${fill.document}">
-										<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
-											<c:set var="firmat" value="false"/> 
-										</c:if>
-									</c:if>
-									<li id="${fill.id}"
-										class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>">
-										<div id="${fill.id}" class="thumbnail element-noclick">
-											<div class="text-center">
-												<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true" />
-											</div>
-											<div class="caption">
-												<p class="text-center">
-													<rip:blocContingutNomAmbIcons contingut="${fill}" />
-												</p>
-												<rip:blocContingutAccions id="accions-fill-${fill.id}"
-													className="botons-accions-element" modeLlistat="false" contingut="${fill}"
-													nodeco="${nodeco}" contingutNavigationId="${contingut.id}"/>
-											</div>
-										</div> <script>
-											$('#${fill.id}').click(function(e) {
-												var contenidorContingut = document.getElementById('grid-documents');
 												
-												if ($(this).hasClass('noclick')) {
-													$(this).removeClass('noclick');
-												} else {
-													if ($('#accions-fill-${fill.id}').has(e.target).length == 0) {
-														$('#${fill.id}').tooltip('destroy');
-														if ($(contenidorContingut).hasClass('multiple') && ${fill.document}) {
-															var index = docsIdx.indexOf(${fill.id});
-															var multipleUrl;
+														<tr id="${fill.id}"
+															class="<c:if test="${fill.arxiuEstat == 'ESBORRANY'}"> element-draggable</c:if> isDocument<c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>"
+															data-expedient-id="${expedientId}" 
+															data-node="treetable-${fill.id}"
+															data-pnode="treetable-${entry.key.id}">
 															
-															if (index > -1) {
-																docsIdx.splice(index, 1);
-																$(this).removeClass('selectd');
-																var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
-																$.get(
-																		multipleUrl, 
-																		{docsIdx: docsIdx},
-																		function(data) {
-																			$(".seleccioCount").html(data);
-																		}
-																);
+												
+															<%------------ checkbox ----------%>
+															<td><c:if test="${fill.document}">
+																<input type="checkbox" class="checkbox" autocomplete="off" />
+															</c:if></td>
+												
+															<%------------ Nom ----------%>
+															<td>
+																<rip:blocIconaContingut contingut="${fill}" /> 
+																<rip:blocContingutNomAmbIcons contingut="${fill}" /> 
+															</td>
+												
+															<%------------ Descripció ----------%>
+															<td><c:if test="${fill.document}">
+																&nbsp;${fill.descripcio}
+															</c:if></td>
+												
+															<%------------ Ruta -----------%>
+															<td width="25%">
+																<c:forEach var="contingutPath" items="${fill.path}" varStatus="status">
+																	<c:if test="${!status.first}">/${contingutPath.nom}</c:if>
+																</c:forEach>
+																<c:if test="${fn:length(fill.path) == 1}">/</c:if>
+															</td>
+												
+															<%------------ Creat el -----------%>
+															<td><fmt:formatDate value="${fill.createdDate}" pattern="dd/MM/yyyy HH:mm" /></td>
+												
+															<%------------ Creat per -----------%>
+															<td>${fill.createdBy.codiAndNom}</td>
+												
+															<%------------ Accions -----------%>
+															<td><rip:blocContingutAccions className="botons-accions-element"
+																	modeLlistat="true" contingut="${fill}" nodeco="${nodeco}" contingutNavigationId="${contingut.id}" /></td>
+												
+															<%------------ sort ----------%>
+															<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+																<td class="ordre-col" title="<spring:message code="contingut.sort.titol"/>"><span
+																	class="fa fa-sort"></span></td>
+															</c:if>
+														</tr>
+													</c:if>
+												 
+												</c:forEach>
+											 </c:when>
+											 <c:otherwise>
+												<tr	data-node="treetable-0"
+													data-pnode="treetable-${entry.key.id}">
+													<td></td><td colspan="6"><spring:message code="contingut.info.table.tree.tipus.document.no.documents"/></td>
+												</tr>
+											 </c:otherwise>
+										 </c:choose>
+									</c:forEach>							
+								
+	
+								
+								</tbody>
+							</table>			
+						</c:when>
+						<c:otherwise>
+							<%--------------------- EMPTY TREETABLE -------------------%>
+							<table class="table table-striped table-bordered table-hover" id="table-documents">
+									<thead>
+										<tr>
+											<th></th>
+											<th><spring:message code="contingut.info.nom"/></th>
+											<th><spring:message code="contingut.info.descirpcio"/></th>
+											<th><spring:message code="contingut.info.tipus" /></th>
+											<th><spring:message code="contingut.info.createl" /></th>
+											<th><spring:message code="contingut.info.creatper" /></th>
+											<th width="10%">&nbsp;</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="odd">
+											<td colspan="9" valign="top">
+												<h1 style="opacity: .1; text-align: center;">
+													<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
+													<strong><spring:message code="contingut.sense.contingut" /></strong>
+												</h1>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+						</c:otherwise>
+					</c:choose>	
+				</c:when>
+				
+			
+				<%--############################################################### VIEW TREETABLE PER CARPETES ###############################################################--%>
+				<c:when test="${vistaLlistat}">
+					<c:choose>
+						<c:when test="${fn:length(fills) > 0}">
+							<%--------------------- TREETABLE -------------------%>
+							<table class="table table-striped table-bordered table-hover" id="table-documents">
+								<thead>
+									<tr>
+										<th><input type="checkbox" id="checkItAll" autocomplete="off"/></th>
+										<th><spring:message code="contingut.info.nom"/></th>
+										<th><spring:message code="contingut.info.descirpcio"/></th>
+										<th><spring:message code="contingut.info.tipus"/></th>
+										<th><spring:message code="contingut.info.createl"/></th>
+										<th><spring:message code="contingut.info.creatper"/></th>
+										<th width="5%">&nbsp;</th>
+										<c:if test="${expedientPareAgafatPerUsuariActual && isOrdenacioPermesa}">
+											<th width="1%">&nbsp;</th>
+										</c:if>
+									</tr>
+								</thead>
+								<tbody>
+									<rip:blocContingutTreeTableFills contingut="${contingut}" mostrarFillsFlat="${!isMostrarCarpetesPerAnotacions}" contingutNavigationId="${contingut.id}"/>
+								</tbody>
+							</table>			
+						</c:when>
+						<c:otherwise>
+							<%--------------------- EMPTY TREETABLE -------------------%>
+							<table class="table table-striped table-bordered table-hover" id="table-documents">
+									<thead>
+										<tr>
+											<th></th>
+											<th><spring:message code="contingut.info.nom" /></th>
+											<th><spring:message code="contingut.info.tipus" /></th>
+											<th><spring:message code="contingut.info.descirpcio"/></th>
+											<th><spring:message code="contingut.info.createl" /></th>
+											<th><spring:message code="contingut.info.creatper" /></th>
+											<th width="10%">&nbsp;</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="odd">
+											<td colspan="9" valign="top">
+												<h1 style="opacity: .1; text-align: center;">
+													<rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false" />
+													<strong><spring:message code="contingut.sense.contingut" /></strong>
+												</h1>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+						</c:otherwise>
+					</c:choose>	
+				</c:when>
+	
+				<%--################################################################# VIEW GRID ################################################################--%>
+				<c:when test="${vistaIcones}">
+					<c:choose>
+						<c:when test="${fn:length(fills) > 0}">
+							<%--------------------- GRID -------------------%>
+							<ul id="grid-documents" class="list-inline row">
+								<c:forEach var="fill" items="${fills}">
+								<%--  && fill.documentTipus != 'VIRTUAL' --%>
+									<c:if test="${fill.carpeta or (fill.document && fill.documentTipus != 'VIRTUAL')}">
+									
+										<c:set var="firmat" value="true"/>
+										<c:if test="${fill.document}">
+											<c:if test="${(fill.estat != 'FIRMAT' || fill.estat == 'CUSTODIAT') && (fill.estat == 'FIRMAT' || fill.estat != 'CUSTODIAT') && fill.estat != 'DEFINITIU'}"><!-- TODO: revise, condition never true -->
+												<c:set var="firmat" value="false"/> 
+											</c:if>
+										</c:if>
+										<li id="${fill.id}"
+											class="col-md-2 element-contingut element-draggable<c:if test="${not fill.document}"> element-droppable</c:if><c:if test="${fill.document && firmat}"> firmat</c:if><c:if test="${fill.document && fill.pdf}"> isPdf</c:if> <c:if test="${fill.document && fill.arxiuUuid == null}"> isPendentGuardarEnArxiu</c:if>">
+											<div id="${fill.id}" class="thumbnail element-noclick">
+												<div class="text-center">
+													<rip:blocIconaContingut contingut="${fill}" tamanyDoble="true" />
+												</div>
+												<div class="caption">
+													<p class="text-center">
+														<rip:blocContingutNomAmbIcons contingut="${fill}" />
+													</p>
+													<rip:blocContingutAccions id="accions-fill-${fill.id}"
+														className="botons-accions-element" modeLlistat="false" contingut="${fill}"
+														nodeco="${nodeco}" contingutNavigationId="${contingut.id}"/>
+												</div>
+											</div> <script>
+												$('#${fill.id}').click(function(e) {
+													var contenidorContingut = document.getElementById('grid-documents');
+													
+													if ($(this).hasClass('noclick')) {
+														$(this).removeClass('noclick');
+													} else {
+														if ($('#accions-fill-${fill.id}').has(e.target).length == 0) {
+															$('#${fill.id}').tooltip('destroy');
+															if ($(contenidorContingut).hasClass('multiple') && ${fill.document}) {
+																var index = docsIdx.indexOf(${fill.id});
+																var multipleUrl;
+																
+																if (index > -1) {
+																	docsIdx.splice(index, 1);
+																	$(this).removeClass('selectd');
+																	var multipleUrl = '<c:url value="/contingut/${contingut.id}/deselect"/>';
+																	$.get(
+																			multipleUrl, 
+																			{docsIdx: docsIdx},
+																			function(data) {
+																				$(".seleccioCount").html(data);
+																			}
+																	);
+																} else {
+																	var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
+																	$(this).addClass('selectd');
+																	docsIdx.push(${fill.id});
+																	$.get(
+																			multipleUrl, 
+																			{docsIdx: docsIdx},
+																			function(data) {
+																				$(".seleccioCount").html(data);
+																			}
+																	);
+																}
+																enableDisableMultipleButtons();
 															} else {
-																var multipleUrl = '<c:url value="/contingut/${contingut.id}/select"/>';
-																$(this).addClass('selectd');
-																docsIdx.push(${fill.id});
-																$.get(
-																		multipleUrl, 
-																		{docsIdx: docsIdx},
-																		function(data) {
-																			$(".seleccioCount").html(data);
-																		}
-																);
+																window.location = $('#${fill.id} a:first').attr('href');
 															}
-															enableDisableMultipleButtons();
-														} else {
-															window.location = $('#${fill.id} a:first').attr('href');
 														}
 													}
-												}
-											});
-											$('#${fill.id} li a').click(function(e) {
-												e.stopPropagation();
-											});
-										</script>
-									</li>
-								</c:if>
-							</c:forEach>
-						</ul>			
-					</c:when>
-					<c:otherwise>
-						<%--------------------- EMPTY GRID -------------------%>
-						<h1 style="opacity: .1; text-align: center; margin-bottom: 1em;"><rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false"/><strong><spring:message code="contingut.sense.contingut"/></strong></h1>		
-					</c:otherwise>
-				</c:choose>
-			</c:when>	
-		</c:choose>
+												});
+												$('#${fill.id} li a').click(function(e) {
+													e.stopPropagation();
+												});
+											</script>
+										</li>
+									</c:if>
+								</c:forEach>
+							</ul>			
+						</c:when>
+						<c:otherwise>
+							<%--------------------- EMPTY GRID -------------------%>
+							<h1 style="opacity: .1; text-align: center; margin-bottom: 1em;"><rip:blocIconaContingut contingut="${fill}" tamanyEnorme="false"/><strong><spring:message code="contingut.sense.contingut"/></strong></h1>		
+						</c:otherwise>
+					</c:choose>
+				</c:when>	
+			</c:choose>
+
+		</div>
 
 		<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >
 			<iframe id="container" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
-		</div>  
+		</div>
 
-		<c:if test="${potModificar}">
-			<div id="drag_container" class="drag_activated">
-				<span class="down fa fa-upload"></span>
-				<p>
-					<spring:message code="contingut.drag.info" />
-				</p>
-			</div>
-		</c:if>
+<%--		<c:if test="${potModificar}">--%>
+<%--			<div id="drag_container" class="drag_activated">--%>
+<%--				<span class="down fa fa-upload"></span>--%>
+<%--				<p>--%>
+<%--					<spring:message code="contingut.drag.info" />--%>
+<%--				</p>--%>
+<%--			</div>--%>
+<%--		</c:if>--%>
 		<input class="hidden" id="dropped-files" type="file"/>
 
 	</c:otherwise>

@@ -94,6 +94,7 @@ import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
 import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import es.caib.ripea.plugin.procediment.ProcedimentPlugin;
+import es.caib.ripea.plugin.summarize.SummarizePlugin;
 import es.caib.ripea.plugin.unitat.NodeDir3;
 import es.caib.ripea.plugin.unitat.UnitatOrganitzativa;
 import es.caib.ripea.plugin.unitat.UnitatsOrganitzativesPlugin;
@@ -109,6 +110,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.fundaciobit.plugins.certificate.InformacioCertificat;
 import org.fundaciobit.plugins.validatesignature.api.IValidateSignaturePlugin;
 import org.fundaciobit.plugins.validatesignature.api.SignatureDetailInfo;
@@ -117,6 +121,10 @@ import org.fundaciobit.plugins.validatesignature.api.TimeStampInfo;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureRequest;
 import org.fundaciobit.plugins.validatesignature.api.ValidateSignatureResponse;
 import org.fundaciobit.plugins.validatesignature.api.ValidationStatus;
+import org.jdom.Element;
+import org.jopendocument.dom.ODPackage;
+import org.jopendocument.dom.text.Paragraph;
+import org.jopendocument.dom.text.TextDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,7 +179,8 @@ public class PluginHelper {
 	private Map<String, ViaFirmaPlugin> viaFirmaPlugins = new HashMap<>();
 	private Map<String, ProcedimentPlugin> procedimentPlugins = new HashMap<>();
 	private Map<String, FirmaWebPlugin> firmaSimpleWebPlugins = new HashMap<>();
-	
+	private Map<String, SummarizePlugin> summarizePlugins = new HashMap<>();
+
 	
 	@Autowired
 	private ConversioTipusHelper conversioTipusHelper;
@@ -4240,6 +4249,111 @@ public class PluginHelper {
 		return accioParams;
 	}
 
+
+	// Summarize
+	// ///////////////////////////////////////////////////////////////////////////////
+
+	public Resum getSummarize(byte[] bytes, String contentType) {
+
+		Resum resum = Resum.builder().build();
+
+		// TODO: Assigna entitat i òrgan ?? Afegir informació de monitor
+
+		SummarizePlugin summarizePlugin = getSummarizePlugin();
+		if (summarizePlugin != null && summarizePlugin.isActive()) {
+			return resum;
+		}
+
+		String documentText = extractTextFromDocument(bytes, contentType);
+
+		if (documentText != null) {
+			try {
+				resum = summarizePlugin.getSummarize(documentText);
+			} catch (es.caib.ripea.plugin.SistemaExternException e) {}
+		}
+		return resum;
+	}
+
+	private static String extractTextFromDocument(byte[] bytes, String contentType) {
+		String documentText = null;
+
+		// Extreure el text del document
+		if ("application/pdf".equalsIgnoreCase(contentType)) {
+			documentText = extractTextFromPDF(bytes);
+		} else if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(contentType)) {
+			documentText = extractTextFromDocx(bytes);
+		} else if ("application/vnd.oasis.opendocument.text".equalsIgnoreCase(contentType)) {
+			documentText = extractTextFromOdt(bytes);
+		}
+
+		return documentText;
+	}
+
+	private static String extractTextFromPDF(byte[] bytes) {
+		String text = "";
+
+		try (PDDocument document = PDDocument.load(bytes)) {
+			if (!document.isEncrypted()) {
+				PDFTextStripper pdfStripper = new PDFTextStripper();
+				text = pdfStripper.getText(document);
+			} else {
+				logger.debug("El document PDF està xifrat i no es pot llegir.");
+			}
+		} catch (IOException e) {
+			logger.error("No s'ha pogut obtenir el text del document PDF", e);
+		}
+
+		return text;
+	}
+
+	private static String extractTextFromDocx(byte[] bytes) {
+		String text = "";
+
+		try (ByteArrayInputStream fis = new ByteArrayInputStream(bytes);
+			 XWPFDocument document = new XWPFDocument(fis);
+			 XWPFWordExtractor extractor = new XWPFWordExtractor(document)) {
+			text = extractor.getText();
+		} catch (IOException e) {
+			logger.error("No s'ha pogut obtenir el text del document DOCX", e);
+		}
+		return text;
+	}
+
+	private static String extractTextFromOdt(byte[] bytes) {
+		StringBuilder text = new StringBuilder();
+
+		ByteArrayInputStream bais = null;
+		try {
+			bais = new ByteArrayInputStream(bytes);
+			ODPackage odPackage = new ODPackage(bais);
+			TextDocument document = TextDocument.get(odPackage);
+
+			int paragraphCount = document.getParagraphCount();
+			for (int i = 0; i < paragraphCount; i++) {
+				Paragraph paragraph = document.getParagraph(i);
+				List<Element> content = paragraph.getElement().getContent();
+				for (Element element : content) {
+					text.append(element.getText());
+				}
+				text.append("\n");
+			}
+		} catch (Exception e) {
+			logger.error("No s'ha pogut obtenir el text del document ODT", e);
+		} finally {
+			if (bais != null) {
+				try {
+					bais.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return text.toString();
+	}
+
+
+
 	private DadesUsuariPlugin getDadesUsuariPlugin() {
 
 		loadPluginProperties("USUARIS");
@@ -4873,6 +4987,56 @@ public class PluginHelper {
 			throw new RuntimeException("Error al crear la instància del plugin de firma simple web", ex);
 		}
 		
+	}
+
+	private SummarizePlugin getSummarizePlugin() {
+
+		String entitatCodi = configHelper.getEntitatActualCodi();
+		if (entitatCodi == null) {
+			throw new RuntimeException("El codi d'entitat actual no pot ser nul");
+		}
+
+		SummarizePlugin plugin = null;
+		// ORGAN PLUGIN
+		String organCodi = configHelper.getOrganActualCodi();
+		if (organCodi != null) {
+			plugin = summarizePlugins.get(entitatCodi + "." + organCodi);
+			if (plugin != null) {
+				return plugin;
+			}
+			String pluginClassOrgan = configHelper.getValueForOrgan(entitatCodi, organCodi, "es.caib.ripea.plugin.summarize.class");
+			if (Utils.isNotEmpty(pluginClassOrgan)) {
+				try {
+					Class<?> clazz = Class.forName(pluginClassOrgan);
+					plugin = (SummarizePlugin) clazz.getDeclaredConstructor(String.class, Properties.class)
+							.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesOrganOrEntitatOrGeneral("SUMMARIZE", entitatCodi, organCodi));
+					summarizePlugins.put(entitatCodi + "." + organCodi, plugin);
+					return plugin;
+				} catch (Exception ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+
+		// ENTITAT/GENERAL PLUGIN
+		plugin = summarizePlugins.get(entitatCodi);
+		if (plugin != null) {
+			return plugin;
+		}
+		String pluginClass = getPropertyPluginFirmaWeb();
+		if (Utils.isEmpty(pluginClass)) {
+			throw new RuntimeException("No està configurada la classe per al plugin de firma simple web");
+		}
+		try {
+			Class<?> clazz = Class.forName(pluginClass);
+			plugin = (SummarizePlugin)clazz.getDeclaredConstructor(String.class, Properties.class)
+					.newInstance(ConfigDto.prefix + ".", configHelper.getGroupPropertiesEntitatOrGeneral("SUMMARIZE", entitatCodi));
+			summarizePlugins.put(entitatCodi, plugin);
+			return plugin;
+		} catch (Exception ex) {
+			throw new RuntimeException("Error al crear la instància del plugin de firma simple web", ex);
+		}
+
 	}
 	
 

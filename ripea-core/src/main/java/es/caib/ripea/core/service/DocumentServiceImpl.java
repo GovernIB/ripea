@@ -39,6 +39,7 @@ import es.caib.ripea.core.firma.DocumentFirmaPortafirmesHelper;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 import es.caib.ripea.core.firma.DocumentFirmaViaFirmaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
 import es.caib.ripea.core.helper.ContingutHelper;
 import es.caib.ripea.core.helper.ConversioTipusHelper;
 import es.caib.ripea.core.helper.DateHelper;
@@ -151,7 +152,9 @@ public class DocumentServiceImpl implements DocumentService {
 	private UsuariHelper usuariHelper;
 	@Autowired
 	private EntitatRepository entitatRepository;
-	
+    @Autowired
+    private ConfigHelper configHelper;
+
 	@Transactional
 	@Override
 	public DocumentDto create(
@@ -303,8 +306,87 @@ public class DocumentServiceImpl implements DocumentService {
 		
 
 	}
+
+    @Override
+    public Resum getSummarize(byte[] bytes, String contentType) {
+
+		return pluginHelper.getSummarize(bytes, contentType);
+
+//		Resum resum = Resum.builder().build();
+//		String documentText = null;
+//
+//		String resumUrl = configHelper.getConfig("es.caib.notib.summarize.resum.url");
+//		String titolUrl = configHelper.getConfig("es.caib.notib.summarize.titol.url");
+//
+//		if (resumUrl == null && titolUrl == null)
+//			return resum;
+//
+//		// Extreure el text del document
+//		if ("application/pdf".equalsIgnoreCase(contentType)) {
+//			documentText = extractTextFromPDF(bytes);
+//		} else if ("application/vnd.openxmlformats-officedocument.wordprocessingml.document".equalsIgnoreCase(contentType)) {
+//			documentText = extractTextFromDocx(bytes);
+//		} else if ("application/vnd.oasis.opendocument.text".equalsIgnoreCase(contentType)) {
+//			documentText = extractTextFromOdt(bytes);
+//		}
+//
+//		if (documentText != null) {
+//			resum = summarize(documentText, resumUrl, titolUrl);
+//		}
+//        return resum;
+    }
 	
-	@Transactional
+//	private Resum summarize(String text, String resumUrl, String titolUrl) {
+//		Resum resum = Resum.builder().build();
+//
+//		try {
+//			RestTemplate restTemplate = new RestTemplate();
+//			String tipusPeticio = configHelper.getConfig("es.caib.notib.summarize.url.tipus");
+//
+//			String summaryText = null;
+//			String titleText = null;
+//
+//			if ("POST".equalsIgnoreCase(tipusPeticio)) {
+//				// Crea els headers de la petició
+//				HttpHeaders headers = new HttpHeaders();
+//				headers.setContentType(MediaType.TEXT_PLAIN);
+//
+//				// Crea un objecte HttpEntity que inclou el cos de la petició i els headers
+//				HttpEntity<String> requestEntity = new HttpEntity<>(text, headers);
+//
+//				// POST
+//				if (resumUrl != null)
+//					summaryText = restTemplate.postForObject(resumUrl, requestEntity, String.class);
+//				if (titolUrl != null)
+//					titleText = restTemplate.postForObject(titolUrl, requestEntity, String.class);
+//
+//			} else {
+//
+//				String params = "?text=" + URLEncoder.encode(text, "UTF-8");
+//
+//				// GET
+//				if (resumUrl != null)
+//					summaryText = restTemplate.getForObject(resumUrl + params, String.class);
+//				if (titolUrl != null)
+//					titleText = restTemplate.getForObject(titolUrl + params, String.class);
+//
+//			}
+//
+//			resum = Resum.builder()
+//					.titol(titleText)
+//					.resum(summaryText)
+//					.build();
+//
+//		} catch (UnsupportedEncodingException e) {
+//			logger.error("Error encoding text for summarize URL", e);
+//		} catch (Exception e) {
+//			logger.error("Error fetching summarized text from remote service", e);
+//		}
+//		return resum;
+//	}
+
+
+    @Transactional
 	@Override
 	public boolean updateTipusDocument(
 			Long entitatId,

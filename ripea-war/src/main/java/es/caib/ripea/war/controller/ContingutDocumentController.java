@@ -3,73 +3,10 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DadaDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.FitxerTemporalDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -97,6 +34,46 @@ import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per al manteniment de documents.
@@ -1340,6 +1317,18 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
 			model.addAttribute("isError", signatureInfoDto.isError());
 			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
+		}
+
+		// Summarize
+		if (command.getDescripcio() == null || command.getDescripcio().isEmpty() ||
+				command.getNom() == null || command.getNom().isEmpty()) {
+
+			Resum resum = documentService.getSummarize(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+
+			if (command.getNom() == null || command.getNom().isEmpty())
+				command.setNom(resum.getTitol());
+			if (command.getDescripcio() == null || command.getDescripcio().isEmpty())
+				command.setDescripcio(resum.getResum());
 		}
 	}
 	

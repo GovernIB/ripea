@@ -3,40 +3,16 @@
  */
 package es.caib.ripea.core.api.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
-import es.caib.ripea.core.api.dto.FirmaResultatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PinbalConsultaDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
-import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
-import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -658,6 +634,9 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	SignatureInfoDto checkIfSignedAttached(byte[] contingut, String contentType);
 
+	@PreAuthorize("hasRole('tothom')")
+	public Resum getSummarize(byte[] bytes, String contentType);
+
 	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('IPA_ORGAN_ADMIN') or hasRole('IPA_REVISIO')")
 	public long countByMetaDocument(
 			Long entitatId,
@@ -726,5 +705,4 @@ public interface DocumentService {
 
 	@PreAuthorize("hasRole('tothom')")
 	public String firmaSimpleWebStartMassiu(Set<Long> ids, String motiu, String urlReturnToRipea, Long entitatId);
-
 }

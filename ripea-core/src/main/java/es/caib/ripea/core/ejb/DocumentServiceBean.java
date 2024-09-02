@@ -3,45 +3,20 @@
  */
 package es.caib.ripea.core.ejb;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
-
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.DocumentViaFirmaDto;
-import es.caib.ripea.core.api.dto.FirmaResultatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaFluxTipusEnumDto;
-import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PaginacioParamsDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PinbalConsultaDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
-import es.caib.ripea.core.api.dto.ViaFirmaCallbackEstatEnumDto;
-import es.caib.ripea.core.api.dto.ViaFirmaDispositiuDto;
-import es.caib.ripea.core.api.dto.ViaFirmaEnviarDto;
-import es.caib.ripea.core.api.dto.ViaFirmaUsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.PinbalException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.DocumentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.interceptor.Interceptors;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementació de ContenidorService com a EJB que empra una clase
@@ -441,8 +416,14 @@ public class DocumentServiceBean implements DocumentService {
 				contingut,
 				contentType);
 	}
-	
-	@Override
+
+    @Override
+	@RolesAllowed("tothom")
+    public Resum getSummarize(byte[] bytes, String contentType) {
+        return delegate.getSummarize(bytes, contentType);
+    }
+
+    @Override
 	@RolesAllowed({"IPA_ADMIN", "IPA_ORGAN_ADMIN", "IPA_REVISIO"})
 	public long countByMetaDocument(
 			Long entitatId,
