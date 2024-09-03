@@ -4256,19 +4256,30 @@ public class PluginHelper {
 
 		Resum resum = Resum.builder().build();
 
-		// TODO: Assigna entitat i òrgan ?? Afegir informació de monitor
+		String accioDescripcio = "Obtenir resum i títol a partir del contingut d'un document";
+		Map<String, String> accioParams = new HashMap<String, String>();
+		accioParams.put("tipus de document", contentType);
 
+		// TODO: Assigna entitat i òrgan ?? Afegir informació de monitor
 		SummarizePlugin summarizePlugin = getSummarizePlugin();
 		if (summarizePlugin != null && summarizePlugin.isActive()) {
 			return resum;
 		}
 
-		String documentText = extractTextFromDocument(bytes, contentType);
+		String documentText = null;
+		try {
+			documentText = extractTextFromDocument(bytes, contentType);
+		} catch (Exception e) {
+			logger.error("No s'ha pogut extreure el text del document", e);
+		}
 
 		if (documentText != null) {
+//			accioParams.put("text", documentText);
 			try {
 				resum = summarizePlugin.getSummarize(documentText);
-			} catch (es.caib.ripea.plugin.SistemaExternException e) {}
+			} catch (es.caib.ripea.plugin.SistemaExternException e) {
+
+			}
 		}
 		return resum;
 	}
@@ -4288,7 +4299,7 @@ public class PluginHelper {
 		return documentText;
 	}
 
-	private static String extractTextFromPDF(byte[] bytes) {
+	private static String extractTextFromPDF(byte[] bytes) throws SistemaExternException {
 		String text = "";
 
 		try (PDDocument document = PDDocument.load(bytes)) {
@@ -4296,16 +4307,17 @@ public class PluginHelper {
 				PDFTextStripper pdfStripper = new PDFTextStripper();
 				text = pdfStripper.getText(document);
 			} else {
-				logger.debug("El document PDF està xifrat i no es pot llegir.");
+				throw new SistemaExternException("SUMMARIZE", "El document PDF està xifrat i no es pot llegir.");
 			}
 		} catch (IOException e) {
 			logger.error("No s'ha pogut obtenir el text del document PDF", e);
+			throw new SistemaExternException("SUMMARIZE", "No s'ha pogut obtenir el text del document PDF", e);
 		}
 
 		return text;
 	}
 
-	private static String extractTextFromDocx(byte[] bytes) {
+	private static String extractTextFromDocx(byte[] bytes) throws SistemaExternException {
 		String text = "";
 
 		try (ByteArrayInputStream fis = new ByteArrayInputStream(bytes);
@@ -4313,12 +4325,12 @@ public class PluginHelper {
 			 XWPFWordExtractor extractor = new XWPFWordExtractor(document)) {
 			text = extractor.getText();
 		} catch (IOException e) {
-			logger.error("No s'ha pogut obtenir el text del document DOCX", e);
+			throw new SistemaExternException("SUMMARIZE", "No s'ha pogut obtenir el text del document DOCX", e);
 		}
 		return text;
 	}
 
-	private static String extractTextFromOdt(byte[] bytes) {
+	private static String extractTextFromOdt(byte[] bytes) throws SistemaExternException {
 		StringBuilder text = new StringBuilder();
 
 		ByteArrayInputStream bais = null;
@@ -4330,21 +4342,8 @@ public class PluginHelper {
 			Element rootElement = document.getContentDocument().getRootElement();
 			extractTextFromElement(rootElement, text);
 
-//			int paragraphCount = document.getParagraphCount();
-//			for (int i = 0; i < paragraphCount; i++) {
-//				Paragraph paragraph = document.getParagraph(i);
-//				List<Content> content = paragraph.getElement().getContent();
-//				for (Content element : content) {
-//					if (element instanceof Element) {
-//						text.append(((Element) element).getText());
-//					} else if (element instanceof Text) {
-//						text.append(((Text) element).getText());
-//					}
-//				}
-//				text.append("\n");
-//			}
 		} catch (Exception e) {
-			logger.error("No s'ha pogut obtenir el text del document ODT", e);
+			throw new SistemaExternException("SUMMARIZE", "No s'ha pogut obtenir el text del document ODT", e);
 		} finally {
 			if (bais != null) {
 				try {
