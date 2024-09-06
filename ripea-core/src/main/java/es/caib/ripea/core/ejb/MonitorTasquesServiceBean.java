@@ -56,8 +56,8 @@ public class MonitorTasquesServiceBean implements MonitorTasquesService {
 	}
 
 	@Override
-	public void reiniciarTasquesEnSegonPla() {
-		delegate.reiniciarTasquesEnSegonPla();
+	public void reiniciarTasquesEnSegonPla(String codiTasca) {
+		delegate.reiniciarTasquesEnSegonPla(codiTasca);
 	}
 
 }

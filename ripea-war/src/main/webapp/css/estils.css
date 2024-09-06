@@ -531,3 +531,12 @@ dd.no_color {
 .h200 {
     min-height: 200px !important;
 }
+
+.ripea-submenu-list {
+    width: 250px;
+    position: fixed;
+}
+
+.ripea-submenu-list li a {
+    white-space: normal;
+}

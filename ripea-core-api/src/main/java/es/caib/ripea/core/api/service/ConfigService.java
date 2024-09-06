@@ -38,6 +38,8 @@ public interface ConfigService {
 	@PreAuthorize("hasRole('IPA_SUPER')")
 	List<ConfigGroupDto> findAll();
 
+	@PreAuthorize("hasRole('IPA_SUPER')")
+	void resetPlugin(String pluginCode);
 
 	/**
 	 * Procediment que actualitza totes les propietats de configuració per a configurar-les amb

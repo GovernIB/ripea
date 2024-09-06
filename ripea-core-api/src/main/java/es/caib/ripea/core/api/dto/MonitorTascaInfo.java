@@ -10,9 +10,7 @@ public class MonitorTascaInfo {
 	private Date dataFi;
 	private Date properaExecucio;
 	private String observacions;
-	
-	
-	
+
 	public String getCodi() {
 		return codi;
 	}
@@ -49,6 +47,7 @@ public class MonitorTascaInfo {
 	public void setObservacions(String observacions) {
 		this.observacions = observacions;
 	}
+
 	/** Calcula el temps d'execució a partir de la data d'inici, la data de fi i l'estat */
 	public String getTempsExecucio() {
 		String temps = "-";
@@ -59,9 +58,5 @@ public class MonitorTascaInfo {
 		}
 		return temps;
 	}
-	
-	
-	
-	
 
 }

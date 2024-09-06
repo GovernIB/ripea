@@ -49,9 +49,8 @@ public class SchedulingConfig implements SchedulingConfigurer {
             taskRegistrar.destroy();
             taskRegistrar.afterPropertiesSet();
         }
-
     }
-    
+
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
     	taskRegistrar.setScheduler(taskScheduler);
