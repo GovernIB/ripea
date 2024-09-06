@@ -495,8 +495,8 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	@Override
-	public void restartSchedulledTasks() {
-		schedulingConfig.restartSchedulledTasks();
+	public void restartSchedulledTasks(String taskCodi) {
+		schedulingConfig.restartSchedulledTasks(taskCodi);
 	}
 
 	private int getArxiuMaxReintentsExpedients() {

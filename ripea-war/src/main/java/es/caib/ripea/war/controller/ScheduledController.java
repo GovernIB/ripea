@@ -24,7 +24,7 @@ public class ScheduledController extends BaseController {
 			HttpServletRequest request,
 			@PathVariable String id) {
 		monitorTasquesService.reiniciarTasquesEnSegonPla(id);
-    	segonPlaService.restartSchedulledTasks();
+    	segonPlaService.restartSchedulledTasks(id);
         return "redirect:/../../ripea/monitor#tasques";
     }
 }
