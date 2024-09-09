@@ -98,6 +98,7 @@ public class OrganGestorSyncHelperIT {
         ConfigHelper.JBossPropertiesHelper.getProperties("classpath:es/caib/ripea/core/test.properties");
     }
 
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -117,6 +118,7 @@ public class OrganGestorSyncHelperIT {
     }
 
 
+    @SuppressWarnings("unchecked")
     @Test
     public void whenOrganGestorSync() throws Exception {
         authenticationTest.autenticarUsuari("admin");

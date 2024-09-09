@@ -32,6 +32,7 @@
 	<context:component-scan base-package="es.caib.ripea.core.task" />
 	<context:component-scan base-package="es.caib.ripea.core.aspect" />
 	<context:component-scan base-package="es.caib.ripea.core.config" />
+	<context:component-scan base-package="es.caib.ripea.core.repository.command" />
 	<jpa:repositories base-package="es.caib.ripea.core.repository" />
 
 	<jpa:auditing auditor-aware-ref="auditorAwareBean" />

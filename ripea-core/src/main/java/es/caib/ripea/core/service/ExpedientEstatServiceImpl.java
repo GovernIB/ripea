@@ -1,19 +1,5 @@
 package es.caib.ripea.core.service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.ContingutMassiuFiltreDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
@@ -47,6 +33,20 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.repository.command.ExpedientRepositoryCommnand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class ExpedientEstatServiceImpl implements ExpedientEstatService {
@@ -77,8 +77,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private ExpedientEstatHelper expedientEstatHelper;
-	
-	
+    @Autowired
+    private ExpedientRepositoryCommnand expedientRepositoryCommnand;
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientEstatDto findExpedientEstatById(
@@ -436,23 +438,17 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			
-			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
+			Page<ExpedientEntity> paginaDocuments = expedientRepositoryCommnand.findExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
 					usuariActual,
-					Utils.getNullIfEmpty(metaExpedientsPermesos), 
-					metaExpedient == null,
 					metaExpedient,
-					expedient == null,
 					expedient,
-					dataInici == null,
 					dataInici,
-					dataFi == null,
 					dataFi,
-					chosenEstatEnum == null,
 					chosenEstatEnum,
-					chosenEstat == null,
 					chosenEstat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos),
 					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
 					paginaDocuments,
@@ -472,25 +468,18 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		
 		} else {
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
-			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
+			List<Long> idsDocuments = expedientRepositoryCommnand.findIdsExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
 					usuariActual,
-					Utils.getNullIfEmpty(metaExpedientsPermesos),
-					metaExpedient == null,
 					metaExpedient,
-					expedient == null,
 					expedient,
-					dataInici == null,
 					dataInici,
-					dataFi == null,
 					dataFi,
-					chosenEstatEnum == null,
 					chosenEstatEnum,
-					chosenEstat == null,
-					chosenEstat);
-		
-		result.setIds(idsDocuments);
+					chosenEstat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos));
+			result.setIds(idsDocuments);
 		}
 		return result;
 		

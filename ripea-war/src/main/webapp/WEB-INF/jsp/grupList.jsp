@@ -136,7 +136,7 @@ $(document).ready(function() {
 		data-selection-enabled="true">
 		<thead>
 			<tr>
-				<th data-col-name="codi" data-orderable="false"><spring:message code="grup.columna.codi"/></th>
+				<th data-col-name="codi" data-orderable="true"><spring:message code="grup.columna.codi"/></th>
 				<th data-col-name="descripcio" data-orderable="false"><spring:message code="grup.columna.descripcio"/></th>
 				<th data-col-name="organGestor.codiINom" data-orderable="false"><spring:message code="metaexpedient.grup.columna.organGestor"/></th>
 				<c:if test="${not isRolAdminOrgan || isActiveGestioPermisPerAdminOrgan}">

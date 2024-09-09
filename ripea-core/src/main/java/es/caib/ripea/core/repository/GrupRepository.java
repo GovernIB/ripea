@@ -22,11 +22,9 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("esNullFiltre") boolean esNullFiltre,
 			@Param("filtre") String filtre,	
 			Pageable pageable);
-	
-	
-	
-	
-	@Query(	"select distinct " +
+
+
+	static final String FIND_BY_ENTITAT_AND_PROCEDIMENT_AND_FILTRE = "select distinct " +
 			"    grup " +
 			"from " +
 			"    GrupEntity grup " +
@@ -36,7 +34,9 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			"    grup.entitat = :entitat " +
 			"and (:esNullProcedimentId = true or me.id = :procedimentId) " +
 			"and (:esNullFiltre = true or lower(grup.rol) like lower('%'||:filtre||'%') or lower(grup.descripcio) like lower('%'||:filtre||'%')) " +
-			"and (:esNullOrgansFills = true or og.codi in (:organsFills))")
+			"and (:esNullOrgansFills = true or og.codi in (:organsFills))";
+	
+	@Query(FIND_BY_ENTITAT_AND_PROCEDIMENT_AND_FILTRE)
 	Page<GrupEntity> findByEntitatAndProcediment(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullFiltre") boolean esNullFiltre,
@@ -46,10 +46,19 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("esNullOrgansFills") boolean esNullOrgansFills,
 			@Param("organsFills") List<String> organsFills,
 			Pageable pageable);
+
+	@Query(FIND_BY_ENTITAT_AND_PROCEDIMENT_AND_FILTRE)
+	List<GrupEntity> findByEntitatAndProcediment(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullFiltre") boolean esNullFiltre,
+			@Param("filtre") String filtre,
+			@Param("esNullProcedimentId") boolean esNullProcedimentId,
+			@Param("procedimentId") Long procedimentId,
+			@Param("esNullOrgansFills") boolean esNullOrgansFills,
+			@Param("organsFills") List<String> organsFills);
 	
-	
-	
-	@Query(	"select distinct " +
+
+	static final String FIND_BY_ENTITAT_AND_PROCEDIMENT = "select distinct " +
 			"    grup " +
 			"from " +
 			"    GrupEntity grup " +
@@ -61,7 +70,9 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			"and (:esNullCodi = true or lower(grup.codi) like lower('%'||:codi||'%')) " +
 			"and (:esNullDescripcio = true or lower(grup.descripcio) like lower('%'||:descripcio||'%')) " +
 			"and (:esNullOrganGestorId = true or og.id = :organGestorId) " +
-			"and (:esNullOrgansFills = true or og.codi in (:organsFills))")
+			"and (:esNullOrgansFills = true or og.codi in (:organsFills))";
+	
+	@Query(FIND_BY_ENTITAT_AND_PROCEDIMENT)
 	Page<GrupEntity> findByEntitatAndProcediment(
 			@Param("entitat") EntitatEntity entitat, 
 			@Param("esNullCodi") boolean esNullCodi,
@@ -75,6 +86,20 @@ public interface GrupRepository extends JpaRepository<GrupEntity, Long> {
 			@Param("esNullOrgansFills") boolean esNullOrgansFills,
 			@Param("organsFills") List<String> organsFills,
 			Pageable pageable);
+
+	@Query(FIND_BY_ENTITAT_AND_PROCEDIMENT)
+	List<GrupEntity> findByEntitatAndProcediment(
+			@Param("entitat") EntitatEntity entitat,
+			@Param("esNullCodi") boolean esNullCodi,
+			@Param("codi") String codi,
+			@Param("esNullDescripcio") boolean esNullDescripcio,
+			@Param("descripcio") String descripcio,
+			@Param("esNullProcedimentId") boolean esNullProcedimentId,
+			@Param("procedimentId") Long procedimentId,
+			@Param("esNullOrganGestorId") boolean esNullOrganGestorId,
+			@Param("organGestorId") Long organGestorId,
+			@Param("esNullOrgansFills") boolean esNullOrgansFills,
+			@Param("organsFills") List<String> organsFills);
 	
 	@Query(	"select distinct " +
 			"    grup.id " +

@@ -1,22 +1,5 @@
 package es.caib.ripea.war.controller;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
@@ -36,6 +19,22 @@ import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 @Slf4j
 @Controller
 @RequestMapping("/massiu/expedientPeticioCanviEstatDistribucio")
@@ -102,12 +101,13 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 					"id",
 					getSessionAttributeSelecio(request));
         } catch (Exception ex) {
+			log.error("Error obtenint el datatable: ", ex);
             throw ex;
         }
     }
-    
-    
 
+
+	@SuppressWarnings("unchecked")
     @RequestMapping(value = "/select", method = RequestMethod.GET)
     @ResponseBody
     public int select(HttpServletRequest request, @RequestParam(value="ids[]", required = false) Long[] ids) {
@@ -118,9 +118,7 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
             RequestSessionHelper.actualitzarObjecteSessio(request, getSessionAttributeSelecio(request), seleccio);
         }
         if (ids != null) {
-            for (Long id: ids) {
-                seleccio.add(id);
-            }
+            Collections.addAll(seleccio, ids);
             return seleccio.size();
         }
         EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
@@ -182,7 +180,7 @@ public class MassiuExpedientPeticioCanviEstatDistribucioController extends BaseU
 		
 		for (Long id : seleccio) {
 			Date dataIniciElement = new Date();
-			Exception exception = null;
+			Exception exception;
 			try {
 				exception = expedientPeticioService.canviarEstatAnotacioDistribucio(
 						entitatActual.getId(), 

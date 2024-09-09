@@ -1,5 +1,10 @@
 package es.caib.ripea.core.api.utils;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -9,11 +14,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 
 public class Utils {
 
@@ -149,7 +149,7 @@ public class Utils {
      * StringUtils.isNotEmpty("  bob  ") = true
      * </pre>
      *
-     * @param str  the String to check, may be null
+     * @param st  the String to check, may be null
      * @return <code>true</code> if the String is not empty and not null
      */
 	public static boolean isNotEmpty(final String st) {
@@ -167,11 +167,15 @@ public class Utils {
      * StringUtils.isEmpty("  bob  ") = false
      * </pre>
      *
-     * @param str  the String to check, may be null
+     * @param st  the String to check, may be null
      * @return <code>true</code> if the String is empty or null
      */
 	public static boolean isEmpty(final String st) {
 		return StringUtils.isEmpty(st);
+	}
+
+	public static boolean isBlank(final String st) {
+		return StringUtils.isBlank(st);
 	}
 	
 	public static boolean isEmpty(byte[] bytes) {
