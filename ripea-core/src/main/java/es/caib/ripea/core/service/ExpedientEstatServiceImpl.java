@@ -33,6 +33,7 @@ import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.repository.command.ExpedientRepositoryCommnand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,8 +77,10 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private ExpedientEstatHelper expedientEstatHelper;
-	
-	
+    @Autowired
+    private ExpedientRepositoryCommnand expedientRepositoryCommnand;
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public ExpedientEstatDto findExpedientEstatById(
@@ -299,7 +302,7 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 				false);
 	}
 
-    @Override
+	@Override
 	@Transactional
 	public ExpedientEstatDto deleteExpedientEstat(
 			Long entitatId,
@@ -434,27 +437,21 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
-			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
-			ordenacioMap.put("numeroINom", new String[] {"numero", "nom", "id"});
-			ordenacioMap.put("metaExpedient.codiSiaINom", new String[] {"metaExpedient.classificacio", "metaExpedient.nom"});
-
-			Page<ExpedientEntity> paginaDocuments = expedientRepository.findExpedientsPerCanviEstatMassiu(
+            ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
+            ordenacioMap.put("numeroINom", new String[] {"numero", "nom", "id"});
+            ordenacioMap.put("metaExpedient.codiSiaINom", new String[] {"metaExpedient.classificacio", "metaExpedient.nom"});
+			
+			Page<ExpedientEntity> paginaDocuments = expedientRepositoryCommnand.findExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
 					usuariActual,
-					Utils.getNullIfEmpty(metaExpedientsPermesos), 
-					metaExpedient == null,
 					metaExpedient,
-					expedient == null,
 					expedient,
-					dataInici == null,
 					dataInici,
-					dataFi == null,
 					dataFi,
-					chosenEstatEnum == null,
 					chosenEstatEnum,
-					chosenEstat == null,
 					chosenEstat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos),
 					paginacioHelper.toSpringDataPageable(paginacioParams,ordenacioMap));
 			PaginaDto<ExpedientDto> paginaDto = paginacioHelper.toPaginaDto(
 					paginaDocuments,
@@ -474,25 +471,18 @@ public class ExpedientEstatServiceImpl implements ExpedientEstatService {
 		
 		} else {
 			// ==================================  RETURNS IDS (SELECCIONAR TOTS) ============================================
-			List<Long> idsDocuments = expedientRepository.findIdsExpedientsPerCanviEstatMassiu(
+			List<Long> idsDocuments = expedientRepositoryCommnand.findIdsExpedientsPerCanviEstatMassiu(
 					entitat,
 					nomesAgafats,
 					usuariActual,
-					Utils.getNullIfEmpty(metaExpedientsPermesos),
-					metaExpedient == null,
 					metaExpedient,
-					expedient == null,
 					expedient,
-					dataInici == null,
 					dataInici,
-					dataFi == null,
 					dataFi,
-					chosenEstatEnum == null,
 					chosenEstatEnum,
-					chosenEstat == null,
-					chosenEstat);
-		
-		result.setIds(idsDocuments);
+					chosenEstat,
+					Utils.getNullIfEmpty(metaExpedientsPermesos));
+			result.setIds(idsDocuments);
 		}
 		return result;
 		

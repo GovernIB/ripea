@@ -62,7 +62,12 @@
 			<artifactId>commons-collections</artifactId>
 			<version>3.2.2</version>
 		</dependency>
-	    
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.1</version>
+		</dependency>
+
 	    <!-- Plugin for Jackson which can serialize cyclic object -->
 		<dependency>
 			<groupId>com.voodoodyne.jackson.jsog</groupId>

@@ -29,6 +29,7 @@ import es.caib.ripea.core.repository.ExpedientPeticioRepository;
 import es.caib.ripea.core.repository.GrupRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
+import es.caib.ripea.core.repository.command.GrupRepositoryCommnand;
 import es.caib.ripea.core.security.ExtendedPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ public class GrupServiceImpl implements GrupService {
 	
 	@Autowired
 	private GrupRepository grupRepository;
+	@Autowired
+	private GrupRepositoryCommnand grupRepositoryCommnand;
 	@Autowired
 	private EntityComprovarHelper entityComprovarHelper;
 	@Autowired
@@ -176,17 +179,15 @@ public class GrupServiceImpl implements GrupService {
 
 		if (organId != null) {
 			OrganGestorEntity organ = organGestorRepository.findOne(organId);
-			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
+//			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
 		}
 
-		Page<GrupEntity> page = grupRepository.findByEntitatAndProcediment(
+		Page<GrupEntity> page = grupRepositoryCommnand.findByEntitatAndProcediment(
 				entitat,
-				paginacioParams.getFiltre() == null,
 				paginacioParams.getFiltre() != null ? paginacioParams.getFiltre() : "",
-				metaExpedientId == null,
 				metaExpedientId,
-				true, //No filtram per organs
-				codisOrgansFills,
+				null, // No filtram per organs
+//				codisOrgansFills,
 				paginacioHelper.toSpringDataPageable(paginacioParams));
 
 		PaginaDto<GrupDto> pageDto = null;
@@ -247,17 +248,12 @@ public class GrupServiceImpl implements GrupService {
 		if (resultEnum == ResultEnumDto.PAGE) {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 		
-			Page<GrupEntity> page = grupRepository.findByEntitatAndProcediment(
+			Page<GrupEntity> page = grupRepositoryCommnand.findByEntitatAndProcediment(
 					entitat,
-					Utils.isEmpty(filtre.getCodi()),
-					Utils.getEmptyStringIfNull(filtre.getCodi()),
-					Utils.isEmpty(filtre.getDescripcio()),
-					Utils.getEmptyStringIfNull(filtre.getDescripcio()),
-					metaExpedientId == null,
+					filtre.getCodi(),
+					filtre.getDescripcio(),
 					metaExpedientId,
-					filtre.getOrganGestorAscendentId() == null,
 					filtre.getOrganGestorAscendentId(),
-					codisOrgansFills == null,
 					codisOrgansFills,
 					paginacioHelper.toSpringDataPageable(paginacioParams));
 			
@@ -521,11 +517,9 @@ public class GrupServiceImpl implements GrupService {
 			codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
 		}
 		
-		List<GrupEntity> grups = grupRepository.findByEntitatAndOrgan(
+		List<GrupEntity> grups = grupRepositoryCommnand.findByEntitatAndOrgan(
 				entitat,
-				metaExpedientId == null,
 				metaExpedientId,
-				codisOrgansFills == null,
 				codisOrgansFills);
 		
 		return conversioTipusHelper.convertirList(
@@ -572,12 +566,7 @@ public class GrupServiceImpl implements GrupService {
 				codisOrgansFills = organGestorCacheHelper.getCodisOrgansFills(entitat.getCodi(), organ.getCodi());
 			}
 
-			grups = grupRepository.findByEntitatAndOrgan(
-					entitat,
-					true,
-					null,
-					codisOrgansFills == null,
-					codisOrgansFills);
+			grups = grupRepositoryCommnand.findByEntitatAndOrgan(entitat, null, codisOrgansFills);
 			if ("tothom".equals(rolActual)) {
 				permisosHelper.filterGrantedAny(
 						grups,
@@ -590,8 +579,8 @@ public class GrupServiceImpl implements GrupService {
 				grups, 
 				GrupDto.class);
 	}
-	
-	
+
+
 	@Transactional(readOnly = true)
 	@Override
 	public GrupDto findGrupById(

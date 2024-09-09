@@ -1,20 +1,5 @@
 package es.caib.ripea.core.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import es.caib.ripea.core.api.dto.ArxiuPendentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
@@ -65,6 +50,20 @@ import es.caib.ripea.core.repository.InteressatRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.MetaExpedientTascaRepository;
 import es.caib.ripea.core.repository.UsuariRepository;
+import es.caib.ripea.core.repository.command.ExpedientRepositoryCommnand;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SeguimentServiceImpl implements SeguimentService {
@@ -103,6 +102,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
+    @Autowired
+    private ExpedientRepositoryCommnand expedientRepositoryCommnand;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -377,8 +378,14 @@ public class SeguimentServiceImpl implements SeguimentService {
 		Page<ExpedientPeticioEntity> paginaExpedientPeticios = expedientPeticioRepository.findByEntitatAndFiltre(
 				entitat,
 				rolActual,
-				permisosPerAnotacions.getProcedimentsPermesos(),
-				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(),
+				permisosPerAnotacions.getProcedimentsPermesos(0),
+				permisosPerAnotacions.getProcedimentsPermesos(1),
+				permisosPerAnotacions.getProcedimentsPermesos(2),
+				permisosPerAnotacions.getProcedimentsPermesos(3),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(0),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(1),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(2),
+				permisosPerAnotacions.getAdminOrganCodisOrganAmbDescendents(3),
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedientFiltre == null,
@@ -486,37 +493,29 @@ public class SeguimentServiceImpl implements SeguimentService {
 
 				
 				// ============ RETURNS PAGE (DATATABLE) ===============
-				Page<ExpedientEntity> exps = expedientRepository.findArxiuPendents(
+				Page<ExpedientEntity> exps = expedientRepositoryCommnand.findArxiuPendents(
 						entitat,
-						metaExpedientsPermesos,
 						nomesAgafats,
 						auth.getName(),
-						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-						metaExpedient == null,
 						metaExpedient,
-						filtre.getDataCreacioInici() == null,
+						filtre.getElementNom(),
 						filtre.getDataCreacioInici(),
-						filtre.getDataCreacioFi() == null,
-						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()),
+						filtre.getDataCreacioFi(),
+						metaExpedientsPermesos,
 						paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap));
 				result.setPagina(paginacioHelper.toPaginaDto(exps, SeguimentArxiuPendentsDto.class));
 
 			} else {
 				// =========== RETURNS IDS (SELECCIONAR TOTS) ==============
-				List<Long> exps = expedientRepository.findIdsArxiuPendents(
+				List<Long> exps = expedientRepositoryCommnand.findIdsArxiuPendents(
 						entitat,
-						metaExpedientsPermesos,
 						nomesAgafats,
 						auth.getName(),
-						filtre.getElementNom() == null || filtre.getElementNom().isEmpty(),
-						filtre.getElementNom() != null ? filtre.getElementNom().trim() : "",
-						metaExpedient == null,
 						metaExpedient,
-						filtre.getDataCreacioInici() == null,
+						filtre.getElementNom(),
 						filtre.getDataCreacioInici(),
-						filtre.getDataCreacioFi() == null,
-						DateHelper.toDateFinalDia(filtre.getDataCreacioFi()));
+						filtre.getDataCreacioFi(),
+						metaExpedientsPermesos);
 				result.setIds(exps);
 			}
 
