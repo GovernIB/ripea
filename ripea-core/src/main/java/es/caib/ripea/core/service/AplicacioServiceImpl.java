@@ -283,9 +283,13 @@ public class AplicacioServiceImpl implements AplicacioService {
 
 	@Override
 	public void excepcioSave(Throwable exception) {
-		logger.debug("Emmagatzemant excepció (" +
-				"exception=" + exception + ")");
-		excepcioLogHelper.addExcepcio(exception);
+		try {
+			logger.debug("Emmagatzemant excepció (exception=" + exception + ")");
+			excepcioLogHelper.addExcepcio(exception);
+		} catch (Exception e) {
+			logger.error("Error al guardar excepció al monitor d'excepcions.", e);
+			logger.error("Excepció no guardada:", exception);
+		}
 	}
 
 	@Override
