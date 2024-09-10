@@ -4,6 +4,7 @@
 package es.caib.ripea.core.helper;
 
 import es.caib.ripea.core.api.dto.ExcepcioLogDto;
+import lombok.Synchronized;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
@@ -19,7 +20,7 @@ public class ExcepcioLogHelper {
 
 	public static final int DEFAULT_MAX_EXCEPCIONS = 20;
 
-	private LinkedList<ExcepcioLogDto> excepcions = new LinkedList<ExcepcioLogDto>();
+	private LinkedList<ExcepcioLogDto> excepcions = new LinkedList<>();
 
 
 
@@ -31,6 +32,7 @@ public class ExcepcioLogHelper {
 		return excepcions;
 	}
 
+	@Synchronized
 	public void addExcepcio(Throwable exception) {
 		if (exception == null) return;
 
