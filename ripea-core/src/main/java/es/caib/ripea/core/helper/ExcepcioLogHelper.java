@@ -3,12 +3,11 @@
  */
 package es.caib.ripea.core.helper;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import es.caib.ripea.core.api.dto.ExcepcioLogDto;
 import org.springframework.stereotype.Component;
 
-import es.caib.ripea.core.api.dto.ExcepcioLogDto;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Mètodes per a la gestió del log d'excepcions.
@@ -32,14 +31,13 @@ public class ExcepcioLogHelper {
 		return excepcions;
 	}
 
-	public void addExcepcio(
-			Throwable exception) {
+	public void addExcepcio(Throwable exception) {
+		if (exception == null) return;
+
 		while (excepcions.size() >= DEFAULT_MAX_EXCEPCIONS) {
-			excepcions.remove(excepcions.size() - 1);
+			excepcions.removeLast();
 		}
-		excepcions.add(
-				0,
-				new ExcepcioLogDto(exception));
+		excepcions.addFirst(new ExcepcioLogDto(exception));
 	}
 
 }

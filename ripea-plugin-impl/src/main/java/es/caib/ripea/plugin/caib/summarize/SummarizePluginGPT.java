@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j;
 import javax.ws.rs.core.MediaType;
 
 @Log4j
-public class SummarizePluginChatGPT extends RipeaAbstractPluginProperties implements SummarizePlugin {
+public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements SummarizePlugin {
 
     private final static int MAX_LENGTH = 25000;
 
@@ -59,11 +59,14 @@ public class SummarizePluginChatGPT extends RipeaAbstractPluginProperties implem
             ArrayNode messagesNode = mapper.createArrayNode();
             ObjectNode message = mapper.createObjectNode();
             message.put("role", "user");
-            message.put("content", "Genera un títol (màxim 70 caràcters) i un resum (màxim 500 caràcters) pel següent text: " + text);
+            message.put("content", "Genera un títol (màxim 60 caràcters) i un resum (màxim 500 caràcters) en català pel següent text: " + text);
             messagesNode.add(message);
 
             // Afegir 'messages' a l'objecte principal
-            rootNode.put("messages", messagesNode);
+            rootNode.set("messages", messagesNode);
+            rootNode.put("temperature", 0.7);
+            rootNode.put("stream", false);
+            rootNode.put("max_tokens", 5000);
 
             // Afegir 'temperature' a l'objecte principal
             rootNode.put("temperature", 0.7);

@@ -4357,6 +4357,7 @@ public class PluginHelper {
 		return text.toString();
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void extractTextFromElement(Element element, StringBuilder text) {
 		List<Element> children = element.getChildren();
 

@@ -188,11 +188,11 @@
 			<version>2.0.0</version>
 		</dependency>		
 		<!-- Fi signatura en el servidor amb PortaFib -->
-  		<dependency>
-			<groupId>es.caib.regweb3</groupId>
-			<artifactId>regweb3-ws-api</artifactId>
-			<version>${regweb.version}</version>
-		</dependency>
+<!--  		<dependency>-->
+<!--			<groupId>es.caib.regweb3</groupId>-->
+<!--			<artifactId>regweb3-ws-api</artifactId>-->
+<!--			<version>${regweb.version}</version>-->
+<!--		</dependency>-->
   		<dependency>
 			<groupId>es.caib.dir3caib</groupId>
 			<artifactId>dir3caib-ws-api</artifactId>
