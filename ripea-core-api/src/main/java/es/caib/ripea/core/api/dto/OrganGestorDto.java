@@ -46,6 +46,14 @@ public class OrganGestorDto extends AuditoriaDto {
     	return codi + " - " + nom;
     }
     
+    public String getCodiAmbEstatINom() {
+    	if (OrganEstatEnumDto.E.equals(this.estat) || OrganEstatEnumDto.A.equals(this.estat)) {
+    		return codi + " <span class='fa fa-warning text-danger' style='margin-top: 3px;'></span> - " + nom;
+    	} else {
+    		return codi + " - " + nom;
+    	}    	
+    }
+    
     public String getNomICodi() {
 		return nom + " (" + codi + ")";
     }
