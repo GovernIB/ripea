@@ -213,8 +213,18 @@ public class ContingutHelper {
 					conversioTipusHelper.convertir(
 							expedient.getAgafatPer(),
 							UsuariDto.class));
-			dto.setValid(
-					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+
+			List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient);
+			dto.setValid(errorsValidacio.isEmpty());
+			dto.setValidPerTancar(true);
+			for (ValidacioErrorDto veDto: errorsValidacio) {
+				//Si té algun error que NO és de notificacions pendents,
+				//posam a false el check de nomes errors de notificacio i sortim del bucle
+				if (!veDto.getTipusValidacio().equals(ErrorsValidacioTipusEnumDto.NOTIFICACIONS)) {
+					dto.setValidPerTancar(false);
+					break;
+				}
+			}
 
 			// expedient estat
 			if (expedient.getEstatAdditional() != null) {
