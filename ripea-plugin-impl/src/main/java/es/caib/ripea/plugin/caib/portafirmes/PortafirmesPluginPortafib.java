@@ -3,28 +3,26 @@
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-
+import es.caib.portafib.ws.api.v1.CarrecWs;
+import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWs;
+import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
+import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
+import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxEstat;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxReviser;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxSigner;
+import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.ApiFirmaAsyncSimple;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleAnnex;
 import org.fundaciobit.apisib.apifirmaasyncsimple.v2.beans.FirmaAsyncSimpleDocumentTypeInformation;
@@ -61,26 +59,26 @@ import org.fundaciobit.apisib.core.exceptions.ApisIBServerException;
 import org.fundaciobit.apisib.core.exceptions.ApisIBTimeOutException;
 import org.slf4j.LoggerFactory;
 
-import es.caib.portafib.ws.api.v1.CarrecWs;
-import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWs;
-import es.caib.portafib.ws.api.v1.PortaFIBUsuariEntitatWsService;
-import es.caib.portafib.ws.api.v1.UsuariEntitatBean;
-import es.caib.portafib.ws.api.v1.UsuariPersonaBean;
-import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxEstat;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxReviser;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxSigner;
-import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Implementació del plugin de portafirmes emprant el portafirmes
@@ -384,12 +382,14 @@ public class PortafirmesPluginPortafib extends RipeaAbstractPluginProperties imp
 			FlowTemplateSimpleFilterGetAllByFilter flowTemplateSimpleFilterGetAllByFilter = new FlowTemplateSimpleFilterGetAllByFilter(idioma, null, descripcio);
 			
 			FlowTemplateSimpleFlowTemplateList resposta = getFluxDeFirmaClient().getAllFlowTemplatesByFilter(flowTemplateSimpleFilterGetAllByFilter);
-			
-			for (FlowTemplateSimpleKeyValue flowTemplate : resposta.getList()) {
-				PortafirmesFluxResposta plantilla = new PortafirmesFluxResposta();
-				plantilla.setFluxId(flowTemplate.getKey());
-				plantilla.setNom(flowTemplate.getValue());
-				plantilles.add(plantilla);
+
+			if (resposta != null) {
+				for (FlowTemplateSimpleKeyValue flowTemplate : resposta.getList()) {
+					PortafirmesFluxResposta plantilla = new PortafirmesFluxResposta();
+					plantilla.setFluxId(flowTemplate.getKey());
+					plantilla.setNom(flowTemplate.getValue());
+					plantilles.add(plantilla);
+				}
 			}
 		} catch (Exception ex) {
 			throw new SistemaExternException(

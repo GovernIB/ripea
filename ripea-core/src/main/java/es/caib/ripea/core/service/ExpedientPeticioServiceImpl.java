@@ -985,12 +985,14 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 //				metaExpedientsPermesos,
 //				MetaExpedientDto.class);
 		List<MetaExpedientDto> dto = new ArrayList<MetaExpedientDto>();
-		for (MetaExpedientEntity metaExpedient: metaExpedientsPermesos) {
-			MetaExpedientDto metaExpedientDto = new MetaExpedientDto();
-			metaExpedientDto.setId(metaExpedient.getId());
-			metaExpedientDto.setClassificacio(metaExpedient.getClassificacio());
-			metaExpedientDto.setNom(metaExpedient.getNom());
-			dto.add(metaExpedientDto);
+		if (metaExpedientsPermesos != null) {
+			for (MetaExpedientEntity metaExpedient : metaExpedientsPermesos) {
+				MetaExpedientDto metaExpedientDto = new MetaExpedientDto();
+				metaExpedientDto.setId(metaExpedient.getId());
+				metaExpedientDto.setClassificacio(metaExpedient.getClassificacio());
+				metaExpedientDto.setNom(metaExpedient.getNom());
+				dto.add(metaExpedientDto);
+			}
 		}
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("convertirList time:  " + (System.currentTimeMillis() - t3) + " ms");
