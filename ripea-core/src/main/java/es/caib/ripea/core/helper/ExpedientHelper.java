@@ -462,7 +462,9 @@ public class ExpedientHelper {
 			interessat = updateInteressat(expedientId, permission, rolActual, interessatOverwritten);
 		// L'interessat no existeix: cream el nou interessat
 		} else {
-			interessat = createInteressat(expedientId, permission, rolActual, interessatDistribucio);
+			interessat = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, interessatDistribucio.getDocumentNumero());
+			if (interessat == null)
+				interessat = createInteressat(expedientId, permission, rolActual, interessatDistribucio);
 		}
 
 		// L'interessat que estam associant té un representant
@@ -470,7 +472,12 @@ public class ExpedientHelper {
 			if (representantOverwritten != null) {
 				updateRepresentant(expedientId, interessat.getId(), permission, rolActual, representantOverwritten);
 			} else {
-				createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
+				InteressatEntity representant = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, representantDistribucio.getDocumentNumero());
+				if (representant == null) {
+					createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
+				} else {
+					interessat.updateRepresentant(representant);
+				}
 			}
 		// L'interessat que estam associant no té representant
 		} else {
@@ -610,6 +617,10 @@ public class ExpedientHelper {
 		Map<String, InteressatDto> interessatsOverwritten = new HashMap<>();
 
 		Set<InteressatEntity> interessatsORepresenantsRipea = expedientEntity.getInteressatsORepresentants();
+		if (interessatsORepresenantsRipea == null || interessatsORepresenantsRipea.isEmpty()) {
+			return interessatsOverwritten;
+		}
+
 		Set<RegistreInteressatEntity> interessatsOrRepresentantsDistribucio = getInteressatOrRepresentantsDistribucio(interessatsDistribucio);
 
 		boolean sobreescriureTipus = configHelper.getAsBoolean("es.caib.ripea.interessats.permet.canvi.tipus");
