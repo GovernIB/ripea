@@ -388,8 +388,13 @@ public class SeguimentServiceImpl implements SeguimentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		
 		MetaExpedientEntity metaExpedientFiltre = null;
+		boolean senseMetaExpedientInformat = false;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
+			if (filtre.getMetaExpedientId()>0l) {
+				metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
+			} else {
+				senseMetaExpedientInformat = true;
+			}
 		}
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
@@ -406,6 +411,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedientFiltre == null,
+				senseMetaExpedientInformat,
 				metaExpedientFiltre,
 				StringUtils.isEmpty(filtre.getNumero()),
 				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
