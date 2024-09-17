@@ -113,7 +113,8 @@
  					urlConsultaLlistat="${urlConsultaLlistat}"
  					placeholderKey="metaexpedient.list.filtre.camp.organGestor"
  					suggestValue="id"
- 					suggestText="codiINom" />
+ 					suggestText="codiAmbEstatINom"
+ 					 />
 			</div>
 			<div class="col-md-4">
 				<c:if test="${not isRolAdminOrgan}">
@@ -161,7 +162,7 @@
 				<th data-col-name="organGestor.codiINom" data-template="#cellSyncTemplate" width="7%">
 					<spring:message code="metaexpedient.list.columna.organGestor"/>
 					<script id="cellSyncTemplate" type="text/x-jsrender">
-						{{:organGestor?.codiINom}}
+						{{:organGestor?.codi}}
 						{{if organNoSincronitzat}}
 							<span class="fa fa-warning text-danger" title="<spring:message code='metaexpedient.actualitzacio.organ.no.sync'/>"></span>
 						{{else organEstat=='E'||organEstat=='A'||organEstat=='T'}}
@@ -174,7 +175,7 @@
 							{{else}}
 								<span class="fa fa-warning text-danger" style="margin-top: 3px;" title="<spring:message code="organgestor.list.obsolet"/>"></span>
 							{{/if}}
-						{{/if}}
+						{{/if}}- {{:organGestor?.nom}}
 					</script>
 				</th>
 				<th data-col-name="comu" data-orderable="false" data-template="#cellComuTemplate" width="1%">

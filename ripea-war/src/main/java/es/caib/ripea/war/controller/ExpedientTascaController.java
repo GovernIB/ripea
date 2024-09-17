@@ -7,10 +7,10 @@ import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.war.command.ExpedientCommand;
 import es.caib.ripea.war.command.ExpedientTascaCommand;
 import es.caib.ripea.war.command.TascaDataLimitCommand;
 import es.caib.ripea.war.command.TascaReassignarCommand;
+import es.caib.ripea.war.command.TascaReobrirCommand;
 import es.caib.ripea.war.helper.*;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -240,6 +241,53 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.reassignat.ok");
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/reobrir", method = RequestMethod.GET)
+	public String reobrir(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			Model model) {
+		getEntitatActualComprovantPermisos(request);
+
+		TascaReobrirCommand command = new TascaReobrirCommand();
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+
+		command.setResponsablesCodi(new ArrayList<String>());
+		
+		ExpedientTascaCommand expedientTasca = ExpedientTascaCommand.asCommand(expedientTascaDto);
+		
+		command.setResponsablesCodi(expedientTasca.getResponsablesCodi());
+		
+		model.addAttribute(command);
+		
+		return "expedientTascaReobrir";
+	}
+	
+	@RequestMapping(value = "/{expedientTascaId}/reobrir", method = RequestMethod.POST)
+	public String reobrirPost(
+			HttpServletRequest request,
+			@PathVariable Long expedientTascaId,
+			@Valid TascaReobrirCommand command,
+			BindingResult bindingResult,
+			Model model) {
+		
+		getEntitatActualComprovantPermisos(request);
+		
+		if (bindingResult.hasErrors()) {
+			return "expedientTascaReobrir";
+		}
+	
+		expedientTascaService.reobrirTasca(
+				expedientTascaId, 
+				command.getResponsablesCodi(), 
+				command.getMotiu(),
+				RolHelper.getRolActual(request));
+		
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"expedient.tasca.controller.reobrir.ok");
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.GET)

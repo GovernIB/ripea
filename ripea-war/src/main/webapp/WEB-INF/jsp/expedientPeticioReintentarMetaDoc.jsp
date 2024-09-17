@@ -108,6 +108,7 @@ $(document).ready(function(){
 
 var previousAnnex;
 function showViewer(event, annexId, observacions, dataCaptura, origen, ntiTipoDocumental, sicresTipoDocumento, annexArxiuEstat) {
+	debugger;
     var resumViewer = $('#annex-viewer');
 	// Mostrar/amagar visor
 	if (!resumViewer.is(':visible')) {
@@ -208,7 +209,7 @@ function showDocument(arxiuUrl, annexId) {
 	            var file = new File([blob], response.contentType, {type: response.contentType});
 	            link = URL.createObjectURL(file);
 	            
-	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+	            var viewerUrl = "<c:url value="/webjars/pdf-js/2.13.216/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
 			    $('#container-previs').removeClass('rmodal_loading');
 			    $('#container-previs').attr('src', viewerUrl);
 			}

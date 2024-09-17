@@ -147,8 +147,7 @@ public class CarpetaHelper {
 				carpeta, false, false);
 	}
 	
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> obtenirArbreCarpetesPerExpedient(Long entitatId, ExpedientEntity expedient) {
-		List<ArbreDto<ExpedientCarpetaArbreDto>> expedients = new ArrayList<ArbreDto<ExpedientCarpetaArbreDto>>();
+	public ArbreDto<ExpedientCarpetaArbreDto> obtenirArbreCarpetesPerExpedient(Long entitatId, ExpedientEntity expedient) {
 
 		long t0 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendiment())
@@ -186,12 +185,11 @@ public class CarpetaHelper {
 			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient obtenirArbreCarpetesPerMetaExpedient time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		expedientArrel.setArrel(currentArbreNode);
-		expedients.add(expedientArrel);
 		
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("CarpetaHelper.obtenirArbreCarpetesPerExpedient end:  " + (System.currentTimeMillis() - t0) + " ms");
 		
-		return expedients;
+		return expedientArrel;
 	}
 
 	public Map<String, Long> crearEstructuraCarpetes(

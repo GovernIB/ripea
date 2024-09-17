@@ -32,6 +32,7 @@
 <%@ attribute name="textKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="labelSize" required="false" rtexprvalue="true"%>
 <%@ attribute name="inputSize" required="false" rtexprvalue="true"%>
+<%@ attribute name="selectMultiple" type="java.lang.Boolean"%>
 
 <c:set var="campPath" value="${name}"/>
 <c:set var="campErrors"><form:errors path="${campPath}"/></c:set>
@@ -44,6 +45,7 @@
 <c:if test="${empty isContextMenuEnabled}"><c:set var="isContextMenuEnabled" value="${false}"/></c:if>
 <c:if test="${empty inicialitzar}"><c:set var="inicialitzar" value="${true}"/></c:if>
 <c:if test="${empty isCheckboxEnabled}"><c:set var="isCheckboxEnabled" value="${false}"/></c:if>
+<c:if test="${empty selectMultiple}"><c:set var="selectMultiple" value="${true}"/></c:if>
 
 <form:hidden path="${name}"/>
 
@@ -122,7 +124,8 @@
 			"check_callback": true,
 			strings : {
 	            'New node': '<spring:message code="metaexpedient.form.camp.estructura.newnode"/>'
-	        }
+	        },
+	        "multiple": ${selectMultiple}
 		},
 		"types" : {
 			"default" : {

@@ -5,6 +5,7 @@ package es.caib.ripea.war.helper;
 
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.MoureDestiVistaEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.EntitatService;
@@ -28,7 +29,8 @@ public class SessioHelper {
 	private static final String SESSION_ATTRIBUTE_PIPELLA_ANOT_REG = "SessioHelper.pipellaAnotacioRegistre";
 	private static final String SESSION_ATTRIBUTE_IDIOMA_USUARI = "SessionHelper.idiomaUsuari";
 	public static final String SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI = "SessionHelper.organActualCodiUsuari"; // organ derived from current contingut or procediment on which user is working
-
+	public static final String SESSION_ATTRIBUTE_MOURE_VISTA = "SessioHelper.moureVista";
+	
 	private static boolean propietatsInicialitzades = false;
 	private static String capLogo = null;
 	private static String capColorFons = null;
@@ -125,6 +127,14 @@ public class SessioHelper {
 
 	public static void removeOrganActual(HttpServletRequest request) {
 		request.getSession().removeAttribute(SESSION_ATTRIBUTE_ORGAN_ACTUAL_CODI_USUARI);
+	}
+	
+	public static void updateMoureVista(HttpServletRequest request, MoureDestiVistaEnumDto vista) {
+		request.getSession().setAttribute(SESSION_ATTRIBUTE_MOURE_VISTA, vista);
+	}
+	
+	public static MoureDestiVistaEnumDto getMoureVista(HttpServletRequest request) {
+		return (MoureDestiVistaEnumDto)request.getSession().getAttribute(SESSION_ATTRIBUTE_MOURE_VISTA);
 	}
 
 }

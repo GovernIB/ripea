@@ -79,6 +79,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			"			and me.gestioAmbGrupsActiva = false " +
 			"			or ((ep.grup is not null and :esNullIdsGrupsPermesos = false and ep.grup.id in (:idsGrupsPermesos))) )) " +
 			"and (:esNullMetaExpedient = true or ep.metaExpedient = :metaExpedient) " +
+			"and (:senseMetaExpedientInformat = false or ep.metaExpedient is null) " +
 			"and (:esNullNumero = true or lower(ep.registre.identificador) like lower('%'||:numero||'%')) " +
 			"and (:esNullExtracte = true or lower(ep.registre.extracte) like lower('%'||:extracte||'%')) " +
 			"and (:esNullDestinacio = true or ep.registre.destiCodi = :destinacio) " + 
@@ -111,6 +112,7 @@ public interface ExpedientPeticioRepository extends JpaRepository<ExpedientPetic
 			@Param("esNullIdsGrupsPermesos") boolean esNullIdsGrupsPermesos,
 			@Param("idsGrupsPermesos") List<Long> idsGrupsPermesos,
 			@Param("esNullMetaExpedient") boolean esNullMetaExpedient,
+			@Param("senseMetaExpedientInformat") boolean senseMetaExpedientInformat,
 			@Param("metaExpedient") MetaExpedientEntity metaExpedient,
 			@Param("esNullNumero") boolean esNullNumero,
 			@Param("numero") String numero,

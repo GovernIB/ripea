@@ -213,8 +213,18 @@ public class ContingutHelper {
 					conversioTipusHelper.convertir(
 							expedient.getAgafatPer(),
 							UsuariDto.class));
-			dto.setValid(
-					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+
+			List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient);
+			dto.setValid(errorsValidacio.isEmpty());
+			dto.setValidPerTancar(true);
+			for (ValidacioErrorDto veDto: errorsValidacio) {
+				//Si té algun error que NO és de notificacions pendents,
+				//posam a false el check de nomes errors de notificacio i sortim del bucle
+				if (!veDto.getTipusValidacio().equals(ErrorsValidacioTipusEnumDto.NOTIFICACIONS)) {
+					dto.setValidPerTancar(false);
+					break;
+				}
+			}
 
 			// expedient estat
 			if (expedient.getEstatAdditional() != null) {
@@ -316,6 +326,17 @@ public class ContingutHelper {
 					Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new LinkedHashMap<MetaDocumentDto, List<ContingutDto>>();
 
 					List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
+					
+					
+					if (getPropertyGuardarCertificacioExpedient()) {
+						MetaDocumentEntity metaDocumentAcuseRebut = metaDocumentRepository.findByEntitatAndTipusGeneric(
+								true, 
+								null,
+								MetaDocumentTipusGenericEnumDto.ACUSE_RECIBO_NOTIFICACION);
+						
+						if (metaDocumentAcuseRebut != null)
+							metaDocuments.add(metaDocumentAcuseRebut);
+					}
 					
 					for (MetaDocumentEntity metaDocument : metaDocuments) {
 						
@@ -2474,6 +2495,9 @@ public class ContingutHelper {
 	public int getArxiuMaxReintentsDocuments() {
 		String arxiuMaxReintentsDocuments = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.documents");
 		return arxiuMaxReintentsDocuments != null && !arxiuMaxReintentsDocuments.isEmpty() ? Integer.valueOf(arxiuMaxReintentsDocuments) : 0;
+	}
+	private boolean getPropertyGuardarCertificacioExpedient() {
+		return configHelper.getAsBoolean("es.caib.ripea.notificacio.guardar.certificacio.expedient");
 	}
 	private static final Logger logger = LoggerFactory.getLogger(ContingutHelper.class);
 

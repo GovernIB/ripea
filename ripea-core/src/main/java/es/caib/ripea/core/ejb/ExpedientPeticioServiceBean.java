@@ -97,15 +97,6 @@ public class ExpedientPeticioServiceBean implements ExpedientPeticioService {
 		
 	}
 
-
-	
-	@Override
-	@RolesAllowed("tothom")
-	public MetaExpedientDto findMetaExpedientByEntitatAndProcedimentCodi(String entitatCodi,
-			String procedimentCodi) {
-		return delegate.findMetaExpedientByEntitatAndProcedimentCodi(entitatCodi, procedimentCodi);
-	}
-
 	@Override
 	@RolesAllowed("tothom")
 	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi) {

@@ -596,7 +596,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				"Consulta del meta-expedient per entitat i codi SIA (" + "entitatId=" + entitatId + ", " + "codi=" + classificacio +
 						")");
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
-		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(entitat, classificacio);
+		List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacioOrderByNomAsc(entitat, classificacio);
 		
 		List<MetaExpedientDto> resposta = null;
 		if (metaExpedients != null) {

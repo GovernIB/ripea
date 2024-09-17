@@ -1391,6 +1391,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
 				entitatActual.getId(),
+				null,
 				expedientId);
 
 		List<DocumentDto> documents = documentService.findByExpedient(

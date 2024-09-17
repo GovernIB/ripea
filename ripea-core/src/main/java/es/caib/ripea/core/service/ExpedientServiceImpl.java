@@ -2100,6 +2100,13 @@ public class ExpedientServiceImpl implements ExpedientService {
 		usuari.updateVistaActual(vistaActual);
 	}
 	
+	@Transactional(readOnly = true)
+	@Override
+	public MoureDestiVistaEnumDto getVistaMoureUsuariActual() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		UsuariEntity usuari = usuariRepository.findOne(auth.getName());
+		return usuari.getVistaMoureActual();
+	}
 	
 	private boolean isPermesReobrir() {
 		return configHelper.getAsBoolean("es.caib.ripea.expedient.permetre.reobrir");

@@ -4,6 +4,7 @@
 package es.caib.ripea.core.entity;
 
 import es.caib.ripea.core.api.dto.ContingutVistaEnumDto;
+import es.caib.ripea.core.api.dto.MoureDestiVistaEnumDto;
 import lombok.Getter;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.annotations.ForeignKey;
@@ -103,6 +104,10 @@ public class UsuariEntity implements Serializable {
 	@Column(name = "expedient_expandit")
 	private boolean expedientExpandit = true;
 
+	@Column(name="vista_moure_actual", length = 16)
+	@Enumerated(EnumType.STRING)
+	private MoureDestiVistaEnumDto vistaMoureActual = MoureDestiVistaEnumDto.LLISTA;
+	
 	public ContingutVistaEnumDto getVistaActual() {
 		return vistaActual;
 	}
@@ -130,7 +135,8 @@ public class UsuariEntity implements Serializable {
 			MetaExpedientEntity procediment,
 			ContingutVistaEnumDto vistaActual, 
 			boolean expedientExpandit,
-			EntitatEntity entitatPerDefecte) {
+			EntitatEntity entitatPerDefecte,
+			MoureDestiVistaEnumDto vistaMoureActual) {
 		this.emailAlternatiu = emailAlternatiu;
 		this.idioma = idioma;
 		this.rebreEmailsAgrupats = rebreEmailsAgrupats;
@@ -144,6 +150,7 @@ public class UsuariEntity implements Serializable {
 		this.vistaActual = vistaActual;
 		this.expedientExpandit = expedientExpandit;
 		this.entitatPerDefecte = entitatPerDefecte;
+		this.vistaMoureActual = vistaMoureActual;
 	}
 
 	public void update(

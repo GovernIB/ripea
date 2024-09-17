@@ -182,7 +182,8 @@ public class AplicacioServiceImpl implements AplicacioService {
 				dto.getProcedimentId() != null ? metaExpedientRepository.findOne(dto.getProcedimentId()) : null,
 				dto.getVistaActual(), 
 				dto.isExpedientExpandit(),
-				dto.getEntitatPerDefecteId() != null ? entitatRepository.findOne(dto.getEntitatPerDefecteId()) : null);
+				dto.getEntitatPerDefecteId() != null ? entitatRepository.findOne(dto.getEntitatPerDefecteId()) : null,
+				dto.getVistaMoureActual());
 		
 		return toUsuariDtoAmbRols(usuari);
 	}

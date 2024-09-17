@@ -215,3 +215,57 @@ databaseChangeLog:
               - column:
                   name: configurable_organ
                   value: ${booleanTrue}
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.plugin.summarize.model
+              - column:
+                  name: description
+                  value: Model de IA a utilitzar si escau.
+              - column:
+                  name: group_code
+                  value: SUMMARIZE
+              - column:
+                  name: position
+                  value: 0
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: TEXT
+              - column:
+                  name: configurable
+                  value: ${booleanTrue}
+              - column:
+                  name: configurable_organ
+                  value: ${booleanTrue}
+        - insert:
+            tableName: ipa_config
+            columns:
+              - column:
+                  name: key
+                  value: es.caib.ripea.plugin.summarize.model.maxTokens
+              - column:
+                  name: description
+                  value: Maxim de tokens (tipicament paraules, pero no sempre) que soporta el model en la peticio i resposta combinats.
+              - column:
+                  name: group_code
+                  value: SUMMARIZE
+              - column:
+                  name: position
+                  value: 0
+              - column:
+                  name: jboss_property
+                  value: ${booleanTrue}
+              - column:
+                  name: type_code
+                  value: INT
+              - column:
+                  name: configurable
+                  value: ${booleanTrue}
+              - column:
+                  name: configurable_organ
+                  value: ${booleanTrue}

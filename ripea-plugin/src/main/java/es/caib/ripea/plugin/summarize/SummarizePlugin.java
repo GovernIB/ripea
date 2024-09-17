@@ -6,6 +6,8 @@ import es.caib.ripea.plugin.SistemaExternException;
 public interface SummarizePlugin {
 
     public Resum getSummarize(String text) throws SistemaExternException;
+    public Resum getSummarize(String text, int longitudDesc) throws SistemaExternException;
+    public Resum getSummarize(String text, int longitudDesc, int longitudTitol) throws SistemaExternException;
     public boolean isActive();
 
 }

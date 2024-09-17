@@ -19,11 +19,13 @@ import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ContingutNotUniqueException;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
+import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.entity.CarpetaEntity;
 import es.caib.ripea.core.entity.ContingutEntity;
 import es.caib.ripea.core.entity.EntitatEntity;
@@ -180,7 +182,7 @@ public class CarpetaServiceImpl implements CarpetaService {
 
 	@Transactional(readOnly = true)
 	@Override
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long contingutId) {
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedientsMetaExpedient, Long contingutId) {
 		ContingutEntity contingut = contingutHelper.comprovarContingutDinsExpedientModificable(
 				entitatId,
 				contingutId,
@@ -188,10 +190,25 @@ public class CarpetaServiceImpl implements CarpetaService {
 				false,
 				false,
 				false, false, true, null);
+
+		List<ArbreDto<ExpedientCarpetaArbreDto>> arbreExpedients = new ArrayList<ArbreDto<ExpedientCarpetaArbreDto>>();
 		
-		ExpedientEntity expedient = contingut instanceof ExpedientEntity ? (ExpedientEntity)contingut : ((CarpetaEntity)contingut).getExpedient();
+		if (expedientsMetaExpedient != null) {
+			for (ExpedientDto expedientDto : expedientsMetaExpedient) {
+				ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(entitatId, expedientDto.getId());
+				ArbreDto<ExpedientCarpetaArbreDto> arbreExpedient = carpetaHelper.obtenirArbreCarpetesPerExpedient(entitatId, expedient);
+				
+				arbreExpedients.add(arbreExpedient);
+			}
+		} else {
+			// Moure contingut dins del mateix expedient
+			ExpedientEntity expedient = contingut instanceof ExpedientEntity ? (ExpedientEntity)contingut : ((CarpetaEntity)contingut).getExpedient();
+			ArbreDto<ExpedientCarpetaArbreDto> arbreExpedient = carpetaHelper.obtenirArbreCarpetesPerExpedient(entitatId, expedient);
+
+			arbreExpedients.add(arbreExpedient);
+		}
 		
-		return carpetaHelper.obtenirArbreCarpetesPerExpedient(entitatId, expedient);
+		return arbreExpedients;
 	}
 	
 	@Override

@@ -41,10 +41,6 @@ public interface ExpedientPeticioService {
 			String observacions);
 
 	@PreAuthorize("hasRole('tothom')")
-	public MetaExpedientDto findMetaExpedientByEntitatAndProcedimentCodi(String entitatCodi,
-			String procedimentCodi);
-
-	@PreAuthorize("hasRole('tothom')")
 	public List<MetaExpedientSelectDto> findMetaExpedientSelect(String entitatCodi);
 
 	@PreAuthorize("hasRole('tothom')")

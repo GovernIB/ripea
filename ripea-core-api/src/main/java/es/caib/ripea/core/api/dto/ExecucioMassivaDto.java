@@ -21,12 +21,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=true)
 public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 
-
 	private Long id;
 	private ExecucioMassivaTipusDto tipus;
 	private Date dataInici;
 	private Date dataFi;
-	
 //	Paràmetres enviament portafirmes
 	private String motiu;
 	private PortafirmesPrioritatEnumDto prioritat = PortafirmesPrioritatEnumDto.NORMAL;
@@ -35,22 +33,16 @@ public class ExecucioMassivaDto extends AuditoriaDto implements Serializable {
 	private MetaDocumentFirmaSequenciaTipusEnumDto portafirmesSequenciaTipus;
 	private String portafirmesFluxId;
 	private String portafirmesTransaccioId;
-
-//	////////////////////////////////////
-	
 	private Boolean enviarCorreu;
 	private List<Long> contingutIds = new ArrayList<Long>();
 	private String rolActual;
-	
 	private Boolean portafirmesAvisFirmaParcial;
-	
 	private int errors;
 	private int cancelats;
 	private double executades;
+	private String documentNom;
 
-
-	public ExecucioMassivaDto() {
-	}
+	public ExecucioMassivaDto() {}
 
 	public ExecucioMassivaDto(
 			ExecucioMassivaTipusDto tipus,

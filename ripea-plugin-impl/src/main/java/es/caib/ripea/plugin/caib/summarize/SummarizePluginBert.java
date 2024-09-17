@@ -24,7 +24,19 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
         super(propertyKeyBase, properties);
     }
 
-    public Resum getSummarize(String text) throws SistemaExternException {
+	@Override
+	public Resum getSummarize(String text, int longitudDesc) throws SistemaExternException {
+		return getSummarize(text, longitudDesc, 10);
+	}
+
+	@Override
+	public Resum getSummarize(String text) throws SistemaExternException {
+		return getSummarize(text, 250, 10);
+	}
+	
+	@Override
+	public Resum getSummarize(String text, int longitudDesc, int longitudTitol) throws SistemaExternException {
+
         Resum resum = Resum.builder().build();
 
         boolean debug = isDebug();
@@ -32,8 +44,8 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
         ObjectMapper objectMapper = new ObjectMapper();
 
         String bertUrl = getUrl();
-        String resumUrl = bertUrl + "/summarize_by_ratio?ratio=0.1&max_length=500";
-        String titolUrl = bertUrl + "/summarize_by_ratio?ratio=0.1&max_length=64";
+        String resumUrl = bertUrl + "/summarize_by_ratio?ratio=0.1&max_length="+longitudDesc;
+        String titolUrl = bertUrl + "/summarize_by_ratio?ratio=0.1&max_length="+longitudTitol;
 
         if (debug) {
             log.info("Realitzant petició de resum a les URLs: " + resumUrl + ", " + titolUrl);
@@ -150,7 +162,6 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
     private Integer getTimeout() {
         return Integer.valueOf(getProperty("plugin.summarize.service.timeout", "5000"));
     }
-
     private boolean isDebug() {
         return getAsBoolean("plugin.summarize.bert.debug");
     }

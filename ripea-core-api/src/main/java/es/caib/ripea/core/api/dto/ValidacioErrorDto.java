@@ -13,6 +13,7 @@ import java.io.Serializable;
  */
 public class ValidacioErrorDto implements Serializable {
 
+	private ErrorsValidacioTipusEnumDto tipusValidacio;
 	private MetaDadaDto metaDada;
 	private MetaDocumentDto metaDocument;
 	private MultiplicitatEnumDto multiplicitat;
@@ -24,11 +25,13 @@ public class ValidacioErrorDto implements Serializable {
 			MultiplicitatEnumDto multiplicitat) {
 		this.metaDada = metaDada;
 		this.multiplicitat = multiplicitat;
+		this.tipusValidacio = ErrorsValidacioTipusEnumDto.MULTIPLICITAT;
 	}
 	public ValidacioErrorDto(
 			MetaDocumentDto metaDocument,
 			MultiplicitatEnumDto multiplicitat,
 			ErrorsValidacioTipusEnumDto tipus) {
+		this.tipusValidacio = tipus;
 		switch (tipus) {
 			case MULTIPLICITAT:
 				this.metaDocument = metaDocument;
@@ -42,9 +45,13 @@ public class ValidacioErrorDto implements Serializable {
 				break;
 		}
 	}
-	public ValidacioErrorDto(
-			boolean documentsWithoutMetaDocument) {
-		this.documentsWithoutMetaDocument = documentsWithoutMetaDocument;
+
+	public ErrorsValidacioTipusEnumDto getTipusValidacio() {
+		return tipusValidacio;
+	}
+
+	public void setTipusValidacio(ErrorsValidacioTipusEnumDto tipusValidacio) {
+		this.tipusValidacio = tipusValidacio;
 	}
 
 	public MetaDadaDto getMetaDada() {

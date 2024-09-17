@@ -187,4 +187,11 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	public ExpedientTascaDto cancelarDelegacio(Long expedientTascaId, String comentari) {
 		return delegate.cancelarDelegacio(expedientTascaId, comentari);
 	}
+
+	@Override
+	@RolesAllowed("tothom")
+	public ExpedientTascaDto reobrirTasca(Long expedientTascaId, List<String> responsablesCodi, String motiu,
+			String rolActual) {
+		return delegate.reobrirTasca(expedientTascaId, responsablesCodi, motiu, rolActual);
+	}
 }

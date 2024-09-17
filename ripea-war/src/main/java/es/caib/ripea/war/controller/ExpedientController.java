@@ -1,42 +1,13 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.CodiValorDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentInteressatDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientComentariDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.GrupDto;
-import es.caib.ripea.core.api.dto.MetaExpedientDto;
-import es.caib.ripea.core.api.dto.OrganismeDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.PrioritatEnumDto;
-import es.caib.ripea.core.api.dto.RespostaPublicacioComentariDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ExpedientTancarSenseDocumentsDefinitiusException;
 import es.caib.ripea.core.api.exception.FirmaServidorException;
 import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientEstatService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.GrupService;
-import es.caib.ripea.core.api.service.MetaExpedientService;
-import es.caib.ripea.core.api.service.OrganGestorService;
+import es.caib.ripea.core.api.service.*;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.war.command.ContenidorCommand.Create;
 import es.caib.ripea.war.command.ContenidorCommand.Update;
@@ -101,30 +72,20 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 	private static final String SESSION_ATTRIBUTE_METAEXP_ID = "ExpedientUserController.session.metaExpedient.id";
 	private static final String COOKIE_MEUS_EXPEDIENTS = "meus_expedients";
 	private static final String COOKIE_FIRMA_PENDENT = "firma_pendent";
-	
 	private static final String SESSION_ATTRIBUTE_RELACIONAR_FILTRE = "ExpedientUserController.session.relacionar.filtre";
 	private static final String SESSION_ATTRIBUTE_RELACIONATS_FILTRE = "ExpedientUserController.session.relacionats.filtre";
 	
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private DocumentEnviamentService documentEnviamentService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private ExpedientEstatService expedientEstatService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private GrupService grupService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private DocumentService documentService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private DocumentEnviamentService documentEnviamentService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ExpedientEstatService expedientEstatService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private GrupService grupService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
 
-	
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			@CookieValue(value = COOKIE_MEUS_EXPEDIENTS, defaultValue = "false") boolean meusExpedients,
@@ -441,7 +402,54 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				fitxer.getContingut(),
 				response);
 	}
-	
+
+	@RequestMapping(value = "/exportarZipMassiu", method = RequestMethod.GET)
+	@ResponseBody
+	public String exportarZipMassiu(
+			HttpServletRequest request,
+			HttpServletResponse response) throws IOException {
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = (Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				SESSION_ATTRIBUTE_SELECCIO);
+
+		if (seleccio!=null && seleccio.size()>0) {
+
+			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+			List<ExecucioMassivaContingutDto> execucioMassivaElements = new ArrayList<>();
+
+			for (Long expedientId : seleccio) {
+				ExecucioMassivaContingutDto execMass = new ExecucioMassivaContingutDto(
+						new Date(),
+						null,
+						expedientId,
+						ExecucioMassivaEstatDto.ESTAT_PENDENT);
+
+				execucioMassivaElements.add(execMass);
+			}
+
+			execucioMassivaService.saveExecucioMassiva(
+					entitatActual.getId(),
+					new ExecucioMassivaDto(
+							ExecucioMassivaTipusDto.EXPORTAR_ZIP,
+							new Date(),
+							null,
+							RolHelper.getRolActual(request)),
+					execucioMassivaElements,
+					ElementTipusEnumDto.EXPEDIENT);
+
+			MissatgesHelper.info(request, getMessage(
+					request,
+					"expedient.controller.exportacio.mass",
+					new Object[]{seleccio.size()}));
+		} else {
+			MissatgesHelper.error(
+					request,
+					getMessage(request,"expedient.controller.exportacio.seleccio.buida"));
+		}
+		return "OK";
+	}
+
 	@RequestMapping(value = "/exportarEni", method = RequestMethod.GET)
 	public String exportarEniMassiu(
 			@RequestParam(required = false) boolean ambDocuments,

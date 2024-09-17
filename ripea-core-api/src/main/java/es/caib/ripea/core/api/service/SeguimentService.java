@@ -21,18 +21,20 @@ import es.caib.ripea.core.api.dto.SeguimentNotificacionsFiltreDto;
 public interface SeguimentService {
 
 
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams);
+			PaginacioParamsDto paginacioParams,
+			String rolActual);
 
-	@PreAuthorize("hasRole('IPA_ADMIN')")
+	@PreAuthorize("hasRole('IPA_ADMIN') or hasRole('tothom')")
 	public ResultDto<SeguimentDto> findNotificacionsEnviaments(
 			Long entitatId,
 			SeguimentNotificacionsFiltreDto filtre,
 			PaginacioParamsDto paginacioParams,
-			ResultEnumDto resultEnum);
+			ResultEnumDto resultEnum, 
+			String rolActual);
 
 	@PreAuthorize("hasRole('IPA_ADMIN')")
 	public PaginaDto<SeguimentDto> findTasques(

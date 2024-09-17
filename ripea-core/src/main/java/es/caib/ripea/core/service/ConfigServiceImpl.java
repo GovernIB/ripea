@@ -163,17 +163,19 @@ public class ConfigServiceImpl implements ConfigService {
         }
         return configGroupDtoList;
     }
-    
+
+    @Override
+    public void resetPlugin(String pluginCode) {
+        pluginHelper.resetPlugins(pluginCode);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public ConfigDto findConfig(String key) {
-
     	ConfigEntity config = configRepository.findOne(key);
     	return conversioTipusHelper.convertir(config, ConfigDto.class);
-
     }
-    
-    
+
 	@Transactional(readOnly = true)
 	@Override
 	public PaginaDto<OrganConfigDto> findConfigsOrgans(

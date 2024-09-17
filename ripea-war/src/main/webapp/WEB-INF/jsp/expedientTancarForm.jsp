@@ -71,6 +71,12 @@
 			</tbody>
 			</table>
 		</c:if>
+		<c:if test="${!expedient.valid and expedient.validPerTancar}">
+			<div class="alert well-sm alert-warning">
+				<span class="fa fa-warning"></span>
+				<spring:message code="contingut.expedient.tancar.notif"/>
+			</div>
+		</c:if>
 		<rip:inputTextarea name="motiu" textKey="contingut.expedient.tancar.form.camp.motiu" required="true"/>
 		<div id="modal-botons" class="well">
 			<button type="submit" id="btnSubmit" class="btn btn-success" data-noloading="true"><span class="fa fa-check"></span>&nbsp;<spring:message code="comu.boto.tancar"/></button>

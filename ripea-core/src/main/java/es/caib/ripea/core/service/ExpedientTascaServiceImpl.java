@@ -479,6 +479,42 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				ExpedientTascaDto.class);
 	}
 	
+	@Transactional
+	@Override
+	public ExpedientTascaDto reobrirTasca(
+			Long expedientTascaId, 
+			List<String> responsablesCodi, 
+			String motiu,
+			String rolActual) {
+		logger.debug("Reobrint tasca (expedientTascaId=" + expedientTascaId + ")");
+		
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
+		
+		if (motiu != null) {
+			ExpedientTascaComentariEntity comentariTasca = ExpedientTascaComentariEntity.getBuilder(expedientTascaEntity, motiu).build();
+			expedientTascaEntity.addComentari(comentariTasca);
+		}
+		
+		List<UsuariEntity> responsables = new ArrayList<UsuariEntity>();
+		for (String responsableCodi: responsablesCodi) {
+			UsuariEntity responsable = usuariHelper.getUsuariByCodiDades(responsableCodi, true, true);
+			responsables.add(responsable);
+		}
+		
+		expedientTascaEntity.updateResponsables(responsables);	
+		
+		canviarTascaEstat(
+				expedientTascaId, 
+				TascaEstatEnumDto.PENDENT, 
+				motiu, 
+				rolActual);
+		
+				
+		return conversioTipusHelper.convertir(
+				expedientTascaEntity,
+				ExpedientTascaDto.class);
+	}
+	
 	@Transactional(readOnly = true)
 	@Override
 	public MetaExpedientTascaDto findMetaExpedientTascaById(Long metaExpedientTascaId) {
