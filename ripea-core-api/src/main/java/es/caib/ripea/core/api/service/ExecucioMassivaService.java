@@ -5,12 +5,9 @@ package es.caib.ripea.core.api.service;
 
 import java.util.List;
 
+import es.caib.ripea.core.api.dto.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import es.caib.ripea.core.api.dto.ElementTipusEnumDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.ValidationException;
 
@@ -33,7 +30,10 @@ public interface ExecucioMassivaService {
 	 */
 	@PreAuthorize("hasRole('tothom')")
 	public void crearExecucioMassiva(Long entitatId, ExecucioMassivaDto dto) throws NotFoundException, ValidationException;
-	
+
+	@PreAuthorize("hasRole('tothom')")
+	public FitxerDto descarregarDocumentExecMassiva(Long entitatId, Long execMassivaId);
+
 	/**
 	 * Executa un contingut massiu
 	 * 

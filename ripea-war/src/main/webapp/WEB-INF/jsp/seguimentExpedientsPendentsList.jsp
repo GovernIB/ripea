@@ -23,9 +23,6 @@
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.datatable.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	
-	
-	
 </head>
 <body>
 
@@ -40,7 +37,7 @@
 				<rip:inputText name="extracte" inline="true" placeholderKey="expedient.peticio.list.placeholder.extracte"/>
 			</div>	
 			<div class="col-md-4">					
-				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="nom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
+				<rip:inputSelect name="metaExpedientId" optionItems="${metaExpedients}" optionValueAttribute="id" emptyOption="true" optionTextAttribute="codiSiaINom" placeholderKey="expedient.peticio.list.placeholder.metaExpedient" inline="true"/>
 			</div>			
 		</div>
 		<div class="row">

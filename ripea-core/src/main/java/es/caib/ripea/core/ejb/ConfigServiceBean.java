@@ -25,8 +25,7 @@ import java.util.List;
 @Interceptors(SpringBeanAutowiringInterceptor.class)
 public class ConfigServiceBean implements ConfigService {
 
-	@Autowired
-	ConfigService delegate;
+	@Autowired ConfigService delegate;
 
 	@Override
 	@RolesAllowed({"IPA_SUPER"})
@@ -37,6 +36,12 @@ public class ConfigServiceBean implements ConfigService {
 	@RolesAllowed({"IPA_SUPER"})
 	public List<ConfigGroupDto> findAll(){
 		return delegate.findAll();
+	}
+
+	@Override
+	@RolesAllowed({"IPA_SUPER"})
+	public void resetPlugin(String pluginCode) {
+		delegate.resetPlugin(pluginCode);
 	}
 
 	@Override

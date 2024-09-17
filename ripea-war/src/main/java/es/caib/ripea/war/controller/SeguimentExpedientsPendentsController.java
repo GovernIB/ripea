@@ -4,6 +4,7 @@
 package es.caib.ripea.war.controller;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,15 +54,22 @@ public class SeguimentExpedientsPendentsController extends BaseAdminController {
     public String get(HttpServletRequest request, Model model) {
     	
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-    	
 		ExpedientPeticioFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
 		
-		List<MetaExpedientDto> metaExpedients = metaExpedientService.findByEntitat(
-				entitatActual.getId());
-		model.addAttribute(
-				"metaExpedients",
-				metaExpedients);
+		List<MetaExpedientDto> metaExpedients = new ArrayList<MetaExpedientDto>();
+		MetaExpedientDto opcioBuida = new MetaExpedientDto();
+		opcioBuida.setId(0l);
+		opcioBuida.setClassificacio(null);
+		opcioBuida.setNom(getMessage(request, "anotacio.filtre.noProcediment"));
+		metaExpedients.add(opcioBuida);
+		metaExpedients.addAll(
+				metaExpedientService.findByEntitat(
+						entitatActual.getId()
+				)
+		);
+		
+		model.addAttribute("metaExpedients", metaExpedients);
     	
         return "seguimentExpedientsPendentsList";
     }

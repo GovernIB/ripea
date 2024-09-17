@@ -68,6 +68,7 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"    DocumentPortafirmesEntity dp " +
 			"where " +
 			"    (dp.document.entitat = :entitat) " +
+			"and (:rolActual = 'IPA_ADMIN' or (:esNullMetaExpedientPermesos = true or dp.expedient.metaExpedient.id in (:idMetaExpedientPermesos))) " +
 			"and (:esNullExpedientNom = true or lower(dp.expedient.nom) like lower('%'||:expedientNom||'%')) " +
 			"and (:esNullDocumentNom = true or lower(dp.document.nom) like lower('%'||:documentNom||'%'))" +
 			"and (:esNullDataEnviamentInici = true or dp.enviatData >= :dataEnviamentInici) " +
@@ -75,6 +76,9 @@ public interface DocumentPortafirmesRepository extends JpaRepository<DocumentPor
 			"and (:esNullEstatEnviament = true or dp.estat = :estatEnviament) ")
 	public Page<DocumentPortafirmesEntity> findAmbFiltrePaginat(
 			@Param("entitat") EntitatEntity entitat,
+			@Param("rolActual") String rolActual,
+			@Param("esNullMetaExpedientPermesos") boolean esNullMetaExpedientPermesos,
+			@Param("idMetaExpedientPermesos") List<Long> idMetaExpedientPermesos,
 			@Param("esNullExpedientNom") boolean esNullExpedientNom,
 			@Param("expedientNom") String expedientNom,
 			@Param("esNullDocumentNom") boolean esNullDocumentNom,

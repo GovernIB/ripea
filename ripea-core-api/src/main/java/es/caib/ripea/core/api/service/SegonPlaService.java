@@ -22,7 +22,7 @@ public interface SegonPlaService {
 
 	void enviarEmailPerComentariMetaExpedient();
 
-	void restartSchedulledTasks();
+	void restartSchedulledTasks(String taskCodi);
 	
 	void tancarExpedientsArxiu();
 

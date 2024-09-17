@@ -1,12 +1,8 @@
-/**
- * 
- */
 package es.caib.ripea.core.api.dto;
 
-import lombok.Data;
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * Informació d'un fitxer.
@@ -38,7 +34,6 @@ public class FitxerDto implements Serializable {
 		this.contentType = contentType;
 		this.tamany = tamany;
 	}
-
 	
 	public void setContingut(byte[] contingut) {
 		this.contingut = contingut;
@@ -59,14 +54,13 @@ public class FitxerDto implements Serializable {
 			return null;
 		}
 	}
-	
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
+		//java.lang.OutOfMemoryError: Java heap space at java.util.Arrays.copyOfRange(Arrays.java:2694)
+		//return ToStringBuilder.reflectionToString(this);
+		return "FitxerDto --> nom: "+this.nom + ", type: "+this.contentType+ ", tamany: "+this.tamany+ ", id: "+this.id;
 	}
 
-
 	private static final long serialVersionUID = -139254994389509932L;
-
 }

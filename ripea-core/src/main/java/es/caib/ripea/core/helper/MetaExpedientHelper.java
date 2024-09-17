@@ -189,7 +189,7 @@ public class MetaExpedientHelper {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, false, false, false, false);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (organGestorId == null) {
-			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitat(entitat);			
+			List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 			permisosHelper.filterGrantedAnyList(
 					metaExpedients,
 					new ListObjectIdentifiersExtractor<MetaExpedientEntity>() {
@@ -342,7 +342,6 @@ public class MetaExpedientHelper {
 		return permisos;
 
 	}
-	
 
 	public List<MetaExpedientEntity> findAmbPermis(
 			Long entitatId,
@@ -353,8 +352,7 @@ public class MetaExpedientHelper {
 			boolean isAdminOrgan,
 			Long organId, 
 			boolean comu) {
-		
-		
+
 		long t0 = System.currentTimeMillis();
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis start ( entitatId=" + entitatId + 
@@ -731,6 +729,21 @@ public class MetaExpedientHelper {
 		}
 		
 		return createWritePermIds;
+		
+	}
+	
+	public List<Long> getIdsReadPermesos(Long entitatId) {
+		List<Long> readPermIds = getIds(
+				findAmbPermis(
+					entitatId,
+					ExtendedPermission.READ,
+					true,
+					null,
+					false,
+					false,
+					null, 
+					false));
+		return readPermIds;
 		
 	}
 	

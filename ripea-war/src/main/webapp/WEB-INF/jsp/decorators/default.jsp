@@ -7,42 +7,42 @@
 
 <%
 	pageContext.setAttribute(
-			"sessionEntitats",
-			es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
+	"sessionEntitats",
+	es.caib.ripea.war.helper.EntitatHelper.findEntitatsAccessibles(request));
 	pageContext.setAttribute(
-			"entitatActual",
-			es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
+	"entitatActual",
+	es.caib.ripea.war.helper.EntitatHelper.getEntitatActual(request));
 	pageContext.setAttribute(
-			"isRevisioActiva",
-			es.caib.ripea.war.helper.MetaExpedientHelper.getRevisioActiva(request));
+	"isRevisioActiva",
+	es.caib.ripea.war.helper.MetaExpedientHelper.getRevisioActiva(request));
 	pageContext.setAttribute(
-			"sessionOrgansGestors",
-			es.caib.ripea.war.helper.EntitatHelper.findOrganGestorsAccessibles(request));
+	"sessionOrgansGestors",
+	es.caib.ripea.war.helper.EntitatHelper.findOrganGestorsAccessibles(request));
 	pageContext.setAttribute(
-			"organGestorActual",
-			es.caib.ripea.war.helper.EntitatHelper.getOrganGestorActual(request));
+	"organGestorActual",
+	es.caib.ripea.war.helper.EntitatHelper.getOrganGestorActual(request));
 	pageContext.setAttribute(
   			"requestParameterCanviOrganGestor",
   			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviOrganGestor());
 	pageContext.setAttribute(
-			"requestParameterCanviEntitat",
-			es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
+	"requestParameterCanviEntitat",
+	es.caib.ripea.war.helper.EntitatHelper.getRequestParameterCanviEntitat());
 	pageContext.setAttribute(
-			"dadesUsuariActual",
-			es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
+	"dadesUsuariActual",
+	es.caib.ripea.war.helper.SessioHelper.getUsuariActual(request));
 	pageContext.setAttribute(
-			"rolActual",
-			es.caib.ripea.war.helper.RolHelper.getRolActual(request));
+	"rolActual",
+	es.caib.ripea.war.helper.RolHelper.getRolActual(request));
 	pageContext.setAttribute(
-			"rolsUsuariActual",
-			es.caib.ripea.war.helper.RolHelper.getRolsUsuariActual(request));
+	"rolsUsuariActual",
+	es.caib.ripea.war.helper.RolHelper.getRolsUsuariActual(request));
 	pageContext.setAttribute(
-			"isRolActualSuperusuari",
-			es.caib.ripea.war.helper.RolHelper.isRolActualSuperusuari(request));
+	"isRolActualSuperusuari",
+	es.caib.ripea.war.helper.RolHelper.isRolActualSuperusuari(request));
 	pageContext.setAttribute(
-			"isRolActualAdministrador",
-			es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request),
-			PageContext.SESSION_SCOPE);
+	"isRolActualAdministrador",
+	es.caib.ripea.war.helper.RolHelper.isRolActualAdministrador(request),
+	PageContext.SESSION_SCOPE);
 	pageContext.setAttribute(
   			"isRolActualAdministradorOrgan",
   			es.caib.ripea.war.helper.RolHelper.isRolActualAdministradorOrgan(request));
@@ -50,42 +50,44 @@
   			"isRolActualRevisor",
   			es.caib.ripea.war.helper.RolHelper.isRolActualRevisor(request));
 	pageContext.setAttribute(
-			"isRolActualUsuari",
-			es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
+	"isRolActualUsuari",
+	es.caib.ripea.war.helper.RolHelper.isRolActualUsuari(request));
 	pageContext.setAttribute(
-			"requestParameterCanviRol",
-			es.caib.ripea.war.helper.RolHelper.getRequestParameterCanviRol());
+	"requestParameterCanviRol",
+	es.caib.ripea.war.helper.RolHelper.getRequestParameterCanviRol());
 	pageContext.setAttribute(
-			"teAccesExpedients",
-			es.caib.ripea.war.helper.ExpedientHelper.teAccesExpedients(request));
+	"teAccesExpedients",
+	es.caib.ripea.war.helper.ExpedientHelper.teAccesExpedients(request));
 	pageContext.setAttribute(
-			"countTasquesPendent",
-			es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
+	"countTasquesPendent",
+	es.caib.ripea.war.helper.TasquesPendentsHelper.countTasquesPendents(request));
 	pageContext.setAttribute(
-			"countAnotacionsPendents",
-			es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
+	"countAnotacionsPendents",
+	es.caib.ripea.war.helper.AnotacionsPendentsHelper.countAnotacionsPendents(request));
 	pageContext.setAttribute(
-			"teAccesEstadistiques",
-			es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
+	"teAccesEstadistiques",
+	es.caib.ripea.war.helper.ExpedientHelper.teAccesEstadistiques(request));
 	pageContext.setAttribute(
-			"avisos",
-			es.caib.ripea.war.helper.AvisHelper.getAvisos(request));
+	"avisos",
+	es.caib.ripea.war.helper.AvisHelper.getAvisos(request));
 	pageContext.setAttribute(
-			"isConvertirDefinitiuActiu",
-			es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
+	"isConvertirDefinitiuActiu",
+	es.caib.ripea.war.helper.ExpedientHelper.isConversioDefinitiuActiva(request));
 	pageContext.setAttribute(
-			"isUrlValidacioDefinida",
-			es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
+	"isUrlValidacioDefinida",
+	es.caib.ripea.war.helper.ExpedientHelper.isUrlValidacioDefinida(request));
 	pageContext.setAttribute(
-			"organsNoSincronitzats",
-			es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
+	"organsNoSincronitzats",
+	es.caib.ripea.war.helper.MetaExpedientHelper.getOrgansNoSincronitzats(request));
 	pageContext.setAttribute(
-			"isUrlsInstruccioActiu",
-			es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
+	"isUrlsInstruccioActiu",
+	es.caib.ripea.war.helper.ExpedientHelper.isUrlsInstruccioActiu(request));
 	pageContext.setAttribute(
-			"isCreacioFluxUsuariActiu",
-			es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
-
+	"isCreacioFluxUsuariActiu",
+	es.caib.ripea.war.helper.FluxFirmaHelper.isCreacioFluxUsuariActiu(request));
+	pageContext.setAttribute(
+	"isMostrarSeguimentEnviamentsUsuariActiu",
+	es.caib.ripea.war.helper.SeguimentEnviamentsUsuariHelper.isMostrarSeguimentEnviamentsUsuariActiu(request));
 %>
 <c:set var="hiHaEntitats" value="${fn:length(sessionEntitats) > 0}"/>
 <c:set var="hiHaMesEntitats" value="${fn:length(sessionEntitats) > 1}"/>
@@ -112,6 +114,9 @@
 	<script src="<c:url value="/webjars/bootstrap/3.3.6/dist/js/bootstrap.min.js"/>"></script>
 	<script src="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.min.js"/>"></script>
 	<link href="<c:url value="/webjars/jquery-ui/1.12.1/jquery-ui.css"/>" rel="stylesheet"></link>
+	
+	<script src="<c:url value="/js/toastr.min.js"/>"></script>
+	<link href="<c:url value="/css/toastr.min.css"/>" rel="stylesheet"></link>
 	
 	<script>
 		var requestLocale = '${requestLocale}';
@@ -487,6 +492,24 @@ body {
 									<spring:message code="decorator.menu.fluxosusuari"/>
 							</a>
 						</c:if>
+						<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
+							<%-- Consulta enviaments --%>
+							<div class="btn-group">
+								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
+								<ul class="dropdown-menu">
+									<li>
+										<a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true">
+											<spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/>
+										</a>
+									</li>
+									<li>
+										<a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true">
+											<spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/>
+										</a>
+									</li>						
+								</ul>
+							</div>		
+						</c:if>			
 					</c:when>
 				</c:choose>
 				<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">

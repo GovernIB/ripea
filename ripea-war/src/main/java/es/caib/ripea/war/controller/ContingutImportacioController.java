@@ -199,6 +199,7 @@ public class ContingutImportacioController extends BaseUserController {
 		
 		List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
 				entitatActual.getId(),
+				null,
 				contingutId);
 		model.addAttribute("carpetes", carpetes);
 		model.addAttribute("jstreeJson", command.getEstructuraCarpetesJson());

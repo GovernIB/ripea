@@ -3,15 +3,8 @@
  */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.ContingutTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaContingutDto;
-import es.caib.ripea.core.api.dto.ExecucioMassivaDto;
-import es.caib.ripea.core.api.dto.ExpedientSelectorDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.UsuariDto;
+import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -21,10 +14,8 @@ import es.caib.ripea.core.api.service.MetaDocumentService;
 import es.caib.ripea.core.api.service.MetaExpedientService;
 import es.caib.ripea.war.command.ContingutMassiuFiltreCommand;
 import es.caib.ripea.war.command.PortafirmesEnviarCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.*;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
-import es.caib.ripea.war.helper.RolHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -39,7 +30,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,22 +52,30 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 	private static final String SESSION_ATTRIBUTE_FILTRE = "ContingutMassiuController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "ContingutMassiuController.session.seleccio";
 
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private MetaExpedientService metaExpedientService;
-	@Autowired
-	private ExecucioMassivaService execucioMassivaService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
+	@Autowired private DocumentService documentService;
+	@Autowired private ContingutService contingutService;
+	@Autowired private MetaExpedientService metaExpedientService;
+	@Autowired private ExecucioMassivaService execucioMassivaService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private MetaDocumentService metaDocumentService;
 
-
+	@RequestMapping(value = "/{execucioMassivaId}/descarregar", method = RequestMethod.GET)
+	public String descarregar(
+			HttpServletRequest request,
+			HttpServletResponse response,
+			@PathVariable Long execucioMassivaId) throws IOException {
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		try {
+			FitxerDto fitxer = execucioMassivaService.descarregarDocumentExecMassiva(
+					entitatActual.getId(),
+					execucioMassivaId);
+			writeFileToResponse(fitxer.getNom(),
+					fitxer.getContingut(),
+					response);
+		} catch (Exception e) { }
+		return null;
+	}
 	
 	@RequestMapping(value = "/definitiu", method = RequestMethod.GET)
 	public String getDocumentsEsborranys(
@@ -115,7 +116,7 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 				expedients);
 		return "contingutMassiuList";
 	}
-	
+
 	@RequestMapping(value = "/definitiu", method = RequestMethod.POST)
 	public String filtrePost(
 			HttpServletRequest request,
@@ -128,12 +129,12 @@ public class ContingutMassiuController extends BaseUserOAdminOOrganController {
 					SESSION_ATTRIBUTE_FILTRE,
 					filtreCommand);
 		}
-		
+
 		filtreCommand.setTipusElement(ContingutTipusEnumDto.DOCUMENT);
 		filtreCommand.setBloquejarTipusElement(true);
 		filtreCommand.setBloquejarMetaDada(true);
 		filtreCommand.setBloquejarMetaExpedient(false);
-		
+
 		return "redirect:/massiu/definitiu";
 	}
 	

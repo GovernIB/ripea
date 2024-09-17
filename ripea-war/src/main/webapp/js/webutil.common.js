@@ -1,8 +1,10 @@
-
 function webutilContextPath() {
-	//return '/ripea';
 	return contextAddress;
 }
+
+function escapeMarkupFn(markup) { return markup; }
+function templateResultFnDefault(data) { return data.text; }
+
 function webutilModalTancarPath() {
 	return webutilContextPath() + '/modal/tancar';
 }
@@ -499,10 +501,13 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		}
 
 		var templateResultFunction = window[$(this).data('templateresultfunction')];
-		if (templateResultFunction != null) {
-			select2Options['templateResult'] = templateResultFunction;
-			select2Options['templateSelection'] = templateResultFunction;
+		if (templateResultFunction == null) {
+			templateResultFunction = templateResultFnDefault;
 		}
+		
+		select2Options['escapeMarkup'] = escapeMarkupFn;
+		select2Options['templateResult'] = templateResultFunction;
+		select2Options['templateSelection'] = templateResultFunction;
 
 		$(this).select2(select2Options);
 		
@@ -624,6 +629,9 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 		$(this).select2({
 		    placeholder: $(this).data('placeholder'),
 		    theme: "bootstrap",
+		    escapeMarkup: escapeMarkupFn,
+		    templateResult: $(this).data('templateResult'),
+		    templateSelection: $(this).data('templateSelection'),
 		    language: $(this).data('idioma'),
 		    allowClear: $(this).data('placeholder') ? true : false,
 		    minimumInputLength: $(this).data('minimumInputLength'),

@@ -110,9 +110,18 @@ public class SeguimentServiceImpl implements SeguimentService {
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
+			PaginacioParamsDto paginacioParams,
+			String rolActual) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		EntitatEntity entitat = null;
+		List<Long> idMetaExpedientPermesos = null;
+
+		if ("tothom".equals(rolActual)) {
+			idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitatId);
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+	 	} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+	 	}
 		
 		Map<String, String[]> ordenacioMap = new HashMap<String, String[]>();
 		ordenacioMap.put("expedientNom", new String[] { "expedient.nom" });
@@ -120,10 +129,12 @@ public class SeguimentServiceImpl implements SeguimentService {
 		ordenacioMap.put("estatEnviament", new String[] { "estat" });
 		ordenacioMap.put("dataEnviament", new String[] { "enviatData" });
 		ordenacioMap.put("portafirmesEstat", new String[] { "estat" });
-		
-		
+
 		Page<DocumentPortafirmesEntity> docsEnvs = documentPortafirmesRepository.findAmbFiltrePaginat(
 				entitat,
+				rolActual,
+				idMetaExpedientPermesos == null || idMetaExpedientPermesos.isEmpty(),
+				idMetaExpedientPermesos,
 				filtre.getExpedientNom() == null || filtre.getExpedientNom().isEmpty(),
 				filtre.getExpedientNom() != null ? filtre.getExpedientNom().trim() : "",
 				filtre.getDocumentNom() == null || filtre.getDocumentNom().isEmpty(),
@@ -186,9 +197,18 @@ public class SeguimentServiceImpl implements SeguimentService {
 			Long entitatId,
 			SeguimentNotificacionsFiltreDto filtre, 
 			PaginacioParamsDto paginacioParams, 
-			ResultEnumDto resultEnum) {
+			ResultEnumDto resultEnum,
+			String rolActual) {
 		
-		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+		EntitatEntity entitat = null;
+		List<Long> idMetaExpedientPermesos = null;
+
+		if ("tothom".equals(rolActual)) {
+			idMetaExpedientPermesos = metaExpedientHelper.getIdsReadPermesos(entitatId);
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, true, false, false, false, false);
+	 	} else {
+			entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
+	 	}
 		
 		ResultDto<SeguimentDto> result = new ResultDto<SeguimentDto>();
 		
@@ -246,6 +266,9 @@ public class SeguimentServiceImpl implements SeguimentService {
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
 					entitat,
+					rolActual,
+					idMetaExpedientPermesos == null || idMetaExpedientPermesos.isEmpty(),
+					idMetaExpedientPermesos,
 					filtre.getExpedientId() == null,
 					filtre.getExpedientId(),
 					Utils.isEmpty(filtre.getDocumentNom()),
@@ -366,8 +389,13 @@ public class SeguimentServiceImpl implements SeguimentService {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitat(entitatId, false, true, false, false, false);
 		
 		MetaExpedientEntity metaExpedientFiltre = null;
+		boolean senseMetaExpedientInformat = false;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
+			if (filtre.getMetaExpedientId()>0l) {
+				metaExpedientFiltre = metaExpedientRepository.findOne(filtre.getMetaExpedientId());
+			} else {
+				senseMetaExpedientInformat = true;
+			}
 		}
 		
 		PermisosPerAnotacions permisosPerAnotacions = expedientPeticioHelper.findPermisosPerAnotacions(
@@ -389,6 +417,7 @@ public class SeguimentServiceImpl implements SeguimentService {
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedientFiltre == null,
+				senseMetaExpedientInformat,
 				metaExpedientFiltre,
 				StringUtils.isEmpty(filtre.getNumero()),
 				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		

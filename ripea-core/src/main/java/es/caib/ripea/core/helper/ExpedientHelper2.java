@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import es.caib.ripea.core.api.dto.ExecucioMassivaEstatDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.entity.InteressatEntity;
 import es.caib.ripea.core.repository.*;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,9 +24,6 @@ import es.caib.plugins.arxiu.api.ContingutArxiu;
 import es.caib.plugins.arxiu.api.ContingutTipus;
 import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentEstat;
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
-import es.caib.ripea.core.api.dto.LogTipusEnumDto;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
@@ -73,8 +70,13 @@ public class ExpedientHelper2 {
 		if (anyExecucioMassiva(expedient)) {
 			throw new ValidationException("No es pot tancar un expedient amb execucions massives pendents de finalitzar");
 		}
-		if (!cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty()) {
-			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
+		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient);
+		if (!errorsExp.isEmpty()) {
+			for (ValidacioErrorDto veDto: errorsExp) {
+				if (!veDto.getTipusValidacio().equals(ErrorsValidacioTipusEnumDto.NOTIFICACIONS)) {
+					throw new ValidationException("No es pot tancar un expedient amb errors de validació");
+				}
+			}
 		}
 		if (CollectionUtils.isEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0))) {
 			throw new ValidationException("No es pot tancar un expedient sense cap document");

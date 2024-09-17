@@ -42,8 +42,9 @@ public  class SeguimentServiceBean implements SeguimentService {
 	public PaginaDto<SeguimentDto> findPortafirmesEnviaments(
 			Long entitatId,
 			SeguimentFiltreDto filtre, 
-			PaginacioParamsDto paginacioParams) {
-		return delegate.findPortafirmesEnviaments(entitatId, filtre, paginacioParams);
+			PaginacioParamsDto paginacioParams,
+			String rolActual) {
+		return delegate.findPortafirmesEnviaments(entitatId, filtre, paginacioParams, rolActual);
 	}
 
 	@Override
@@ -52,12 +53,14 @@ public  class SeguimentServiceBean implements SeguimentService {
 			Long entitatId,
 			SeguimentNotificacionsFiltreDto filtre,
 			PaginacioParamsDto paginacioParams, 
-			ResultEnumDto resultEnum) {
+			ResultEnumDto resultEnum,
+			String rolActual) {
 		return delegate.findNotificacionsEnviaments(
 				entitatId,
 				filtre,
 				paginacioParams, 
-				resultEnum);
+				resultEnum,
+				rolActual);
 	}
 
 	@Override

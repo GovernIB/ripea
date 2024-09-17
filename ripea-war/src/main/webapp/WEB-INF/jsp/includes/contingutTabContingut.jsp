@@ -48,6 +48,7 @@
 	#drop-area.dragover { border-color: #ffd351; }
 	#drop-message { font-size: 20px; color: #917421; text-align: center; display: none; position: absolute; width: 420px; background-color: #CCC; opacity: 0.75; font-size: 16px; left: calc(50% - 210px); z-index: 10; border-radius: 8px; margin-top: 5px; }
 	#drop-message-icon { font-size: 70px; }
+    .toast-top-right { margin-top: 100px; }
 </style>
 
 
@@ -914,11 +915,11 @@ function dragAndDropVistaCarpetes() {
 					response = json.data;
 					var blob = base64toBlob(response.contingut, response.contentType);
 					var file = new File([blob], response.contentType, {type: response.contentType});
-					link = URL.createObjectURL(file);
+		            link = URL.createObjectURL(file);
 
-					var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
-					$('#container').removeClass('rmodal_loading');
-					$('#container').attr('src', viewerUrl);
+		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.13.216/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+				    $('#container').removeClass('rmodal_loading');
+				    $('#container').attr('src', viewerUrl);
 				}
 
 			},

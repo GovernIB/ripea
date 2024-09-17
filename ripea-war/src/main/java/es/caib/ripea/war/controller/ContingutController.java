@@ -7,6 +7,7 @@ import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.registre.RegistreTipusEnum;
 import es.caib.ripea.core.api.service.AlertaService;
 import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.CarpetaService;
 import es.caib.ripea.core.api.service.ContingutService;
 import es.caib.ripea.core.api.service.DocumentEnviamentService;
 import es.caib.ripea.core.api.service.DocumentService;
@@ -23,6 +24,7 @@ import es.caib.ripea.war.command.ContingutMoureCopiarEnviarCommand;
 import es.caib.ripea.war.helper.BeanGeneratorHelper;
 import es.caib.ripea.war.helper.CustomDatesEditor;
 import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.EntitatHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.EnumHelper;
 import es.caib.ripea.war.helper.ExceptionHelper;
@@ -105,6 +107,8 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	private URLInstruccioService urlInstruccioService;
 	@Autowired
 	private ExpedientTascaService expedientTascaService;
+	@Autowired
+	private CarpetaService carpetaService;
 
 	@RequestMapping(value = "/contingut/{contingutId}", method = RequestMethod.GET)
 	public String contingutGet(
@@ -443,6 +447,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 				SESSION_ATTRIBUTE_SELECCIO);
 		
 		omplirModelPerMoureOCopiarVincular(
+				request,
 				entitatActual,
 				contingutOrigenId,
 				docsIdx,
@@ -477,6 +482,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 						SESSION_ATTRIBUTE_SELECCIO);
 		if (bindingResult.hasErrors()) {
 			omplirModelPerMoureOCopiarVincular(
+					request,
 					entitatActual,
 					contingutOrigenId,
 					docsIdx,
@@ -566,6 +572,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		omplirModelPerMoureOCopiarVincular(
+				request,
 				entitatActual,
 				contingutOrigenId,
 				null,
@@ -586,6 +593,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			omplirModelPerMoureOCopiarVincular(
+					request,
 					entitatActual,
 					contingutOrigenId,
 					null,
@@ -610,6 +618,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		omplirModelPerMoureOCopiarVincular(
+				request,
 				entitatActual,
 				contingutOrigenId,
 				null,
@@ -631,6 +640,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		if (bindingResult.hasErrors()) {
 			omplirModelPerMoureOCopiarVincular(
+					request,
 					entitatActual,
 					contingutOrigenId,
 					null,
@@ -1065,6 +1075,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 	}
 
 	private void omplirModelPerMoureOCopiarVincular(
+			HttpServletRequest request,
 			EntitatDto entitatActual,
 			Long contingutOrigenId,
 			Set<Long> docsIdx,
@@ -1087,6 +1098,30 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		model.addAttribute(
 				"contingutOrigen",
 				contingutOrigen);
+		
+		boolean isVistaArbreMoureDocuments = expedientHelper.isVistaArbreMoureDocuments(request);
+		if (isVistaArbreMoureDocuments) {
+			model.addAttribute("isVistaArbreMoureDocuments", true);
+			List<ExpedientDto> expedientsMetaExpedient = null;
+			boolean moureEntreExpedients = ! Boolean.parseBoolean(aplicacioService.propertyFindByNom("es.caib.ripea.creacio.documents.moure.mateix.expedient"));
+			
+			Long metaExpedientId = (contingutOrigen instanceof ExpedientDto) ? ((ExpedientDto)contingutOrigen).getMetaNode().getId() : contingutOrigen.getExpedientPare().getMetaNode().getId();
+							
+			if (moureEntreExpedients) {
+				expedientsMetaExpedient = expedientService.findByEntitatAndMetaExpedient(
+						entitatActual.getId(), 
+						metaExpedientId, 
+						RolHelper.getRolActual(request), 
+						EntitatHelper.getOrganGestorActualId(request));
+			}
+			
+			List<ArbreDto<ExpedientCarpetaArbreDto>> carpetes = carpetaService.findArbreCarpetesExpedient(
+					entitatActual.getId(),
+					expedientsMetaExpedient,
+					contingutOrigen.getExpedientId());
+			
+			model.addAttribute("carpetes", carpetes);
+		}
 	}
 
 	@RequestMapping(value = "/contingut/orfes/delete", method = RequestMethod.GET)

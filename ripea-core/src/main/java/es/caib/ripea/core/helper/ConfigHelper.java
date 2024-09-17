@@ -348,7 +348,6 @@ public class ConfigHelper {
             if (value != null) {
                 properties.put(configGeneral.getKey(), value);
 			}
-
         }
         return properties;
     }

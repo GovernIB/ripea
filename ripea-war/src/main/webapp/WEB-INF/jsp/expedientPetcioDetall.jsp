@@ -14,7 +14,7 @@
 	<title>${titol}</title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/webutil.modal.js"/>"></script>
-	<script src="<c:url value="/webjars/pdf-js/2.5.207/build/pdf.js"/>"></script>
+	<script src="<c:url value="/webjars/pdf-js/2.13.216/build/pdf.js"/>" type="module"></script>
 	<rip:modalHead/>
 <style>
 body {
@@ -132,6 +132,7 @@ tr.clicable {
 	// ]]>
 	var previousAnnex;
 	function showViewer(event, annexId, observacions, dataCaptura, origen) {
+		debugger;
 		if (event.target.cellIndex === undefined || event.target.cellIndex === 6 || event.target.cellIndex === 7) return;
         var resumViewer = $('#resum-viewer');
         var resumAnnexos = $('#resum-annexos');
@@ -234,7 +235,7 @@ tr.clicable {
 		            var file = new File([blob], response.contentType, {type: response.contentType});
 		            link = URL.createObjectURL(file);
 		            
-		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.5.207/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
+		            var viewerUrl = "<c:url value="/webjars/pdf-js/2.13.216/web/viewer.html"/>" + '?file=' + encodeURIComponent(link);
 				    $('#container').removeClass('rmodal_loading');
 				    $('#container').attr('src', viewerUrl);
 				}
