@@ -382,9 +382,15 @@ public class ExpedientInteressatHelper {
 	public void updateOrganNom(InteressatDto interessatRepresentant) {
 		if (interessatRepresentant.isAdministracio()) {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) interessatRepresentant;
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
-			interessatAdministracioDto.setOrganCodi(unitat != null ? unitat.getCodi() : null);
-			interessatAdministracioDto.setOrganNom(unitat != null ? unitat.getDenominacio() : null);
+			if (interessatAdministracioDto.getOrganCodi() != null) {
+				try {
+					UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
+					interessatAdministracioDto.setOrganCodi(unitat != null ? unitat.getCodi() : null);
+					interessatAdministracioDto.setOrganNom(unitat != null ? unitat.getDenominacio() : null);
+				} catch (Exception e) {
+					logger.error("No s'ha pogut actualitzar l'òrgan '" + interessatAdministracioDto.getOrganCodi() + "'de l'interessat/representant");
+				}
+			}
 		}
 	}
 
