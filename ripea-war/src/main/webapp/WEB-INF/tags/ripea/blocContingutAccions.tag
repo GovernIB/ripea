@@ -219,12 +219,11 @@
 					            $(dummy).remove();
 					            var successDiv = $("<div class='copy alert alert-success' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.copiat'/></div>");
 
-					            $('.copy').remove();
-					            $('.panel-body').prepend(successDiv);
-
-					            setTimeout(function(){
-					                successDiv.remove();
-					            }, 2000);
+					            toastr.options = {
+									"positionClass": "toast-top-right"
+					            };
+					            
+					            toastr.success("<spring:message code='comu.boto.urlValidacio.copiat'/>");
 					        },
 					        error: function(xhr, status, error) {
 							    var errorDiv = $("<div class='copy alert alert-danger' style='font-weight:bold;' role='alert'><spring:message code='comu.boto.urlValidacio.error'/> " + error + "</div>");
@@ -233,12 +232,11 @@
 					            document.execCommand("copy");
 							    $(dummy).remove();
 							    
-					            $('.copy').remove();
-					            $('.panel-body').prepend(errorDiv);
-
-					            setTimeout(function(){
-					                errorDiv.remove();
-					            }, 2000);
+							    toastr.options = {
+									"positionClass": "toast-top-right"
+					            };
+					            
+							    toastr.error("<spring:message code='comu.boto.urlValidacio.error'/>");
 					        }
 					    });
 					});

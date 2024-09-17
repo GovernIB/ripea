@@ -82,8 +82,8 @@ public class SegonPlaServiceBean implements SegonPlaService {
 	}
 
 	@Override
-	public void restartSchedulledTasks() {
-		delegate.restartSchedulledTasks();		
+	public void restartSchedulledTasks(String taskCodi) {
+		delegate.restartSchedulledTasks(taskCodi);
 	}
 
 	@Override

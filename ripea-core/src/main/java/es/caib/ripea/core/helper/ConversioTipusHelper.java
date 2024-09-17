@@ -507,6 +507,8 @@ public class ConversioTipusHelper {
 						target.setDocumentNom(source.getDocument().getNom());
 						target.setPortafirmesEstat(source.getEstat());
 						target.setDataEnviament(source.getEnviatData());
+						target.setDataFinalitzacio(source.getProcessatData());
+						target.setConcepte(source.getAssumpte());
 						return target;
 					}
 				});	
@@ -527,6 +529,7 @@ public class ConversioTipusHelper {
 						target.setOrgan(source.getExpedient().getOrganGestor().getCodiINom());
 						target.setProcediment(source.getExpedient().getMetaExpedient().getCodiSiaINom());
 						target.setConcepte(source.getAssumpte());
+						target.setDataFinalitzacio(source.getProcessatData());
 						target.setError(source.isError());
 						if (Utils.isNotEmpty(source.getDocumentEnviamentInteressats())) {
 							String enviamentDatatEstat  = source.getDocumentEnviamentInteressats().iterator().next().getEnviamentDatatEstat();

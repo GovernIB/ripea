@@ -116,10 +116,19 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
     		logger.info("getFiltreCommand time:  " + (System.currentTimeMillis() - t2) + " ms");
 		
 		long t3 = System.currentTimeMillis();
-		List<MetaExpedientDto> metaExpedientsPermesos = expedientPeticioService.findMetaExpedientsPermesosPerAnotacions(
+		List<MetaExpedientDto> metaExpedientsPermesos = new ArrayList<MetaExpedientDto>();
+		MetaExpedientDto opcioBuida = new MetaExpedientDto();
+		opcioBuida.setId(0l);
+		opcioBuida.setClassificacio(null);
+		opcioBuida.setNom(getMessage(request, "anotacio.filtre.noProcediment"));
+		metaExpedientsPermesos.add(opcioBuida);
+		metaExpedientsPermesos.addAll(
+			expedientPeticioService.findMetaExpedientsPermesosPerAnotacions(
 				entitatActual.getId(),
 				organActualId,
-				rolActual);
+				rolActual
+			)
+		);
 		model.addAttribute("metaExpedients", metaExpedientsPermesos);
 		model.addAttribute("isRolActualAdmin", rolActual.equals("IPA_ADMIN") || rolActual.equals("IPA_ORGAN_ADMIN"));
 

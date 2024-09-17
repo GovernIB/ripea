@@ -17,6 +17,7 @@ import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 import es.caib.ripea.core.api.dto.ArbreDto;
 import es.caib.ripea.core.api.dto.CarpetaDto;
 import es.caib.ripea.core.api.dto.ExpedientCarpetaArbreDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.CarpetaService;
@@ -76,8 +77,8 @@ public class CarpetaServiceBean implements CarpetaService {
 
 	@Override
 	@RolesAllowed("tothom")
-	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, Long expedientId) {
-		return delegate.findArbreCarpetesExpedient(entitatId, expedientId);
+	public List<ArbreDto<ExpedientCarpetaArbreDto>> findArbreCarpetesExpedient(Long entitatId, List<ExpedientDto> expedients, Long expedientId) {
+		return delegate.findArbreCarpetesExpedient(entitatId, expedients, expedientId);
 	}
 
 	@Override

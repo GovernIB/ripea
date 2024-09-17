@@ -6,6 +6,7 @@ package es.caib.ripea.war.interceptor;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -55,10 +56,16 @@ public class AplicacioInterceptor extends HandlerInterceptorAdapter {
 				}
 				Locale locale = new Locale(RequestContextUtils.getLocale(request).getLanguage(), 
 						RequestContextUtils.getLocale(request).getCountry());
-				manifestAtributsMap.put(
-						"Build-Timestamp",
-						formatBuildTimestamp(
-								manifestAtributsMap.get("Build-Timestamp").toString(), locale));
+				//En local, traballant amb Jboss Integrat amb eclipse, aquesta propietat pot no haver-se inicialitzat
+				if (manifestAtributsMap.get("Build-Timestamp")!=null) {
+					manifestAtributsMap.put(
+							"Build-Timestamp",
+							formatBuildTimestamp(
+									manifestAtributsMap.get("Build-Timestamp").toString(), locale));
+				} else {
+					SimpleDateFormat sdtTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+					manifestAtributsMap.put("Build-Timestamp", sdtTime.format(Calendar.getInstance().getTime()));
+				}
 			}
 		}
 		request.setAttribute(

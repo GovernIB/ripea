@@ -33,7 +33,6 @@ import es.caib.ripea.core.helper.ExpedientPeticioHelper0;
 import es.caib.ripea.core.helper.MetaExpedientHelper;
 import es.caib.ripea.core.helper.OrganGestorHelper;
 import es.caib.ripea.core.helper.PaginacioHelper;
-import es.caib.ripea.core.helper.PermisosHelper;
 import es.caib.ripea.core.helper.PermisosPerAnotacions;
 import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.helper.SynchronizationHelper;
@@ -56,7 +55,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,7 +63,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * Implementació dels mètodes per a gestionar expedient peticions.
@@ -111,17 +108,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Resource
 	private OrganGestorHelper organGestorHelper;
 	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
 	private MetaExpedientHelper metaExpedientHelper;
-	
 	@Autowired
 	private ExpedientPeticioHelper0 expedientPeticioHelper0;
 	@Autowired
 	private UsuariRepository usuariRepository;
 	@Autowired
 	private GrupRepository grupRepository;
-
 	
 	@Transactional(readOnly = true)
 	@Override
@@ -154,8 +147,13 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		ExpedientPeticioEstatViewEnumDto estatView = filtre.getEstat();
 		
 		MetaExpedientEntity metaExpedient = null;
+		boolean senseMetaExpedientInformat = false;
 		if (filtre.getMetaExpedientId() != null) {
-			metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
+			if (filtre.getMetaExpedientId()>0l) {
+				metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, filtre.getMetaExpedientId());
+			} else {
+				senseMetaExpedientInformat = true;
+			}
 		}
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("comprovarEntitat time:  " + (System.currentTimeMillis() - t2) + " ms");
@@ -179,6 +177,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 				permisosPerAnotacions.getIdsGrupsPermesos() == null,
 				permisosPerAnotacions.getIdsGrupsPermesos(),
 				metaExpedient == null,
+				senseMetaExpedientInformat,
 				metaExpedient,
 				StringUtils.isEmpty(filtre.getNumero()),
 				filtre.getNumero() != null ? StringUtils.trim(filtre.getNumero()) : "",		
@@ -286,36 +285,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		synchronized (SynchronizationHelper.get0To99Lock(expedientPeticioId, SynchronizationHelper.locksAnnotacions)) {
 			expedientPeticioHelper0.consultarIGuardarAnotacioPeticioPendent(expedientPeticioId, true);
 		}
-		
-		
-	}
-
-	
-	@Transactional(readOnly = true)
-	@Override
-	public MetaExpedientDto findMetaExpedientByEntitatAndProcedimentCodi(
-			String entitatCodi,
-			String procedimentCodi) {
-
-		MetaExpedientDto metaExpedientDto = null;
-
-		if (procedimentCodi != null) {
-
-			EntitatEntity entitat = entitatRepository.findByUnitatArrel(entitatCodi);
-
-			if (entitat != null) {
-				// set metaexpedient to which expedient will belong if peticion is accepted
-				List<MetaExpedientEntity> metaExpedients = metaExpedientRepository.findByEntitatAndClassificacio(
-						entitat,
-						procedimentCodi);
-
-				if (!metaExpedients.isEmpty()) {
-					metaExpedientDto = conversioTipusHelper.convertir(metaExpedients.get(0),
-							MetaExpedientDto.class);
-				}
-			}
-		}
-		return metaExpedientDto;
 	}
 
 	@Transactional
@@ -533,10 +502,9 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional(readOnly = true)
 	@Override
 	public void evictCountAnotacionsPendents(Long entitatId) {
-		EntitatEntity entitat = entitatRepository.findOne(entitatId);
+//		EntitatEntity entitat = entitatRepository.findOne(entitatId);
 		cacheHelper.evictAllCountAnotacionsPendents();
 	}
-	
 	
 	@Transactional
 	@Override
@@ -576,30 +544,21 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		if (containsDocumentsNotRelated) {
 			throw new RuntimeException("No es pot retornar l'anotació a estat pendent. Expedient relacionat conté documents no relacionts amb l'anotació.");
 		}
-		
 
 		for (RegistreAnnexEntity registreAnnexEntity : expedientPeticioEntity.getRegistre().getAnnexos()) {
 			
 
-			DocumentEntity document = registreAnnexEntity.getDocument();
-			
+//			DocumentEntity document = registreAnnexEntity.getDocument();
 //			registreAnnexEntity.updateUuidDispatched(document.getArxiuUuid());
-			
 			registreAnnexEntity.updateDocument(null);
-			
 //			documentRepository.delete(document);
-			
-
 		}
 //		if (!containsDocumentsNotRelated) {
 			expedientRepository.delete(expedient);
 //		}
-
 		
 		expedientPeticioEntity.setExpedient(null);
-		
 		expedientPeticioEntity.updateEstat(ExpedientPeticioEstatEnumDto.PENDENT);
-
 	}
 	
 
@@ -960,7 +919,7 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		long t2 = System.currentTimeMillis();
 		List<MetaExpedientEntity> metaExpedientsPermesos = null;
 		if (rolActual.equals("IPA_ADMIN")) {
-			metaExpedientsPermesos = metaExpedientRepository.findByEntitat(entitat);
+			metaExpedientsPermesos = metaExpedientRepository.findByEntitatOrderByNomAsc(entitat);
 		} else if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientsPermesos = metaExpedientHelper.findProcedimentsDeOrganIDeDescendentsDeOrgan(organActualId);
 			if (organGestorHelper.hasPermisAdminComu(organActualId)) {

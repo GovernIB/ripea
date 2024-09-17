@@ -193,6 +193,7 @@ $(document).ready(function() {
 				</th>
 				<th data-col-name="concepte" data-orderable="false"><spring:message code="seguiment.list.columna.concepte"/></th>	
 				<th data-col-name="documentNom"><spring:message code="seguiment.list.columna.documentNom"/></th>
+				<th data-col-name="dataFinalitzacio" data-type="datetime" data-converter="datetime" width="5%" nowrap><spring:message code="seguiment.list.columna.dataFinalitzacio"/></th>
 				<th data-col-name="notificacioEstat" data-template="#cellNotificacioEstatTemplate" data-orderable="false" width="5%">
 					<spring:message code="contingut.enviament.columna.estat"/>
 					<script id="cellNotificacioEstatTemplate" type="text/x-jsrender">

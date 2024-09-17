@@ -1256,19 +1256,22 @@ public class PluginHelper {
 								fitxer.getContingut()));
 			}
 			
-			ArrayList<Firma> arxiuFirmes = new ArrayList<Firma>();
-			for (ArxiuFirmaDto firmaDto: firmes) {
-				Firma firma = getFirma(
-						firmaDto.getFitxerNom(),
-						firmaDto.getTipusMime(),
-						firmaDto.getContingut(),
-						firmaDto.getTipus(),
-						firmaDto.getPerfil(),
-						firmaDto.getCsvRegulacio());
-				arxiuFirmes.add(firma);
+			if (firmes != null) {
+				ArrayList<Firma> arxiuFirmes = new ArrayList<Firma>();
+				for (ArxiuFirmaDto firmaDto: firmes) {
+					Firma firma = getFirma(
+							firmaDto.getFitxerNom(),
+							firmaDto.getTipusMime(),
+							firmaDto.getContingut(),
+							firmaDto.getTipus(),
+							firmaDto.getPerfil(),
+							firmaDto.getCsvRegulacio());
+					arxiuFirmes.add(firma);
+				}
+				
+				documentArxiu.setFirmes(arxiuFirmes);
 			}
-			documentArxiu.setFirmes(arxiuFirmes);
-
+			
 		}
 		
 		// És una modificació de metadades d'un document definitiu
@@ -4899,21 +4902,25 @@ public class PluginHelper {
 	}
 
 	public void resetPlugins() {
-		dadesUsuariPlugin = null;
-		unitatsOrganitzativesPlugins = new HashMap<>();
-		portafirmesPlugins  = new HashMap<>();
-		digitalitzacioPlugins  = new HashMap<>();
-		conversioPlugins  = new HashMap<>();
-		dadesExternesPlugins  = new HashMap<>();
-		dadesExternesPinbalPlugins  = new HashMap<>();
-		arxiuPlugins = new HashMap<>();
-		validaSignaturaPlugins  = new HashMap<>();
-		notificacioPlugins  = new HashMap<>();
-		gestioDocumentalPlugins  = new HashMap<>();
-		firmaServidorPlugins  = new HashMap<>();
-		viaFirmaPlugins  = new HashMap<>();
-		procedimentPlugins = new HashMap<>();
-		firmaSimpleWebPlugins = new HashMap<>();
+		resetPlugins("xx");
+	}
+
+	public void resetPlugins(String pluginCode) {
+		if ("ax".equals(pluginCode) || "xx".equals(pluginCode)) { arxiuPlugins = new HashMap<>(); }
+		if ("di".equals(pluginCode) || "xx".equals(pluginCode)) { unitatsOrganitzativesPlugins = new HashMap<>(); }
+		if ("no".equals(pluginCode) || "xx".equals(pluginCode)) { notificacioPlugins = new HashMap<>(); }
+		if ("cd".equals(pluginCode) || "xx".equals(pluginCode)) { conversioPlugins = new HashMap<>(); }
+		if ("us".equals(pluginCode) || "xx".equals(pluginCode)) { dadesUsuariPlugin = null; }
+		if ("pi".equals(pluginCode) || "xx".equals(pluginCode)) { dadesExternesPinbalPlugins = new HashMap<>(); }
+		if ("de".equals(pluginCode) || "xx".equals(pluginCode)) { dadesExternesPlugins = new HashMap<>(); }
+		if ("ro".equals(pluginCode) || "xx".equals(pluginCode)) { procedimentPlugins = new HashMap<>(); }
+		if ("dg".equals(pluginCode) || "xx".equals(pluginCode)) { digitalitzacioPlugins = new HashMap<>(); }
+		if ("pf".equals(pluginCode) || "xx".equals(pluginCode)) { portafirmesPlugins = new HashMap<>(); }
+		if ("vf".equals(pluginCode) || "xx".equals(pluginCode)) { validaSignaturaPlugins = new HashMap<>(); }
+		if ("gd".equals(pluginCode) || "xx".equals(pluginCode)) { gestioDocumentalPlugins = new HashMap<>(); }
+		if ("fs".equals(pluginCode) || "xx".equals(pluginCode)) { firmaServidorPlugins = new HashMap<>(); }
+		if ("si".equals(pluginCode) || "xx".equals(pluginCode)) { firmaSimpleWebPlugins = new HashMap<>(); }
+		if ("vi".equals(pluginCode) || "xx".equals(pluginCode)) { viaFirmaPlugins = new HashMap<>(); }
 	}
 
 	private String getPropertyPluginDadesUsuari() {

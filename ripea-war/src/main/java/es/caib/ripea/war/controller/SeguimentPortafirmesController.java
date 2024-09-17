@@ -4,30 +4,27 @@
 package es.caib.ripea.war.controller;
 
 
-import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.PaginaDto;
-import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
-import es.caib.ripea.core.api.dto.SeguimentDto;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.SeguimentService;
-import es.caib.ripea.war.command.SeguimentFiltreCommand;
-import es.caib.ripea.war.helper.DatatablesHelper;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.RequestSessionHelper;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.List;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.SeguimentDto;
+import es.caib.ripea.core.api.service.SeguimentService;
+import es.caib.ripea.war.command.SeguimentFiltreCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.RequestSessionHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al manteniment de seguiment de documents enviats a Portafib
@@ -42,8 +39,6 @@ public class SeguimentPortafirmesController extends BaseAdminController {
 	
     @Autowired
     private SeguimentService seguimentService;
-	@Autowired
-	private DocumentService documentService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -90,7 +85,8 @@ public class SeguimentPortafirmesController extends BaseAdminController {
             docsPortafirmes = seguimentService.findPortafirmesEnviaments(
 					entitat.getId(),
 					SeguimentFiltreCommand.asDto(filtreCommand),
-					DatatablesHelper.getPaginacioDtoFromRequest(request));
+					DatatablesHelper.getPaginacioDtoFromRequest(request),
+					RolHelper.getRolActual(request));
 			
         return DatatablesHelper.getDatatableResponse(request, docsPortafirmes, "id");
     }

@@ -40,9 +40,7 @@ table.dataTable td {
 
 </style>
 	<script type="application/javascript">
-
 		function showEstat(element) {
-			
 			if (element.id == 'PENDENT') {
 				return $('<span class="fa fa-spinner"></span><span> ' + element.text + '</span>');
 			} else if(element.id == 'ACCEPTAT'){

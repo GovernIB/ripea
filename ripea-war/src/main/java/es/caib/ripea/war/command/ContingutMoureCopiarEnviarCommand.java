@@ -8,11 +8,14 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import es.caib.ripea.war.validation.DestiNotEmpty;
+
 /**
  * Command per a copiar, moure o enviar contenidors.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
+@DestiNotEmpty
 public class ContingutMoureCopiarEnviarCommand {
 
 	protected Long origenId;
@@ -22,6 +25,7 @@ public class ContingutMoureCopiarEnviarCommand {
 	@Size(max=256)
 	protected String comentariEnviar;
 
+	private String estructuraCarpetesJson;
 
 
 	public Long getOrigenId() {
@@ -48,7 +52,13 @@ public class ContingutMoureCopiarEnviarCommand {
 	public void setComentariEnviar(String comentariEnviar) {
 		this.comentariEnviar = comentariEnviar != null ? comentariEnviar.trim() : null;
 	}
-
+	public String getEstructuraCarpetesJson() {
+		return estructuraCarpetesJson;
+	}
+	public void setEstructuraCarpetesJson(String estructuraCarpetesJson) {
+		this.estructuraCarpetesJson = estructuraCarpetesJson;
+	}
+	
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);

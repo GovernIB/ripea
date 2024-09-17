@@ -165,7 +165,8 @@
 			<div class="col-md-1"><strong><spring:message code="accio.massiva.header.error"/></strong></div>
 			<div class="col-md-2"><strong><spring:message code="accio.massiva.header.dataInici"/></strong></div>
 			<div class="col-md-2"><strong><spring:message code="accio.massiva.header.dataFi"/></strong></div>
-			<div class="col-md-2"><strong><spring:message code="accio.massiva.header.usuari"/></strong></div>
+			<div class="col-md-1"><strong><spring:message code="accio.massiva.header.usuari"/></strong></div>
+			<div class="col-md-1"><strong><spring:message code="accio.massiva.header.doc"/></strong></div>
 		</div>
 	</div>
 </div>
@@ -210,9 +211,14 @@
 	          	<div class="col-xs-2" id="dataFi_${exm.id}">
 		          	<fmt:formatDate value="${exm.dataFi}" pattern="dd/MM/yyyy HH:mm:ss"/>
 	          	</div>
-	          	<div class="col-xs-2">
+	          	<div class="col-xs-1">
 		          	${exm.createdBy.nom}
 	          	</div>
+				<div class="col-xs-1">
+					<c:if test="${! empty exm.documentNom}">
+						<a href="<c:url value="/massiu/${exm.id}/descarregar"/>" title="Descarregar document"><span class="fa fa-download fa-2x"></span></a>
+					</c:if>
+				</div>
           	</div>
         </a>
     </div>

@@ -11,7 +11,34 @@
 	<title>${titol}</title>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<script src="<c:url value="/js/JSOG.js"/>"></script>
+	<link href="<c:url value="/webjars/jstree/3.2.1/dist/themes/default/style.min.css"/>" rel="stylesheet">
+	<script src="<c:url value="/webjars/jstree/3.2.1/dist/jstree.min.js"/>"></script>
 	<rip:modalHead/>
+<style type="text/css">
+#arbreCarpetes a {
+    white-space: normal !important;
+    height: auto;
+    padding: 1px 2px;
+}
+</style>
+<script type="text/javascript">
+$(document).ready(function() {
+	var arbre = $('#arbreCarpetes');
+	
+	$('form').on('submit', function(){
+	    // Obtener la carpeta seleccionada en jstree
+	    var selectedNode = arbre.jstree('get_selected', true)[0];
+		var json = arbre.data().jstree.get_json()
+		var jsonString = JSON.stringify(json);
+
+		$('#estructuraCarpetesJson').val(jsonString);
+
+		if (selectedNode) {
+	    	$('#destiId').val(selectedNode.id);
+	    }
+	});
+});
+</script>
 </head>
 <body>
 	<form:form action="" class="form-horizontal" commandName="contingutMoureCopiarEnviarCommand">
@@ -32,7 +59,16 @@
 		</c:choose>
 			
 		</rip:inputFixed>
-		<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" documentsOrigen="${documentsOrigen}" ocultarDocuments="true" textKey="contingut.moure.camp.desti" required="true"/>
+		
+		<c:choose>
+			<c:when test="${isVistaArbreMoureDocuments}">
+				<rip:arbreMultiple name="estructuraCarpetesJson" id="arbreCarpetes" withlabel="true" textKey="contingut.importacio.form.camp.desti" atributId="id" atributNom="nom" arbre="${carpetes}" selectMultiple="${false}" required="true"/>				
+				<form:hidden path="destiId"/>
+			</c:when>
+			<c:otherwise>
+				<rip:inputFileChooserMultipleExpedients name="destiId" contingutOrigen="${contingutOrigen}" documentsOrigen="${documentsOrigen}" ocultarDocuments="true" textKey="contingut.moure.camp.desti" required="true"/>
+			</c:otherwise>
+		</c:choose>
 		
 <%-- 		<rip:inputFileChooser name="destiId" contingutOrigen="${contingutOrigen}" textKey="contingut.moure.camp.desti" required="true"/> --%>
 		<div id="modal-botons" class="well">

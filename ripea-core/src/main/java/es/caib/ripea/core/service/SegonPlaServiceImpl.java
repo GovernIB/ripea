@@ -495,11 +495,10 @@ public class SegonPlaServiceImpl implements SegonPlaService {
 	}
 	
 	@Override
-	public void restartSchedulledTasks() {
-		schedulingConfig.restartSchedulledTasks();
+	public void restartSchedulledTasks(String taskCodi) {
+		schedulingConfig.restartSchedulledTasks(taskCodi);
 	}
-	
-	
+
 	private int getArxiuMaxReintentsExpedients() {
 		String arxiuMaxReintentsExpedients = configHelper.getConfig("es.caib.ripea.segonpla.guardar.arxiu.max.reintents.expedients");
 		return arxiuMaxReintentsExpedients != null && !arxiuMaxReintentsExpedients.isEmpty() ? Integer.valueOf(arxiuMaxReintentsExpedients) : 0;

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1716384985679-2
+      author: limit
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  name: document_nom
+                  type: varchar(256 ${varcharunit})
+            tableName: ipa_execucio_massiva
+        - sql:
+            sql: "Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE) values ('es.caib.ripea.segonpla.arxiu.maxMb','100','Maxim tamany en Mb que pot ocupar l''arxiu zip que conté els documents dels expedients seleccionats.','SCHEDULLED',3,0,'INT');
+                  Insert into IPA_CONFIG (KEY,VALUE,DESCRIPTION,GROUP_CODE,POSITION,JBOSS_PROPERTY,TYPE_CODE) values ('es.caib.ripea.segonpla.arxiu.maxTempsExec','10','Maxim temps en minut que pot tardar el procés de  generar l''arxiu zip que conté els documents dels expedients seleccionats.','SCHEDULLED',4,0,'INT');"
