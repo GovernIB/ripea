@@ -29,6 +29,7 @@ import java.util.List;
 public interface InteressatRepository extends JpaRepository<InteressatEntity, Long> {
 
 	InteressatEntity findByExpedientAndDocumentNum(ExpedientEntity expedient, String documentNum);
+	InteressatEntity findByExpedientIdAndDocumentNum(Long expedientId, String documentNum);
 
 	List<InteressatEntity> findByExpedient(ExpedientEntity expedient);
 

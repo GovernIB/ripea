@@ -205,7 +205,7 @@ public class ExpedientInteressatHelper {
 			if (interessatAdministracioDto.getOrganCodi() != null) {
 				unitat = unitatOrganitzativaHelper.findAmbCodi(
 						interessatAdministracioDto.getOrganCodi());
-				
+
 				unitatDenominacio = (unitat.getDenominacio() != null && unitat.getDenominacio().length() > 80) ? unitat.getDenominacio().substring(0, 80) : unitat.getDenominacio();
 
 			}
@@ -386,14 +386,20 @@ public class ExpedientInteressatHelper {
 	public void updateOrganNom(InteressatDto interessatRepresentant) {
 		if (interessatRepresentant.isAdministracio()) {
 			InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) interessatRepresentant;
-			UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
-			
-			if (unitat != null) {
-				String unitatDenominacio = (unitat.getDenominacio() != null && unitat.getDenominacio().length() > 80) ? unitat.getDenominacio().substring(0, 80) : unitat.getDenominacio();
-			
-				interessatAdministracioDto.setOrganCodi(unitat.getCodi());
-				interessatAdministracioDto.setOrganNom(unitatDenominacio);
-			}
+			if (interessatAdministracioDto.getOrganCodi() == null)
+                return;
+
+            try {
+                UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
+                if (unitat != null) {
+                    String unitatDenominacio = (unitat.getDenominacio() != null && unitat.getDenominacio().length() > 80) ? unitat.getDenominacio().substring(0, 80) : unitat.getDenominacio();
+
+                    interessatAdministracioDto.setOrganCodi(unitat.getCodi());
+                    interessatAdministracioDto.setOrganNom(unitatDenominacio);
+                }
+            } catch (Exception e) {
+                logger.error("No s'ha pogut actualitzar l'òrgan '" + interessatAdministracioDto.getOrganCodi() + "'de l'interessat/representant");
+            }
 		}
 	}
 
