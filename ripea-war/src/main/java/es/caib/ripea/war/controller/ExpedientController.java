@@ -520,15 +520,12 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		String rolActual = (String)request.getSession().getAttribute(
-				SESSION_ATTRIBUTE_ROL_ACTUAL);
+		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 
 		ExpedientCommand command = null;
 		if (expedientId != null) {
-			ExpedientDto expedient = expedientService.findById(
-					entitatActual.getId(),
-					expedientId, null);
+			ExpedientDto expedient = expedientService.findById(entitatActual.getId(), expedientId, null);
 			command = ExpedientCommand.asCommand(expedient);
 			
 			List<GrupDto> grups = metaExpedientService.findGrupsAmbMetaExpedient(

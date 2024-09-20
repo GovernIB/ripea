@@ -1128,15 +1128,17 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 				organsGestors = organGestorHelper.findDescendents(entitat.getCodi(), metaExpedient.getOrganGestor().getId(), filtre);
 			} else {
 
-				// Cercam las parelles metaExpedient-organ amb permisos assignats 
-				List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
-				permisosHelper.filterGrantedAll(
-						metaExpedientOrgansGestors,
-						MetaExpedientOrganGestorEntity.class,
-						new Permission[]{permis});
 				Set<String> organCodis = new HashSet<>();
-				if (!metaExpedientOrgansGestors.isEmpty()) {
-					organCodis.addAll(metaExpedientOrganGestorRepository.findOrganGestorCodisByMetaExpedientOrganGestors(metaExpedientOrgansGestors));
+				// Cercam las parelles metaExpedient-organ amb permisos assignats
+				List<MetaExpedientOrganGestorEntity> metaExpedientOrgansGestors = metaExpedientOrganGestorRepository.findByMetaExpedient(metaExpedient);
+				if (metaExpedientOrgansGestors != null && !metaExpedientOrgansGestors.isEmpty()) {
+					permisosHelper.filterGrantedAll(
+							metaExpedientOrgansGestors,
+							MetaExpedientOrganGestorEntity.class,
+							new Permission[]{permis});
+					if (!metaExpedientOrgansGestors.isEmpty()) {
+						organCodis.addAll(metaExpedientOrganGestorRepository.findOrganGestorCodisByMetaExpedientOrganGestors(metaExpedientOrgansGestors));
+					}
 				}
 				// Cercam els òrgans amb permisos per procediments comuns
 				if (metaExpedient.getOrganGestor() == null) {
@@ -1146,7 +1148,9 @@ public class OrganGestorServiceImpl implements OrganGestorService {
 									ExtendedPermission.COMU,
 									permis));
 
-					organCodis.addAll(organGestorRepository.findCodisByIdList(organProcedimentsComunsIds));
+					if (organProcedimentsComunsIds != null && !organProcedimentsComunsIds.isEmpty()) {
+						organCodis.addAll(organGestorRepository.findCodisByIdList(organProcedimentsComunsIds));
+					}
 				}
 				organsGestors = organGestorHelper.findDescendents(entitat.getCodi(), new ArrayList<>(organCodis), filtre);
 

@@ -371,12 +371,9 @@ public class MetaExpedientHelper {
 		
 		long t1 = System.currentTimeMillis();
 		// Cercam els metaExpedients amb permisos assignats directament
-		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(
-				MetaNodeEntity.class,
-				permis));
+		List<Long> metaExpedientIds = toListLong(permisosHelper.getObjectsIdsWithPermission(MetaNodeEntity.class, permis));
 		if (cacheHelper.mostrarLogsRendiment())
 			logger.info("MetaExpedientHelper.findAmbPermis metaExpedientIds (" + (Utils.isNotEmpty(metaExpedientIds) ? metaExpedientIds.size() : 0) + ") time:  " + (System.currentTimeMillis() - t1) + " ms");
-		
 		
 		long t2 = System.currentTimeMillis();
 		// Cercam els òrgans amb permisos assignats directament
