@@ -307,8 +307,6 @@ public class DocumentServiceImpl implements DocumentService {
 					contingut, 
 					contentType);
 		}
-		
-
 	}
 
     @Override

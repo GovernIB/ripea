@@ -37,7 +37,7 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
 	@Override
 	public Resum getSummarize(String text, int longitudDesc, int longitudTitol) throws SistemaExternException {
 
-        Resum resum = Resum.builder().build();
+        Resum resum = new Resum();
 
         boolean debug = isDebug();
 
@@ -78,10 +78,8 @@ public class SummarizePluginBert extends RipeaAbstractPluginProperties implement
             }
             if (debug) log.info("Titol obtingut: " + titleText);
 
-            resum = Resum.builder()
-                    .titol(titleText)
-                    .resum(summaryText)
-                    .build();
+            resum.setTitol(titleText);
+            resum.setResum(summaryText);
 
         } catch (Exception e) {
             String errorMsg = "Error obtenint el text resumit del servei remot";

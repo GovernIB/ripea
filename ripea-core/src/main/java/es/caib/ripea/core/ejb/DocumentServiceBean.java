@@ -10,9 +10,12 @@ import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.service.DocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.interceptor.Interceptors;
 import java.io.IOException;
 import java.util.List;
@@ -420,6 +423,7 @@ public class DocumentServiceBean implements DocumentService {
 
     @Override
 	@RolesAllowed("tothom")
+    @TransactionAttribute(TransactionAttributeType.NEVER)
     public Resum getSummarize(byte[] bytes, String contentType) {
         return delegate.getSummarize(bytes, contentType);
     }

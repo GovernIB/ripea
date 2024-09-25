@@ -1,26 +1,27 @@
 package es.caib.ripea.plugin.caib.summarize;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import es.caib.ripea.core.api.dto.Resum;
-import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.summarize.SummarizePlugin;
-import lombok.extern.log4j.Log4j;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.ws.rs.core.MediaType;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+
+import es.caib.ripea.core.api.dto.Resum;
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.summarize.SummarizePlugin;
+import lombok.extern.log4j.Log4j;
 
 @Log4j
 public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements SummarizePlugin {
@@ -53,7 +54,7 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
 	@Override
 	public Resum getSummarize(String text, int longitudDesc, int longitudTitol) throws SistemaExternException {
 
-        Resum resum = Resum.builder().build();
+        Resum resum = new Resum();
 
         boolean debug = isDebug();
 
@@ -107,84 +108,138 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
              * El error "The prompt size exceeds the context window size and cannot be processed" 
              * indica que el tamaño del prompt que estás enviando al método completions de GPT4All es mayor que la capacidad máxima del modelo para procesar texto en una sola solicitud.
              * 
-             * El modelo Llama 3 8B Instruct tiene un límite de contexto de 16,000 tokens. 
+             * El modelo Llama 3 8B Instruct tiene un límite de contexto de 16,000 tokens.
              * Esto significa que el tamaño combinado del prompt y la respuesta generada no puede exceder este límite.
              * Si tu prompt tiene 15,000 tokens, solo quedarán 1,000 tokens disponibles para la respuesta generada por el modelo.
              */
-            String prompt = "Donat el següent texte, proporciona un títol de "+longitudTitol+" caràcters màxim i un resum de "+longitudDesc+" caràcters màxim, en idioma català.:" + text;
+            String prompt = "Donat el següent texte, proporciona un títol de "+longitudTitol+" caràcters màxim i un resum de "+longitudDesc+" caràcters màxim. Retorna només 1 titol i 1 descripció en dues lines separades. En idioma català.:" + text;
             //en idioma català, separa el titol de la descripció amb la seqüència de caràcters ####. No afegeixis cap altre text addicional.
            
             StringTokenizer sTok = new StringTokenizer(prompt);
             int numeroDeTokensPrompt = sTok.countTokens();
-            int maxTokensModel = geMaxTokens();
+            int maxTokensPrompt = geMaxTokens()-longitudDesc; //Realment la longitud desc son caracters, no tokens, pero així ens curam en salut de que tendrem espai per la resposta.
             
-            //Convé reservar un % dels tokens maxims del model per la resposta, que sempré será bastant mes petta que el promtp inicial, ja que estam resumint texte.
-            int tokensReservats = maxTokensModel/5;
-            
-            if (numeroDeTokensPrompt+tokensReservats>maxTokensModel) {
-            	prompt = tokenRemover(prompt, maxTokensModel-tokensReservats);
+            if (numeroDeTokensPrompt>maxTokensPrompt) {
+            	prompt = tokenRemover(prompt, maxTokensPrompt);
             }
             
-            prompt = prompt.substring(0, 2048);
+//            prompt = prompt.substring(0, maxTokensModel);
             
             rootNode.put("prompt", prompt);
 
             String input = mapper.writeValueAsString(rootNode);
 
+            System.out.println(input);
+            long t1 = Calendar.getInstance().getTimeInMillis();
+            
             WebResource webResource = client.resource(gptUrl);
             response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
-        } catch (Exception e) {
-            throwSistemaExternException("Error realitzant petició al ChatGPT", e, debug);
-        }
 
-        String summaryText = null;
-        String titleText = null;
-
-        if (response.getStatus() == 200) {
-        	
-            try {
-            	
+            
+            
+            
+	        String summaryText = null;
+	        String titleText = null;
+	
+	        if (response.getStatus() == 200) {
+	        	
+	        	long t2 = Calendar.getInstance().getTimeInMillis();
+	        	
                 String jsonResponse = response.getEntity(String.class);
+                
+                System.out.println(jsonResponse);
+                
+                System.out.println("Temps: "+((t2-t1)/1000)+" segons.");
+                
                 JsonNode root = mapper.readTree(jsonResponse);
                 String generatedText = root.path("choices").get(0).path("text").textValue();
 
-                // Divideix el text generat per obtenir el títol i resum
-                int posRes = generatedText.indexOf("Resum");
-                if (posRes>0) {
-                	titleText	= generatedText.substring(0, posRes);
-                	summaryText = generatedText.substring(posRes, generatedText.length());
+                if (generatedText.startsWith("ERROR")) {
+                	
+                	if (generatedText.indexOf("prompt size exceeds")>0) {
+                		resum.setError("El texte del document es massa llarg per que el model de IA pugui fer-ne un resum.");
+                	} else {
+                		resum.setError(generatedText);
+                	}
+                	
                 } else {
-                	String[] lines = generatedText.split("\\r?\\n");
-                	List<String> filteredLines = new ArrayList<String>();
-                	for (String line : lines) {
-                		if (line != null && !line.trim().isEmpty()) {
-                			filteredLines.add(line);
-                		}
-                	}
-                	if (filteredLines.size()==1) {
-                		titleText = filteredLines.get(0);
-                		summaryText = filteredLines.get(0);
-                	} else if (filteredLines.size()>1) {
-                		titleText = filteredLines.get(0);
-                		summaryText = filteredLines.get(1);
-                	}
+                
+	                // Divideix el text generat per obtenir el títol i resum
+	                int posRes = generatedText.indexOf("Resum");
+	                if (posRes>0) {
+	                	titleText	= generatedText.substring(0, posRes);
+	                	summaryText = generatedText.substring(posRes, generatedText.length());
+	                } else {
+	                	String[] lines = generatedText.split("\\r?\\n");
+	                	List<String> filteredLines = new ArrayList<String>();
+	                	for (String line : lines) {
+	                		if (line != null && !line.trim().isEmpty()) {
+	                			filteredLines.add(line);
+	                		}
+	                	}
+	                	if (filteredLines.size()==1) {
+	                		titleText = filteredLines.get(0);
+	                		summaryText = filteredLines.get(0);
+	                	} else if (filteredLines.size()>1) {
+	                		titleText = filteredLines.get(0);
+	                		summaryText = filteredLines.get(1);
+	                	}
+	                }
+	
+	                //De vegades el model inclou les paraules "**Titol**" o "**Titulo**" o "Resum (500 caràcters)" abans del titol i la descripcio...
+	                titleText = removeOccurrences(titleText, "*", "Títol", "Titulo", ":", longitudTitol+" caràcters", "en català", "(", ")").trim();
+	                summaryText = removeOccurrences(summaryText, "*", "Resum", "Resumen", ":", longitudDesc+" caràcters", "en català", "(", ")").trim();
+	                
+	                if (titleText!=null && titleText.length()>longitudTitol) {
+	                	titleText = titleText.substring(0, longitudTitol);
+	                }
+	                
+	                if (summaryText!=null && summaryText.length()>longitudDesc) {
+	                	summaryText = summaryText.substring(0, longitudDesc);	
+	                }
+	                
+	               resum.setTitol(titleText);
+	               resum.setResum(summaryText);
                 }
-
-                resum = Resum.builder()
-                		.titol(titleText)
-                        .resum(summaryText)
-                        .build();
-
-            } catch (Exception e) {
-                throwSistemaExternException("Error processant la resposta del API", e, debug);
-            }
-        } else {
-            throwSistemaExternException("Error en la resposta de la API: " + response.getStatus(), null, debug);
+	
+	        } else {       	
+	            throwSistemaExternException(""+response.getStatus(), null, debug);
+	        }
+        
+        } catch (Exception e) {
+            throwSistemaExternException("Error realitzant petició al model de IA: "+e.getMessage(), e, debug);
         }
 
         return resum;
     }
 
+	public String removeOccurrences(String original, String... toRemove) {
+		
+		if (original == null || toRemove == null) {
+			return original;
+		}
+
+		int length = original.length();
+		int boundary = 15;
+
+		// Definir las secciones a revisar
+		String startSection = original.substring(0, Math.min(boundary, length));
+		String endSection = original.substring(Math.max(length - boundary, 0));
+
+		// Eliminar ocurrencias en la sección inicial
+		for (String remove : toRemove) {
+			if (remove != null && !remove.isEmpty()) {
+				startSection = startSection.replace(remove, "");
+				endSection = endSection.replace(remove, "");
+			}
+		}
+		
+		// Reconstruir el string original
+		String middleSection = original.substring(Math.min(boundary, length), Math.max(length - boundary, 0));
+		String resultat = startSection + middleSection + endSection;
+		return resultat.trim();
+	}
+	
 	/**
 	 * Puesto que parte del prompt es texto extraido de un PDF, contiene caracteres especiales como circulos correspondientes a listas de elementos o quizas tabulaciones o espacios en blanco extra.
 	 * Función en Java que elimina caracteres especiales, tabulaciones y espacios en blanco extra de un texto, dejando solo las palabras entendibles	 * 
@@ -280,13 +335,13 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
         return getProperty("plugin.summarize.model");
     }
     private Integer geMaxTokens() {
-        return Integer.valueOf(getProperty("plugin.summarize.model.maxTokens", "10000"));
+        return Integer.valueOf(getProperty("plugin.summarize.model.maxTokens", "8192"));
     }
     private String getApiKey() {
         return getProperty("plugin.summarize.gpt.apiKey");
     }
     private Integer getTimeout() {
-        return Integer.valueOf(getProperty("plugin.summarize.service.timeout", "300000"));
+        return Integer.valueOf(getProperty("plugin.summarize.service.timeout", "60000"));
     }
     private boolean isDebug() {
         return getAsBoolean("plugin.summarize.debug");

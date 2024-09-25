@@ -220,6 +220,27 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 
 	}
 	
+	@RequestMapping(value = "/{pareId}/document/summarize", method = RequestMethod.POST)
+	@ResponseBody
+	public Resum summarizePost(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			DocumentCommand command,
+			Model model) {
+
+		FitxerTemporalDto fitxerTemp = (FitxerTemporalDto) request.getSession().getAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT);
+		
+		Resum resum = null;
+		
+		if (fitxerTemp!=null && fitxerTemp.getBytes()!=null && fitxerTemp.getBytes().length>0) {
+			resum = documentService.getSummarize(fitxerTemp.getBytes(), fitxerTemp.getContentType());
+		} else {
+			resum = new Resum();
+			resum.setError("No s'ha seleccionat cap fitxer.");
+		}
+		
+		return resum;
+	}
 	
 	@RequestMapping(value = "/{pareId}/document/docNew", method = RequestMethod.POST)
 	public String postNew(
@@ -1419,6 +1440,11 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		return aplicacioService.propertyBooleanFindByKey("es.caib.ripea.document.deteccio.firma.automatica");
 	}
 	
+	private Boolean isPluginSummarizeActiu() {
+		String aux = aplicacioService.propertyFindByNom("es.caib.ripea.plugin.summarize.class");
+		return (aux!=null && !aux.isEmpty());
+	}
+	
 	private void fillModelFileSubmit(DocumentCommand command, Model model, HttpServletRequest request) {
 		if (command.isUnselect()) {
 			request.getSession().setAttribute(FitxerTemporalHelper.SESSION_ATTRIBUTE_DOCUMENT, null);
@@ -1429,18 +1455,6 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			model.addAttribute("isSignedAttached", signatureInfoDto.isSigned());
 			model.addAttribute("isError", signatureInfoDto.isError());
 			model.addAttribute("errorMsg", signatureInfoDto.getErrorMsg());
-		}
-
-		// Summarize
-		if (command.getDescripcio() == null || command.getDescripcio().isEmpty() ||
-				command.getNom() == null || command.getNom().isEmpty()) {
-
-			Resum resum = documentService.getSummarize(fitxerTemp.getBytes(), fitxerTemp.getContentType());
-
-			if (command.getNom() == null || command.getNom().isEmpty())
-				command.setNom(resum.getTitol());
-			if (command.getDescripcio() == null || command.getDescripcio().isEmpty())
-				command.setDescripcio(resum.getResum());
 		}
 	}
 	
@@ -1633,7 +1647,7 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		model.addAttribute("estatsElaboracioIdentificadorEniObligat", obtenirEstatsElaboracioIdentificadorEniObligat());
 		model.addAttribute("isMascaraPermesa", isMascaraPermesa() != null ? isMascaraPermesa() : true);
 		model.addAttribute("isDeteccioFirmaAutomaticaActiva", isDeteccioFirmaAutomaticaActiva());
-		
+		model.addAttribute("isPluginSummarizeActiu", isPluginSummarizeActiu());
 		model.addAttribute("isFuncionariHabilitatDigitalib", aplicacioService.doesCurrentUserHasRol("DIB_USER"));	
 		
 		model.addAttribute("isScannerMock", aplicacioService.getBooleanJbossProperty("es.caib.ripea.document.scanner.mock", false));

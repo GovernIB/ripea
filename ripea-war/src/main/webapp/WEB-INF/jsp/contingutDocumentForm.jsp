@@ -100,6 +100,10 @@ body.loading .rmodal {
 	border-color: #c4c4c4;
 }
 
+.nom_btn {
+	cursor: pointer;
+}
+
 </style>
 <script>
 function mostrarDocument(fileName) {
@@ -117,6 +121,35 @@ function mostrarFrima(fileName) {
 }
 
 $(document).ready(function() {
+
+	$(".nom_btn").on('click', function() {
+		$(this).html('<i class="fa fa-circle-o-notch fa-spin"></i>');
+		var formData = $("#documentCommand").serialize();
+		$.ajax({
+			type: 'POST',
+			url: '<rip:modalUrl value="/contingut/${documentCommand.pareId}/document/summarize"/>',
+			data: formData,
+			async: true,
+			success: function(response) {
+				if (response) {
+					if (response.error) {
+						alert(response.error);
+					} else {
+						$("#nom").val(response.titol);
+						$("#descripcio").val(response.resum);
+					}
+				}
+				$(".nom_btn").html('IA');
+				return true;
+			},
+			error: function(xhr, status, error) {
+				console.error("No s'ha pogut obtenir el resum per IA del document: ", error);
+				$(".nom_btn").html('IA');
+				return true;
+			}
+		});
+	});
+	
 	if (${isMascaraPermesa}) {
 		$("#ntiIdDocumentoOrigen").mask("**_*********_9999_******************************",{ 
 			placeholder:"_"
@@ -438,8 +471,6 @@ $(document).ready(function() {
 		}
 	});
 	$('#ntiEstadoElaboracion').trigger('change');
-
-
 	<c:if test="${isDeteccioFirmaAutomaticaActiva}">
 		$("#inputDoc .fileinput").on("clear.bs.fileinput", function(e){
 			 $('.crearDocumentBtnSubmit', parent.document).prop('disabled', true);
@@ -522,8 +553,6 @@ $(document).ready(function() {
 			//}
 	
 		});
-	
-	
 		
 		if(${not empty nomDocument}){
 			$('#inputAmbFirma').removeClass('hidden');
@@ -538,7 +567,6 @@ $(document).ready(function() {
 	        $('input[type=radio][name=tipusFirma]').val('SEPARAT');
 	    }
 	</c:if>
-	
 });
 
 function removeLoading() {
@@ -546,10 +574,10 @@ function removeLoading() {
 	$body.removeClass("loading");
 }
 </script>
+
 </head>
+
 <body>
-
-
 
 	<c:set var="formAction"><rip:modalUrl value="/contingut/${documentCommand.pareId}/document${isCreate ? '/docNew' : '/docUpdate'}?tascaId=${tascaId}"/></c:set>
 	
@@ -585,7 +613,28 @@ function removeLoading() {
 		</c:choose>
 		
 		<rip:inputSelect name="metaNodeId" textKey="contingut.document.form.camp.metanode" optionItems="${metaDocuments}" optionValueAttribute="id" optionTextAttribute="nom" emptyOption="${fn:length(metaDocuments) > 1 ? true : false}" emptyOptionTextKey="contingut.document.form.camp.nti.cap" required="true"/>
-		<rip:inputText name="nom" textKey="contingut.document.form.camp.nom" required="true" tooltip="true" tooltipMsg="contingut.document.form.camp.nom.caracters" maxlength="250"/>
+		<c:if test="${isPluginSummarizeActiu}">
+			<rip:inputText
+				name="nom"
+				 textKey="contingut.document.form.camp.nom"
+				 required="true"
+				 tooltip="true"
+				 tooltipMsg="contingut.document.form.camp.nom.caracters"
+				 maxlength="250"
+				 button="true"
+				 customIcon="IA"
+				 buttonMsg="modal.document.boto.IA"/>
+		</c:if>
+		<c:if test="${not isPluginSummarizeActiu}">
+			<rip:inputText
+				name="nom"
+				 textKey="contingut.document.form.camp.nom"
+				 required="true"
+				 tooltip="true"
+				 tooltipMsg="contingut.document.form.camp.nom.caracters"
+				 maxlength="250"/>		
+		</c:if>
+		
 		<rip:inputTextarea name="descripcio" textKey="contingut.document.form.camp.descripcio" showsize="true" maxlength="510"/>
 		<%-- <rip:inputDate name="data" textKey="contingut.document.form.camp.data" required="true" readonly="${readOnlyValue}"/>--%>
 		<rip:inputDateTime name="dataTime" textKey="contingut.document.form.camp.data" required="true" readonly="${!isPermesPropagarModificacioDefinitius}"/>
