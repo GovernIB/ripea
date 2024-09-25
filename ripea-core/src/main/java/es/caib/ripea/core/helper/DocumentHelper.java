@@ -393,7 +393,7 @@ public class DocumentHelper {
 			throw new ValidationException(
 					documentEntity.getId(),
 					DocumentEntity.class,
-					"No es poden actualitzar un document definitiu");
+					"No es pot actualitzar un document definitiu");
 		}
 		if (documentEntity.getEstat().equals(DocumentEstatEnumDto.FIRMA_PENDENT)) {
 			throw new ValidationException(
@@ -609,11 +609,6 @@ public class DocumentHelper {
 		return fitxer;
 	}
 	
-	
-	
-	
-	
-	
 	public boolean updateTipusDocumentDocument(
 			Long entitatId,
 			DocumentEntity documentEntity,
@@ -704,6 +699,43 @@ public class DocumentHelper {
 			return true;
 		}
 		
+	}
+
+	// Mètode implementat únicament per solucionar error de documents que s'han creat sense el seu tipus, i ja estan com a definitius
+	public void updateTipusDocumentDefinitiu(
+			DocumentEntity documentEntity,
+			Long metaDocumentId) {
+
+		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(documentEntity.getId()));
+
+		MetaDocumentEntity metaDocument = null;
+		if (metaDocumentId != null) {
+			metaDocument = entityComprovarHelper.comprovarMetaDocument(
+					documentEntity.getEntitat(),
+					documentEntity.getMetaDocument() != null ? documentEntity.getMetaDocument().getMetaExpedient() : null,
+					metaDocumentId,
+					false,
+					false);
+		}
+		if (metaDocument != null) {
+			documentEntity.updateTipusDocument(
+					metaDocument,
+					metaDocument.getNtiOrigen(),
+					metaDocument.getNtiEstadoElaboracion(),
+					metaDocument.getNtiTipoDocumental());
+		}
+
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity);
+		cacheHelper.evictErrorsValidacioPerNode(documentEntity.getExpedient());
+		// Registra al log la modificació del document
+		contingutLogHelper.log(
+				documentEntity,
+				LogTipusEnumDto.MODIFICACIO,
+				documentEntity.getNom(),
+				null,
+				true,
+				true);
+
 	}
 
 	public DocumentEntity crearDocumentDB(

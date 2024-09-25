@@ -405,7 +405,13 @@ public class DocumentServiceBean implements DocumentService {
 				rolActual);
 	}
 
-	@Override
+    @Override
+	@RolesAllowed("tothom")
+    public void updateTipusDocumentDefinitiu(Long entitatId, Long documentId, Long tipusDocumentId) {
+        delegate.updateTipusDocumentDefinitiu(entitatId, documentId, tipusDocumentId);
+    }
+
+    @Override
 	@RolesAllowed("tothom")
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId) {
 		return delegate.notificacioDescarregarJustificantEnviamentNotib(notificacioId);

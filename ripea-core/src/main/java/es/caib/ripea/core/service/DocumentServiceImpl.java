@@ -433,6 +433,29 @@ public class DocumentServiceImpl implements DocumentService {
 				comprovarMetaExpedient);
 	}
 
+	// Mètode implementat únicament per solucionar error de documents que s'han creat sense el seu tipus, i ja estan com a definitius
+	@Transactional
+	@Override
+	public void updateTipusDocumentDefinitiu(Long entitatId, Long documentId, Long tipusDocumentId) {
+		logger.debug("Actualitzant el tipus de document del document definitiu (" +
+				"entitatId=" + entitatId + ", " +
+				"id=" + documentId + ", " +
+				"tipusDocument=" + tipusDocumentId + ")");
+		DocumentEntity document = documentHelper.comprovarDocument(
+				entitatId,
+				documentId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				null);
+
+		documentHelper.updateTipusDocumentDefinitiu(
+				document,
+				tipusDocumentId);
+	}
+
 	@Transactional(readOnly = true)
 	@Override
 	public DocumentDto findById(

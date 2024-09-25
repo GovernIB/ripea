@@ -203,8 +203,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		return "contingutDocumentForm";
 	}
-	
-	
+
+
 	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
 		
 		if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
@@ -386,7 +386,77 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return "contingutDocumentForm";
 		}
 	}
-	
+
+	@RequestMapping(value = "/{pareId}/document/modificarTipus/{documentId}", method = RequestMethod.GET)
+	public String updateTipusDocumentGet(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			Model model) throws ClassNotFoundException, IOException {
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentDto document = null;
+		if (documentId != null) {
+			document = documentService.findById(
+					entitatActual.getId(),
+					documentId,
+					null);
+		}
+		if (documentId == null || document == null) {
+			throw new RuntimeException("No s'ha indicat cap document, o aquest no existeix. DocId: " + documentId);
+		}
+		DocumentCommand command = DocumentCommand.asCommand(document);
+
+		if(document.getFitxerNom() != null) {
+			model.addAttribute("nomDocument", document.getFitxerNom());
+		}
+		command.setEntitatId(entitatActual.getId());
+		command.setPareId(pareId);
+		model.addAttribute(command);
+		model.addAttribute("contingutId", pareId);
+		model.addAttribute("documentId", documentId);
+
+		model.addAttribute(
+				"metaDocuments",
+				metaDocumentService.findActiusPerCreacio(
+						entitatActual.getId(),
+						document.getExpedientId(),
+						null,
+						false));
+
+		return "contingutDocumentTipusForm";
+	}
+
+	@RequestMapping(value = "/{pareId}/document/modificarTipus/{documentId}", method = RequestMethod.POST)
+	public String updateTipusDocumentPost(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			DocumentCommand command,
+			Model model) throws IOException {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		try {
+			documentService.updateTipusDocumentDefinitiu(
+					entitatActual.getId(),
+					command.getId(),
+					command.getMetaNodeId());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../contingut/" + pareId,
+					"document.controller.modificat.ok");
+
+		} catch (Exception e) {
+			logger.error("Error actualitzant el document amb el nou tipus de document", e);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:../contingut/" + pareId,
+					"document.controller.modificat.error",
+					e);
+		}
+	}
+
 	@RequestMapping(value = "/{contingutId}/document/updateTipusDocument", method = RequestMethod.GET)
 	@ResponseBody
 	public JsonResponse updateTipusDocument(

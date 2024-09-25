@@ -631,6 +631,13 @@ public interface DocumentService {
 			Long tascaId, 
 			String rolActual);
 
+	// Mètode implementat únicament per solucionar error de documents que s'han creat sense el seu tipus, i ja estan com a definitius
+	@PreAuthorize("hasRole('tothom')")
+	public void updateTipusDocumentDefinitiu(
+			Long entitatId,
+			Long documentId,
+			Long tipusDocumentId);
+
 	@PreAuthorize("hasRole('tothom')")
 	public RespostaJustificantEnviamentNotibDto notificacioDescarregarJustificantEnviamentNotib(Long notificacioId);
 
