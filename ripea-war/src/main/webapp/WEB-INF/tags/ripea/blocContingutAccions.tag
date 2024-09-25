@@ -66,14 +66,25 @@
 			<%---- Modificar... ----%>
 			<c:set var="isPermesModificarCustodiatsVar" value="${isPermesModificarCustodiats && contingut.document && (contingut.estat == 'CUSTODIAT' || contingut.estat == 'FIRMAT' || contingut.estat == 'FIRMA_PARCIAL' || contingut.estat == 'DEFINITIU')}"/>
 			<c:choose>
+				<%--- Expedient ---%>
 				<c:when test="${contingut.expedient && contingut.estat == 'OBERT'}">
 					<li><a href="<c:url value="/expedient/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
 				</c:when>
-				<c:when test="${contingut.document && contingut.estat != 'FIRMA_PENDENT' && (!contingut.arxiuEstatDefinitiu || isPermesModificarCustodiatsVar) && expedientObert}">
-					<li class="${(contingut.document && (contingut.arxiuUuid==null || contingut.gesDocFirmatId != null)) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/modificar/${contingut.id}/?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
-					<c:set var="mostrarSeparador" value="${true}"/>
+				<%--- Document ---%>
+				<c:when test="${contingut.document && expedientObert}">
+					<c:choose>
+						<c:when test="${contingut.estat != 'FIRMA_PENDENT' && (!contingut.arxiuEstatDefinitiu || isPermesModificarCustodiatsVar)}">
+							<li class="${(contingut.document && (contingut.arxiuUuid==null || contingut.gesDocFirmatId != null)) ? 'disabled' : ''}"><a href="<c:url value="/contingut/${contingut.pare.id}/document/modificar/${contingut.id}/?tascaId=${tascaId}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
+							<c:set var="mostrarSeparador" value="${true}"/>
+						</c:when>
+						<c:when test="${empty contingut.metaNode and contingut.arxiuEstatDefinitiu and empty tascaId}">
+							<li><a href="<c:url value="/contingut/${contingut.pare.id}/document/modificarTipus/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar.tipus"/>...</a></li>
+							<c:set var="mostrarSeparador" value="${true}"/>
+						</c:when>
+					</c:choose>
 				</c:when>
+				<%--- Carpeta ---%>
 				<c:when test="${contingut.carpeta && isCreacioCarpetesActiva}">
 					<li><a href="<c:url value="/contingut/${contingut.pare.id}/carpeta/${contingut.id}"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-pencil"></span>&nbsp;<spring:message code="comu.boto.modificar"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>

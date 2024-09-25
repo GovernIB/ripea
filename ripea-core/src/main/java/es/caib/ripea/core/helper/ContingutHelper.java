@@ -413,14 +413,45 @@ public class ContingutHelper {
 						mapPerEstat.put(expedientEstatDto, docsDtos);
 						
 					}
+
+					List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalIsNullAndEsborrat(expedient, 0);
+
+					List<ContingutDto> docsDtos = new ArrayList<ContingutDto>();
+					if (CollectionUtils.isNotEmpty(documents)) {
+						for (DocumentEntity document : documents) {
+							docsDtos.add(
+									toContingutDto(
+											document,
+											ambPermisos,
+											false,
+											false,
+											ambPath,
+											false,
+											false,
+											rolActual,
+											onlyForList,
+											organActualId,
+											onlyFirstDescendant,
+											level,
+											null,
+											null,
+											ambExpedientPare,
+											ambEntitat,
+											false,
+											false));
+
+
+						}
+
+						mapPerEstat.put(new ExpedientEstatDto("Sense estat", 0L), docsDtos);
+					}
+
 					dto.setMapPerEstat(mapPerEstat);
 					
 					if (cacheHelper.mostrarLogsRendiment())
 						logger.info("ambMapPerEstat end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 				}	
-				
 
-				
 			}
 			
 			if (cacheHelper.mostrarLogsRendiment())

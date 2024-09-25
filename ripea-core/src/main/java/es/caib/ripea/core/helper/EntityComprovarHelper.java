@@ -555,7 +555,7 @@ public class EntityComprovarHelper {
 		if (cacheHelper.mostrarLogsCreacioContingut())
 			logger.info("[DOC] Comprovant metadDocument (" +
 					"entitatId=" + entitat.getId() + ", " +
-					"metaExpedientId=" + metaExpedient.getId() + ", " +
+					"metaExpedientId=" + (metaExpedient != null ? metaExpedient.getId() : "null") + ", " +
 					"metaDocumentId=" + id + ")");
 
 		MetaDocumentEntity metaDocument;

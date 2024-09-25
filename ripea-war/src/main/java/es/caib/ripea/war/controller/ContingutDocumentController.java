@@ -3,73 +3,10 @@
  */
 package es.caib.ripea.war.controller;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.ConnectException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
-import es.caib.ripea.core.api.dto.ArxiuFirmaDetallDto;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DadaDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioEstatDto;
-import es.caib.ripea.core.api.dto.DigitalitzacioResultatDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNtiTipoDocumentalEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentTipusFirmaEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.FitxerTemporalDto;
-import es.caib.ripea.core.api.dto.MetaDadaDto;
-import es.caib.ripea.core.api.dto.MetaDocumentDto;
-import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
-import es.caib.ripea.core.api.dto.PermissionEnumDto;
-import es.caib.ripea.core.api.dto.SignatureInfoDto;
+import es.caib.ripea.core.api.dto.*;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.ArxiuNotFoundDocumentException;
 import es.caib.ripea.core.api.exception.NotFoundException;
-import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.api.service.ContingutService;
@@ -97,6 +34,46 @@ import es.caib.ripea.war.helper.JsonResponse;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.StringArrayPropertyEditor;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.ConnectException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Controlador per al manteniment de documents.
@@ -216,8 +193,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 		
 		return "contingutDocumentForm";
 	}
-	
-	
+
+
 	private void setTipusFirma(DocumentCommand command, DocumentDto document) {
 		
 		if (document.getDocumentFirmaTipus() == DocumentFirmaTipusEnumDto.SENSE_FIRMA) {
@@ -376,6 +353,76 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 					model, 
 					tascaId);
 			return "contingutDocumentForm";
+		}
+	}
+
+	@RequestMapping(value = "/{pareId}/document/modificarTipus/{documentId}", method = RequestMethod.GET)
+	public String updateTipusDocumentGet(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			Model model) throws ClassNotFoundException, IOException {
+		organGestorService.actualitzarOrganCodi(organGestorService.getOrganCodiFromContingutId(pareId));
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		DocumentDto document = null;
+		if (documentId != null) {
+			document = documentService.findById(
+					entitatActual.getId(),
+					documentId,
+					null);
+		}
+		if (documentId == null || document == null) {
+			throw new RuntimeException("No s'ha indicat cap document, o aquest no existeix. DocId: " + documentId);
+		}
+		DocumentCommand command = DocumentCommand.asCommand(document);
+
+		if(document.getFitxerNom() != null) {
+			model.addAttribute("nomDocument", document.getFitxerNom());
+		}
+		command.setEntitatId(entitatActual.getId());
+		command.setPareId(pareId);
+		model.addAttribute(command);
+		model.addAttribute("contingutId", pareId);
+		model.addAttribute("documentId", documentId);
+
+		model.addAttribute(
+				"metaDocuments",
+				metaDocumentService.findActiusPerCreacio(
+						entitatActual.getId(),
+						document.getExpedientId(),
+						null,
+						false));
+
+		return "contingutDocumentTipusForm";
+	}
+
+	@RequestMapping(value = "/{pareId}/document/modificarTipus/{documentId}", method = RequestMethod.POST)
+	public String updateTipusDocumentPost(
+			HttpServletRequest request,
+			@PathVariable Long pareId,
+			@PathVariable Long documentId,
+			DocumentCommand command,
+			Model model) throws IOException {
+
+		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+
+		try {
+			documentService.updateTipusDocumentDefinitiu(
+					entitatActual.getId(),
+					command.getId(),
+					command.getMetaNodeId());
+			return getModalControllerReturnValueSuccess(
+					request,
+					"redirect:../contingut/" + pareId,
+					"document.controller.modificat.ok");
+
+		} catch (Exception e) {
+			logger.error("Error actualitzant el document amb el nou tipus de document", e);
+			return getModalControllerReturnValueError(
+					request,
+					"redirect:../contingut/" + pareId,
+					"document.controller.modificat.error",
+					e);
 		}
 	}
 	
