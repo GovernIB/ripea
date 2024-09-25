@@ -471,9 +471,7 @@ public class ContingutHelper {
 					if (cacheHelper.mostrarLogsRendiment())
 						logger.info("ambMapPerEstat end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
 				}	
-				
 
-				
 			}
 			
 			if (cacheHelper.mostrarLogsRendiment())

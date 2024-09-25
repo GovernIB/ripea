@@ -319,7 +319,7 @@ public interface DocumentRepository extends JpaRepository<DocumentEntity, Long> 
 	List<DocumentEntity> findByExpedientAndExpedientEstatAdditionalIsNullAndEsborrat(
 			ExpedientEntity expedient,
 			int esborrat);
-	
+
 	List<DocumentEntity> findByMetaNode(
 			MetaNodeEntity metaNode);
 	

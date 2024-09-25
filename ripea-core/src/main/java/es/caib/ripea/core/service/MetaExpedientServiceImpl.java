@@ -617,9 +617,7 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 	@Transactional(readOnly = true)
 	@Override
 	public List<MetaExpedientDto> findActiusAmbEntitatPerCreacio(Long entitatId, String rolActual) {
-		logger.debug(
-				"Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId +
-						")");
+		logger.debug("Consulta de meta-expedients actius de l'entitat amb el permis CREATE (" + "entitatId=" + entitatId + ")");
 
 		return conversioTipusHelper.convertirList(
 				metaExpedientHelper.findAmbPermis(
