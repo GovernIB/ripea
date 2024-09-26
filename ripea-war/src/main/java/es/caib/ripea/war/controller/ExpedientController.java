@@ -1403,18 +1403,23 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			ExpedientCommand command,
 			BindingResult bindingResult,
 			Model model) {
+		
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		
 		if (bindingResult.hasErrors()) {
 			return "expedientChoosePrioritatForm";
 		}
+		
 		expedientService.changeExpedientPrioritat(
 				entitatActual.getId(),
 				command.getId(),
 				command.getPrioritat());
+		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../expedient",
-				"expedient.controller.prioritatModificat.ok");
+				"expedient.controller.prioritatModificat.ok",
+				new Object[]{command.getNom()});
 	}
 	
 	@RequestMapping(value = "/{expedientId}/relacionarList/select", method = RequestMethod.GET)

@@ -26,7 +26,7 @@
 		<form:hidden path="id"/>
 		<form:hidden path="entitatId"/>
 		<form:hidden path="pareId"/>
-		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" disabled="true"/>
+		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" readonly="readonly"/>
 		<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
 		<div class="h200" />
 		<div id="modal-botons" class="well">
