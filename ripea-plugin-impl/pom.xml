@@ -285,7 +285,6 @@
 	            </exclusion>
 	        </exclusions>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.fundaciobit.apisib.apifirmasimple</groupId>
 			<artifactId>apifirmasimple-api</artifactId>
@@ -296,6 +295,11 @@
 			<groupId>org.fundaciobit.apisib.apifirmasimple</groupId>
 			<version>1.0.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.opennlp</groupId>
+			<artifactId>opennlp-tools</artifactId>
+			<version>1.5.3</version>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>

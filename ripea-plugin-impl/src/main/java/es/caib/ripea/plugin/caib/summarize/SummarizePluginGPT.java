@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
-import java.util.StringTokenizer;
 
 import javax.ws.rs.core.MediaType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -22,12 +24,14 @@ import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
 import es.caib.ripea.plugin.SistemaExternException;
 import es.caib.ripea.plugin.summarize.SummarizePlugin;
 import lombok.extern.log4j.Log4j;
+import opennlp.tools.tokenize.SimpleTokenizer;
 
 @Log4j
 public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements SummarizePlugin {
 
     private Client jerseyClient;
     private ObjectMapper mapper;
+    private static final Logger logger = LoggerFactory.getLogger(SummarizePluginGPT.class);
    
 	public SummarizePluginGPT() {
 		super();
@@ -112,19 +116,25 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
              * Esto significa que el tamaño combinado del prompt y la respuesta generada no puede exceder este límite.
              * Si tu prompt tiene 15,000 tokens, solo quedarán 1,000 tokens disponibles para la respuesta generada por el modelo.
              */
-            String prompt = "Donat el següent texte, proporciona un títol de "+longitudTitol+" caràcters màxim i un resum de "+longitudDesc+" caràcters màxim. Retorna només 1 titol i 1 descripció en dues lines separades. En idioma català.:" + text;
+            String prompt = "Donat el següent texte, proporciona un títol de "+longitudTitol+" caràcters màxim i un resum de "+longitudDesc+" caràcters màxim. En idioma català.:" + text;
             //en idioma català, separa el titol de la descripció amb la seqüència de caràcters ####. No afegeixis cap altre text addicional.
-           
-            StringTokenizer sTok = new StringTokenizer(prompt);
-            int numeroDeTokensPrompt = sTok.countTokens();
+            //Given the following text, which can be in Catalan or Spanish, provide a title of up to 50 characters and a summary of the most relevant sections of up to 500 characters. The result must be translated into Catalan.
+            
             int maxTokensPrompt = geMaxTokens()-longitudDesc; //Realment la longitud desc son caracters, no tokens, pero així ens curam en salut de que tendrem espai per la resposta.
-            
-            if (numeroDeTokensPrompt>maxTokensPrompt) {
-            	prompt = tokenRemover(prompt, maxTokensPrompt);
-            }
-            
-//            prompt = prompt.substring(0, maxTokensModel);
-            
+
+            /**
+             * Utilitza la llibreria Apache OpenNLP para la tokenización básica.
+             * Pero els tokens amb el algoritme utilitzat per la llibreria no es el mateix que utilitza GPT4All.
+             * GPT4All utiliza un algoritmo de tokenización basado en técnicas de subword tokenization, como Byte Pair Encoding (BPE) o WordPiece,
+             * similares a las utilizadas por otros modelos de lenguaje basados en transformers.
+             * Estas técnicas dividen las palabras en subcomponentes más pequeños, lo que puede resultar en un mayor número de tokens comparado con la tokenización basada en palabras.
+             * 
+             * Per tant, durant les proves realitzades, s'ha comprovat que el metode reduceTokens conta aproximadament el doble de tokens que GPT4All.
+             * 
+             * Si passam algun dia a Java8, podrem utilitzar la llibreria propia de com.hexadevlabs gpt4all-java-bindings 0.1.0 que hauria de ser més aproximada.
+             */
+            prompt = reduceTokens(prompt, maxTokensPrompt/2);
+
             rootNode.put("prompt", prompt);
 
             String input = mapper.writeValueAsString(rootNode);
@@ -134,9 +144,6 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
             
             WebResource webResource = client.resource(gptUrl);
             response = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, input);
-
-            
-            
             
 	        String summaryText = null;
 	        String titleText = null;
@@ -304,28 +311,35 @@ public class SummarizePluginGPT extends RipeaAbstractPluginProperties implements
         }
         return jerseyClient;
     }
-
-  //int n Número de tokens a eliminar desde el final
-    private String tokenRemover(String texto, int n) {
-
-    	StringTokenizer tokenizer = new StringTokenizer(texto);
-    	int totalTokens = tokenizer.countTokens();
-
-    	// Si n es mayor o igual al número total de tokens, devolver una cadena vacía
-    	if (n >= totalTokens) {
-    		return "";
+    
+    public String reduceTokens(String promptInicial, int maxTokens) {
+    	
+    	SimpleTokenizer tokenizer = SimpleTokenizer.INSTANCE;
+    	String[] tokens = tokenizer.tokenize(promptInicial);
+    	
+    	if (tokens.length > maxTokens) {
+    		String[] reducedTokens = new String[maxTokens];
+    		System.arraycopy(tokens, 0, reducedTokens, 0, maxTokens);
+    		tokens = reducedTokens;
+    		
+        	// Volver a formar un String a partir de los tokens reducidos usando StringBuilder
+        	StringBuilder reducedTextBuilder = new StringBuilder();
+        	for (String token : tokens) {
+    	    	if (reducedTextBuilder.length() > 0) {
+    	    		reducedTextBuilder.append(" ");
+    	    	}
+    	    	reducedTextBuilder.append(token);
+        	}
+        	String resultat = reducedTextBuilder.toString();
+        	
+        	String[] tokensFinals = tokenizer.tokenize(resultat);
+        	logger.debug("Summarize tokens reduits de "+tokens.length+" a "+tokensFinals.length);
+        	
+        	return resultat;
+        	
+    	} else {
+    		return 	promptInicial;
     	}
-
-    	// Construir el nuevo String sin los últimos n tokens
-    	StringBuilder resultado = new StringBuilder();
-    	for (int i = 0; i < totalTokens - n; i++) {
-	    	resultado.append(tokenizer.nextToken());
-	    	if (i < totalTokens - n - 1) {
-	    		resultado.append(" ");
-	    	}
-    	}
-
-    	return resultado.toString();
     }
     
     private String getUrl() {

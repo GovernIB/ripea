@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.TextPosition;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.fundaciobit.plugins.certificate.InformacioCertificat;
@@ -4313,6 +4314,20 @@ public class PluginHelper {
 
 		try (PDDocument document = PDDocument.load(bytes)) {
 			if (!document.isEncrypted()) {
+				/*PDFTextStripper pdfStripper = new PDFTextStripper() {
+					@Override
+					protected void writeString(String text, List<TextPosition> textPositions) throws IOException {
+						// Aquí puedes añadir lógica para ignorar cabeceras y pies de página
+						if (!isHeaderOrFooter(text)) {
+							super.writeString(text, textPositions);
+						}
+					}
+
+					private boolean isHeaderOrFooter(String text) {
+						// Implementa tu lógica para identificar cabeceras y pies de página
+						return text.contains("Header") || text.contains("Footer");
+					}
+				};*/
 				PDFTextStripper pdfStripper = new PDFTextStripper();
 				text = pdfStripper.getText(document);
 			} else {
