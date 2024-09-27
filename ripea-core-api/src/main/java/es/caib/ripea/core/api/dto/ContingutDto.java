@@ -3,41 +3,44 @@
  */
 package es.caib.ripea.core.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.voodoodyne.jackson.jsog.JSOGGenerator;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.voodoodyne.jackson.jsog.JSOGGenerator;
-
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * Informació d'un contingut.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
 @Setter
-@JsonIdentityInfo(generator=JSOGGenerator.class)
+@ToString(onlyExplicitlyIncluded = true)
+@JsonIdentityInfo(generator = JSOGGenerator.class)
 public abstract class ContingutDto extends AuditoriaDto {
 
+	@ToString.Include
 	protected Long id;
+	@ToString.Include
 	protected String nom;
 	protected List<ContingutDto> fills;
-	
+
 	protected Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument;
 	protected Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat;
-	
+
 	protected List<ContingutDto> path;
 	protected ExpedientDto expedientPare;
 	protected EntitatDto entitat;
+	@ToString.Include
 	protected int esborrat;
+	@ToString.Include
 	protected String arxiuUuid;
 	protected Date arxiuDataActualitzacio;
 	protected Date darrerMovimentData;
@@ -47,12 +50,12 @@ public abstract class ContingutDto extends AuditoriaDto {
 	private boolean hasFills;
 	protected Date esborratData;
 	private boolean admin;
-	
+
 	private boolean conteDocumentsDefinitius;
 	private boolean conteDocumentsPendentsReintentsArxiu;
 
 	protected int ordre;
-	
+
 	public boolean isEsborrat() {
 		return esborrat > 0;
 	}
@@ -134,11 +137,11 @@ public abstract class ContingutDto extends AuditoriaDto {
 		return "/ " + nom;
 	}
 
-	
+
 	public List<ContingutDto> getFillsHierarchical() {
 		return fills;
 	}
-	
+
 	public List<ContingutDto> getFillsFlat() {
 		List<ContingutDto> fillsFlat = new ArrayList<ContingutDto>();
 		if (fills != null) {
@@ -148,8 +151,8 @@ public abstract class ContingutDto extends AuditoriaDto {
 		}
 		return fillsFlat;
 	}
-	
-	
+
+
 	public void getFillsFlat(ContingutDto contenidor, List<ContingutDto> fillsFlat) {
 		if (contenidor instanceof CarpetaDto) {
 			if (contenidor.getFills() != null) {
@@ -161,13 +164,11 @@ public abstract class ContingutDto extends AuditoriaDto {
 			fillsFlat.add(contenidor);
 		}
 	}
-	
-	
+
+
 	public int getFillsFlatCount() {
 		return getFillsFlat().size();
 	}
-	
-	
 
 
 	public int getFillsHierarchicalCount() {
@@ -179,7 +180,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 				count++;
 				// No contar resultat concatenació i zip
 				if (contenidor.isDocument() &&
-						((DocumentDto)contenidor).getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
+						((DocumentDto) contenidor).getDocumentTipus().equals(DocumentTipusEnumDto.VIRTUAL)) {
 					count--;
 				}
 			}
@@ -213,7 +214,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 	public boolean isReplicatDinsArxiu() {
 		return arxiuUuid != null;
 	}
-	
+
 	public Long getExpedientId() {
 		ExpedientDto expedient = getExpedientObject();
 		if (expedient != null) {
@@ -222,7 +223,7 @@ public abstract class ContingutDto extends AuditoriaDto {
 			return null;
 		}
 	}
-	
+
 	public ExpedientDto getExpedientObject() {
 		if (isExpedient()) {
 			return ((ExpedientDto) this);
@@ -271,11 +272,6 @@ public abstract class ContingutDto extends AuditoriaDto {
 		} else {
 			return null;
 		}
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
 	}
 
 	protected abstract ContingutDto copiarContenidor(ContingutDto original);

@@ -42,6 +42,8 @@ import es.caib.ripea.core.security.ExtendedPermission;
 import es.caib.ripea.plugin.arxiu.ArxiuContingutTipusEnum;
 import es.caib.ripea.plugin.arxiu.ArxiuDocumentContingut;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatEnviament;
+import lombok.Builder;
+import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,735 +147,693 @@ public class ContingutHelper {
 	@Autowired
 	private DocumentNotificacioRepository documentNotificacioRepository;
 
+	private static final int NO_ESBORRAT = 0;
 
+	@Builder
+	@Data
+	public static class ToContingutParams {
+		private boolean ambPermisos;
+		private boolean ambFills;
+		private boolean ambDades;
+		private boolean ambPath;
+		private boolean pathNomesFinsExpedientArrel;
+		private boolean ambVersions;
+		private String rolActual;
+		private boolean onlyForList;
+		private Long organActualId;
+		private boolean onlyFirstDescendant;
+		private int level;
+		private ExpedientDto expedientDto;
+		private List<ContingutDto> pathDto;
+		private boolean ambExpedientPare;
+		private boolean ambEntitat;
+		private boolean ambMapPerTipusDocument;
+		private boolean ambMapPerEstat;
+
+		public void addLevel() {
+			this.level++;
+		}
+	}
+	
 
 	public ContingutDto toContingutDto(
 			ContingutEntity contingut, 
 			boolean ambPath, 
 			boolean pathNomesFinsExpedientArrel) {
 		return toContingutDto(
-				contingut,
-				false,
-				false,
-				false,
-				ambPath,
-				pathNomesFinsExpedientArrel,
-				false,
-				null,
-				false,
-				null,
-				false,
-				0,
-				null,
-				null,
-				false,
-				false,
-				false, 
-				false);
+				contingut, 
+				ToContingutParams.builder()
+						.ambPath(ambPath)
+						.pathNomesFinsExpedientArrel(pathNomesFinsExpedientArrel)
+						.build());
 	}
-	
-	
-	public ContingutDto toContingutDto(
-			ContingutEntity contingut,
-			boolean ambPermisos,
-			boolean ambFills,
-			boolean ambDades,
-			boolean ambPath,
-			boolean pathNomesFinsExpedientArrel,
-			boolean ambVersions,
-			String rolActual,
-			boolean onlyForList,
-			Long organActualId,
-			boolean onlyFirstDescendant, 
-			int level, 
-			ExpedientDto expedientDto, 
-			List<ContingutDto> pathDto, 
-			boolean ambExpedientPare, 
-			boolean ambEntitat, 
-			boolean ambMapPerTipusDocument, 
-			boolean ambMapPerEstat) {
-		level++;
+
+	public ContingutDto toContingutDto(ContingutEntity contingut,
+									   boolean ambPermisos,
+									   boolean ambFills,
+									   boolean ambDades,
+									   boolean ambPath,
+									   boolean pathNomesFinsExpedientArrel,
+									   boolean ambVersions,
+									   String rolActual,
+									   boolean onlyForList,
+									   Long organActualId,
+									   boolean onlyFirstDescendant,
+									   int level,
+									   ExpedientDto expedientDto,
+									   List<ContingutDto> pathDto,
+									   boolean ambExpedientPare,
+									   boolean ambEntitat,
+									   boolean ambMapPerTipusDocument,
+									   boolean ambMapPerEstat) {
+		return toContingutDto(
+				contingut, 
+				ToContingutParams.builder()
+						.ambPermisos(ambPermisos)
+						.ambFills(ambFills)
+						.ambDades(ambDades)
+						.ambPath(ambPath)
+						.pathNomesFinsExpedientArrel(pathNomesFinsExpedientArrel)
+						.ambVersions(ambVersions)
+						.rolActual(rolActual)
+						.onlyForList(onlyForList)
+						.organActualId(organActualId)
+						.onlyFirstDescendant(onlyFirstDescendant)
+						.level(level)
+						.expedientDto(expedientDto)
+						.pathDto(pathDto)
+						.ambExpedientPare(ambExpedientPare)
+						.ambEntitat(ambEntitat)
+						.ambMapPerTipusDocument(ambMapPerTipusDocument)
+						.ambMapPerEstat(ambMapPerEstat)
+						.build());
+	}
+
+	public ContingutDto toContingutDto(ContingutEntity contingut, ToContingutParams params) {
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(contingut.getId()));
-		ContingutDto resposta = null;
-		MetaNodeDto metaNode = null;
-		// Crea el contenidor del tipus correcte
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
-		// ##################### EXPEDIENT ##################################
-		if (deproxied instanceof ExpedientEntity) {
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto start (" + contingut.getId() + ", level=" + level + ") ");
-			long t1 = System.currentTimeMillis();
 
-			ExpedientEntity expedient = (ExpedientEntity)deproxied;
-			ExpedientDto dto = new ExpedientDto();
+		params.addLevel();
+		ContingutDto resposta = createDtoFromEntity(deproxied, params);
 
-			dto.setEstat(expedient.getEstat());
-			dto.setNumero(expedient.getNumero());
-			dto.setAgafatPer(
-					conversioTipusHelper.convertir(
-							expedient.getAgafatPer(),
-							UsuariDto.class));
-			dto.setValid(
-					cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+		long t1 = System.currentTimeMillis();
+		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase() + "] start (" + contingut.getId();
+		logMsg("toContingutDto[" + tipus + ", level=" + params.getLevel() + ") ");
 
-			// expedient estat
-			if (expedient.getEstatAdditional() != null) {
-				dto.setExpedientEstat(conversioTipusHelper.convertir(
-						expedient.getEstatAdditional(),
-						ExpedientEstatDto.class));
-			}
-			
-			if (ambPermisos) {
-				omplirPermisosPerExpedient(dto, rolActual, contingut.getId());
-			}
-			
-			dto.setNumSeguidors(expedient.getSeguidors().size());
-			dto.setNumComentaris(expedient.getComentaris().size());
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null) {
-				UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
-				if (expedient.getSeguidors().contains(usuariActual))
-					dto.setSeguidor(true);
-			}
-			dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
-			dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
-			dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
-			dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
-			metaNode = conversioTipusHelper.convertir(
-					expedient.getMetaNode(),
-					MetaExpedientDto.class);
-			dto.setMetaNode(metaNode);
+		setExpedientBasicProperties(resposta, contingut);
+		setAlerta(resposta, contingut);
 
-//			dto.setConteDocumentsDefinitius(conteDocumentsDefinitius(contingut));
-
-			Boolean conteDocumentsDefinitiusSelect = documentRepository.expedientHasDocumentsDefinitius(expedient);
-			dto.setConteDocumentsDefinitius(conteDocumentsDefinitiusSelect);
-			dto.setConteDocuments(CollectionUtils.isNotEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0)));
-			dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));	
-			dto.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient)));	
-			dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
-			dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));	
-
-			dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(),InteressatDto.class));
-			dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
-			dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
-
-			if (onlyForList) {
-				dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
-				dto.setRolActualAdminEntitatOAdminOrgan(entityComprovarHelper.comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual));
-				dto.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedient));
-				dto.setExpedientAgafatPerUsuariActual(entityComprovarHelper.comprovarSiExpedientAgafatPerUsuariActual(expedient));
-				dto.setRolActualPermisPerModificarExpedient(entityComprovarHelper.comprovarSiRolTePermisPerModificarExpedient(expedient, rolActual));
-				dto.setPotReobrir(entityComprovarHelper.comprovarSiEsPotReobrirExpedient(expedient));
-			}
-			
-			if (!onlyForList) {
-				dto.setTancatData(expedient.getTancatData());
-				dto.setTancatMotiu(expedient.getTancatMotiu());
-				dto.setAny(expedient.getAny());
-				dto.setSequencia(expedient.getSequencia());
-				dto.setCodi(expedient.getCodi());
-				dto.setNtiVersion(expedient.getNtiVersion());
-				dto.setNtiIdentificador(expedient.getNtiIdentificador());
-				dto.setNtiOrgano(expedient.getNtiOrgano());
-				dto.setNtiOrganoDescripcio(expedient.getNtiOrgano());
-				dto.setNtiFechaApertura(expedient.getNtiFechaApertura());
-				dto.setNtiClasificacionSia(expedient.getNtiClasificacionSia());
-				dto.setSistraPublicat(expedient.isSistraPublicat());
-				dto.setSistraUnitatAdministrativa(expedient.getSistraUnitatAdministrativa());
-				dto.setSistraClau(expedient.getSistraClau());
-				dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions( ).isEmpty() ? true : false);
-
-
-				dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
-				dto.setConteDocumentsFirmats(
-						documentRepository.countByExpedientAndEstat(
-								expedient,
-								DocumentEstatEnumDto.CUSTODIAT) > 0);
-				dto.setHasAllDocumentsDefinitiu(documentRepository.hasAllDocumentsDefinitiu(expedient));
-				// expedient estat
-				if (expedient.getEstatAdditional() != null) {
-					ExpedientEstatEntity estat =  expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getEstatAdditional().getMetaExpedient(), expedient.getEstatAdditional().getOrdre()+1);
-					if (estat != null) {
-						dto.setExpedientEstatNextInOrder(estat.getId());
-					} else {//if there is no estat with higher order, choose previous
-						dto.setExpedientEstatNextInOrder(expedient.getEstatAdditional().getId());
-					}
-				}
-
-				dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
-
-				dto.setOrganGestorId(expedient.getOrganGestor() != null ? expedient.getOrganGestor().getId() : null);
-				dto.setOrganGestorText(expedient.getOrganGestor() != null ?
-						expedient.getOrganGestor().getCodi() + " - " + expedient.getOrganGestor().getNom() : "");
-			
-			
-			
-				if (ambMapPerTipusDocument) {
-					if (cacheHelper.mostrarLogsRendiment())
-						logger.info("ambMapPerTipusDocument start (" + contingut.getId() + ")");
-					long t2 = System.currentTimeMillis();
-
-					Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new LinkedHashMap<MetaDocumentDto, List<ContingutDto>>();
-
-					List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
-					
-					for (MetaDocumentEntity metaDocument : metaDocuments) {
-						
-						List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(
-								expedient,
-								metaDocument,
-								0);
-						
-						MetaDocumentDto metaDocumentDto = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
-						
-						
-						List<ContingutDto> docsDtos = new ArrayList<ContingutDto>(); 
-						if (CollectionUtils.isNotEmpty(documents)) {
-							for (DocumentEntity document : documents) {
-								
-								docsDtos.add(
-										toContingutDto(
-												document,
-												ambPermisos,
-												false,
-												false,
-												ambPath,
-												false,
-												false,
-												rolActual,
-												onlyForList,
-												organActualId,
-												onlyFirstDescendant,
-												level,
-												null,
-												null,
-												ambExpedientPare,
-												ambEntitat,
-												false,
-												ambMapPerEstat));
-								
-							}
-						} 
-						mapPerTipusDocument.put(metaDocumentDto, docsDtos);
-						
-					}
-					dto.setMapPerTipusDocument(mapPerTipusDocument);
-					
-					if (cacheHelper.mostrarLogsRendiment())
-						logger.info("ambMapPerTipusDocument end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-				}		
-				if (ambMapPerEstat) {
-					if (cacheHelper.mostrarLogsRendiment())
-						logger.info("ambMapPerEstat start (" + contingut.getId() + ")");
-					long t2 = System.currentTimeMillis();
-
-					Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat = new LinkedHashMap<ExpedientEstatDto, List<ContingutDto>>();
-
-					List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
-					
-					for (ExpedientEstatEntity expedientEstat : expedientEstats) {
-						
-						List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalAndEsborrat(
-								expedient,
-								expedientEstat,
-								0);
-						
-						ExpedientEstatDto expedientEstatDto = conversioTipusHelper.convertir(expedientEstat, ExpedientEstatDto.class);
-						
-						
-						List<ContingutDto> docsDtos = new ArrayList<ContingutDto>(); 
-						if (CollectionUtils.isNotEmpty(documents)) {
-							for (DocumentEntity document : documents) {
-								
-								docsDtos.add(
-										toContingutDto(
-												document,
-												ambPermisos,
-												false,
-												false,
-												ambPath,
-												false,
-												false,
-												rolActual,
-												onlyForList,
-												organActualId,
-												onlyFirstDescendant,
-												level,
-												null,
-												null,
-												ambExpedientPare,
-												ambEntitat,
-												false,
-												false));
-								
-								
-							}
-						} 
-						mapPerEstat.put(expedientEstatDto, docsDtos);
-						
-					}
-
-					List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalIsNullAndEsborrat(expedient, 0);
-
-					List<ContingutDto> docsDtos = new ArrayList<ContingutDto>();
-					if (CollectionUtils.isNotEmpty(documents)) {
-						for (DocumentEntity document : documents) {
-							docsDtos.add(
-									toContingutDto(
-											document,
-											ambPermisos,
-											false,
-											false,
-											ambPath,
-											false,
-											false,
-											rolActual,
-											onlyForList,
-											organActualId,
-											onlyFirstDescendant,
-											level,
-											null,
-											null,
-											ambExpedientPare,
-											ambEntitat,
-											false,
-											false));
-
-
-						}
-
-						mapPerEstat.put(new ExpedientEstatDto("Sense estat", 0L), docsDtos);
-					}
-
-					dto.setMapPerEstat(mapPerEstat);
-					
-					if (cacheHelper.mostrarLogsRendiment())
-						logger.info("ambMapPerEstat end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-				}	
-
-			}
-			
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
-
-			resposta = dto;
-		// ##################### DOCUMENT ##################################
-		} else if (deproxied instanceof DocumentEntity) {
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto start (" + contingut.getId() + ", level=" + level + ") ");
-			long t2 = System.currentTimeMillis();
-			long t10 = System.currentTimeMillis();
-			DocumentEntity document = (DocumentEntity)deproxied;
-			DocumentDto dto = new DocumentDto();
-			dto.setDescripcio(document.getDescripcio());
-			dto.setDocumentTipus(document.getDocumentTipus());
-			dto.setEstat(document.getEstat());
-			dto.setUbicacio(document.getUbicacio());
-			dto.setData(document.getData());
-			dto.setCustodiaData(document.getCustodiaData());
-			dto.setCustodiaId(document.getCustodiaId());
-			if (document.getFitxerNom() != null) {
-				dto.setFitxerNom(document.getFitxerNom());
-				dto.setFitxerNomEnviamentPortafirmes(
-						pluginHelper.conversioConvertirPdfArxiuNom(document.getFitxerNom()));
-			}
-			dto.setFitxerContentType(document.getFitxerContentType());
-			dto.setFitxerTamany(document.getFitxerTamany());
-			dto.setDataCaptura(document.getDataCaptura());
-			dto.setVersioDarrera(document.getVersioDarrera());
-			dto.setVersioCount(document.getVersioCount());
-			if (ambVersions && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == 0) {
-				List<ContingutArxiu> arxiuVersions = pluginHelper.arxiuDocumentObtenirVersions(document);
-				if (arxiuVersions != null) {
-					List<DocumentVersioDto> versions = new ArrayList<DocumentVersioDto>();
-					for (ContingutArxiu arxiuVersio: arxiuVersions) {
-						DocumentVersioDto versio = new DocumentVersioDto();
-						versio.setArxiuUuid(arxiuVersio.getIdentificador());
-						versio.setId(arxiuVersio.getVersio());
-						versions.add(versio);
-					}
-					dto.setVersions(versions);
-				}
-			}
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto 1/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t10) + " ms");
-			long t20 = System.currentTimeMillis();
-			dto.setNtiVersion(document.getNtiVersion());
-			dto.setNtiIdentificador(document.getNtiIdentificador());
-			dto.setNtiOrgano(document.getNtiOrgano());
-			dto.setNtiOrganoDescripcio(document.getNtiOrgano());
-			dto.setNtiOrigen(document.getNtiOrigen());
-			dto.setNtiEstadoElaboracion(document.getNtiEstadoElaboracion());
-			dto.setNtiTipoDocumental(document.getNtiTipoDocumental());
-			if (document.getNtiTipoDocumental() != null) {
-				TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(
-						document.getNtiTipoDocumental(),
-						contingut.getEntitat());
-
-				if (tipusDocumental != null) {
-	            	if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
-	            		dto.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
-					} else {
-						dto.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
-					}
-				} else {
-					List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
-
-					for (TipusDocumentalDto docAddicional : docsAddicionals) {
-						if (docAddicional.getCodi().equals(document.getNtiTipoDocumental())) {
-							dto.setNtiTipoDocumentalNom(docAddicional.getNom());
-						}
-					}
-				}
-			}
-			dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
-			dto.setNtiTipoFirma(document.getNtiTipoFirma());
-			dto.setNtiCsv(document.getNtiCsv());
-			dto.setNtiCsvRegulacion(document.getNtiCsvRegulacion());
-//			dto.setAmbNotificacions(document.isAmbNotificacions());
-			dto.setAmbNotificacions(documentNotificacioRepository.countByDocument(document) > 0);
-//			dto.setEstatDarreraNotificacio(document.getEstatDarreraNotificacio());
-			DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocument(document);
-			dto.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
-//			dto.setErrorDarreraNotificacio(document.isErrorDarreraNotificacio());
-			Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocument(document);
-			dto.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
-//			dto.setErrorEnviamentPortafirmes(document.isErrorEnviamentPortafirmes());
-			Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocument(document);
-			dto.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
-			dto.setGesDocFirmatId(document.getGesDocFirmatId());
-			dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
-			dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
-
-			dto.setDocFromAnnex(document.isDocFromAnnex()); 
-			dto.setEstat(document.getEstat());
-			
-			if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
-				RegistreAnnexEntity annex = document.getAnnexos().get(0);
-				String error = annex.getError();
-				if (error != null && !error.isEmpty()) {
-					dto.setPendentMoverArxiu(true);
-				}
-				dto.setAnnexId(annex.getId());
-				dto.setDocumentDeAnotacio(true);
-			}
-
-			metaNode = conversioTipusHelper.convertir(
-					document.getMetaNode(),
-					MetaDocumentDto.class);
-			dto.setMetaNode(metaNode);
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto 2/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t20) + " ms");
-
-			long t3 = System.currentTimeMillis();
-			dto.setValid(
-					cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
-			dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
-			dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
-			dto.setEstat(document.getEstat());
-			dto.setArxiuEstat(document.getArxiuEstat());
-			dto.setArxiuEstatDefinitiu(document.isArxiuEstatDefinitiu());
-			dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
-			
-			resposta = dto;
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto 3/3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
-
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toDocumentDto end (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-		// ##################### CARPETA ##################################
-		} else if (deproxied instanceof CarpetaEntity) {
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toCarpetaDto start (" + contingut.getId() + ", level=" + level + ") ");
-			
-			long t2 = System.currentTimeMillis();
-			CarpetaDto dto = new CarpetaDto();
-			CarpetaEntity carpeta = (CarpetaEntity)deproxied;
-			if (carpeta.getExpedientRelacionat() != null)
-				dto.setExpedientRelacionat(
-						(ExpedientDto)toContingutDto(
-								carpeta.getExpedientRelacionat(),
-								false,
-								false,
-								false,
-								false,
-								false,
-								false,
-								null,
-								true,
-								null,
-								onlyFirstDescendant,
-								level,
-								null,
-								null,
-								ambExpedientPare,
-								ambEntitat,
-								ambMapPerTipusDocument,
-								ambMapPerEstat));
-			
-//			boolean conteDocsDef = conteDocumentsDefinitius(contingut);
-			Boolean conteDocsDef = documentRepository.carpetaHasDocumentsDefinitius(carpeta);
-			dto.setConteDocumentsDefinitius(conteDocsDef);
-			resposta = dto;
-			
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("toCarpetaDto end (" + carpeta.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+		if (!params.isOnlyForList()) {
+			setExpedientDetailedProperties(resposta, contingut, params);
+			setExpedientPare(resposta, contingut, params);
+			List<ContingutDto> pathCalculatPerFills = calculaPathPerFills(resposta, contingut, params);
+			setFills(resposta, contingut, params, pathCalculatPerFills);
 		}
+		logMsg("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + params.getLevel() + "): "+ (System.currentTimeMillis() - t1) + " ms");
 
-		
-		// ##################### CONTINGUT ##################################
-		long t3 = System.currentTimeMillis();
-		
-		long t234 = System.currentTimeMillis();
-		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase();
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("propertiesContingut1 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t234) + " ms");
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toContingutDto[" + tipus + "] start (" + contingut.getId() + ", level=" + level + ") ");
-		
-		long t23 = System.currentTimeMillis();
+		return resposta;
+	}
+
+	private ContingutDto createDtoFromEntity(ContingutEntity deproxied, ToContingutParams params) {
+		if (deproxied instanceof ExpedientEntity) {
+			return createExpedientDto((ExpedientEntity) deproxied, params);
+		} else if (deproxied instanceof DocumentEntity) {
+			return createDocumentDto((DocumentEntity) deproxied, params);
+		} else if (deproxied instanceof CarpetaEntity) {
+			return createCarpetaDto((CarpetaEntity) deproxied, params);
+		}
+		return null;
+	}
+
+	private void setExpedientBasicProperties(ContingutDto resposta, ContingutEntity contingut) {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
 		resposta.setCreatedDate(contingut.getCreatedDate().toDate());
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("propertiesContingut2 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t23) + " ms");
+	}
 
-		
-		long t22 = System.currentTimeMillis();
-		resposta.setAlerta(
-				alertaRepository.countByLlegidaAndContingutId(
-				false,
-				contingut.getId()) > 0);
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("setAlerta time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t22) + " ms");
+	private void setAlerta(ContingutDto resposta, ContingutEntity contingut) {
+		long t1 = System.currentTimeMillis();
+		resposta.setAlerta(alertaRepository.countByLlegidaAndContingutId(false, contingut.getId()) > 0);
+		logMsg("setAlerta time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
 
-		if (!onlyForList) {
+	private void setExpedientDetailedProperties(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
+		long t1 = System.currentTimeMillis();
+		resposta.setEsborrat(contingut.getEsborrat());
+		resposta.setEsborratData(contingut.getEsborratData());
+		resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
+		resposta.setHasFills(contingutRepository.hasFills(contingut, NO_ESBORRAT));
+		logMsg("setDetailedProperties time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 
-			long t2341 = System.currentTimeMillis();
-
-			resposta.setEsborrat(contingut.getEsborrat());
-			resposta.setEsborratData(contingut.getEsborratData());
-			resposta.setArxiuDataActualitzacio(contingut.getArxiuDataActualitzacio());
-
-			Boolean hasFills = contingutRepository.hasFills(
-					contingut, 
-					0);
-			if (hasFills) {
-				resposta.setHasFills(true);
-			} else {
-				resposta.setHasFills(false);
-			}
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("propertiesContingut3 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2341) + " ms");
-
-			
-			if (ambEntitat) {
-				long t2342 = System.currentTimeMillis();
-				resposta.setEntitat(
-						conversioTipusHelper.convertir(
-								contingut.getEntitat(),
-									EntitatDto.class));
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("propertiesContingut4 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2342) + " ms");
-			}
-
-			
-			if (contingut.getDarrerMoviment() != null) {
-				long t1 = System.currentTimeMillis();
-				ContingutMovimentEntity darrerMoviment = contingut.getDarrerMoviment();
-				resposta.setDarrerMovimentUsuari(
-						conversioTipusHelper.convertir(
-								darrerMoviment.getRemitent(),
-								UsuariDto.class));
-				resposta.setDarrerMovimentData(darrerMoviment.getCreatedDate().toDate());
-				resposta.setDarrerMovimentComentari(darrerMoviment.getComentari());
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("propertiesContingut5 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
-			}
-
-			if (ambPermisos) {
-				
-				long t2 = System.currentTimeMillis();
-				resposta.setAdmin(checkIfUserIsAdminOfContingut(contingut.getId(), rolActual));
-				
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambPermisos time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-				
-			}
-
-			long t1 = System.currentTimeMillis();
-			// Omple la informació d'auditoria
-			resposta.setCreatedBy(
-					conversioTipusHelper.convertir(
-							contingut.getCreatedBy(),
-							UsuariDto.class));
-			resposta.setLastModifiedBy(
-					conversioTipusHelper.convertir(
-							contingut.getLastModifiedBy(),
-							UsuariDto.class));
-			resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
-			if (cacheHelper.mostrarLogsRendiment())
-				logger.info("propertiesContingut6 time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
-			
-
-			if (ambDades && contingut instanceof NodeEntity) {
-				long t2 = System.currentTimeMillis();
-				NodeEntity node = (NodeEntity)contingut;
-				List<DadaEntity> dades = dadaRepository.findByNode(node);
-				((NodeDto)resposta).setDades(
-						conversioTipusHelper.convertirList(
-								dades,
-								DadaDto.class));
-				for (int i = 0; i < dades.size(); i++) {
-					((NodeDto)resposta).getDades().get(i).setValor(dades.get(i).getValor());
-				}
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambDades time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-			}
-			
-			
-			
-			ExpedientDto expedientCalculat = null;
-			if (ambExpedientPare) {
-				if (contingut instanceof ExpedientEntity) { //if is expedient
-					expedientCalculat = (ExpedientDto) resposta;
-				} else {
-					if (expedientDto != null) { //if is called recursively from pare that already calculated expedient
-						expedientCalculat = expedientDto;
-					} else { //if is not called recursively from pare that already calculated expedient, calculate expedient now
-						long t2 = System.currentTimeMillis();
-						if (cacheHelper.mostrarLogsRendiment())
-							logger.info("expedientPare (recursive) start (" + contingut.getId() + ") " );
-	
-						expedientCalculat = (ExpedientDto) toContingutDto(
-								contingut.getExpedient(),
-								ambPermisos,
-								false,
-								true,
-								false,
-								false,
-								false,
-								rolActual,
-								onlyForList,
-								organActualId,
-								onlyFirstDescendant,
-								level,
-								null,
-								null,
-								ambExpedientPare, 
-								ambEntitat, 
-								ambMapPerTipusDocument, 
-								ambMapPerEstat);
-						if (cacheHelper.mostrarLogsRendiment())
-							logger.info("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-					}
-					resposta.setExpedientPare(expedientCalculat);
-				}
-			}
-			
-			List<ContingutDto> pathCalculatPerFills = null;
-			List<ContingutDto> pathCalculatPerThisContingut = null;
-			if (ambPath) {
-				if (contingut instanceof ExpedientEntity) { //if is expedient
-					pathCalculatPerThisContingut = null;
-				} else {
-					if (pathDto != null) { //if is called recursively from pare that already calculated path
-						pathCalculatPerThisContingut = pathDto;
-					} else { //if is not called recursively from pare that already calculated path, calculate path now
-						long t2 = System.currentTimeMillis();
-						if (cacheHelper.mostrarLogsRendiment())
-							logger.info("ambPath (recursive) start (" + contingut.getId() + ") " );
-						pathCalculatPerThisContingut = getPathContingutComDto(
-								contingut,
-								ambPermisos,
-								pathNomesFinsExpedientArrel, level);
-						if (cacheHelper.mostrarLogsRendiment())
-							logger.info("ambPath (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-						
-					}
-				}
-				resposta.setPath(pathCalculatPerThisContingut);
-			
-			
-				pathCalculatPerFills = new ArrayList<>();
-				if (pathCalculatPerThisContingut != null) {
-					pathCalculatPerFills.addAll(pathCalculatPerThisContingut);
-				}
-				pathCalculatPerFills.add(resposta);
-
-			}
-			
-			if (ambFills) {
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambFills (recursive) start (" + contingut.getId() + ")");
-				
-				long t2 = System.currentTimeMillis();
-				// Cerca els nodes fills
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-				List<ContingutEntity> fills = new ArrayList<ContingutEntity>();
-				
-				if (isOrdenacioPermesa()) {
-					fills = contingutRepository.findByPareAndEsborratAndOrdenatOrdre(contingut, 0);
-				} else {
-					fills = contingutRepository.findByPareAndEsborratAndOrdenat(contingut, 0);
-				}
-				
-				List<ContingutDto> fillsDtos = new ArrayList<ContingutDto>();
-				for (ContingutEntity fill: fills) {
-					if (fill.getEsborrat() == 0) {
-						ContingutDto fillDto = toContingutDto(
-								fill,
-								ambPermisos,
-								onlyFirstDescendant ? false : true,
-								false,
-								ambPath,
-								false,
-								false,
-								rolActual,
-								onlyForList,
-								organActualId,
-								onlyFirstDescendant,
-								level,
-								expedientCalculat,
-								pathCalculatPerFills,
-								ambExpedientPare,
-								ambEntitat,
-								ambMapPerTipusDocument,
-								ambMapPerEstat);
-						// Configura el pare de cada fill
-						fillsDtos.add(fillDto);
-					}
-				}
-
-				resposta.setFills(fillsDtos);
-				
-				if (cacheHelper.mostrarLogsRendiment())
-					logger.info("ambFills (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
-			}
-
-
+		if (params.isAmbEntitat()) {
+			t1 = System.currentTimeMillis();
+			resposta.setEntitat(conversioTipusHelper.convertir(contingut.getEntitat(), EntitatDto.class));
+			logMsg("setEntitat time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		}
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + level + "): "+ (System.currentTimeMillis() - t3) + " ms");
-		return resposta;
+
+		if (contingut.getDarrerMoviment() != null) {
+			setDarrerMoviment(resposta, contingut);
+		}
+
+		if (params.isAmbPermisos()) {
+			t1 = System.currentTimeMillis();
+			resposta.setAdmin(checkIfUserIsAdminOfContingut(contingut.getId(), params.getRolActual()));
+			logMsg("ambPermisos time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		}
+
+		setAuditInfo(resposta, contingut);
+
+		if (params.isAmbDades() && contingut instanceof NodeEntity) {
+			setDades((NodeDto) resposta, (NodeEntity) contingut);
+		}
+	}
+
+	private void setDarrerMoviment(ContingutDto resposta, ContingutEntity contingut) {
+		long t1 = System.currentTimeMillis();
+		ContingutMovimentEntity darrerMoviment = contingut.getDarrerMoviment();
+		resposta.setDarrerMovimentUsuari(conversioTipusHelper.convertir(darrerMoviment.getRemitent(), UsuariDto.class));
+		resposta.setDarrerMovimentData(darrerMoviment.getCreatedDate().toDate());
+		resposta.setDarrerMovimentComentari(darrerMoviment.getComentari());
+		logMsg("setDarrerMoviment time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private void setAuditInfo(ContingutDto resposta, ContingutEntity contingut) {
+		long t1 = System.currentTimeMillis();
+		resposta.setCreatedBy(conversioTipusHelper.convertir(contingut.getCreatedBy(), UsuariDto.class));
+		resposta.setLastModifiedBy(conversioTipusHelper.convertir(contingut.getLastModifiedBy(), UsuariDto.class));
+		resposta.setLastModifiedDate(contingut.getLastModifiedDate().toDate());
+		logMsg("setAuditInfo time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private void setDades(NodeDto resposta, NodeEntity node) {
+		long t1 = System.currentTimeMillis();
+		List<DadaEntity> dades = dadaRepository.findByNode(node);
+		resposta.setDades(conversioTipusHelper.convertirList(dades, DadaDto.class));
+		for (int i = 0; i < dades.size(); i++) {
+			resposta.getDades().get(i).setValor(dades.get(i).getValor());
+		}
+		logMsg("setDades time (" + node.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private void setExpedientPare(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
+		if (!params.isAmbExpedientPare()) return;
+
+		ExpedientDto expedientCalculat = calculateExpedientPare(resposta, contingut, params);
+		resposta.setExpedientPare(expedientCalculat);
+	}
+
+	private ExpedientDto calculateExpedientPare(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
+		if (contingut instanceof ExpedientEntity) {
+			return (ExpedientDto) resposta;
+		} else if (params.getExpedientDto() != null) {
+			return params.getExpedientDto();
+		} else {
+			long t1 = System.currentTimeMillis();
+			logMsg("expedientPare (recursive) start (" + contingut.getId() + ") ");
+			ExpedientDto expedientCalculat = (ExpedientDto) toContingutDto(
+					contingut.getExpedient(),
+					ToContingutParams.builder()
+							.ambPermisos(params.isAmbPermisos())
+							.rolActual(params.getRolActual())
+							.onlyForList(params.isOnlyForList())
+							.organActualId(params.getOrganActualId())
+							.onlyFirstDescendant(params.isOnlyFirstDescendant())
+							.level(params.getLevel())
+							.ambExpedientPare(params.isAmbExpedientPare())
+							.ambEntitat(params.isAmbEntitat())
+							.ambMapPerTipusDocument(params.isAmbMapPerTipusDocument())
+							.ambMapPerEstat(params.isAmbMapPerEstat())
+							.build());
+			logMsg("expedientPare (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+			return expedientCalculat;
+		}
+	}
+
+	private List<ContingutDto> calculaPathPerFills(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
+		if (!params.isAmbPath()) return null;
+
+		List<ContingutDto> pathCalculatPerFills = calculatePath(contingut, params);
+		resposta.setPath(pathCalculatPerFills);
+
+		if (pathCalculatPerFills == null) {
+			pathCalculatPerFills = new ArrayList<>();
+		}
+		pathCalculatPerFills.add(resposta);
+		return pathCalculatPerFills;
+	}
+
+	private List<ContingutDto> calculatePath(ContingutEntity contingut, ToContingutParams params) {
+		if (contingut instanceof ExpedientEntity) {
+			return null;
+		} else if (params.getPathDto() != null) {
+			return params.getPathDto();
+		} else {
+			long t1 = System.currentTimeMillis();
+			logMsg("path (recursive) start (" + contingut.getId() + ") ");
+			List<ContingutDto> pathCalculatPerThisContingut = getPathContingutComDto(contingut, params.isAmbPermisos(), params.isPathNomesFinsExpedientArrel(), params.getLevel());
+			logMsg("path (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+			return pathCalculatPerThisContingut;
+		}
+	}
+
+	private void setFills(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params, List<ContingutDto> pathCalculatPerFills) {
+		if (!params.isAmbFills()) return;
+
+		long t1 = System.currentTimeMillis();
+		logMsg("ambFills (recursive) start (" + contingut.getId() + ") ");
+
+		List<ContingutEntity> fills = isOrdenacioPermesa() ?
+				contingutRepository.findByPareAndEsborratAndOrdenatOrdre(contingut, NO_ESBORRAT) :
+				contingutRepository.findByPareAndEsborratAndOrdenat(contingut, NO_ESBORRAT);
+
+		List<ContingutDto> fillsDtos = convertFillsToDtos(fills, resposta.getExpedientPare(), params, pathCalculatPerFills);
+		resposta.setFills(fillsDtos);
+
+		logMsg("ambFills (recursive) end (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private List<ContingutDto> convertFillsToDtos(List<ContingutEntity> fills, ExpedientDto expedientCalculat, ToContingutParams params, List<ContingutDto> pathCalculatPerFills) {
+		List<ContingutDto> fillsDtos = new ArrayList<>();
+		for (ContingutEntity fill: fills) {
+			if (fill.getEsborrat() == 0) {
+				fillsDtos.add(toContingutDto(fill, createParamsForFill(params, expedientCalculat, pathCalculatPerFills)));
+			}
+		}
+		return fillsDtos;
+	}
+
+	private ToContingutParams createParamsForFill(ToContingutParams params, ExpedientDto expedientCalculat, List<ContingutDto> pathCalculatPerFills) {
+		return ToContingutParams.builder()
+				.ambPermisos(params.isAmbPermisos())
+				.ambFills(!params.isOnlyFirstDescendant())
+				.ambPath(params.isAmbPath())
+				.rolActual(params.getRolActual())
+				.onlyForList(params.isOnlyForList())
+				.organActualId(params.getOrganActualId())
+				.onlyFirstDescendant(params.isOnlyFirstDescendant())
+				.level(params.getLevel())
+				.expedientDto(expedientCalculat)
+				.pathDto(pathCalculatPerFills)
+				.ambExpedientPare(params.isAmbExpedientPare())
+				.ambEntitat(params.isAmbEntitat())
+				.ambMapPerTipusDocument(params.isAmbMapPerTipusDocument())
+				.ambMapPerEstat(params.isAmbMapPerEstat())
+				.build();
 	}
 	
-	
-	
-	public void omplirPermisosPerExpedient(
+	private ExpedientDto createExpedientDto(ExpedientEntity expedient, ToContingutParams params) {
+		long t1 = System.currentTimeMillis();
+		logMsg("toExpedientDto start (" + expedient.getId() + ", level=" + params.getLevel() + ") ");
+
+		ExpedientDto dto = muntarExpedientDtoBase(expedient);
+
+		if (params.isAmbPermisos()) {
+			omplirExpedientPermisos(dto, expedient.getId());
+		}
+		omplirExpedientSeguidor(dto, expedient);
+		omplirExpedientEstatErrors(dto, expedient);
+		omplirExpedientEstatDocuments(dto, expedient);
+
+		if (params.isOnlyForList()) {
+			omplirExpedientNomesPerLlista(dto, expedient, params.getRolActual());
+		} else {
+			omplirExpedientComplet(dto, expedient, params);
+		}
+
+		logMsg("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		return dto;
+	}
+
+	private ExpedientDto muntarExpedientDtoBase(ExpedientEntity expedient) {
+		ExpedientDto dto = new ExpedientDto();
+		dto.setEstat(expedient.getEstat());
+		dto.setNumero(expedient.getNumero());
+		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+		if (expedient.getEstatAdditional() != null) {
+			dto.setExpedientEstat(conversioTipusHelper.convertir(expedient.getEstatAdditional(), ExpedientEstatDto.class));
+		}
+		dto.setNumSeguidors(expedient.getSeguidors().size());
+		dto.setNumComentaris(expedient.getComentaris().size());
+		dto.setMetaNode(conversioTipusHelper.convertir(expedient.getMetaNode(), MetaExpedientDto.class));
+		dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(), InteressatDto.class));
+		dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
+		dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
+		return dto;
+	}
+
+	private void omplirExpedientSeguidor(ExpedientDto dto, ExpedientEntity expedient) {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
+			dto.setSeguidor(expedient.getSeguidors().contains(usuariActual));
+		}
+	}
+
+	private void omplirExpedientEstatErrors(ExpedientDto dto, ExpedientEntity expedient) {
+		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
+		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
+		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
+		dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
+	}
+
+	private void omplirExpedientEstatDocuments(ExpedientDto dto, ExpedientEntity expedient) {
+		dto.setConteDocuments(CollectionUtils.isNotEmpty(documentRepository.findByExpedientAndEsborrat(expedient, NO_ESBORRAT)));
+		dto.setConteDocumentsDefinitius(documentRepository.expedientHasDocumentsDefinitius(expedient));
+		dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));
+		dto.setConteDocumentsDePortafirmesNoCustodiats(CollectionUtils.isNotEmpty(documentRepository.findDocumentsDePortafirmesNoCustodiats(expedient)));
+		dto.setConteDocumentsPendentsReintentsArxiu(CollectionUtils.isNotEmpty(documentRepository.findDocumentsPendentsReintentsArxiu(expedient, getArxiuMaxReintentsDocuments())));
+		dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));
+	}
+
+	private void omplirExpedientNomesPerLlista(ExpedientDto dto, ExpedientEntity expedient, String rolActual) {
+		dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
+		dto.setRolActualAdminEntitatOAdminOrgan(entityComprovarHelper.comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual));
+		dto.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedient));
+		dto.setExpedientAgafatPerUsuariActual(entityComprovarHelper.comprovarSiExpedientAgafatPerUsuariActual(expedient));
+		dto.setRolActualPermisPerModificarExpedient(entityComprovarHelper.comprovarSiRolTePermisPerModificarExpedient(expedient, rolActual));
+		dto.setPotReobrir(entityComprovarHelper.comprovarSiEsPotReobrirExpedient(expedient));
+	}
+
+	private void omplirExpedientComplet(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+		omplirInformacioBasica(dto, expedient);
+		omplirInformacioDocumental(dto, expedient);
+		omplirEstatExpedient(dto, expedient);
+		dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
+		omplirOrganGestor(dto, expedient);
+
+		if (params.isAmbMapPerTipusDocument()) {
+			omplirMapPerTipusDocument(dto, expedient, params);
+		}
+
+		if (params.isAmbMapPerEstat()) {
+			omplirMapPerEstat(dto, expedient, params);
+		}
+
+	}
+
+	private void omplirInformacioBasica(ExpedientDto dto, ExpedientEntity expedient) {
+		dto.setTancatData(expedient.getTancatData());
+		dto.setTancatMotiu(expedient.getTancatMotiu());
+		dto.setAny(expedient.getAny());
+		dto.setSequencia(expedient.getSequencia());
+		dto.setCodi(expedient.getCodi());
+		dto.setNtiVersion(expedient.getNtiVersion());
+		dto.setNtiIdentificador(expedient.getNtiIdentificador());
+		dto.setNtiOrgano(expedient.getNtiOrgano());
+		dto.setNtiOrganoDescripcio(expedient.getNtiOrgano());
+		dto.setNtiFechaApertura(expedient.getNtiFechaApertura());
+		dto.setNtiClasificacionSia(expedient.getNtiClasificacionSia());
+		dto.setSistraPublicat(expedient.isSistraPublicat());
+		dto.setSistraUnitatAdministrativa(expedient.getSistraUnitatAdministrativa());
+		dto.setSistraClau(expedient.getSistraClau());
+		dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions().isEmpty());
+	}
+
+	private void omplirInformacioDocumental(ExpedientDto dto, ExpedientEntity expedient) {
+		dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
+		dto.setConteDocumentsFirmats(documentRepository.countByExpedientAndEstat(expedient, DocumentEstatEnumDto.CUSTODIAT) > 0);
+		dto.setHasAllDocumentsDefinitiu(documentRepository.hasAllDocumentsDefinitiu(expedient));
+	}
+
+	private void omplirEstatExpedient(ExpedientDto dto, ExpedientEntity expedient) {
+		if (expedient.getEstatAdditional() != null) {
+			ExpedientEstatEntity estat = expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getEstatAdditional().getMetaExpedient(), expedient.getEstatAdditional().getOrdre() + 1);
+			dto.setExpedientEstatNextInOrder(estat != null ? estat.getId() : expedient.getEstatAdditional().getId());
+		}
+	}
+
+	private void omplirOrganGestor(ExpedientDto dto, ExpedientEntity expedient) {
+		OrganGestorEntity organGestor = expedient.getOrganGestor();
+		dto.setOrganGestorId(organGestor != null ? organGestor.getId() : null);
+		dto.setOrganGestorText(organGestor != null ? organGestor.getCodi() + " - " + organGestor.getNom() : "");
+	}
+
+	private void omplirMapPerTipusDocument(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+		logMsg("ambMapPerTipusDocument start (" + expedient.getId() + ")");
+		long t1 = System.currentTimeMillis();
+
+		Map<MetaDocumentDto, List<ContingutDto>> mapPerTipusDocument = new LinkedHashMap<>();
+		List<MetaDocumentEntity> metaDocuments = metaDocumentRepository.findByMetaExpedientAndActiuTrueOrderByOrdreAsc(expedient.getMetaExpedient());
+
+		for (MetaDocumentEntity metaDocument : metaDocuments) {
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndMetaNodeAndEsborrat(expedient, metaDocument, NO_ESBORRAT);
+			MetaDocumentDto metaDocumentDto = conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class);
+
+			List<ContingutDto> docsDtos = new ArrayList<>();
+			if (CollectionUtils.isNotEmpty(documents)) {
+				for (DocumentEntity document : documents) {
+					docsDtos.add(toContingutDto(document, params));
+				}
+			}
+
+			mapPerTipusDocument.put(metaDocumentDto, docsDtos);
+		}
+
+		dto.setMapPerTipusDocument(mapPerTipusDocument);
+		logMsg("ambMapPerTipusDocument end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private void omplirMapPerEstat(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+		logMsg("ambMapPerEstat start (" + expedient.getId() + ")");
+		long t1 = System.currentTimeMillis();
+
+		Map<ExpedientEstatDto, List<ContingutDto>> mapPerEstat = new LinkedHashMap<>();
+		List<ExpedientEstatEntity> expedientEstats = expedientEstatRepository.findByMetaExpedientOrderByOrdreAsc(expedient.getMetaExpedient());
+
+		for (ExpedientEstatEntity expedientEstat : expedientEstats) {
+			List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalAndEsborrat(expedient, expedientEstat, NO_ESBORRAT);
+			ExpedientEstatDto expedientEstatDto = conversioTipusHelper.convertir(expedientEstat, ExpedientEstatDto.class);
+
+			List<ContingutDto> docsDtos = new ArrayList<>();
+			if (CollectionUtils.isNotEmpty(documents)) {
+				for (DocumentEntity document : documents) {
+					docsDtos.add(toContingutDto(document, params));
+				}
+			}
+
+			mapPerEstat.put(expedientEstatDto, docsDtos);
+		}
+
+		List<DocumentEntity> documents = documentRepository.findByExpedientAndExpedientEstatAdditionalIsNullAndEsborrat(expedient, NO_ESBORRAT);
+
+		List<ContingutDto> docsDtos = new ArrayList<>();
+		if (CollectionUtils.isNotEmpty(documents)) {
+			for (DocumentEntity document : documents) {
+				docsDtos.add(toContingutDto(document, params));
+			}
+
+			mapPerEstat.put(new ExpedientEstatDto("Sense estat", 0L), docsDtos);
+		}
+
+		dto.setMapPerEstat(mapPerEstat);
+
+		logMsg("ambMapPerEstat end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private ContingutDto toContingutDto(DocumentEntity document, ToContingutParams params) {
+		return toContingutDto(
+				document,
+				ToContingutParams.builder()
+						.ambPermisos(params.isAmbPermisos())
+						.ambPath(params.isAmbPath())
+						.rolActual(params.getRolActual())
+						.onlyForList(params.isOnlyForList())
+						.organActualId(params.getOrganActualId())
+						.onlyFirstDescendant(params.isOnlyFirstDescendant())
+						.level(params.getLevel())
+						.ambExpedientPare(params.isAmbExpedientPare())
+						.ambEntitat(params.isAmbEntitat())
+//						.ambMapPerEstat(params.isAmbMapPerEstat())
+						.build()
+		);
+	}
+
+	private DocumentDto createDocumentDto(DocumentEntity document, ToContingutParams params) {
+		logMsg("toDocumentDto start (" + document.getId() + ", level=" + params.getLevel() + ") ");
+		long t1 = System.currentTimeMillis();
+
+		DocumentDto dto = new DocumentDto();
+		setDocumentBasicProperties(dto, document);
+		setDocumentFileProperties(dto, document, params);
+
+		logMsg("toDocumentDto 1/3 time (" + document.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		long t2 = System.currentTimeMillis();
+
+		setNtiProperties(dto, document, params);
+		setEnviamentProperties(dto, document);
+
+		if (document.getAnnexos() != null && !document.getAnnexos().isEmpty()) {
+			setAnnexProperties(dto, document);
+		}
+
+		dto.setMetaNode(conversioTipusHelper.convertir(document.getMetaNode(), MetaDocumentDto.class));
+
+		logMsg("toDocumentDto 2/3 time (" + document.getId() + "):  " + (System.currentTimeMillis() - t2) + " ms");
+		long t3 = System.currentTimeMillis();
+
+		setValidationProperties(dto, document);
+		setArxiuProperties(dto, document);
+
+		logMsg("toDocumentDto 3/3 time (" + document.getId() + "):  " + (System.currentTimeMillis() - t3) + " ms");
+		logMsg("toDocumentDto end (" + document.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+
+		return dto;
+	}
+
+	private void setDocumentBasicProperties(DocumentDto dto, DocumentEntity document) {
+		dto.setDescripcio(document.getDescripcio());
+		dto.setDocumentTipus(document.getDocumentTipus());
+		dto.setEstat(document.getEstat());
+		dto.setUbicacio(document.getUbicacio());
+		dto.setData(document.getData());
+		dto.setCustodiaData(document.getCustodiaData());
+		dto.setCustodiaId(document.getCustodiaId());
+	}
+
+	private void setDocumentFileProperties(DocumentDto dto, DocumentEntity document, ToContingutParams params) {
+		if (document.getFitxerNom() != null) {
+			dto.setFitxerNom(document.getFitxerNom());
+			dto.setFitxerNomEnviamentPortafirmes(pluginHelper.conversioConvertirPdfArxiuNom(document.getFitxerNom()));
+		}
+		dto.setFitxerContentType(document.getFitxerContentType());
+		dto.setFitxerTamany(document.getFitxerTamany());
+		dto.setDataCaptura(document.getDataCaptura());
+		dto.setVersioDarrera(document.getVersioDarrera());
+		dto.setVersioCount(document.getVersioCount());
+
+		if (params.isAmbVersions() && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == NO_ESBORRAT) {
+			setVersions(dto, document);
+		}
+	}
+
+	private void setVersions(DocumentDto dto, DocumentEntity document) {
+		List<ContingutArxiu> arxiuVersions = pluginHelper.arxiuDocumentObtenirVersions(document);
+		if (arxiuVersions != null) {
+			List<DocumentVersioDto> versions = new ArrayList<>();
+			for (ContingutArxiu arxiuVersio : arxiuVersions) {
+				DocumentVersioDto versio = new DocumentVersioDto();
+				versio.setArxiuUuid(arxiuVersio.getIdentificador());
+				versio.setId(arxiuVersio.getVersio());
+				versions.add(versio);
+			}
+			dto.setVersions(versions);
+		}
+	}
+
+	private void setNtiProperties(DocumentDto dto, DocumentEntity document, ToContingutParams params) {
+		dto.setNtiVersion(document.getNtiVersion());
+		dto.setNtiIdentificador(document.getNtiIdentificador());
+		dto.setNtiOrgano(document.getNtiOrgano());
+		dto.setNtiOrganoDescripcio(document.getNtiOrgano());
+		dto.setNtiOrigen(document.getNtiOrigen());
+		dto.setNtiEstadoElaboracion(document.getNtiEstadoElaboracion());
+		dto.setNtiTipoDocumental(document.getNtiTipoDocumental());
+		if (document.getNtiTipoDocumental() != null) {
+			setNtiTipoDocumentalNom(dto, document);
+		}
+		dto.setNtiIdDocumentoOrigen(document.getNtiIdDocumentoOrigen());
+		dto.setNtiTipoFirma(document.getNtiTipoFirma());
+		dto.setNtiCsv(document.getNtiCsv());
+		dto.setNtiCsvRegulacion(document.getNtiCsvRegulacion());
+	}
+
+	private void setNtiTipoDocumentalNom(DocumentDto dto, DocumentEntity document) {
+		TipusDocumentalEntity tipusDocumental = tipusDocumentalRepository.findByCodiAndEntitat(document.getNtiTipoDocumental(), document.getEntitat());
+		if (tipusDocumental != null) {
+			if (LocaleContextHolder.getLocale().toString().equals("ca") && Utils.isNotEmpty(tipusDocumental.getNomCatala())) {
+				dto.setNtiTipoDocumentalNom(tipusDocumental.getNomCatala());
+			} else {
+				dto.setNtiTipoDocumentalNom(tipusDocumental.getNomEspanyol());
+			}
+		} else {
+			List<TipusDocumentalDto> docsAddicionals = pluginHelper.documentTipusAddicionals();
+			for (TipusDocumentalDto docAddicional : docsAddicionals) {
+				if (docAddicional.getCodi().equals(document.getNtiTipoDocumental())) {
+					dto.setNtiTipoDocumentalNom(docAddicional.getNom());
+				}
+			}
+		}
+	}
+
+	private void setEnviamentProperties(DocumentDto dto, DocumentEntity document) {
+		dto.setAmbNotificacions(documentNotificacioRepository.countByDocument(document) > 0);
+		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocument(document);
+		dto.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
+		Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocument(document);
+		dto.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
+		Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocument(document);
+		dto.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
+		dto.setGesDocFirmatId(document.getGesDocFirmatId());
+		dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
+		dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
+
+		dto.setDocFromAnnex(document.isDocFromAnnex());
+		dto.setEstat(document.getEstat());
+	}
+
+	private void setAnnexProperties(DocumentDto dto, DocumentEntity document) {
+		RegistreAnnexEntity annex = document.getAnnexos().get(0);
+		String error = annex.getError();
+		if (error != null && !error.isEmpty()) {
+			dto.setPendentMoverArxiu(true);
+		}
+		dto.setAnnexId(annex.getId());
+		dto.setDocumentDeAnotacio(true);
+	}
+
+	private void setValidationProperties(DocumentDto dto, DocumentEntity document) {
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(document).isEmpty());
+		dto.setValidacioFirmaCorrecte(document.isValidacioFirmaCorrecte());
+		dto.setValidacioFirmaErrorMsg(document.getValidacioFirmaErrorMsg());
+	}
+
+	private void setArxiuProperties(DocumentDto dto, DocumentEntity document) {
+		dto.setEstat(document.getEstat());
+		dto.setArxiuEstat(document.getArxiuEstat());
+		dto.setArxiuEstatDefinitiu(document.isArxiuEstatDefinitiu());
+		dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
+	}
+
+	private CarpetaDto createCarpetaDto(CarpetaEntity carpeta, ToContingutParams params) {
+		logMsg("toCarpetaDto start (" + carpeta.getId() + ", level=" + params.getLevel() + ") ");
+		long t1 = System.currentTimeMillis();
+
+		CarpetaDto dto = new CarpetaDto();
+		if (carpeta.getExpedientRelacionat() != null)
+			dto.setExpedientRelacionat(
+					(ExpedientDto)toContingutDto(
+							carpeta.getExpedientRelacionat(),
+							ToContingutParams.builder()
+									.onlyFirstDescendant(params.isOnlyFirstDescendant())
+									.level(params.getLevel())
+									.ambExpedientPare(params.isAmbExpedientPare())
+									.ambEntitat(params.isAmbEntitat())
+									.ambMapPerTipusDocument(params.isAmbMapPerTipusDocument())
+									.ambMapPerEstat(params.isAmbMapPerEstat())
+									.build()));
+
+		dto.setConteDocumentsDefinitius(documentRepository.carpetaHasDocumentsDefinitius(carpeta));
+
+		logMsg("toCarpetaDto end (" + carpeta.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
+		return dto;
+	}
+
+	private void logMsg(String message) {
+		if (cacheHelper.mostrarLogsRendiment()) {
+			logger.info(message);
+		}
+	}
+
+	private void omplirExpedientPermisos(
 			ExpedientDto dto, 
-			String rolActual, 
 			Long expedientId) {
 
-		
 		long t10 = System.currentTimeMillis();
 		try {
 			dto.setUsuariActualWrite(false);
-			
-			
+
 			entityComprovarHelper.comprovarExpedient(
 					expedientId,
 					false,
@@ -884,8 +844,7 @@ public class ContingutHelper {
 					null);
 			
 			dto.setUsuariActualWrite(true);
-		} catch (PermissionDeniedException ex) {
-		}
+		} catch (PermissionDeniedException ex) {}
 
 		try {
 			dto.setUsuariActualDelete(false);
@@ -898,11 +857,8 @@ public class ContingutHelper {
 					true,
 					null);
 			dto.setUsuariActualDelete(true);
-		} catch (PermissionDeniedException ex) {
-		}
-		if (cacheHelper.mostrarLogsRendiment())
-			logger.info("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
-	
+		} catch (PermissionDeniedException ex) {}
+		logMsg("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
 
 	}
 	

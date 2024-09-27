@@ -16,6 +16,7 @@ import es.caib.ripea.war.command.InteressatCommand;
 import es.caib.ripea.war.command.InteressatCommand.Administracio;
 import es.caib.ripea.war.command.InteressatCommand.PersonaFisica;
 import es.caib.ripea.war.command.InteressatCommand.PersonaJuridica;
+import es.caib.ripea.war.command.InteressatCommand.Repres;
 import es.caib.ripea.war.helper.ExceptionHelper;
 import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
@@ -258,6 +259,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 //		InteressatDto representantDto = interessatService.findById(entitatActual.getId(), representantId);
 		InteressatCommand interessatCommand = InteressatCommand.asCommand(representantDto);
 		interessatCommand.setEntitatId(entitatActual.getId());
+		interessatCommand.setInteressatId(interessatId);
 		model.addAttribute("interessatCommand", interessatCommand);
 		model.addAttribute("expedientId", expedientId);
 		model.addAttribute("esRepresentant", true);
@@ -294,6 +296,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 				grups.add(Administracio.class);
 				break;
 			}
+			grups.add(Repres.class);
 		}
 		new ValidationHelper(validator).isValid(
 				interessatCommand,
