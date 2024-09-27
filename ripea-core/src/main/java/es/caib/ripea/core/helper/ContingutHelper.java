@@ -240,11 +240,11 @@ public class ContingutHelper {
 		String tipus = contingut.getClass().toString().replace("class es.caib.ripea.core.entity.", "").replace("Entity", "").toLowerCase() + "] start (" + contingut.getId();
 		logMsg("toContingutDto[" + tipus + ", level=" + params.getLevel() + ") ");
 
-		setExpedientBasicProperties(resposta, contingut);
+		setBasicProperties(resposta, contingut);
 		setAlerta(resposta, contingut);
 
 		if (!params.isOnlyForList()) {
-			setExpedientDetailedProperties(resposta, contingut, params);
+			setDetailedProperties(resposta, contingut, params);
 			setExpedientPare(resposta, contingut, params);
 			List<ContingutDto> pathCalculatPerFills = calculaPathPerFills(resposta, contingut, params);
 			setFills(resposta, contingut, params, pathCalculatPerFills);
@@ -265,7 +265,11 @@ public class ContingutHelper {
 		return null;
 	}
 
-	private void setExpedientBasicProperties(ContingutDto resposta, ContingutEntity contingut) {
+
+	// CONTINGUT
+	// //////////////////////////////////////////////////////////////////////////////////////////
+
+	private void setBasicProperties(ContingutDto resposta, ContingutEntity contingut) {
 		resposta.setId(contingut.getId());
 		resposta.setNom(contingut.getNom());
 		resposta.setArxiuUuid(contingut.getArxiuUuid());
@@ -278,7 +282,7 @@ public class ContingutHelper {
 		logMsg("setAlerta time (" + contingut.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
-	private void setExpedientDetailedProperties(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
+	private void setDetailedProperties(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
 		long t1 = System.currentTimeMillis();
 		resposta.setEsborrat(contingut.getEsborrat());
 		resposta.setEsborratData(contingut.getEsborratData());
@@ -441,49 +445,68 @@ public class ContingutHelper {
 				.ambMapPerEstat(params.isAmbMapPerEstat())
 				.build();
 	}
-	
+
+
+	// EXPEDIENT
+	// //////////////////////////////////////////////////////////////////////////////////////////
+
 	private ExpedientDto createExpedientDto(ExpedientEntity expedient, ToContingutParams params) {
 		long t1 = System.currentTimeMillis();
 		logMsg("toExpedientDto start (" + expedient.getId() + ", level=" + params.getLevel() + ") ");
 
-		ExpedientDto dto = muntarExpedientDtoBase(expedient);
+		ExpedientDto dto = new ExpedientDto();
+		setExpedientBasicProperties(dto, expedient);
 
 		if (params.isAmbPermisos()) {
-			omplirExpedientPermisos(dto, expedient.getId());
+			setExpedientPermisos(dto, expedient.getId());
 		}
-		omplirExpedientSeguidor(dto, expedient);
-		omplirExpedientEstatErrors(dto, expedient);
-		omplirExpedientEstatDocuments(dto, expedient);
+		setExpedientSeguidor(dto, expedient);
+		setExpedientEstatErrors(dto, expedient);
+		setExpedientEstatDocuments(dto, expedient);
 
 		if (params.isOnlyForList()) {
-			omplirExpedientNomesPerLlista(dto, expedient, params.getRolActual());
+			setExpedientNomesPerLlista(dto, expedient, params.getRolActual());
 		} else {
-			omplirExpedientComplet(dto, expedient, params);
+			setExpedientComplet(dto, expedient, params);
 		}
 
 		logMsg("toExpedientDto end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		return dto;
 	}
 
-	private ExpedientDto muntarExpedientDtoBase(ExpedientEntity expedient) {
-		ExpedientDto dto = new ExpedientDto();
-		dto.setEstat(expedient.getEstat());
+	private void setExpedientBasicProperties(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setNumero(expedient.getNumero());
-		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
-		dto.setValid(cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
+		dto.setEstat(expedient.getEstat());
 		if (expedient.getEstatAdditional() != null) {
 			dto.setExpedientEstat(conversioTipusHelper.convertir(expedient.getEstatAdditional(), ExpedientEstatDto.class));
 		}
+		dto.setAgafatPer(conversioTipusHelper.convertir(expedient.getAgafatPer(), UsuariDto.class));
+		dto.setValid(cacheHelper.findErrorsValidacioPerNode(expedient).isEmpty());
 		dto.setNumSeguidors(expedient.getSeguidors().size());
 		dto.setNumComentaris(expedient.getComentaris().size());
 		dto.setMetaNode(conversioTipusHelper.convertir(expedient.getMetaNode(), MetaExpedientDto.class));
 		dto.setInteressats(conversioTipusHelper.convertirSet(expedient.getInteressatsORepresentants(), InteressatDto.class));
 		dto.setGrupId(expedient.getGrup() != null ? expedient.getGrup().getId() : null);
 		dto.setGrupNom(expedient.getGrup() != null ? expedient.getGrup().getDescripcio() : null);
-		return dto;
 	}
 
-	private void omplirExpedientSeguidor(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientPermisos(ExpedientDto dto, Long expedientId) {
+		long t1 = System.currentTimeMillis();
+		try {
+			dto.setUsuariActualWrite(false);
+			entityComprovarHelper.comprovarExpedientPermisWrite(expedientId);
+			dto.setUsuariActualWrite(true);
+		} catch (PermissionDeniedException ex) {}
+
+		try {
+			dto.setUsuariActualDelete(false);
+			entityComprovarHelper.comprovarExpedientPermisDelete(expedientId);
+			dto.setUsuariActualDelete(true);
+		} catch (PermissionDeniedException ex) {}
+		logMsg("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t1) + " ms");
+	}
+
+	private void setExpedientSeguidor(ExpedientDto dto, ExpedientEntity expedient) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null) {
 			UsuariEntity usuariActual = usuariRepository.findByCodi(auth.getName());
@@ -491,14 +514,14 @@ public class ContingutHelper {
 		}
 	}
 
-	private void omplirExpedientEstatErrors(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientEstatErrors(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setErrorLastEnviament(cacheHelper.hasEnviamentsPortafirmesAmbErrorPerExpedient(expedient));
 		dto.setErrorLastNotificacio(cacheHelper.hasNotificacionsAmbErrorPerExpedient(expedient));
 		dto.setAmbEnviamentsPendents(cacheHelper.hasEnviamentsPortafirmesPendentsPerExpedient(expedient));
 		dto.setAmbNotificacionsPendents(cacheHelper.hasNotificacionsPendentsPerExpedient(expedient));
 	}
 
-	private void omplirExpedientEstatDocuments(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientEstatDocuments(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setConteDocuments(CollectionUtils.isNotEmpty(documentRepository.findByExpedientAndEsborrat(expedient, NO_ESBORRAT)));
 		dto.setConteDocumentsDefinitius(documentRepository.expedientHasDocumentsDefinitius(expedient));
 		dto.setConteDocumentsEnProcessDeFirma(CollectionUtils.isNotEmpty(documentRepository.findEnProccessDeFirma(expedient)));
@@ -507,7 +530,7 @@ public class ContingutHelper {
 		dto.setConteDocumentsDeAnotacionesNoMogutsASerieFinal(CollectionUtils.isNotEmpty(registreAnnexRepository.findDocumentsDeAnotacionesNoMogutsASerieFinal(expedient)));
 	}
 
-	private void omplirExpedientNomesPerLlista(ExpedientDto dto, ExpedientEntity expedient, String rolActual) {
+	private void setExpedientNomesPerLlista(ExpedientDto dto, ExpedientEntity expedient, String rolActual) {
 		dto.setDataDarrerEnviament(cacheHelper.getDataDarrerEnviament(expedient));
 		dto.setRolActualAdminEntitatOAdminOrgan(entityComprovarHelper.comprovarRolActualAdminEntitatOAdminOrganDelExpedient(expedient, rolActual));
 		dto.setPotModificar(entityComprovarHelper.comprovarSiEsPotModificarExpedient(expedient));
@@ -516,24 +539,24 @@ public class ContingutHelper {
 		dto.setPotReobrir(entityComprovarHelper.comprovarSiEsPotReobrirExpedient(expedient));
 	}
 
-	private void omplirExpedientComplet(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
-		omplirInformacioBasica(dto, expedient);
-		omplirInformacioDocumental(dto, expedient);
-		omplirEstatExpedient(dto, expedient);
+	private void setExpedientComplet(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+		setExpedientInformacioBasica(dto, expedient);
+		setExpedientInformacioDocumental(dto, expedient);
+		setExpedientNextEstat(dto, expedient);
 		dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
-		omplirOrganGestor(dto, expedient);
+		setExpedientOrganGestor(dto, expedient);
 
 		if (params.isAmbMapPerTipusDocument()) {
-			omplirMapPerTipusDocument(dto, expedient, params);
+			setMapPerTipusDocument(dto, expedient, params);
 		}
 
 		if (params.isAmbMapPerEstat()) {
-			omplirMapPerEstat(dto, expedient, params);
+			setMapPerEstat(dto, expedient, params);
 		}
 
 	}
 
-	private void omplirInformacioBasica(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientInformacioBasica(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setTancatData(expedient.getTancatData());
 		dto.setTancatMotiu(expedient.getTancatMotiu());
 		dto.setAny(expedient.getAny());
@@ -551,26 +574,26 @@ public class ContingutHelper {
 		dto.setPeticions(expedient.getPeticions() != null && !expedient.getPeticions().isEmpty());
 	}
 
-	private void omplirInformacioDocumental(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientInformacioDocumental(ExpedientDto dto, ExpedientEntity expedient) {
 		dto.setHasEsborranys(documentRepository.hasFillsEsborranys(expedient));
 		dto.setConteDocumentsFirmats(documentRepository.countByExpedientAndEstat(expedient, DocumentEstatEnumDto.CUSTODIAT) > 0);
 		dto.setHasAllDocumentsDefinitiu(documentRepository.hasAllDocumentsDefinitiu(expedient));
 	}
 
-	private void omplirEstatExpedient(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientNextEstat(ExpedientDto dto, ExpedientEntity expedient) {
 		if (expedient.getEstatAdditional() != null) {
 			ExpedientEstatEntity estat = expedientEstatRepository.findByMetaExpedientAndOrdre(expedient.getEstatAdditional().getMetaExpedient(), expedient.getEstatAdditional().getOrdre() + 1);
 			dto.setExpedientEstatNextInOrder(estat != null ? estat.getId() : expedient.getEstatAdditional().getId());
 		}
 	}
 
-	private void omplirOrganGestor(ExpedientDto dto, ExpedientEntity expedient) {
+	private void setExpedientOrganGestor(ExpedientDto dto, ExpedientEntity expedient) {
 		OrganGestorEntity organGestor = expedient.getOrganGestor();
 		dto.setOrganGestorId(organGestor != null ? organGestor.getId() : null);
 		dto.setOrganGestorText(organGestor != null ? organGestor.getCodi() + " - " + organGestor.getNom() : "");
 	}
 
-	private void omplirMapPerTipusDocument(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+	private void setMapPerTipusDocument(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
 		logMsg("ambMapPerTipusDocument start (" + expedient.getId() + ")");
 		long t1 = System.currentTimeMillis();
 
@@ -595,7 +618,7 @@ public class ContingutHelper {
 		logMsg("ambMapPerTipusDocument end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
-	private void omplirMapPerEstat(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
+	private void setMapPerEstat(ExpedientDto dto, ExpedientEntity expedient, ToContingutParams params) {
 		logMsg("ambMapPerEstat start (" + expedient.getId() + ")");
 		long t1 = System.currentTimeMillis();
 
@@ -650,13 +673,17 @@ public class ContingutHelper {
 		);
 	}
 
+
+	// DOCUMENT
+	// //////////////////////////////////////////////////////////////////////////////////////////
+
 	private DocumentDto createDocumentDto(DocumentEntity document, ToContingutParams params) {
 		logMsg("toDocumentDto start (" + document.getId() + ", level=" + params.getLevel() + ") ");
 		long t1 = System.currentTimeMillis();
 
 		DocumentDto dto = new DocumentDto();
 		setDocumentBasicProperties(dto, document);
-		setDocumentFileProperties(dto, document, params);
+		setDocumentFitxerProperties(dto, document, params);
 
 		logMsg("toDocumentDto 1/3 time (" + document.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 		long t2 = System.currentTimeMillis();
@@ -683,16 +710,14 @@ public class ContingutHelper {
 	}
 
 	private void setDocumentBasicProperties(DocumentDto dto, DocumentEntity document) {
-		dto.setDescripcio(document.getDescripcio());
 		dto.setDocumentTipus(document.getDocumentTipus());
+		dto.setDescripcio(document.getDescripcio());
 		dto.setEstat(document.getEstat());
 		dto.setUbicacio(document.getUbicacio());
 		dto.setData(document.getData());
-		dto.setCustodiaData(document.getCustodiaData());
-		dto.setCustodiaId(document.getCustodiaId());
 	}
 
-	private void setDocumentFileProperties(DocumentDto dto, DocumentEntity document, ToContingutParams params) {
+	private void setDocumentFitxerProperties(DocumentDto dto, DocumentEntity document, ToContingutParams params) {
 		if (document.getFitxerNom() != null) {
 			dto.setFitxerNom(document.getFitxerNom());
 			dto.setFitxerNomEnviamentPortafirmes(pluginHelper.conversioConvertirPdfArxiuNom(document.getFitxerNom()));
@@ -706,6 +731,9 @@ public class ContingutHelper {
 		if (params.isAmbVersions() && pluginHelper.arxiuSuportaVersionsDocuments() && document.getEsborrat() == NO_ESBORRAT) {
 			setVersions(dto, document);
 		}
+
+		dto.setCustodiaId(document.getCustodiaId());
+		dto.setCustodiaData(document.getCustodiaData());
 	}
 
 	private void setVersions(DocumentDto dto, DocumentEntity document) {
@@ -759,18 +787,21 @@ public class ContingutHelper {
 
 	private void setEnviamentProperties(DocumentDto dto, DocumentEntity document) {
 		dto.setAmbNotificacions(documentNotificacioRepository.countByDocument(document) > 0);
+
 		DocumentNotificacioEstatEnumDto estatDarreraNotificacio = documentNotificacioRepository.findLastEstatNotificacioByDocument(document);
 		dto.setEstatDarreraNotificacio(estatDarreraNotificacio != null ? estatDarreraNotificacio.name() : "");
+
 		Boolean isErrorLastNotificacio = documentNotificacioRepository.findErrorLastNotificacioByDocument(document);
 		dto.setErrorDarreraNotificacio(isErrorLastNotificacio != null ? isErrorLastNotificacio : false);
+
 		Boolean isErrorLastEnviament = documentPortafirmesRepository.findErrorLastEnviamentPortafirmesByDocument(document);
 		dto.setErrorEnviamentPortafirmes(isErrorLastEnviament != null ? isErrorLastEnviament : false);
+
 		dto.setGesDocFirmatId(document.getGesDocFirmatId());
 		dto.setGesDocAdjuntId(document.getGesDocAdjuntId());
 		dto.setGesDocAdjuntFirmaId(document.getGesDocAdjuntFirmaId());
 
 		dto.setDocFromAnnex(document.isDocFromAnnex());
-		dto.setEstat(document.getEstat());
 	}
 
 	private void setAnnexProperties(DocumentDto dto, DocumentEntity document) {
@@ -796,6 +827,8 @@ public class ContingutHelper {
 		dto.setDocumentFirmaTipus(document.getDocumentFirmaTipus());
 	}
 
+	// CARPETA
+	// //////////////////////////////////////////////////////////////////////////////////////////
 	private CarpetaDto createCarpetaDto(CarpetaEntity carpeta, ToContingutParams params) {
 		logMsg("toCarpetaDto start (" + carpeta.getId() + ", level=" + params.getLevel() + ") ");
 		long t1 = System.currentTimeMillis();
@@ -826,43 +859,6 @@ public class ContingutHelper {
 		}
 	}
 
-	private void omplirExpedientPermisos(
-			ExpedientDto dto, 
-			Long expedientId) {
-
-		long t10 = System.currentTimeMillis();
-		try {
-			dto.setUsuariActualWrite(false);
-
-			entityComprovarHelper.comprovarExpedient(
-					expedientId,
-					false,
-					false,
-					true,
-					false,
-					false,
-					null);
-			
-			dto.setUsuariActualWrite(true);
-		} catch (PermissionDeniedException ex) {}
-
-		try {
-			dto.setUsuariActualDelete(false);
-			entityComprovarHelper.comprovarExpedient(
-					expedientId,
-					false,
-					false,
-					false,
-					false,
-					true,
-					null);
-			dto.setUsuariActualDelete(true);
-		} catch (PermissionDeniedException ex) {}
-		logMsg("toExpedientDto comprovarPermisos time:  " + (System.currentTimeMillis() - t10) + " ms");
-
-	}
-	
-	
 	public ContingutDto getBasicInfo(ContingutEntity contingut) {
 		ContingutEntity deproxied = HibernateHelper.deproxy(contingut);
 		ContingutDto resposta = null;
