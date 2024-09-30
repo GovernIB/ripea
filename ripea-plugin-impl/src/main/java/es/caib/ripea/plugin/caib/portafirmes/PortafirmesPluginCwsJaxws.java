@@ -3,6 +3,32 @@
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
+import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.caib.cws.*;
+import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
+import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
+import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
+import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Service;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
+import javax.xml.ws.soap.SOAPBinding;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -19,56 +45,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Service;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.soap.SOAPBinding;
-
-import es.caib.ripea.plugin.RipeaAbstractPluginProperties;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.portafirmes.PortafirmesBlockInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesCarrec;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
-import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentTipus;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxBloc;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxInfo;
-import es.caib.ripea.plugin.portafirmes.PortafirmesFluxResposta;
-import es.caib.ripea.plugin.portafirmes.PortafirmesIniciFluxResposta;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPlugin;
-import es.caib.ripea.plugin.portafirmes.PortafirmesPrioritatEnum;
-import es.indra.portafirmasws.cws.Annex;
-import es.indra.portafirmasws.cws.Annexes;
-import es.indra.portafirmasws.cws.Application;
-import es.indra.portafirmasws.cws.Cws;
-import es.indra.portafirmasws.cws.DeleteRequest;
-import es.indra.portafirmasws.cws.DeleteRequestDocument;
-import es.indra.portafirmasws.cws.DeleteRequestDocuments;
-import es.indra.portafirmasws.cws.DeleteResponse;
-import es.indra.portafirmasws.cws.DocumentAttributes;
-import es.indra.portafirmasws.cws.DownloadRequest;
-import es.indra.portafirmasws.cws.DownloadRequestDocument;
-import es.indra.portafirmasws.cws.DownloadResponse;
-import es.indra.portafirmasws.cws.ImportanceEnum;
-import es.indra.portafirmasws.cws.Result;
-import es.indra.portafirmasws.cws.Sender;
-import es.indra.portafirmasws.cws.SignModeEnum;
-import es.indra.portafirmasws.cws.Signer;
-import es.indra.portafirmasws.cws.Signers;
-import es.indra.portafirmasws.cws.Steps;
-import es.indra.portafirmasws.cws.UploadRequest;
-import es.indra.portafirmasws.cws.UploadRequestDocument;
-import es.indra.portafirmasws.cws.UploadResponse;
-import es.indra.portafirmasws.cws.UploadStep;
 
 /**
  * Implementació del plugin de portafirmes emprant el portafirmes

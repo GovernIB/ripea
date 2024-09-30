@@ -3,16 +3,19 @@
  */
 package es.caib.ripea.plugin.caib.portafirmes;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import es.caib.ripea.plugin.caib.cws.Application;
+import es.caib.ripea.plugin.caib.cws.Cws;
+import es.caib.ripea.plugin.caib.cws.DocumentAttributes;
+import es.caib.ripea.plugin.caib.cws.ImportanceEnum;
+import es.caib.ripea.plugin.caib.cws.Sender;
+import es.caib.ripea.plugin.caib.cws.SignModeEnum;
+import es.caib.ripea.plugin.caib.cws.Signer;
+import es.caib.ripea.plugin.caib.cws.Signers;
+import es.caib.ripea.plugin.caib.cws.Steps;
+import es.caib.ripea.plugin.caib.cws.UploadRequest;
+import es.caib.ripea.plugin.caib.cws.UploadRequestDocument;
+import es.caib.ripea.plugin.caib.cws.UploadResponse;
+import es.caib.ripea.plugin.caib.cws.UploadStep;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -28,20 +31,16 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import javax.xml.ws.soap.MTOMFeature;
-
-import es.indra.portafirmasws.cws.Application;
-import es.indra.portafirmasws.cws.Cws;
-import es.indra.portafirmasws.cws.DocumentAttributes;
-import es.indra.portafirmasws.cws.ImportanceEnum;
-import es.indra.portafirmasws.cws.Sender;
-import es.indra.portafirmasws.cws.SignModeEnum;
-import es.indra.portafirmasws.cws.Signer;
-import es.indra.portafirmasws.cws.Signers;
-import es.indra.portafirmasws.cws.Steps;
-import es.indra.portafirmasws.cws.UploadRequest;
-import es.indra.portafirmasws.cws.UploadRequestDocument;
-import es.indra.portafirmasws.cws.UploadResponse;
-import es.indra.portafirmasws.cws.UploadStep;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Classe de proves pel portafirmes.

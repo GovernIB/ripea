@@ -3,20 +3,20 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import java.util.List;
-
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.List;
 
 /**
  * Informació d'un node.
- * 
+ *
  * @author Limit Tecnologies <limit@limit.es>
  */
 @Getter
 @Setter
+@ToString(callSuper = true)
 public abstract class NodeDto extends ContingutDto {
 
 	private MetaNodeDto metaNode;
@@ -29,11 +29,6 @@ public abstract class NodeDto extends ContingutDto {
 			return 0;
 		else
 			return dades.size();
-	}
-
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this);
 	}
 
 }

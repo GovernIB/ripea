@@ -206,50 +206,8 @@ public class ConversioTipusHelper {
 		mapperFactory.getConverterFactory().registerConverter(
 				new CustomConverter<InteressatEntity, InteressatDto>() {
 					public InteressatDto convert(InteressatEntity source, Type<? extends InteressatDto> destinationClass) {
-						InteressatDto target = null;
-						if(source instanceof HibernateProxy) {
-							HibernateProxy hibernateProxy = (HibernateProxy) source;
-							LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
-							source = (InteressatEntity)initializer.getImplementation();
-						}
-						if (source instanceof  InteressatAdministracioEntity) {
-							target = new InteressatAdministracioDto();
-							((InteressatAdministracioDto)target).setOrganCodi(((InteressatAdministracioEntity)source).getOrganCodi());
-							((InteressatAdministracioDto)target).setOrganNom(((InteressatAdministracioEntity)source).getOrganNom());
-							((InteressatAdministracioDto)target).setAmbOficinaSir(((InteressatAdministracioEntity)source).getAmbOficinaSir());
-						} else if (source instanceof  InteressatPersonaFisicaEntity) {
-							target = new InteressatPersonaFisicaDto();
-							((InteressatPersonaFisicaDto)target).setNom(((InteressatPersonaFisicaEntity)source).getNom());
-							((InteressatPersonaFisicaDto)target).setLlinatge1(((InteressatPersonaFisicaEntity)source).getLlinatge1());
-							((InteressatPersonaFisicaDto)target).setLlinatge2(((InteressatPersonaFisicaEntity)source).getLlinatge2());
-						} else if (source instanceof  InteressatPersonaJuridicaEntity) {
-							target = new InteressatPersonaJuridicaDto();
-							((InteressatPersonaJuridicaDto)target).setRaoSocial(((InteressatPersonaJuridicaEntity)source).getRaoSocial());
-						} 
-						target.setId(source.getId());
-						target.setDocumentNum(source.getDocumentNum());
-						target.setDocumentTipus(source.getDocumentTipus());
-						target.setPais(source.getPais());
-						target.setProvincia(source.getProvincia());
-						target.setMunicipi(source.getMunicipi());
-						target.setAdresa(source.getAdresa());
-						target.setCodiPostal(source.getCodiPostal());
-						target.setEmail(source.getEmail());
-						target.setTelefon(source.getTelefon());
-						target.setObservacions(source.getObservacions());
-						target.setPreferenciaIdioma(source.getPreferenciaIdioma());
-						target.setRepresentantId(source.getRepresentantId());
-						target.setIdentificador(source.getIdentificador());
-						target.setRepresentantIdentificador(source.getRepresentantIdentificador());
-						target.setEntregaDeh(source.getEntregaDeh());
-						target.setEntregaDehObligat(source.getEntregaDehObligat());
-						target.setIncapacitat(source.getIncapacitat());
-						target.setRepresentant(source.getRepresentant() != null ? convertir(source.getRepresentant(),InteressatDto.class) : null);
-						target.setArxiuPropagat(source.isArxiuPropagat());
-						target.setRepresentantArxiuPropagat(source.getRepresentant() != null ? source.getRepresentant().isArxiuPropagat() : true);
-						target.setExpedientArxiuPropagat(source.getExpedient().getArxiuUuid() != null);
-						target.setEsRepresentant(source.isEsRepresentant());
-						return target;
+						source = deproxyInteressatEntity(source);
+						return getInteressatDto(source);
 					}
 				});
 		
@@ -861,7 +819,81 @@ public class ConversioTipusHelper {
 	      
 	      
 	}
-	
+
+	private static InteressatEntity deproxyInteressatEntity(InteressatEntity source) {
+		if (source == null) return null;
+
+		if(source instanceof HibernateProxy) {
+			HibernateProxy hibernateProxy = (HibernateProxy) source;
+			LazyInitializer initializer = hibernateProxy.getHibernateLazyInitializer();
+			source = (InteressatEntity)initializer.getImplementation();
+		}
+		return source;
+	}
+
+	private InteressatDto getInteressatDto(final InteressatEntity source) {
+		InteressatDto target = createTargetDto(source);
+		mapCommonFields(target, source);
+		mapRepresentantFields(target, source);
+		return target;
+	}
+
+	private InteressatDto getRepresentantDto(final InteressatEntity source) {
+		InteressatDto target = createTargetDto(source);
+		mapCommonFields(target, source);
+		target.setEsRepresentant(true);
+		return target;
+	}
+
+	private InteressatDto createTargetDto(final InteressatEntity source) {
+		InteressatDto target = null;
+		if (source instanceof InteressatAdministracioEntity) {
+			target = new InteressatAdministracioDto();
+			((InteressatAdministracioDto) target).setOrganCodi(((InteressatAdministracioEntity) source).getOrganCodi());
+			((InteressatAdministracioDto) target).setOrganNom(((InteressatAdministracioEntity) source).getOrganNom());
+			((InteressatAdministracioDto) target).setAmbOficinaSir(((InteressatAdministracioEntity) source).getAmbOficinaSir());
+		} else if (source instanceof InteressatPersonaFisicaEntity) {
+			target = new InteressatPersonaFisicaDto();
+			((InteressatPersonaFisicaDto) target).setNom(((InteressatPersonaFisicaEntity) source).getNom());
+			((InteressatPersonaFisicaDto) target).setLlinatge1(((InteressatPersonaFisicaEntity) source).getLlinatge1());
+			((InteressatPersonaFisicaDto) target).setLlinatge2(((InteressatPersonaFisicaEntity) source).getLlinatge2());
+		} else if (source instanceof InteressatPersonaJuridicaEntity) {
+			target = new InteressatPersonaJuridicaDto();
+			((InteressatPersonaJuridicaDto) target).setRaoSocial(((InteressatPersonaJuridicaEntity) source).getRaoSocial());
+		}
+		return target;
+	}
+
+	private void mapCommonFields(InteressatDto target, final InteressatEntity source) {
+		target.setId(source.getId());
+		target.setDocumentNum(source.getDocumentNum());
+		target.setDocumentTipus(source.getDocumentTipus());
+		target.setPais(source.getPais());
+		target.setProvincia(source.getProvincia());
+		target.setMunicipi(source.getMunicipi());
+		target.setAdresa(source.getAdresa());
+		target.setCodiPostal(source.getCodiPostal());
+		target.setEmail(source.getEmail());
+		target.setTelefon(source.getTelefon());
+		target.setObservacions(source.getObservacions());
+		target.setPreferenciaIdioma(source.getPreferenciaIdioma());
+		target.setIdentificador(source.getIdentificador());
+		target.setEntregaDeh(source.getEntregaDeh());
+		target.setEntregaDehObligat(source.getEntregaDehObligat());
+		target.setIncapacitat(source.getIncapacitat());
+		target.setArxiuPropagat(source.isArxiuPropagat());
+		target.setExpedientArxiuPropagat(source.getExpedient() != null && source.getExpedient().getArxiuUuid() != null);
+	}
+
+	private void mapRepresentantFields(InteressatDto target, final InteressatEntity source) {
+		target.setEsRepresentant(source.isEsRepresentant());
+		target.setRepresentantId(source.getRepresentantId());
+		target.setRepresentantIdentificador(source.getRepresentantIdentificador());
+
+		InteressatEntity representant = deproxyInteressatEntity(source.getRepresentant());
+		target.setRepresentant(representant != null ? getRepresentantDto(representant) : null);
+		target.setRepresentantArxiuPropagat(representant != null ? representant.isArxiuPropagat() : true);
+	}
 
 
 	public <T> T convertir(Object source, Class<T> targetType) {

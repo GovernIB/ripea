@@ -595,6 +595,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		<form:hidden path="id" />
 		<form:hidden path="expedientId" />
 		<form:hidden path="formulariAnterior" />
+		<form:hidden path="interessatId" />
 		<input type="hidden" id="id" />
 		
 		<!-- Tipus d'interessat -->

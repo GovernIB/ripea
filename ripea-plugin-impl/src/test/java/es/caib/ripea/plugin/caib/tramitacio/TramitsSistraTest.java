@@ -3,22 +3,20 @@
  */
 package es.caib.ripea.plugin.caib.tramitacio;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import es.caib.ripea.plugin.caib.bantel.BackofficeFacade;
+import es.caib.ripea.plugin.caib.bantel.BackofficeFacadeException_Exception;
+import es.caib.ripea.plugin.caib.bantel.BackofficeFacadeService;
+import es.caib.ripea.plugin.caib.bantel.DatosDocumentoTelematico;
+import es.caib.ripea.plugin.caib.bantel.DocumentoBTE;
+import es.caib.ripea.plugin.caib.bantel.ReferenciaEntrada;
+import es.caib.ripea.plugin.caib.bantel.ReferenciasEntrada;
+import es.caib.ripea.plugin.caib.bantel.TramiteBTE;
+import org.junit.Test;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
-
-import org.junit.Test;
-
-import es.caib.bantel.ws.v2.model.datosdocumentotelematico.DatosDocumentoTelematico;
-import es.caib.bantel.ws.v2.model.documentobte.DocumentoBTE;
-import es.caib.bantel.ws.v2.model.referenciaentrada.ReferenciaEntrada;
-import es.caib.bantel.ws.v2.model.referenciaentrada.ReferenciasEntrada;
-import es.caib.bantel.ws.v2.model.tramitebte.TramiteBTE;
-import es.caib.bantel.ws.v2.services.BackofficeFacade;
-import es.caib.bantel.ws.v2.services.BackofficeFacadeException;
-import es.caib.bantel.ws.v2.services.BackofficeFacadeService;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Client de test per al servei bustia de RIPEA.
@@ -34,7 +32,7 @@ public class TramitsSistraTest {
 
 
 	@Test
-	public void test() throws MalformedURLException, BackofficeFacadeException {
+	public void test() throws MalformedURLException, BackofficeFacadeException_Exception {
 		ReferenciasEntrada refs = getBackofficeFacade().obtenerNumerosEntradas(
 				"EC0001CTLA",
 				"EC0001CTLA",

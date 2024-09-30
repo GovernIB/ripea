@@ -3,6 +3,44 @@
  */
 package es.caib.ripea.plugin.caib.ciutada;
 
+import es.caib.ripea.plugin.PropertiesHelper;
+import es.caib.ripea.plugin.SistemaExternException;
+import es.caib.ripea.plugin.caib.regtel.Aviso;
+import es.caib.ripea.plugin.caib.regtel.DatosExpediente;
+import es.caib.ripea.plugin.caib.regtel.DatosInteresado;
+import es.caib.ripea.plugin.caib.regtel.DatosNotificacion;
+import es.caib.ripea.plugin.caib.regtel.DatosRegistroSalida;
+import es.caib.ripea.plugin.caib.regtel.DatosRepresentado;
+import es.caib.ripea.plugin.caib.regtel.DetalleAcuseRecibo;
+import es.caib.ripea.plugin.caib.regtel.Documento;
+import es.caib.ripea.plugin.caib.regtel.Documentos;
+import es.caib.ripea.plugin.caib.regtel.IdentificacionInteresadoDesglosada;
+import es.caib.ripea.plugin.caib.regtel.OficinaRegistral;
+import es.caib.ripea.plugin.caib.regtel.OficioRemision;
+import es.caib.ripea.plugin.caib.regtel.ResultadoRegistro;
+import es.caib.ripea.plugin.caib.zonaper.ConfiguracionAvisosExpediente;
+import es.caib.ripea.plugin.caib.zonaper.DocumentoExpediente;
+import es.caib.ripea.plugin.caib.zonaper.DocumentosExpediente;
+import es.caib.ripea.plugin.caib.zonaper.EventoExpediente;
+import es.caib.ripea.plugin.caib.zonaper.Expediente;
+import es.caib.ripea.plugin.ciutada.CiutadaDocument;
+import es.caib.ripea.plugin.ciutada.CiutadaExpedientInformacio;
+import es.caib.ripea.plugin.ciutada.CiutadaNotificacioEstat;
+import es.caib.ripea.plugin.ciutada.CiutadaNotificacioEstat.ZonaperJustificantEstat;
+import es.caib.ripea.plugin.ciutada.CiutadaNotificacioResultat;
+import es.caib.ripea.plugin.ciutada.CiutadaPersona;
+import es.caib.ripea.plugin.ciutada.CiutadaPlugin;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPHandler;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,45 +55,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPMessage;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.handler.Handler;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.ws.handler.soap.SOAPHandler;
-import javax.xml.ws.handler.soap.SOAPMessageContext;
-
-import es.caib.regtel.ws.v2.model.aviso.Aviso;
-import es.caib.regtel.ws.v2.model.datosexpediente.DatosExpediente;
-import es.caib.regtel.ws.v2.model.datosinteresado.DatosInteresado;
-import es.caib.regtel.ws.v2.model.datosinteresado.IdentificacionInteresadoDesglosada;
-import es.caib.regtel.ws.v2.model.datosnotificacion.DatosNotificacion;
-import es.caib.regtel.ws.v2.model.datosregistrosalida.DatosRegistroSalida;
-import es.caib.regtel.ws.v2.model.datosrepresentado.DatosRepresentado;
-import es.caib.regtel.ws.v2.model.detalleacuserecibo.DetalleAcuseRecibo;
-import es.caib.regtel.ws.v2.model.documento.Documento;
-import es.caib.regtel.ws.v2.model.documento.Documentos;
-import es.caib.regtel.ws.v2.model.oficinaregistral.OficinaRegistral;
-import es.caib.regtel.ws.v2.model.oficioremision.OficioRemision;
-import es.caib.regtel.ws.v2.model.resultadoregistro.ResultadoRegistro;
-import es.caib.ripea.plugin.SistemaExternException;
-import es.caib.ripea.plugin.ciutada.CiutadaDocument;
-import es.caib.ripea.plugin.ciutada.CiutadaExpedientInformacio;
-import es.caib.ripea.plugin.ciutada.CiutadaNotificacioEstat;
-import es.caib.ripea.plugin.ciutada.CiutadaNotificacioEstat.ZonaperJustificantEstat;
-import es.caib.ripea.plugin.ciutada.CiutadaNotificacioResultat;
-import es.caib.ripea.plugin.ciutada.CiutadaPersona;
-import es.caib.ripea.plugin.ciutada.CiutadaPlugin;
-import es.caib.ripea.plugin.PropertiesHelper;
-import es.caib.zonaper.ws.v2.model.configuracionavisosexpediente.ConfiguracionAvisosExpediente;
-import es.caib.zonaper.ws.v2.model.documentoexpediente.DocumentoExpediente;
-import es.caib.zonaper.ws.v2.model.documentoexpediente.DocumentosExpediente;
-import es.caib.zonaper.ws.v2.model.eventoexpediente.EventoExpediente;
-import es.caib.zonaper.ws.v2.model.expediente.Expediente;
 
 /**
  * Implementació de del plugin de comunicació amb el ciutadà
@@ -448,15 +447,15 @@ public class CiutadaPluginSistra implements CiutadaPlugin {
 		}
 	}
 
-	private es.caib.zonaper.ws.v2.services.BackofficeFacade getZonaperWs() throws MalformedURLException {
+	private es.caib.ripea.plugin.caib.zonaper.BackofficeFacade getZonaperWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/zonaperws/services/v2/BackofficeFacade";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
-		es.caib.zonaper.ws.v2.services.BackofficeFacadeService service = new es.caib.zonaper.ws.v2.services.BackofficeFacadeService(
+		es.caib.ripea.plugin.caib.zonaper.BackofficeFacadeService service = new es.caib.ripea.plugin.caib.zonaper.BackofficeFacadeService(
 				wsdlUrl,
 				new QName(
 						"urn:es:caib:zonaper:ws:v2:services",
 						"BackofficeFacadeService"));
-		es.caib.zonaper.ws.v2.services.BackofficeFacade backofficeFacade = service.getBackofficeFacade();
+		es.caib.ripea.plugin.caib.zonaper.BackofficeFacade backofficeFacade = service.getBackofficeFacade();
 		BindingProvider bp = (BindingProvider)backofficeFacade;
 		Map<String, Object> reqContext = bp.getRequestContext();
 		reqContext.put(
@@ -477,15 +476,15 @@ public class CiutadaPluginSistra implements CiutadaPlugin {
 		return backofficeFacade;
 	}
 
-	private es.caib.regtel.ws.v2.services.BackofficeFacade getRegtelWs() throws MalformedURLException {
+	private es.caib.ripea.plugin.caib.regtel.BackofficeFacade getRegtelWs() throws MalformedURLException {
 		String webServiceUrl = getBaseUrl() + "/regtelws/services/v2/BackofficeFacade";
 		URL wsdlUrl = new URL(webServiceUrl + "?wsdl");
-		es.caib.regtel.ws.v2.services.BackofficeFacadeService service = new es.caib.regtel.ws.v2.services.BackofficeFacadeService(
+		es.caib.ripea.plugin.caib.regtel.BackofficeFacadeService service = new es.caib.ripea.plugin.caib.regtel.BackofficeFacadeService(
 				wsdlUrl,
 				new QName(
 						"urn:es:caib:regtel:ws:v2:services",
 						"BackofficeFacadeService"));
-		es.caib.regtel.ws.v2.services.BackofficeFacade backofficeFacade = service.getBackofficeFacade();
+		es.caib.ripea.plugin.caib.regtel.BackofficeFacade backofficeFacade = service.getBackofficeFacade();
 		BindingProvider bp = (BindingProvider)backofficeFacade;
 		Map<String, Object> reqContext = bp.getRequestContext();
 		reqContext.put(

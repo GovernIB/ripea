@@ -762,6 +762,47 @@ public class EntityComprovarHelper {
 				rolActual);
 	}
 
+	public ExpedientEntity comprovarExpedientPermisRead(Long expedientId) {
+		return comprovarExpedient(
+				expedientId,
+				false,
+				true,
+				false,
+				false,
+				false,
+				null);
+	}
+	public ExpedientEntity comprovarExpedientPermisWrite(Long expedientId) {
+		return comprovarExpedient(
+				expedientId,
+				false,
+				false,
+				true,
+				false,
+				false,
+				null);
+	}
+	public ExpedientEntity comprovarExpedientPermisCreate(Long expedientId) {
+		return comprovarExpedient(
+				expedientId,
+				false,
+				false,
+				false,
+				true,
+				false,
+				null);
+	}
+	public ExpedientEntity comprovarExpedientPermisDelete(Long expedientId) {
+		return comprovarExpedient(
+				expedientId,
+				false,
+				false,
+				false,
+				false,
+				true,
+				null);
+	}
+
 	public ExpedientEntity comprovarExpedient(
 			Long expedientId,
 			boolean comprovarAgafatPerUsuariActual,

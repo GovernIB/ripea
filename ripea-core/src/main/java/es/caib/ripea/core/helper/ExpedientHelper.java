@@ -480,13 +480,17 @@ public class ExpedientHelper {
 		// L'interessat que estam associant té un representant
 		if (hasRepresentantDistribucio) {
 			if (representantOverwritten != null) {
-				updateRepresentant(expedientId, interessat.getId(), permission, rolActual, representantOverwritten);
+				if (distinctDocNum(interessat.getDocumentNum(),representantOverwritten.getDocumentNum())) {
+					updateRepresentant(expedientId, interessat.getId(), permission, rolActual, representantOverwritten);
+				}
 			} else {
 				InteressatEntity representant = interessatRepository.findByExpedientIdAndDocumentNum(expedientId, representantDistribucio.getDocumentNumero());
-				if (representant == null) {
-					createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
-				} else {
-					interessat.updateRepresentant(representant);
+				if (distinctDocNum(interessat.getDocumentNum(),representant.getDocumentNum())) {
+					if (representant == null) {
+						createRepresentant(expedientId, interessat.getId(), permission, rolActual, representantDistribucio);
+					} else {
+						interessat.updateRepresentant(representant);
+					}
 				}
 			}
 		// L'interessat que estam associant no té representant
@@ -497,6 +501,12 @@ public class ExpedientHelper {
 				expedientInteressatHelper.removeRepresentant(interessat);
 			}
 		}
+	}
+
+	private boolean distinctDocNum(String interessatDocNum, String representantDocNum) {
+		if (interessatDocNum == null && representantDocNum == null) return false;
+		if (interessatDocNum != null) return !interessatDocNum.equalsIgnoreCase(representantDocNum);
+		return !representantDocNum.equalsIgnoreCase(interessatDocNum);
 	}
 
 	private InteressatEntity createInteressat(Long expedientId, PermissionEnumDto permission, String rolActual, RegistreInteressatEntity interessatDistribucio) {
