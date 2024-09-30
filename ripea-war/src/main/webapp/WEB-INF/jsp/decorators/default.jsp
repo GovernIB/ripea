@@ -125,7 +125,7 @@
 		$(window).bind("pageshow", function(event) {
 		    $('body').removeClass('loading');
 		});
-		
+
 		$(document).ready(function() {
 			$('button[value="filtrar"]').click(function() {
 				$('table').dataTable().api().state.clear();
@@ -134,6 +134,32 @@
 				$('table').dataTable().api().state.clear();
 			});
 			$('table').data("page-length", ${dadesUsuariActual.numElementsPagina});
+
+			/**
+			 * Funcions per posar un doble submenu a RIPEA.
+			 * El pare (tipicament un li) ha de tenir la classe ripea-doble-menu
+			 * El fill, ha de ser un "ul" inmediatament a continuació en el codi, i amb la classe ripea-submenu-list
+			 */
+			$('.ripea-doble-menu a').click(function(event) {
+				event.preventDefault();
+				return false;
+			});
+			$('.ripea-doble-menu').mouseover(function(event) {
+				let submenu = $(this).next();
+				$(submenu).mouseleave(function(event) { $(this).hide(); });
+				let coordPare = $(this)[0].getBoundingClientRect();
+				$(submenu).show();
+				let coordSubm = $(submenu)[0].getBoundingClientRect();
+				$(submenu).css('top', coordPare.top+"px");
+				$(submenu).css('left', (coordPare.left-coordSubm.width)+"px");
+			});
+			$('.ripea-doble-menu').mouseleave(function(event) {
+				let rect = this.getBoundingClientRect();
+				if(event.clientX > rect.left) {
+					let submenu = $(this).next();
+					$(submenu).hide();
+				}
+			});
 		});
 		
 	</script>
@@ -350,8 +376,39 @@ body {
 							<ul class="dropdown-menu">
 								<li><a href="<c:url value="/config"/>" title="<spring:message code="decorator.menu.config.properties"/>"><spring:message code="decorator.menu.config.properties"/></a></li>
 								<li><a href="<c:url value="/pinbalServei"/>"><spring:message code="decorator.menu.pinbal.servei"/></a></li>
-								<li><a href="<c:url value="/scheduled/restart"/>" title="<spring:message code="decorator.menu.reinici.scheduler"/>"><spring:message code="decorator.menu.reinici.scheduler"/></a></li>
-								 <!--<li><a href="<c:url value="/contingut/orfes/delete"/>"><spring:message code="decorator.menu.config.delete.orfes"/></a></li>-->
+								<li class="ripea-doble-menu"><a href="#"><spring:message code="decorator.menu.reinici.scheduler"/></a></li>
+								<ul class="ripea-submenu-list" style="display: none;width: 420px;">
+									<li><a href="<c:url value="/scheduled/restart/actualitzacioDeProcediments"/>"><spring:message code="decorator.menu.reinici.scheduler.pr"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/enviarEmailsInformantDeNouComentariPerProcediment"/>"><spring:message code="decorator.menu.reinici.scheduler.em"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/tancarExpedientsEnArxiu"/>"><spring:message code="decorator.menu.reinici.scheduler.ta"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/consultaDeCanvisAlOrganigrama"/>"><spring:message code="decorator.menu.reinici.scheduler.or"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/consultarIGuardarAnotacionsPendents"/>"><spring:message code="decorator.menu.reinici.scheduler.an"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/enviarEmailsAgrupats"/>"><spring:message code="decorator.menu.reinici.scheduler.ag"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/enviarDocumentsAlPortafirmes"/>"><spring:message code="decorator.menu.reinici.scheduler.fi"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/canviarEstatEnDistribucio"/>"><spring:message code="decorator.menu.reinici.scheduler.di"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/guardarEnArxiuContingutsPendents"/>"><spring:message code="decorator.menu.reinici.scheduler.ax"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/guardarEnArxiuInteressats"/>"><spring:message code="decorator.menu.reinici.scheduler.ai"/></a></li>
+									<li><a href="<c:url value="/scheduled/restart/tots"/>"><spring:message code="decorator.menu.reinici.scheduler.xx"/></a></li>
+								</ul>
+								<li class="ripea-doble-menu"><a href="#"><spring:message code="decorator.menu.reinici.plugin"/></a></li>
+								<ul class="ripea-submenu-list" style="display: none;width: 240px;">
+									<li><a href="<c:url value="/plugin/restart/ax"/>"><spring:message code="decorator.menu.reinici.plugin.ax"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/di"/>"><spring:message code="decorator.menu.reinici.plugin.di"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/no"/>"><spring:message code="decorator.menu.reinici.plugin.no"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/cd"/>"><spring:message code="decorator.menu.reinici.plugin.cd"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/us"/>"><spring:message code="decorator.menu.reinici.plugin.us"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/pi"/>"><spring:message code="decorator.menu.reinici.plugin.pi"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/de"/>"><spring:message code="decorator.menu.reinici.plugin.de"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/ro"/>"><spring:message code="decorator.menu.reinici.plugin.ro"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/dg"/>"><spring:message code="decorator.menu.reinici.plugin.dg"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/pf"/>"><spring:message code="decorator.menu.reinici.plugin.pf"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/vf"/>"><spring:message code="decorator.menu.reinici.plugin.vf"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/gd"/>"><spring:message code="decorator.menu.reinici.plugin.gd"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/fs"/>"><spring:message code="decorator.menu.reinici.plugin.fs"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/si"/>"><spring:message code="decorator.menu.reinici.plugin.si"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/vi"/>"><spring:message code="decorator.menu.reinici.plugin.vi"/></a></li>
+									<li><a href="<c:url value="/plugin/restart/xx"/>"><spring:message code="decorator.menu.reinici.plugin.xx"/></a></li>
+								</ul>
 							</ul>
 						</div>
 						

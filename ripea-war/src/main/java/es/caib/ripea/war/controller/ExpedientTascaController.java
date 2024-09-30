@@ -145,12 +145,13 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				TascaEstatEnumDto.CANCELLADA,
 				null,
 				RolHelper.getRolActual(request));
-		
+		//TODO Es necessari recuperar de nou la tasca? canviarTascaEstat ja retorna un objecte ExpedientTascaDto 
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
-				"expedient.tasca.controller.cancellada.ok");
+				"expedient.tasca.controller.cancellada.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 		
 	}	
 	
@@ -235,12 +236,13 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaReassignar";
 		}
 	
-		expedientTascaService.updateResponsables(expedientTascaId, command.getResponsablesCodi());
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.updateResponsables(expedientTascaId, command.getResponsablesCodi());
 		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.reassignat.ok");
+				"expedient.tasca.controller.reassignat.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/reobrir", method = RequestMethod.GET)
@@ -278,7 +280,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaReobrir";
 		}
 	
-		expedientTascaService.reobrirTasca(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.reobrirTasca(
 				expedientTascaId, 
 				command.getResponsablesCodi(), 
 				command.getMotiu(),
@@ -287,7 +289,8 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.reobrir.ok");
+				"expedient.tasca.controller.reobrir.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.GET)

@@ -129,6 +129,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 		ordenacioMap.put("estatEnviament", new String[] { "estat" });
 		ordenacioMap.put("dataEnviament", new String[] { "enviatData" });
 		ordenacioMap.put("portafirmesEstat", new String[] { "estat" });
+		ordenacioMap.put("concepte", new String[] { "assumpte" });
+		ordenacioMap.put("dataFinalitzacio", new String[] { "processatData" });
 
 		Page<DocumentPortafirmesEntity> docsEnvs = documentPortafirmesRepository.findAmbFiltrePaginat(
 				entitat,
@@ -262,6 +264,8 @@ public class SeguimentServiceImpl implements SeguimentService {
 			ordenacioMap.put("documentNom", new String[] { "document.nom" });
 			ordenacioMap.put("estatEnviament", new String[] { "estat" });
 			ordenacioMap.put("dataEnviament", new String[] { "createdDate" });
+			ordenacioMap.put("concepte", new String[] { "assumpte" });
+			ordenacioMap.put("dataFinalitzacio", new String[] { "processatData" });
 			
 			// ================================  RETURNS PAGE (DATATABLE) ==========================================
 			Page<DocumentNotificacioEntity> docsEnvs = documentNotificacioRepository.findAmbFiltrePaginat(
