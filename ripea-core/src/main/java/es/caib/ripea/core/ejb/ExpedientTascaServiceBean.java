@@ -4,7 +4,6 @@
 package es.caib.ripea.core.ejb;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ejb.interceptor.SpringBeanAutowiringInterceptor;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
@@ -166,8 +164,8 @@ public class ExpedientTascaServiceBean implements ExpedientTascaService {
 	}
 
 	@Override
-	public ExpedientTascaDto updateDataLimit(Long expedientTascaId, Date dataLimit) {
-		return delegate.updateDataLimit(expedientTascaId, dataLimit);
+	public ExpedientTascaDto updateDataLimit(ExpedientTascaDto expedientTascaDto) {
+		return delegate.updateDataLimit(expedientTascaDto);
 	}
 
 	@Override

@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 
+import es.caib.ripea.core.api.utils.Utils;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,13 +28,17 @@ public class ExpedientTascaDto {
 	private String motiuRebuig;
 	private UsuariDto createdBy;
 	private Date dataLimit;
+	@SuppressWarnings("unused")
+	private String dataLimitString;
 	private boolean shouldNotifyAboutDeadline;
 	private String comentari;
 	private long numComentaris;
 	private boolean usuariActualResponsable;
 	private String titol;
 	private String observacions;
-	private String duracio;
+	private Integer duracio;
+	@SuppressWarnings("unused")
+	private String duracioFormat;
 	private PrioritatEnumDto prioritat;
 	private List<String> observadorsCodi;
 	private List<UsuariDto> observadors;
@@ -48,6 +54,14 @@ public class ExpedientTascaDto {
 			return "";
 		}
 	}
+	
+	public String getDuracioFormat() {
+		if (this.duracio!=null) {
+			return Utils.duracioEnDiesToString(this.duracio);
+		} else {
+			return getDataLimitString();
+		}
+	}	
 	
 	public boolean isAgafada() {
 		return responsableActual != null;
@@ -68,5 +82,4 @@ public class ExpedientTascaDto {
 	public String getMetaExpedientTascaDescAbrv() {
 		return StringUtils.abbreviate(metaExpedientTasca.getDescripcio(), 70);
 	}
-
 }

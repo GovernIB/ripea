@@ -38,7 +38,7 @@
 			</tr>
 			<tr>
 				<td><strong><spring:message code="tasca.list.column.duracio"/></strong></td>
-				<td>${expedientTascaDto.duracio}</td>
+				<td>${expedientTascaDto.duracioFormat}</td>
 			</tr>	
 			<tr>
 				<td><strong><spring:message code="expedient.tasca.form.camp.dataLimit"/></strong></td>

@@ -282,26 +282,16 @@ public class ConfigServiceImpl implements ConfigService {
         
         pluginHelper.resetPlugins();
     }
-
-    
-
-    
-    
-
-    
     
     @Override
     @Transactional
     public List<ConfigDto> findEntitatsConfigByKey(String key) {
-
         if (Strings.isNullOrEmpty(key)) {
             return new ArrayList<>();
         }
         String suffix = key.replace(ConfigDto.prefix, "");
         return conversioTipusHelper.convertirList(configRepository.findLikeKeyEntitatNotNullAndConfigurable(ConfigDto.prefix, suffix), ConfigDto.class);
     }
-    
-    
     
     @Override
     @Transactional(readOnly = true)
@@ -325,13 +315,10 @@ public class ConfigServiceImpl implements ConfigService {
             }
         }
     }
-
-
     
     @Override
     @Transactional
     public void crearPropietatsConfigPerEntitats() {
-
         List<ConfigEntity> configs = configRepository.findByEntitatCodiIsNullAndConfigurableIsTrue();
         List<EntitatEntity> entitats = entitatRepository.findAll();
         for (ConfigEntity config : configs) {

@@ -195,22 +195,25 @@
 				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+				<th data-col-name="duracioFormat" data-visible="false"></th>
 				<th data-col-name="agafada" data-visible="false"></th>
 				<th data-col-name="usuariActualObservador" data-visible="false"></th>
 				<th data-col-name="delegada" data-visible="false"></th>
 				<th data-col-name="usuariActualDelegat" data-visible="false"></th>
 				<th data-col-name="responsableActual.codi" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
-				<th data-col-name="duracio" width="20%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
-					<spring:message code="tasca.list.column.duracio"/>
+				<th data-col-name="dataLimitString" width="20%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
+					<spring:message code="expedient.tasca.list.boto.dataLimit"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
-						{{if shouldNotifyAboutDeadline}}
-								<span style="color: red;">
-									{{:duracio}}
-									<span class="fa fa-clock-o"></span>
-								</span>
-						{{else}}
-							{{:duracio}}
-						{{/if}}
+					{{if shouldNotifyAboutDeadline}}
+							<span style="color: red;" title="Duració estimada {{:duracioFormat}}">                            
+                                {{:dataLimitString}}
+                                <span class="fa fa-clock-o"></span>
+                            </span>
+                    {{else}}
+						<span title="Duració estimada {{:duracioFormat}}">  
+                        	{{:dataLimitString}}
+						</span>
+                    {{/if}}
 					</script>
 				</th>
 				<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
@@ -255,14 +258,16 @@
 									{{else}}						
 										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>	
 									{{/if}}
-
+									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
+										<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
+									{{/if}}
 									{{if estat != 'FINALITZADA'}}
 										{{if !delegada}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/delegar"/>" data-toggle="modal"><span class="fa fa-share"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegar"/></a></li>
 										{{else delegada && !usuariActualDelegat}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/retomar"/>" data-toggle="modal"><span class="fa fa-remove"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegacio.desfer"/></a></li>
 										{{/if}}		
-									{{/if}}		
+									{{/if}}
 								</ul>
 							</div>
 						{{/if}}

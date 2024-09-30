@@ -194,6 +194,7 @@ $(document).ready(function() {
 		</c:if>
 	} else {
 		let currentValues = $('#interessatsIds').val();
+		if (currentValues==null) currentValues = [];
 		if (!currentValues.includes('${interessatCreat}')) {
 			currentValues.push('${interessatCreat}');
 		}

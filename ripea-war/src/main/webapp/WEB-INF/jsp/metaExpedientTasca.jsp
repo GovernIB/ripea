@@ -31,9 +31,9 @@
 			<tr>
 				<th data-col-name="codi" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.codi"/></th>
 				<th data-col-name="nom" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.nom"/></th>
-				<th data-col-name="responsable" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.responsable"/></th>
-				<th data-col-name="duracio"><spring:message code="tasca.list.column.duracio"/></th>
-				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="11%">
+				<th data-col-name="responsable" width="10%" data-orderable="false"><spring:message code="metaexpedient.tasca.columna.responsable"/></th>
+				<th data-col-name="duracioFormat" width="10%"><spring:message code="tasca.list.column.duracio"/></th>
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="10%">
 					<spring:message code="tasca.list.column.prioritat"/>
 					<script id="cellPrioritatTemplate" type="text/x-jsrender">
 						<span class="label label-{{:prioritat}}">
@@ -54,7 +54,7 @@
 					</script>
 				</th>
 				<th data-col-name="estatColorCrearTasca" data-visible="false"></th>
-				<th data-col-name="estatNomCrearTasca" data-template="#cellTascaCrearTemplate" data-orderable="false">
+				<th data-col-name="estatNomCrearTasca" width="10%" data-template="#cellTascaCrearTemplate" data-orderable="false">
 					<spring:message code="metaexpedient.tasca.list.camp.estat.crearTasca"/>
 					<script id="cellTascaCrearTemplate" type="text/x-jsrender">
 						{{if estatNomCrearTasca}}
@@ -64,7 +64,7 @@
 					</script>
 				</th>
 				<th data-col-name="estatColorFinalitzarTasca" data-visible="false"></th>
-				<th data-col-name="estatNomFinalitzarTasca" data-template="#cellTascaFiTemplate" data-orderable="false">
+				<th data-col-name="estatNomFinalitzarTasca" width="10%" data-template="#cellTascaFiTemplate" data-orderable="false">
 					<spring:message code="metaexpedient.tasca.list.camp.estat.finalitzarTasca"/>
 					<script id="cellTascaFiTemplate" type="text/x-jsrender">
 						{{if estatNomFinalitzarTasca}}
@@ -73,13 +73,13 @@
 						{{/if}}
 					</script>
 				</th>
-				<th data-col-name="activa" data-template="#cellActivaTemplate" data-orderable="false">
+				<th data-col-name="activa" width="5%" data-template="#cellActivaTemplate" data-orderable="false">
 					<spring:message code="metaexpedient.tasca.columna.activa"/>
 					<script id="cellActivaTemplate" type="text/x-jsrender">
 						{{if activa}}<span class="fa fa-check"></span>{{/if}}
 					</script>
 				</th>
-				<th data-col-name="id" data-template="#cellAccionsTemplate" data-orderable="false" width="10%">
+				<th data-col-name="id"  data-template="#cellAccionsTemplate" data-orderable="false" width="5%">
 					<script id="cellAccionsTemplate" type="text/x-jsrender">
 						<div class="dropdown">
 							<button class="btn btn-primary" data-toggle="dropdown"><span class="fa fa-cog"></span>&nbsp;<spring:message code="comu.boto.accions"/>&nbsp;<span class="caret"></span></button>

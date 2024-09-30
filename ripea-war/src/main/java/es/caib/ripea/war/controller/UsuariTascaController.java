@@ -1,6 +1,3 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
 import java.text.SimpleDateFormat;
@@ -34,37 +31,29 @@ import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
 import es.caib.ripea.war.helper.RequestSessionHelper;
 import es.caib.ripea.war.helper.RolHelper;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Controlador per al llistat d'expedients tasques.
+ * Controlador per al llistat de tasques d'usuaris.
  * 
  * @author Limit Tecnologies <limit@limit.es>
  */
-@Slf4j
 @Controller
 @RequestMapping("/usuariTasca")
 public class UsuariTascaController extends BaseUserController {
 
 	private static final String SESSION_ATTRIBUTE_FILTRE = "UsuariTascaController.session.filtre";
 
-	@Autowired
-	private ExpedientTascaService expedientTascaService;
-
+	@Autowired private ExpedientTascaService expedientTascaService;
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String get(
 			HttpServletRequest request,
 			Model model) {
 		
-		
 		UsuariTascaFiltreCommand command = getFiltreCommand(request);
 		model.addAttribute(command);
-		
 		return "usuariTascaList";
 	}
-	
-	
 	
 	@RequestMapping(value = "/filtrar", method = RequestMethod.POST)
 	public String post(
@@ -89,7 +78,6 @@ public class UsuariTascaController extends BaseUserController {
 		return "redirect:../usuariTasca";
 	}
 
-
 	@RequestMapping(value = "/datatable", method = RequestMethod.GET)
 	@ResponseBody
 	public DatatablesResponse datatable(
@@ -105,7 +93,6 @@ public class UsuariTascaController extends BaseUserController {
 						UsuariTascaFiltreCommand.asDto(filtreCommand), 
 						DatatablesHelper.getPaginacioDtoFromRequest(request)));		
 	}
-
 	
 	@RequestMapping(value = "/{expedientTascaId}/iniciar", method = RequestMethod.GET)
 	public String expedientTascaIniciar(
@@ -124,13 +111,14 @@ public class UsuariTascaController extends BaseUserController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				redirectATasca != null && redirectATasca == true ? "redirect:/contingut/" + expedientId + "?tascaId=" + expedientTascaId : "redirect:/usuariTasca",
-				"expedient.tasca.controller.iniciada.ok");
+				"expedient.tasca.controller.iniciada.ok",
+				new Object[]{tasca.getTitol()});
 		
 	}
 	
 	
 	@RequestMapping(value = "/{expedientTascaId}/rebutjar", method = RequestMethod.GET)
-	public String getExpedientTascaDetall(
+	public String getExpedientTascaRebutjar(
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
 			Model model) {
@@ -159,7 +147,7 @@ public class UsuariTascaController extends BaseUserController {
 			return "usuariTascaRebuigForm";
 		}
 		
-		expedientTascaService.canviarTascaEstat(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.canviarTascaEstat(
 				command.getId(),
 				TascaEstatEnumDto.REBUTJADA,
 				command.getMotiu(), 
@@ -167,7 +155,8 @@ public class UsuariTascaController extends BaseUserController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/usuariTasca",
-				"expedient.tasca.controller.rebutjada.ok");
+				"expedient.tasca.controller.rebutjada.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 	}
 	
 	
@@ -179,7 +168,7 @@ public class UsuariTascaController extends BaseUserController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-		expedientTascaService.canviarTascaEstat(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.canviarTascaEstat(
 				expedientTascaId,
 				TascaEstatEnumDto.FINALITZADA,
 				null,
@@ -188,7 +177,8 @@ public class UsuariTascaController extends BaseUserController {
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:/usuariTasca",
-				"expedient.tasca.controller.finalitzada.ok");
+				"expedient.tasca.controller.finalitzada.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 	}
 	
 	@InitBinder
@@ -227,7 +217,7 @@ public class UsuariTascaController extends BaseUserController {
 			return "expedientTascaDelegar";
 		}
 	
-		expedientTascaService.updateDelegat(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.updateDelegat(
 				expedientTascaId, 
 				command.getDelegatCodi(),
 				command.getComentari());
@@ -236,7 +226,7 @@ public class UsuariTascaController extends BaseUserController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.delegar.ok",
-				new String [] {command.getDelegatCodi()});
+				new String [] {expedientTascaDto.getTitol(), command.getDelegatCodi()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/retomar", method = RequestMethod.GET)
@@ -266,14 +256,15 @@ public class UsuariTascaController extends BaseUserController {
 			return "expedientTascaCancelarDelegacio";
 		}
 	
-		expedientTascaService.cancelarDelegacio(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.cancelarDelegacio(
 				expedientTascaId, 
 				command.getComentari());
 		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.cancelar.delegacio.ok");
+				"expedient.tasca.controller.cancelar.delegacio.ok",
+				new String [] {expedientTascaDto.getTitol()});
 	}
 	
 	private UsuariTascaFiltreCommand getFiltreCommand(

@@ -150,8 +150,12 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			model.addAttribute(tasca);
 		} else {
 			tasca = new MetaExpedientTascaDto();
-			String duracioTascaConf = configService.getConfigValue("es.caib.ripea.duracio.tasca");
-			tasca.setDuracio(duracioTascaConf!=null?duracioTascaConf:"10d");
+			try {
+				String duracioTascaConf = configService.getConfigValue("es.caib.ripea.duracio.tasca");
+				tasca.setDuracio(duracioTascaConf!=null?Integer.parseInt(duracioTascaConf):10);
+			} catch (Exception ex) {
+				tasca.setDuracio(10);
+			}
 		}
 		
 		List<ExpedientEstatDto> expedientEstats = expedientEstatService.findExpedientEstatsByMetaExpedient(
@@ -200,6 +204,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			@Valid MetaExpedientTascaCommand command,
 			BindingResult bindingResult,
 			Model model) {
+
 		EntitatDto entitatActual = getEntitatActualComprovantPermisAdminEntitatOAdminOrganOrRevisor(request);
 		String rolActual = (String)request.getSession().getAttribute(SESSION_ATTRIBUTE_ROL_ACTUAL);
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
@@ -215,14 +220,11 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			
 			return "metaExpedientTascaForm";
 		}
-		if (command!=null && command.getDuracio()!=null) {
-			String duracio = command.getDuracio().toLowerCase().trim();
-			if (!duracio.endsWith("h") && !duracio.endsWith("d")) {
-				duracio += "d";
-			}
-			command.setDuracio(duracio);
-		}
+		
+		if (command.getDuracio()!=null && command.getDuracio()<0) { command.setDuracio(0); }
+		
 		if (command.getId() == null) {
+			//CREATE
 			metaExpedientService.tascaCreate(
 					entitatActual.getId(),
 					metaExpedientId,
@@ -236,7 +238,10 @@ public class MetaExpedientTascaController extends BaseAdminController {
 					"redirect:expedientEstat/" + metaExpedientId,
 					"metaexpedient.controller.tasca.creada.ok",
 					new Object[] { command.getNom() });
+		
 		} else {
+			
+			//UPDATE
 			metaExpedientService.tascaUpdate(
 					entitatActual.getId(),
 					metaExpedientId,

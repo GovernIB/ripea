@@ -533,10 +533,31 @@ dd.no_color {
 }
 
 .ripea-submenu-list {
-    width: 250px;
     position: fixed;
+    display: block;
+    right: 250px;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: 4px;
+    padding: 0px;
 }
-
+.ripea-submenu-list li {
+    line-height: 30px;
+}
+.ripea-submenu-list li:hover {
+    background-color: #f5f5f5;
+    cursor: pointer;
+}
 .ripea-submenu-list li a {
-    white-space: normal;
+    position: relative;
+    /*white-space: normal;
+    font-weight: 400;
+    line-height: 1.42857143;*/
+    color: #333;
+    padding: 20px;
+    /*padding-top: 3px;
+    padding-bottom: 3px;*/
+}
+.ripea-submenu-list li a:hover {
+    text-decoration: none;
 }

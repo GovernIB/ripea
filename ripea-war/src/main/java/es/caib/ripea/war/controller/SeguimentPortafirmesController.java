@@ -1,8 +1,4 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -71,7 +67,6 @@ public class SeguimentPortafirmesController extends BaseAdminController {
 		}
 		return "redirect:../seguimentPortafirmes";
 	}
-    
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
@@ -90,10 +85,6 @@ public class SeguimentPortafirmesController extends BaseAdminController {
 			
         return DatatablesHelper.getDatatableResponse(request, docsPortafirmes, "id");
     }
-    
-    
-    
-
 	
 	private SeguimentFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -109,9 +100,5 @@ public class SeguimentPortafirmesController extends BaseAdminController {
 		}
 		return filtreCommand;
 	}
-
-    
-
-	
 	
 }

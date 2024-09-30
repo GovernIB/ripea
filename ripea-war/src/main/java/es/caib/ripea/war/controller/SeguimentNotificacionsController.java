@@ -1,8 +1,4 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
-
 
 import java.util.HashSet;
 import java.util.Set;
@@ -49,12 +45,9 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 	public static final String SESSION_ATTRIBUTE_FILTRE = "SeguimentNotificacionsController.session.filtre";
 	private static final String SESSION_ATTRIBUTE_SELECCIO = "SeguimentNotificacionsController.session.seleccio";
 	
-    @Autowired
-    private SeguimentService seguimentService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private AplicacioService aplicacioService;
+    @Autowired private SeguimentService seguimentService;
+	@Autowired private DocumentService documentService;
+	@Autowired private AplicacioService aplicacioService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String get(HttpServletRequest request, Model model) {
@@ -107,7 +100,6 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 		}
 		return "redirect:../seguimentNotificacions";
 	}
-    
 
     @RequestMapping(value = "/datatable", method = RequestMethod.GET)
     @ResponseBody
@@ -131,9 +123,6 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 				"id",
 				getSessionAttributeSelecio(request));
     }
-    
-    
-    
     
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/select", method = RequestMethod.GET)
@@ -196,73 +185,61 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 		return seleccio.size();
 	}
 	
-    
-
-	
-	
-	
-	   @RequestMapping(value = "/actualitzarEstatMassiu", method = RequestMethod.GET)
-		public String comunicadaConsultarMassiu(
-				HttpServletRequest request) throws Throwable {
-			
-			
-			@SuppressWarnings("unchecked")
-			Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+    @RequestMapping(value = "/actualitzarEstatMassiu", method = RequestMethod.GET)
+	public String comunicadaConsultarMassiu(
+			HttpServletRequest request) throws Throwable {
+		
+		
+		@SuppressWarnings("unchecked")
+		Set<Long> seleccio = ((Set<Long>) RequestSessionHelper.obtenirObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request)));
+		
+		if (seleccio == null || seleccio.isEmpty()) {
+			return getModalControllerReturnValueError(
 					request,
-					getSessionAttributeSelecio(request)));
-			
-			if (seleccio == null || seleccio.isEmpty()) {
-				return getModalControllerReturnValueError(
-						request,
-						"redirect:/seguimentNotificacions",
-						"accio.massiva.seleccio.buida",
-						null);
-			}
-			
-			int errors = 0;
-			int correctes = 0;
-			
-			for (Long id : seleccio) {
-				Exception exception = null;
-				try {
-					documentService.notificacioActualitzarEstat(id);
-				} catch (Exception ex) {
-					exception = ex;
-				}
-				if (exception != null ) {
-					log.error("Error al actualitzar estat del notificacio massiu", exception);
-					errors++;
-				} else {
-					correctes++;
-				}
-			}
-			
-			if (correctes > 0){
-				MissatgesHelper.success(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.ok", new Object[]{correctes}));
-			} 
-			if (errors > 0) {
-				MissatgesHelper.error(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.error", new Object[]{errors}), null);
-			} 
-			
-			seleccio.clear();
-			RequestSessionHelper.actualitzarObjecteSessio(
-					request,
-					getSessionAttributeSelecio(request),
-					seleccio);
-			
-			return "redirect:/seguimentNotificacions";
+					"redirect:/seguimentNotificacions",
+					"accio.massiva.seleccio.buida",
+					null);
 		}
-	    
-	
-	
-	
-    
+		
+		int errors = 0;
+		int correctes = 0;
+		
+		for (Long id : seleccio) {
+			Exception exception = null;
+			try {
+				documentService.notificacioActualitzarEstat(id);
+			} catch (Exception ex) {
+				exception = ex;
+			}
+			if (exception != null ) {
+				log.error("Error al actualitzar estat del notificacio massiu", exception);
+				errors++;
+			} else {
+				correctes++;
+			}
+		}
+		
+		if (correctes > 0){
+			MissatgesHelper.success(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.ok", new Object[]{correctes}));
+		} 
+		if (errors > 0) {
+			MissatgesHelper.error(request, getMessage(request, "seguiment.list.notificacio.actualitzar.estat.massiu.error", new Object[]{errors}), null);
+		} 
+		
+		seleccio.clear();
+		RequestSessionHelper.actualitzarObjecteSessio(
+				request,
+				getSessionAttributeSelecio(request),
+				seleccio);
+		
+		return "redirect:/seguimentNotificacions";
+	}
     
 	private String getSessionAttributeSelecio(HttpServletRequest request) {
 		return SESSION_ATTRIBUTE_SELECCIO;
 	}
-
-
 	
 	private SeguimentNotificacionsFiltreCommand getFiltreCommand(
 			HttpServletRequest request) {
@@ -280,6 +257,4 @@ public class SeguimentNotificacionsController extends BaseAdminController {
 		return filtreCommand;
 	}
 
-    
-	
 }

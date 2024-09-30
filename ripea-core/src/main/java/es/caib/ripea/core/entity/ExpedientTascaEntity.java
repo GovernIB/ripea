@@ -84,8 +84,8 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Column(name = "data_limit")
 	private Date dataLimit;
 
-	@Column(name = "DURACIO", length = 16)
-	private String duracio;
+	@Column(name = "DURACIO")
+	private Integer duracio;
 
 	@Column(name = "PRIORITAT", length = 16)
 	@Enumerated(EnumType.STRING)
@@ -114,7 +114,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 			List<UsuariEntity> observadors,
 			Date dataLimit,
 			String titol,
-			String duracio,
+			Integer duracio,
 			PrioritatEnumDto prioritat,
 			String observacions) {
 		return new Builder(
@@ -138,7 +138,7 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 				List<UsuariEntity> observadors,
 				Date dataLimit,
 				String titol,
-				String duracio,
+				Integer duracio,
 				PrioritatEnumDto prioritat,
 				String observacions) {
 			built = new ExpedientTascaEntity();
@@ -242,8 +242,9 @@ public class ExpedientTascaEntity extends RipeaAuditable<Long> {
 	public String getObservacions() {
 		return observacions;
 	}
-	public String getDuracio() { return duracio; }
-	public void setDuracio(String duracio) { this.duracio = duracio; }
+	
+	public Integer getDuracio() { return duracio; }
+	public void setDuracio(Integer duracio) { this.duracio = duracio; }
 	public PrioritatEnumDto getPrioritat() { return prioritat; }
 	public void setPrioritat(PrioritatEnumDto prioritat) { this.prioritat = prioritat; }
 

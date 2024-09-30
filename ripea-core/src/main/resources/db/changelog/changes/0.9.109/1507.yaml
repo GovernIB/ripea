@@ -15,7 +15,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: DURACIO
-                  type: varchar(16 ${varcharunit})
+                  type: number(19)
               - column:
                   name: PRIORITAT
                   type: varchar(16 ${varcharunit})
@@ -24,7 +24,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: DURACIO
-                  type: varchar(16 ${varcharunit})
+                  type: number(19)
               - column:
                   name: PRIORITAT
                   type: varchar(16 ${varcharunit})
@@ -37,10 +37,10 @@ databaseChangeLog:
                   value: es.caib.ripea.duracio.tasca
               - column:
                   name: value
-                  value: 10d
+                  value: 10
               - column:
                   name: description
-                  value: Duració per defecte de una tasca (10 dies)
+                  value: Duració per defecte de una tasca, sempre especificat en dies.
               - column:
                   name: group_code
                   value: ALTRES
@@ -52,7 +52,7 @@ databaseChangeLog:
                   value: ${booleanFalse}
               - column:
                   name: type_code
-                  value: TEXT
+                  value: INT
               - column:
                   name: configurable
                   value: ${booleanFalse}

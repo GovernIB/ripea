@@ -28,6 +28,15 @@ public class PaginacioParamsDto implements Serializable {
 	private List<FiltreDto> filtres = new ArrayList<FiltreDto>();
 	private List<OrdreDto> ordres = new ArrayList<OrdreDto>();
 
+	public void canviaCampOrdenacio(String campInicial, String campFinal) {
+		if (ordres!=null) {
+			for (OrdreDto ordre: this.ordres) {
+				if (campInicial.equals(ordre.camp)) {
+					ordre.setCamp(campFinal);
+				}
+			}
+		}
+	}
 
 	public void afegirFiltre(String camp, String valor) {
 		getFiltres().add(new FiltreDto(camp, valor));

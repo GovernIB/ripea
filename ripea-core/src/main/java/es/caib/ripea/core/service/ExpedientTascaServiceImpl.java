@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
@@ -33,7 +32,6 @@ import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.core.api.utils.Utils;
 import es.caib.ripea.core.entity.ContingutEntity;
-import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.entity.ExpedientTascaComentariEntity;
 import es.caib.ripea.core.entity.ExpedientTascaEntity;
@@ -114,6 +112,9 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 				false,
 				false,
 				null);
+		
+		paginacioParams.canviaCampOrdenacio("dataLimitString", "dataLimit");
+		paginacioParams.canviaCampOrdenacio("duracioFormat", "duracio");
 		
 		List<ExpedientTascaEntity> tasques = expedientTascaRepository.findByExpedient(
 				expedient,
@@ -727,17 +728,22 @@ public class ExpedientTascaServiceImpl implements ExpedientTascaService {
 
 	@Transactional
 	@Override
-	public ExpedientTascaDto updateDataLimit(Long expedientTascaId, Date dataLimit) {
+	public ExpedientTascaDto updateDataLimit(ExpedientTascaDto expedientTascaDto) {
 		logger.debug("Canviant responsable de la tasca " +
-				"expedientTascaId=" + expedientTascaId +", "+
-				"dataLimit=" + dataLimit +
-				")");
+				"expedientTascaId=" + expedientTascaDto.getId() +", "+
+				"dataLimit=" + expedientTascaDto.getDataLimit() + ")");
 
-		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaId);
-				
-		expedientTascaEntity.updateDataLimit(dataLimit);	
-		
-		emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
+		ExpedientTascaEntity expedientTascaEntity = expedientTascaRepository.findOne(expedientTascaDto.getId());
+
+		//Si no ha canviat res en el DTO respecte del entity (info a BBDD), no fer cap acció
+		if (Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDataLimit(),  expedientTascaDto.getDataLimit()) ||
+			Utils.sonValorsDiferentsControlantNulls(expedientTascaEntity.getDuracio(),  expedientTascaDto.getDuracio())) {
+			
+			expedientTascaEntity.updateDataLimit(expedientTascaDto.getDataLimit());
+			expedientTascaEntity.setDuracio(expedientTascaDto.getDuracio());
+			
+			emailHelper.enviarEmailModificacioDataLimitTasca(expedientTascaEntity);
+		}
 		
 		log(expedientTascaEntity, LogTipusEnumDto.CANVI_DATALIMIT_TASCA);
 		

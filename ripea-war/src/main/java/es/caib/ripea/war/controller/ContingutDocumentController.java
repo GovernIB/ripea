@@ -445,7 +445,8 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../contingut/" + pareId,
-					"document.controller.modificat.ok");
+					"document.controller.modificat.ok",
+					new Object[] { command.getNom() });
 
 		} catch (Exception e) {
 			logger.error("Error actualitzant el document amb el nou tipus de document", e);

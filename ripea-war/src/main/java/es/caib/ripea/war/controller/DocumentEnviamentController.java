@@ -3,35 +3,21 @@
  */
 package es.caib.ripea.war.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.ContingutDto;
-import es.caib.ripea.core.api.dto.DocumentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
-import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
-import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
-import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
-import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ExpedientDto;
-import es.caib.ripea.core.api.dto.FitxerDto;
-import es.caib.ripea.core.api.dto.InteressatDto;
-import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
-import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
-import es.caib.ripea.core.api.dto.ServeiTipusEnumDto;
-import es.caib.ripea.core.api.dto.TipusClassificacioEnumDto;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ContingutService;
-import es.caib.ripea.core.api.service.DadesExternesService;
-import es.caib.ripea.core.api.service.DocumentEnviamentService;
-import es.caib.ripea.core.api.service.DocumentService;
-import es.caib.ripea.core.api.service.ExpedientInteressatService;
-import es.caib.ripea.plugin.NotibRepostaException;
-import es.caib.ripea.war.command.*;
-import es.caib.ripea.war.helper.EnumHelper;
-import es.caib.ripea.war.helper.ExceptionHelper;
-import es.caib.ripea.war.helper.MissatgesHelper;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,19 +34,28 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.ConnectException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import es.caib.ripea.core.api.dto.ContingutDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentDto;
+import es.caib.ripea.core.api.dto.DocumentEnviamentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioDto;
+import es.caib.ripea.core.api.dto.DocumentNotificacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.DocumentPublicacioDto;
+import es.caib.ripea.core.api.dto.DocumentPublicacioTipusEnumDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.RespostaJustificantEnviamentNotibDto;
+import es.caib.ripea.core.api.service.ContingutService;
+import es.caib.ripea.core.api.service.DocumentEnviamentService;
+import es.caib.ripea.core.api.service.DocumentService;
+import es.caib.ripea.plugin.NotibRepostaException;
+import es.caib.ripea.war.command.DocumentNotificacionsCommand;
+import es.caib.ripea.war.command.DocumentPublicacioCommand;
+import es.caib.ripea.war.helper.EnumHelper;
+import es.caib.ripea.war.helper.ExceptionHelper;
+import es.caib.ripea.war.helper.MissatgesHelper;
 
 /**
  * Controlador per als enviaments dels expedients.
@@ -74,7 +69,6 @@ public class DocumentEnviamentController extends BaseUserController {
  	@Autowired private DocumentEnviamentService documentEnviamentService;
 	@Autowired private ContingutService contingutService;
 	@Autowired private DocumentService documentService;
-	@Autowired private DadesExternesService dadesExternesService;
 
     DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 

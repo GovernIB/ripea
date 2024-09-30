@@ -1114,6 +1114,8 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 
 		MetaExpedientEntity metaExpedient = entityComprovarHelper.comprovarMetaExpedient(entitat, metaExpedientId);
 
+		paginacioParams.canviaCampOrdenacio("duracioFormat", "duracio");
+		
 		return paginacioHelper.toPaginaDto(
 				metaExpedientTascaRepository.findByEntitatAndMetaExpedientAndFiltre(
 						entitat,

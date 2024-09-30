@@ -13,45 +13,91 @@
 	<link href="<c:url value="/webjars/select2/4.0.6-rc.1/dist/css/select2.min.css"/>" rel="stylesheet"/>
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
+	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
 	<link href="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/css/bootstrap-datepicker.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/js/bootstrap-datepicker.min.js"/>"></script>
 	<script src="<c:url value="/webjars/bootstrap-datepicker/1.6.1/dist/locales/bootstrap-datepicker.${requestLocale}.min.js"/>"></script>
 	<rip:modalHead/>
 	
-<script>
-$(document).ready(function(){
-
-	let errorsValidacio = parseBoolean('${errorsValidacio}');
-
-	$('#metaExpedientTascaId').on('change', function() {
-
-		var metaTascaId = $(this).val();
-		$('#expedientId').select2('val', '', true);
-		$('#expedientId option[value!=""]').remove();
+	<script type="text/javascript">
+		$(document).ready(function() {
 		
-		if (metaTascaId != null && metaTascaId != "") {
-			$.get("<c:url value="/expedientTasca/"/>" + metaTascaId + "/getMetaExpedientTasca")
-			.done(function(data){
-				$('#metaExpedientTascaDescripcio').val(data.descripcio);
-				$('#responsablesCodi').data('currentValue', data.responsable);
-				$('#responsablesCodi').webutilInputSuggest();
-				$('#duracio').val(data.duracio);
-				$('#prioritat').val(data.prioritat).change();
-			})
-			.fail(function() {
-				alert("<spring:message code="error.jquery.ajax"/>");
+			let errorsValidacio = parseBoolean('${errorsValidacio}');
+			
+// 			$('#metaExpedientTascaId').attr("tabindex", "1");
+// 			$('#metaExpedientTascaDescripcio').attr("tabindex", "2");
+// 			$('#responsablesCodi').attr("tabindex", "3");
+// 			$('#observadorsCodi').attr("tabindex", "4");
+// 			$('#duracio').attr("tabindex", "5");
+//  		$('#dataLimit').attr("tabindex", "99");
+// 			$('#titol').attr("tabindex", "6");
+// 			$('#observacions').attr("tabindex", "7");
+// 			$('#prioritat').attr("tabindex", "8");
+		
+			$('#duracio').on('blur', function(event) { 
+				$('#titol').focus();
+				event.preventDefault();
+				return false;
 			});
-		}
-	});
-	//Si venim de guardar amb errors, no volem recarregar les dades, sino mantenir les del command
-	//Al carregar una tasca existent, tampoc volem carregar dades de la meta-tasca, sino les del command
-	if (!errorsValidacio) {
-		$('#metaExpedientTascaId').trigger('change');
-	}
-});
-
-</script>	
+		
+			$('#duracio').on('change', function() {
+				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDuracio",
+				$("#tascaform").serialize())
+				.done(function(data){
+					debugger;
+					//El seguent camp en el onchenge de duracio es la propia data que estam canviant
+					//com que els tags de ripea no tenen tabIndex, ens botam el foco en el camp en el que volem insertar el valor.
+					//$('#dataLimit').datepicker('setDate', data.dataLimitString);
+					$('#dataLimit').val(data.dataLimitString);
+					remarcaElement($('#dataLimit'));
+					//$('#dataLimit').val(data.dataLimitString);
+				})
+				.fail(function() {
+					alert("<spring:message code="error.jquery.ajax"/>");
+				});
+			});
+		
+			$('#dataLimit').on('change', function() {
+				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDataLimit",
+				$("#tascaform").serialize())
+				.done(function(data){
+					$('#duracio').val(data.duracio);
+					remarcaElement($('#duracio'));
+				})
+				.fail(function() {
+					alert("<spring:message code="error.jquery.ajax"/>");
+				});
+			});
+			
+			$('#metaExpedientTascaId').on('change', function() {
+		
+				var metaTascaId = $(this).val();
+				$('#expedientId').select2('val', '', true);
+				$('#expedientId option[value!=""]').remove();
+				
+				if (metaTascaId != null && metaTascaId != "") {
+					$.get("<c:url value="/expedientTasca/"/>" + metaTascaId + "/getMetaExpedientTasca")
+					.done(function(data){
+						$('#metaExpedientTascaDescripcio').val(data.descripcio);
+						$('#responsablesCodi').data('currentValue', data.responsable);
+						$('#responsablesCodi').webutilInputSuggest();
+						$('#duracio').val(data.duracio);
+						$('#dataLimit').val(data.dataLimitString);
+						$('#prioritat').val(data.prioritat).change();
+					})
+					.fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});
+				}
+			});
+			//Si venim de guardar amb errors, no volem recarregar les dades, sino mantenir les del command
+			//Al carregar una tasca existent, tampoc volem carregar dades de la meta-tasca, sino les del command
+			if (!errorsValidacio) {
+				$('#metaExpedientTascaId').trigger('change');
+			}
+		});
+	</script>
 </head>
 <body>
 
@@ -65,7 +111,7 @@ $(document).ready(function(){
 			optionValueAttribute="id"  
 			optionTextAttribute="nom"
 			required="true" /> 
-			
+
 		<rip:inputTextarea 
 			name="metaExpedientTascaDescripcio" 
 			textKey="expedient.tasca.form.camp.metaExpedientTascaDescripcio" 
@@ -97,7 +143,10 @@ $(document).ready(function(){
 				textKey="tasca.list.column.duracio"
 				tooltip="true"
 				comment="tasca.list.column.duracio.tip"
-				tooltipMsg="tasca.list.column.duracio.tip" />
+				tooltipMsg="tasca.list.column.duracio.tip"/>
+		<rip:inputDate
+			name="dataLimit"
+			textKey="expedient.tasca.list.boto.dataLimit"/>
 		<rip:inputText 
 			name="titol"
 			textKey="expedient.tasca.form.camp.titol"

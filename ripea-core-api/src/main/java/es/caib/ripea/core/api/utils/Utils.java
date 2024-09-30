@@ -16,8 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Utils {
-
-
 	
 	public static String trim(String value) { 
 		return StringUtils.trimToNull(value);
@@ -273,4 +271,48 @@ public class Utils {
 		return str;
 	}
 	
+	public static String duracioEnDiesToString(Integer dies) {
+		
+		if (dies!=null) {
+		
+			try {
+			
+				if (dies>0) {
+					
+					int weeks = dies / 7;
+					int remainingDays = dies % 7;
+	
+					String retorn = "";
+					if (weeks>0) { retorn += weeks + " setmanes"; }
+					if (remainingDays>0) { retorn += " ," + remainingDays + " dies"; }
+					
+					if (retorn.startsWith(" ,")) {
+						return retorn.substring(2, retorn.length());
+					} else {
+						return retorn;
+					}			
+					
+				} else {
+					return "El mateix dia.";
+				}
+			} catch (Exception ex) {
+				return dies + " dies";
+			}
+
+		} else {
+			return "Duració no definida.";
+		}
+	}
+	
+	public static boolean sonValorsDiferentsControlantNulls(Object valor1, Object valor2) {
+		if (valor1 == null && valor2 == null) {
+			return false; // Ambos son nulos, no ha cambiado
+		}
+
+		if (valor1 == null || valor2 == null) {
+			return true; // Uno es nulo y el otro no, ha cambiado
+		}
+
+		return !valor1.equals(valor2); // Comparación de valores no nulos
+	}
 }

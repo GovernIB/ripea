@@ -15,6 +15,10 @@ function webutilRefreshMissatges() {
 	$('#contingut-missatges').load(webutilContextPath() + "/nodeco/missatges");
 }
 
+function remarcaElement(jQueryElem) {
+	jQueryElem[0].animate({ backgroundColor: 'aliceblue' }, 500);
+}
+
 function base64toBlob(b64Data, contentType) {
 	var contentType = contentType || '';
 	var sliceSize = 512;

@@ -726,25 +726,6 @@ public class ContingutHelper {
 		logMsg("ambMapPerEstat end (" + expedient.getId() + "):  " + (System.currentTimeMillis() - t1) + " ms");
 	}
 
-	private ContingutDto toContingutDto(DocumentEntity document, ToContingutParams params) {
-		return toContingutDto(
-				document,
-				ToContingutParams.builder()
-						.ambPermisos(params.isAmbPermisos())
-						.ambPath(params.isAmbPath())
-						.rolActual(params.getRolActual())
-						.onlyForList(params.isOnlyForList())
-						.organActualId(params.getOrganActualId())
-						.onlyFirstDescendant(params.isOnlyFirstDescendant())
-						.level(params.getLevel())
-						.ambExpedientPare(params.isAmbExpedientPare())
-						.ambEntitat(params.isAmbEntitat())
-//						.ambMapPerEstat(params.isAmbMapPerEstat())
-						.build()
-		);
-	}
-
-
 	// DOCUMENT
 	// //////////////////////////////////////////////////////////////////////////////////////////
 

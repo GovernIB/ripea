@@ -1,7 +1,6 @@
 package es.caib.ripea.core.api.service;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -83,9 +82,7 @@ public interface ExpedientTascaService {
 			String motiu, 
 			String rolActual);
 	
-	public ExpedientTascaDto updateDataLimit(
-			Long expedientTascaId, 
-			Date dataLimit);
+	public ExpedientTascaDto updateDataLimit(ExpedientTascaDto expedientTascaDto);
 	
 	public List<MetaExpedientTascaDto> findAmbEntitat(Long entitatId);
 

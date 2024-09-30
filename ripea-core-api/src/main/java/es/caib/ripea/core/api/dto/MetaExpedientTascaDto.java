@@ -7,9 +7,9 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import es.caib.ripea.core.api.utils.Utils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Informació d'una tasca d'un meta-expedient.
@@ -27,7 +27,11 @@ public class MetaExpedientTascaDto implements Serializable {
 	private String responsable;
 	private boolean activa;
 	private Date dataLimit;
-	private String duracio = "1d";
+	@SuppressWarnings("unused")
+	private String dataLimitString;
+	private Integer duracio = 10;
+	@SuppressWarnings("unused")
+	private String duracioFormat;
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	private Long estatIdCrearTasca;
 	private String estatNomCrearTasca;
@@ -45,6 +49,14 @@ public class MetaExpedientTascaDto implements Serializable {
 		}
 	}
 
+	public String getDuracioFormat() {
+		if (this.duracio!=null) {
+			return Utils.duracioEnDiesToString(this.duracio);
+		} else {
+			return getDataLimitString();
+		}
+	}
+	
 	private static final long serialVersionUID = -139254994389509932L;
 
 }

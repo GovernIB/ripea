@@ -54,6 +54,18 @@ interessatTipusText["${option.value}"] = "<spring:message code="${option.text}"/
 //################################################## document ready START ##############################################################
 $(document).ready(function() {
 
+	$('#taulaInteressats').on('draw.dt', function (e, settings) {
+		let api = new $.fn.dataTable.Api(settings);
+		if (api.page.info().recordsTotal>0) {
+			$("#exportInteressatBtn").removeAttr('disabled');
+			$("#exportInteressatBtn").removeAttr('title');
+			$("#exportInteressatBtn").attr('href', '<c:url value="/expedient/${expedientId}/interessat/exportar"/>');
+		} else {
+			$("#exportInteressatBtn").attr('disabled', 'disabled');
+			$("#exportInteressatBtn").attr('title', '<spring:message code="tab.interessats.noExportData"/>');
+			$("#exportInteressatBtn").attr('href', '#');
+		}
+	});
 
 	//=======================  list additonal info on clicking desplegable in interessats table =============================
 	$('#taulaInteressats').on('rowinfo.dataTable', function (e, td, rowData) {

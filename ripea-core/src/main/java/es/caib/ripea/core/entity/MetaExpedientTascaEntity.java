@@ -43,8 +43,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "data_limit")
 	private Date dataLimit;
-	@Column(name = "DURACIO", length = 16)
-	private String duracio;
+	@Column(name = "DURACIO")
+	private Integer duracio;
 	@Column(name = "PRIORITAT", length = 16)
 	@Enumerated(EnumType.STRING)
 	private PrioritatEnumDto prioritat;

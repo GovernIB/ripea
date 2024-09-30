@@ -1,18 +1,15 @@
-/**
- * 
- */
 package es.caib.ripea.war.controller;
 
-import es.caib.ripea.core.api.dto.*;
-import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ExpedientService;
-import es.caib.ripea.core.api.service.ExpedientTascaService;
-import es.caib.ripea.war.command.ExpedientTascaCommand;
-import es.caib.ripea.war.command.TascaDataLimitCommand;
-import es.caib.ripea.war.command.TascaReassignarCommand;
-import es.caib.ripea.war.command.TascaReobrirCommand;
-import es.caib.ripea.war.helper.*;
-import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -20,18 +17,30 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
+import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
+import es.caib.ripea.core.api.service.AplicacioService;
+import es.caib.ripea.core.api.service.ConfigService;
+import es.caib.ripea.core.api.service.ExpedientService;
+import es.caib.ripea.core.api.service.ExpedientTascaService;
+import es.caib.ripea.war.command.ExpedientTascaCommand;
+import es.caib.ripea.war.command.TascaReassignarCommand;
+import es.caib.ripea.war.command.TascaReobrirCommand;
+import es.caib.ripea.war.helper.DatatablesHelper;
+import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
+import es.caib.ripea.war.helper.MissatgesHelper;
+import es.caib.ripea.war.helper.RolHelper;
 
 /**
  * Controlador per al llistat d'expedients tasques.
@@ -42,13 +51,10 @@ import java.util.List;
 @RequestMapping("/expedientTasca")
 public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private ExpedientTascaService expedientTascaService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private AplicacioService aplicacioService;
-
+	@Autowired private ExpedientTascaService expedientTascaService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ConfigService configService;
 
 	@RequestMapping(value = "/{expedientId}/datatable", method = RequestMethod.GET)
 	@ResponseBody
@@ -145,12 +151,13 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				TascaEstatEnumDto.CANCELLADA,
 				null,
 				RolHelper.getRolActual(request));
-		
+		//TODO Es necessari recuperar de nou la tasca? canviarTascaEstat ja retorna un objecte ExpedientTascaDto 
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
-				"expedient.tasca.controller.cancellada.ok");
+				"expedient.tasca.controller.cancellada.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 		
 	}	
 	
@@ -181,13 +188,6 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			model.addAttribute("errorsValidacio", true);
 			return "expedientTascaForm";
 		}
-		if (expedientTascaCommand!=null && expedientTascaCommand.getDuracio()!=null) {
-			String duracio = expedientTascaCommand.getDuracio().toLowerCase().trim();
-			if (!duracio.endsWith("h") && !duracio.endsWith("d")) {
-				duracio += "d";
-			}
-			expedientTascaCommand.setDuracio(duracio);
-		}
 		expedientTascaService.createTasca(
 				entitatActual.getId(),
 				expedientId,
@@ -196,7 +196,8 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.creat.ok");
+				"expedient.tasca.controller.creat.ok",
+				new Object[]{expedientTascaCommand.getTitol()});
 	}
 
 	@RequestMapping(value = "{metaExpedientTascaId}/getMetaExpedientTasca", method = RequestMethod.GET)
@@ -205,7 +206,67 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long metaExpedientTascaId,
 			Model model) {
-		return expedientTascaService.findMetaExpedientTascaById(metaExpedientTascaId);
+		MetaExpedientTascaDto resultat = expedientTascaService.findMetaExpedientTascaById(metaExpedientTascaId);
+		Calendar cal = Calendar.getInstance();
+		if (resultat.getDuracio()==null) {
+			String duracioTascaConf = configService.getConfigValue("es.caib.ripea.duracio.tasca");
+			resultat.setDuracio(duracioTascaConf!=null?Integer.parseInt(duracioTascaConf):10);
+		}		
+		cal.add(Calendar.DAY_OF_YEAR, resultat.getDuracio());
+		resultat.setDataLimit(cal.getTime());
+		return resultat;
+	}
+	
+	//Han canviat la duració del command, recalculam la data limit
+	@RequestMapping(value = "{metaExpedientTascaId}/changedDuracio", method = RequestMethod.POST)
+	@ResponseBody
+	public ExpedientTascaCommand changedDuracio(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientTascaId,
+			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
+			Model model) {
+		if (expedientTascaCommand.getDuracio()!=null && expedientTascaCommand.getDuracio()>0) {
+			//Afegirem els dies de duració a la data de inici, o a la de avui si no en té
+			Calendar cal = Calendar.getInstance();
+			if (expedientTascaCommand.getDataInici()!=null) {
+				cal.setTime(expedientTascaCommand.getDataInici());
+			}
+			cal.add(Calendar.DAY_OF_YEAR, expedientTascaCommand.getDuracio());
+			expedientTascaCommand.setDataLimit(cal.getTime());
+		} else {
+			expedientTascaCommand.setDuracio(0);
+			expedientTascaCommand.setDataLimit(Calendar.getInstance().getTime());
+		}
+		return expedientTascaCommand;
+	}
+	
+	//Han canviat la data limit del command, recalculam la duracio
+	@RequestMapping(value = "{metaExpedientTascaId}/changedDataLimit", method = RequestMethod.POST)
+	@ResponseBody
+	public ExpedientTascaCommand changedDataLimit(
+			HttpServletRequest request,
+			@PathVariable Long metaExpedientTascaId,
+			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
+			Model model) {
+		if (expedientTascaCommand.getDataLimit()!=null) {
+			long avui  = Calendar.getInstance().getTimeInMillis();
+			long limit = expedientTascaCommand.getDataLimit().getTime();
+			long diff = limit-avui;
+			//La data limit no pot ser anterior al dia d'avui
+			if (diff<=0) {
+				expedientTascaCommand.setDataLimit(Calendar.getInstance().getTime());
+				expedientTascaCommand.setDuracio(0);
+			} else {
+				//La data de limit es posterior a avui, calculam durada
+				long diffInDays = TimeUnit.MILLISECONDS.toDays(diff);
+				// Redondeo hacia arriba si hay una fracción de día
+				if (diff % TimeUnit.DAYS.toMillis(1) != 0) {
+					diffInDays++;
+				}
+				expedientTascaCommand.setDuracio((int)diffInDays);
+			}
+		}
+		return expedientTascaCommand;
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/reassignar", method = RequestMethod.GET)
@@ -235,12 +296,13 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaReassignar";
 		}
 	
-		expedientTascaService.updateResponsables(expedientTascaId, command.getResponsablesCodi());
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.updateResponsables(expedientTascaId, command.getResponsablesCodi());
 		
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.reassignat.ok");
+				"expedient.tasca.controller.reassignat.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/reobrir", method = RequestMethod.GET)
@@ -278,7 +340,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaReobrir";
 		}
 	
-		expedientTascaService.reobrirTasca(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.reobrirTasca(
 				expedientTascaId, 
 				command.getResponsablesCodi(), 
 				command.getMotiu(),
@@ -287,7 +349,8 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.reobrir.ok");
+				"expedient.tasca.controller.reobrir.ok",
+				new Object[]{expedientTascaDto.getTitol()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.GET)
@@ -296,14 +359,8 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientTascaId,
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
-
-		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
-		
-		TascaDataLimitCommand command = new TascaDataLimitCommand();
-		command.setDataLimit(expedientTascaDto.getDataLimit());
-		
+		ExpedientTascaDto command = expedientTascaService.findOne(expedientTascaId);
 		model.addAttribute(command);
-		
 		return "expedientTascaDataLimit";
 	}
 	
@@ -311,7 +368,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	public String datalimitPost(
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
-			@Valid TascaDataLimitCommand command,
+			@Valid ExpedientTascaDto command,
 			BindingResult bindingResult,
 			Model model) {
 		
@@ -321,7 +378,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			return "expedientTascaDataLimit";
 		}
 	
-		expedientTascaService.updateDataLimit(expedientTascaId, command.getDataLimit());
+		expedientTascaService.updateDataLimit(command);
 		
 		return getModalControllerReturnValueSuccess(
 				request,

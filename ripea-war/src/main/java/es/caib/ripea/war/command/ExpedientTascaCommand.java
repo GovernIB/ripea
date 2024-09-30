@@ -1,17 +1,17 @@
 package es.caib.ripea.war.command;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import es.caib.ripea.core.api.dto.ExpedientTascaDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.war.helper.ConversioTipusHelper;
 
@@ -25,16 +25,26 @@ public class ExpedientTascaCommand {
 	private Date dataInici;
 	private Date dataFi;
 	private Date dataLimit;
+	@SuppressWarnings("unused")
+	private String dataLimitString;
 	@Size(max=256)
 	private String comentari;
-	@Pattern(regexp = "\\d+\\s*[hHdD]?")
-	private String duracio = "1d";
+	private Integer duracio = 10;
 	private PrioritatEnumDto prioritat = PrioritatEnumDto.B_NORMAL;
 	@Size(max=256)
 	private String titol;
 	@Size(max=1024)
 	private String observacions;
 	private List<String> observadorsCodi;
+	
+	public String getDataLimitString() {
+		if (dataLimit != null) {
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+			return sdf.format(this.dataLimit);
+		} else {
+			return "";
+		}
+	}
 	
 	public Date getDataLimit() {
 		return dataLimit;
@@ -96,11 +106,12 @@ public class ExpedientTascaCommand {
 	public void setObservadorsCodi(List<String> observadorsCodi) {
 		this.observadorsCodi = observadorsCodi;
 	}
+	
 	public PrioritatEnumDto getPrioritat() { return prioritat; }
 	public void setPrioritat(PrioritatEnumDto prioritat) { this.prioritat = prioritat; }
-	public String getDuracio() { return duracio; }
-	public void setDuracio(String duracio) { this.duracio = duracio; }
-
+	public Integer getDuracio() { return duracio; }
+	public void setDuracio(Integer duracio) { this.duracio = duracio; }
+	
 	public static ExpedientTascaCommand asCommand(ExpedientTascaDto dto) {
 		ExpedientTascaCommand command = ConversioTipusHelper.convertir(
 				dto,
