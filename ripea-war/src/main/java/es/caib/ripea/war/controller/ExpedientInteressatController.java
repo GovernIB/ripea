@@ -312,7 +312,8 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 				return getModalControllerReturnValueSuccess(
 						request,
 						"redirect:../../../contingut/" + expedientId,
-						msgKey);
+						msgKey,
+						new Object[] { interessatCommand.getDocumentNum() });
 			}
         }
 	}

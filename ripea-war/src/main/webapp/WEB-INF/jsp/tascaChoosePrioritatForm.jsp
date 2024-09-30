@@ -23,7 +23,7 @@
 <form:form action="${formAction}" method="post" cssClass="form-horizontal" commandName="expedientTascaDto">
     <form:hidden path="id"/>
     <rip:inputText name="metaExpedientTasca.nom" textKey="expedient.tasca.form.camp.metaExpedientTasca" disabled="true"/>
-    <rip:inputText name="titol" textKey="expedient.tasca.list.columna.titol" disabled="true"/>
+    <rip:inputText name="titol" textKey="expedient.tasca.list.columna.titol" readonly="true"/>    
     <rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
     <div class="h200" />
     <div id="modal-botons" class="well">

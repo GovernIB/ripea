@@ -125,7 +125,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		expedientTascaService.changeTascaPrioritat(command);
-		MissatgesHelper.success(request, getMessage(request, "tasca.controller.prioritatModificat.ok"));
+		MissatgesHelper.success(request, getMessage(request, "tasca.controller.prioritatModificat.ok", new Object[]{command.getTitol()}));
 		return modalUrlTancar();
 //		return getModalControllerReturnValueSuccess(
 //				request,
