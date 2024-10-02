@@ -1636,6 +1636,7 @@ function showLoadingCurrentFolder(carpetaId) {
 			</c:if>
 			
 			<%---- Descarregar carpetes seleccionades ----%>
+			<%---- 
 			<c:if test="${isCreacioCarpetesActiva}">
 				<div class="btn-group">
 					<div title="<spring:message code="contingut.boto.menu.descarregar.estructura"/>" class="btn-group">
@@ -1645,7 +1646,7 @@ function showLoadingCurrentFolder(carpetaId) {
 					</div>
 				</div>
 			</c:if>
-			
+			----%>
 			<%---- Descarregar documents seleccionats ----%>
 			<div class="btn-group">
 				<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">

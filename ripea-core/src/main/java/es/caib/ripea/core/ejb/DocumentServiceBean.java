@@ -570,16 +570,16 @@ public class DocumentServiceBean implements DocumentService {
 				entitatId);
 	}
 
-	@Override
-	@RolesAllowed("tothom")
-	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(Long id, Long expedientId, String rolActual,
-			Long tascaId) throws IOException {
-		return delegate.descarregarAllDocumentsOfExpedientWithFolders(
-				id, 
-				expedientId, 
-				rolActual, 
-				tascaId);
-	}
+//	@Override
+//	@RolesAllowed("tothom")
+//	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(Long id, Long expedientId, String rolActual,
+//			Long tascaId) throws IOException {
+//		return delegate.descarregarAllDocumentsOfExpedientWithFolders(
+//				id, 
+//				expedientId, 
+//				rolActual, 
+//				tascaId);
+//	}
 
 	@Override
 	@RolesAllowed("tothom")

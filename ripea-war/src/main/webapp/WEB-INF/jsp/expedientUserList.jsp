@@ -836,7 +836,8 @@ function removeCookie(cname) {
 
 								<%---- Descarregar fitxer comprimit ----%>
 								{{if conteDocuments}}
-									<li><a href="<c:url value="/contingut/{{:id}}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li>
+									<%---- <li><a href="<c:url value="/contingut/{{:id}}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li> ----%>
+									<li><a href="<c:url value="/contingut/{{:id}}/descarregarSelectedDocuments?tascaId=${tascaId}"/>" data-toggle="modal"><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/>...</a></li>
 								{{/if}}
 
 								{{if conteDocuments}}
