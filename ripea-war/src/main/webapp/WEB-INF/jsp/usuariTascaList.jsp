@@ -162,17 +162,17 @@
 		<thead>
 			<tr>
 				<th data-col-name="expedient.id" data-visible="false"></th>
-				<th data-col-name="expedient.nomINumero" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.expedient"/></th>
-				<th data-col-name="titol" width="15%"><spring:message code="expedient.tasca.list.columna.titol"/></th>
+				<th data-col-name="expedient.nomINumero" data-orderable="false" width="10%"><spring:message code="expedient.tasca.list.columna.expedient"/></th>
+				<th data-col-name="titol" width="10%"><spring:message code="expedient.tasca.list.columna.titol"/></th>
 				<th data-col-name="observacions" width="15%"><spring:message code="expedient.tasca.list.columna.observacions"/></th>
-				<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
-				<th data-col-name="metaExpedientTasca.descripcio" data-orderable="false" width="30%" data-template="#cellTascaDescripcio" >
+				<th data-col-name="metaExpedientTasca.nom" data-orderable="false" width="10%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
+				<th data-col-name="metaExpedientTasca.descripcio" data-orderable="false" data-template="#cellTascaDescripcio" >
 					<spring:message code="expedient.tasca.list.columna.metaExpedientTascaDescripcio"/>
 					<script id="cellTascaDescripcio" type="text/x-jsrender">
 						<span title="{{:metaExpedientTasca.descripcio}}">{{:metaExpedientTascaDescAbrv}}</span>
 					</script>
 				</th>
-				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="11%">
+				<th data-col-name="prioritat" data-template="#cellPrioritatTemplate" width="8%">
 					<spring:message code="contingut.expedient.form.camp.prioritat"/>
 					<script id="cellPrioritatTemplate" type="text/x-jsrender">
 						<span class="label label-{{:prioritat}}">
@@ -193,15 +193,15 @@
 					</script>
 				</th>
 				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
-				<th data-col-name="dataInici" data-converter="datetime" width="20%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
+				<th data-col-name="dataInici" data-converter="datetime" width="8%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
 				<th data-col-name="duracioFormat" data-visible="false"></th>
 				<th data-col-name="agafada" data-visible="false"></th>
 				<th data-col-name="usuariActualObservador" data-visible="false"></th>
 				<th data-col-name="delegada" data-visible="false"></th>
 				<th data-col-name="usuariActualDelegat" data-visible="false"></th>
-				<th data-col-name="responsableActual.codi" data-orderable="false" width="20%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
-				<th data-col-name="dataLimitString" width="20%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
+				<th data-col-name="responsableActual.codi" data-orderable="false" width="12%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
+				<th data-col-name="dataLimitString" width="8%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
 					<spring:message code="expedient.tasca.list.boto.dataLimit"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
 					{{if shouldNotifyAboutDeadline}}
@@ -216,7 +216,7 @@
                     {{/if}}
 					</script>
 				</th>
-				<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="10%">
+				<th data-col-name="estat" data-template="#cellTascaEstatTemplate" data-orderable="false" width="8%">
 					<spring:message code="expedient.tasca.list.columna.estat"/>
 					<script id="cellTascaEstatTemplate" type="text/x-jsrender">
 						{{if estat == 'PENDENT'}}

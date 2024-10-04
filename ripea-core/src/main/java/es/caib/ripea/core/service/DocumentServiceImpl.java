@@ -602,44 +602,44 @@ public class DocumentServiceImpl implements DocumentService {
 		return documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
 	}
 
-	@Transactional(readOnly = true)
-	@Override
-	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
-			Long id, 
-			Long expedientId,
-			String rolActual,
-			Long tascaId) throws IOException {
-		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
-				expedientId, 
-				false, 
-				true, 
-				false, 
-				false, 
-				false, 
-				rolActual);
-		
-		FitxerDto resultat = new FitxerDto();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ZipOutputStream zos = new ZipOutputStream(baos);
-		
-		List<Long> documents = documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
-		
-		for (Long documentId : documents) {
-			documentHelper.crearEntradaDocument(
-					zos, 
-					documentId, 
-					tascaId, 
-					rolActual);
-		}
-
-		zos.close();
-		
-		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
-		resultat.setContentType("application/zip");
-		resultat.setContingut(baos.toByteArray());
-		
-		return resultat;
-	}
+//	@Transactional(readOnly = true)
+//	@Override
+//	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
+//			Long id, 
+//			Long expedientId,
+//			String rolActual,
+//			Long tascaId) throws IOException {
+//		ExpedientEntity expedient = entityComprovarHelper.comprovarExpedient(
+//				expedientId, 
+//				false, 
+//				true, 
+//				false, 
+//				false, 
+//				false, 
+//				rolActual);
+//		
+//		FitxerDto resultat = new FitxerDto();
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		ZipOutputStream zos = new ZipOutputStream(baos);
+//		
+//		List<Long> documents = documentRepository.findIdByExpedientIdAndEsborrat(expedientId, 0);
+//		
+//		for (Long documentId : documents) {
+//			documentHelper.crearEntradaDocument(
+//					zos, 
+//					documentId, 
+//					tascaId, 
+//					rolActual);
+//		}
+//
+//		zos.close();
+//		
+//		resultat.setNom(expedient.getNom().replaceAll(" ", "_") + ".zip");
+//		resultat.setContentType("application/zip");
+//		resultat.setContingut(baos.toByteArray());
+//		
+//		return resultat;
+//	}
 	
 	@Transactional(readOnly = true)
 	@Override

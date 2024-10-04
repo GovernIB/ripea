@@ -24,16 +24,6 @@
 		$(document).ready(function() {
 		
 			let errorsValidacio = parseBoolean('${errorsValidacio}');
-			
-// 			$('#metaExpedientTascaId').attr("tabindex", "1");
-// 			$('#metaExpedientTascaDescripcio').attr("tabindex", "2");
-// 			$('#responsablesCodi').attr("tabindex", "3");
-// 			$('#observadorsCodi').attr("tabindex", "4");
-// 			$('#duracio').attr("tabindex", "5");
-//  		$('#dataLimit').attr("tabindex", "99");
-// 			$('#titol').attr("tabindex", "6");
-// 			$('#observacions').attr("tabindex", "7");
-// 			$('#prioritat').attr("tabindex", "8");
 		
 			$('#duracio').on('blur', function(event) { 
 				$('#titol').focus();
@@ -45,13 +35,8 @@
 				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDuracio",
 				$("#tascaform").serialize())
 				.done(function(data){
-					debugger;
-					//El seguent camp en el onchenge de duracio es la propia data que estam canviant
-					//com que els tags de ripea no tenen tabIndex, ens botam el foco en el camp en el que volem insertar el valor.
-					//$('#dataLimit').datepicker('setDate', data.dataLimitString);
 					$('#dataLimit').val(data.dataLimitString);
 					remarcaElement($('#dataLimit'));
-					//$('#dataLimit').val(data.dataLimitString);
 				})
 				.fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");

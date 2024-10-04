@@ -56,11 +56,7 @@ public class ExpedientTascaDto {
 	}
 	
 	public String getDuracioFormat() {
-		if (this.duracio!=null) {
-			return Utils.duracioEnDiesToString(this.duracio);
-		} else {
-			return getDataLimitString();
-		}
+		return Utils.duracioEnDiesToString(this.duracio);
 	}	
 	
 	public boolean isAgafada() {

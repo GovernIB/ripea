@@ -284,9 +284,9 @@ public class Utils {
 	
 					String retorn = "";
 					if (weeks>0) { retorn += weeks + " setmanes"; }
-					if (remainingDays>0) { retorn += " ," + remainingDays + " dies"; }
+					if (remainingDays>0) { retorn += ", " + remainingDays + " dies"; }
 					
-					if (retorn.startsWith(" ,")) {
+					if (retorn.startsWith(", ")) {
 						return retorn.substring(2, retorn.length());
 					} else {
 						return retorn;

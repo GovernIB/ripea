@@ -842,69 +842,69 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	}
 	
 	
-	@RequestMapping(value = "/{expedientId}/descarregarAllDocumentsOfExpedient", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public void descarregarAllDocumentsOfExpedient(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long expedientId,
-			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-		
-
-		ContingutDto expedient = null;
-		if (tascaId == null) {
-			expedient = contingutService.getBasicInfo(
-					expedientId,
-					true);
-		} else {
-			expedient = expedientTascaService.findByTascaBasicInfo(
-					expedientId,
-					tascaId);
-		}
-		
-		
-		byte[] reportContent = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
-		Set<Long> docsIdx = new HashSet<>(documentService.findIdsAllDocumentsOfExpedient(expedientId));
-		
-		documentHelper.generarFitxerZip(
-				entitatActual.getId(),
-				documentService, 
-				contingutService,
-				entitatActual, 
-				docsIdx,
-				baos,
-				request, 
-				null, 
-				tascaId,
-				null,
-				null);
-		
-		reportContent = baos.toByteArray();
-		response.setHeader("Content-Disposition", "attachment; filename=" + expedient.getNom().replaceAll(" ", "_") + ".zip");
-		response.getOutputStream().write(reportContent);
-		response.getOutputStream().flush();
-	}
+//	@RequestMapping(value = "/{expedientId}/descarregarAllDocumentsOfExpedient", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+//	public void descarregarAllDocumentsOfExpedient(
+//			HttpServletRequest request,
+//			HttpServletResponse response,
+//			@PathVariable Long expedientId,
+//			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		
+//
+//		ContingutDto expedient = null;
+//		if (tascaId == null) {
+//			expedient = contingutService.getBasicInfo(
+//					expedientId,
+//					true);
+//		} else {
+//			expedient = expedientTascaService.findByTascaBasicInfo(
+//					expedientId,
+//					tascaId);
+//		}
+//		
+//		
+//		byte[] reportContent = null;
+//		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//		
+//		Set<Long> docsIdx = new HashSet<>(documentService.findIdsAllDocumentsOfExpedient(expedientId));
+//		
+//		documentHelper.generarFitxerZip(
+//				entitatActual.getId(),
+//				documentService, 
+//				contingutService,
+//				entitatActual, 
+//				docsIdx,
+//				baos,
+//				request, 
+//				null, 
+//				tascaId,
+//				null,
+//				null);
+//		
+//		reportContent = baos.toByteArray();
+//		response.setHeader("Content-Disposition", "attachment; filename=" + expedient.getNom().replaceAll(" ", "_") + ".zip");
+//		response.getOutputStream().write(reportContent);
+//		response.getOutputStream().flush();
+//	}
 	
-	@RequestMapping(value = "/{expedientId}/descarregarAllDocumentsOfExpedientEstructurat", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public void descarregarAllDocumentsOfExpedientEstructurat(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			@PathVariable Long expedientId,
-			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-
-		FitxerDto fitxer = documentService.descarregarAllDocumentsOfExpedientWithFolders(
-				entitatActual.getId(),
-				expedientId,
-				RolHelper.getRolActual(request),
-				tascaId);
-
-		response.setHeader("Content-Disposition", "attachment; filename=" + fitxer.getNom());
-		response.getOutputStream().write(fitxer.getContingut());
-		response.getOutputStream().flush();
-	}
+//	@RequestMapping(value = "/{expedientId}/descarregarAllDocumentsOfExpedientEstructurat", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+//	public void descarregarAllDocumentsOfExpedientEstructurat(
+//			HttpServletRequest request,
+//			HttpServletResponse response,
+//			@PathVariable Long expedientId,
+//			@RequestParam(value = "tascaId", required = false) Long tascaId) throws IOException {
+//		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+//		
+//		FitxerDto fitxer = documentService.descarregarAllDocumentsOfExpedientWithFolders(
+//				entitatActual.getId(),
+//				expedientId,
+//				RolHelper.getRolActual(request),
+//				tascaId);
+//		
+//		response.setHeader("Content-Disposition", "attachment; filename=" + fitxer.getNom());
+//		response.getOutputStream().write(fitxer.getContingut());
+//		response.getOutputStream().flush();
+//	}
 	
 	@RequestMapping(value = "/{expedientId}/descarregarSelectedDocuments", method = RequestMethod.GET)
 	public String descarregarSelectedDocuments(

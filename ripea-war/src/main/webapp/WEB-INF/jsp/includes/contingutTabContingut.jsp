@@ -1474,7 +1474,7 @@ function dragAndDropVistaCarpetes() {
 			<%----------------------------------- ACCION BUTTONS --------------------------------%>
 			<div class="text-right" id="contingut-botons">
 
-				<%---- path ----%>
+				<%---- Miga de pa ----%>
 				<c:if test="${contingut.expedient or contingut.carpeta}">
 					<rip:blocContenidorPath contingut="${contingut}"/>
 				</c:if>
@@ -1495,11 +1495,10 @@ function dragAndDropVistaCarpetes() {
 
 					</div>
 				</c:if>
+				
 				<c:if test="${isTasca}">
 					<a href="<c:url value="/expedientTasca/${tascaId}/comentaris"/>" data-toggle="modal" data-refresh-tancar="true" class="btn btn-default pull-left"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">${tasca.numComentaris}</span></a>
 				</c:if>
-
-
 
 				<c:if test="${vistaIcones}">
 					<%---- Habilitar selecció múltiple ----%>
@@ -1516,17 +1515,6 @@ function dragAndDropVistaCarpetes() {
 					</div>
 				</c:if>
 
-                <%---- Descarregar carpetes seleccionades ----%>
-                <c:if test="${isCreacioCarpetesActiva}">
-                    <div class="btn-group">
-                        <div title="<spring:message code="contingut.boto.menu.descarregar.estructura"/>" class="btn-group">
-                            <a href="<c:url value="/contingut/${contingut.id}/descarregarSelectedDocuments?tascaId=${tascaId}"/>" class="btn btn-default" data-toggle="modal">
-                                <span class="fa fa-list-ul"></span>
-                            </a>
-                        </div>
-                    </div>
-                </c:if>
-
                 <%---- Descarregar documents seleccionats ----%>
 				<div class="btn-group">
 					<div data-toggle="tooltip" title="<spring:message code="contingut.boto.menu.seleccio.multiple.descarregar"/>" id="descarregar-mult" class="btn-group">
@@ -1539,9 +1527,8 @@ function dragAndDropVistaCarpetes() {
 				</div>
 
 				<c:if test="${potModificar && !isTasca}">
+				
 					<c:set var="definitiuConfirmacioMsg"><spring:message code="contingut.confirmacio.definitiu.multiple"/></c:set>
-
-
 
 					<%---- Button notificar mult ----%>
 					<div class="btn-group">
@@ -1618,9 +1605,12 @@ function dragAndDropVistaCarpetes() {
 				</div>
 
 				<c:if test="${potModificar && (!contingut.carpeta || isCreacioCarpetesActiva)}">
+				
+					<%---- Boto desplegable de + Crear contingut ----%>
 					<div id="botons-crear-contingut" class="btn-group">
-						<%---- Crear contingut ----%>
+						
 						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="fa fa-plus"></span>&nbsp;<spring:message code="contingut.boto.crear.contingut"/>&nbsp;<span class="caret"></span></button>
+						
 						<ul class="dropdown-menu text-left" role="menu">
 							<c:if test="${contingut.crearExpedients and hasPermissionAnyProcediment}">
 								<li>
@@ -1721,10 +1711,7 @@ function dragAndDropVistaCarpetes() {
 											<td></td>
 											<%------------ Nom ----------%>
 											<td><b>${entry.key.nom}</b>
-
 												<span class="badge">${fn:length(entry.value)}</span>
-
-
 											</td>
 											<%------------ Descripció ----------%>
 											<td></td>
@@ -2179,4 +2166,3 @@ function dragAndDropVistaCarpetes() {
 
 	</c:otherwise>
 </c:choose> 
-

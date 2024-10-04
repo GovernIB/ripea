@@ -409,7 +409,6 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 		}
 	}
 	
-	
 	@RequestMapping(value = "/contingut/{contingutId}/canviVista/{vista}", method = RequestMethod.GET)
 	public String canviVista(
 			HttpServletRequest request,
@@ -419,18 +418,10 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			Model model) {
 		getEntitatActualComprovantPermisos(request);
 		Set<Long> seleccio = new HashSet<Long>();
-		RequestSessionHelper.actualitzarObjecteSessio(
-				request,
-				SESSION_ATTRIBUTE_SELECCIO,
-				seleccio);
-		
-		SessioHelper.updateContenidorVista(
-				request,
-				vista);
-		
+		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO, seleccio);
+		SessioHelper.updateContenidorVista(request, vista);		
 		return "redirect:/contingut/" + contingutId + "?tascaId=" + (tascaId == null ? "" : tascaId);
 	}
-	
 
 	@RequestMapping(value = "/contingut/{contingutOrigenId}/moure", method = RequestMethod.GET)
 	public String moureForm(

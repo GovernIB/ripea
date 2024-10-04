@@ -716,12 +716,12 @@ public interface DocumentService {
 	@PreAuthorize("hasRole('tothom')")
 	public String firmaSimpleWebStartMassiu(Set<Long> ids, String motiu, String urlReturnToRipea, Long entitatId);
 
-	@PreAuthorize("hasRole('tothom')")
-	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
-			Long id, 
-			Long expedientId, 
-			String rolActual,
-			Long tascaId) throws IOException;
+//	@PreAuthorize("hasRole('tothom')")
+//	public FitxerDto descarregarAllDocumentsOfExpedientWithFolders(
+//			Long id, 
+//			Long expedientId, 
+//			String rolActual,
+//			Long tascaId) throws IOException;
 
 	@PreAuthorize("hasRole('tothom')")
 	public List<DocumentDto> findByExpedient(

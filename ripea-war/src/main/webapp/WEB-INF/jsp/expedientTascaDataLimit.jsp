@@ -22,18 +22,17 @@
 	
 	<script type="text/javascript">
 		$(document).ready(function() {
+			$('#duracio').on('blur', function(event) { 
+				$('#dataInici').focus();
+				event.preventDefault();
+				return false;
+			});			
 			$('#duracio').on('change', function() {
-				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDuracio",
-				$("#tascaform").serialize())
+				$.post("<c:url value="/expedientTasca/"/>" + $('#id').val() + "/changedDuracio",
+				$("#expedientTascaDto").serialize())
 				.done(function(data){
-					debugger;
-					//El seguent camp en el onchenge de duracio es la propia data que estam canviant
-					//com que els tags de ripea no tenen tabIndex, ens botam el foco en el camp en el que volem insertar el valor.
-					$('#dataLimit').blur();
-					$('#dataLimit').datepicker('setDate', data.dataLimitString);
-					$('#dataLimit').blur();
-					$('#duracio').val(data.duracio);
-					//$('#dataLimit').val(data.dataLimitString);
+					$('#dataLimit').val(data.dataLimitString);
+					remarcaElement($('#dataLimit'));
 				})
 				.fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");
@@ -41,11 +40,11 @@
 			});
 		
 			$('#dataLimit').on('change', function() {
-				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDataLimit",
-				$("#tascaform").serialize())
+				$.post("<c:url value="/expedientTasca/"/>" + $('#id').val() + "/changedDataLimit",
+				$("#expedientTascaDto").serialize())
 				.done(function(data){
 					$('#duracio').val(data.duracio);
-					$('#dataLimit').datepicker('setDate', data.dataLimitString);
+					remarcaElement($('#duracio'));
 				})
 				.fail(function() {
 					alert("<spring:message code="error.jquery.ajax"/>");
@@ -58,7 +57,12 @@
 	<form:form action="" method="post" cssClass="form-horizontal" commandName="expedientTascaDto">
 		<form:hidden path="id"/>
 		<form:hidden path="titol"/>
-		<form:hidden path="dataInici"/>
+		
+		<rip:inputDate
+			name="dataInici"
+			textKey="expedient.tasca.form.camp.dataInici"
+			readonly="true"/>
+		
 		<rip:inputText
 				name="duracio"
 				textKey="tasca.list.column.duracio"

@@ -90,8 +90,10 @@
 					<c:set var="mostrarSeparador" value="${true}"/>
 					<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/PDF"/>"><span class="fa fa-list-ol"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.pdf"/>...</a></li>
 					<c:set var="mostrarSeparador" value="${true}"/>
-					<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/XLSX"/>"><span class="fa fa-th-list"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.xlsx"/>...</a></li>
-					<c:set var="mostrarSeparador" value="${true}"/>
+					<c:if test="${isExportacioExcelActiva}">
+						<li><a href="<c:url value="/contingut/carpeta/${contingut.id}/generarIndex/XLSX"/>"><span class="fa fa-th-list"></span>&nbsp;<spring:message code="carpeta.list.user.recuperar.index.xlsx"/>...</a></li>
+						<c:set var="mostrarSeparador" value="${true}"/>
+					</c:if>
 				</c:when>
 			</c:choose>
 			<c:if test="${contingut.document and !isTasca or (contingut.carpeta && isCreacioCarpetesActiva)}">
@@ -366,9 +368,11 @@
 		
 		<c:if test="${contingut.expedient && contingut.conteDocuments}">
 			<%---- Descarregar fitxer comprimit ----%>
-			<li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li>
+			<%---- <li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedient?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/></a></li> ----%>
 			<%---- Descarregar fitxer comprimit mantenint estructura carpetes ----%>
-			<li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedientEstructurat?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit.estructurat"/></a></li>
+			<%---- <li><a href="<c:url value="/contingut/${contingut.id}/descarregarAllDocumentsOfExpedientEstructurat?tascaId=${tascaId}"/>" ><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit.estructurat"/></a></li> ----%>
+			<%---- Descarregar contingut seleccionat modal ----%>
+			<li><a href="<c:url value="/contingut/${contingut.id}/descarregarSelectedDocuments?tascaId=${tascaId}"/>" data-toggle="modal"><span class="fa fa-download"></span>&nbsp;<spring:message code="expedient.boto.descarregar.fitxer.comprimit"/>...</a></li>
 		</c:if>
 		
 		<c:if test="${(contingut.expedient or contingut.document) and !isTasca}">

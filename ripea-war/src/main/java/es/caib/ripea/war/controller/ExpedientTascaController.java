@@ -383,7 +383,8 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-				"expedient.tasca.controller.dataLimit.ok");
+				"expedient.tasca.controller.dataLimit.ok",
+				new Object[]{command.getTitol()});
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/comentaris", method = RequestMethod.GET)
