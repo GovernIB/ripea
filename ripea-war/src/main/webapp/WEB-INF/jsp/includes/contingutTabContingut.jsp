@@ -46,7 +46,7 @@
 	.ui-droppable-hover { background: #999999 !important; }
 	#drop-area { border: 4px dashed transparent; }
 	#drop-area.dragover { border-color: #ffd351; }
-	#drop-message { font-size: 20px; color: #917421; text-align: center; display: none; position: absolute; width: 420px; background-color: #CCC; opacity: 0.75; font-size: 16px; left: calc(50% - 210px); z-index: 10; border-radius: 8px; margin-top: 5px; }
+	#drop-message { font-size: 20px; color: #917421; text-align: center; display: none; position: absolute; width: 420px; background-color: #CCC; opacity: 0.75; font-size: 16px; left: calc(50% - 210px); top: 50%; z-index: 10; border-radius: 8px; margin-top: 5px; }
 	#drop-message-icon { font-size: 70px; }
     .toast-top-right { margin-top: 100px; }
 </style>
@@ -410,31 +410,9 @@
 			getDetallsSignants($('#detallSignants'), contingutId, false);
 		});
 
-
 		removeTransactionId();
-		$(window).resize(resizeDropZone);
 
 	});//################################################## document ready END ##############################################################
-
-	const resizeDropZone = () => {
-
-		const windowHeight = $(window).height();
-		const capsaleraHeight = 216;
-
-		const panelHeight = $('.panel-body').innerHeight();
-		const errorsHeight = $('#botons-errors-validacio').length ? $('#botons-errors-validacio').outerHeight(true) : 0;
-		const tabsHeight = 84;
-
-		const usedHeightInPanel = errorsHeight + tabsHeight;
-		const overallusedHeight = capsaleraHeight + errorsHeight + tabsHeight;
-
-		let alt = panelHeight - usedHeightInPanel;
-		if (windowHeight < panelHeight + capsaleraHeight) {
-			alt = windowHeight - overallusedHeight;
-		}
-
-		$('#drop-area').css('height', alt + 'px');
-	}
 
 	$(document).on('change', '.checkbox', function () {
 		selectCheckbox($(this));
@@ -631,8 +609,6 @@ function dragAndDropVistaCarpetes() {
 			var $dropArea = $('#drop-area');
 			var $dropMessage = $('#drop-message');
 
-			resizeDropZone();
-
 			$('#drop-area').filedrop({
 				// paramname: 'file', // El nom del paràmetre que es passarà al servidor
 				// url: '/upload', // URL del servidor on es carregaran els fitxers
@@ -660,6 +636,7 @@ function dragAndDropVistaCarpetes() {
 
 				// Executat quan un fitxer està sobre l'àrea
 				dragOver: function () {
+					debugger;
 					$dropArea.css('border-color', '#ffd351');
 					$dropMessage.css('display', 'block');
 				},

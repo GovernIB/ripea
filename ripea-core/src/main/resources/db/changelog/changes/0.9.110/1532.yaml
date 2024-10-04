@@ -1,0 +1,12 @@
+databaseChangeLog:
+- changeSet:
+    id: 1722515937801-1
+    author: limit
+    runOnChange: true
+    changes:
+      - alter_table:
+        table_name: IPA_INTERESSAT
+        column_name: organ_nom
+        data_type: VARCHAR2
+        length: 256
+        char: true

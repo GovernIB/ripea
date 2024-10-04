@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.TextPosition;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.fundaciobit.plugins.certificate.InformacioCertificat;
@@ -4105,7 +4104,8 @@ public class PluginHelper {
 			persona.setInteressatTipus(InteressatTipusEnumDto.ADMINISTRACIO);
 			UnitatOrganitzativaDto unitatOrganitzativaDto = unitatOrganitzativaHelper.findAmbCodi(interessatA.getOrganCodi());
 			persona.setNif(unitatOrganitzativaDto.getNifCif());
-			persona.setNom(unitatOrganitzativaDto.getNom());
+			persona.setNom(unitatOrganitzativaDto.getDenominacioCooficial());
+			persona.setCodiDir3(unitatOrganitzativaDto.getCodi());
 		}
 		persona.setTelefon(interessat.getTelefon());
 		persona.setEmail(interessat.getEmail());

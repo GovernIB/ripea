@@ -293,9 +293,13 @@ public class ContingutHelper {
 
 		if (!params.isOnlyForList()) {
 			setDetailedProperties(resposta, contingut, params);
-			setExpedientPare(resposta, contingut, params);
+			if (params.isAmbExpedientPare()) { 
+				setExpedientPare(resposta, contingut, params);
+			}
 			List<ContingutDto> pathCalculatPerFills = calculaPathPerFills(resposta, contingut, params);
-			setFills(resposta, contingut, params, pathCalculatPerFills);
+			if (params.isAmbFills()) {
+				setFills(resposta, contingut, params, pathCalculatPerFills);
+			}
 		}
 		logMsg("toContingutDto[" + tipus + "] end (" + contingut.getId() + ", level=" + params.getLevel() + "): "+ (System.currentTimeMillis() - t1) + " ms");
 
@@ -389,8 +393,6 @@ public class ContingutHelper {
 	}
 
 	private void setExpedientPare(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params) {
-		if (!params.isAmbExpedientPare()) return;
-
 		ExpedientDto expedientCalculat = calculateExpedientPare(resposta, contingut, params);
 		resposta.setExpedientPare(expedientCalculat);
 	}
@@ -450,8 +452,6 @@ public class ContingutHelper {
 	}
 
 	private void setFills(ContingutDto resposta, ContingutEntity contingut, ToContingutParams params, List<ContingutDto> pathCalculatPerFills) {
-		if (!params.isAmbFills()) return;
-
 		long t1 = System.currentTimeMillis();
 		logMsg("ambFills (recursive) start (" + contingut.getId() + ") ");
 
@@ -607,11 +607,11 @@ public class ContingutHelper {
 //		dto.setInteressatsNotificable(conversioTipusHelper.convertirList(expedientInteressatHelper.findByExpedientAndNotRepresentantAndAmbDadesPerNotificacio(expedient), InteressatDto.class));
 		setExpedientOrganGestor(dto, expedient);
 
-		if (params.isAmbMapPerTipusDocument()) {
+		if (params.isAmbMapPerTipusDocument() && params.isAmbFills()) {
 			setMapPerTipusDocument(dto, expedient, params);
 		}
 
-		if (params.isAmbMapPerEstat()) {
+		if (params.isAmbMapPerEstat() && params.isAmbFills()) {
 			setMapPerEstat(dto, expedient, params);
 		}
 

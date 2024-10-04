@@ -302,7 +302,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.reassignat.ok",
-				new Object[]{expedientTascaDto.getTitol()});
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/reobrir", method = RequestMethod.GET)

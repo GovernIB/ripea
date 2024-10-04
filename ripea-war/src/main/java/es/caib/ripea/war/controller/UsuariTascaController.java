@@ -226,7 +226,7 @@ public class UsuariTascaController extends BaseUserController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.delegar.ok",
-				new String [] {expedientTascaDto.getTitol(), command.getDelegatCodi()});
+				new String [] {expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv(), command.getDelegatCodi()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/retomar", method = RequestMethod.GET)

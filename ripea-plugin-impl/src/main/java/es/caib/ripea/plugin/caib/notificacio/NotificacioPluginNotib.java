@@ -3,11 +3,21 @@
  */
 package es.caib.ripea.plugin.caib.notificacio;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+
 import es.caib.notib.client.NotificacioRestClientFactory;
 import es.caib.notib.client.NotificacioRestClientV2;
 import es.caib.notib.client.domini.Certificacio;
@@ -46,19 +56,6 @@ import es.caib.ripea.plugin.notificacio.RespostaConsultaEstatNotificacio;
 import es.caib.ripea.plugin.notificacio.RespostaConsultaInfoRegistre;
 import es.caib.ripea.plugin.notificacio.RespostaEnviar;
 import es.caib.ripea.plugin.notificacio.RespostaJustificantEnviamentNotib;
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Implementació de del plugin d'enviament de notificacions
@@ -308,7 +305,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 				}
 			}
 
-
 			RespostaConsultaEstatEnviament resposta = new RespostaConsultaEstatEnviament();
 			
 			resposta.setEstat(respostaConsultaEstat.getEstat() != null ? EnviamentEstat.valueOf(respostaConsultaEstat.getEstat().toString()) : null);
@@ -350,11 +346,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 					ex);
 		}
 	}
-	
-	
-	
-
-
 
 	public void testCallbackNotificaCanvi(String identificador, String referenciaEnviament) {
 		
@@ -380,8 +371,6 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 			throw new RuntimeException(ex);
 		}
 	}
-	
-	
 
 	@Override
 	public RespostaConsultaInfoRegistre consultarRegistreInfo(
@@ -440,33 +429,14 @@ public class NotificacioPluginNotib extends RipeaAbstractPluginProperties implem
 		}
 	}
 
-
-	private XMLGregorianCalendar toXmlGregorianCalendar(Date date) throws DatatypeConfigurationException {
-		if (date == null) {
-			return null;
-		}
-		GregorianCalendar gc = new GregorianCalendar();
-		gc.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
-	}
-	private Date toDate(XMLGregorianCalendar calendar) throws DatatypeConfigurationException {
-		if (calendar == null) {
-			return null;
-		}
-		return calendar.toGregorianCalendar().getTime();
-	}
-
-	private es.caib.notib.client.domini.Persona toPersonaNotib(
-			Persona persona) {
+	private es.caib.notib.client.domini.Persona toPersonaNotib(Persona persona) {
 		es.caib.notib.client.domini.Persona p = null;
 		if (persona != null) {
 			p = new es.caib.notib.client.domini.Persona();
 			if (persona.getInteressatTipus() == es.caib.ripea.core.api.dto.InteressatTipusEnumDto.ADMINISTRACIO) {
-				p.setDir3Codi(persona.getNif());
-				
-			} else {
-				p.setNif(persona.getNif());
+				p.setDir3Codi(persona.getCodiDir3());
 			}
+			p.setNif(persona.getNif());
 			p.setNom(persona.getNom());
 			p.setLlinatge1(persona.getLlinatge1());
 			p.setLlinatge2(persona.getLlinatge2());

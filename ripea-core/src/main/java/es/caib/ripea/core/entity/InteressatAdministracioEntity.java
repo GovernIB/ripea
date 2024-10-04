@@ -30,7 +30,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 	
 	@Column(name = "organ_codi", length = 9)
 	protected String organCodi;
-	@Column(name = "organ_nom", length = 80)
+	@Column(name = "organ_nom", length = 256)
 	protected String organNom;
 	
 	@Column(name = "amb_oficina_sir")
@@ -79,7 +79,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 			Boolean incapacitat,
 			Boolean ambOficinaSir) {
 		this.organCodi = organCodi;
-		this.organNom = organNom;
+		this.organNom = (organNom!=null && organNom.length() > 256) ? organNom.substring(0, 256) : organNom;
 		this.documentTipus = documentTipus;
 		this.documentNum = documentNum;
 		this.pais = pais;
@@ -107,7 +107,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 
 		InteressatAdministracioDto interessatAdministracioDto = (InteressatAdministracioDto) dto;
 		this.organCodi = interessatAdministracioDto.getOrganCodi();
-		this.organNom = interessatAdministracioDto.getOrganNom();
+		this.organNom = (interessatAdministracioDto.getOrganNom()!=null && interessatAdministracioDto.getOrganNom().length() > 256) ? interessatAdministracioDto.getOrganNom().substring(0, 256) : interessatAdministracioDto.getOrganNom();
 		this.ambOficinaSir = interessatAdministracioDto.getAmbOficinaSir();
 	}
 
@@ -226,7 +226,7 @@ public class InteressatAdministracioEntity extends InteressatEntity {
 				Boolean ambOficinaSir) {
 			built = new InteressatAdministracioEntity();
 			built.organCodi = organCodi;
-			built.organNom = organNom;
+			built.organNom = (organNom!=null && organNom.length() > 256) ? organNom.substring(0, 256) : organNom;
 			built.documentTipus = documentTipus;
 			built.documentNum = documentNum;
 			built.pais = pais;

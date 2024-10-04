@@ -3,14 +3,12 @@
  */
 package es.caib.ripea.core.api.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 import es.caib.ripea.core.api.utils.Utils;
+import lombok.Setter;
 
 /**
  * Informació d'una unitat organitzativa.
@@ -49,16 +47,9 @@ public class UnitatOrganitzativaDto implements Serializable {
 
 	private Boolean ambOficinaSir;
 	
-	public String getNom() {
-		return this.getDenominacioCooficial() + " (" + this.codi + ")";
-	}
-	
 	public String getDenominacioCooficial() {
 		return Utils.isNotEmpty(denominacioCooficial) ? denominacioCooficial : denominacio;
 	}
-
-	
-	
 	
 	public String getCodi() {
 		return codi;

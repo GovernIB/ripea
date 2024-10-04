@@ -203,11 +203,8 @@ public class ExpedientInteressatHelper {
 			UnitatOrganitzativaDto unitat = null;
 			String unitatDenominacio = null;
 			if (interessatAdministracioDto.getOrganCodi() != null) {
-				unitat = unitatOrganitzativaHelper.findAmbCodi(
-						interessatAdministracioDto.getOrganCodi());
-
-				unitatDenominacio = (unitat.getDenominacio() != null && unitat.getDenominacio().length() > 80) ? unitat.getDenominacio().substring(0, 80) : unitat.getDenominacio();
-
+				unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
+				unitatDenominacio = unitat.getDenominacio();
 			}
 
 			interessatEntity = InteressatAdministracioEntity.getBuilder(
@@ -392,10 +389,9 @@ public class ExpedientInteressatHelper {
             try {
                 UnitatOrganitzativaDto unitat = unitatOrganitzativaHelper.findAmbCodi(interessatAdministracioDto.getOrganCodi());
                 if (unitat != null) {
-                    String unitatDenominacio = (unitat.getDenominacio() != null && unitat.getDenominacio().length() > 80) ? unitat.getDenominacio().substring(0, 80) : unitat.getDenominacio();
-
                     interessatAdministracioDto.setOrganCodi(unitat.getCodi());
-                    interessatAdministracioDto.setOrganNom(unitatDenominacio);
+                    String organRetall = (unitat.getDenominacio()!=null && unitat.getDenominacio().length() > 256) ? unitat.getDenominacio().substring(0, 256) : unitat.getDenominacio();
+                    interessatAdministracioDto.setOrganNom(organRetall);
                 }
             } catch (Exception e) {
                 logger.error("No s'ha pogut actualitzar l'òrgan '" + interessatAdministracioDto.getOrganCodi() + "'de l'interessat/representant");

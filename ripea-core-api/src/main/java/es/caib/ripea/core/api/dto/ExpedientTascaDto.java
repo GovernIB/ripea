@@ -76,6 +76,10 @@ public class ExpedientTascaDto {
 	}
 	
 	public String getMetaExpedientTascaDescAbrv() {
-		return StringUtils.abbreviate(metaExpedientTasca.getDescripcio(), 70);
+		if (metaExpedientTasca!=null) {
+			return StringUtils.abbreviate(metaExpedientTasca.getDescripcio(), 70);
+		} else {
+			return "";
+		}
 	}
 }
