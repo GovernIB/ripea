@@ -112,7 +112,7 @@ public class UsuariTascaController extends BaseUserController {
 				request,
 				redirectATasca != null && redirectATasca == true ? "redirect:/contingut/" + expedientId + "?tascaId=" + expedientTascaId : "redirect:/usuariTasca",
 				"expedient.tasca.controller.iniciada.ok",
-				new Object[]{tasca.getTitol()});
+				new Object[]{tasca.getTitol()!=null?tasca.getTitol():tasca.getMetaExpedientTascaDescAbrv()});
 		
 	}
 	
@@ -156,7 +156,7 @@ public class UsuariTascaController extends BaseUserController {
 				request,
 				"redirect:/usuariTasca",
 				"expedient.tasca.controller.rebutjada.ok",
-				new Object[]{expedientTascaDto.getTitol()});
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
 	
 	
@@ -178,7 +178,7 @@ public class UsuariTascaController extends BaseUserController {
 				request,
 				"redirect:/usuariTasca",
 				"expedient.tasca.controller.finalitzada.ok",
-				new Object[]{expedientTascaDto.getTitol()});
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
 	
 	@InitBinder
@@ -264,7 +264,7 @@ public class UsuariTascaController extends BaseUserController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.cancelar.delegacio.ok",
-				new String [] {expedientTascaDto.getTitol()});
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
 	
 	private UsuariTascaFiltreCommand getFiltreCommand(
@@ -282,8 +282,5 @@ public class UsuariTascaController extends BaseUserController {
 		}
 		return filtreCommand;
 	}
-
-	
-
 
 }

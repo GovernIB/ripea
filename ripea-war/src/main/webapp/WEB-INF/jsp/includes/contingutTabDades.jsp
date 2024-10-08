@@ -43,6 +43,59 @@ $(document).ready(function() {
 	
 	$('#nodeDades input').change(nodeDadesInputChange);
 
+	$('#dades').on('submit', 'form#nodeDades', function() {
+		showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
+		$.post(
+				'../ajax/contingutDada/${expedientId}/save',
+				$(this).serialize(),
+				function (data) {
+					if (data.estatOk) {
+						$('#nodeDades input').each(function() {
+							var $pare = $(this).parent();
+							if ($pare.hasClass('has-warning') || $pare.hasClass('has-error')) {
+								$pare.removeClass('has-success');
+								$pare.removeClass('has-warning');
+								$pare.removeClass('has-error');
+								$pare.addClass('has-success has-feedback');
+								$(this).next().removeClass().addClass('glyphicon glyphicon-ok form-control-feedback');
+								$(this).attr('title', 'Valor guardat correctament');
+							} else {
+								$pare.removeClass('has-success');
+								$pare.removeClass('has-feedback');
+								$(this).next().removeClass();
+								$(this).removeAttr('title');
+							}
+						});
+// 						$.get(
+// 								'../ajax/contingutDada/${contingut.id}/count',
+// 								function (data) 
+<%-- 									<meta name="subtitle" content="${serveiPerTitol}"/>{ --%>
+// 									$('#dades-count').html(data);
+// 								});
+						
+					} else {
+						$('#nodeDades input').each(function() {
+							for (var i = 0; i < data.errorsCamps.length; i++) {
+								var error = data.errorsCamps[i];
+								if (error.camp == $(this).attr('name')) {
+									var $pare = $(this).parent();
+									$pare.removeClass('has-success');
+									$pare.removeClass('has-warning');
+									$pare.removeClass('has-error');
+									$pare.addClass('has-error has-feedback');
+									$(this).next().removeClass().addClass('glyphicon glyphicon-warning-sign form-control-feedback');
+									$(this).attr('title', error.missatge);
+									break;
+								}
+							}
+						});
+					}
+// 					webutilRefreshMissatges();
+					location.reload();
+				});
+		return false;
+	});	
+	
 	$('form#nodeDades td .form-group').on('clone.multifield', function(event, clon) {
 		$('input', clon).change(nodeDadesInputChange);
 // 		var url = '<c:url value="/contingutDada/' + $('#contingutId').val() + '/' + $('input', clon).attr('id') + '"/>';
@@ -280,7 +333,7 @@ function setCheckboxTrue($checkbox) {
 			</tbody>
 			</table>
 			<c:if test="${potModificar}">
-				<button type="submit" id="submitformDadesDoc" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
+				<button type="submit" class="btn btn-default pull-right" style="margin-top: -14px"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>
 			</c:if>
 		</form:form>
 	</c:when>

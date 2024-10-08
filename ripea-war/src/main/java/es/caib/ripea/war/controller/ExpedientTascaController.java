@@ -350,7 +350,7 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:/expedientTasca",
 				"expedient.tasca.controller.reobrir.ok",
-				new Object[]{expedientTascaDto.getTitol()});
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}
 	
 	@RequestMapping(value = "/{expedientTascaId}/datalimit", method = RequestMethod.GET)

@@ -132,7 +132,7 @@
 				<rip:inputDate name="dataLimitInici" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitInici"/>
 			</div>
 			<div class="col-md-2">
-				<rip:inputDate name="duracio" inline="true" placeholderKey="tasca.list.column.duracio"/>
+				<rip:inputDate name="dataLimitFi" inline="true" placeholderKey="accio.massiva.list.filtre.dataLimitFi"/>
 			</div>					
 			<div class="col-md-4">
 				<rip:inputSelect name="estats" optionEnum="TascaEstatEnumDto" emptyOption="true" placeholderKey="expedient.tasca.list.columna.estat" multiple="true" inline="true"/>
