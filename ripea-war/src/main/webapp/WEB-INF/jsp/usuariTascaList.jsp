@@ -266,7 +266,11 @@
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/delegar"/>" data-toggle="modal"><span class="fa fa-share"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegar"/></a></li>
 										{{else delegada && !usuariActualDelegat}}
 											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/retomar"/>" data-toggle="modal"><span class="fa fa-remove"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegacio.desfer"/></a></li>
-										{{/if}}		
+										{{/if}}
+									{{/if}}
+
+									{{if estat == 'FINALITZADA'}}
+										<li><a href="<c:url value="/expedientTasca/{{:id}}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reobrir"/></a></li>
 									{{/if}}
 								</ul>
 							</div>
