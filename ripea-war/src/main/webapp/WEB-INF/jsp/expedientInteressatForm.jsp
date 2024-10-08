@@ -1,6 +1,5 @@
 <%@page import="es.caib.ripea.war.helper.EnumHelper"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
@@ -8,21 +7,17 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <%
-java.util.List<EnumHelper.HtmlOption> tipusEnum = EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class, "interessat.tipus.enum.");
+java.util.List<EnumHelper.HtmlOption> tipusEnum = EnumHelper.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatTipusEnumDto.class, "interessat.tipus.enum.");
 Boolean esRepresentant = (Boolean) request.getAttribute("esRepresentant");
 if (esRepresentant != null && esRepresentant) {
 	tipusEnum.remove(2);
 }
 pageContext.setAttribute("tipusEnumOptions", tipusEnum);
-pageContext.setAttribute("documentTipusEnumOptions", es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-		es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto.class, "interessat.document.tipus.enum."));
-pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelper
-		.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto.class, "interessat.idioma.enum."));
+pageContext.setAttribute("documentTipusEnumOptions", es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto.class, "interessat.document.tipus.enum."));
+pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto.class, "interessat.idioma.enum."));
 %>
 
 <c:set var="potModificar">${potModificar == null || potModificar == true ? true : false}</c:set>
-
 
 <c:set var="titol">
 	<c:choose>
@@ -63,7 +58,6 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 	</c:choose>
 </c:set>
 
-
 <html>
 <head>
 <title>${titol}</title>
@@ -86,6 +80,7 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 </style>
 
 <script type="text/javascript">
+
 	var interessatNoms = [];
 	var interessatLlinatges = [];
 	<c:forEach var="intFis" items="${interessats}">
@@ -94,13 +89,14 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		interessatLlinatges['${intFis.id}'] = "${intFis.llinatges}";
 	</c:if>
 	</c:forEach>
+	
 	const esRepresentant = <c:choose><c:when test="${esRepresentant}">true</c:when><c:otherwise>false</c:otherwise></c:choose>;
-
 	const isPropertyNotEmpty = (obj, prop) => {
 		return obj.hasOwnProperty(prop) && obj[prop] !== null && obj[prop] !== undefined;
 	}
 
 	$(document).ready(function() {
+		
 		var munOrgan = '';
 		var edicio = <c:out value="${not empty interessatCommand.id}"/>;
 		var idEdicio = '${interessatCommand.id}';
@@ -188,12 +184,11 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 				$('#documentTipus').change();
 				$('#documentTipus').prop("disabled", true);
 				$('#documentNum').prop("readonly", true);
-
 			}
 			canviVisibilitat(tipusInt);
 		});
-		$('select#tipus').change();
 
+		$('select#tipus').change();
 
 		$('input#documentNum').on('keydown', function(evt) {
 			$(this).val(function (_, val) {
@@ -202,15 +197,16 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		});
 
 		$('input#documentNum').change((event) => {
+			
 			$('#id').val(edicio ? idEdicio : '');
-			$('#editar-warn').hide();
+// 			$('#editar-warn').hide();
 			const documentNum = $(event.target).val();
 			console.log('Element has changed:', documentNum);
 
-			if (esRepresentant && documentNum.trim() !== "") {
+			if (documentNum.trim() !== "") {
 				$.ajax({
 					type: 'GET',
-					url: "<c:url value="/expedient/${expedientId}/representant/"/>" + documentNum,
+					url: "<c:url value="/expedient/${expedientId}/comprovarDoc/"/>" + documentNum,
 					success: function(data) {
 						if (data !== null && isPropertyNotEmpty(data, 'id')) {
 							$('#id').val(data.id);
@@ -238,6 +234,8 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 							if (isPropertyNotEmpty(data, 'telefon')) $('#telefon').val(data.telefon);
 							if (isPropertyNotEmpty(data, 'observacions')) $('#observacions').val(data.observacions);
 							if (isPropertyNotEmpty(data, 'preferenciaIdioma')) $('#preferenciaIdioma').val(data.preferenciaIdioma);
+						} else {
+							//Maldament després canviin de nou el nif per un que no existeix, seguiran modificant el interessat existent i carregat anteriorment. 
 						}
 					}
 				});
@@ -588,9 +586,8 @@ pageContext.setAttribute("idiomaEnumOptions", es.caib.ripea.war.helper.EnumHelpe
 		</c:otherwise>
 	</c:choose>
 
-	<form:form 
-		id="interessatform" action="${formAction}" method="post"
-		cssClass="form-horizontal" commandName="interessatCommand">
+	<form:form id="interessatform" action="${formAction}" method="post" cssClass="form-horizontal" commandName="interessatCommand">
+	
 		<form:hidden path="entitatId" />
 		<form:hidden path="id" />
 		<form:hidden path="expedientId" />

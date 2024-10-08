@@ -283,8 +283,20 @@ public class Utils {
 					int remainingDays = dies % 7;
 	
 					String retorn = "";
-					if (weeks>0) { retorn += weeks + " setmanes"; }
-					if (remainingDays>0) { retorn += ", " + remainingDays + " dies"; }
+					if (weeks>0) {
+						if (weeks==1) {
+							retorn += weeks + " setmana";
+						} else {
+							retorn += weeks + " setmanes";
+						}
+					}
+					if (remainingDays>0) {
+						if (remainingDays==1) {
+							retorn += ", " + remainingDays + " dia";
+						} else {
+							retorn += ", " + remainingDays + " dies";
+						}
+					}
 					
 					if (retorn.startsWith(", ")) {
 						return retorn.substring(2, retorn.length());

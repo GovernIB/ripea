@@ -56,6 +56,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -268,7 +269,7 @@ public class CacheHelper {
 			}
 			
 			for (DocumentEntity document : documents) {
-				if (hasNotificacionsNoFinalitzadesINoPendentsAmbError(document)) {
+				if (hasNotificacionsNoCaducadesPendents(document)) {
 					errors.add(
 							crearValidacioError(
 									null,
@@ -666,19 +667,23 @@ public class CacheHelper {
 	}
 	
 	
-	private boolean hasNotificacionsNoFinalitzadesINoPendentsAmbError(DocumentEntity document) {
+	private boolean hasNotificacionsNoCaducadesPendents(DocumentEntity document) {
 		List<DocumentNotificacioEstatEnumDto> estatsFinals = new ArrayList<DocumentNotificacioEstatEnumDto>(Arrays.asList(
 				DocumentNotificacioEstatEnumDto.FINALITZADA, 
 				DocumentNotificacioEstatEnumDto.PROCESSADA));
 		List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
-		//Si la darrera notificació del document no està finalitzada
-		if (Utils.isNotEmpty(notificacionsPendents) && !estatsFinals.contains(notificacionsPendents.get(0).getNotificacioEstat()) && !notificacionsPendents.get(0).isError()) {
+		//No permetrem tancar l'expedient si té alguna notificacio:
+		// - Que esta pendent
+		// - Que no té error
+		// - Que no esta caducada
+		if (Utils.isNotEmpty(notificacionsPendents) &&
+			!estatsFinals.contains(notificacionsPendents.get(0).getNotificacioEstat()) &&
+			!notificacionsPendents.get(0).isError() &&
+			(notificacionsPendents.get(0).getDataCaducitat()==null || notificacionsPendents.get(0).getDataCaducitat().after(Calendar.getInstance().getTime()))) {
 			return true;
 		}
 		return false;
 	}
-	
-	
 	
 	@CacheEvict(value = "notificacionsPendentsPerExpedient", key="#expedient")
 	public void evictNotificacionsPendentsPerExpedient(ExpedientEntity expedient) {

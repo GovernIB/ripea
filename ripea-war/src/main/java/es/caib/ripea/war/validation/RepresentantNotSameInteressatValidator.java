@@ -36,8 +36,8 @@ public class RepresentantNotSameInteressatValidator implements ConstraintValidat
                                     MessageHelper.getInstance().getMessage("RepresentantSameInteressat", null, new RequestContext(request).getLocale()))
                             .addNode("documentNum")
                             .addConstraintViolation();
+                    return false;
                 }
-                return false;
             }
         } catch (final Exception ex) {
             LOGGER.error("Error al comprovar si el representant és el mateix que l'interessat", ex);

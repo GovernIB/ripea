@@ -71,7 +71,7 @@
 			</tbody>
 			</table>
 		</c:if>
-		<c:if test="${!expedient.valid and expedient.validPerTancar}">
+		<c:if test="${expedient.notificacionsCaducades}">
 			<div class="alert well-sm alert-warning">
 				<span class="fa fa-warning"></span>
 				<spring:message code="contingut.expedient.tancar.notif"/>

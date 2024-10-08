@@ -357,9 +357,11 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long expedientId,
 			@PathVariable Long interessatId,
 			Model model) {
+		//interessatId = Interessat al qual es representa
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		InteressatCommand interessatCommand = new InteressatCommand();
 		interessatCommand.setEntitatId(entitatActual.getId());
+		interessatCommand.setInteressatId(interessatId);
 		interessatCommand.setPais("724");
 		model.addAttribute("interessatCommand", interessatCommand);
 		model.addAttribute("expedientId", expedientId);
@@ -377,11 +379,12 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 			@PathVariable Long representantId,
 			@RequestParam(value = "potModificar", required = false) Boolean potModificar,
 			Model model) {
+		//interessatId		= Interessat al qual es representa
+		//representantId	= representant que s'esrà modificant (no poden ser el mateix)
 		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
 		InteressatDto representantDto = expedientInteressatService.findRepresentantById(
 				interessatId, 
 				representantId);
-//		InteressatDto representantDto = interessatService.findById(entitatActual.getId(), representantId);
 		InteressatCommand interessatCommand = InteressatCommand.asCommand(representantDto);
 		interessatCommand.setEntitatId(entitatActual.getId());
 		interessatCommand.setInteressatId(interessatId);
@@ -473,7 +476,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 						request,
 						"redirect:../../../contingut/" + expedientId,
 						"interessat.controller.creat.error.arxiu.representant",
-						null);
+						new Object[] { interessatCommand.getDocumentNum() });
 			}
 			
 		} else {
@@ -488,7 +491,8 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		return getModalControllerReturnValueSuccess(
 				request,
 				"redirect:../../contenidor/" + expedientId,
-				msgKey);
+				msgKey,
+				new Object[] { interessatCommand.getDocumentNum() });
 	}
 
 	@RequestMapping(value = "/{expedientId}/interessat/{interessatId}/representant/{representantId}/delete", method = RequestMethod.GET)
@@ -513,9 +517,9 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		
 	}
 
-	@RequestMapping(value = "/{expedientId}/representant/{documentNum}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{expedientId}/comprovarDoc/{documentNum}", method = RequestMethod.GET)
 	@ResponseBody
-	public InteressatDto getInteressatExpedient(
+	public InteressatDto comprovarDocInteressatExpedient(
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			@PathVariable String documentNum) {
@@ -526,8 +530,7 @@ public class ExpedientInteressatController extends BaseUserOAdminOOrganControlle
 		InteressatDto interessatDto = expedientInteressatService.findByExpedientAndDocumentNum(documentNum, expedientId);
 		return interessatDto;
 	}
-	
-	
+		
 	@RequestMapping(value = "/{expedientId}/guardarInteressatsArxiu", method = RequestMethod.GET)
 	public String guardarExpedientArxiu(
 			HttpServletRequest request,

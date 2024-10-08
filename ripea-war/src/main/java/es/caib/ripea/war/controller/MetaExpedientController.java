@@ -480,7 +480,6 @@ public class MetaExpedientController extends BaseAdminController {
 		
 	}
 	
-	
 	@RequestMapping(value = "/importFitxerEdit", method = RequestMethod.POST)
 	public String importFitxerEditPost(
 			HttpServletRequest request,
@@ -499,7 +498,6 @@ public class MetaExpedientController extends BaseAdminController {
 			model.addAttribute("tipus", EnumHelper.getOptionsForEnum(TipusClassificacioEnumDto.class, "tipus.classificacio."));
 			return "importMetaExpedientEditForm";
 		}
-		
 		
 		try {
 			if (command.getMetaDocuments() != null) {
@@ -577,12 +575,12 @@ public class MetaExpedientController extends BaseAdminController {
 			}
 			
 			metaExpedientService.createFromImport(entitatActual.getId(), metaExpedientExport, rolActual, EntitatHelper.getOrganGestorActualId(request));
-			
 
 			return getModalControllerReturnValueSuccess(
 					request,
 					"redirect:metaExpedient",
-					"metaexpedient.import.controller.import.ok");
+					"metaexpedient.import.controller.import.ok",
+					new String[] {command.getNom() });
 			
 		} catch (Exception e) {
 			
@@ -591,16 +589,14 @@ public class MetaExpedientController extends BaseAdminController {
 					request,
 					"redirect:metaExpedient",
 					"metaexpedient.import.controller.import.error",
-					new Object[] { ExceptionHelper.getRootCauseOrItself(e).getMessage() }, e);
+					new Object[] { command.getNom(), ExceptionHelper.getRootCauseOrItself(e).getMessage() },
+					e);
 		} finally {
 			request.getSession().removeAttribute(SESSION_ATTRIBUTE_IMPORT_TEMPORAL);
 		}
-
 	}
 	
 	private void fillImportEditForm(MetaExpedientExportDto metaExpedientExport, Model model, EntitatDto entitatActual, HttpServletRequest request, MetaExpedientImportEditCommand metaExpedientImportEditCommand) {
-		
-		
 		
 		for (MetaDocumentDto metaDocumentDto : metaExpedientExport.getMetaDocuments()) {
 			if (metaDocumentDto.getPortafirmesFluxTipus() == MetaDocumentFirmaFluxTipusEnumDto.SIMPLE && metaDocumentDto.getPortafirmesResponsables() != null && metaDocumentDto.getPortafirmesResponsables().length != 0) {

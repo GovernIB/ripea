@@ -98,37 +98,21 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 	private static final String SESSION_ATTRIBUTE_RETURN_SCANNED = "DigitalitzacioController.session.scanned";
 	private static final String SESSION_ATTRIBUTE_RETURN_SIGNED = "DigitalitzacioController.session.signed";
 	private static final String SESSION_ATTRIBUTE_RETURN_IDTRANSACCIO = "DigitalitzacioController.session.idTransaccio";
-
 	
-	@Autowired
-	private ServletContext servletContext;
-
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private DocumentService documentService;
-	@Autowired
-	private MetaDocumentService metaDocumentService;
-	@Autowired
-	private MetaDadaService metaDadaService;
-	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
-	private ArxiuTemporalHelper arxiuTemporalHelper;
-	@Autowired
-	private BeanGeneratorHelper beanGeneratorHelper;
-	@Autowired 
-	private DocumentHelper documentHelper;
-	@Autowired
-	private DigitalitzacioService digitalitzacioService;
-	@Autowired
-	private ExpedientService expedientService;
-	@Autowired
-	private OrganGestorService organGestorService;
-	@Autowired
-	private ExpedientTascaService expedientTascaService;
-	@Autowired
-	private CarpetaService carpetaService;
+	@Autowired private ServletContext servletContext; 
+	@Autowired private ContingutService contingutService;
+	@Autowired private DocumentService documentService;
+	@Autowired private MetaDocumentService metaDocumentService;
+	@Autowired private MetaDadaService metaDadaService;
+	@Autowired private AplicacioService aplicacioService;
+	@Autowired private ArxiuTemporalHelper arxiuTemporalHelper;
+	@Autowired private BeanGeneratorHelper beanGeneratorHelper;
+	@Autowired private DocumentHelper documentHelper;
+	@Autowired private DigitalitzacioService digitalitzacioService;
+	@Autowired private ExpedientService expedientService;
+	@Autowired private OrganGestorService organGestorService;
+	@Autowired private ExpedientTascaService expedientTascaService;
+	@Autowired private CarpetaService carpetaService;
 	
 	@RequestMapping(value = "/{pareId}/document/new", method = RequestMethod.GET)
 	public String get(
@@ -976,19 +960,27 @@ public class ContingutDocumentController extends BaseUserOAdminOOrganController 
 			Model model) {
 		
 		try {
-			EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
-			model.addAttribute(new DocumentCommand());
-			model.addAttribute(
-					"metaDocuments",
-					metaDocumentService.findActiusPerCreacio(
-							entitatActual.getId(),
-							expedientId, 
-							null,
-							false));
-			model.addAttribute("expedientId", expedientId);
 			
-			return "notificarMultipleDocuemntTipusForm";
+			Set<Long> docsIdx = (Set<Long>)RequestSessionHelper.obtenirObjecteSessio(request, SESSION_ATTRIBUTE_SELECCIO);
+			
+			if (docsIdx!=null && docsIdx.size()>1) {
+			
+				EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+				model.addAttribute(new DocumentCommand());
+				model.addAttribute(
+						"metaDocuments",
+						metaDocumentService.findActiusPerCreacio(
+								entitatActual.getId(),
+								expedientId, 
+								null,
+								false));
+				model.addAttribute("expedientId", expedientId);
 				
+				return "notificarMultipleDocuemntTipusForm";
+
+			} else {
+				return "redirect:/modal/document/"+docsIdx.iterator().next()+"/notificar";
+			}
 		
 		} catch (Exception e) {
 			logger.error("Error al chooseTipusDocument", e);

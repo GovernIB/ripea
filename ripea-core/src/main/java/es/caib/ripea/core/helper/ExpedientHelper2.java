@@ -6,6 +6,7 @@ package es.caib.ripea.core.helper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import es.caib.ripea.core.api.dto.*;
@@ -27,6 +28,8 @@ import es.caib.plugins.arxiu.api.DocumentEstat;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.DocumentEnviamentInteressatEntity;
+import es.caib.ripea.core.entity.DocumentNotificacioEntity;
 import es.caib.ripea.core.entity.ExpedientEntity;
 import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
 
@@ -62,6 +65,8 @@ public class ExpedientHelper2 {
 	private AplicacioService aplicacioService;
 	@Autowired
 	private ExecucioMassivaContingutRepository execucioMassivaContingutRepository;
+	@Autowired
+	private DocumentNotificacioRepository documentNotificacioRepository;
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void checkIfExpedientCanBeClosed(Long expedientId) {
@@ -72,11 +77,7 @@ public class ExpedientHelper2 {
 		}
 		List<ValidacioErrorDto> errorsExp = cacheHelper.findErrorsValidacioPerNode(expedient);
 		if (!errorsExp.isEmpty()) {
-			for (ValidacioErrorDto veDto: errorsExp) {
-				if (!veDto.getTipusValidacio().equals(ErrorsValidacioTipusEnumDto.NOTIFICACIONS)) {
-					throw new ValidationException("No es pot tancar un expedient amb errors de validació");
-				}
-			}
+			throw new ValidationException("No es pot tancar un expedient amb errors de validació");
 		}
 		if (CollectionUtils.isEmpty(documentRepository.findByExpedientAndEsborrat(expedient, 0))) {
 			throw new ValidationException("No es pot tancar un expedient sense cap document");
@@ -136,7 +137,9 @@ public class ExpedientHelper2 {
 			expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu);
 			expedient.updateEstatAdditional(null);
 			contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
-	
+			logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
+			actualitzaEstatNotificacionsCaducades(expedient);
+			logger.debug("Tancant expedient a l'arxiu per acció iniciada per usuari...");
 			pluginHelper.arxiuExpedientTancar(expedient);
 		} else {
 			expedient.updateEstat(ExpedientEstatEnumDto.TANCAT, motiu, getDiesPerTancament());
@@ -149,7 +152,29 @@ public class ExpedientHelper2 {
 	public void closeExpedientArxiu(ExpedientEntity expedient) {
 		expedient.updateTancatData();
 		contingutLogHelper.log(expedient, LogTipusEnumDto.TANCAMENT, null, null, false, false);
+		logger.debug("Actualitzant estat de les notificacions caducades abans de tancar...");
+		actualitzaEstatNotificacionsCaducades(expedient);
+		logger.debug("Tancant expedient a l'arxiu desde acció en segon pla...");		
 		pluginHelper.arxiuExpedientTancar(expedient);
+	}
+	
+	private void actualitzaEstatNotificacionsCaducades(ExpedientEntity expedient) {
+        List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+        for (DocumentEntity document : documents) {
+	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
+	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
+	            if (notificacionsPendents.get(0).getDataCaducitat()!=null && 
+	            	notificacionsPendents.get(0).getDataCaducitat().before(Calendar.getInstance().getTime())) {
+	        		if (notificacionsPendents.get(0).getDocumentEnviamentInteressats()!=null) {
+	        			for (DocumentEnviamentInteressatEntity documentEnviamentInteressatEntity: notificacionsPendents.get(0).getDocumentEnviamentInteressats()) {
+	        				try {
+	        					pluginHelper.notificacioConsultarIActualitzarEstat(documentEnviamentInteressatEntity);
+	        				} catch (Exception ex) {logger.warn("No s'ha pogut actualitzar l'estat de la notificació "+notificacionsPendents.get(0).getNotificacioIdentificador());}
+	        			}
+	        		}
+	            }
+	        }
+        }
 	}
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW)

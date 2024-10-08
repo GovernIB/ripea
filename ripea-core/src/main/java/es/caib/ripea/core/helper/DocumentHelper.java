@@ -206,7 +206,7 @@ public class DocumentHelper {
 		ArxiuEstatEnumDto arxiuEstat = getArxiuEstat(documentFirmaTipus, null);
 		
 		try {
-			if (entity.getExpedient().getArxiuUuid() != null) {
+			if (entity.getExpedient().getArxiuUuid() != null && expedient.getTancatData()==null) {
 				
 				List<ArxiuFirmaDto> firmes = null;
 				if (isDocumentFromPinbal(entity)) {

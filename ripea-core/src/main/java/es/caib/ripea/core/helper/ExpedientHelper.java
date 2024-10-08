@@ -4,9 +4,35 @@
  */
 package es.caib.ripea.core.helper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.ZipOutputStream;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+
 import es.caib.distribucio.rest.client.integracio.domini.DocumentTipus;
 import es.caib.distribucio.rest.client.integracio.domini.FirmaTipus;
 import es.caib.distribucio.rest.client.integracio.domini.InteressatTipus;
@@ -20,12 +46,60 @@ import es.caib.plugins.arxiu.api.Document;
 import es.caib.plugins.arxiu.api.DocumentContingut;
 import es.caib.plugins.arxiu.api.Expedient;
 import es.caib.plugins.arxiu.caib.ArxiuConversioHelper;
-import es.caib.ripea.core.api.dto.*;
+import es.caib.ripea.core.api.dto.ArxiuEstatEnumDto;
+import es.caib.ripea.core.api.dto.CarpetaDto;
+import es.caib.ripea.core.api.dto.DocumentDto;
+import es.caib.ripea.core.api.dto.DocumentEstatEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiEstadoElaboracionEnumDto;
+import es.caib.ripea.core.api.dto.DocumentNtiTipoFirmaEnumDto;
+import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatEnumDto;
+import es.caib.ripea.core.api.dto.ExpedientPeticioEstatEnumDto;
+import es.caib.ripea.core.api.dto.FitxerDto;
+import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
+import es.caib.ripea.core.api.dto.InteressatAssociacioAccioEnum;
+import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
+import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
+import es.caib.ripea.core.api.dto.LogTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MultiplicitatEnumDto;
+import es.caib.ripea.core.api.dto.NtiOrigenEnumDto;
+import es.caib.ripea.core.api.dto.PermisosPerExpedientsDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrioritatEnumDto;
+import es.caib.ripea.core.api.dto.RegistreAnnexEstatEnumDto;
+import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.ArxiuJaGuardatException;
 import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.entity.*;
-import es.caib.ripea.core.firma.DocumentFirmaServidorFirma;
+import es.caib.ripea.core.entity.CarpetaEntity;
+import es.caib.ripea.core.entity.ContingutEntity;
+import es.caib.ripea.core.entity.DadaEntity;
+import es.caib.ripea.core.entity.DocumentEntity;
+import es.caib.ripea.core.entity.EntitatEntity;
+import es.caib.ripea.core.entity.ExpedientEntity;
+import es.caib.ripea.core.entity.ExpedientEstatEntity;
+import es.caib.ripea.core.entity.ExpedientPeticioEntity;
+import es.caib.ripea.core.entity.GrupEntity;
+import es.caib.ripea.core.entity.InteressatAdministracioEntity;
+import es.caib.ripea.core.entity.InteressatEntity;
+import es.caib.ripea.core.entity.InteressatPersonaFisicaEntity;
+import es.caib.ripea.core.entity.InteressatPersonaJuridicaEntity;
+import es.caib.ripea.core.entity.MetaDadaEntity;
+import es.caib.ripea.core.entity.MetaDocumentEntity;
+import es.caib.ripea.core.entity.MetaExpedientEntity;
+import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
+import es.caib.ripea.core.entity.MetaNodeEntity;
+import es.caib.ripea.core.entity.OrganGestorEntity;
+import es.caib.ripea.core.entity.RegistreAnnexEntity;
+import es.caib.ripea.core.entity.RegistreInteressatEntity;
+import es.caib.ripea.core.entity.UsuariEntity;
 import es.caib.ripea.core.repository.AlertaRepository;
 import es.caib.ripea.core.repository.CarpetaRepository;
 import es.caib.ripea.core.repository.ContingutRepository;
@@ -42,30 +116,6 @@ import es.caib.ripea.core.repository.MetaExpedientRepository;
 import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.RegistreAnnexRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Mètodes comuns per a la gestió d'expedients.
@@ -134,8 +184,6 @@ public class ExpedientHelper {
 	@Autowired
 	private ExpedientPeticioHelper expedientPeticioHelper;
 	@Autowired
-	private DocumentFirmaServidorFirma documentFirmaServidorFirma;
-	@Autowired
 	private PermisosHelper permisosHelper;
 	@Autowired
 	private MetaExpedientRepository metaExpedientRepository;
@@ -147,8 +195,6 @@ public class ExpedientHelper {
 	private OrganGestorCacheHelper organGestorCacheHelper;
 	
 	public static List<DocumentDto> expedientsWithImportacio = new ArrayList<DocumentDto>();
-	
-	
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public Long create(
@@ -1339,7 +1385,6 @@ public class ExpedientHelper {
 		return expedientDto;
 	}
 	
-	
 	public ExpedientEntity tancar(Long entitatId, Long expedientId, String motiu, Long[] documentsPerFirmar, boolean checkPerMassiuAdmin) {
 
 		organGestorHelper.actualitzarOrganCodi(organGestorHelper.getOrganCodiFromContingutId(expedientId));
@@ -1360,11 +1405,6 @@ public class ExpedientHelper {
 
 		return expedientRepository.findOne(expedientId);
 	}
-	
-	
-
-	
-
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public List<Long> getMetaExpedientIdDomini(String dominiCodi) {

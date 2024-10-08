@@ -203,6 +203,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		boolean metaExpedientPendentRevisio = metaExpedientService.isMetaExpedientPendentRevisio(entitatActual.getId(), metaExpedientId);
 		OrganGestorDto organActual = EntitatHelper.getOrganGestorActual(request);
 		comprovarAccesMetaExpedient(request, metaExpedientId);
+		PermisDto permisDto = findPermisById(entitatActual, metaExpedientId, permisId);
 		metaExpedientService.permisDelete(
 				entitatActual.getId(),
 				metaExpedientId,
@@ -213,7 +214,7 @@ public class MetaExpedientPermisController extends BaseAdminController {
 		if (rolActual.equals("IPA_ORGAN_ADMIN") && !metaExpedientPendentRevisio && metaExpedientService.isRevisioActiva()) {
 			MissatgesHelper.info(request, getMessage(request, "metaexpedient.revisio.modificar.alerta"));
 		}
-		PermisDto permisDto = findPermisById(entitatActual, metaExpedientId, permisId);
+		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:../../../../metaExpedient/" + metaExpedientId + "/permis",

@@ -22,7 +22,7 @@ public abstract class NodeDto extends ContingutDto {
 	private MetaNodeDto metaNode;
 	private List<DadaDto> dades;
 	private boolean valid; //No té cap avis de validacio
-	private boolean validPerTancar; //O no té cap avis de validació o els que té son per notificacions
+	private boolean notificacionsCaducades;
 
 	public int getDadesCount() {
 		if (dades == null)

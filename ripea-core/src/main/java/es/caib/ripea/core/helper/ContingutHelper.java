@@ -53,7 +53,6 @@ import es.caib.ripea.core.api.dto.DocumentNotificacioEstatEnumDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentVersioDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.ErrorsValidacioTipusEnumDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientEstatDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
@@ -532,16 +531,22 @@ public class ContingutHelper {
 
         List<ValidacioErrorDto> errorsValidacio = cacheHelper.findErrorsValidacioPerNode(expedient);
         dto.setValid(errorsValidacio.isEmpty());
-        dto.setValidPerTancar(true);
-        for (ValidacioErrorDto veDto: errorsValidacio) {
-            //Si té algun error que NO és de notificacions pendents,
-            //posam a false el check de nomes errors de notificacio i sortim del bucle
-            if (!veDto.getTipusValidacio().equals(ErrorsValidacioTipusEnumDto.NOTIFICACIONS)) {
-                dto.setValidPerTancar(false);
-                break;
-            }
+        
+        boolean notificacionsCaducades = false;
+        List<DocumentEntity> documents = documentRepository.findByExpedientAndEsborrat(expedient, 0);
+        for (DocumentEntity document : documents) {
+	        List<DocumentNotificacioEntity> notificacionsPendents = documentNotificacioRepository.findByDocumentOrderByCreatedDateDesc(document);
+	        if (notificacionsPendents!=null && notificacionsPendents.size()>0) {
+	            if (notificacionsPendents.get(0).getDataCaducitat()!=null && 
+	            	notificacionsPendents.get(0).getDataCaducitat().before(Calendar.getInstance().getTime())) {
+	            		notificacionsCaducades = true;
+	            		break;
+	            }
+	        }
+	        if (notificacionsCaducades) break;
         }
-
+        
+        dto.setNotificacionsCaducades(notificacionsCaducades);
 		dto.setNumSeguidors(expedient.getSeguidors().size());
 		dto.setNumComentaris(expedient.getComentaris().size());
 		dto.setMetaNode(conversioTipusHelper.convertir(expedient.getMetaNode(), MetaExpedientDto.class));
