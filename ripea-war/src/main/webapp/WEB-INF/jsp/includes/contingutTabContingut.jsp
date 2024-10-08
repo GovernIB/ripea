@@ -60,10 +60,8 @@
 	//################################################## document ready START ##############################################################
 	$(document).ready(function () {
 
-
 	//------------------------- if contingut is not document START ----------------------------------
 	<c:if test="${!contingut.document}">
-
 
 		clearSelection();
 		enableDisableMultipleButtons();
@@ -410,8 +408,67 @@
 			getDetallsSignants($('#detallSignants'), contingutId, false);
 		});
 
-		removeTransactionId();
+// 		removeTransactionId();
 
+		<c:if test="${contingut.document}">
+
+		$('form#nodeDades').on('submit', function() {
+
+			debugger;
+			showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
+			
+			$.post(
+					'../ajax/contingutDada/${contingutId}/save',
+					$(this).serialize(),
+					function (data) {
+						debugger;
+						if (data.estatOk) {
+							$('#nodeDades input').each(function() {
+								var $pare = $(this).parent();
+								if ($pare.hasClass('has-warning') || $pare.hasClass('has-error')) {
+									$pare.removeClass('has-success');
+									$pare.removeClass('has-warning');
+									$pare.removeClass('has-error');
+									$pare.addClass('has-success has-feedback');
+									$(this).next().removeClass().addClass('glyphicon glyphicon-ok form-control-feedback');
+									$(this).attr('title', 'Valor guardat correctament');
+								} else {
+									$pare.removeClass('has-success');
+									$pare.removeClass('has-feedback');
+									$(this).next().removeClass();
+									$(this).removeAttr('title');
+								}
+							});
+	// 						$.get(
+	// 								'../ajax/contingutDada/${contingut.id}/count',
+	// 								function (data) 
+	<%-- 									<meta name="subtitle" content="${serveiPerTitol}"/>{ --%>
+	// 									$('#dades-count').html(data);
+	// 								});
+							
+						} else {
+							$('#nodeDades input').each(function() {
+								for (var i = 0; i < data.errorsCamps.length; i++) {
+									var error = data.errorsCamps[i];
+									if (error.camp == $(this).attr('name')) {
+										var $pare = $(this).parent();
+										$pare.removeClass('has-success');
+										$pare.removeClass('has-warning');
+										$pare.removeClass('has-error');
+										$pare.addClass('has-error has-feedback');
+										$(this).next().removeClass().addClass('glyphicon glyphicon-warning-sign form-control-feedback');
+										$(this).attr('title', error.missatge);
+										break;
+									}
+								}
+							});
+						}
+	// 					webutilRefreshMissatges();
+						location.reload();
+					});
+			return false;
+		});
+		</c:if>
 	});//################################################## document ready END ##############################################################
 
 	$(document).on('change', '.checkbox', function () {
@@ -732,10 +789,6 @@ function dragAndDropVistaCarpetes() {
 		}
 	}
 
-	//------------------------- if contingut is not document START ----------------------------------
-	<c:if test="${!contingut.document}">
-
-
 	function showLoadingModal(message) {
 		var modalDivId = "modalLoading";
 
@@ -749,22 +802,6 @@ function dragAndDropVistaCarpetes() {
 			keyboard: false, //remove option to close with keyboard
 			show: true //Display loader!
 		});
-	}
-
-	function modalCloseLoadingHandler() {
-		$('body').addClass('loading');
-	}
-
-	function addLoading(idModal) {
-		$('#' + idModal).on('hidden.bs.modal', modalCloseLoadingHandler)
-	}
-
-	function removeLoading(idModal) {
-		if (idModal) {
-			$('#' + idModal).off('hidden.bs.modal', modalCloseLoadingHandler)
-		} else {
-			$('body').removeClass('loading');
-		}
 	}
 
 	function modalLoading(modalDivId, modalData, message) {
@@ -783,7 +820,25 @@ function dragAndDropVistaCarpetes() {
 				'	</div>' +
 				'</div>';
 	}
+	
+	//------------------------- if contingut is not document START ----------------------------------
+	<c:if test="${!contingut.document}">
 
+	function modalCloseLoadingHandler() {
+		$('body').addClass('loading');
+	}
+
+	function addLoading(idModal) {
+		$('#' + idModal).on('hidden.bs.modal', modalCloseLoadingHandler)
+	}
+
+	function removeLoading(idModal) {
+		if (idModal) {
+			$('#' + idModal).off('hidden.bs.modal', modalCloseLoadingHandler)
+		} else {
+			$('body').removeClass('loading');
+		}
+	}
 
 	function removeTransactionId(idModal) {
 		if (idModal) {

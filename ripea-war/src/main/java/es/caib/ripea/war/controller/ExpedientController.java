@@ -992,7 +992,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientId,
 			Model model) {
-		EntitatDto entitatActual = getEntitatActualComprovantPermisos(request);
+		getEntitatActualComprovantPermisos(request);
 		model.addAttribute(
 				"contingut",
 				contingutService.getBasicInfo(
@@ -1410,7 +1410,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 			return "expedientChoosePrioritatForm";
 		}
 		
-		expedientService.changeExpedientPrioritat(
+		ExpedientDto expedientDto = expedientService.changeExpedientPrioritat(
 				entitatActual.getId(),
 				command.getId(),
 				command.getPrioritat());
@@ -1419,7 +1419,7 @@ public class ExpedientController extends BaseUserOAdminOOrganController {
 				request,
 				"redirect:../expedient",
 				"expedient.controller.prioritatModificat.ok",
-				new Object[]{command.getNom()});
+				new Object[]{expedientDto.getNom()});
 	}
 	
 	@RequestMapping(value = "/{expedientId}/relacionarList/select", method = RequestMethod.GET)

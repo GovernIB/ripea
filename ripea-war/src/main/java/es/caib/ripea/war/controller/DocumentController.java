@@ -204,7 +204,8 @@ public class DocumentController extends BaseUserOAdminOOrganController {
 			return this.getModalControllerReturnValueSuccess(
 					request,
 					"redirect:../../../contingut/" + documentId,
-					"document.controller.portafirmes.upload.ok");	
+					"document.controller.portafirmes.upload.ok",
+					new Object[] {document.getNom()});	
 			
 		} catch (Exception ex) {
 			String missatge = ExceptionHelper.isExceptionOrCauseInstanceOf(ex, ResponsableNoValidPortafirmesException.class)

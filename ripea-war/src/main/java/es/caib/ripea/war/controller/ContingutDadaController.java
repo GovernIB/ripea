@@ -51,18 +51,9 @@ import java.util.Map;
 @RequestMapping("/contingutDada")
 public class ContingutDadaController extends BaseUserOAdminOOrganController {
 
-	@Autowired
-	private ContingutService contingutService;
-	@Autowired
-	private MetaDadaService metaDadaService;
-
-	@Autowired
-	private BeanGeneratorHelper beanGeneratorHelper;
-	
-	/*@Autowired
-	private Validator validator;*/
-
-
+	@Autowired private ContingutService contingutService;
+	@Autowired private MetaDadaService metaDadaService;
+	@Autowired private BeanGeneratorHelper beanGeneratorHelper;
 
 	@ModelAttribute("dadesCommand")
 	public Object addDadesCommand(

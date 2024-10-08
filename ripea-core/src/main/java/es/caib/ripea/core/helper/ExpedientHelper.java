@@ -345,14 +345,11 @@ public class ExpedientHelper {
 		return expedient.getId();
 	}
 
-
-
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public boolean arxiuPropagarExpedientAmbInteressatsNewTransaction(
 			Long expedientId) {
 		return arxiuPropagarExpedientAmbInteressats(expedientId);
 	}
-	
 	
 	public boolean arxiuPropagarExpedientAmbInteressats(
 			Long expedientId) {
@@ -380,7 +377,6 @@ public class ExpedientHelper {
 			
 		return exception == null;
 	}
-
 
 	@Transactional
 	public void associateInteressats(

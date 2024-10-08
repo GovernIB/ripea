@@ -441,8 +441,8 @@ $(document).ajaxError(function(event, jqxhr, ajaxSettings, thrownError) {
 				$heading.wrap("<div class='col-md-" + col1Size + "'></div>");
 				$(this).wrap("<div class='col-md-" + col2Size + "'></div>");	
 			} else {
-				$heading.wrap( "<div class='col-md-10'></div>");
-				$(this).wrap( "<div class='col-md-2'></div>");	
+				$heading.wrap( "<div class='col-md-9'></div>");
+				$(this).wrap( "<div class='col-md-3'></div>");	
 			}
 		}
 	}
