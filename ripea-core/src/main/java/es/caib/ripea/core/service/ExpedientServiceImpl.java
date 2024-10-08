@@ -66,6 +66,7 @@ import es.caib.ripea.core.api.dto.ResultEnumDto;
 import es.caib.ripea.core.api.dto.UsuariDto;
 import es.caib.ripea.core.api.exception.DocumentAlreadyImportedException;
 import es.caib.ripea.core.api.exception.NotFoundException;
+import es.caib.ripea.core.api.exception.PermissionDeniedException;
 import es.caib.ripea.core.api.exception.ValidationException;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.utils.Utils;
@@ -762,7 +763,20 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 		List<ExpedientDto> expedientsDto = new ArrayList<>();
 		// if meta expedient has write permissions add all expedients
-		if (entityComprovarHelper.hasMetaExpedientWritePermissons(metaExpedientId) || RolHelper.isAdminEntitat(rolActual) || rolActual.equals("IPA_ORGAN_ADMIN")) {
+		boolean permittedModificarProcediment = true;
+		try {
+			entityComprovarHelper.comprovarMetaExpedient(
+					entitat,
+					metaExpedientId,
+					false,
+					true,
+					false,
+					false,
+					false, null, null);
+		} catch (PermissionDeniedException ex) {
+			permittedModificarProcediment = false;
+		}
+		if (permittedModificarProcediment || RolHelper.isAdminEntitat(rolActual) || rolActual.equals("IPA_ORGAN_ADMIN")) {
 			for (ContingutEntity cont : expedientsEnt) {
 				ExpedientEntity exp = (ExpedientEntity)cont;
 				ExpedientDto expedient = new ExpedientDto();
