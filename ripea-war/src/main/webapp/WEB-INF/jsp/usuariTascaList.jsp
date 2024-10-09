@@ -255,8 +255,10 @@
 									{{if estat == 'PENDENT'}}					
 										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
 										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>	 
-									{{else}}						
-										<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>	
+									{{else}}
+										{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
+											<li {{if agafada && usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
+										{{/if}}
 									{{/if}}
 									{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
 										<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
