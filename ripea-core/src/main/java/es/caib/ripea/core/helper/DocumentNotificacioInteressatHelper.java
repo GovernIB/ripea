@@ -1,6 +1,5 @@
 package es.caib.ripea.core.helper;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +55,10 @@ public class DocumentNotificacioInteressatHelper {
 		InteressatEntity interessat = entityComprovarHelper.comprovarInteressat(expedientEntity, interessatId);
 		notificacioDto.setServeiTipusEnum(notificacioDto.getServeiTipusEnum());
 		notificacioDto.setEntregaPostal(notificacioDto.isEntregaPostal());
+		//#1545 NotibRepostaException [1042] Els salts de linia no estan permesos al camp descripció (observacions del notificacioDto)
+		if (notificacioDto.getObservacions()!=null) {
+			notificacioDto.setObservacions(notificacioDto.getObservacions().replaceAll("\\r?\\n", " "));
+		}
 
 		RespostaEnviar respostaEnviar = pluginHelper.notificacioEnviar(
 				notificacioDto, 
