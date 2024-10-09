@@ -88,6 +88,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			String responsable,
 			MetaExpedientEntity metaExpedient,
 			Date dataLimit,
+			Integer duracio,
+			PrioritatEnumDto prioritat,
 			ExpedientEstatEntity estatCrearTasca,
 			ExpedientEstatEntity estatFinalitzarTasca) {
 		return new Builder(
@@ -97,6 +99,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				responsable,
 				metaExpedient,
 				dataLimit,
+				duracio,
+				prioritat,
 				estatCrearTasca,
 				estatFinalitzarTasca);
 	}
@@ -109,6 +113,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 				String responsable,
 				MetaExpedientEntity metaExpedient,
 				Date dataLimit,
+				Integer duracio,
+				PrioritatEnumDto prioritat,
 				ExpedientEstatEntity estatCrearTasca,
 				ExpedientEstatEntity estatFinalitzarTasca) {
 			built = new MetaExpedientTascaEntity();
@@ -119,6 +125,8 @@ public class MetaExpedientTascaEntity extends RipeaAuditable<Long> {
 			built.metaExpedient = metaExpedient;
 			built.activa = true;
 			built.dataLimit = dataLimit;
+			built.duracio = duracio != null ? duracio : 10;
+			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
 			built.estatCrearTasca = estatCrearTasca;
 			built.estatFinalitzarTasca = estatFinalitzarTasca;
 		}

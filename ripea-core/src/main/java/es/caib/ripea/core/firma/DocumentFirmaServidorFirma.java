@@ -51,11 +51,8 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 	
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	public ArxiuFirmaDto firmar(Long documentId, String motiu) {
-
 		return doFirmar(documentId, motiu);
-
 	}
-	
 	
 	public ArxiuFirmaDto doFirmar(Long documentId, String motiu) {
 
@@ -99,7 +96,6 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				arxiuFirma.setTipus(ArxiuConversions.toArxiuFirmaTipus(firma.getTipusFirmaEni()));
 				ArxiuFirmaPerfilEnumDto perfil = ArxiuConversions.toArxiuFirmaPerfilEnum(firma.getPerfilFirmaEni());
 				arxiuFirma.setPerfil(perfil);
-				
 				
 				ArxiuEstatEnumDto arxiuEstat = ArxiuEstatEnumDto.DEFINITIU;
 				
@@ -145,9 +141,7 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		} else {
 			throw new NotFoundException(documentId, DocumentEntity.class);
 		}
-
 	}
-	
 	
 	private DocumentFirmaTipusEnumDto getDocumentFirmaTipus(SignaturaResposta firma){
 		DocumentFirmaTipusEnumDto documentFirmaTipus = null;
@@ -158,9 +152,6 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		}
 		return documentFirmaTipus;
 	}
-	
-	
-	
 
 	/**
 	 * Registra el log al document i al expedient on està el document.
@@ -180,8 +171,6 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 				false);
 		logExpedient(document, tipusLog);
 	}
-	
-	
 
 	public byte[] removeSignaturesPdfUsingPdfWriterCopyPdf(
 			byte[] contingut,
@@ -225,68 +214,8 @@ public class DocumentFirmaServidorFirma extends DocumentFirmaHelper{
 		} else {
 			throw new RuntimeException("L'eliminació de la firma invàlida només està suportada pels fitxers pdf");
 		}
-
 	}
-	
 
-	
-	
-	
-	
-//	public byte[] removeSignaturesPdfUsingGhost4J(
-//			byte[] contingut,
-//			String contentType) {
-//		if (contentType.equals("application/pdf")) {
-//			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//
-//			try {
-//				 //load PostScript document
-//				PDFDocument document = new PDFDocument();
-//			    document.load(new ByteArrayInputStream(contingut));
-//			 
-//			 
-//			    // gives org.ghost4j.document.DocumentException: Documents of class org.ghost4j.document.PDFDocument are not supported by the component 
-//			    // at org.ghost4j.AbstractComponent.assertDocumentSupported(AbstractComponent.java:58)
-////			    //create converter
-////			    PDFConverter converter = new PDFConverter();
-////			    //set options
-////			    converter.setPDFSettings(PDFConverter.OPTION_PDFSETTINGS_PREPRESS);
-////			    //convert
-////			    converter.convert(document, baos);
-//			    
-//
-//
-//		 
-//		        // prepare modifier
-//		        SafeAppenderModifier modifier = new SafeAppenderModifier();
-//		 
-//		        // prepare modifier parameters
-//		        Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-//		        parameters.put(SafeAppenderModifier.PARAMETER_APPEND_DOCUMENT,
-//		        		document);
-//		 
-//		        // run modifier
-//		        Document result = modifier.modify(document, parameters);
-//		 
-//		        // write resulting document to file
-//		        result.write(baos);
-//			    
-//			    return baos.toByteArray();
-//			    
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//
-//		} else {
-//			throw new RuntimeException("Only removing signatures of pdf supported");
-//		}
-//
-//	}
-	
-	
-	
 	private static final Logger logger = LoggerFactory.getLogger(DocumentFirmaServidorFirma.class);
-
-	
 	
 }

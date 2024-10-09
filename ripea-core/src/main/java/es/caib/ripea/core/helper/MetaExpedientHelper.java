@@ -504,10 +504,10 @@ public class MetaExpedientHelper {
 				metaExpedientTasca.getResponsable(),
 				metaExpedient,
 				metaExpedientTasca.getDataLimit(),
+				metaExpedientTasca.getDuracio(),
+				metaExpedientTasca.getPrioritat(),
 				estatCrearTasca,
 				estatFinalitzarTasca).build();
-		entity.setDuracio(metaExpedientTasca.getDuracio());
-		entity.setPrioritat(metaExpedientTasca.getPrioritat());
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			canviarRevisioADisseny(entitatId, metaExpedient.getId(), organId);
 		}
