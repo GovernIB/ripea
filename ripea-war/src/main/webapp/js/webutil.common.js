@@ -1,7 +1,4 @@
-function webutilContextPath() {
-	return contextAddress;
-}
-
+function webutilContextPath() { return contextAddress; }
 function escapeMarkupFn(markup) { return markup; }
 function templateResultFnDefault(data) { return data.text; }
 
@@ -17,6 +14,14 @@ function webutilRefreshMissatges() {
 
 function remarcaElement(jQueryElem) {
 	jQueryElem[0].animate({ backgroundColor: 'aliceblue' }, 500);
+}
+
+function changedPrioritat() {
+	if ($('#prioritat').val()!='B_NORMAL') {
+		$('#prioritatMotiu').closest('.form-group').show();
+	} else {
+		$('#prioritatMotiu').closest('.form-group').hide();
+	}
 }
 
 function base64toBlob(b64Data, contentType) {

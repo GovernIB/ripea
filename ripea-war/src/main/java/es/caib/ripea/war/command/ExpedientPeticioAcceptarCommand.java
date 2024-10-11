@@ -27,6 +27,7 @@ public class ExpedientPeticioAcceptarCommand {
 	
 	private String newExpedientTitol;
 	private PrioritatEnumDto prioritat;
+	private String prioritatMotiu;
 	private int any;
 	private Long sequencia;
 	private boolean associarInteressats;

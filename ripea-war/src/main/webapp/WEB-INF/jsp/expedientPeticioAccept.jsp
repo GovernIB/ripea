@@ -19,6 +19,7 @@
 <link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 <script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/i18n/${requestLocale}.js"/>"></script>
+
 <style type="text/css">
 .fa-circle-o-notch {
 	position: absolute;
@@ -26,15 +27,15 @@
 	top: 10px;
 }
 </style>
-<script>
+
+<script type="text/javascript">
+
 var metaExpedientOrgan = {};
 var metaExpedientGrup = {};
 <c:forEach var="metaExpedient" items="${metaExpedients}">
 <c:if test="${not empty metaExpedient.organGestor}">metaExpedientOrgan['${metaExpedient.id}'] = {id: ${metaExpedient.organGestor.id}, codi: '${metaExpedient.organGestor.codi}', nom: '${fn:escapeXml(metaExpedient.organGestor.nom)}'};</c:if>
 metaExpedientGrup['${metaExpedient.id}'] = {gestioAmbGrupsActiva: ${metaExpedient.gestioAmbGrupsActiva}};
 </c:forEach>
-
-
 
 function refrescarOrgan() {
 	const metaExpedientId = $('#metaExpedientId').val();
@@ -77,7 +78,6 @@ function refrescarOrgan() {
 
 //################################################## document ready START ##############################################################
 $(document).ready(function(){
-
 
 	$('#expedientPeticioAcceptarForm').on('submit', function () {
 	  $(this).find('select#grupId').prop('disabled', false);
@@ -156,13 +156,9 @@ $(document).ready(function(){
 		    $('#accio1').parent().hide();
 		    $("#accio2").click();
 		}
-
-		
-
 	});	
 
 	$('#metaExpedientId').trigger('change');
-
 
 	$('input[type=radio][name=accio]').on('change', function() {
 		if ($(this).val() == 'CREAR') {
@@ -202,10 +198,14 @@ $(document).ready(function(){
 		} else {
 			$('#expedientPeticioAcceptarForm').submit();
 		}
-	});		
+	});
+
+	changedPrioritat();
+	$("#prioritat").change(function (event) {
+		changedPrioritat();
+	});
 			
 });//################################################## document ready END ##############################################################
-
 
 
 function refrescarSequencia() {
@@ -336,6 +336,7 @@ function refrescarGrups() {
 		<div id="input-accio-crear" class="hidden">
 			<rip:inputText name="newExpedientTitol" textKey="expedient.peticio.form.acceptar.camp.newExpedientTitol" required="true" />
 			<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
+			<rip:inputTextarea name="prioritatMotiu" textKey="expedient.form.prioritat.motiu" required="true"></rip:inputTextarea>
 			<div id="organFixed" style="display: none;">
 				<rip:inputFixed textKey="contingut.expedient.form.camp.organ" required="true"><span id="organFixedNom"></span></rip:inputFixed>
 			</div>

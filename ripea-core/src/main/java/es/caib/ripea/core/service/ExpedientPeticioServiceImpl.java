@@ -57,6 +57,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -890,7 +892,6 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 	@Transactional
 	@Override
 	public Exception canviarEstatAnotacioDistribucio(Long entitatId, Long id) {
-
 		entityComprovarHelper.comprovarEntitat(
 				entitatId,
 				false,
@@ -958,6 +959,16 @@ public class ExpedientPeticioServiceImpl implements ExpedientPeticioService {
 		
 		if (cacheHelper.mostrarLogsCercadorAnotacio())
     		log.info("findMetaExpedientsPermesosPerAnotacions end:  " + (System.currentTimeMillis() - t1) + " ms");
+		
+		//#1502 ordenam el resultat per nom independentment de quina cerca s'hagi realitzat
+		Collections.sort(dto, new Comparator<MetaExpedientDto>() {
+			@Override
+			public int compare(MetaExpedientDto o1, MetaExpedientDto o2) {
+				try {
+					return o1.getNom().compareTo(o2.getNom());
+				} catch (Exception ex) {return 0;}
+			}
+		});
 		
 		return dto;
 	}

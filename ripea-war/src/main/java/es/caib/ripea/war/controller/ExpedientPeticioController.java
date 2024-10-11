@@ -359,7 +359,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (command.getNewExpedientTitol() != null && command.getNewExpedientTitol().contains(".")) {
 			bindingResult.rejectValue("newExpedientTitol", "ExpedientODocumentNom");
 		}
-		
+		if (command.getPrioritat()!=null && !command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL) && Utils.isEmpty(command.getPrioritatMotiu())) {
+			bindingResult.rejectValue("prioritatMotiu", "PrioritatNecessitaObservacions");
+		} else if (command.getPrioritat()!=null && command.getPrioritat().equals(PrioritatEnumDto.B_NORMAL)) {
+			command.setPrioritatMotiu(null);
+		}
 		boolean exists = expedientService.checkIfExistsByMetaExpedientAndNom(
 				command.getMetaExpedientId(),
 				command.getNewExpedientTitol()) != null;
@@ -374,9 +378,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		if (command.isGestioAmbGrupsActiva() && command.getGrupId() == null) {
 			bindingResult.rejectValue("grupId", "NotNull");
 		}
-
 	}
-	
 
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}/getFirstAnnex", method = RequestMethod.POST)
 	public String acceptarPostGetFirstAnnex(
@@ -403,7 +405,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("metaDocuments", tipusDocsDisponibles);
 		RequestSessionHelper.actualitzarObjecteSessio(request, SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES, tipusDocsDisponibles);
 		
-		
 		RegistreDto registre = expedientPeticioService.findOne(expedientPeticioId).getRegistre();
 		// set annexos
 		expedientPeticioAcceptarCommand.setAnnexos(ConversioTipusHelper.convertirList(registre.getAnnexos(), RegistreAnnexCommand.class));
@@ -428,7 +429,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		}
 		model.addAttribute("registreAnnexCommand", registreAnnexCommand);
 		
-		
 		Integer index = 0;
 		setIndexAndSize(
 				request,
@@ -439,10 +439,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
 		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
 
-
 		return "expedientPeticioAcceptMetaDocs";
-
-		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -453,14 +450,12 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			boolean isThereNext) {
 		
-		
 		List<MetaDocumentDto> tipusDocsDisponibles = (List<MetaDocumentDto>)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_TIPUS_DOCS_DISPONIBLES);	
 		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
 				request,
 				SESSION_ATTRIBUTE_COMMAND);	
-		
 		
 		boolean noAnnexos = Utils.isEmpty(expedientPeticioAcceptarCommand.getAnnexos());
 		if (noAnnexos) {
@@ -522,7 +517,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
 
 		return expedientPeticioAcceptarCommand;
-		
 	}
 	
 	private void setIndexAndSize(
@@ -539,7 +533,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		boolean isFirst = (index == 0);
 		model.addAttribute("isFirst", isFirst);
 	}
-	
 	
 	private void tipusPerDefecte(
 			HttpServletRequest request,
@@ -566,7 +559,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
-		
 
 		processAnnex(
 				request,
@@ -575,9 +567,7 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 				bindingResult,
 				true);
 		
-		
 		return "expedientPeticioAcceptMetaDocs";
-		
 	}
 
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}/getInteressats", method = RequestMethod.POST)
@@ -636,7 +626,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 
 		carregaInteressats(expedientPeticioAcceptarCommand, registre, expedient);
 		model.addAttribute(expedientPeticioAcceptarCommand);
-
 		model.addAttribute("isCrearNewExpedient", isCrearNew);
 
 		return "expedientPeticioAcceptInteressats";
@@ -716,7 +705,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 	public String previousPage(
 			HttpServletRequest request,
 			Model model) {
-
 		
 		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = (ExpedientPeticioAcceptarCommand)RequestSessionHelper.obtenirObjecteSessio(
 				request,
@@ -744,13 +732,11 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 		model.addAttribute("metaDocuments", tipusDocsDisponibles);
 		model.addAttribute("registreAnnexCommand", previousAnnexCommand);
 		model.addAttribute("expedientPeticioId", expedientPeticioAcceptarCommand.getId());
-
 		model.addAttribute("isCrearNewExpedient", expedientPeticioAcceptarCommand.getAccio() == ExpedientPeticioAccioEnumDto.CREAR);
 		model.addAttribute("isAssociarInteressats", expedientPeticioAcceptarCommand.isAssociarInteressats());
 
 		return "expedientPeticioAcceptMetaDocs";
 	}
-
 
 	@RequestMapping(value = "/acceptar/{expedientPeticioId}", method = RequestMethod.POST)
 	public String acceptarPost(
@@ -759,7 +745,6 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 			@PathVariable Long expedientPeticioId,
 			BindingResult bindingResult,
 			Model model) {
-		
 		
 		ExpedientPeticioAcceptarCommand expedientPeticioAcceptarCommand = processAnnex(
 				request,
@@ -830,7 +815,8 @@ public class ExpedientPeticioController extends BaseUserOAdminOOrganController {
 						anexosIdsMetaDocsIdsMap,
 						justificantIdMetaDoc,
 						interessatsAccionsMap,
-						expedientPeticioAcceptarCommand.getPrioritat());
+						expedientPeticioAcceptarCommand.getPrioritat(),
+						expedientPeticioAcceptarCommand.getPrioritatMotiu());
 				processatOk = expedientDto.isProcessatOk();
 				expCreatArxiuOk = expedientDto.isExpCreatArxiuOk();
 				expedientId = expedientDto.getId();

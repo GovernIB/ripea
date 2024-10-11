@@ -3,6 +3,7 @@ ALTER TABLE ipa_execucio_massiva ADD document_nom VARCHAR2(256 CHAR);
 
 -- 1516
 ALTER TABLE ipa_expedient ADD prioritat VARCHAR2(16 CHAR) DEFAULT 'B_NORMAL';
+ALTER TABLE ipa_expedient ADD prioritat_motiu VARCHAR2(1024 CHAR);
 
 -- 1507
 ALTER TABLE ipa_expedient_tasca ADD prioritat VARCHAR2(16 CHAR) DEFAULT 'B_NORMAL';

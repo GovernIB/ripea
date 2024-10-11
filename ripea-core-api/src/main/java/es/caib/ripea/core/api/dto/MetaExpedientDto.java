@@ -60,6 +60,14 @@ public class MetaExpedientDto extends MetaNodeAmbMetaDadesDto implements Seriali
     		return nom;
     	}
     }
+    
+    public String getNomICodiSia() {
+    	if(this.classificacio!=null && !"".equals(classificacio)) {
+    		return nom + " (" + classificacio +")";
+    	} else {
+    		return nom;
+    	}
+    }
 	
 	public boolean isComu() {
 		if (organGestor == null) {
