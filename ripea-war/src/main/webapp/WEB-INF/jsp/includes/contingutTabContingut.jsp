@@ -19,7 +19,7 @@
 	#grid-documents .caption .dropdown-menu { text-align: left; }
 	#grid-documents .caption .dropdown-menu li { width: 100%; margin: 0; padding: 0; }
 	#contingut-botons { margin-bottom: .8em; }
-	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+	.drag_activated { border: 4px dashed #ffd351; height: 200px; width: 100%; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; flex-direction: column; mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0)); }
 	.ordre-col { cursor: move; vertical-align: middle !important; }
 	.popover { max-width: none; z-index: 100; cursor: default; width: 500px; }
 	.popover .close { position: relative; top: -3px; }
@@ -414,14 +414,12 @@
 
 		$('form#nodeDades').on('submit', function() {
 
-			debugger;
 			showLoadingModal('<spring:message code="contingut.dades.form.processant"/>');
 			
 			$.post(
 					'../ajax/contingutDada/${contingutId}/save',
 					$(this).serialize(),
 					function (data) {
-						debugger;
 						if (data.estatOk) {
 							$('#nodeDades input').each(function() {
 								var $pare = $(this).parent();
@@ -469,7 +467,14 @@
 			return false;
 		});
 		</c:if>
+
+		$(window).resize(resizeDropZone);
+
 	});//################################################## document ready END ##############################################################
+
+	const resizeDropZone = () => {
+		$('#drop-area').css('height', ($('div.panel-body').height() - 54) + 'px');
+	}
 
 	$(document).on('change', '.checkbox', function () {
 		selectCheckbox($(this));
@@ -665,6 +670,10 @@ function dragAndDropVistaCarpetes() {
 			// Add new document by dragging it to #drop-area
 			var $dropArea = $('#drop-area');
 			var $dropMessage = $('#drop-message');
+			var $dragArea = $('#drag-area')
+			var dragCounter = 0;
+
+			resizeDropZone();
 
 			$('#drop-area').filedrop({
 				// paramname: 'file', // El nom del paràmetre que es passarà al servidor
@@ -691,23 +700,35 @@ function dragAndDropVistaCarpetes() {
 					}
 				},
 
-				// Executat quan un fitxer està sobre l'àrea
-				dragOver: function () {
-					debugger;
+				dragEnter: function() {
+					dragCounter++;
 					$dropArea.css('border-color', '#ffd351');
 					$dropMessage.css('display', 'block');
+					$dragArea.hide();
+				},
+
+				// Executat quan un fitxer està sobre l'àrea
+				dragOver: function (e) {
+					e.preventDefault();
 				},
 
 				// Executat quan un fitxer surt de l'àrea de drop
 				dragLeave: function () {
-					$dropArea.css('border-color', 'transparent');
-					$dropMessage.css('display', 'none');
+					dragCounter--;
+					if (dragCounter === 0) {
+						$dropArea.css('border-color', 'transparent');
+						$dropMessage.css('display', 'none');
+						$dragArea.show();
+					}
 				},
 
 				// Executat quan un fitxer es deixa anar a l'àrea de drop, abans de començar la càrrega
 				drop: function (e) {
+					e.preventDefault();
+					dragCounter = 0;
 					$dropArea.css('border-color', 'transparent');
 					$dropMessage.css('display', 'none');
+					$dragArea.show();
 					if (quedenDocumentsPerAdjuntar) {
 						let files = e.originalEvent.dataTransfer.files;
 						if (!(files.length > 1)) {
@@ -716,7 +737,6 @@ function dragAndDropVistaCarpetes() {
 						}
 					} else {
 						alert("<spring:message code="contingut.document.alerta.max"/>");
-						e.preventDefault();
 					}
 					return false;
 				},
@@ -2180,20 +2200,19 @@ function dragAndDropVistaCarpetes() {
 				</c:when>
 			</c:choose>
 
+			<c:if test="${potModificar}">
+				<div id="drag-area" class="drag_activated">
+					<span class="down fa fa-upload"></span>
+					<p><spring:message code="contingut.drag.info" /></p>
+				</div>
+			</c:if>
+
 		</div>
 
 		<div class="panel panel-default" id="resum-viewer" style="display: none; width: 100%;" >
 			<iframe id="container" class="viewer-padding" width="100%" height="540" frameBorder="0"></iframe>
 		</div>
 
-<%--		<c:if test="${potModificar}">--%>
-<%--			<div id="drag_container" class="drag_activated">--%>
-<%--				<span class="down fa fa-upload"></span>--%>
-<%--				<p>--%>
-<%--					<spring:message code="contingut.drag.info" />--%>
-<%--				</p>--%>
-<%--			</div>--%>
-<%--		</c:if>--%>
 		<input class="hidden" id="dropped-files" type="file"/>
 
 	</c:otherwise>
