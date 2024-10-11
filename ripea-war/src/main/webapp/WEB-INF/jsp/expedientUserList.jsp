@@ -5,13 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-<%
-//pageContext.setAttribute(
-//		"expedientEstatsOptdions",
-//		es.caib.ripea.war.helper.EnumHelper.getOptionsForEnum(
-//		es.caib.ripea.core.api.dto.ExpedientEstatEnumDto.class,
-//		"expedient.estat.enum."));
-%>
 <html>
 <head>
 	<title><spring:message code="expedient.list.user.titol"/></title>
@@ -69,11 +62,9 @@ body.loading .rmodal {
 /* .dark-color { color: black }
 .light-color { color: white }	 */
 
-
 table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a, table.dataTable tbody td.selected a {
     color: #333;
 }
-
 
 table.dataTable tr > td:nth-child(6) {
 	word-wrap: break-word; 
@@ -85,13 +76,8 @@ table.dataTable tr > td:nth-child(6) {
 var mostrarMeusExpedients = '${meusExpedients}' === 'true';
 var mostrarExpedientsFirmaPendent = '${firmaPendent}' === 'true';
 var columnaAgafatPer = 19;
-$(document).ready(function() {
 
-	// $.views.helpers({
-	// 	getPrioritatColor: function(prioritat) {
-	// 		return colorsPrioritats[prioritat];
-	// 	}
-	// });
+$(document).ready(function() {
 
 	$('#taulaDades').on('selectionchange.dataTable', function (e, accio, ids) {
 		$.get(
@@ -102,6 +88,7 @@ $(document).ready(function() {
 				}
 		);
 	});
+	
 	$('#taulaDades').on('draw.dt', function () {
 		$('#seleccioAll').on('click', function() {
 			$.get(
@@ -457,24 +444,6 @@ function removeCookie(cname) {
 <body>
 	<form:form id="expedientFiltreForm" action="" method="post" cssClass="well" commandName="expedientFiltreCommand">
 		<div class="row">
-			<%--
-			<div class="col-md-3">
-				<c:url value="/metaexpedientajax/metaexpedient" var="urlConsultaInicial"/>
-				<c:url value="/metaexpedientajax/metaexpedients" var="urlConsultaLlistat"/>
-				<rip:inputSuggest 
- 					name="metaExpedientId"  
- 					urlConsultaInicial="${urlConsultaInicial}"
- 					urlConsultaLlistat="${urlConsultaLlistat}"
- 					placeholderKey="expedient.list.user.placeholder.tipusExpedient"
- 					suggestValue="id"
- 					suggestText="nom"
- 					suggestTextAddicional="classificacio"
- 					inline="true"
- 					urlParamAddicional="${expedientFiltreCommand.organGestorId}"
- 					/>				
-			</div>
-			--%>
-
 			<div class="col-md-2">
 				<rip:inputText name="numero" inline="true" placeholderKey="expedient.list.user.placeholder.numero.expedient"/>
 			</div>
@@ -643,6 +612,7 @@ function removeCookie(cname) {
 				<th data-col-name="agafat" data-visible="false"></th>
 				<th data-col-name="agafatPer.codi" data-visible="false"></th>
 				<th data-col-name="expedientEstat" data-visible="false"></th>
+				<th data-col-name="prioritatMotiu" data-visible="false"></th>
 				<th data-col-name="alerta" data-visible="false"></th>
 				<th data-col-name="valid" data-visible="false"></th>
 				<th data-col-name="errorLastEnviament" data-visible="false"></th>

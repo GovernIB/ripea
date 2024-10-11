@@ -194,6 +194,11 @@ public class ExpedientEntity extends NodeEntity {
 	@Enumerated(EnumType.STRING)
 	private PrioritatEnumDto prioritat;
 	
+	//En el despacho de los expedientes se guardará el orden riguroso de incoación en asuntos de homogénea naturaleza
+	//salvo que por el titular de la unidad administrativa se dé orden motivada en contrario, de la que quede constancia.
+	@Column(name = "prioritat_motiu")
+	private String prioritatMotiu;
+	
 
 	public GrupEntity getGrup() {
 		return grup;
@@ -297,7 +302,13 @@ public class ExpedientEntity extends NodeEntity {
 	public PrioritatEnumDto getPrioritat() {
 		return this.prioritat;
 	}
-
+	public String getPrioritatMotiu() {
+		return prioritatMotiu;
+	}
+	public void setPrioritatMotiu(String prioritatMotiu) {
+		this.prioritatMotiu = prioritatMotiu;
+	}
+	
 	public void updateNom(
 			String nom) {
 		this.nom = nom;
@@ -392,10 +403,6 @@ public class ExpedientEntity extends NodeEntity {
 	public void addSeguidor(UsuariEntity usuariEntity) {
 		seguidors.add(usuariEntity);
 	}
-	
-	public void deleteSeguidor(UsuariEntity usuariEntity) {
-
-	}
 
 	public void addRelacionat(ExpedientEntity relacionat) {
 		relacionatsAmb.add(relacionat);
@@ -437,8 +444,9 @@ public class ExpedientEntity extends NodeEntity {
 		return this.estat == ExpedientEstatEnumDto.TANCAT && this.tancatProgramat != null && this.tancatData == null;
 	}
 
-	public void updatePrioritat(PrioritatEnumDto prioritat) {
+	public void updatePrioritat(PrioritatEnumDto prioritat, String prioritatMotiu) {
 		this.prioritat = prioritat;
+		this.prioritatMotiu = prioritatMotiu;
 	}
 	
 	public static Builder getBuilder(
@@ -451,7 +459,8 @@ public class ExpedientEntity extends NodeEntity {
 			Date ntiFechaApertura,
 			String ntiClasificacionSia,
 			OrganGestorEntity organGestor,
-			PrioritatEnumDto prioritat) {
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
 		return new Builder(
 				nom,
 				metaExpedient,
@@ -462,7 +471,8 @@ public class ExpedientEntity extends NodeEntity {
 				ntiFechaApertura,
 				ntiClasificacionSia,
 				organGestor,
-				prioritat);
+				prioritat,
+				prioritatMotiu);
 	}
 
 	public static class Builder {
@@ -477,7 +487,8 @@ public class ExpedientEntity extends NodeEntity {
 				Date ntiFechaApertura,
 				String ntiClasificacionSia,
 				OrganGestorEntity organGestor,
-				PrioritatEnumDto prioritat) {
+				PrioritatEnumDto prioritat,
+				String prioritatMotiu) {
 			built = new ExpedientEntity();
 			built.nom = nom;
 			built.metaNode = metaExpedient;
@@ -493,6 +504,7 @@ public class ExpedientEntity extends NodeEntity {
 			built.estat = ExpedientEstatEnumDto.OBERT;
 			built.tipus = ContingutTipusEnumDto.EXPEDIENT;
 			built.prioritat = prioritat != null ? prioritat : PrioritatEnumDto.B_NORMAL;
+			built.prioritatMotiu = prioritatMotiu;
 		}
 		public Builder agafatPer(UsuariEntity agafatPer) {
 			built.agafatPer = agafatPer;

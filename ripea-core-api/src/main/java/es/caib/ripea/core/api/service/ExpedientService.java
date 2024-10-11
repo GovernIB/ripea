@@ -62,7 +62,8 @@ public interface ExpedientService {
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
-			PrioritatEnumDto prioritat) throws NotFoundException, ValidationException;
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) throws NotFoundException, ValidationException;
 
 
     /**
@@ -357,7 +358,17 @@ public interface ExpedientService {
 	boolean hasWritePermission(Long expedientId);
 
 	@PreAuthorize("hasRole('tothom')")
-	ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat);
+	ExpedientDto update(
+			Long entitatId,
+			Long id,
+			String nom,
+			int any,
+			Long metaExpedientDominiId,
+			Long organGestorId,
+			String rolActual,
+			Long grupId,
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu);
 
 	@PreAuthorize("hasRole('tothom')")
 	Exception retryCreateDocFromAnnex(
@@ -561,7 +572,8 @@ public interface ExpedientService {
 	ExpedientDto changeExpedientPrioritat(
 			Long entitatId,
 			Long expedientId,
-			PrioritatEnumDto prioritat);
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu);
 
 	@PreAuthorize("hasRole('tothom')")
 	void changeExpedientsPrioritat(Long entitatId, Set<Long> expedientsId, PrioritatEnumDto prioritat);

@@ -31,38 +31,25 @@ import java.util.List;
 @Component
 public class ExpedientInteressatHelper {
 	
-	@Autowired
-	private InteressatRepository interessatRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private ContingutLogHelper contingutLogHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private ExpedientHelper expedientHelper;
-	@Autowired
-	private ContingutHelper contingutHelper;
-
-
+	@Autowired private InteressatRepository interessatRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private ContingutLogHelper contingutLogHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private UnitatOrganitzativaHelper unitatOrganitzativaHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private ExpedientHelper expedientHelper;
+	@Autowired private ContingutHelper contingutHelper;
+	
 	@Transactional
 	public InteressatEntity create(
 			Long expedientId,
 			InteressatDto interessat,
 			PermissionEnumDto permission,
 			String rolActual){
-
 		logger.debug("Creant nou interessatEntity (expedientId=" + expedientId + ", interessat=" + interessat + ")");
-
 		ExpedientEntity expedient = getExpedientComprovantPermisos(expedientId, permission, rolActual, false);
 		InteressatEntity interessatEntity = createDB(expedient, interessat);
-
 		return interessatEntity;
 	}
 
@@ -294,6 +281,21 @@ public class ExpedientInteressatHelper {
 				InteressatDto.class);
 	}
 
+	//Actualitza les dades que no son null de interessatDto al InteressatEntity amb id interessatId
+	public InteressatEntity mergeInteressat(
+			Long interessatId,
+			InteressatDto interessatDto) {
+		InteressatEntity interessat = interessatRepository.findOne(interessatId);
+		if (interessat instanceof InteressatPersonaFisicaEntity) {
+			((InteressatPersonaFisicaEntity)interessat).merge(interessatDto);
+		} else if (interessat instanceof InteressatPersonaJuridicaEntity) {
+			((InteressatPersonaJuridicaEntity)interessat).merge(interessatDto);
+		} else {
+			((InteressatAdministracioEntity)interessat).merge(interessatDto);
+		}
+		return interessat;
+	}
+	
 	public InteressatEntity updateInteressatRepresentantEntity(
 			Long expedientId,
 			Long interessatId,

@@ -69,19 +69,15 @@ public class ExpedientDto extends NodeDto {
 	private boolean hasAllDocumentsDefinitiu;
 	private Long organGestorId;
 	private String organGestorText;
-
 	private boolean hasNoFirmatsOAmbFirmaInvalida;
-	
 	private Date dataDarrerEnviament;
-	
-	
 	private boolean rolActualAdminEntitatOAdminOrgan;
 	private boolean rolActualPermisPerModificarExpedient;
 	private boolean potModificar;
 	private boolean expedientAgafatPerUsuariActual;
 	private boolean potReobrir;
-
 	private PrioritatEnumDto prioritat;
+	private String prioritatMotiu;
 
 	public boolean isPotTancar() {
 		return isValid() && conteDocuments && !conteDocumentsEnProcessDeFirma && !conteDocumentsDePortafirmesNoCustodiats && !isConteDocumentsPendentsReintentsArxiu() && !conteDocumentsDeAnotacionesNoMogutsASerieFinal;

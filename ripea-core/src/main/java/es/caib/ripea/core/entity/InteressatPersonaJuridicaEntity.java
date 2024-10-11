@@ -1,7 +1,10 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
@@ -9,11 +12,6 @@ import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 
 /**
  * Classe del model de dades que representa un interessat de tipus persona jurídica.
@@ -27,7 +25,6 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 //	CAMP					TIPUS INTERESSAT	DESCRIPCIÓ
 //	------------------------------------------------------------------------------------------------------------------------------------
 //	raoSocial: 				JURÍDICA			nom de l’empresa en cas de persona jurídica.
-
 	
 	@Column(name = "rao_social", length = 80)
 	protected String raoSocial;
@@ -44,6 +41,13 @@ public class InteressatPersonaJuridicaEntity extends InteressatEntity {
 		return this.raoSocial;
 	}
 
+	@Override
+	public void merge(InteressatDto dto) {
+		super.merge(dto);
+		InteressatPersonaJuridicaDto pjdDto = (InteressatPersonaJuridicaDto) dto;
+		if (pjdDto.getRaoSocial()!=null) { this.raoSocial = pjdDto.getRaoSocial(); }
+	}
+	
 	public void update(
 			String raoSocial,
 			InteressatDocumentTipusEnumDto documentTipus,

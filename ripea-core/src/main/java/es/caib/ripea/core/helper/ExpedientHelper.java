@@ -209,7 +209,8 @@ public class ExpedientHelper {
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
 			Long grupId,
 			String rolActual,
-			PrioritatEnumDto prioritat) {
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
 
 		logger.info(
 				"Expedient crear Helper START(" +
@@ -287,7 +288,8 @@ public class ExpedientHelper {
 				any,
 				true,
 				grupId,
-				prioritat);
+				prioritat,
+				prioritatMotiu);
 		contingutLogHelper.logCreacio(expedient, false, false);
 		crearDadesPerDefecte(
 				metaExpedient,
@@ -1317,10 +1319,10 @@ public class ExpedientHelper {
 		return expedient;
 	}
 
-	public ExpedientEntity updatePrioritat(ExpedientEntity expedient, PrioritatEnumDto prioritat) {
+	public ExpedientEntity updatePrioritat(ExpedientEntity expedient, PrioritatEnumDto prioritat, String prioritatMotiu) {
 
 		PrioritatEnumDto prioritatAnterior = expedient.getPrioritat();
-		expedient.updatePrioritat(prioritat);
+		expedient.updatePrioritat(prioritat, prioritatMotiu);
 
 		// log change of state
 		if(!prioritatAnterior.equals(prioritat)){

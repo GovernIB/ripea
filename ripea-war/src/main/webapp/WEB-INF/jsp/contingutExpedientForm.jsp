@@ -41,6 +41,7 @@
 		<rip:inputSelect name="grupId" optionItems="${grups}" required="true" optionValueAttribute="id" optionTextAttribute="descripcio" textKey="contingut.expedient.form.camp.grup" labelSize="2"/>
 	</div>
 	<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" labelSize="2"/>
+	<rip:inputTextarea name="prioritatMotiu" textKey="expedient.form.prioritat.motiu" required="true" labelSize="2"></rip:inputTextarea>
 	<div id="modal-botons" class="well">
 		<button type="submit" class="btn btn-success"><span class="fa fa-save"></span>
 			<c:choose>
@@ -214,6 +215,10 @@
 			refrescarGrups();
 			refrescarOrgan();
 			$('input#any').trigger('change');
+			changedPrioritat();
+			$("#prioritat").change(function (event) {
+				changedPrioritat();
+			});
 		});//################################################## document ready END ##############################################################
 
 	</script>
