@@ -524,49 +524,32 @@ body {
 					</c:when>
 					<c:when test="${isRolActualUsuari}">
 						<%---- Expedients ----%>
-						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary">
-								<spring:message code="decorator.menu.expedients"/>
-						</a>
+						<a href="<c:url value="/expedient"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedients"/></a>
 						<%---- Annotacions pendents ----%>
-						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary">
-							<spring:message code="decorator.menu.expedientPeticions"/>
-							<span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span>
-						</a>
+						<a href="<c:url value="/expedientPeticio"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.expedientPeticions"/> <span id="anotacio-pendent-count" class="badge small">${countAnotacionsPendents}</span></a>
 						<%---- Tasques ----%>
-						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary">
-							<spring:message code="decorator.menu.tasques"/>
-							<span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span>
-						</a>
-						<%---- Estadístiques ----%>
- 						<c:if test="${teAccesEstadistiques}">
- 							<a href="<c:url value="/historic"/>" data-maximized="true" class="btn btn-primary">
- 								<spring:message code="decorator.menu.accions.estadistiques"/>
- 							</a>
- 						</c:if>
+						<a href="<c:url value="/usuariTasca"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.tasques"/> <span id="tasca-pendent-count" class="badge small">${countTasquesPendent}</span></a>
 						<%-- Fluxos --%>
 						<c:if test="${isCreacioFluxUsuariActiu}">
-							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary">
-									<spring:message code="decorator.menu.fluxosusuari"/>
-							</a>
+							<a href="<c:url value="/fluxusuari"></c:url>"class="btn btn-primary"><spring:message code="decorator.menu.fluxosusuari"/></a>
 						</c:if>
-						<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
-							<%-- Consulta enviaments --%>
+						<%-- Consulta --%>
+						<c:if test="${teAccesEstadistiques or isMostrarSeguimentEnviamentsUsuariActiu}">
 							<div class="btn-group">
 								<button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><spring:message code="decorator.menu.consultar"/>&nbsp;<span class="caret caret-white"></span></button>
 								<ul class="dropdown-menu">
-									<li>
-										<a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true">
-											<spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/>
-										</a>
-									</li>
-									<li>
-										<a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true">
-											<spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/>
-										</a>
-									</li>						
+									<%---- Estadístiques ----%>
+									<c:if test="${teAccesEstadistiques}">
+										<li><a href="<c:url value="/historic"/>" data-maximized="true"><spring:message code="decorator.menu.accions.estadistiques"/></a></li>
+									</c:if>
+									<c:if test="${isMostrarSeguimentEnviamentsUsuariActiu}">
+										<%-- Consulta enviaments --%>
+										<li><a href="<c:url value="/seguimentPortafirmes"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.documentsEnviatsPortafib"/></a></li>
+										<li><a href="<c:url value="/seguimentNotificacions"/>" data-maximized="true"><spring:message code="decorator.menu.seguiment.notificacionsEnviatsNotib"/></a></li>
+									</c:if>
 								</ul>
-							</div>		
-						</c:if>			
+							</div>
+						</c:if>
 					</c:when>
 				</c:choose>
 				<c:if test="${isRolActualAdministrador or isRolActualAdministradorOrgan or isRolActualUsuari}">
@@ -579,7 +562,7 @@ body {
 							<li><a href="<c:url value="/massiu/portafirmes"/>"><spring:message code="massiu.portafirmes.firma"/></a></li>
 							<li><a href="<c:url value="/massiu/firmasimpleweb"/>"><spring:message code="massiu.firmasimpleweb"/></a></li>
 							<c:if test="${isConvertirDefinitiuActiu}">
-							<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
+								<li><a href="<c:url value="/massiu/definitiu"/>"><spring:message code="massiu.estat.definitiu"/></a></li>
 							</c:if>
 							<li><a href="<c:url value="/massiu/canviEstat"/>"><spring:message code="massiu.canviEstat"/></a></li>
 							<li><a href="<c:url value="/massiu/tancament"/>"><spring:message code="massiu.tancament"/></a></li>
