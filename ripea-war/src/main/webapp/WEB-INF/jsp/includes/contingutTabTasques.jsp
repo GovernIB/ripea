@@ -26,21 +26,29 @@ $(document).ready(function() { });
 		<tr>
 			<th data-col-name="id" data-visible="false"></th>
 			<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+			<th data-col-name="dataLimitExpirada" data-visible="false"></th>
 			<th data-col-name="duracioFormat" data-visible="false"></th>
 			<th data-col-name="metaExpedientTasca.nom" width="15%"><spring:message code="expedient.tasca.list.columna.metaExpedientTasca"/></th>
 			<th data-col-name="dataInici" data-converter="datetime" width="15%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 			<th data-col-name="dataLimitString" width="15%" data-template="#cellTascaDeadlineTemplate" >
-				<spring:message code="expedient.tasca.list.boto.dataLimit"/>
+				<spring:message code="expedient.tasca.list.columna.dataLimit"/>
 				<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
-					{{if shouldNotifyAboutDeadline}}
+					{{if dataLimitExpirada}}
 							<span style="color: red;" title="Duració estimada {{:duracioFormat}}">                            
                                 {{:dataLimitString}}
                                 <span class="fa fa-clock-o"></span>
                             </span>
-                    {{else}}
-						<span title="Duració estimada {{:duracioFormat}}">  
-                        	{{:dataLimitString}}
-						</span>
+					{{else}}
+						{{if shouldNotifyAboutDeadline}}
+							<span style="color: orange;" title="Duració estimada {{:duracioFormat}}">                            
+                                {{:dataLimitString}}
+                                <span class="fa fa-clock-o"></span>
+                            </span>
+                    	{{else}}
+							<span title="Duració estimada {{:duracioFormat}}">  
+                        		{{:dataLimitString}}
+							</span>
+                    	{{/if}}
                     {{/if}}
 				</script>
 			</th>

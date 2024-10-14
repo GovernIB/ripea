@@ -1,44 +1,29 @@
 package es.caib.ripea.war.command;
 
-import es.caib.ripea.core.api.dto.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class InteressatImportCommand {
+import es.caib.ripea.core.api.dto.InteressatAdministracioDto;
+import es.caib.ripea.core.api.dto.InteressatDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
+import es.caib.ripea.core.api.dto.InteressatPersonaJuridicaDto;
 
-    private Long expedientId;
-    private String accio = "INTERESSATS"; //INTERESSATS = Recupera interessats, SAVE = Importa els interessats
-    private MultipartFile fitxerInteressats;
+public class InteressatExportCommand {
+
+	private Long expedientId;
     private List<InteressatPersonaFisicaDto> interessatsFisica = new ArrayList<InteressatPersonaFisicaDto>();
     private List<InteressatPersonaJuridicaDto> interessatsJuridi = new ArrayList<InteressatPersonaJuridicaDto>();
     private List<InteressatAdministracioDto> interessatsAdmini = new ArrayList<InteressatAdministracioDto>();
     @SuppressWarnings("unused")
 	private boolean hasInteressats=false;
-
+    
+    
     public Long getExpedientId() {
         return expedientId;
     }
 
     public void setExpedientId(Long expedientId) {
         this.expedientId = expedientId;
-    }
-
-    public MultipartFile getFitxerInteressats() {
-        return fitxerInteressats;
-    }
-
-    public void setFitxerInteressats(MultipartFile fitxerInteressats) {
-        this.fitxerInteressats = fitxerInteressats;
-    }
-
-    public String getAccio() {
-        return accio;
-    }
-
-    public void setAccio(String accio) {
-        this.accio = accio;
     }
 
     public List<InteressatPersonaFisicaDto> getInteressatsFisica() {
@@ -74,16 +59,13 @@ public class InteressatImportCommand {
     public void setHasInteressats(boolean hasInteressats) {
         this.hasInteressats = hasInteressats;
     }
-
-    public void setInteressatsFromInteressatDto(List<InteressatDto> interessats, List<InteressatDto> listaActual) {
+    
+    public void setInteressatsFromInteressatDto(List<InteressatDto> interessats) {
         List<InteressatPersonaFisicaDto> lf = new ArrayList<InteressatPersonaFisicaDto>();
         List<InteressatPersonaJuridicaDto> lj = new ArrayList<InteressatPersonaJuridicaDto>();
         List<InteressatAdministracioDto> la = new ArrayList<InteressatAdministracioDto>();
         if (interessats!=null) {
             for (InteressatDto interessat : interessats) {
-
-                interessat.setJaExistentExpedient(dinsLlistaActual(interessat.getDocumentNum(), listaActual));
-
                 if (interessat instanceof InteressatPersonaFisicaDto) {
                     lf.add((InteressatPersonaFisicaDto) interessat);
                 } else if (interessat instanceof InteressatPersonaJuridicaDto) {
@@ -96,17 +78,6 @@ public class InteressatImportCommand {
         this.setInteressatsFisica(lf);
         this.setInteressatsJuridi(lj);
         this.setInteressatsAdmini(la);
-    }
-
-    private boolean dinsLlistaActual(String documentNum, List<InteressatDto> listaActual) {
-        if (listaActual!=null) {
-            for (InteressatDto interessat : listaActual) {
-                if (documentNum.equals(interessat.getDocumentNum())) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
     
     public List<Long> getSeleccionats() {
@@ -121,5 +92,5 @@ public class InteressatImportCommand {
     		if (aux.isExporta()) { seleccs.add(aux.getId()); }
     	}
     	return seleccs;
-    }    
+    }
 }

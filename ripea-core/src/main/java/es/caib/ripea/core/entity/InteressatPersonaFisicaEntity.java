@@ -1,7 +1,10 @@
-/**
- * 
- */
 package es.caib.ripea.core.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import es.caib.ripea.core.api.dto.InteressatDocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.InteressatDto;
@@ -9,11 +12,6 @@ import es.caib.ripea.core.api.dto.InteressatIdiomaEnumDto;
 import es.caib.ripea.core.api.dto.InteressatPersonaFisicaDto;
 import es.caib.ripea.core.api.dto.InteressatTipusEnumDto;
 import es.caib.ripea.core.api.exception.InteressatTipusDocumentException;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
 
 /**
  * Classe del model de dades que representa un interessat de tipus persona física.
@@ -29,7 +27,6 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 //	nom: 					FÍSICA				nom de l’interessat.
 //	llinatge1: 				FÍSICA				primer llinatge de l’interessat.
 //	llinatge2: 				FÍSICA				segon llinatge de l’interessat.
-
 
 	@Column(name = "nom", length = 30)
 	protected String nom;
@@ -62,6 +59,15 @@ public class InteressatPersonaFisicaEntity extends InteressatEntity {
 	@Override
 	public String getIdentificador() {
 		return this.llinatge1 + (this.llinatge2 != null ? " " + this.llinatge2 : "") + ", " + this.nom;
+	}
+	
+	@Override
+	public void merge(InteressatDto dto) {
+		super.merge(dto);
+		InteressatPersonaFisicaDto pfiDto = (InteressatPersonaFisicaDto) dto;
+		if (pfiDto.getNom()!=null) { this.nom = pfiDto.getNom(); }
+		if (pfiDto.getLlinatge1()!=null) { this.llinatge1 = pfiDto.getLlinatge1(); }
+		if (pfiDto.getLlinatge2()!=null) { this.llinatge2 = pfiDto.getLlinatge2(); }
 	}
 	
 	public void update(

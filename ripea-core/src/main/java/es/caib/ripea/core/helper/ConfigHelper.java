@@ -1,6 +1,20 @@
 package es.caib.ripea.core.helper;
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.google.common.base.Strings;
+
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.config.ConfigDto;
 import es.caib.ripea.core.api.exception.NotDefinedConfigException;
@@ -13,18 +27,6 @@ import es.caib.ripea.core.repository.OrganGestorRepository;
 import es.caib.ripea.core.repository.config.ConfigGroupRepository;
 import es.caib.ripea.core.repository.config.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 @Slf4j
 @Component
@@ -285,6 +287,13 @@ public class ConfigHelper {
     }
     public int getAsInt(String key) {
         return new Integer(getConfig(key));
+    }
+    public int getAsInt(String key, int defecte) {
+    	try {
+    		return new Integer(getConfig(key));
+    	} catch (Exception ex) {
+    		return defecte;
+    	}
     }
     public long getAsLong(String key) {
         return new Long(getConfig(key));

@@ -5,7 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-
 <c:set var="titol"><spring:message code="expedient.prioritat.form.modificar.titol"/></c:set>
 
 <html>
@@ -16,9 +15,16 @@
 	<link href="<c:url value="/webjars/select2-bootstrap-theme/0.1.0-beta.4/dist/select2-bootstrap.min.css"/>" rel="stylesheet"/>
 	<script src="<c:url value="/webjars/select2/4.0.6-rc.1/dist/js/select2.min.js"/>"></script>
 	<script src="<c:url value="/js/webutil.common.js"/>"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			changedPrioritat();
+			$("#prioritat").change(function (event) {
+				changedPrioritat();
+			});
+		});
+	</script>	
 </head>
 <body>
-
 
 	<c:set var="formAction"><rip:modalUrl value="/expedient/canviarPrioritat"/></c:set>
 
@@ -28,6 +34,7 @@
 		<form:hidden path="pareId"/>
 		<rip:inputText name="nom" textKey="contingut.expedient.form.camp.nom" readonly="true"/>
 		<rip:inputSelect name="prioritat" optionEnum="PrioritatEnumDto" emptyOption="false" textKey="contingut.expedient.form.camp.prioritat" templateResultFunction="showColorPriritats" />
+		<rip:inputTextarea name="prioritatMotiu" textKey="expedient.form.prioritat.motiu" required="true"></rip:inputTextarea>
 		<div class="h200" />
 		<div id="modal-botons" class="well">
 			<button type="submit" class="btn btn-success"><span class="fa fa-save"></span> <spring:message code="comu.boto.guardar"/></button>

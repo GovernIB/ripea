@@ -32,6 +32,7 @@ public interface InteressatRepository extends JpaRepository<InteressatEntity, Lo
 	InteressatEntity findByExpedientIdAndDocumentNum(Long expedientId, String documentNum);
 
 	List<InteressatEntity> findByExpedient(ExpedientEntity expedient);
+	List<InteressatEntity> findByExpedientId(Long expedientId);
 
 	InteressatEntity findByExpedientAndId(ExpedientEntity expedient, Long id);
 

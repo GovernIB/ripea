@@ -48,6 +48,9 @@ public abstract class InteressatDto implements Serializable {
 	private boolean jaExistentExpedient = false;
 	private InteressatAssociacioAccioEnum accio;
 	
+	protected boolean exporta = true;
+	protected boolean exportaRepresentant= (representant!=null);
+	
 	public Boolean getIncapacitat() {
 		return incapacitat;
 	}
@@ -166,7 +169,18 @@ public abstract class InteressatDto implements Serializable {
 	public void setMunicipiNom(String municipiNom) {
 		this.municipiNom = municipiNom;
 	}
-
+	public boolean isExporta() {
+		return exporta;
+	}
+	public void setExporta(boolean exporta) {
+		this.exporta = exporta;
+	}
+	public boolean isExportaRepresentant() {
+		return exportaRepresentant;
+	}
+	public void setExportaRepresentant(boolean exportaRepresentant) {
+		this.exportaRepresentant = exportaRepresentant;
+	}
 	public boolean isPersonaFisica() {
 		return this instanceof InteressatPersonaFisicaDto;
 	}

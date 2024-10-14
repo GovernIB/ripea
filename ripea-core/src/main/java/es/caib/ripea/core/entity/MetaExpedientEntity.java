@@ -243,7 +243,7 @@ public class MetaExpedientEntity extends MetaNodeEntity {
 				boolean gestioAmbGrupsActiva) {
             built = new MetaExpedientEntity();
             built.codi = codi;
-            built.nom = nom;
+            built.nom = nom!=null?nom.trim():null;
             built.descripcio = StringUtils.abbreviate(descripcio, 1000);
             built.serieDocumental = serieDocumental;
             built.classificacio = classificacio;

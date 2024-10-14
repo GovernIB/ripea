@@ -50,6 +50,7 @@ public class ExpedientCommand extends ContenidorCommand {
 	private boolean gestioAmbGrupsActiva;
 	@NotNull(groups = {Create.class, Update.class})
 	private PrioritatEnumDto prioritat;
+	private String prioritatMotiu;
 
 	public void setTancatMotiu(String tancatMotiu) {
 		this.tancatMotiu = Utils.trim(tancatMotiu);

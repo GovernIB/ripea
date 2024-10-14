@@ -37,6 +37,16 @@ public class PaginacioParamsDto implements Serializable {
 			}
 		}
 	}
+	
+	public void eliminaCampOrdenacio(String campEliminar) {
+		if (ordres!=null) {
+			for (int o=this.ordres.size()-1; o>=0; o--) {
+				if (campEliminar.equals(this.ordres.get(o).camp)) {
+					this.ordres.remove(o);
+				}
+			}
+		}
+	}
 
 	public void afegirFiltre(String camp, String valor) {
 		getFiltres().add(new FiltreDto(camp, valor));

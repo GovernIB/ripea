@@ -216,7 +216,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			Map<Long, Long> anexosIdsMetaDocsIdsMap, 
 			Long justificantIdMetaDoc,
 			Map<String, InteressatAssociacioAccioEnum> interessatsAccionsMap,
-			PrioritatEnumDto prioritat) {
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
 		
 		
 		organGestorHelper.actualitzarOrganCodi(organGestorRepository.findOne(organGestorId).getCodi());
@@ -245,7 +246,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 					interessatsAccionsMap,
 					grupId,
 					rolActual,
-					prioritat);
+					prioritat,
+					prioritatMotiu);
 		}
 
 		boolean expCreatArxiuOk = expedientHelper.arxiuPropagarExpedientAmbInteressatsNewTransaction(expedientId);
@@ -500,12 +502,21 @@ public class ExpedientServiceImpl implements ExpedientService {
 			return expedientHelper.moveDocumentArxiuNewTransaction(registreAnnexId);
 		}
 	}
-	
-
 
 	@Transactional
 	@Override
-	public ExpedientDto update(Long entitatId, Long id, String nom, int any, Long metaExpedientDominiId, Long organGestorId, String rolActual, Long grupId, PrioritatEnumDto prioritat) {
+	public ExpedientDto update(
+			Long entitatId,
+			Long id,
+			String nom,
+			int any,
+			Long metaExpedientDominiId,
+			Long organGestorId,
+			String rolActual,
+			Long grupId,
+			PrioritatEnumDto prioritat,
+			String prioritatMotiu) {
+		
 		logger.debug(
 				"Actualitzant dades de l'expedient (" + "entitatId=" + entitatId + ", " + "id=" + id + ", " + "nom=" +
 						nom + ")");
@@ -525,7 +536,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 		if (grupId != null) {
 			expedient.setGrup(grupRepository.findOne(grupId));
 		}
-		expedientHelper.updatePrioritat(expedient, prioritat);
+		expedientHelper.updatePrioritat(expedient, prioritat, prioritatMotiu);
 		ExpedientDto dto = expedientHelper.toExpedientDto(expedient, false, false, null, false);
 		contingutHelper.arxiuPropagarModificacio(expedient);
 		return dto;
@@ -533,7 +544,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 
 	@Transactional
 	@Override
-	public ExpedientDto changeExpedientPrioritat(Long entitatId, Long expedientId, PrioritatEnumDto prioritat) {
+	public ExpedientDto changeExpedientPrioritat(Long entitatId, Long expedientId, PrioritatEnumDto prioritat, String prioritatMotiu) {
 
 		logger.debug("Canviant la prioritat de l'expedient (entitatId=" + entitatId + ", expedientId=" + expedientId + ", prioritat=" + prioritat + ")");
 		entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);
@@ -546,7 +557,7 @@ public class ExpedientServiceImpl implements ExpedientService {
 				false,
 				null);
 
-		expedientHelper.updatePrioritat(expedient, prioritat);
+		expedientHelper.updatePrioritat(expedient, prioritat, prioritatMotiu);
 		return expedientHelper.toExpedientDto(expedient, false, false, null, false);
 	}
 
@@ -1697,6 +1708,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
 			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
+			paginacioParams.eliminaCampOrdenacio("tipusStr");
+
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,
