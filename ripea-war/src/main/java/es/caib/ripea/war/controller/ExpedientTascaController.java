@@ -1,29 +1,5 @@
 package es.caib.ripea.war.controller;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import es.caib.ripea.core.api.dto.EntitatDto;
 import es.caib.ripea.core.api.dto.ExpedientDto;
 import es.caib.ripea.core.api.dto.ExpedientTascaComentariDto;
@@ -39,8 +15,29 @@ import es.caib.ripea.war.command.TascaReassignarCommand;
 import es.caib.ripea.war.command.TascaReobrirCommand;
 import es.caib.ripea.war.helper.DatatablesHelper;
 import es.caib.ripea.war.helper.DatatablesHelper.DatatablesResponse;
-import es.caib.ripea.war.helper.MissatgesHelper;
 import es.caib.ripea.war.helper.RolHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Controlador per al llistat d'expedients tasques.
@@ -131,12 +128,11 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			BindingResult bindingResult,
 			Model model) {
 		expedientTascaService.changeTascaPrioritat(command);
-		MissatgesHelper.success(request, getMessage(request, "tasca.controller.prioritatModificat.ok", new Object[]{command.getTitol()}));
-		return modalUrlTancar();
-//		return getModalControllerReturnValueSuccess(
-//				request,
-//				"redirect:../expedient",
-//				"expedient.controller.prioritatModificat.ok");
+		return getModalControllerReturnValueSuccess(
+				request,
+				"redirect:/expedientTasca",
+				"tasca.controller.prioritatModificat.ok",
+				new Object[]{command.getTitol()});
 	}
 
 	@RequestMapping(value = "/{expedientTascaId}/cancellar", method = RequestMethod.GET)
@@ -155,10 +151,11 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
 		return getAjaxControllerReturnValueSuccess(
 				request,
-				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
+				"redirect:/expedientTasca",
+//				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
 				"expedient.tasca.controller.cancellada.ok",
 				new Object[]{expedientTascaDto.getTitol()});
-		
+
 	}	
 	
 	@RequestMapping(value="/{expedientId}/tasca", method = RequestMethod.POST)

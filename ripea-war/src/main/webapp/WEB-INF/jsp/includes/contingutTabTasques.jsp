@@ -46,8 +46,8 @@ $(document).ready(function() { });
 			</th>
 			<th data-col-name="titol" width="15%"><spring:message code="expedient.tasca.list.columna.titol"/></th>
 			<th data-col-name="observacions" width="15%"><spring:message code="expedient.tasca.list.columna.observacions"/></th>
-			<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>	
-			<th data-col-name="responsableActual.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>								
+			<th data-col-name="responsablesStr" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsables"/></th>
+			<th data-col-name="responsableActual.codi" data-orderable="false" width="15%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
 			<th data-col-name="estat" data-template="#cellTascaEstatTemplate" width="10%">
 				<spring:message code="expedient.tasca.list.columna.estat"/>
 				<script id="cellTascaEstatTemplate" type="text/x-jsrender">
@@ -89,6 +89,9 @@ $(document).ready(function() { });
 					<a href='<c:url value="/expedientTasca/{{:id}}/comentaris"/>' data-toggle="modal" data-refresh-tancar="true" data-modal-id="comentaris{{:id}}" class="btn btn-default"><span class="fa fa-lg fa-comments"></span>&nbsp;<span class="badge">{{:numComentaris}}</span></a>
 				</script>
 			</th>
+			<th data-col-name="delegada" data-visible="false"></th>
+			<th data-col-name="usuariActualDelegat" data-visible="false"></th>
+			<th data-col-name="usuariActualResponsable" data-visible="false"></th>
 			<th data-col-name="id" data-orderable="false" data-template="#cellExpedientTascaTemplate" width="1%">
 				<script id="cellExpedientTascaTemplate" type="text/x-jsrender">
 				<div class="dropdown">
@@ -96,13 +99,28 @@ $(document).ready(function() { });
 					<ul class="dropdown-menu">
 						<li><a href="<c:url value="/expedientTasca/{{:id}}/detall"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-info"></span>&nbsp;&nbsp;<spring:message code="comu.boto.detalls"/></a></li>
 						<c:if test="${potModificar}">
-							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA'}}
-								<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
-								<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
-								<li><a 	href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
-								<li><a 	href="<c:url value="/expedientTasca/{{:id}}/canviarPrioritat"/>" data-toggle="modal" data-refresh-pagina="true"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
+							<li class="divider"></li>
+							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
+								<li {{if !usuariActualResponsable}}class="disabled"{{/if}}><a href="<c:url value="/contingut/${expedientId} ?tascaId={{:id}}"/>"><span class="fa fa-folder-open-o"></span>&nbsp;&nbsp;<spring:message code="comu.boto.tramitar"/></a></li>
 							{{/if}}
-
+							{{if estat == 'PENDENT'}}
+								<li><a href="<c:url value="/usuariTasca/{{:id}}/iniciar"/>" data-toggle="ajax"><span class="fa fa-play"></span>&nbsp;&nbsp;<spring:message code="comu.boto.iniciar"/></a></li>
+								<li><a href="<c:url value="/usuariTasca/{{:id}}/rebutjar"/>" data-maximized="true" data-toggle="modal"><span class="fa fa-reply"></span>&nbsp;&nbsp;<spring:message code="comu.boto.rebutjar"/></a></li>
+							{{/if}}
+							{{if estat != 'CANCELLADA' && estat != 'FINALITZADA' && estat != 'REBUTJADA'}}
+								<li><a href="<c:url value="/expedientTasca/{{:id}}/cancellar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.confirmacio.cancellar"/>"><span class="fa fa-times"></span>&nbsp;&nbsp;<spring:message code="comu.boto.cancellar"/></a></li>
+								<li><a href="<c:url value="/usuariTasca/{{:id}}/finalitzar"/>" data-toggle="ajax" data-confirm="<spring:message code="expedient.tasca.finalitzar"/>"><span class="fa fa-check"></span>&nbsp;&nbsp;<spring:message code="comu.boto.finalitzar"/></a></li>
+								<li class="divider"></li>
+								<li><a href="<c:url value="/expedientTasca/{{:id}}/reassignar"/>" data-toggle="modal"><span class="fa fa-user"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reassignar"/></a></li>
+								{{if !delegada}}
+									<li><a href="<c:url value="/usuariTasca/{{:id}}/delegar"/>" data-toggle="modal"><span class="fa fa-share"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegar"/></a></li>
+								{{else delegada && !usuariActualDelegat}}
+									<li><a href="<c:url value="/usuariTasca/{{:id}}/retomar"/>" data-toggle="modal"><span class="fa fa-remove"></span>&nbsp;&nbsp;<spring:message code="comu.boto.delegacio.desfer"/></a></li>
+								{{/if}}
+								<li class="divider"></li>
+								<li><a href="<c:url value="/expedientTasca/{{:id}}/datalimit"/>" data-toggle="modal"><span class="fa fa-clock-o"></span>&nbsp;&nbsp;<spring:message code="expedient.tasca.list.boto.dataLimit"/></a></li>
+								<li><a 	href="<c:url value="/expedientTasca/{{:id}}/canviarPrioritat"/>" data-toggle="modal"><span class="fa fa-sign-out"></span>&nbsp;<spring:message code="comu.boto.canviarPrioritat"/>...</a></li>
+							{{/if}}
 							{{if estat == 'FINALITZADA'}}
 								<li><a href="<c:url value="/expedientTasca/{{:id}}/reobrir"/>" data-toggle="modal"><span class="fa fa-undo"></span>&nbsp;&nbsp;<spring:message code="comu.boto.reobrir"/></a></li>
 							{{/if}}
@@ -110,8 +128,8 @@ $(document).ready(function() { });
 					</ul>
 				</div>
 			</script>
-			</th>										
-		
+			</th>
+
 		</tr>
 	</thead>
 </table>

@@ -115,6 +115,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long contingutId,
 			@RequestParam(value = "tascaId", required = false) Long tascaId,
+			@RequestParam(value = "origenTasques", required = false) Boolean origenTasques,
 			Model model) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		String organCodi = organGestorService.getOrganCodiFromContingutId(contingutId);
 		SessioHelper.setOrganActual(request, organCodi);
@@ -230,6 +231,7 @@ public class ContingutController extends BaseUserOAdminOOrganController {
 			model.addAttribute("notificacioEnviamentEstats",
 					EnumHelper.getOptionsForEnum(EnviamentEstat.class,
 							"notificacio.enviamentEstat.enum."));
+			model.addAttribute("origenTasques", origenTasques != null && origenTasques);
 			
 	    	if (aplicacioService.mostrarLogsRendiment())
 	    		logger.info("metaDocumentsPerCreacio time (" + contingutId + "):  " + (System.currentTimeMillis() - t11) + " ms");
