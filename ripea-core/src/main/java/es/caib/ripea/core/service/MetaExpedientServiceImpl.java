@@ -3,8 +3,53 @@
  */
 package es.caib.ripea.core.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.acls.model.Permission;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import es.caib.ripea.core.api.dto.*;
+
+import es.caib.ripea.core.api.dto.ArbreDto;
+import es.caib.ripea.core.api.dto.CrearReglaDistribucioEstatEnumDto;
+import es.caib.ripea.core.api.dto.CrearReglaResponseDto;
+import es.caib.ripea.core.api.dto.DominiDto;
+import es.caib.ripea.core.api.dto.EntitatDto;
+import es.caib.ripea.core.api.dto.ExpedientEstatDto;
+import es.caib.ripea.core.api.dto.GrupDto;
+import es.caib.ripea.core.api.dto.MetaDadaDto;
+import es.caib.ripea.core.api.dto.MetaDadaTipusEnumDto;
+import es.caib.ripea.core.api.dto.MetaDocumentDto;
+import es.caib.ripea.core.api.dto.MetaExpedientAmbitEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientCarpetaDto;
+import es.caib.ripea.core.api.dto.MetaExpedientComentariDto;
+import es.caib.ripea.core.api.dto.MetaExpedientDto;
+import es.caib.ripea.core.api.dto.MetaExpedientExportDto;
+import es.caib.ripea.core.api.dto.MetaExpedientFiltreDto;
+import es.caib.ripea.core.api.dto.MetaExpedientRevisioEstatEnumDto;
+import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
+import es.caib.ripea.core.api.dto.OrganGestorDto;
+import es.caib.ripea.core.api.dto.PaginaDto;
+import es.caib.ripea.core.api.dto.PaginacioParamsDto;
+import es.caib.ripea.core.api.dto.PermisDto;
+import es.caib.ripea.core.api.dto.PermissionEnumDto;
+import es.caib.ripea.core.api.dto.PrincipalTipusEnumDto;
+import es.caib.ripea.core.api.dto.ProcedimentDto;
+import es.caib.ripea.core.api.dto.ProgresActualitzacioDto;
+import es.caib.ripea.core.api.dto.ReglaDistribucioDto;
+import es.caib.ripea.core.api.dto.StatusEnumDto;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsEsborratsException;
 import es.caib.ripea.core.api.exception.ExisteixenExpedientsException;
 import es.caib.ripea.core.api.exception.NotFoundException;
@@ -19,7 +64,6 @@ import es.caib.ripea.core.entity.GrupEntity;
 import es.caib.ripea.core.entity.HistoricExpedientEntity;
 import es.caib.ripea.core.entity.HistoricInteressatEntity;
 import es.caib.ripea.core.entity.HistoricUsuariEntity;
-import es.caib.ripea.core.entity.MetaDocumentEntity;
 import es.caib.ripea.core.entity.MetaExpedientComentariEntity;
 import es.caib.ripea.core.entity.MetaExpedientEntity;
 import es.caib.ripea.core.entity.MetaExpedientOrganGestorEntity;
@@ -27,14 +71,31 @@ import es.caib.ripea.core.entity.MetaExpedientTascaEntity;
 import es.caib.ripea.core.entity.MetaNodeEntity;
 import es.caib.ripea.core.entity.OrganGestorEntity;
 import es.caib.ripea.core.entity.UsuariEntity;
-import es.caib.ripea.core.helper.*;
+import es.caib.ripea.core.helper.CacheHelper;
+import es.caib.ripea.core.helper.ConfigHelper;
+import es.caib.ripea.core.helper.ConversioTipusHelper;
+import es.caib.ripea.core.helper.DistribucioReglaHelper;
+import es.caib.ripea.core.helper.DominiHelper;
+import es.caib.ripea.core.helper.EntityComprovarHelper;
+import es.caib.ripea.core.helper.ExceptionHelper;
+import es.caib.ripea.core.helper.ExpedientEstatHelper;
+import es.caib.ripea.core.helper.GrupHelper;
+import es.caib.ripea.core.helper.MessageHelper;
+import es.caib.ripea.core.helper.MetaDadaHelper;
+import es.caib.ripea.core.helper.MetaDocumentHelper;
+import es.caib.ripea.core.helper.MetaExpedientCarpetaHelper;
+import es.caib.ripea.core.helper.MetaExpedientHelper;
+import es.caib.ripea.core.helper.MetaNodeHelper;
+import es.caib.ripea.core.helper.PaginacioHelper;
 import es.caib.ripea.core.helper.PaginacioHelper.Converter;
 import es.caib.ripea.core.helper.PaginacioHelper.ConverterParam;
+import es.caib.ripea.core.helper.PermisosHelper;
+import es.caib.ripea.core.helper.PluginHelper;
+import es.caib.ripea.core.helper.UsuariHelper;
 import es.caib.ripea.core.repository.DominiRepository;
 import es.caib.ripea.core.repository.ExpedientEstatRepository;
 import es.caib.ripea.core.repository.ExpedientRepository;
 import es.caib.ripea.core.repository.GrupRepository;
-import es.caib.ripea.core.repository.MetaDocumentRepository;
 import es.caib.ripea.core.repository.MetaExpedientComentariRepository;
 import es.caib.ripea.core.repository.MetaExpedientOrganGestorRepository;
 import es.caib.ripea.core.repository.MetaExpedientRepository;
@@ -45,21 +106,6 @@ import es.caib.ripea.core.repository.historic.HistoricExpedientRepository;
 import es.caib.ripea.core.repository.historic.HistoricInteressatRepository;
 import es.caib.ripea.core.repository.historic.HistoricUsuariRepository;
 import es.caib.ripea.core.security.ExtendedPermission;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.acls.model.Permission;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Implementació del servei de gestió de meta-expedients.
@@ -69,68 +115,36 @@ import java.util.Map;
 @Service
 public class MetaExpedientServiceImpl implements MetaExpedientService {
 
-	@Autowired
-	private MetaExpedientRepository metaExpedientRepository;
-	@Autowired
-	private MetaDocumentRepository metaDocumentRepository;
-	@Autowired
-	private ExpedientEstatRepository expedientEstatRepository;
-	@Autowired
-	private MetaExpedientTascaRepository metaExpedientTascaRepository;
-	@Autowired
-	private ConversioTipusHelper conversioTipusHelper;
-	@Autowired
-	private MetaNodeHelper metaNodeHelper;
-	@Autowired
-	private PaginacioHelper paginacioHelper;
-	@Autowired
-	private PermisosHelper permisosHelper;
-	@Autowired
-	private EntityComprovarHelper entityComprovarHelper;
-	@Autowired
-	private MetaExpedientHelper metaExpedientHelper;
-	@Autowired
-	private OrganGestorRepository organGestorRepository;
-	@Autowired
-	private ExpedientRepository expedientRepository;
-	@Autowired
-	private UsuariRepository usuariRepository;
-	@Autowired
-	private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
-	@Autowired
-	private PluginHelper pluginHelper;
-	@Autowired
-	private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
-	@Autowired
-	private UsuariHelper usuariHelper;
-	@Autowired
-	private ConfigHelper configHelper;
-	@Autowired
-	private MetaExpedientComentariRepository metaExpedientComentariRepository;
-	@Resource
-	private MetaDocumentHelper metaDocumentHelper;
-	@Resource
-	private MetaDadaHelper metaDadaHelper;
-	@Autowired
-	private ExpedientEstatHelper expedientEstatHelper;
-	@Autowired
-	private GrupHelper grupHelper;
-	@Autowired
-	private GrupRepository grupRepository;
-	@Autowired
-	private DominiRepository dominiRepository;
-	@Autowired
-	private DominiHelper dominiHelper;
-	@Autowired
-	private HistoricExpedientRepository historicExpedientRepository;
-	@Autowired
-	private HistoricInteressatRepository historicInteressatRepository;
-	@Autowired
-	private HistoricUsuariRepository historicUsuariRepository;
-	@Autowired
-	private DistribucioReglaHelper distribucioReglaHelper;
-	@Autowired
-	private CacheHelper cacheHelper;
+	@Autowired private MetaExpedientRepository metaExpedientRepository;
+	@Autowired private ExpedientEstatRepository expedientEstatRepository;
+	@Autowired private MetaExpedientTascaRepository metaExpedientTascaRepository;
+	@Autowired private ConversioTipusHelper conversioTipusHelper;
+	@Autowired private MetaNodeHelper metaNodeHelper;
+	@Autowired private PaginacioHelper paginacioHelper;
+	@Autowired private PermisosHelper permisosHelper;
+	@Autowired private EntityComprovarHelper entityComprovarHelper;
+	@Autowired private MetaExpedientHelper metaExpedientHelper;
+	@Autowired private OrganGestorRepository organGestorRepository;
+	@Autowired private ExpedientRepository expedientRepository;
+	@Autowired private UsuariRepository usuariRepository;
+	@Autowired private MetaExpedientCarpetaHelper metaExpedientCarpetaHelper;
+	@Autowired private PluginHelper pluginHelper;
+	@Autowired private MetaExpedientOrganGestorRepository metaExpedientOrganGestorRepository;
+	@Autowired private UsuariHelper usuariHelper;
+	@Autowired private ConfigHelper configHelper;
+	@Autowired private MetaExpedientComentariRepository metaExpedientComentariRepository;
+	@Autowired private ExpedientEstatHelper expedientEstatHelper;
+	@Autowired private GrupHelper grupHelper;
+	@Autowired private GrupRepository grupRepository;
+	@Autowired private DominiRepository dominiRepository;
+	@Autowired private DominiHelper dominiHelper;
+	@Autowired private HistoricExpedientRepository historicExpedientRepository;
+	@Autowired private HistoricInteressatRepository historicInteressatRepository;
+	@Autowired private HistoricUsuariRepository historicUsuariRepository;
+	@Autowired private DistribucioReglaHelper distribucioReglaHelper;
+	@Autowired private CacheHelper cacheHelper;
+	@Resource private MetaDocumentHelper metaDocumentHelper;
+	@Resource private MetaDadaHelper metaDadaHelper;
 
 	public static Map<String, ProgresActualitzacioDto> progresActualitzacio = new HashMap<>();
 //	public static Map<Long, Integer> metaExpedientsAmbOrganNoSincronitzat = new HashMap<>();
@@ -1047,10 +1061,10 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 				metaExpedientTasca.getDescripcio(),
 				metaExpedientTasca.getResponsable(),
 				metaExpedientTasca.getDataLimit(),
+				metaExpedientTasca.getDuracio(),
+				metaExpedientTasca.getPrioritat(),
 				estatCrearTasca,
 				estatFinalitzarTasca);
-		entity.setDuracio(metaExpedientTasca.getDuracio());
-		entity.setPrioritat(metaExpedientTasca.getPrioritat());
 		if (rolActual.equals("IPA_ORGAN_ADMIN")) {
 			metaExpedientHelper.canviarRevisioADisseny(entitatId, metaExpedientId, organId);
 		}
@@ -1375,52 +1389,13 @@ public class MetaExpedientServiceImpl implements MetaExpedientService {
 		return progres;
 	}
 
-//	@Override
-//	public Integer getMetaExpedientsAmbOrganNoSincronitzat(Long entitatId) {
-//		Integer organsNoSincronitzats = metaExpedientsAmbOrganNoSincronitzat.get(entitatId);
-//		if (organsNoSincronitzats == null) {
-//			organsNoSincronitzats = metaExpedientRepository.countByEntitatIdAndOrganNoSincronitzatTrue(entitatId);
-//			metaExpedientsAmbOrganNoSincronitzat.put(entitatId, organsNoSincronitzats);
-//		}
-//		return organsNoSincronitzats;
-//	}
-
 	@Override
 	@Transactional
 	public void actualitzaProcediments(EntitatDto entitatDto, Locale locale) {
-
 		logger.debug("[PROCEDIMENTS] Inici actualitzar procediments");
 		MessageHelper.setCurrentLocale(locale);
 		metaExpedientHelper.actualitzarProcediments(entitatDto, locale, null);
-
 	}
-
-	private void omplirMetaDocumentsPerMetaExpedients(List<MetaExpedientDto> metaExpedients) {
-		List<Long> metaExpedientIds = new ArrayList<Long>();
-		for (MetaExpedientDto metaExpedient : metaExpedients) {
-			metaExpedientIds.add(metaExpedient.getId());
-		}
-		List<MetaDocumentEntity> metaDocumentsDelsMetaExpedients = null;
-		// Si passam una llista buida dona un error a la consulta.
-		if (metaExpedientIds.size() > 0) {
-			metaDocumentsDelsMetaExpedients = metaDocumentRepository.findByMetaExpedientIdIn(metaExpedientIds);
-		}
-		for (MetaExpedientDto metaExpedient : metaExpedients) {
-			List<MetaDocumentDto> metaDocuments = new ArrayList<MetaDocumentDto>();
-			if (metaDocumentsDelsMetaExpedients != null) {
-				for (MetaDocumentEntity metaDocument : metaDocumentsDelsMetaExpedients) {
-					if (metaDocument.getMetaExpedient().getId().equals(metaExpedient.getId())) {
-						metaDocuments.add(conversioTipusHelper.convertir(metaDocument, MetaDocumentDto.class));
-					}
-				}
-			}
-			metaExpedient.setMetaDocuments(metaDocuments);
-		}
-	}
-
-
-
-
 
 	private MetaExpedientTascaEntity getMetaExpedientTasca(Long entitatId, Long metaExpedientId, Long id) {
 		EntitatEntity entitat = entityComprovarHelper.comprovarEntitatPerMetaExpedients(entitatId);

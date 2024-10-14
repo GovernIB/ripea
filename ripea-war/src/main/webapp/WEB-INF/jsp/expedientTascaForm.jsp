@@ -1,4 +1,4 @@
-<%@page import="es.caib.ripea.war.helper.EnumHelper"%>
+<%@ page import="es.caib.ripea.war.helper.EnumHelper"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib tagdir="/WEB-INF/tags/ripea" prefix="rip"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -7,6 +7,8 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 <c:set var="titol"><spring:message code="expedient.tasca.form.titol.crear"/></c:set>
+<c:set var="idioma"><%=org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).getLanguage()%></c:set>
+
 <html>
 <head>
 	<title>${titol}</title>
@@ -21,6 +23,10 @@
 	<rip:modalHead/>
 	
 	<script type="text/javascript">
+	
+		var userTriggered = true;
+		function aturaSpin() { $(".fa-refresh").removeClass("fa-spin"); }
+
 		$(document).ready(function() {
 		
 			let errorsValidacio = parseBoolean('${errorsValidacio}');
@@ -31,28 +37,53 @@
 				return false;
 			});
 		
-			$('#duracio').on('change', function() {
-				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDuracio",
-				$("#tascaform").serialize())
-				.done(function(data){
-					$('#dataLimit').val(data.dataLimitString);
-					remarcaElement($('#dataLimit'));
-				})
-				.fail(function() {
-					alert("<spring:message code="error.jquery.ajax"/>");
-				});
+			$('#duracio').on('change', function(event) {
+				if ($('#duracio').val()!='' && $('#duracio').val()!='0') {
+					$(".fa-refresh").addClass("fa-spin");
+					$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDuracio",
+					$("#tascaform").serialize())
+					.done(function(data) {
+						//Ara canviam el valor del camp dataLimit, pero no volem executar el onchange
+						userTriggered = false;
+						$('#dataLimit').val(data.dataLimitString);
+						$('#dataLimit').datepicker('update', data.dataLimitString);
+						setTimeout(aturaSpin, 500);
+						remarcaElement($('#dataLimit'), '#d9edf7');
+					})
+					.fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});
+				} else {
+					$('#duracio').val('');
+					userTriggered = false;
+					$('#dataLimit').val('');
+					$('#dataLimit').datepicker('update', '');
+				}						
 			});
 		
-			$('#dataLimit').on('change', function() {
-				$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDataLimit",
-				$("#tascaform").serialize())
-				.done(function(data){
-					$('#duracio').val(data.duracio);
-					remarcaElement($('#duracio'));
-				})
-				.fail(function() {
-					alert("<spring:message code="error.jquery.ajax"/>");
-				});
+			$('#dataLimit').on('change', function(event) {
+				if (userTriggered) {
+					$(".fa-refresh").addClass("fa-spin");
+					$.post("<c:url value="/expedientTasca/"/>" + $('#metaExpedientTascaId').val() + "/changedDataLimit",
+					$("#tascaform").serialize())
+					.done(function(data){
+						if (data.duracio>0) {
+							$('#duracio').val(data.duracio);
+						} else {
+							$('#duracio').val('');
+							userTriggered = false;
+							$('#dataLimit').val('');
+							$('#dataLimit').datepicker('update', '');
+						}
+						setTimeout(aturaSpin, 500);
+						remarcaElement($('#duracio'), '#d9edf7');
+					})
+					.fail(function() {
+						alert("<spring:message code="error.jquery.ajax"/>");
+					});
+				} else {
+					userTriggered = true;
+				}
 			});
 			
 			$('#metaExpedientTascaId').on('change', function() {
@@ -123,15 +154,23 @@
 			suggestText="nom"
 			comment="expedient.tasca.form.camp.observador.comentari"
 			multiple="true"/>
-		<rip:inputText
-				name="duracio"
-				textKey="tasca.list.column.duracio"
-				tooltip="true"
-				comment="tasca.list.column.duracio.tip"
-				tooltipMsg="tasca.list.column.duracio.tip"/>
-		<rip:inputDate
-			name="dataLimit"
-			textKey="expedient.tasca.list.boto.dataLimit"/>
+			
+		<div class="form-group">
+			<label class="control-label col-xs-4" for="duracio"><spring:message code="tasca.list.column.duracio"/></label>
+			<div class="col-xs-3" style="padding-right: 0px;">
+				<form:input id="duracio" path="duracio" cssClass="form-control"/>
+				<p class="comentari"><spring:message code="tasca.list.column.duracio.tip"/></p>
+			</div>
+			<c:set var="tipSincroDuracio"><spring:message code="expedient.tasca.form.tipSincroDuracio"/></c:set>
+			<div class="col-xs-1" style=" text-align: center; padding: 6px 0 0 0;" title="${tipSincroDuracio}">
+				<span class="fa fa-lg  fa-refresh" style="color: darkgrey;"></span>
+			</div>
+			<div class="col-xs-4" style="padding-left: 0px;">
+				<form:input id="dataLimit" path="dataLimit" cssClass="form-control datepicker" data-toggle="datepicker" data-idioma="${idioma}"/>
+				<p class="comentari"><spring:message code="expedient.tasca.list.columna.dataLimit"/></p>
+			</div>
+		</div>
+
 		<rip:inputText 
 			name="titol"
 			textKey="expedient.tasca.form.camp.titol"

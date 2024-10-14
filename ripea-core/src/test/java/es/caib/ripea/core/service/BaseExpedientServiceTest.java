@@ -192,7 +192,8 @@ public class BaseExpedientServiceTest extends BaseServiceTest {
 								null, 
 								null,
 								null,
-								PrioritatEnumDto.B_NORMAL);
+								PrioritatEnumDto.B_NORMAL,
+								null);
 						try {
 							elementsCreats.add(creat);
 							testAmbExpedientCreat.executar(elementsCreats);

@@ -12,8 +12,8 @@ function webutilRefreshMissatges() {
 	$('#contingut-missatges').load(webutilContextPath() + "/nodeco/missatges");
 }
 
-function remarcaElement(jQueryElem) {
-	jQueryElem[0].animate({ backgroundColor: 'aliceblue' }, 500);
+function remarcaElement(jQueryElem, color) {
+	jQueryElem[0].animate({ backgroundColor: color }, 500);
 }
 
 function changedPrioritat() {

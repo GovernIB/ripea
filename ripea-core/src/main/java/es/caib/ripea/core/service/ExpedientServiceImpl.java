@@ -1708,8 +1708,8 @@ public class ExpedientServiceImpl implements ExpedientService {
 			ordenacioMap.put("createdBy.codiAndNom", new String[] {"createdBy.nom"});
 			ordenacioMap.put("agafatPer.codiAndNom", new String[] {"agafatPer.codi"});
 			ordenacioMap.put("estat", new String[] {"estatAdditional", "estat", "id"});
-			ordenacioMap.remove("tipusStr");
-			
+			paginacioParams.eliminaCampOrdenacio("tipusStr");
+
 			Pageable pageable = paginacioHelper.toSpringDataPageable(paginacioParams, ordenacioMap);
 			Page<ExpedientEntity> paginaExpedients = expedientRepository.findByEntitatAndPermesosAndFiltre(
 					entitat,
