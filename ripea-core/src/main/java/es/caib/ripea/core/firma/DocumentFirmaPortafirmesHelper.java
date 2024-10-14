@@ -27,7 +27,6 @@ import es.caib.ripea.core.api.dto.DocumentFirmaTipusEnumDto;
 import es.caib.ripea.core.api.dto.DocumentPortafirmesDto;
 import es.caib.ripea.core.api.dto.DocumentTipusEnumDto;
 import es.caib.ripea.core.api.dto.EntitatDto;
-import es.caib.ripea.core.api.dto.FitxerAmbFirmaArxiuDto;
 import es.caib.ripea.core.api.dto.FitxerDto;
 import es.caib.ripea.core.api.dto.LogObjecteTipusEnumDto;
 import es.caib.ripea.core.api.dto.LogTipusEnumDto;
@@ -36,15 +35,12 @@ import es.caib.ripea.core.api.dto.MetaDocumentFirmaSequenciaTipusEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesBlockDto;
 import es.caib.ripea.core.api.dto.PortafirmesCallbackEstatEnumDto;
 import es.caib.ripea.core.api.dto.PortafirmesPrioritatEnumDto;
-import es.caib.ripea.core.api.exception.NotFoundException;
 import es.caib.ripea.core.api.exception.SistemaExternException;
 import es.caib.ripea.core.api.exception.ValidationException;
-import es.caib.ripea.core.api.service.AplicacioService;
 import es.caib.ripea.core.entity.DocumentEntity;
 import es.caib.ripea.core.entity.DocumentPortafirmesEntity;
 import es.caib.ripea.core.entity.DocumentViaFirmaEntity;
 import es.caib.ripea.core.entity.PortafirmesBlockEntity;
-import es.caib.ripea.core.entity.PortafirmesBlockInfoEntity;
 import es.caib.ripea.core.helper.AlertaHelper;
 import es.caib.ripea.core.helper.CacheHelper;
 import es.caib.ripea.core.helper.ConfigHelper;
@@ -59,7 +55,6 @@ import es.caib.ripea.core.helper.PluginHelper;
 import es.caib.ripea.core.repository.DocumentPortafirmesRepository;
 import es.caib.ripea.core.repository.DocumentRepository;
 import es.caib.ripea.core.repository.DocumentViaFirmaRepository;
-import es.caib.ripea.core.repository.PortafirmesBlockInfoRepository;
 import es.caib.ripea.core.repository.PortafirmesBlockRepository;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocument;
 import es.caib.ripea.plugin.portafirmes.PortafirmesDocumentFirmant;
@@ -87,11 +82,7 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 	@Autowired
 	private DocumentHelper documentHelper;
 	@Autowired
-	private AplicacioService aplicacioService;
-	@Autowired
 	private PortafirmesBlockRepository portafirmesBlockRepository;
-	@Autowired
-	private PortafirmesBlockInfoRepository portafirmesBlockInfoRepository;
 	@Autowired
 	private DocumentViaFirmaRepository documentViaFirmaRepository;
 	@Autowired
@@ -527,42 +518,6 @@ public class DocumentFirmaPortafirmesHelper extends DocumentFirmaHelper{
 		}
 		return portafirmesDocument;
 	}
-	
-	
-	private FitxerAmbFirmaArxiuDto getFitxerAmbFirma(PortafirmesDocument portafirmesDocument, DocumentEntity document) {
-		FitxerAmbFirmaArxiuDto fitxerAmbFirmaArxiuDto = new FitxerAmbFirmaArxiuDto();
-		FitxerDto fitxer = new FitxerDto();
-		
-		ArxiuFirmaDto arxiuFirma = new ArxiuFirmaDto();
-		
-		fitxer = documentHelper.getFitxerAssociatFirmat(
-				document, 
-				null);
-		arxiuFirma.setFitxerNom(portafirmesDocument.getArxiuNom());
-		arxiuFirma.setContingut(portafirmesDocument.getArxiuContingut());
-		arxiuFirma.setTipusMime(portafirmesDocument.getArxiuMime());
-		arxiuFirma.setTipus(ArxiuFirmaTipusEnumDto.CADES_DET);
-		arxiuFirma.setPerfil(ArxiuFirmaPerfilEnumDto.BES);
-		
-		List<ArxiuFirmaDetallDto> detalls = new ArrayList<ArxiuFirmaDetallDto>();
-		for (PortafirmesDocumentFirmant firmant: portafirmesDocument.getFirmants()) {
-			ArxiuFirmaDetallDto detall = new ArxiuFirmaDetallDto();
-			detall.setData(firmant.getData());
-			detall.setEmissorCertificat(firmant.getEmissorCertificat());
-			detall.setResponsableNif(firmant.getResponsableNif());
-			detall.setResponsableNom(firmant.getResponsableNom());
-			detalls.add(detall);
-		}
-		arxiuFirma.setDetalls(detalls);
-		arxiuFirma.setAutofirma(true);
-		
-		
-		fitxerAmbFirmaArxiuDto.setFitxer(fitxer);
-		fitxerAmbFirmaArxiuDto.setArxiuFirma(arxiuFirma);
-		
-		return fitxerAmbFirmaArxiuDto;
-	}
-	
 	
 	public void portafirmesCancelar(
 			Long entitatId,

@@ -221,7 +221,7 @@ public class MetaExpedientTascaController extends BaseAdminController {
 			return "metaExpedientTascaForm";
 		}
 		
-		if (command.getDuracio()!=null && command.getDuracio()<0) { command.setDuracio(0); }
+		if (command.getDuracio()!=null && command.getDuracio()<0) { command.setDuracio(null); }
 		
 		if (command.getId() == null) {
 			//CREATE

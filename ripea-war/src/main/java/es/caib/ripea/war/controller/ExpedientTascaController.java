@@ -31,7 +31,6 @@ import es.caib.ripea.core.api.dto.ExpedientTascaDto;
 import es.caib.ripea.core.api.dto.MetaExpedientTascaDto;
 import es.caib.ripea.core.api.dto.TascaEstatEnumDto;
 import es.caib.ripea.core.api.service.AplicacioService;
-import es.caib.ripea.core.api.service.ConfigService;
 import es.caib.ripea.core.api.service.ExpedientService;
 import es.caib.ripea.core.api.service.ExpedientTascaService;
 import es.caib.ripea.war.command.ExpedientTascaCommand;
@@ -54,7 +53,6 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 	@Autowired private ExpedientTascaService expedientTascaService;
 	@Autowired private ExpedientService expedientService;
 	@Autowired private AplicacioService aplicacioService;
-	@Autowired private ConfigService configService;
 
 	@RequestMapping(value = "/{expedientId}/datatable", method = RequestMethod.GET)
 	@ResponseBody
@@ -207,13 +205,12 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			@PathVariable Long metaExpedientTascaId,
 			Model model) {
 		MetaExpedientTascaDto resultat = expedientTascaService.findMetaExpedientTascaById(metaExpedientTascaId);
-		Calendar cal = Calendar.getInstance();
-		if (resultat.getDuracio()==null) {
-			String duracioTascaConf = configService.getConfigValue("es.caib.ripea.duracio.tasca");
-			resultat.setDuracio(duracioTascaConf!=null?Integer.parseInt(duracioTascaConf):10);
-		}		
-		cal.add(Calendar.DAY_OF_YEAR, resultat.getDuracio());
-		resultat.setDataLimit(cal.getTime());
+		//Com que estam creant una tasca nova, la data limit no es la del procediment, sino avui+duració de la tasca.
+		if (resultat.getDuracio()!=null) {
+			Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.DAY_OF_YEAR, resultat.getDuracio());
+			resultat.setDataLimit(cal.getTime());
+		}
 		return resultat;
 	}
 	
@@ -248,13 +245,21 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			@PathVariable Long metaExpedientTascaId,
 			@ModelAttribute("expedientTascaCommand") ExpedientTascaCommand expedientTascaCommand,
 			Model model) {
+		
 		if (expedientTascaCommand.getDataLimit()!=null) {
-			long avui  = Calendar.getInstance().getTimeInMillis();
-			long limit = expedientTascaCommand.getDataLimit().getTime();
-			long diff = limit-avui;
-			//La data limit no pot ser anterior al dia d'avui
+			
+			//La data limit no podrà ser anterior a la data d'inici de la tasca (si s'esta creant, serà la data d'avui)
+			Calendar calIni = Calendar.getInstance();
+			if (expedientTascaCommand.getDataInici()!=null) {
+				calIni.setTime(expedientTascaCommand.getDataInici());
+			}
+			
+			Calendar calFin = Calendar.getInstance();
+			calFin.setTime(expedientTascaCommand.getDataLimit());
+			
+			long diff = calFin.getTimeInMillis()-calIni.getTimeInMillis();
+
 			if (diff<=0) {
-				expedientTascaCommand.setDataLimit(Calendar.getInstance().getTime());
 				expedientTascaCommand.setDuracio(0);
 			} else {
 				//La data de limit es posterior a avui, calculam durada

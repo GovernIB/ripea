@@ -67,37 +67,37 @@ public class SchedulingConfig implements SchedulingConfigurer {
             //taskRegistrar.destroy();
             //taskRegistrar.afterPropertiesSet();
             if (codiTancarExpedientsEnArxiu.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("tancarExpedientsEnArxiu", getTrigger(taskCodi));
+                rescheduleTask("tancarExpedientsEnArxiu", getTrigger(codiTancarExpedientsEnArxiu));
             }
             if (codiEnviarDocumentsAlPortafirmes.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("enviarDocumentsAlPortafirmes", getTrigger(taskCodi));
+                rescheduleTask("enviarDocumentsAlPortafirmes", getTrigger(codiEnviarDocumentsAlPortafirmes));
             }
             if (codiConsultarIGuardarAnotacionsPendents.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("consultarIGuardarAnotacionsPendents", getTrigger(taskCodi));
+                rescheduleTask("consultarIGuardarAnotacionsPendents", getTrigger(codiConsultarIGuardarAnotacionsPendents));
             }
             if (codiCanviarEstatEnDistribucio.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("canviarEstatEnDistribucio", getTrigger(taskCodi));
+                rescheduleTask("canviarEstatEnDistribucio", getTrigger(codiCanviarEstatEnDistribucio));
             }
             if (codiEnviarEmailsInformantDeNouComentariPerProcediment.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("enviarEmailsInformantDeNouComentariPerProcediment", getTrigger(taskCodi));
+                rescheduleTask("enviarEmailsInformantDeNouComentariPerProcediment", getTrigger(codiEnviarEmailsInformantDeNouComentariPerProcediment));
             }
             if (codiEnviarEmailsAgrupats.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("enviarEmailsAgrupats", getTrigger(taskCodi));
+                rescheduleTask("enviarEmailsAgrupats", getTrigger(codiEnviarEmailsAgrupats));
             }
             if (codiGuardarEnArxiuContingutsPendents.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("guardarEnArxiuContingutsPendents", getTrigger(taskCodi));
+                rescheduleTask("guardarEnArxiuContingutsPendents", getTrigger(codiGuardarEnArxiuContingutsPendents));
             }
             if (codiGuardarEnArxiuInteressats.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("guardarEnArxiuInteressats", getTrigger(taskCodi));
+                rescheduleTask("guardarEnArxiuInteressats", getTrigger(codiGuardarEnArxiuInteressats));
             }
             if (codiActualitzacioDeProcediments.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("actualitzacioDeProcediments", getTrigger(taskCodi));
+                rescheduleTask("actualitzacioDeProcediments", getTrigger(codiActualitzacioDeProcediments));
             }
             if (codiConsultaDeCanvisAlOrganigrama.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("consultaDeCanvisAlOrganigrama", getTrigger(taskCodi));
+                rescheduleTask("consultaDeCanvisAlOrganigrama", getTrigger(codiConsultaDeCanvisAlOrganigrama));
             }
             if (codiBuidarCachesDominis.equals(taskCodi) || "totes".equals(taskCodi)) {
-                rescheduleTask("buidarCachesDominis", getTrigger(taskCodi));
+                rescheduleTask("buidarCachesDominis", getTrigger(codiBuidarCachesDominis));
             }
         }
     }

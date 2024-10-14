@@ -195,6 +195,7 @@
 				<th data-col-name="metaExpedientTascaDescAbrv" data-orderable="false" data-visible="false"></th>
 				<th data-col-name="dataInici" data-converter="datetime" width="8%"><spring:message code="expedient.tasca.list.columna.dataInici"/></th>
 				<th data-col-name="shouldNotifyAboutDeadline" data-visible="false"></th>
+				<th data-col-name="dataLimitExpirada" data-visible="false"></th>
 				<th data-col-name="duracioFormat" data-visible="false"></th>
 				<th data-col-name="agafada" data-visible="false"></th>
 				<th data-col-name="usuariActualObservador" data-visible="false"></th>
@@ -202,17 +203,24 @@
 				<th data-col-name="usuariActualDelegat" data-visible="false"></th>
 				<th data-col-name="responsableActual.codi" data-orderable="false" width="12%"><spring:message code="expedient.tasca.list.columna.responsable.actual"/></th>
 				<th data-col-name="dataLimitString" width="8%" data-orderable="false" data-template="#cellTascaDeadlineTemplate" >
-					<spring:message code="expedient.tasca.list.boto.dataLimit"/>
+					<spring:message code="expedient.tasca.list.columna.dataLimit"/>
 					<script id="cellTascaDeadlineTemplate" type="text/x-jsrender">
-					{{if shouldNotifyAboutDeadline}}
+					{{if dataLimitExpirada}}
 							<span style="color: red;" title="Duració estimada {{:duracioFormat}}">                            
                                 {{:dataLimitString}}
                                 <span class="fa fa-clock-o"></span>
                             </span>
-                    {{else}}
-						<span title="Duració estimada {{:duracioFormat}}">  
-                        	{{:dataLimitString}}
-						</span>
+					{{else}}
+						{{if shouldNotifyAboutDeadline}}
+							<span style="color: orange;" title="Duració estimada {{:duracioFormat}}">                            
+                                {{:dataLimitString}}
+                                <span class="fa fa-clock-o"></span>
+                            </span>
+                    	{{else}}
+							<span title="Duració estimada {{:duracioFormat}}">  
+                        		{{:dataLimitString}}
+							</span>
+                    	{{/if}}
                     {{/if}}
 					</script>
 				</th>

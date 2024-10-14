@@ -10,10 +10,12 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
 	
@@ -271,6 +273,46 @@ public class Utils {
 		return str;
 	}
 	
+	public static String diesRestantsToString(Date dataLimit) {
+		if (dataLimit!=null) {
+			Calendar dFin = Calendar.getInstance();
+			dFin.setTime(dataLimit);
+			Calendar dAvui = Calendar.getInstance();
+			if (dFin.before(dAvui)) {
+				return "Data límit expirada.";
+			} if (mateixDia(dFin, dAvui)) {
+				return "La data límit és avui.";
+			} else {
+				long diffInMillies = dFin.getTimeInMillis()-dAvui.getTimeInMillis();
+				long diasDiferencia = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS)+1;
+				return "Falten "+diasDiferencia+" dies.";
+			}
+		}
+		return null;
+	}
+	
+	public static boolean mateixDia(Calendar data1, Calendar data2) {
+		if (data1!=null && data2!=null) {
+			if (data1.get(Calendar.DAY_OF_MONTH)==data2.get(Calendar.DAY_OF_MONTH) &&
+				data1.get(Calendar.MONTH)==data2.get(Calendar.MONTH) &&
+				data1.get(Calendar.YEAR)==data2.get(Calendar.YEAR)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	public static void truncarDate(Calendar dataLimit) {
+		if (dataLimit!=null) {
+			dataLimit.set(Calendar.HOUR_OF_DAY, 0);
+			dataLimit.set(Calendar.MINUTE, 0);
+			dataLimit.set(Calendar.SECOND, 0);
+			dataLimit.set(Calendar.MILLISECOND, 0);
+		}
+	}
+	
 	public static String duracioEnDiesToString(Integer dies) {
 		
 		if (dies!=null) {
@@ -292,27 +334,27 @@ public class Utils {
 					}
 					if (remainingDays>0) {
 						if (remainingDays==1) {
-							retorn += ", " + remainingDays + " dia";
+							retorn += " i " + remainingDays + " dia";
 						} else {
-							retorn += ", " + remainingDays + " dies";
+							retorn += " i " + remainingDays + " dies";
 						}
 					}
 					
-					if (retorn.startsWith(", ")) {
-						return retorn.substring(2, retorn.length());
+					if (retorn.startsWith(" i ")) {
+						return retorn.substring(3, retorn.length())+".";
 					} else {
-						return retorn;
+						return retorn+".";
 					}			
 					
 				} else {
 					return "El mateix dia.";
 				}
 			} catch (Exception ex) {
-				return dies + " dies";
+				return dies + " dies.";
 			}
 
 		} else {
-			return "Duració no definida.";
+			return "";
 		}
 	}
 	
@@ -326,5 +368,16 @@ public class Utils {
 		}
 
 		return !valor1.equals(valor2); // Comparación de valores no nulos
+	}
+	
+	public static String extractNumbers(String str) {
+		if (str==null) return null;
+		StringBuilder numbers = new StringBuilder();
+		for (char c : str.toCharArray()) {
+			if (Character.isDigit(c)) {
+				numbers.append(c);
+			}
+		}
+		return numbers.toString();
 	}
 }

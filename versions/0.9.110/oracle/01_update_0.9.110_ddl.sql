@@ -7,10 +7,10 @@ ALTER TABLE ipa_expedient ADD prioritat_motiu VARCHAR2(1024 CHAR);
 
 -- 1507
 ALTER TABLE ipa_expedient_tasca ADD prioritat VARCHAR2(16 CHAR) DEFAULT 'B_NORMAL';
-ALTER TABLE ipa_expedient_tasca ADD duracio NUMBER(19,0) DEFAULT 10;
+ALTER TABLE ipa_expedient_tasca ADD duracio NUMBER(19,0);
 
 ALTER TABLE ipa_metaexp_tasca ADD prioritat VARCHAR2(16 CHAR) DEFAULT 'B_NORMAL';
-ALTER TABLE ipa_metaexp_tasca ADD duracio NUMBER(19,0) DEFAULT 10;
+ALTER TABLE ipa_metaexp_tasca ADD duracio NUMBER(19,0);
 
 -- 1532
 ALTER TABLE IPA_INTERESSAT MODIFY organ_nom VARCHAR2(256 CHAR);

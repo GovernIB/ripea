@@ -16,3 +16,17 @@ INSERT INTO ipa_config (key, description, group_code, position, jboss_property, 
 INSERT INTO ipa_config (key, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.plugin.summarize.gpt.apiKey', 'ApiKey d''accés al servei de resum GPT', 'SUMMARIZE', '4', '0', 'TEXT', '1', '1');
 INSERT INTO ipa_config (key, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.plugin.summarize.model', 'Model de IA a utilitzar si escau.', 'SUMMARIZE', '0', '0', 'TEXT', '1', '1');
 INSERT INTO ipa_config (key, description, group_code, position, jboss_property, type_code, configurable, configurable_organ) VALUES ('es.caib.ripea.plugin.summarize.model.maxTokens', 'Maxim de tokens (tipicament paraules, pero no sempre) que soporta el model en la peticio i resposta combinats.', 'SUMMARIZE', '0', '0', 'INT', '1', '1');
+
+-- 1502
+UPDATE IPA_METANODE SET NOM=TRIM(NOM);
+
+-- 1068
+UPDATE ipa_expedient_tasca SET DURACIO = CASE 
+WHEN (DATA_LIMIT IS NULL OR DATA_INICI IS NULL) THEN NULL 
+WHEN DATA_LIMIT < DATA_INICI THEN NULL
+ELSE CEIL(EXTRACT(DAY FROM (DATA_LIMIT - DATA_INICI)) + 1) END;
+
+UPDATE IPA_METAEXP_TASCA SET DURACIO = CASE 
+WHEN (DATA_LIMIT IS NULL OR CREATEDDATE IS NULL) THEN NULL 
+WHEN DATA_LIMIT < CREATEDDATE THEN NULL
+ELSE CEIL(EXTRACT(DAY FROM (DATA_LIMIT - CREATEDDATE)) + 1) END;

@@ -24,7 +24,7 @@ public class TascaHelper {
 		try {
 
 			boolean shouldNotifyAboutDeadline = false;
-			int preavisDataLimitEnDies = configHelper.getAsInt("es.caib.ripea.tasca.preavisDataLimitEnDies");
+			int preavisDataLimitEnDies = configHelper.getAsInt("es.caib.ripea.tasca.preavisDataLimitEnDies", 3);
 
 			if (expedientTascaEntity.getDataLimit() != null) {
 				if ((new Date()).after(new DateTime(expedientTascaEntity.getDataLimit()).minusDays(preavisDataLimitEnDies).toDate())) {

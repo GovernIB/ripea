@@ -181,7 +181,7 @@ function descarregarDocumentExport() {
 	id="taulaInteressats" 
 	data-url="<c:url value="/contingut/${expedientId}/interessat/datatable"/>" 
 	data-paging-enabled="false"
-	data-botons-template="#taulaInteressatsNouBoton" 
+	data-botons-template="#taulaInteressatsNouBoton"
 	class="table table-striped table-bordered" 
 	style="width:100%"
 	data-row-info="true">
