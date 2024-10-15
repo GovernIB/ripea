@@ -140,22 +140,20 @@ public class ExpedientTascaController extends BaseUserOAdminOOrganController {
 			HttpServletRequest request,
 			@PathVariable Long expedientTascaId,
 			Model model) {
+		
 		getEntitatActualComprovantPermisos(request);
 		
-		expedientTascaService.canviarTascaEstat(
+		ExpedientTascaDto expedientTascaDto = expedientTascaService.canviarTascaEstat(
 				expedientTascaId,
 				TascaEstatEnumDto.CANCELLADA,
 				null,
 				RolHelper.getRolActual(request));
-		//TODO Es necessari recuperar de nou la tasca? canviarTascaEstat ja retorna un objecte ExpedientTascaDto 
-		ExpedientTascaDto expedientTascaDto = expedientTascaService.findOne(expedientTascaId);
+		
 		return getAjaxControllerReturnValueSuccess(
 				request,
 				"redirect:/expedientTasca",
-//				"redirect:/contingut/" + expedientTascaDto.getExpedient().getId(),
 				"expedient.tasca.controller.cancellada.ok",
-				new Object[]{expedientTascaDto.getTitol()});
-
+				new Object[]{expedientTascaDto.getTitol()!=null?expedientTascaDto.getTitol():expedientTascaDto.getMetaExpedientTascaDescAbrv()});
 	}	
 	
 	@RequestMapping(value="/{expedientId}/tasca", method = RequestMethod.POST)

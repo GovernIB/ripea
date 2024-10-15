@@ -106,7 +106,10 @@
 				<span class="fa fa-lg fa-refresh" style="color: darkgrey;"></span>
 			</div>
 			<div class="col-xs-4" style="padding-left: 0px;">
-				<form:input id="dataLimit" path="dataLimit" cssClass="form-control datepicker" data-toggle="datepicker" data-idioma="${idioma}"/>
+				<div class="input-group" style="width:100%">
+					<form:input id="dataLimit" path="dataLimit" cssClass="form-control datepicker" data-toggle="datepicker" data-idioma="${requestLocale}"/>
+					<span class="input-group-addon" style="width:1%"><span class="fa fa-calendar"></span></span>
+				</div>
 				<p class="comentari"><spring:message code="expedient.tasca.list.columna.dataLimit"/></p>
 			</div>
 		</div>
